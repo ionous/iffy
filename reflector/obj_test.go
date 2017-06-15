@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestObjects(t *testing.T) {
+func xTestObjectGetSet(t *testing.T) {
 	assert := assert.New(t)
 	test := func(n ref.Object) {
 		var name string

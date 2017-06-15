@@ -24,8 +24,7 @@ func (n *RefInst) GetClass() (ret ref.Class) {
 // GetValue stores the value into the pointer pv.
 // Values include ref.Objects for relations and pointers, numbers, and text. For numbers, pv can be any numberic type: float64, int, etc.
 func (n *RefInst) GetValue(name string, pv interface{}) (err error) {
-	id := MakeId(name)
-
+	//	id := MakeId(name)
 	panic("not implemented")
 	return
 }
