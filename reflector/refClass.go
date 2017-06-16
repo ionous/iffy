@@ -6,11 +6,12 @@ import (
 )
 
 type RefClass struct {
-	id     string
-	rtype  r.Type // mainly for equality building tests
-	meta   Metadata
-	parent *RefClass
-	props  []ref.Property // RefProp, RefEnum, etc.
+	id        string
+	rtype     r.Type // mainly for equality building tests
+	meta      Metadata
+	parent    *RefClass
+	parentIdx int            // index of parent aggregate in rtype; valid if parent!= nil
+	props     []ref.Property // RefProp, RefEnum, etc.
 }
 
 // findId returns the field name in rtype containing id.
@@ -65,14 +66,29 @@ func (c *RefClass) GetProperty(name string) (ret ref.Property, okay bool) {
 }
 
 // GetPropertyByChoice evaluates all properties to find an enumeration which can store the passed choice
-func (c *RefClass) GetPropertyByChoice(choice string) (ret ref.Property, okay bool) {
+func (c *RefClass) GetPropertyByChoice(choice string) (ref.Property, bool) {
 	id := MakeId(choice)
-	for _, p := range c.props {
-		if p, ok := p.(*RefEnum); ok {
-			if i := p.ChoiceToIndex(id); i >= 0 {
-				ret, okay = p, true
-				break
+	r, _, _ := c.getPropertyByChoice(id)
+	return r, r != nil
+}
+
+func (c *RefClass) getPropertyByChoice(id string) (ret *RefEnum, path []int, value int) {
+	for {
+		for _, p := range c.props {
+			if p, ok := p.(*RefEnum); ok {
+				if i := p.choiceToIndex(id); i >= 0 {
+					ret = p
+					path = append(path, p.fieldIdx)
+					value = i
+					break
+				}
 			}
+		}
+		if ret != nil && c.parent == nil {
+			break
+		} else {
+			c = c.parent
+			path = append(path, c.parentIdx)
 		}
 	}
 	return

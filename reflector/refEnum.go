@@ -32,6 +32,10 @@ type Enumeration []Choice
 
 func (enum Enumeration) ChoiceToIndex(choice string) (ret int) {
 	id := MakeId(choice)
+	return enum.choiceToIndex(id)
+}
+
+func (enum Enumeration) choiceToIndex(id string) (ret int) {
 	found := false
 	for i, c := range enum {
 		if id == c.Id() {

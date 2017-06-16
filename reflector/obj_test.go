@@ -6,21 +6,29 @@ import (
 	"testing"
 )
 
-func xTestObjectGetSet(t *testing.T) {
+func TestObjectGetSet(t *testing.T) {
 	assert := assert.New(t)
 	test := func(n ref.Object) {
-		var name string
-		assert.NoError(n.GetValue("name", &name))
+		state := false
+		if e := n.GetValue("yes", &state); assert.NoError(e) {
+			assert.True(state)
+		}
+		if e := n.GetValue("maybe", &state); assert.NoError(e) {
+			assert.False(state)
+		}
+
+		// var name string
+		// assert.NoError(n.GetValue("name", &name))
 
 		// test text
-		{
-			var v string
-			assert.NoError(n.GetValue("text", &v))
-			assert.Empty(v)
-			assert.NoError(n.SetValue("text", "something"))
-			assert.NoError(n.GetValue("text", &v))
-			assert.Equal("something", v)
-		}
+		// {
+		// 	var v string
+		// 	assert.NoError(n.GetValue("text", &v))
+		// 	assert.Empty(v)
+		// 	assert.NoError(n.SetValue("text", "something"))
+		// 	assert.NoError(n.GetValue("text", &v))
+		// 	assert.Equal("something", v)
+		// }
 
 		// text number: float and int
 
@@ -28,8 +36,8 @@ func xTestObjectGetSet(t *testing.T) {
 
 		// pointers.... and relations?
 	}
-	b := BaseClass{Name: "first-instance"}
-	d := DerivedClass{BaseClass{Name: "second-instance"}}
+	b := BaseClass{Name: "first-instance", State: Yes}
+	d := DerivedClass{BaseClass{Name: "second-instance", State: Yes}}
 	if m, e := MakeModel(b, d); assert.NoError(e) {
 		if n, ok := m.GetObject("first-instance"); assert.True(ok) {
 			assert.Equal("$firstInstance", n.GetId())

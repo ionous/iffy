@@ -80,7 +80,7 @@ func (cs *ClassSet) AddClass(rtype r.Type) (ret *RefClass, err error) {
 		cs.linear = append(cs.linear, cls)
 
 		// parse the properties
-		if ptype, props, e := MakeProperties(rtype, &cls.meta); e != nil {
+		if ptype, pidx, props, e := MakeProperties(rtype, &cls.meta); e != nil {
 			err = e
 		} else {
 			cls.props = props
@@ -91,6 +91,7 @@ func (cs *ClassSet) AddClass(rtype r.Type) (ret *RefClass, err error) {
 					err = e
 				} else {
 					cls.parent = p
+					cls.parentIdx = pidx
 					ret = cls
 				}
 			}
@@ -99,11 +100,12 @@ func (cs *ClassSet) AddClass(rtype r.Type) (ret *RefClass, err error) {
 	return
 }
 
-func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, props []ref.Property, err error) {
+func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int, props []ref.Property, err error) {
 	ids := make(map[string]string)
 	//
 	for i, cnt := 0, rtype.NumField(); i < cnt; i++ {
 		field := rtype.Field(i)
+
 		//
 		if len(field.PkgPath) > 0 {
 			err = errutil.New("expected only exportable fields", field.Name)
@@ -117,6 +119,7 @@ func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, props []ref.P
 					break
 				} else {
 					parent = field.Type
+					parentIdx = i
 				}
 			} else {
 				id := MakeId(field.Name)

@@ -88,7 +88,7 @@ func TestClassProperties(t *testing.T) {
 	assert := assert.New(t)
 	base := r.TypeOf((*BaseClass)(nil)).Elem()
 	var md Metadata
-	if parent, props, e := MakeProperties(base, &md); assert.NoError(e) {
+	if parent, _, props, e := MakeProperties(base, &md); assert.NoError(e) {
 		assert.Nil(parent)
 		for i, v := range expected() {
 			p := props[i]
@@ -102,7 +102,7 @@ func TestClassProperties(t *testing.T) {
 	}
 	var dd Metadata
 	derived := r.TypeOf((*DerivedClass)(nil)).Elem()
-	if parent, props, e := MakeProperties(derived, &dd); assert.NoError(e) {
+	if parent, _, props, e := MakeProperties(derived, &dd); assert.NoError(e) {
 		assert.Equal(base, parent)
 		assert.Len(props, 0)
 	}
