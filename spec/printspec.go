@@ -4,20 +4,20 @@ import (
 	"fmt"
 )
 
-func PrintArray(cmds []*Command) {
-	printArg(&(cmds), "", "")
+func PrintSpec(cmd *Command) {
+	printCmd(cmd, "", "")
 }
 
 func printCmd(cmd *Command, space, header string) {
-	if len(cmd.name) > 0 {
-		fmt.Println(space, header, cmd.name)
+	if len(cmd.Name) > 0 {
+		fmt.Println(space, header, cmd.Name)
 	}
 	space = space + " "
-	for _, arg := range cmd.args {
+	for _, arg := range cmd.Args {
 		dash := fmt.Sprint(space, "-")
 		printArg(arg, space, dash)
 	}
-	for k, arg := range cmd.keys {
+	for k, arg := range cmd.Keys {
 		dash := fmt.Sprint(space, "- ", k)
 		printArg(arg, space, dash)
 	}
@@ -27,10 +27,10 @@ func printArg(arg interface{}, space, header string) {
 	switch arg := arg.(type) {
 	case *Command:
 		printCmd(arg, space, header)
-	case *[]*Command:
+	case *Commands:
 		fmt.Println(space, header, "{")
 		indent := space + " "
-		for i, cmd := range *arg {
+		for i, cmd := range arg.Commands() {
 			printCmd(cmd, indent, fmt.Sprint(" ", i, ":"))
 		}
 		fmt.Println(space, "}")
