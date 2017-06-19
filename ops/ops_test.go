@@ -1,9 +1,8 @@
 package ops
 
 import (
-	// "github.com/kr/pretty"
+	"github.com/ionous/iffy/reflector"
 	"github.com/stretchr/testify/assert"
-	r "reflect"
 	"strconv"
 	"testing"
 )
@@ -35,17 +34,18 @@ var testData = &Container{
 	Two: &Contents{"dilute, dilute"},
 	More: []SomeInterface{
 		&Container{Value: 5},
+		&Container{Value: 7},
 	},
 }
 
 // TODO:
 // 1. test unknown commands
-// 2. mismatched eleemmnt types
+// 2. mismatched element types
 func TestOps(t *testing.T) {
 	assert := assert.New(t)
 	ops := NewOps()
-	ops.RegisterType(r.TypeOf((*Container)(nil)).Elem())
-	ops.RegisterType(r.TypeOf((*Contents)(nil)).Elem())
+	ops.RegisterType((*Container)(nil))
+	ops.RegisterType((*Contents)(nil))
 	{
 		var root Container
 		if c := ops.Build(&root); c.Args {
@@ -58,11 +58,24 @@ func TestOps(t *testing.T) {
 		if c := ops.Build(&root); c.Args {
 			c.Cmd("contents", "all are one")
 			c.Cmd("contents").Value("dilute, dilute")
-
 			if c := c.Param("more").Array(); c.Cmds {
 				c.Cmd("container").Param("value").Value(5)
+				c.Cmd("container").Param("value").Value(7)
 			}
 		}
 		assert.EqualValues(*testData, root)
 	}
+}
+
+type CommandBlock struct {
+	*Container
+	*Contents
+}
+
+// just make sure we can register a block of commands succesfully.
+func TestOpsBlock(t *testing.T) {
+	assert := assert.New(t)
+	ops := NewOps((*CommandBlock)(nil))
+	assert.Contains(ops.names, reflector.MakeId("Container"))
+	assert.Contains(ops.names, reflector.MakeId("Contents"))
 }

@@ -36,8 +36,8 @@ func TestObjectGetSet(t *testing.T) {
 
 		// pointers.... and relations?
 	}
-	b := BaseClass{Name: "first-instance", State: Yes}
-	d := DerivedClass{BaseClass{Name: "second-instance", State: Yes}}
+	b := &BaseClass{Name: "first-instance", State: Yes}
+	d := &DerivedClass{BaseClass{Name: "second-instance", State: Yes}}
 	if m, e := MakeModel(b, d); assert.NoError(e) {
 		if n, ok := m.GetObject("first-instance"); assert.True(ok) {
 			assert.Equal("$firstInstance", n.GetId())

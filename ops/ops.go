@@ -12,36 +12,56 @@ type Ops struct {
 	root  []interface{}
 }
 
-func NewOps(commands ...interface{}) *Ops {
+// NewOps creates a registry, calling RegisterBlock on each passed element.
+func NewOps(blocks ...interface{}) *Ops {
 	ops := &Ops{names: make(map[string]r.Type)}
-	for _, cmdArray := range commands {
-		if e := ops.RegisterBlock(cmdArray); e != nil {
+	for _, block := range blocks {
+		if e := ops.RegisterBlock(block); e != nil {
 			panic(e)
 		}
 	}
 	return ops
 }
 
-// RegisterBlock registers a structure containing pointers to interfaces.
+// RegisterBlock registers a structure containing pointers to commands.
 func (ops *Ops) RegisterBlock(block interface{}) (err error) {
-	cmdArray := r.TypeOf(block)
-	for i, cnt := 0, cmdArray.NumField(); i < cnt; i++ {
-		rtype := cmdArray.Field(i).Type
-		if e := ops.RegisterType(rtype); e != nil {
-			err = e
-			break
+	if blockType := r.TypeOf(block); blockType.Kind() != r.Ptr {
+		err = errutil.New("block should be a (nil) pointer (to a struct).")
+	} else if structType := blockType.Elem(); structType.Kind() != r.Struct {
+		err = errutil.New("block should point to a struct.")
+	} else {
+		for i, cnt := 0, structType.NumField(); i < cnt; i++ {
+			field := structType.Field(i)
+			if e := ops.registerType(field.Type); e != nil {
+				err = errutil.New(field.Name, e)
+				break
+			}
 		}
 	}
 	return
 }
 
-// RegisterType registers a single type.
-func (ops *Ops) RegisterType(rtype r.Type) (err error) {
-	id := reflector.MakeId(rtype.Name())
-	if was, exists := ops.names[id]; exists && was != rtype {
-		err = errutil.New("conflicting names", id, was, rtype)
+// RegisterType registers a single pointer to a command.
+func (ops *Ops) RegisterType(cmd interface{}) (err error) {
+	if e := ops.registerType(r.TypeOf(cmd)); e != nil {
+		err = errutil.New("command", e)
+	}
+	return
+}
+
+// rtype should be a struct ptr.
+func (ops *Ops) registerType(cmdType r.Type) (err error) {
+	if ptrType := cmdType; ptrType.Kind() != r.Ptr {
+		err = errutil.New("should be a pointer (to struct).")
+	} else if rtype := ptrType.Elem(); rtype.Kind() != r.Struct {
+		err = errutil.New("should point to a struct.")
 	} else {
-		ops.names[id] = rtype
+		id := reflector.MakeId(rtype.Name())
+		if was, exists := ops.names[id]; exists && was != rtype {
+			err = errutil.New("has conflicting names, id:", id, "was:", was, "type:", rtype)
+		} else {
+			ops.names[id] = rtype
+		}
 	}
 	return
 }
@@ -149,7 +169,8 @@ func setField(dst r.Value, value interface{}) (err error) {
 		} else {
 			src.cmdArray = dst
 		}
-	case float64, string, int, []float64, []string:
+		// this are literals:
+	case bool, float64, string, int, []float64, []string:
 		err = reflector.CoerceToValue(dst, src)
 	default:
 		err = errutil.Fmt("assigning unexpected type %T", value)

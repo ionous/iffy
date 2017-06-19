@@ -20,7 +20,7 @@ func MakeModel(instances ...interface{}) (ret ref.Model, err error) {
 	// 2. simplify coding
 	// 3. basis for inception-style code generation
 	for i, inst := range instances {
-		rval := r.ValueOf(inst)
+		rval := r.ValueOf(inst).Elem()
 		// create the class first:
 		if cls, e := cs.AddClass(rval.Type()); e != nil {
 			err = e
