@@ -48,21 +48,21 @@ func (ops *Ops) RegisterType(rtype r.Type) (err error) {
 
 // OpBuilder implements spec.Spec.
 type OpBuilder struct {
-	*Ops
+	ops       *Ops
 	targetPtr r.Value // output object we are building
 	index     int
 }
 
-// OpsBuilder implements spec.Specs.
-type OpsBuilder struct {
-	*Ops
+// OpsArrayBuilder implements spec.Specs.
+type OpsArrayBuilder struct {
+	ops      *Ops
 	cmdArray r.Value // output array we are appending to.
 }
 
 func (ops *Ops) Build(ptr interface{}) *spec.Context {
 	targetPtr := r.ValueOf(ptr)
-	ob := &OpBuilder{Ops: ops, targetPtr: targetPtr}
-	return spec.NewBlock(ob)
+	ob := &OpBuilder{ops: ops, targetPtr: targetPtr}
+	return spec.NewContext(ops, ob)
 }
 
 // NewSpec implements spc.SpecFactory.
@@ -73,7 +73,7 @@ func (ops *Ops) NewSpec(name string) (ret spec.Spec, err error) {
 	} else {
 		targetPtr := r.New(rtype)
 		ret = &OpBuilder{
-			Ops:       ops,
+			ops:       ops,
 			targetPtr: targetPtr,
 		}
 	}
@@ -84,7 +84,7 @@ func (ops *Ops) NewSpec(name string) (ret spec.Spec, err error) {
 // the spec algorithm creates NewSpecs, and then assigns it to a slot
 // we need the slot to targetPtr the array properly, so we just wait,
 func (ops *Ops) NewSpecs() (spec.Specs, error) {
-	return &OpsBuilder{Ops: ops}, nil
+	return &OpsArrayBuilder{ops: ops}, nil
 }
 
 // Position implements Spec.
@@ -120,7 +120,7 @@ func (ob *OpBuilder) Assign(key string, arg interface{}) (err error) {
 	return
 }
 
-func (cbs *OpsBuilder) AddElement(el spec.Spec) (err error) {
+func (cbs *OpsArrayBuilder) AddElement(el spec.Spec) (err error) {
 	if ob, ok := el.(*OpBuilder); !ok {
 		err = errutil.Fmt("unexpected element type %T", el)
 	} else {
@@ -143,7 +143,7 @@ func setField(dst r.Value, value interface{}) (err error) {
 	case *OpBuilder:
 		val := src.targetPtr.Interface()
 		err = reflector.CoerceToValue(dst, val)
-	case *OpsBuilder:
+	case *OpsArrayBuilder:
 		if kind, isArray := arrayKind(dst.Type()); !isArray || kind != r.Interface {
 			err = errutil.New("expected an array of commands")
 		} else {

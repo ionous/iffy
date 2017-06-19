@@ -6,8 +6,6 @@ type SpecFactory interface {
 }
 
 type Spec interface {
-	// SpecFactory makes specs hierarchical.
-	SpecFactory
 	// Position adds a new positional argument.
 	// Positional arguments are guaranteed to precede keyword arguments.
 	Position(arg interface{}) error

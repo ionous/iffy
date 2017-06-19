@@ -6,8 +6,8 @@ import (
 )
 
 func TestSpec(t *testing.T) {
-	cmds := NewCommands()
-	if c := NewArray(cmds); c.Cmds {
+	cmds := NewCommandBuilder()
+	if c := cmds.NewArray(); c.Cmds {
 		if c := c.Cmd("unit"); c.Args {
 			if c := c.Param("trials").Array(); c.Cmds {
 				// cycles

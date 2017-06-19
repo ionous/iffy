@@ -42,11 +42,6 @@ func (n *RefInst) GetValue(name string, pv interface{}) (err error) {
 	return
 }
 
-// func idToMember(id string) string {
-// 	ret := strings.Replace(id[1:], "$", "X", -1)
-// 	return lang.Capitalize(ret)
-// }
-
 // GetValue can return error when the value violates a property constraint,
 // if the value is not of the requested type, or if the targeted property holder is read-only. Read-only values include the "many" side of a relation.
 func (n *RefInst) SetValue(name string, v interface{}) (err error) {

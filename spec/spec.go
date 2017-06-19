@@ -2,25 +2,22 @@ package spec
 
 import "github.com/ionous/errutil"
 
-func NewArray(spec Spec) Array {
-	return NewBlock(spec).Array()
-}
-
-func NewBlock(spec Spec) *Context {
-	return &Context{spec, true}
+func NewContext(sf SpecFactory, spec Spec) *Context {
+	return &Context{sf, spec, true}
 }
 
 // Context provides tools for building commands.
 type Context struct {
+	fac  SpecFactory
 	spec Spec
 	Args bool // Args is true when we are ready for positional arguments.
 }
 
 // Cmd creates a new command of name with the passed set of non-keywords args. It returns a new context, allowing the user to add additional (key-value, or linear) arguments to the new coommand.
 func (ctx *Context) Cmd(name string, args ...interface{}) *Context {
-	newSpec := newSpec(ctx.spec, name, args)
+	newSpec := newSpec(ctx.fac, name, args)
 	ctx.addArg(newSpec)
-	return &Context{newSpec, true}
+	return &Context{ctx.fac, newSpec, true}
 }
 
 // Value specifies a single literal: whether one primitive value or one array of primitive values. It does not start a new block, because primitive values have no additional parameters.
@@ -30,7 +27,7 @@ func (ctx *Context) Value(arg interface{}) {
 
 // Array specifies a new array parameter.
 func (ctx *Context) Array() (ret Array) {
-	if specs, e := ctx.spec.NewSpecs(); e != nil {
+	if specs, e := ctx.fac.NewSpecs(); e != nil {
 		panic(e)
 	} else {
 		ctx.addArg(specs)
@@ -95,9 +92,10 @@ type Chain struct {
 // Cmd sets the value of a key specified via Context.Param.
 // See also: Context.Cmd
 func (c Chain) Cmd(name string, args ...interface{}) *Context {
-	newSpec := newSpec(c.ctx.spec, name, args)
-	c.ctx.assign(c.key, newSpec)
-	return &Context{newSpec, true}
+	ctx := c.ctx
+	newSpec := newSpec(ctx.fac, name, args)
+	ctx.assign(c.key, newSpec)
+	return &Context{ctx.fac, newSpec, true}
 }
 
 // Value sets the value of a key specified via Context.Param.
@@ -108,7 +106,7 @@ func (c Chain) Value(arg interface{}) {
 
 // Array starts a new list of commands.
 func (c Chain) Array() (ret Array) {
-	if specs, e := c.ctx.spec.NewSpecs(); e != nil {
+	if specs, e := c.ctx.fac.NewSpecs(); e != nil {
 		panic(e)
 	} else {
 		c.ctx.assign(c.key, specs)
@@ -127,9 +125,9 @@ type Array struct {
 // Cmd adds a new command to the array.
 // See also: Context.Cmd
 func (a Array) Cmd(name string, args ...interface{}) *Context {
-	newSpec := newSpec(a.ctx.spec, name, args)
+	newSpec := newSpec(a.ctx.fac, name, args)
 	if e := a.specs.AddElement(newSpec); e != nil {
 		panic(e)
 	}
-	return &Context{newSpec, true}
+	return &Context{a.ctx.fac, newSpec, true}
 }

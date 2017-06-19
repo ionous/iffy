@@ -20,18 +20,20 @@ type CommandFactory struct{}
 
 // CommandBuilder implements Spec.
 type CommandBuilder struct {
-	CommandFactory
 	cmd *Command
 }
 
 // CommandsBuilder implements Specs.
 type CommandsBuilder struct {
-	CommandFactory
 	cmds *Commands
 }
 
-func NewCommands() *CommandBuilder {
+func NewCommandBuilder() *CommandBuilder {
 	return &CommandBuilder{cmd: &Command{Name: "root"}}
+}
+
+func (cb *CommandBuilder) NewArray() Array {
+	return NewContext(CommandFactory{}, cb).Array()
 }
 
 // NewSpec implements SpecFactory.
