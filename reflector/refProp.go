@@ -8,7 +8,7 @@ import (
 
 type RefProp struct {
 	id       string
-	idx      int
+	fieldIdx int //  index in parent rtype
 	propType ref.PropertyType
 }
 

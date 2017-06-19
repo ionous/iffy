@@ -2,11 +2,12 @@ package spec
 
 import "github.com/ionous/errutil"
 
-// TODO: detection of primitives arrays, replacing them with literals.
+func NewArray(spec Spec) Array {
+	return NewBlock(spec).Array()
+}
 
-func Build(spec Spec) (ret Array) {
-	ctx := &Context{spec, true}
-	return ctx.Array()
+func NewBlock(spec Spec) *Context {
+	return &Context{spec, true}
 }
 
 // Context provides tools for building commands.
@@ -27,7 +28,7 @@ func (ctx *Context) Value(arg interface{}) {
 	ctx.addArg(arg)
 }
 
-// Array
+// Array specifies a new array parameter.
 func (ctx *Context) Array() (ret Array) {
 	if specs, e := ctx.spec.NewSpecs(); e != nil {
 		panic(e)

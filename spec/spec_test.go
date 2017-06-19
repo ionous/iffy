@@ -7,7 +7,7 @@ import (
 
 func TestSpec(t *testing.T) {
 	cmds := NewCommands()
-	if c := Build(cmds); c.Cmds {
+	if c := NewArray(cmds); c.Cmds {
 		if c := c.Cmd("unit"); c.Args {
 			if c := c.Param("trials").Array(); c.Cmds {
 				// cycles
@@ -29,5 +29,5 @@ func TestSpec(t *testing.T) {
 			}
 		}
 	}
-	PrintSpec(cmds.Command())
+	PrintSpec(cmds.Root())
 }

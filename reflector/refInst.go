@@ -2,10 +2,8 @@ package reflector
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/ref"
 	r "reflect"
-	"strings"
 )
 
 type RefInst struct {

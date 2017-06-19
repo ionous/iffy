@@ -30,7 +30,7 @@ func printArg(arg interface{}, space, header string) {
 	case *Commands:
 		fmt.Println(space, header, "{")
 		indent := space + " "
-		for i, cmd := range arg.Commands() {
+		for i, cmd := range arg.Els {
 			printCmd(cmd, indent, fmt.Sprint(" ", i, ":"))
 		}
 		fmt.Println(space, "}")

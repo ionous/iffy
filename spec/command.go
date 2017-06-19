@@ -12,11 +12,7 @@ type Command struct {
 }
 
 type Commands struct {
-	els []*Command
-}
-
-func (cmds *Commands) Commands() []*Command {
-	return cmds.els
+	Els []*Command
 }
 
 // CommandFactory implements SpecFactory.
@@ -49,12 +45,11 @@ func (CommandFactory) NewSpecs() (Specs, error) {
 	return &CommandsBuilder{cmds: cmds}, nil
 }
 
-func (cb *CommandBuilder) Command() *Command {
+func (cb *CommandBuilder) Root() *Command {
 	return cb.cmd
 }
 
 // Position implements Spec.
-// If the arg is not
 func (cb *CommandBuilder) Position(arg interface{}) (err error) {
 	if arg, e := cmdUnpack(arg); e != nil {
 		err = e
@@ -78,14 +73,14 @@ func (cb *CommandBuilder) Assign(key string, arg interface{}) (err error) {
 }
 
 func (cbs *CommandsBuilder) Commands() []*Command {
-	return cbs.cmds.els
+	return cbs.cmds.Els
 }
 
 func (cbs *CommandsBuilder) AddElement(s Spec) (err error) {
 	if cb, ok := s.(*CommandBuilder); !ok {
 		err = errutil.Fmt("unexpected element type %T", s)
 	} else {
-		cbs.cmds.els = append(cbs.cmds.els, cb.cmd)
+		cbs.cmds.Els = append(cbs.cmds.Els, cb.cmd)
 	}
 	return
 }
