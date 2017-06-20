@@ -20,7 +20,6 @@ func TestMetadata(t *testing.T) {
 	{
 		m := MakeMetadata(`if:"id"`)
 		assert.Len(m, 1)
-		t.Log("WWEWLK", m)
 		assert.Equal("id", m["id"])
 	}
 	{
