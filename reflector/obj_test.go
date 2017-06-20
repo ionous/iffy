@@ -1,9 +1,9 @@
 package reflector
 
 import (
-	"github.com/ionous/arrayOf"
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/suite"
 	"strings"
 	"testing"
@@ -57,7 +57,7 @@ func (t *ObjectSuite) TestStateAccess() {
 		if n, ok := t.m.GetObject(obj); t.True(ok) {
 			var res bool
 			if e := n.GetValue(prop, &res); t.NoError(e) {
-				t.Equal(value, res, strings.Join(arrayOf.String(obj, prop), " "))
+				t.Equal(value, res, strings.Join(sliceOf.String(obj, prop), " "))
 			}
 		}
 	}
