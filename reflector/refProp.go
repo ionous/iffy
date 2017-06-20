@@ -28,7 +28,7 @@ func Categorize(rtype r.Type) (ret ref.PropertyType, err error) {
 		ret = ref.Number
 	case r.String:
 		ret = ref.Text
-	case r.Int:
+	case r.Bool, r.Int:
 		ret = ref.State
 	case r.Ptr:
 		// FIX: how far do you want to take this?

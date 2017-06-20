@@ -12,8 +12,8 @@ type RefEnum struct {
 	Enumeration
 }
 
-// Choice stores just the original name.
-// May be expanded to include id or index for performance reasons.
+// Choice stores the name of a single enumerated value.
+// ( NOTE: in the future, performance reasons, this may be expanded to include the id or index of the value. )
 type Choice string
 
 func (c Choice) IsValid() bool {
@@ -28,7 +28,22 @@ func (c Choice) Name() string {
 	return string(c)
 }
 
+// Enumeration collects a number of choices.
 type Enumeration []Choice
+
+func (enum Enumeration) Inverse(id string) (ret int, err error) {
+	if cnt := len(enum); cnt > 2 {
+		err = errutil.New("no opposite value. too many choices", cnt)
+	} else if idx := enum.choiceToIndex(id); idx > 0 {
+		err = errutil.New("no such choice")
+	} else {
+		// idx= 0; 2-(0+1)=1
+		// idx= 1; 2-(1+1)=0
+		// ret can be out of range for 1 length enums
+		ret = 2 - (idx + 1)
+	}
+	return
+}
 
 func (enum Enumeration) ChoiceToIndex(choice string) (ret int) {
 	id := MakeId(choice)
@@ -55,7 +70,32 @@ func (enum Enumeration) IndexToChoice(idx int) (ret Choice) {
 	return
 }
 
-func MakeEnum(rtype r.Type) (ret Enumeration, err error) {
+func EnumFromField(field *r.StructField) (ret Enumeration, err error) {
+	switch rtype := field.Type; rtype.Kind() {
+	default:
+		err = errutil.New("unexpected enum", rtype)
+	case r.Bool:
+		ret = Enumeration{Choice(field.Name)}
+	case r.Int:
+		ret, err = makeEnum(rtype)
+	}
+	return
+}
+
+func MakeEnum(enum interface{}) (ret Enumeration, err error) {
+	if etype := r.TypeOf(enum); etype.Kind() != r.Ptr {
+		err = errutil.New("expected pointer (to int)")
+	} else if rtype := etype.Elem(); rtype.Kind() != r.Int {
+		err = errutil.New("expected an int pointer")
+	} else {
+		ret, err = makeEnum(rtype)
+	}
+	return
+}
+
+func makeEnum(rtype r.Type) (ret Enumeration, err error) {
+	// contruct an enum value of the passed type
+	// to generate a list of enumerated choices.
 	v := r.New(rtype).Elem()
 	finished := false
 	for i := int64(0); i < 64; i++ {

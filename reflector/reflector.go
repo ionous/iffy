@@ -9,7 +9,7 @@ import (
 // questions:
 // how far do you want to take pointers?
 // suck in their references if set? what about their class definitions?
-func MakeModel(instances ...interface{}) (ret ref.Model, err error) {
+func MakeModel(instances ...interface{}) (ret *RefModel, err error) {
 	// tasks: walk the instances to extract some classes.
 	var linearObject []*RefInst
 	objects := make(map[string]*RefInst)
@@ -135,7 +135,7 @@ func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int
 					if cat != ref.State {
 						p = &base
 					} else {
-						if choices, e := MakeEnum(field.Type); e != nil {
+						if choices, e := EnumFromField(&field); e != nil {
 							err = errutil.New("error enumerating", field.Name, field.Type, e)
 							break
 						} else {

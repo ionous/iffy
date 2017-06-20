@@ -29,6 +29,7 @@ func TestIdStrings(t *testing.T) {
 	assert.EqualValues(t, "$appleTurnover", MakeId("Apple Turnover"))
 	assert.EqualValues(t, "$appleTurnover", MakeId("Apple turnover"))
 	assert.EqualValues(t, "$appleTurnover", MakeId("APPLE TURNOVER"))
+	assert.EqualValues(t, "$appleTurnover", MakeId("apple-turnover"))
 
 	assert.EqualValues(t, "$pascalCase", MakeId("PascalCase"))
 	assert.EqualValues(t, "$camelCase", MakeId("camelCase"))

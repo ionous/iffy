@@ -26,9 +26,9 @@ func NewOps(blocks ...interface{}) *Ops {
 // RegisterBlock registers a structure containing pointers to commands.
 func (ops *Ops) RegisterBlock(block interface{}) (err error) {
 	if blockType := r.TypeOf(block); blockType.Kind() != r.Ptr {
-		err = errutil.New("block should be a (nil) pointer (to a struct).")
+		err = errutil.New("expected (nil) pointer (to a struct).")
 	} else if structType := blockType.Elem(); structType.Kind() != r.Struct {
-		err = errutil.New("block should point to a struct.")
+		err = errutil.New("expected a struct pointer.")
 	} else {
 		for i, cnt := 0, structType.NumField(); i < cnt; i++ {
 			field := structType.Field(i)
@@ -52,9 +52,9 @@ func (ops *Ops) RegisterType(cmd interface{}) (err error) {
 // rtype should be a struct ptr.
 func (ops *Ops) registerType(cmdType r.Type) (err error) {
 	if ptrType := cmdType; ptrType.Kind() != r.Ptr {
-		err = errutil.New("should be a pointer (to struct).")
+		err = errutil.New("expected (nil) pointer (to a struct).")
 	} else if rtype := ptrType.Elem(); rtype.Kind() != r.Struct {
-		err = errutil.New("should point to a struct.")
+		err = errutil.New("expected a struct pointer.")
 	} else {
 		id := reflector.MakeId(rtype.Name())
 		if was, exists := ops.names[id]; exists && was != rtype {
@@ -161,8 +161,7 @@ func (cbs *OpsArrayBuilder) AddElement(el spec.Spec) (err error) {
 func setField(dst r.Value, value interface{}) (err error) {
 	switch src := value.(type) {
 	case *OpBuilder:
-		val := src.targetPtr.Interface()
-		err = reflector.CoerceToValue(dst, val)
+		err = reflector.CoerceValue(dst, src.targetPtr)
 	case *OpsArrayBuilder:
 		if kind, isArray := arrayKind(dst.Type()); !isArray || kind != r.Interface {
 			err = errutil.New("expected an array of commands")
@@ -171,7 +170,7 @@ func setField(dst r.Value, value interface{}) (err error) {
 		}
 		// this are literals:
 	case bool, float64, string, int, []float64, []string:
-		err = reflector.CoerceToValue(dst, src)
+		err = reflector.CoerceValue(dst, src)
 	default:
 		err = errutil.Fmt("assigning unexpected type %T", value)
 	}

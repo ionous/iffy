@@ -3,7 +3,6 @@ package reflector
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	r "reflect"
 	"strings"
 	"testing"
 )
@@ -49,8 +48,7 @@ func (i TriState) String() string {
 // TestEnumChoices to verify a stringerified enum generates good choices.
 func TestEnumChoices(t *testing.T) {
 	assert := assert.New(t)
-	rtype := r.TypeOf((*TriState)(nil)).Elem()
-	if enum, e := MakeEnum(rtype); assert.NoError(e, "enum should generate") {
+	if enum, e := MakeEnum((*TriState)(nil)); assert.NoError(e, "enum should generate") {
 		var reduce []string
 		for _, c := range enum {
 			reduce = append(reduce, c.Name())
@@ -68,15 +66,13 @@ func TestEnumChoices(t *testing.T) {
 // TestEnumEmpty to verify an empty enum is an error.
 func TestEnumEmpty(t *testing.T) {
 	assert := assert.New(t)
-	rtype := r.TypeOf((*EmptyState)(nil)).Elem()
-	_, e := MakeEnum(rtype)
+	_, e := MakeEnum((*EmptyState)(nil))
 	assert.Error(e, "enum shouldnt generate")
 }
 
 // TestEnumTooLong to verify an enum with too many choices is an error.
 func TestEnumTooLong(t *testing.T) {
 	assert := assert.New(t)
-	rtype := r.TypeOf((*TooLongState)(nil)).Elem()
-	_, e := MakeEnum(rtype)
+	_, e := MakeEnum((*TooLongState)(nil))
 	assert.Error(e, "enum shouldnt generate")
 }

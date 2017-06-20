@@ -1,59 +1,145 @@
 package reflector
 
 import (
+	"github.com/ionous/arrayOf"
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"strings"
 	"testing"
 )
 
-func TestObjectGetSet(t *testing.T) {
-	assert := assert.New(t)
-	test := func(n ref.Object) {
-		state := false
-		if e := n.GetValue("yes", &state); assert.NoError(e) {
-			assert.True(state)
-		}
-		if e := n.GetValue("maybe", &state); assert.NoError(e) {
-			assert.False(state)
-		}
+func TestObjectSuite(t *testing.T) {
+	suite.Run(t, new(ObjectSuite))
+}
 
-		// var name string
-		// assert.NoError(n.GetValue("name", &name))
+type ObjectSuite struct {
+	suite.Suite
+	m *RefModel
+	b *BaseClass
+	d *DerivedClass
+}
 
-		// test text
-		// {
-		// 	var v string
-		// 	assert.NoError(n.GetValue("text", &v))
-		// 	assert.Empty(v)
-		// 	assert.NoError(n.SetValue("text", "something"))
-		// 	assert.NoError(n.GetValue("text", &v))
-		// 	assert.Equal("something", v)
-		// }
-
-		// text number: float and int
-
-		// test state: bool
-
-		// pointers.... and relations?
+func (t *ObjectSuite) SetupTest() {
+	errutil.Panic = true
+	b := &BaseClass{Name: "first", State: Yes, Labeled: true}
+	d := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
+	if m, e := MakeModel(b, d); t.NoError(e) {
+		t.b = b
+		t.d = d
+		t.m = m
 	}
-	b := &BaseClass{Name: "first-instance", State: Yes}
-	d := &DerivedClass{BaseClass{Name: "second-instance", State: Yes}}
-	if m, e := MakeModel(b, d); assert.NoError(e) {
-		if n, ok := m.GetObject("first-instance"); assert.True(ok) {
-			assert.Equal("$firstInstance", n.GetId())
-			cls := n.GetClass()
-			assert.NotNil(cls)
-			assert.Equal("$baseClass", cls.GetId())
-			//
-			test(n)
+}
+
+func (t *ObjectSuite) TestDerivation() {
+	if n, ok := t.m.GetObject("first"); t.True(ok) {
+		t.Equal("$first", n.GetId())
+		cls := n.GetClass()
+		t.NotNil(cls)
+		t.Equal("$baseClass", cls.GetId())
+		parent, ok := cls.GetParent()
+		t.Nil(parent)
+		t.False(ok)
+	}
+	if d, ok := t.m.GetObject("second"); t.True(ok) {
+		t.Equal("$second", d.GetId())
+		cls := d.GetClass()
+		t.NotNil(cls)
+		t.Equal("$derivedClass", cls.GetId())
+		if parent, ok := cls.GetParent(); t.True(ok) {
+			t.Equal("$baseClass", parent.GetId())
 		}
-		if d, ok := m.GetObject("second-instance"); assert.True(ok) {
-			assert.Equal("$secondInstance", d.GetId())
-			cls := d.GetClass()
-			assert.NotNil(cls)
-			assert.Equal("$derivedClass", cls.GetId())
-			//
-			test(d)
+	}
+}
+
+func (t *ObjectSuite) TestStateAccess() {
+	test := func(obj, prop string, value bool) {
+		if n, ok := t.m.GetObject(obj); t.True(ok) {
+			var res bool
+			if e := n.GetValue(prop, &res); t.NoError(e) {
+				t.Equal(value, res, strings.Join(arrayOf.String(obj, prop), " "))
+			}
 		}
+	}
+
+	test("first", "yes", true)
+	test("first", "no", false)
+	test("first", "maybe", false)
+	test("first", "labeled", true)
+	//
+	test("second", "yes", false)
+	test("second", "no", false)
+	test("second", "maybe", true)
+	test("second", "labeled", false)
+}
+
+func (t *ObjectSuite) TestStateSet() {
+	if n, ok := t.m.GetObject("first"); t.True(ok) {
+		var res bool
+		// start with yes, it should be true
+		n.GetValue("yes", &res)
+		if t.True(res) {
+			// try to change the value to maybe
+			n.SetValue("maybe", true)
+			// yes should now be false.
+			n.GetValue("yes", &res)
+			if t.False(res) {
+				// and maybe should now be true
+				n.GetValue("maybe", &res)
+				t.True(res)
+				t.Panics(func() {
+					// try to change states in an illegal way:
+					n.SetValue("maybe", false)
+				})
+				// add verify it didnt change:
+				n.GetValue("maybe", &res)
+				t.True(res)
+			}
+		}
+	}
+	toggle := func(name, prop string, goal bool) {
+		if n, ok := t.m.GetObject(name); t.True(ok) {
+			var res bool
+			n.GetValue(prop, &res)
+			if t.NotEqual(goal, res, "initial value") {
+				n.SetValue(prop, goal)
+				n.GetValue(prop, &res)
+				t.Equal(goal, res)
+			}
+		}
+	}
+	toggle("second", "labeled", true)
+	toggle("second", "labeled", false)
+}
+
+// test that normal properties are accessible
+func (t *ObjectSuite) xTestPropertyAccess() {
+	var expected = []struct {
+		name string
+		pv   interface{}
+	}{
+	// {"Name", new(string)},
+	// {"Num", new(float64)},
+	// {"Text", new(string)},
+	// {"Object", ref.Pointer},
+	// {"Nums", new([]float64)},
+	// {"Texts", ref.Text | ref.Array},
+	// {"Objects", ref.Pointer | ref.Array},
+	}
+	test := func(n ref.Object) {
+		for _, v := range expected {
+			if e := n.GetValue(v.name, v.pv); t.NoError(e) {
+				//
+			}
+		}
+	}
+	if n, ok := t.m.GetObject("first"); t.True(ok) {
+		//
+		test(n)
+	}
+	if d, ok := t.m.GetObject("second"); t.True(ok) {
+
+		//
+		test(d)
 	}
 }

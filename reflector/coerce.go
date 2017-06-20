@@ -5,23 +5,26 @@ import (
 	r "reflect"
 )
 
-// Coerce moves the srcValue into the outValue pointer
-func Coerce(outValue, srcValue interface{}) (err error) {
-	if dst := r.ValueOf(outValue); dst.Kind() != r.Ptr {
-		err = errutil.Fmt("destination not a pointer, %s", dst.Kind())
+// CoerceValue moves the src into the dst pointer
+func CoerceValue(dst, src interface{}) (err error) {
+	if dst := valueOf(dst); !dst.CanSet() {
+		err = errutil.New("destination not settable")
 	} else {
-		err = CoerceToValue(dst.Elem(), srcValue)
+		if src := valueOf(src); !src.Type().ConvertibleTo(dst.Type()) {
+			err = errutil.New("incompatible types", src.Type(), dst.Type())
+		} else {
+			v := src.Convert(dst.Type())
+			dst.Set(v)
+		}
 	}
 	return
 }
 
-func CoerceToValue(dst r.Value, srcValue interface{}) (err error) {
-	src := r.ValueOf(srcValue)
-	if !src.Type().ConvertibleTo(dst.Type()) {
-		err = errutil.New("incompatible types", src.Type(), dst.Type())
+func valueOf(i interface{}) (ret r.Value) {
+	if v, ok := i.(r.Value); !ok {
+		ret = r.ValueOf(i)
 	} else {
-		v := src.Convert(dst.Type())
-		dst.Set(v)
+		ret = v
 	}
 	return
 }

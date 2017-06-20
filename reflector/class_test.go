@@ -16,6 +16,7 @@ type BaseClass struct {
 	Texts   []string
 	Objects []*BaseClass
 	State   TriState
+	Labeled bool
 }
 
 type DerivedClass struct {
@@ -37,6 +38,7 @@ func expected() []Expected {
 		{"Texts", ref.Text | ref.Array},
 		{"Objects", ref.Pointer | ref.Array},
 		{"State", ref.State},
+		{"Labeled", ref.State},
 	}
 }
 
