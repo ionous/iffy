@@ -2,6 +2,7 @@ package reflector
 
 import (
 	"github.com/ionous/iffy/ref"
+	. "github.com/ionous/iffy/tests"
 	"github.com/stretchr/testify/assert"
 	r "reflect"
 	"testing"

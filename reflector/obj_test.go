@@ -3,6 +3,7 @@ package reflector
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref"
+	. "github.com/ionous/iffy/tests"
 	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/suite"
 	"strings"

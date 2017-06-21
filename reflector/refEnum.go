@@ -31,11 +31,32 @@ func (c Choice) Name() string {
 // Enumeration collects a number of choices.
 type Enumeration []Choice
 
-func (enum Enumeration) Inverse(id string) (ret int, err error) {
+func (enum Enumeration) setValue(field r.Value, idx int, val bool) (err error) {
+	// if the field is a bool, and we found it via getPropertyByChoice,
+	// then name must equal the name of the field, and we directly directly setting its status
+	if field.Kind() == r.Bool {
+		err = CoerceValue(field, val)
+	} else {
+		// if the field in an int, and the user is trying to set a particular choice
+		// we want to set the field to the value of that passed choice.
+		if val {
+			err = CoerceValue(field, idx)
+		} else {
+			// if the user is saying unset some choice
+			// we have to try to generate an opposite value.
+			if invIdx, e := enum.InverseIndex(idx); e != nil {
+				err = e
+			} else {
+				err = CoerceValue(field, invIdx)
+			}
+		}
+	}
+	return
+}
+
+func (enum Enumeration) InverseIndex(idx int) (ret int, err error) {
 	if cnt := len(enum); cnt > 2 {
 		err = errutil.New("no opposite value. too many choices", cnt)
-	} else if idx := enum.choiceToIndex(id); idx > 0 {
-		err = errutil.New("no such choice")
 	} else {
 		// idx= 0; 2-(0+1)=1
 		// idx= 1; 2-(1+1)=0
