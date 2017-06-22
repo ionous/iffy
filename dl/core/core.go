@@ -7,10 +7,10 @@ type Commands struct {
 	*Bool
 	// *Buffer
 	// *ChangeState
-	// *Choose
-	// *ChooseNum
-	// *ChooseObj
-	// *ChooseText
+	*Choose
+	*ChooseNum
+	*ChooseObj
+	*ChooseText
 	*CompareNum
 	*CompareText
 	// *DoNothing

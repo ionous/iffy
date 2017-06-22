@@ -5,6 +5,8 @@ import (
 	"github.com/ionous/sliceOf"
 )
 
+// TestPrintSpacing verifies that print line uses acts like the span printer:
+// adding spaces between words as needed.
 func (t *CoreSuite) TestPrintSpacing() {
 	var root struct {
 		Eval rt.Execute
@@ -22,8 +24,8 @@ func (t *CoreSuite) TestPrintSpacing() {
 	}
 }
 
-// in the original, the default printer made every print a new line
-// we should do the same.
+// TestMultiLines verifies that iffy printing works similar to sashimi printing.
+// In sashimi, the default printer made every print a new line, we should do the same. This test complements TestSingleLines.
 func (t *CoreSuite) TestMultiLines() {
 	var root struct {
 		Eval rt.Execute
@@ -42,6 +44,8 @@ func (t *CoreSuite) TestMultiLines() {
 	}
 }
 
+// TestSingleLine verifies the ability of print line to join text.
+// It complements TestMultiLines
 func (t *CoreSuite) TestSingleLines() {
 	var root struct {
 		Eval rt.Execute
@@ -64,6 +68,7 @@ func (t *CoreSuite) TestSingleLines() {
 	}
 }
 
+// TestLineIndex verifies the loop index property.
 func (t *CoreSuite) TestLineIndex() {
 	var root struct {
 		Eval rt.Execute
@@ -80,33 +85,29 @@ func (t *CoreSuite) TestLineIndex() {
 	}
 }
 
-// // needs ChooseText and substitution
-// func (t *CoreSuite) TestLineEndings() {
-// 	var root struct {
-// 		Eval rt.Execute
-// 	}
-// 	if c := t.ops.Build(&root); c.Args {
-// 		if c := c.Cmd("for each text"); c.Cmds {
-// 			c.Cmd("texts", sliceOf.String("one", "two", "three"))
-// 			if c := c.Cmd("print text"); c.Args {
-// 				if c := c.Cmd("choose text"); c.Args {
-// 					c.Param("if").Cmd("get", "@", "first")
-// 					c.Param("true").Value("first")
-// 					if c := c.Param("false").Cmd("choose text"); c.Args {
-// 						c.Param("if").Cmd("get", "@", "last")
-// 						c.Param("true").Value("last")
-// 						c.Param("false").Cmd("get", "@", "text")
-// 					}
-// 				}
-// 				c.Cmd("object", "@")
-// 				c.Value("num")
-// 			}
-// 		}
-// 	}
-// 	if e := root.Eval.Execute(t.run); t.NoError(e) {
-// 		lines := t.Lines()
-// 		t.Equal(sliceOf.String("first",
-// 			"two",
-// 			"last"), lines)
-// 	}
-// }
+// TestLineEndings verifies loop first and last properties.
+func (t *CoreSuite) TestLineEndings() {
+	var root struct {
+		Eval rt.Execute
+	}
+	if c := t.ops.Build(&root); c.Args {
+		if c := c.Cmd("for each text"); c.Args {
+			c.Param("in").Value(sliceOf.String("one", "two", "three"))
+			if c := c.Param("go").Array().Cmd("print text"); c.Args {
+				if c := c.Cmd("choose text"); c.Args {
+					c.Param("if").Cmd("get", "@", "last")
+					c.Param("true").Value("last")
+					if c := c.Param("false").Cmd("choose text"); c.Args {
+						c.Param("if").Cmd("get", "@", "first")
+						c.Param("true").Value("first")
+						c.Param("false").Cmd("get", "@", "text")
+					}
+				}
+			}
+		}
+	}
+	if e := root.Eval.Execute(t.run); t.NoError(e) {
+		lines := t.Lines()
+		t.Equal(sliceOf.String("first", "two", "last"), lines)
+	}
+}
