@@ -1,8 +1,12 @@
 package rt
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref"
 )
+
+const StreamEnd errutil.Error = "stream end"
+const StreamExceeded errutil.Error = "stream exceeded"
 
 type Execute interface {
 	Execute(Runtime) error
@@ -22,13 +26,27 @@ type ObjectEval interface {
 type StateEval interface {
 	GetState(Runtime) (int, error)
 }
+type NumListEval interface {
+	GetNumberStream(Runtime) (NumberStream, error)
+}
+type TextListEval interface {
+	GetTextStream(Runtime) (TextStream, error)
+}
+type ObjListEval interface {
+	GetObjectStream(Runtime) (ObjectStream, error)
+}
 
-// type NumListEval interface {
-// 	GetNumberStream(Runtime) (NumberStream, error)
-// }
-// type TextListEval interface {
-// 	GetTextStream(Runtime) (TextStream, error)
-// }
-// type ObjListEval interface {
-// 	GetObjectStream(Runtime) (ObjectStream, error)
-// }
+type NumberStream interface {
+	HasNext() bool
+	GetNext() (float64, error)
+}
+
+type TextStream interface {
+	HasNext() bool
+	GetNext() (string, error)
+}
+
+type ObjectStream interface {
+	HasNext() bool
+	GetNext() (ref.Object, error)
+}

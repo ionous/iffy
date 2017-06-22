@@ -7,7 +7,7 @@ import (
 
 type RefClass struct {
 	id        string
-	rtype     r.Type // mainly for equality building tests
+	rtype     r.Type
 	meta      Metadata
 	parent    *RefClass
 	parentIdx int            // index of parent aggregate in rtype; valid if parent!= nil
@@ -56,11 +56,21 @@ func (c *RefClass) PropertyNum(i int) ref.Property {
 // GetProperty by name.
 func (c *RefClass) GetProperty(name string) (ret ref.Property, okay bool) {
 	id := MakeId(name)
-	for _, p := range c.props {
-		if p.GetId() == id {
-			ret, okay = p, true
-			break
+	if p, _, ok := c.getProperty(id); ok {
+		ret, okay = p, true
+	}
+	return
+}
+
+func (c *RefClass) getProperty(id string) (ret ref.Property, path []int, okay bool) {
+	if out, ok := c.FindProperty(func(p ref.Property) (found bool) {
+		if id == p.GetId() {
+			ret, found = p, true
 		}
+		return
+	}); ok {
+		path = out
+		okay = true
 	}
 	return
 }
@@ -72,24 +82,41 @@ func (c *RefClass) GetPropertyByChoice(choice string) (ref.Property, bool) {
 	return r, r != nil
 }
 
-func (c *RefClass) getPropertyByChoice(id string) (ret *RefEnum, path []int, value int) {
+func (c *RefClass) FindProperty(match func(p ref.Property) bool) (path []int, okay bool) {
+	var partial []int
+	type getFieldIndex interface {
+		getFieldIndex() int
+	}
 	for {
 		for _, p := range c.props {
-			if p, ok := p.(*RefEnum); ok {
-				if i := p.choiceToIndex(id); i >= 0 {
-					ret = p
-					path = append(path, p.fieldIdx)
-					value = i
-					break
-				}
+			if match(p) {
+				idx := p.(getFieldIndex).getFieldIndex()
+				path = append(partial, idx)
+				okay = true
+				break
 			}
 		}
-		if ret != nil && c.parent == nil {
+		if okay || c.parent == nil {
 			break
 		} else {
-			c = c.parent
-			path = append(path, c.parentIdx)
+			c, partial = c.parent, append(partial, c.parentIdx)
 		}
+	}
+	return
+}
+
+func (c *RefClass) getPropertyByChoice(id string) (ret *RefEnum, path []int, value int) {
+	if out, ok := c.FindProperty(func(p ref.Property) (found bool) {
+		if p, ok := p.(*RefEnum); ok {
+			if i := p.choiceToIndex(id); i >= 0 {
+				ret = p
+				value = i
+				found = true
+			}
+		}
+		return
+	}); ok {
+		path = out
 	}
 	return
 }

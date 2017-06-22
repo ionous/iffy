@@ -21,6 +21,10 @@ func (ref *RefProp) GetType() ref.PropertyType {
 	return ref.propType
 }
 
+func (ref *RefProp) getFieldIndex() int {
+	return ref.fieldIdx
+}
+
 // Categorize returns the property type for an go-type
 func Categorize(rtype r.Type) (ret ref.PropertyType, err error) {
 	switch k := rtype.Kind(); k {

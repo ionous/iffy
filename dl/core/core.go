@@ -1,19 +1,10 @@
 package core
 
 type Commands struct {
-	// literals
-	*Bool
-	*Num
-	// *Numbers
-	// *Object
-	// *Objects
-	// *State
-	*Text
-	// *Texts
-	//
 	// *AddNum
 	*AllTrue
 	*AnyTrue
+	*Bool
 	// *Buffer
 	// *ChangeState
 	// *Choose
@@ -25,7 +16,10 @@ type Commands struct {
 	// *DoNothing
 	*EqualTo
 	// *Error
-	// *Get
+	*ForEachNum
+	// *ForEachObj
+	*ForEachText
+	*Get
 	// *GoCall
 	*GreaterThan
 	// *Inc
@@ -39,16 +33,22 @@ type Commands struct {
 	// *IsValid
 	*LesserThan
 	*NotEqualTo
+	*Num
+	*Numbers
+	*Object
+	// *Objects
 	// *ObjListContains
 	// *ObjListIsEmpty
 	// *Object
-	// *PrintLine
-	// *PrintNum
-	// *PrintObj
-	// *PrintText
+	*PrintLine
+	*PrintNum
+	*PrintText
 	// *SetNumber
 	// *SetObject
 	// *SetText
+	// *State
 	// *StopNow
+	*Text
+	*Texts
 	// *Using
 }

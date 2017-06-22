@@ -6,20 +6,67 @@ import (
 	r "reflect"
 )
 
+type ModelMaker struct {
+	instances []interface{}
+	classes   []interface{} // nil pointers
+}
+
+func NewModelMaker() *ModelMaker {
+	return &ModelMaker{}
+}
+
+func (mm *ModelMaker) AddClass(cls interface{}) {
+	mm.classes = append(mm.classes, cls)
+}
+
+func (mm *ModelMaker) AddInstance(inst interface{}) {
+	mm.instances = append(mm.instances, inst)
+}
+
 // questions:
 // how far do you want to take pointers?
 // suck in their references if set? what about their class definitions?
-func MakeModel(instances ...interface{}) (ret *RefModel, err error) {
+func MakeModel(instances ...interface{}) (*RefModel, error) {
+	mm := &ModelMaker{instances: instances}
+	return mm.MakeModel()
+}
+
+func (mm *ModelMaker) MakeModel() (ret *RefModel, err error) {
 	// tasks: walk the instances to extract some classes.
+	if cs, e := mm.createClasses(); e != nil {
+		err = e
+	} else if m, e := mm.createModel(cs); e != nil {
+		err = e
+	} else {
+		ret = m
+	}
+	return
+}
+
+func (mm *ModelMaker) createClasses() (ret ClassSet, err error) {
+	cs := MakeClassSet()
+	for _, cls := range mm.classes {
+		rtype := r.TypeOf(cls).Elem()
+		if _, e := cs.AddClass(rtype); e != nil {
+			err = e
+			break
+		}
+	}
+	if err == nil {
+		ret = cs
+	}
+	return
+}
+
+func (mm *ModelMaker) createModel(cs ClassSet) (ret *RefModel, err error) {
 	var linearObject []*RefInst
 	objects := make(map[string]*RefInst)
-	cs := MakeClassSet()
 
 	// note: building copies up front because:
 	// 1. error checking
 	// 2. simplify coding
 	// 3. basis for inception-style code generation
-	for i, inst := range instances {
+	for i, inst := range mm.instances {
 		rval := r.ValueOf(inst).Elem()
 		// create the class first:
 		if cls, e := cs.AddClass(rval.Type()); e != nil {
@@ -105,7 +152,6 @@ func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int
 	//
 	for i, cnt := 0, rtype.NumField(); i < cnt; i++ {
 		field := rtype.Field(i)
-
 		//
 		if len(field.PkgPath) > 0 {
 			err = errutil.New("expected only exportable fields", field.Name)

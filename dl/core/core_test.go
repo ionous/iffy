@@ -1,11 +1,13 @@
-package core
+package core_test
 
 import (
-	. "github.com/ionous/iffy/dl/tests"
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ops"
 	"github.com/ionous/iffy/reflector"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
+	. "github.com/ionous/iffy/tests"
 	"github.com/stretchr/testify/suite"
 	"strings"
 	"testing"
@@ -17,10 +19,12 @@ var people = []interface{}{
 	&Person{"carol", Laughing, Sitting},
 }
 
+// Regular expression to select test suites specified command-line argument "-run". Regular expression to select the methods of test suites specified command-line argument "-m"
 type CoreSuite struct {
 	suite.Suite
-	ops *ops.Ops
-	run rt.Runtime
+	ops   *ops.Ops
+	run   rt.Runtime
+	lines rtm.LineWriter
 }
 
 func TestCoreSuite(t *testing.T) {
@@ -30,13 +34,36 @@ func TestCoreSuite(t *testing.T) {
 func (t *CoreSuite) Log(args ...interface{}) {
 	t.T().Log(args...)
 }
+func (t *CoreSuite) Lines() (ret []string) {
+	ret = t.lines.Lines()
+	t.lines = rtm.LineWriter{}
+	return
+}
 
 func (t *CoreSuite) SetupTest() {
-	t.ops = ops.NewOps((*Commands)(nil))
-	if m, e := reflector.MakeModel(); e != nil {
+	errutil.Panic = true
+	t.ops = ops.NewOps((*core.Commands)(nil))
+	mm := reflector.NewModelMaker()
+	mm.AddClass((*core.NumberCounter)(nil))
+	mm.AddClass((*core.TextCounter)(nil))
+	//
+	if m, e := mm.MakeModel(); e != nil {
 		panic(e)
 	} else {
 		t.run = rtm.NewRtm(m)
+		t.run.PushWriter(&t.lines)
+	}
+}
+
+func (t *CoreSuite) TestShortcuts() {
+	var root struct {
+		Eval rt.TextEval
+	}
+	if c := t.ops.Build(&root); c.Args {
+		c.Value("shortcut")
+	}
+	if res, e := root.Eval.GetText(t.run); t.NoError(e) {
+		t.EqualValues("shortcut", res)
 	}
 }
 
@@ -125,24 +152,3 @@ func (t *CoreSuite) TestCompareText() {
 	test("bobby", "not equal to", "suzzie")
 	test("tyrone", "equal to", "tyrone")
 }
-
-// if m, e := reflector.MakeModel(people...); t.NoError(e) {
-// 	rtm.NewRtm(m)
-// 	{
-// 		var root struct {
-// 			Eval rt.BoolEval
-// 		}
-// 		if c := ops.Build(&root); c.Args {
-// 			if c := c.Cmd("all true").Array(); c.Cmds {
-// 				c.Cmd("get", "alice", "listening")
-// 				c.Cmd("get", "bob", "sitting")
-// 				c.Cmd("get", "carol", "laughing")
-// 			}
-// 		}
-// 		// for _, op := range ops {
-// 		// }
-// 	}
-// }
-
-// FIX: test all forms of Get
-// TODO: test literals as eval subsitution

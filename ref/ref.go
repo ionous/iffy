@@ -8,7 +8,8 @@ type Model interface {
 
 	NumObject() int
 	ObjectNum(int) Object
-	GetObject(string) (Object, bool)
+	GetObject(name string) (Object, bool)
+	NewObject(class string) (Object, error)
 }
 
 // Class describes a shared class of Objects.

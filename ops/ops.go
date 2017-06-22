@@ -2,7 +2,9 @@ package ops
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/reflector"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
 	r "reflect"
 )
@@ -115,7 +117,9 @@ func (ob *OpBuilder) Position(arg interface{}) (err error) {
 	} else {
 		field := tgt.Field(ob.index)
 		if e := setField(field, arg); e != nil {
-			err = errutil.New("field", ob.index, e)
+			parent := ob.targetPtr.Elem().Type().Name()
+			name := tgt.Type().Field(ob.index).Name
+			err = errutil.Fmt("position %d (%s.%s) %v", ob.index, parent, name, e)
 		} else {
 			ob.index++
 		}
@@ -157,25 +161,74 @@ func (cbs *OpsArrayBuilder) AddElement(el spec.Spec) (err error) {
 	return
 }
 
-// dst is field
-func setField(dst r.Value, value interface{}) (err error) {
-	switch src := value.(type) {
+// dst is the field we are setting
+func setField(dst r.Value, src interface{}) (err error) {
+	switch src := src.(type) {
 	case *OpBuilder:
 		err = reflector.CoerceValue(dst, src.targetPtr)
 	case *OpsArrayBuilder:
 		if kind, isArray := arrayKind(dst.Type()); !isArray || kind != r.Interface {
-			err = errutil.New("expected an array of commands")
+			if !isArray {
+				err = errutil.Fmt("trying to set an array to %v", dst.Type())
+			} else {
+				err = errutil.New("trying to set commands to", kind)
+			}
 		} else {
 			src.cmdArray = dst
 		}
-		// this are literals:
+
 	case bool, float64, string, int, []float64, []string:
+		if dst.Kind() == r.Interface {
+			if literal, ok := literally(dst.Type(), src); ok {
+				src = literal
+			}
+		}
 		err = reflector.CoerceValue(dst, src)
+
 	default:
-		err = errutil.Fmt("assigning unexpected type %T", value)
+		err = errutil.Fmt("assigning unexpected type %T", src)
 	}
 	return
 }
+
+// literally allows users to specify primitive values for some evals.
+//
+// c.Cmd("texts", sliceOf.String("one", "two", "three"))
+// c.Value(sliceOf.String("one", "two", "three"))
+//
+// c := c.Cmd("get"); c.Args { c.Cmd("object", "@") c.Value("text") }
+// c.Cmd("get", "@", "text")
+//
+// FIX? move literals to "builtin" to avoid the dependency on core.
+// ( or, more ugly, have a "shortcut" interface users of core can inject. )
+func literally(dstType r.Type, src interface{}) (ret interface{}, okay bool) {
+	switch src := src.(type) {
+	case []float64:
+		ret = &core.Numbers{src}
+		okay = true
+	case []string:
+		ret = &core.Texts{src}
+		okay = true
+	case float64:
+		ret = &core.Num{src}
+		okay = true
+	case string:
+		// could be text or object --
+		switch dstType {
+		case textEval:
+			ret = &core.Text{src}
+			okay = true
+		case objEval:
+			ret = &core.Object{src}
+			okay = true
+		}
+	}
+	return
+}
+
+// switch doesnt seem to work well dstValue.Interface().(type) b/c dst is usually nil.
+var textEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
+var objEval = r.TypeOf((*rt.ObjectEval)(nil)).Elem()
 
 func arrayKind(rtype r.Type) (ret r.Kind, isArray bool) {
 	if k := rtype.Kind(); k != r.Slice {

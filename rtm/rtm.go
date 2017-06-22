@@ -7,6 +7,7 @@ import (
 type Rtm struct {
 	ref.Model
 	ScopeStack
+	OutputStack
 }
 
 func NewRtm(model ref.Model) *Rtm {
