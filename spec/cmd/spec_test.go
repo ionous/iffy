@@ -11,7 +11,7 @@ import (
 func TestMismatchedEnds(t *testing.T) {
 	assert := assert.New(t)
 	if c, ok := cmd.NewBuilder(); ok {
-		if c.Array().Block() {
+		if c.Cmds().Block() {
 			if c.Cmd("unit").Block() {
 				// c.End() --> missing an end
 			} // unit
@@ -28,19 +28,19 @@ func TestSpec(t *testing.T) {
 	assert := assert.New(t)
 	if c, ok := cmd.NewBuilder(); ok {
 		if c.Cmd("unit").Block() {
-			if c.Param("trials").Array().Block() {
+			if c.Param("trials").Cmds().Block() {
 				// cycles
-				if c.Cmd("match output", c.Val(sliceOf.String("a", "b", "c", "d"))).Block() {
-					if c.Cmd("for each num", c.Val(sliceOf.Float(1, 2, 3, 4))).Block() {
-						c.Cmd("print text", c.Cmd("cycle", c.Val(sliceOf.String("a", "b", "c"))))
+				if c.Cmd("match output", sliceOf.String("a", "b", "c", "d")).Block() {
+					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Block() {
+						c.Cmd("print text", c.Cmd("cycle", sliceOf.String("a", "b", "c")))
 						c.End()
 					}
 					c.End()
 				}
 				// stopping
-				if c.Cmd("match output", c.Val(sliceOf.String("a", "b", "c", "c"))).Block() {
-					if c.Cmd("for each num", c.Val(sliceOf.Float(1, 2, 3, 4))).Block() {
-						c.Cmd("print text", c.Cmd("stopping", c.Val(sliceOf.String("a", "b", "c"))))
+				if c.Cmd("match output", sliceOf.String("a", "b", "c", "c")).Block() {
+					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Block() {
+						c.Cmd("print text", c.Cmd("stopping", sliceOf.String("a", "b", "c")))
 						c.End()
 					}
 					c.End()

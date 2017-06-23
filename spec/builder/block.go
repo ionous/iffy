@@ -1,7 +1,7 @@
 package builder
 
 type Block struct {
-	parent   *Memento
+	parent   *Memento // factory guarentees this is non-nil
 	mementos []*Memento
 }
 
