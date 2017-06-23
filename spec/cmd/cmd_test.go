@@ -29,7 +29,7 @@ func TestSpec(t *testing.T) {
 	if c, ok := cmd.NewBuilder(); ok {
 		if c.Cmd("unit").Block() {
 			if c.Param("trials").Cmds().Block() {
-				// cycles
+				// cycles:
 				if c.Cmd("match output", sliceOf.String("a", "b", "c", "d")).Block() {
 					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Block() {
 						c.Cmd("print text", c.Cmd("cycle", sliceOf.String("a", "b", "c")))
@@ -37,7 +37,7 @@ func TestSpec(t *testing.T) {
 					}
 					c.End()
 				}
-				// stopping
+				// stopping:
 				if c.Cmd("match output", sliceOf.String("a", "b", "c", "c")).Block() {
 					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Block() {
 						c.Cmd("print text", c.Cmd("stopping", sliceOf.String("a", "b", "c")))

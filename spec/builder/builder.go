@@ -9,8 +9,8 @@ type Builder struct {
 	internal *Factory
 }
 
-func NewBuilder(sf spec.SpecFactory, spec spec.Spec) Builder {
-	internal := &Factory{SpecFactory: sf}
+func NewBuilder(sf spec.Factory, spec spec.Spec) Builder {
+	internal := &Factory{Factory: sf}
 	b := Builder{internal}
 	if _, e := internal.NewBlock(&Memento{
 		Builder: b,

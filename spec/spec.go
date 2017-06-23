@@ -1,6 +1,6 @@
 package spec
 
-type SpecFactory interface {
+type Factory interface {
 	NewSpec(name string) (Spec, error)
 	NewSpecs() (Specs, error)
 }

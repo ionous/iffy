@@ -6,7 +6,7 @@ import (
 )
 
 type Factory struct {
-	spec.SpecFactory
+	spec.Factory
 	blocks []*Block // stack of blocks
 }
 
