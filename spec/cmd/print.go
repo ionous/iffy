@@ -1,10 +1,9 @@
-package spec
+package cmd
 
-import (
-	"fmt"
-)
+import "fmt"
 
-func PrintSpec(cmd *Command) {
+// PrintSpec writes the passed command to stdout.
+func Print(cmd *Command) {
 	printCmd(cmd, "", "")
 }
 
