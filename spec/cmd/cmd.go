@@ -20,7 +20,6 @@ type Commands struct {
 
 // CommandBuilder provides a package spec implementation for Command/s.
 type CommandBuilder struct {
-	root *Command
 	builder.Builder
 }
 
@@ -29,19 +28,18 @@ func NewBuilder() (*CommandBuilder, bool) {
 	root := new(Command)
 	spec := &_Spec{cmd: root}
 	return &CommandBuilder{
-		root:    root,
-		Builder: builder.NewBuilder(_Factory{}, spec),
+		builder.NewBuilder(_Factory{}, spec),
 	}, true
 }
 
 // Build finializes the builder, returning the root Command.
 func (u *CommandBuilder) Build() (ret *Command, err error) {
-	if u.root == nil {
-		err = errutil.New("build can only be called once")
-	} else if fini := u.Builder.End(); !fini {
-		err = errutil.New("mismatched Block/End(s)")
+	if res, e := u.Builder.Build(); e != nil {
+		err = e
+	} else if spec, ok := res.(*_Spec); !ok {
+		err = errutil.Fmt("unknown error")
 	} else {
-		ret, u.root = u.root, nil
+		ret = spec.cmd
 	}
 	return
 }

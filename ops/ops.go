@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy/reflector"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
+	"github.com/ionous/iffy/spec/builder"
 	r "reflect"
 )
 
@@ -68,34 +69,42 @@ func (ops *Ops) registerType(cmdType r.Type) (err error) {
 	return
 }
 
-// OpBuilder implements spec.Spec.
-type OpBuilder struct {
-	ops       *Ops
-	targetPtr r.Value // output object we are building
-	index     int
+type OpsBuilder struct {
+	builder.Builder
 }
 
-// OpsArrayBuilder implements spec.Specs.
-type OpsArrayBuilder struct {
-	ops      *Ops
-	cmdArray r.Value // output array we are appending to.
-}
-
-func (ops *Ops) Build(ptr interface{}) *spec.Context {
+func (ops *Ops) NewBuilder(ptr interface{}) (*OpsBuilder, bool) {
 	targetPtr := r.ValueOf(ptr)
-	ob := &OpBuilder{ops: ops, targetPtr: targetPtr}
-	return spec.NewContext(ops, ob)
+	spec := &_Spec{ops: ops, targetPtr: targetPtr}
+	return &OpsBuilder{
+		builder.NewBuilder(&_Factory{ops}, spec),
+	}, true
 }
 
-// NewSpec implements spc.SpecFactory.
-func (ops *Ops) NewSpec(name string) (ret spec.Spec, err error) {
+func (u *OpsBuilder) Build() (ret interface{}, err error) {
+	if res, e := u.Builder.Build(); e != nil {
+		err = e
+	} else if spec, ok := res.(*_Spec); !ok {
+		err = errutil.Fmt("unknown error")
+	} else {
+		ret = spec.targetPtr.Interface()
+	}
+	return
+}
+
+type _Factory struct {
+	ops *Ops
+}
+
+// NewSpec implements spec.SpecFactory.
+func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
 	id := reflector.MakeId(name)
-	if rtype, ok := ops.names[id]; !ok {
+	if rtype, ok := fac.ops.names[id]; !ok {
 		err = errutil.New("unknown command", name)
 	} else {
 		targetPtr := r.New(rtype)
-		ret = &OpBuilder{
-			ops:       ops,
+		ret = &_Spec{
+			ops:       fac.ops,
 			targetPtr: targetPtr,
 		}
 	}
@@ -105,33 +114,38 @@ func (ops *Ops) NewSpec(name string) (ret spec.Spec, err error) {
 // NewSpecs implements spec.SpecFactory.
 // the spec algorithm creates NewSpecs, and then assigns it to a slot
 // we need the slot to targetPtr the array properly, so we just wait,
-func (ops *Ops) NewSpecs() (spec.Specs, error) {
-	return &OpsArrayBuilder{ops: ops}, nil
+func (fac *_Factory) NewSpecs() (spec.Specs, error) {
+	return &_Specs{ops: fac.ops}, nil
 }
 
-// Position implements Spec.
-func (ob *OpBuilder) Position(arg interface{}) (err error) {
-	tgt := ob.targetPtr.Elem()
-	if cnt := tgt.NumField(); ob.index >= cnt {
-		err = errutil.New("too many arguments. expected", ob.index)
+type _Spec struct {
+	ops       *Ops
+	targetPtr r.Value // output object we are building
+	index     int
+}
+
+func (spec *_Spec) Position(arg interface{}) (err error) {
+	tgt := spec.targetPtr.Elem()
+	if cnt := tgt.NumField(); spec.index >= cnt {
+		err = errutil.New("too many arguments. expected", spec.index)
 	} else {
-		field := tgt.Field(ob.index)
+		field := tgt.Field(spec.index)
 		if e := setField(field, arg); e != nil {
-			parent := ob.targetPtr.Elem().Type().Name()
-			name := tgt.Type().Field(ob.index).Name
-			err = errutil.Fmt("position %d (%s.%s) %v", ob.index, parent, name, e)
+			parent := spec.targetPtr.Elem().Type().Name()
+			name := tgt.Type().Field(spec.index).Name
+			err = errutil.Fmt("position %d (%s.%s) %v", spec.index, parent, name, e)
 		} else {
-			ob.index++
+			spec.index++
 		}
 	}
 	return
 }
 
-func (ob *OpBuilder) Assign(key string, arg interface{}) (err error) {
+func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
 	id := reflector.MakeId(key)
-	tgt := ob.targetPtr.Elem()
+	tgt := spec.targetPtr.Elem()
 	tgtType := tgt.Type()
-	for i, cnt := ob.index, tgtType.NumField(); i < cnt; i++ {
+	for i, cnt := spec.index, tgtType.NumField(); i < cnt; i++ {
 		fieldInfo := tgtType.Field(i)
 		if id == reflector.MakeId(fieldInfo.Name) {
 			field := tgt.Field(i)
@@ -144,19 +158,16 @@ func (ob *OpBuilder) Assign(key string, arg interface{}) (err error) {
 	return
 }
 
-func (cbs *OpsArrayBuilder) AddElement(el spec.Spec) (err error) {
-	if ob, ok := el.(*OpBuilder); !ok {
+type _Specs struct {
+	ops *Ops
+	els []*_Spec
+}
+
+func (specs *_Specs) AddElement(el spec.Spec) (err error) {
+	if spec, ok := el.(*_Spec); !ok {
 		err = errutil.Fmt("unexpected element type %T", el)
 	} else {
-		from := ob.targetPtr.Type()
-		to := cbs.cmdArray.Type().Elem()
-		//
-		if !from.AssignableTo(to) {
-			err = errutil.Fmt("incompatible element type. from: %v to: %v", from, to)
-		} else {
-			slice := r.Append(cbs.cmdArray, ob.targetPtr)
-			cbs.cmdArray.Set(slice)
-		}
+		specs.els = append(specs.els, spec)
 	}
 	return
 }
@@ -164,9 +175,10 @@ func (cbs *OpsArrayBuilder) AddElement(el spec.Spec) (err error) {
 // dst is the field we are setting
 func setField(dst r.Value, src interface{}) (err error) {
 	switch src := src.(type) {
-	case *OpBuilder:
+	case *_Spec:
 		err = reflector.CoerceValue(dst, src.targetPtr)
-	case *OpsArrayBuilder:
+
+	case *_Specs:
 		if kind, isArray := arrayKind(dst.Type()); !isArray || kind != r.Interface {
 			if !isArray {
 				err = errutil.Fmt("trying to set an array to %v", dst.Type())
@@ -174,7 +186,17 @@ func setField(dst r.Value, src interface{}) (err error) {
 				err = errutil.New("trying to set commands to", kind)
 			}
 		} else {
-			src.cmdArray = dst
+			slice, elType := dst, dst.Type().Elem()
+			for _, spec := range src.els {
+				from := spec.targetPtr.Type()
+				if !from.AssignableTo(elType) {
+					err = errutil.Fmt("incompatible element type. from: %v to: %v", from, elType)
+					break
+				} else {
+					slice = r.Append(slice, spec.targetPtr)
+				}
+			}
+			dst.Set(slice)
 		}
 
 	case bool, float64, string, int, []float64, []string:
@@ -196,7 +218,7 @@ func setField(dst r.Value, src interface{}) (err error) {
 // c.Cmd("texts", sliceOf.String("one", "two", "three"))
 // c.Value(sliceOf.String("one", "two", "three"))
 //
-// c := c.Cmd("get"); c.Args { c.Cmd("object", "@") c.Value("text") }
+// c.Cmd("get").Block() { c.Cmd("object", "@") c.Value("text") }
 // c.Cmd("get", "@", "text")
 //
 // FIX? move literals to "builtin" to avoid the dependency on core.

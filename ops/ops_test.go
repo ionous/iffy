@@ -2,7 +2,9 @@ package ops
 
 import (
 	"github.com/ionous/iffy/reflector"
+	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"strconv"
 	"testing"
 )
@@ -42,28 +44,52 @@ var testData = &Container{
 // 1. test unknown commands
 // 2. mismatched element types
 func TestOps(t *testing.T) {
-	assert := assert.New(t)
+	suite.Run(t, new(OpsSuite))
+}
+
+type OpsSuite struct {
+	suite.Suite
+	ops  *Ops
+	test *testing.T
+}
+
+func (t *OpsSuite) SetupTest() {
 	ops := NewOps()
 	ops.RegisterType((*Container)(nil))
 	ops.RegisterType((*Contents)(nil))
-	{
-		var root Container
-		if c := ops.Build(&root); c.Args {
-			c.Param("Value").Value(4)
+	t.ops = ops
+	t.test = t.T()
+}
+
+func (t *OpsSuite) TestKeyValue() {
+	var root Container
+	if c, ok := t.ops.NewBuilder(&root); ok {
+		c.Param("Value").Val(4)
+		//
+		if _, e := c.Build(); t.NoError(e) {
+			t.EqualValues(4, root.Value)
 		}
-		assert.EqualValues(4, root.Value)
 	}
-	{
-		var root Container
-		if c := ops.Build(&root); c.Args {
-			c.Cmd("contents", "all are one")
-			c.Cmd("contents").Value("dilute, dilute")
-			if c := c.Param("more").Array(); c.Cmds {
-				c.Cmd("container").Param("value").Value(5)
-				c.Cmd("container").Param("value").Value(7)
-			}
+}
+
+func (t *OpsSuite) TestAllAreOne() {
+	var root Container
+	if c, ok := t.ops.NewBuilder(&root); ok {
+		// the simple way:
+		c.Cmd("contents", "all are one")
+		// // cause why not:
+		if c.Cmd("contents").Block() {
+			c.Val("dilute, dilute").End()
 		}
-		assert.EqualValues(*testData, root)
+		if c.Param("more").Cmds().Block() {
+			c.Cmd("container", c.Param("value").Val(5))
+			c.Cmd("container", c.Param("value").Val(7))
+			c.End()
+		}
+		if _, e := c.Build(); t.NoError(e) {
+			t.EqualValues(*testData, root)
+			t.test.Log(pretty.Sprint(root))
+		}
 	}
 }
 
@@ -72,7 +98,7 @@ type CommandBlock struct {
 	*Contents
 }
 
-// just make sure we can register a block of commands succesfully.
+// TestOpsBlock ensures blocks of commands register succesfully.
 func TestOpsBlock(t *testing.T) {
 	assert := assert.New(t)
 	ops := NewOps((*CommandBlock)(nil))
