@@ -11,5 +11,7 @@ type Rtm struct {
 }
 
 func NewRtm(model ref.Model) *Rtm {
-	return &Rtm{Model: model}
+	rtm := &Rtm{Model: model}
+	rtm.PushScope(ModelFinder{model})
+	return rtm
 }

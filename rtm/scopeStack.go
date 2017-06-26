@@ -3,6 +3,7 @@ package rtm
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/reflector"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -14,7 +15,8 @@ type ScopeStack struct {
 // FindObject implements rt.ObjectFinder
 func (os *ScopeStack) FindObject(name string) (ret ref.Object, okay bool) {
 	if len(os.scp) > 0 {
-		ret, okay = os.scp[0].FindObject(name)
+		id := reflector.MakeId(name)
+		ret, okay = os.scp[0].FindObject(id)
 	}
 	return
 }

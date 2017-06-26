@@ -22,6 +22,30 @@ type Person struct {
 	Standing  StandingState
 }
 
+type Kind struct {
+	Name              string `if:"id"`
+	PrintedName       string
+	IndefiniteArticle string
+	SingularPlural
+	CommonProper
+}
+
+//go:generate stringer -type=SingularPlural
+type SingularPlural int
+
+const (
+	SingularNamed SingularPlural = iota
+	PluralNamed
+)
+
+//go:generate stringer -type=CommonProper
+type CommonProper int
+
+const (
+	CommonNamed CommonProper = iota
+	ProperNamed
+)
+
 //go:generate stringer -type=SecretState
 type SecretState int
 

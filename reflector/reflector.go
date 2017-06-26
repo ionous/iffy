@@ -15,12 +15,12 @@ func NewModelMaker() *ModelMaker {
 	return &ModelMaker{}
 }
 
-func (mm *ModelMaker) AddClass(cls interface{}) {
-	mm.classes = append(mm.classes, cls)
+func (mm *ModelMaker) AddClass(cls ...interface{}) {
+	mm.classes = append(mm.classes, cls...)
 }
 
-func (mm *ModelMaker) AddInstance(inst interface{}) {
-	mm.instances = append(mm.instances, inst)
+func (mm *ModelMaker) AddInstance(inst ...interface{}) {
+	mm.instances = append(mm.instances, inst...)
 }
 
 // questions:
@@ -81,6 +81,7 @@ func (mm *ModelMaker) createModel(cs ClassSet) (ret *RefModel, err error) {
 				break
 			} else {
 				objid := MakeId(name.String())
+				// println("making", objid)
 				if orig, ok := objects[objid]; ok {
 					err = errutil.New("instance needs unique name", name, orig, objid)
 					break
@@ -159,7 +160,7 @@ func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int
 		} else {
 			MergeMetadata(field, pdata)
 			//
-			if field.Anonymous {
+			if field.Anonymous && field.Type.Kind() == r.Struct {
 				if parent != nil {
 					err = errutil.New("multiple parents specified", parent, field.Type)
 					break
