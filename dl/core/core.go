@@ -44,6 +44,7 @@ type Commands struct {
 	*PrintLine
 	*PrintNum
 	*PrintText
+	*Range
 	// *SetNumber
 	// *SetObject
 	// *SetText
