@@ -1,4 +1,4 @@
-package reflector
+package id
 
 import (
 	"github.com/stretchr/testify/assert"

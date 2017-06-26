@@ -3,6 +3,7 @@ package reflector
 import (
 	"fmt"
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/id"
 	r "reflect"
 	"strings"
 )
@@ -21,7 +22,7 @@ func (c Choice) IsValid() bool {
 }
 
 func (c Choice) Id() string {
-	return MakeId(string(c))
+	return id.MakeId(string(c))
 }
 
 func (c Choice) Name() string {
@@ -67,7 +68,7 @@ func (enum Enumeration) InverseIndex(idx int) (ret int, err error) {
 }
 
 func (enum Enumeration) ChoiceToIndex(choice string) (ret int) {
-	id := MakeId(choice)
+	id := id.MakeId(choice)
 	return enum.choiceToIndex(id)
 }
 

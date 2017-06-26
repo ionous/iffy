@@ -1,6 +1,7 @@
 package reflector
 
 import (
+	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
 	r "reflect"
 )
@@ -55,7 +56,7 @@ func (c *RefClass) PropertyNum(i int) ref.Property {
 
 // GetProperty by name.
 func (c *RefClass) GetProperty(name string) (ret ref.Property, okay bool) {
-	id := MakeId(name)
+	id := id.MakeId(name)
 	if p, _, ok := c.getProperty(id); ok {
 		ret, okay = p, true
 	}
@@ -77,7 +78,7 @@ func (c *RefClass) getProperty(id string) (ret ref.Property, path []int, okay bo
 
 // GetPropertyByChoice evaluates all properties to find an enumeration which can store the passed choice
 func (c *RefClass) GetPropertyByChoice(choice string) (ref.Property, bool) {
-	id := MakeId(choice)
+	id := id.MakeId(choice)
 	r, _, _ := c.getPropertyByChoice(id)
 	return r, r != nil
 }
@@ -122,7 +123,7 @@ func (c *RefClass) getPropertyByChoice(id string) (ret *RefEnum, path []int, val
 }
 
 func (c *RefClass) IsCompatible(name string) (okay bool) {
-	id := MakeId(name)
+	id := id.MakeId(name)
 	if c.id == id {
 		okay = true
 	} else {

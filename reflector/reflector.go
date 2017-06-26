@@ -2,6 +2,7 @@ package reflector
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
 	r "reflect"
 )
@@ -80,7 +81,7 @@ func (mm *ModelMaker) createModel(cs ClassSet) (ret *RefModel, err error) {
 				err = errutil.New("instance needs an valid id", i, rval)
 				break
 			} else {
-				objid := MakeId(name.String())
+				objid := id.MakeId(name.String())
 				// println("making", objid)
 				if orig, ok := objects[objid]; ok {
 					err = errutil.New("instance needs unique name", name, orig, objid)
@@ -113,7 +114,7 @@ func MakeClassSet() ClassSet {
 }
 
 func (cs *ClassSet) AddClass(rtype r.Type) (ret *RefClass, err error) {
-	clsid := MakeId(rtype.Name())
+	clsid := id.MakeId(rtype.Name())
 	// does the class already exist?
 	if cls, exists := cs.classes[clsid]; exists {
 		// does the id and class match?
@@ -169,7 +170,7 @@ func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int
 					parentIdx = i
 				}
 			} else {
-				id := MakeId(field.Name)
+				id := id.MakeId(field.Name)
 				if was := ids[id]; len(was) > 0 {
 					err = errutil.New("duplicate property was:", was, "now:", field.Name)
 					break

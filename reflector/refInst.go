@@ -2,6 +2,7 @@ package reflector
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
 	r "reflect"
 )
@@ -28,7 +29,7 @@ func (n *RefInst) GetValue(name string, pv interface{}) (err error) {
 	if dst := r.ValueOf(pv); dst.Kind() != r.Ptr {
 		err = errutil.New("expected a pointer")
 	} else {
-		id, dst := MakeId(name), dst.Elem()
+		id, dst := id.MakeId(name), dst.Elem()
 		// a bool is an indicator of state lookup
 		if dst.Kind() == r.Bool {
 			if enum, path, idx := n.cls.getPropertyByChoice(id); enum == nil {
@@ -66,7 +67,7 @@ func (n *RefInst) GetValue(name string, pv interface{}) (err error) {
 // GetValue can return error when the value violates a property constraint,
 // if the value is not of the requested type, or if the targeted property holder is read-only. Read-only values include the "many" side of a relation.
 func (n *RefInst) SetValue(name string, v interface{}) (err error) {
-	id := MakeId(name)
+	id := id.MakeId(name)
 	if val, ok := v.(bool); ok {
 		if p, path, idx := n.cls.getPropertyByChoice(id); !ok {
 			err = errutil.New("choice not found", name)

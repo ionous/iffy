@@ -1,6 +1,7 @@
 package reflector
 
 import (
+	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
 	. "github.com/ionous/iffy/tests"
 	"github.com/stretchr/testify/assert"
@@ -95,7 +96,7 @@ func TestClassProperties(t *testing.T) {
 		assert.Nil(parent)
 		for i, v := range expected() {
 			p := props[i]
-			assert.Equal(MakeId(v.name), p.GetId(), v.name)
+			assert.Equal(id.MakeId(v.name), p.GetId(), v.name)
 			assert.Equal(v.kind, p.GetType(), v.name)
 		}
 		if assert.Len(md, 2) {

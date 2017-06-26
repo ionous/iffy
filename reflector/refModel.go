@@ -2,6 +2,7 @@ package reflector
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
 	r "reflect"
 )
@@ -23,7 +24,7 @@ func (m *RefModel) ClassNum(i int) ref.Class {
 }
 
 func (m *RefModel) GetClass(name string) (ret ref.Class, okay bool) {
-	id := MakeId(name)
+	id := id.MakeId(name)
 	ret, okay = m.classes[id]
 	return
 }
@@ -37,13 +38,13 @@ func (m *RefModel) ObjectNum(i int) (ret ref.Object) {
 }
 
 func (m *RefModel) GetObject(name string) (ret ref.Object, okay bool) {
-	id := MakeId(name)
+	id := id.MakeId(name)
 	ret, okay = m.objects[id]
 	return
 }
 
 func (m *RefModel) NewObject(class string) (ret ref.Object, err error) {
-	id := MakeId(class)
+	id := id.MakeId(class)
 	if cls, ok := m.classes[id]; !ok {
 		err = errutil.New("no such class", class)
 	} else {
