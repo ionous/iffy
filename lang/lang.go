@@ -29,6 +29,7 @@ func SliceArticle(str string) (article, bare string) {
 	}
 	return article, bare
 }
+
 func StripArticle(str string) string {
 	_, bare := SliceArticle(str)
 	return bare
@@ -44,7 +45,11 @@ var Pluralize = inflect.Pluralize
 var Capitalize = inflect.Capitalize
 
 // Titleize returns a new string, starting every word with a capital.
-var Titleize = inflect.Titleize
+var Titlecase = inflect.Titleize
+
+func Lowercase(s string) string {
+	return strings.ToLower(s)
+}
 
 func StartsWith(s string, set ...string) (ok bool) {
 	for _, x := range set {
