@@ -53,7 +53,7 @@ func (t Tag) Find(key string) (ret string, okay bool) {
 	return
 }
 
-func MergeMetadata(f r.StructField, m *Metadata) {
+func MergeMetadata(f *r.StructField, m *Metadata) {
 	if s := MakeTag(f.Tag); len(s) > 0 {
 		if len(*m) == 0 {
 			*m = make(Metadata)

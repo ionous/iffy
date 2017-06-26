@@ -1,7 +1,7 @@
 package ops
 
 import (
-	"github.com/ionous/iffy/reflector"
+	"github.com/ionous/iffy/id"
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -102,6 +102,6 @@ type CommandBlock struct {
 func TestOpsBlock(t *testing.T) {
 	assert := assert.New(t)
 	ops := NewOps((*CommandBlock)(nil))
-	assert.Contains(ops.names, reflector.MakeId("Container"))
-	assert.Contains(ops.names, reflector.MakeId("Contents"))
+	assert.Contains(ops.Types, id.MakeId("Container"))
+	assert.Contains(ops.Types, id.MakeId("Contents"))
 }

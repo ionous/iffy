@@ -53,39 +53,39 @@ func TestClass(t *testing.T) {
 	var baseClass *RefClass
 	if ref, e := cs.AddClass(base); assert.NoError(e) {
 		baseClass = ref
-	}
-	// base class tests:
-	assert.Equal("$baseClass", baseClass.GetId())
-	_, parentExists := baseClass.GetParent()
-	assert.False(parentExists)
-	// id field
-	assert.Equal("Name", baseClass.findId())
-	// test the property interfaces:
-	assert.Equal(len(expected()), baseClass.NumProperty())
-	first := baseClass.PropertyNum(0)
-	if name, ok := baseClass.GetProperty("name"); assert.True(ok) {
-		assert.Equal(first, name)
-	}
-	// test find by choice:
-	if state, ok := baseClass.GetProperty("state"); assert.True(ok) {
-		if p, ok := baseClass.GetPropertyByChoice("yes"); assert.True(ok) {
-			assert.Equal(state, p)
-		}
-	}
-	// derived class tests:
-	derived := r.TypeOf((*DerivedClass)(nil)).Elem()
-	if ref, e := cs.AddClass(derived); assert.NoError(e) {
-		assert.Equal("$derivedClass", ref.GetId())
-		if p, ok := ref.GetParent(); assert.True(ok) {
-			assert.Equal(baseClass, p)
-			assert.True(p.IsCompatible(p.GetId()))
-		}
+		// base class tests:
+		assert.Equal("$baseClass", baseClass.GetId())
+		_, parentExists := baseClass.GetParent()
+		assert.False(parentExists)
 		// id field
-		assert.Equal("Name", ref.findId())
+		assert.Equal("Name", baseClass.findId())
+		// test the property interfaces:
+		assert.Equal(len(expected()), baseClass.NumProperty())
+		first := baseClass.PropertyNum(0)
+		if name, ok := baseClass.GetProperty("name"); assert.True(ok) {
+			assert.Equal(first, name)
+		}
+		// test find by choice:
+		if state, ok := baseClass.GetProperty("state"); assert.True(ok) {
+			if p, ok := baseClass.GetPropertyByChoice("yes"); assert.True(ok) {
+				assert.Equal(state, p)
+			}
+		}
+		// derived class tests:
+		derived := r.TypeOf((*DerivedClass)(nil)).Elem()
+		if ref, e := cs.AddClass(derived); assert.NoError(e) {
+			assert.Equal("$derivedClass", ref.GetId())
+			if p, ok := ref.GetParent(); assert.True(ok) {
+				assert.Equal(baseClass, p)
+				assert.True(p.IsCompatible(p.GetId()))
+			}
+			// id field
+			assert.Equal("Name", ref.findId())
+		}
+		// class set verification:
+		assert.Contains(cs.classes, "$baseClass")
+		assert.Contains(cs.classes, "$derivedClass")
 	}
-	// class set verification:
-	assert.Contains(cs.classes, "$baseClass")
-	assert.Contains(cs.classes, "$derivedClass")
 }
 
 func TestClassProperties(t *testing.T) {

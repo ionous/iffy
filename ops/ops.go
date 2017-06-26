@@ -3,6 +3,7 @@ package ops
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/ops/unique"
 	"github.com/ionous/iffy/reflector"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
@@ -11,63 +12,18 @@ import (
 )
 
 type Ops struct {
-	names map[string]r.Type
-	root  []interface{}
+	unique.Types
 }
 
 // NewOps creates a registry, calling RegisterBlock on each passed element.
 func NewOps(blocks ...interface{}) *Ops {
-	ops := &Ops{names: make(map[string]r.Type)}
+	ops := &Ops{make(unique.Types)}
 	for _, block := range blocks {
 		if e := ops.RegisterBlock(block); e != nil {
 			panic(e)
 		}
 	}
 	return ops
-}
-
-// RegisterBlock registers a structure containing pointers to commands.
-func (ops *Ops) RegisterBlock(block interface{}) (err error) {
-	if blockType := r.TypeOf(block); blockType.Kind() != r.Ptr {
-		err = errutil.New("expected (nil) pointer (to a struct).")
-	} else if structType := blockType.Elem(); structType.Kind() != r.Struct {
-		err = errutil.New("expected a struct pointer.")
-	} else {
-		for i, cnt := 0, structType.NumField(); i < cnt; i++ {
-			field := structType.Field(i)
-			if e := ops.registerType(field.Type); e != nil {
-				err = errutil.New(field.Name, e)
-				break
-			}
-		}
-	}
-	return
-}
-
-// RegisterType registers a single pointer to a command.
-func (ops *Ops) RegisterType(cmd interface{}) (err error) {
-	if e := ops.registerType(r.TypeOf(cmd)); e != nil {
-		err = errutil.New("command", e)
-	}
-	return
-}
-
-// rtype should be a struct ptr.
-func (ops *Ops) registerType(cmdType r.Type) (err error) {
-	if ptrType := cmdType; ptrType.Kind() != r.Ptr {
-		err = errutil.New("expected (nil) pointer (to a struct).")
-	} else if rtype := ptrType.Elem(); rtype.Kind() != r.Struct {
-		err = errutil.New("expected a struct pointer.")
-	} else {
-		id := reflector.MakeId(rtype.Name())
-		// println("regsiter", id)
-		if was, exists := ops.names[id]; exists && was != rtype {
-			err = errutil.New("has conflicting names, id:", id, "was:", was, "type:", rtype)
-		} else {
-			ops.names[id] = rtype
-		}
-	}
-	return
 }
 
 type Builder struct {
@@ -99,9 +55,8 @@ type _Factory struct {
 
 // NewSpec implements spec.SpecFactory.
 func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
-	id := reflector.MakeId(name)
-	if rtype, ok := fac.ops.names[id]; !ok {
-		err = errutil.New("unknown command", name, id)
+	if rtype, ok := fac.ops.Find(name); !ok {
+		err = errutil.New("unknown command", name)
 	} else {
 		targetPtr := r.New(rtype)
 		ret = &_Spec{

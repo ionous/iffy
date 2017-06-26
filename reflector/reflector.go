@@ -151,24 +151,22 @@ func (cs *ClassSet) AddClass(rtype r.Type) (ret *RefClass, err error) {
 
 func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int, props []ref.Property, err error) {
 	ids := make(map[string]string)
-	//
-	for i, cnt := 0, rtype.NumField(); i < cnt; i++ {
-		field := rtype.Field(i)
+
+	for fw := Fields(rtype); fw.HasNext(); {
+		field := fw.GetNext()
+		if field.Target != rtype {
+			break // weve advanced to the parent
+		}
 		//
-		if len(field.PkgPath) > 0 {
+		if !field.IsPublic() {
 			err = errutil.New("expected only exportable fields", field.Name)
 			break
 		} else {
-			MergeMetadata(field, pdata)
+			MergeMetadata(field.StructField, pdata)
 			//
-			if field.Anonymous && field.Type.Kind() == r.Struct {
-				if parent != nil {
-					err = errutil.New("multiple parents specified", parent, field.Type)
-					break
-				} else {
-					parent = field.Type
-					parentIdx = i
-				}
+			if field.IsParent() {
+				parent = field.Type
+				parentIdx = field.Index
 			} else {
 				id := id.MakeId(field.Name)
 				if was := ids[id]; len(was) > 0 {
@@ -179,11 +177,11 @@ func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int
 					break
 				} else {
 					var p ref.Property
-					base := RefProp{id, i, cat}
+					base := RefProp{id, field.Index, cat}
 					if cat != ref.State {
 						p = &base
 					} else {
-						if choices, e := EnumFromField(&field); e != nil {
+						if choices, e := EnumFromField(field.StructField); e != nil {
 							err = errutil.New("error enumerating", field.Name, field.Type, e)
 							break
 						} else {

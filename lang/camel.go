@@ -30,7 +30,7 @@ func Camelize(name string) (ret string) {
 			parts.WriteRune(r)
 			wasUpper = false
 			inword = number
-		} else if unicode.IsLetter(r) {
+		} else if unicode.IsLetter(r) || r == '#' {
 			currUpper := unicode.IsUpper(r)
 			// classify some common word changes
 			sameWord := (inword == letter) && ((wasUpper == currUpper) || (wasUpper && !currUpper))
