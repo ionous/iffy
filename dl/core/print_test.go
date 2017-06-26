@@ -21,8 +21,8 @@ func (t *CoreSuite) TestPrintSpacing() {
 			}
 			c.End()
 		}
-		if _, e := c.Build(); t.NoError(e) {
-			if e := root.Eval.Execute(t.run); t.NoError(e) {
+		if run, e := t.newRuntime(c); t.NoError(e) {
+			if e := root.Eval.Execute(run); t.NoError(e) {
 				lines := t.Lines()
 				t.Equal("hello there, world.", lines[0], "Note the space after the comma, and the lack of space after the period.")
 			}
@@ -45,8 +45,8 @@ func (t *CoreSuite) TestMultiLines() {
 			}
 			c.End()
 		}
-		if _, e := c.Build(); t.NoError(e) {
-			if e := root.Eval.Execute(t.run); t.NoError(e) {
+		if run, e := t.newRuntime(c); t.NoError(e) {
+			if e := root.Eval.Execute(run); t.NoError(e) {
 				lines := t.Lines()
 				t.Equal(sliceOf.String("hello", "there", "world"), lines)
 			}
@@ -74,8 +74,8 @@ func (t *CoreSuite) TestSingleLines() {
 			}
 			c.End()
 		}
-		if _, e := c.Build(); t.NoError(e) {
-			if e := root.Eval.Execute(t.run); t.NoError(e) {
+		if run, e := t.newRuntime(c); t.NoError(e) {
+			if e := root.Eval.Execute(run); t.NoError(e) {
 				lines := t.Lines()
 				t.Equal("hello there world", lines[0])
 			}
@@ -99,8 +99,8 @@ func (t *CoreSuite) TestLineIndex() {
 			}
 			c.End()
 		}
-		if _, e := c.Build(); t.NoError(e) {
-			if e := root.Eval.Execute(t.run); t.NoError(e) {
+		if run, e := t.newRuntime(c); t.NoError(e) {
+			if e := root.Eval.Execute(run); t.NoError(e) {
 				lines := t.Lines()
 				t.Equal(sliceOf.String("1", "2", "3"), lines)
 			}
@@ -109,7 +109,7 @@ func (t *CoreSuite) TestLineIndex() {
 }
 
 // TestLineEndings verifies loop first and last properties.
-func (t *CoreSuite) xTestLineEndings() {
+func (t *CoreSuite) TestLineEndings() {
 	var root struct {
 		Eval rt.Execute
 	}
@@ -135,8 +135,8 @@ func (t *CoreSuite) xTestLineEndings() {
 			}
 			c.End()
 		}
-		if _, e := c.Build(); t.NoError(e) {
-			if e := root.Eval.Execute(t.run); t.NoError(e) {
+		if run, e := t.newRuntime(c); t.NoError(e) {
+			if e := root.Eval.Execute(run); t.NoError(e) {
 				lines := t.Lines()
 				t.Equal(sliceOf.String("first", "two", "last"), lines)
 			}

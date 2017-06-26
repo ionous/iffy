@@ -3,6 +3,7 @@ package ops
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ops/unique"
 	"github.com/ionous/iffy/reflector"
 	"github.com/ionous/iffy/rt"
@@ -98,12 +99,12 @@ func (spec *_Spec) Position(arg interface{}) (err error) {
 }
 
 func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
-	id := reflector.MakeId(key)
+	myid := id.MakeId(key)
 	tgt := spec.targetPtr.Elem()
 	tgtType := tgt.Type()
 	for i, cnt := spec.index, tgtType.NumField(); i < cnt; i++ {
 		fieldInfo := tgtType.Field(i)
-		if id == reflector.MakeId(fieldInfo.Name) {
+		if myid == id.MakeId(fieldInfo.Name) {
 			field := tgt.Field(i)
 			if e := setField(field, arg); e != nil {
 				err = errutil.New("field", key, e)

@@ -13,6 +13,7 @@ type Commands struct {
 	*ChooseText
 	*CompareNum
 	*CompareText
+	*CycleText
 	// *DoNothing
 	*EqualTo
 	// *Error
