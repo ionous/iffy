@@ -7,17 +7,10 @@ import (
 	"github.com/ionous/iffy/reflector"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
-	. "github.com/ionous/iffy/tests"
 	"github.com/stretchr/testify/suite"
 	"strings"
 	"testing"
 )
-
-var people = []interface{}{
-	&Person{"alice", Listening, Standing},
-	&Person{"bob", Listening, Sitting},
-	&Person{"carol", Laughing, Sitting},
-}
 
 func TestCore(t *testing.T) {
 	suite.Run(t, new(CoreSuite))

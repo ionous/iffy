@@ -43,17 +43,16 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 	} else if l, e := NewLooper(run, "NumberCounter", f.Go); e != nil {
 		err = e
 	} else {
-		run.PushScope(NewScope(l.obj))
-		defer run.PopScope()
 		for it.HasNext() {
 			if v, e := it.GetNext(); e != nil {
 				err = errutil.New("failed each num get", e)
 				break
-			} else if l.RunNext("Num", v, it.HasNext()); e != nil {
+			} else if e := l.RunNext("Num", v, it.HasNext()); e != nil {
 				err = e
 				break
 			}
 		}
+		l.End()
 	}
 	return
 }
@@ -76,17 +75,16 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	} else if l, e := NewLooper(run, "TextCounter", f.Go); e != nil {
 		err = e
 	} else {
-		run.PushScope(NewScope(l.obj))
-		defer run.PopScope()
 		for it.HasNext() {
 			if v, e := it.GetNext(); e != nil {
 				err = errutil.New("failed each num get", e)
 				break
-			} else if l.RunNext("Text", v, it.HasNext()); e != nil {
+			} else if e := l.RunNext("Text", v, it.HasNext()); e != nil {
 				err = e
 				break
 			}
 		}
+		l.End()
 	}
 	return
 }
