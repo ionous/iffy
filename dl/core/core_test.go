@@ -19,21 +19,19 @@ var people = []interface{}{
 	&Person{"carol", Laughing, Sitting},
 }
 
-// Regular expression to select test suites specified command-line argument "-run". Regular expression to select the methods of test suites specified command-line argument "-m"
-type CoreSuite struct {
-	suite.Suite
-	ops   *ops.Ops
-	run   rt.Runtime
-	lines rtm.LineWriter
-}
-
 func TestCoreSuite(t *testing.T) {
 	suite.Run(t, new(CoreSuite))
 }
 
-func (t *CoreSuite) Log(args ...interface{}) {
-	t.T().Log(args...)
+// Regular expression to select test suites specified command-line argument "-run". Regular expression to select the methods of test suites specified command-line argument "-m"
+type CoreSuite struct {
+	suite.Suite
+	ops   *ops.Ops
+	test  *testing.T
+	run   rt.Runtime
+	lines rtm.LineWriter
 }
+
 func (t *CoreSuite) Lines() (ret []string) {
 	ret = t.lines.Lines()
 	t.lines = rtm.LineWriter{}
@@ -41,8 +39,9 @@ func (t *CoreSuite) Lines() (ret []string) {
 }
 
 func (t *CoreSuite) SetupTest() {
-	errutil.Panic = true
+	errutil.Panic = !true
 	t.ops = ops.NewOps((*core.Commands)(nil))
+	t.test = t.T()
 	mm := reflector.NewModelMaker()
 	mm.AddClass((*core.NumberCounter)(nil))
 	mm.AddClass((*core.TextCounter)(nil))
@@ -59,11 +58,13 @@ func (t *CoreSuite) TestShortcuts() {
 	var root struct {
 		Eval rt.TextEval
 	}
-	if c := t.ops.Build(&root); c.Args {
-		c.Value("shortcut")
-	}
-	if res, e := root.Eval.GetText(t.run); t.NoError(e) {
-		t.EqualValues("shortcut", res)
+	if c, ok := t.ops.NewBuilder(&root); ok {
+		c.Val("shortcut")
+		if _, e := c.Build(); t.NoError(e) {
+			if res, e := root.Eval.GetText(t.run); t.NoError(e) {
+				t.EqualValues("shortcut", res)
+			}
+		}
 	}
 }
 
@@ -72,15 +73,17 @@ func (t *CoreSuite) TestAllTrue() {
 	var root struct {
 		Eval rt.BoolEval
 	}
-	test := func(a, b, c bool) {
-		if c := t.ops.Build(&root); c.Args {
-			if c := c.Cmd("all true").Array(); c.Cmds {
-				c.Cmd("bool", a)
-				c.Cmd("bool", b)
+	test := func(a, b, res bool) {
+		if c, ok := t.ops.NewBuilder(&root); ok {
+			c.Cmd("all true", c.Cmds(
+				c.Cmd("bool", a),
+				c.Cmd("bool", b)))
+			//
+			if _, e := c.Build(); t.NoError(e) {
+				if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
+					t.EqualValues(res, ok)
+				}
 			}
-		}
-		if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
-			t.EqualValues(c, ok)
 		}
 	}
 	test(true, false, false)
@@ -93,15 +96,18 @@ func (t *CoreSuite) TestAnyTrue() {
 	var root struct {
 		Eval rt.BoolEval
 	}
-	test := func(a, b, c bool) {
-		if c := t.ops.Build(&root); c.Args {
-			if c := c.Cmd("any true").Array(); c.Cmds {
-				c.Cmd("bool", a)
-				c.Cmd("bool", b)
+	test := func(a, b, res bool) {
+		if c, ok := t.ops.NewBuilder(&root); ok {
+			if c.Cmd("any true").Block() {
+				c.Cmds(c.Cmd("bool", a), c.Cmd("bool", b))
+				c.End()
 			}
-		}
-		if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
-			t.EqualValues(c, ok)
+			// /
+			if _, e := c.Build(); t.NoError(e) {
+				if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
+					t.EqualValues(res, ok)
+				}
+			}
 		}
 	}
 	test(true, false, true)
@@ -114,15 +120,17 @@ func (t *CoreSuite) TestCompareNum() {
 		Eval rt.BoolEval
 	}
 	test := func(a float64, op string, b float64) {
-		if c := t.ops.Build(&root); c.Args {
-			if c := c.Cmd("compare num"); c.Args {
-				c.Cmd("num", a)
-				c.Cmd(op)
-				c.Cmd("num", b)
+		if c, ok := t.ops.NewBuilder(&root); ok {
+			if c.Cmd("compare num").Block() {
+				c.Val(a).Cmd(op).Val(b)
+				c.End()
 			}
-		}
-		if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
-			t.True(ok)
+
+			if _, e := c.Build(); t.NoError(e) {
+				if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
+					t.True(ok)
+				}
+			}
 		}
 	}
 	test(10, "greater than", 1)
@@ -136,15 +144,14 @@ func (t *CoreSuite) TestCompareText() {
 		Eval rt.BoolEval
 	}
 	test := func(a, op, b string) {
-		if c := t.ops.Build(&root); c.Args {
-			if c := c.Cmd("compare text"); c.Args {
-				c.Cmd("text", a)
-				c.Cmd(op)
-				c.Cmd("text", b)
+		if c, ok := t.ops.NewBuilder(&root); ok {
+			c.Cmd("compare text", c.Val(a), c.Cmd(op), c.Val(b))
+			//
+			if _, e := c.Build(); t.NoError(e) {
+				if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
+					t.True(ok, strings.Join([]string{a, op, b}, " "))
+				}
 			}
-		}
-		if ok, e := root.Eval.GetBool(t.run); t.NoError(e) {
-			t.True(ok, strings.Join([]string{a, op, b}, " "))
 		}
 	}
 	test("Z", "greater than", "A")

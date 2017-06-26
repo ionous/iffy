@@ -67,3 +67,47 @@ func TestSpec(t *testing.T) {
 		}
 	}
 }
+
+var order = &cmd.Command{
+	Name: "container",
+	Args: []interface{}{
+		5,
+		&cmd.Command{
+			Name: "op",
+		},
+		10,
+	},
+}
+
+func TestPositioning(t *testing.T) {
+	assert := assert.New(t)
+	if c, ok := cmd.NewBuilder(); assert.True(ok) {
+		c.Cmd("container", c.Val(5), c.Cmd("op"), c.Val(10))
+		if root, e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(order, root.Args[0])
+		}
+	}
+}
+
+func TestChaining(t *testing.T) {
+	assert := assert.New(t)
+	if c, ok := cmd.NewBuilder(); assert.True(ok) {
+
+		if c.Cmd("container").Block() {
+			c.Val(5).Cmd("op").Val(10)
+			c.End()
+		}
+		if root, e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(order, root.Args[0])
+		}
+	}
+}
+
+func TestParameterChaining(t *testing.T) {
+	assert := assert.New(t)
+	if c, ok := cmd.NewBuilder(); assert.True(ok) {
+		assert.Panics(func() {
+			c.Cmd("container", c.Val(5).Val(10))
+		})
+	}
+}

@@ -127,7 +127,7 @@ type _Spec struct {
 func (spec *_Spec) Position(arg interface{}) (err error) {
 	tgt := spec.targetPtr.Elem()
 	if cnt := tgt.NumField(); spec.index >= cnt {
-		err = errutil.New("too many arguments. expected", spec.index)
+		err = errutil.New("too many arguments. expected", cnt)
 	} else {
 		field := tgt.Field(spec.index)
 		if e := setField(field, arg); e != nil {
@@ -176,7 +176,9 @@ func (specs *_Specs) AddElement(el spec.Spec) (err error) {
 func setField(dst r.Value, src interface{}) (err error) {
 	switch src := src.(type) {
 	case *_Spec:
-		err = reflector.CoerceValue(dst, src.targetPtr)
+		if e := reflector.CoerceValue(dst, src.targetPtr); e != nil {
+			err = errutil.New("couldnt assign command", e)
+		}
 
 	case *_Specs:
 		if kind, isArray := arrayKind(dst.Type()); !isArray || kind != r.Interface {
@@ -205,7 +207,9 @@ func setField(dst r.Value, src interface{}) (err error) {
 				src = literal
 			}
 		}
-		err = reflector.CoerceValue(dst, src)
+		if e := reflector.CoerceValue(dst, src); e != nil {
+			err = errutil.New("couldnt assign primitive value", e)
+		}
 
 	default:
 		err = errutil.Fmt("assigning unexpected type %T", src)

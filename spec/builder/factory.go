@@ -5,97 +5,130 @@ import (
 	"github.com/ionous/iffy/spec"
 )
 
-// Build the memento tree to finialize values
-func Build(n *Memento) (ret interface{}, err error) {
-	if n.spec != nil {
-		if e := buildSpec(n); e != nil {
-			err = e
-		} else {
-			ret = n.spec
-		}
-	} else if n.specs != nil {
-		if e := buildSpecs(n); e != nil {
-			err = e
-		} else {
-			ret = n.specs
-		}
-	} else if n.val != nil {
-		if e := buildValue(n); e != nil {
-			err = e
-		} else {
-			ret = n.val
-		}
+// Factory builds commands.
+type Factory struct {
+	specs  spec.Factory
+	blocks *Mementos
+}
+
+func (b *Factory) newBlock() (err error) {
+	// another way of thinking about new/Block() is that it elevates the most recent^ memento to block status. parameters are excluded from most recent because they are pulled from the block
+	if block, ok := b.blocks.Top(); !ok {
+		err = errutil.New("block can only be used inside of another block.")
+	} else if mostRecent, ok := block.kids.Top(); !ok {
+		err = errutil.New("block encountered an unexpected error")
 	} else {
-		err = errutil.New(n.pos, "memento is empty?")
+		b.blocks.Push(mostRecent)
 	}
 	return
 }
 
-func buildValue(n *Memento) (err error) {
-	if !n.kids.IsEmpty() {
-		err = errutil.New("values should not have children")
+func (b *Factory) endBlock() (err error) {
+	if _, ok := b.blocks.Pop(); !ok {
+		err = errutil.New("mismatched begin/end")
 	}
 	return
 }
 
-func buildSpec(n *Memento) (err error) {
-	var keys map[string]*Memento
-	// walk in order for the sake of positions.
-	var list []*Memento
-	list, n.kids.list = n.kids.list, nil
-	for _, kid := range list {
-		//
-		if v, e := Build(kid); e != nil {
-			err = errutil.New(kid.pos, e)
-			break
+func (b *Factory) newCmd(src *Memento, name string, args []interface{}) (ret *Memento, err error) {
+	if spec, e := b.specs.NewSpec(name); e != nil {
+		err = e
+	} else {
+		if n, e := b.zip(&Memento{
+			chain:   src,
+			factory: b,
+			spec:    spec,
+			pos:     Capture(2),
+		}, args); e != nil {
+			err = e
 		} else {
-			// verify keyword expectations:
-			if k := kid.key; len(k) > 0 {
-				if keys == nil {
-					keys = map[string]*Memento{k: kid}
-				} else if was := keys[k]; was != nil {
-					err = errutil.New(kid.pos, "duplicate keyword detected", was.pos)
+			ret = n
+		}
+	}
+	return
+}
+
+func (b *Factory) newCmds(src *Memento, cmds []*Memento) (ret *Memento, err error) {
+	if specs, e := b.specs.NewSpecs(); e != nil {
+		err = e
+	} else {
+		// normalize into an array of interfaces :(
+		args := make([]interface{}, len(cmds))
+		for i, c := range cmds {
+			args[i] = c
+		}
+		if n, e := b.zip(&Memento{
+			chain:   src,
+			factory: b,
+			specs:   specs,
+			pos:     Capture(2),
+		}, args); e != nil {
+			err = e
+		} else {
+			ret = n
+		}
+	}
+	return
+}
+
+func (b *Factory) newVal(src *Memento, val interface{}) (ret *Memento, err error) {
+	if _, isMemento := val.(*Memento); isMemento {
+		err = errutil.New("New value requested, but the value is not a primitive.")
+	} else {
+		if n, e := b.zip(&Memento{
+			chain:   src,
+			factory: b,
+			val:     val,
+			pos:     Capture(2),
+		}, nil); e != nil {
+			err = e
+		} else {
+			ret = n
+		}
+	}
+	return
+}
+
+// Move the passed args to the targeted memento, then add the target to the current block.
+// FIX: add a check against the most recent block to ensure it doesnt get pulled --
+// that could happen if the user called .Block inside of a call to Cmd/s
+func (b *Factory) zip(dst *Memento, args []interface{}) (ret *Memento, err error) {
+	if block, ok := b.blocks.Top(); !ok {
+		err = errutil.New("no active block.")
+	} else if !dst.kids.IsEmpty() {
+		err = errutil.New("kids not empty")
+	} else {
+		if cnt := len(args); cnt > 0 {
+			a := make([]*Memento, cnt)
+			// Commands created as arguments will exist as mementos in this block's stack.
+			// Go evaluates expression calls left to right, so the rightmost arg is on top.
+			// Walk right-to-left, removing from the block and adding to the dst.
+			for i := cnt - 1; i >= 0; i-- {
+				arg := args[i]
+				if n, ok := arg.(*Memento); !ok {
+					// not a memento? then its a positional value.
+					a[i] = &Memento{
+						val: arg,
+						pos: Capture(3),
+					}
+				} else if mostRecent, _ := block.kids.Pop(); n != mostRecent {
+					err = errutil.New("unexpected argument")
+					break
+				} else if n.chain.chain != nil {
+					// parameters always have a parent: the root node of the system
+					// but a parent chain means we are in too deep.
+					// we could, alternatively, run the chain out here.
+					err = errutil.New("chaining calls while passing parameters is not permitted")
 					break
 				} else {
-					keys[k] = kid
-				}
-
-				if e := n.spec.Assign(k, v); e != nil {
-					err = errutil.New(kid.pos, e)
-					break
-				}
-			} else {
-				if keys != nil {
-					err = errutil.New(kid.pos, "positional arguments should appear before all keyword arguments")
-					break
-				}
-				if e := n.spec.Position(v); e != nil {
-					err = errutil.New(kid.pos, e)
-					break
+					a[i] = n
+					n.chain = nil // clear for garbage collector
 				}
 			}
+			dst.kids.list = a
 		}
-	}
-	return
-}
-
-func buildSpecs(n *Memento) (err error) {
-	// walk in order for the sake of array arrangment.
-	var list []*Memento
-	list, n.kids.list = n.kids.list, nil
-	for _, kid := range list {
-		if len(kid.key) > 0 {
-			err = errutil.New(kid.pos, "array elements shouldnt use keyword arguments")
-			break
-		} else if res, e := Build(kid); e != nil {
-			err = errutil.New(kid.pos, e)
-			break
-		} else if spec, ok := res.(spec.Spec); !ok {
-			err = errutil.New(kid.pos, "only commands should be used in arrays")
-			break
-		} else if e := n.specs.AddElement(spec); e != nil {
-			err = errutil.New(kid.pos, e)
-			break
+		if err == nil {
+			ret = block.kids.Push(dst)
 		}
 	}
 	return
