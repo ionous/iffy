@@ -60,6 +60,7 @@ func (ops *Ops) registerType(cmdType r.Type) (err error) {
 		err = errutil.New("expected a struct pointer.")
 	} else {
 		id := reflector.MakeId(rtype.Name())
+		// println("regsiter", id)
 		if was, exists := ops.names[id]; exists && was != rtype {
 			err = errutil.New("has conflicting names, id:", id, "was:", was, "type:", rtype)
 		} else {
@@ -69,19 +70,19 @@ func (ops *Ops) registerType(cmdType r.Type) (err error) {
 	return
 }
 
-type OpsBuilder struct {
+type Builder struct {
 	builder.Builder
 }
 
-func (ops *Ops) NewBuilder(ptr interface{}) (*OpsBuilder, bool) {
+func (ops *Ops) NewBuilder(ptr interface{}) (*Builder, bool) {
 	targetPtr := r.ValueOf(ptr)
 	spec := &_Spec{ops: ops, targetPtr: targetPtr}
-	return &OpsBuilder{
+	return &Builder{
 		builder.NewBuilder(&_Factory{ops}, spec),
 	}, true
 }
 
-func (u *OpsBuilder) Build() (ret interface{}, err error) {
+func (u *Builder) Build() (ret interface{}, err error) {
 	if res, e := u.Builder.Build(); e != nil {
 		err = e
 	} else if spec, ok := res.(*_Spec); !ok {
@@ -100,7 +101,7 @@ type _Factory struct {
 func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
 	id := reflector.MakeId(name)
 	if rtype, ok := fac.ops.names[id]; !ok {
-		err = errutil.New("unknown command", name)
+		err = errutil.New("unknown command", name, id)
 	} else {
 		targetPtr := r.New(rtype)
 		ret = &_Spec{
@@ -222,7 +223,7 @@ func setField(dst r.Value, src interface{}) (err error) {
 // c.Cmd("texts", sliceOf.String("one", "two", "three"))
 // c.Value(sliceOf.String("one", "two", "three"))
 //
-// c.Cmd("get").Block() { c.Cmd("object", "@") c.Value("text") }
+// c.Cmd("get").Begin() { c.Cmd("object", "@") c.Value("text") }
 // c.Cmd("get", "@", "text")
 //
 // FIX? move literals to "builtin" to avoid the dependency on core.

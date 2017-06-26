@@ -5,7 +5,7 @@ import (
 )
 
 // Memento is returned by Factory. It contains a Factory to allow chaining of calls. Each chained call targets the surrounding block. For example, in:
-//  if c.Cmd("parent").Block() {
+//  if c.Cmd("parent").Begin() {
 //    c.Cmd("some command", params).Cmds(els).Val(value).End()
 //  }
 // the command, the array, and the val are all considered members of "parent".
@@ -20,11 +20,11 @@ type Memento struct {
 	kids    Mementos    // child data, either array elements or command parameters
 }
 
-// Block starts a new block of commands. Usually used as:
-//  if c.Cmd("name").Block() {
+// Begin starts a new parameter block. Usually used as:
+//  if c.Cmd("name").Begin() {
 //    c.End()
 //  }
-func (n *Memento) Block() (okay bool) {
+func (n *Memento) Begin() (okay bool) {
 	if e := n.factory.newBlock(); e != nil {
 		panic(e)
 	} else {
@@ -33,7 +33,7 @@ func (n *Memento) Block() (okay bool) {
 	return
 }
 
-// End terminates a block. See also Factory.Blto	ock()
+// End terminates a block. See also Factory.Begin()
 func (n *Memento) End() {
 	if e := n.factory.endBlock(); e != nil {
 		panic(e)
@@ -42,7 +42,7 @@ func (n *Memento) End() {
 }
 
 // Cmd adds a new command of name with the passed set of positional args. Args can contain Mementos and literals. Returns a memento which can be passed to arrays or commands, or chained.
-// To add data to the new command, pass them via args or follow this call with a call to Factory.Block().
+// To add data to the new command, pass them via args or follow this call with a call to Factory.Begin().
 func (n *Memento) Cmd(name string, args ...interface{}) (ret *Memento) {
 	if n, e := n.factory.newCmd(n, name, args); e != nil {
 		panic(e)
@@ -52,7 +52,7 @@ func (n *Memento) Cmd(name string, args ...interface{}) (ret *Memento) {
 	return
 }
 
-// Cmds specifies a new array of commands. Additional elements can be added to the array using Factory.Block().
+// Cmds specifies a new array of commands. Additional elements can be added to the array using Factory.Begin().
 func (n *Memento) Cmds(cmds ...*Memento) (ret *Memento) {
 	if n, e := n.factory.newCmds(n, cmds); e != nil {
 		panic(e)

@@ -12,8 +12,8 @@ func (t *CoreSuite) TestPrintSpacing() {
 		Eval rt.Execute
 	}
 	if c, ok := t.ops.NewBuilder(&root); ok {
-		if c.Cmd("print line").Block() {
-			if c.Cmds().Block() {
+		if c.Cmd("print line").Begin() {
+			if c.Cmds().Begin() {
 				c.Cmd("print text", "hello")
 				c.Cmd("print text", "there,")
 				c.Cmd("print text", "world.")
@@ -37,9 +37,9 @@ func (t *CoreSuite) TestMultiLines() {
 		Eval rt.Execute
 	}
 	if c, ok := t.ops.NewBuilder(&root); ok {
-		if c.Cmd("for each text").Block() {
+		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("hello", "there", "world"))
-			if c.Param("go").Cmds().Block() {
+			if c.Param("go").Cmds().Begin() {
 				c.Cmd("print text", c.Cmd("get", "@", "text"))
 				c.End()
 			}
@@ -61,11 +61,11 @@ func (t *CoreSuite) TestSingleLines() {
 		Eval rt.Execute
 	}
 	if c, ok := t.ops.NewBuilder(&root); ok {
-		if c.Cmd("print line").Block() {
-			if c.Cmds().Block() {
-				if c.Cmd("for each text").Block() {
+		if c.Cmd("print line").Begin() {
+			if c.Cmds().Begin() {
+				if c.Cmd("for each text").Begin() {
 					c.Param("in").Val(sliceOf.String("hello", "there", "world"))
-					if c.Param("go").Cmds().Block() {
+					if c.Param("go").Cmds().Begin() {
 						c.Cmd("print text", c.Cmd("get", "@", "text")).End()
 					}
 					c.End()
@@ -89,10 +89,10 @@ func (t *CoreSuite) TestLineIndex() {
 		Eval rt.Execute
 	}
 	if c, ok := t.ops.NewBuilder(&root); ok {
-		if c.Cmd("for each text").Block() {
+		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
-			if c.Param("go").Cmds().Block() {
-				if c.Cmd("print num").Block() {
+			if c.Param("go").Cmds().Begin() {
+				if c.Cmd("print num").Begin() {
 					c.Cmd("get", "@", "index").End()
 				}
 				c.End()
@@ -114,14 +114,14 @@ func (t *CoreSuite) xTestLineEndings() {
 		Eval rt.Execute
 	}
 	if c, ok := t.ops.NewBuilder(&root); ok {
-		if c.Cmd("for each text").Block() {
+		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
-			if c.Param("go").Cmds().Block() {
-				if c.Cmd("print text").Block() {
-					if c.Cmd("choose text").Block() {
+			if c.Param("go").Cmds().Begin() {
+				if c.Cmd("print text").Begin() {
+					if c.Cmd("choose text").Begin() {
 						c.Param("if").Cmd("get", "@", "last")
 						c.Param("true").Val("last")
-						if c.Param("false").Cmd("choose text").Block() {
+						if c.Param("false").Cmd("choose text").Begin() {
 							c.Param("if").Cmd("get", "@", "first")
 							c.Param("true").Val("first")
 							c.Param("false").Cmd("get", "@", "text")

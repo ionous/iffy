@@ -78,10 +78,10 @@ func (t *OpsSuite) TestAllAreOne() {
 		// the simple way:
 		c.Cmd("contents", "all are one")
 		// // cause why not:
-		if c.Cmd("contents").Block() {
+		if c.Cmd("contents").Begin() {
 			c.Val("dilute, dilute").End()
 		}
-		if c.Param("more").Cmds().Block() {
+		if c.Param("more").Cmds().Begin() {
 			c.Cmd("container", c.Param("value").Val(5))
 			c.Cmd("container", c.Param("value").Val(7))
 			c.End()

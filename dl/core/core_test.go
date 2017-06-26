@@ -19,7 +19,7 @@ var people = []interface{}{
 	&Person{"carol", Laughing, Sitting},
 }
 
-func TestCoreSuite(t *testing.T) {
+func TestCore(t *testing.T) {
 	suite.Run(t, new(CoreSuite))
 }
 
@@ -98,7 +98,7 @@ func (t *CoreSuite) TestAnyTrue() {
 	}
 	test := func(a, b, res bool) {
 		if c, ok := t.ops.NewBuilder(&root); ok {
-			if c.Cmd("any true").Block() {
+			if c.Cmd("any true").Begin() {
 				c.Cmds(c.Cmd("bool", a), c.Cmd("bool", b))
 				c.End()
 			}
@@ -121,7 +121,7 @@ func (t *CoreSuite) TestCompareNum() {
 	}
 	test := func(a float64, op string, b float64) {
 		if c, ok := t.ops.NewBuilder(&root); ok {
-			if c.Cmd("compare num").Block() {
+			if c.Cmd("compare num").Begin() {
 				c.Val(a).Cmd(op).Val(b)
 				c.End()
 			}

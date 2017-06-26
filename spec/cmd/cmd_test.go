@@ -11,8 +11,8 @@ import (
 func TestMismatchedEnds(t *testing.T) {
 	assert := assert.New(t)
 	if c, ok := cmd.NewBuilder(); assert.True(ok) {
-		if c.Cmds().Block() {
-			if c.Cmd("unit").Block() {
+		if c.Cmds().Begin() {
+			if c.Cmd("unit").Begin() {
 				// c.End() --> missing an end
 			} // unit
 			c.End()
@@ -39,20 +39,20 @@ func TestDuplicateKeys(t *testing.T) {
 func TestSpec(t *testing.T) {
 	assert := assert.New(t)
 	if c, ok := cmd.NewBuilder(); assert.True(ok) {
-		if c.Cmd("unit").Block() {
-			if c.Param("trials").Cmds().Block() {
+		if c.Cmd("unit").Begin() {
+			if c.Param("trials").Cmds().Begin() {
 				// 	// cycles:
 				c.Cmd("match output", sliceOf.String("a", "b", "c", "d"))
-				if c.Cmd("match output", sliceOf.String("a", "b", "c", "d")).Block() {
-					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Block() {
+				if c.Cmd("match output", sliceOf.String("a", "b", "c", "d")).Begin() {
+					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Begin() {
 						a := c.Cmd("cycle", sliceOf.String("a", "b", "c"))
 						c.Cmd("print text", a).End()
 					}
 					c.End()
 				}
 				// stopping:
-				if c.Cmd("match output", sliceOf.String("a", "b", "c", "c")).Block() {
-					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Block() {
+				if c.Cmd("match output", sliceOf.String("a", "b", "c", "c")).Begin() {
+					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Begin() {
 						c.Cmd("print text", c.Cmd("stopping", sliceOf.String("a", "b", "c")))
 						c.End()
 					}
@@ -93,7 +93,7 @@ func TestChaining(t *testing.T) {
 	assert := assert.New(t)
 	if c, ok := cmd.NewBuilder(); assert.True(ok) {
 
-		if c.Cmd("container").Block() {
+		if c.Cmd("container").Begin() {
 			c.Val(5).Cmd("op").Val(10)
 			c.End()
 		}
