@@ -1,20 +1,36 @@
 package rtm
 
 import (
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/reflector"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
+	r "reflect"
 )
 
 type Rtm struct {
-	ref.Model
+	reflector.Classes
+	reflector.Objects
 	ScopeStack
 	OutputStack
 	Randomizer
 }
 
-func NewRtm(model ref.Model) *Rtm {
-	rtm := &Rtm{Model: model}
-	rtm.PushScope(scope.ModelFinder(model))
+func NewRtm(classes reflector.Classes, objects reflector.Objects) *Rtm {
+	rtm := &Rtm{Classes: classes, Objects: objects}
+	rtm.PushScope(scope.ModelFinder(rtm))
 	rtm.Randomizer.Reset(1) // FIX: time?
 	return rtm
+}
+
+func (rtm *Rtm) NewObject(class string) (ret rt.Object, err error) {
+	id := id.MakeId(class)
+	if cls, ok := rtm.Classes[id]; !ok {
+		err = errutil.New("no such class", class)
+	} else {
+		inst := r.New(cls.Type())
+		ret = reflector.NewInst(cls, inst.Elem())
+	}
+	return
 }

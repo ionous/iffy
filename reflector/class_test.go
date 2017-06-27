@@ -2,8 +2,8 @@ package reflector
 
 import (
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/reflector/unique"
+	"github.com/ionous/iffy/rt"
 	. "github.com/ionous/iffy/tests"
 	"github.com/stretchr/testify/assert"
 	r "reflect"
@@ -28,31 +28,31 @@ type DerivedClass struct {
 
 type Expected struct {
 	name string
-	kind ref.PropertyType
+	kind rt.PropertyType
 }
 
 func expected() []Expected {
 	return []Expected{
-		{"Name", ref.Text},
-		{"Num", ref.Number},
-		{"Text", ref.Text},
-		{"Object", ref.Pointer},
-		{"Nums", ref.Number | ref.Array},
-		{"Texts", ref.Text | ref.Array},
-		{"Objects", ref.Pointer | ref.Array},
-		{"State", ref.State},
-		{"Labeled", ref.State},
+		{"Name", rt.Text},
+		{"Num", rt.Number},
+		{"Text", rt.Text},
+		{"Object", rt.Pointer},
+		{"Nums", rt.Number | rt.Array},
+		{"Texts", rt.Text | rt.Array},
+		{"Objects", rt.Pointer | rt.Array},
+		{"State", rt.State},
+		{"Labeled", rt.State},
 	}
 }
 
 func TestClass(t *testing.T) {
 	assert := assert.New(t)
 	//
-	cs := MakeClassSet()
+	cs := make(Classes)
 	base := r.TypeOf((*BaseClass)(nil)).Elem()
 	// add and retrieve base class:
 	var baseClass *RefClass
-	if ref, e := cs.AddClass(base); assert.NoError(e) {
+	if ref, e := cs.addClass(base); assert.NoError(e) {
 		baseClass = ref
 		// base class tests:
 		assert.Equal("$baseClass", baseClass.GetId())
@@ -73,19 +73,19 @@ func TestClass(t *testing.T) {
 			}
 		}
 		// derived class tests:
-		derived := r.TypeOf((*DerivedClass)(nil)).Elem()
-		if ref, e := cs.AddClass(derived); assert.NoError(e) {
-			assert.Equal("$derivedClass", ref.GetId())
-			if p, ok := ref.GetParent(); assert.True(ok) {
+		derivedType := r.TypeOf((*DerivedClass)(nil)).Elem()
+		if derived, e := cs.addClass(derivedType); assert.NoError(e) {
+			assert.Equal("$derivedClass", derived.GetId())
+			if p, ok := derived.GetParent(); assert.True(ok) {
 				assert.Equal(baseClass, p)
 				assert.True(p.IsCompatible(p.GetId()))
 			}
 			// id field
-			assert.Equal("Name", ref.findId())
+			assert.Equal("Name", derived.findId())
 		}
 		// class set verification:
-		assert.Contains(cs.classes, "$baseClass")
-		assert.Contains(cs.classes, "$derivedClass")
+		assert.Contains(cs, "$baseClass")
+		assert.Contains(cs, "$derivedClass")
 	}
 }
 

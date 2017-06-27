@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ref"
+
 	"github.com/ionous/iffy/rt"
 	"strconv"
 )
@@ -68,7 +68,7 @@ type Object struct {
 }
 
 // GetObject searches through the scope for an object matching Name
-func (op *Object) GetObject(run rt.Runtime) (ret ref.Object, err error) {
+func (op *Object) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, ok := run.FindObject(op.Name); !ok {
 		err = errutil.New("Object.GetObject, couldnt find", op.Name)
 	} else {
@@ -164,7 +164,7 @@ func (it *ObjectIt) HasNext() bool {
 	return it.idx < len(it.list)
 }
 
-func (it *ObjectIt) GetNext() (ret ref.Object, err error) {
+func (it *ObjectIt) GetNext() (ret rt.Object, err error) {
 	if !it.HasNext() {
 		err = rt.StreamExceeded
 	} else {

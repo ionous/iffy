@@ -2,7 +2,7 @@ package reflector
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/rt"
 	. "github.com/ionous/iffy/tests"
 	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/suite"
@@ -16,7 +16,7 @@ func TestObjectSuite(t *testing.T) {
 
 type ObjectSuite struct {
 	suite.Suite
-	m *RefModel
+	m Objects
 	b *BaseClass
 	d *DerivedClass
 }
@@ -28,7 +28,8 @@ func (t *ObjectSuite) SetupTest() {
 	errutil.Panic = true
 	b := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	d := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
-	if m, e := MakeModel(b, d); t.NoError(e) {
+	cs := make(Classes)
+	if m, e := cs.MakeModel(sliceOf.Interface(b, d)); t.NoError(e) {
 		t.b = b
 		t.d = d
 		t.m = m
@@ -125,12 +126,12 @@ func (t *ObjectSuite) xTestPropertyAccess() {
 	// {"Name", new(string)},
 	// {"Num", new(float64)},
 	// {"Text", new(string)},
-	// {"Object", ref.Pointer},
+	// {"Object", rt.Pointer},
 	// {"Nums", new([]float64)},
-	// {"Texts", ref.Text | ref.Array},
-	// {"Objects", ref.Pointer | ref.Array},
+	// {"Texts", rt.Text | rt.Array},
+	// {"Objects", rt.Pointer | rt.Array},
 	}
-	test := func(n ref.Object) {
+	test := func(n rt.Object) {
 		for _, v := range expected {
 			if e := n.GetValue(v.name, v.pv); t.NoError(e) {
 				//

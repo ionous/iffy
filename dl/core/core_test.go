@@ -52,25 +52,22 @@ func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 		err = e
 	} else {
 
-		mm := reflector.NewModelMaker()
-		mm.AddClass((*core.NumberCounter)(nil))
-		mm.AddClass((*core.TextCounter)(nil))
+		cs := make(reflector.Classes)
+		mm := unique.PanicRegistry(cs)
+		unique.RegisterType(mm, (*core.NumberCounter)(nil))
+		unique.RegisterType(mm, (*core.TextCounter)(nil))
 		// add all the classes we registered in unique
 		for _, rtype := range t.unique.Types {
-			mm.AddClass(r.New(rtype).Interface())
+			unique.RegisterType(mm, r.New(rtype).Interface())
 		}
 
 		if inst, e := t.unique.Generate(); e != nil {
 			err = e
 		} else {
-			if cnt := len(inst); cnt > 0 {
-				mm.AddInstance(inst...)
-			}
-			//
-			if m, e := mm.MakeModel(); e != nil {
+			if m, e := cs.MakeModel(inst); e != nil {
 				err = e
 			} else {
-				run := rtm.NewRtm(m)
+				run := rtm.NewRtm(cs, m)
 				run.PushWriter(&t.lines)
 				ret = run
 			}

@@ -2,7 +2,6 @@ package rtm
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -12,7 +11,7 @@ type ScopeStack struct {
 }
 
 // FindObject implements rt.ObjectFinder
-func (os *ScopeStack) FindObject(name string) (ret ref.Object, okay bool) {
+func (os *ScopeStack) FindObject(name string) (ret rt.Object, okay bool) {
 	if cnt := len(os.stack); cnt > 0 {
 		ret, okay = os.stack[cnt-1].FindObject(name)
 	}

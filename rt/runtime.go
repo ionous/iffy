@@ -1,25 +1,32 @@
 package rt
 
 import (
-	"github.com/ionous/iffy/ref"
 	"io"
 )
 
 type ObjectFinder interface {
-	FindObject(name string) (ref.Object, bool)
+	FindObject(name string) (Object, bool)
 }
 
 type Runtime interface {
-	ref.Model
-
 	Random(inclusiveMin, exclusiveMax int) int
 
 	ObjectFinder
 	PushScope(ObjectFinder)
 	PopScope()
 
+	// NewObject from the passed class. The object has no name and cannot be found via GetObject()
+	NewObject(class string) (Object, error)
+	// GetObject returns the object with the passed name.
+	GetObject(name string) (Object, bool)
+	// GetClass returns the class with the passed name.
+	GetClass(name string) (Class, bool)
+
+	// Writer writes standard output.
 	io.Writer
+	// PushWriter to set the active writer.
 	PushWriter(io.Writer)
+	// PopWriter to restore the writer active before the most recent PushWriter.
 	PopWriter()
 }
 

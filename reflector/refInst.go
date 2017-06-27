@@ -3,7 +3,7 @@ package reflector
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
@@ -13,18 +13,22 @@ type RefInst struct {
 	cls  *RefClass
 }
 
+func NewInst(cls *RefClass, rval r.Value) *RefInst {
+	return &RefInst{rval: rval, cls: cls}
+}
+
 // GetId returns the unique identifier for this Object.
 func (n *RefInst) GetId() string {
 	return n.id
 }
 
 // GetClass returns the variety of object.
-func (n *RefInst) GetClass() (ret ref.Class) {
+func (n *RefInst) GetClass() (ret rt.Class) {
 	return n.cls
 }
 
 // GetValue stores the value into the pointer pv.
-// Values include ref.Objects for relations and pointers, numbers, and text. For numbers, pv can be any numberic type: float64, int, etc.
+// Values include rt.Objects for relations and pointers, numbers, and text. For numbers, pv can be any numberic type: float64, int, etc.
 func (n *RefInst) GetValue(name string, pv interface{}) (err error) {
 	if dst := r.ValueOf(pv); dst.Kind() != r.Ptr {
 		err = errutil.New("expected a pointer")
@@ -49,10 +53,10 @@ func (n *RefInst) GetValue(name string, pv interface{}) (err error) {
 				err = errutil.New("field not found", name)
 			} else {
 				switch t := p.GetType(); t {
-				case ref.Pointer:
+				case rt.Pointer:
 					panic("not implemented")
 					break
-				case ref.Pointer | ref.Array:
+				case rt.Pointer | rt.Array:
 					panic("not implemented")
 					break
 				default:
@@ -84,10 +88,10 @@ func (n *RefInst) SetValue(name string, v interface{}) (err error) {
 		err = errutil.New("field not found", name)
 	} else {
 		switch t := p.GetType(); t {
-		case ref.Pointer:
+		case rt.Pointer:
 			panic("not implemented")
 			break
-		case ref.Pointer | ref.Array:
+		case rt.Pointer | rt.Array:
 			panic("not implemented")
 			break
 		default:

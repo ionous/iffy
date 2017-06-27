@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ref"
+
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
 )
@@ -10,7 +10,7 @@ import (
 // Looper creates LoopScopes
 type Looper struct {
 	run  rt.Runtime
-	obj  ref.Object
+	obj  rt.Object
 	loop []rt.Execute
 }
 

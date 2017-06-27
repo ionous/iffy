@@ -2,7 +2,6 @@ package rt
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ref"
 )
 
 const StreamEnd errutil.Error = "stream end"
@@ -21,7 +20,7 @@ type TextEval interface {
 	GetText(Runtime) (string, error)
 }
 type ObjectEval interface {
-	GetObject(Runtime) (ref.Object, error)
+	GetObject(Runtime) (Object, error)
 }
 type StateEval interface {
 	GetState(Runtime) (int, error)
@@ -48,5 +47,5 @@ type TextStream interface {
 
 type ObjectStream interface {
 	HasNext() bool
-	GetNext() (ref.Object, error)
+	GetNext() (Object, error)
 }

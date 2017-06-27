@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -39,7 +38,7 @@ func (p *Get) GetText(r rt.Runtime) (ret string, err error) {
 	return
 }
 
-func (p *Get) GetObject(r rt.Runtime) (ret ref.Object, err error) {
+func (p *Get) GetObject(r rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Obj.GetObject(r); e != nil {
 		err = e
 	} else {

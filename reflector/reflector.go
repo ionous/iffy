@@ -3,66 +3,73 @@ package reflector
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/reflector/unique"
+	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
-type ModelMaker struct {
-	instances []interface{}
-	classes   []interface{} // nil pointers
+type Classes map[string]*RefClass
+
+func (cs Classes) GetClass(name string) (ret rt.Class, okay bool) {
+	id := id.MakeId(name)
+	ret, okay = cs[id]
+	return
 }
 
-func NewModelMaker() *ModelMaker {
-	return &ModelMaker{}
+func (cs Classes) FindType(name string) (ret r.Type, okay bool) {
+	id := id.MakeId(name)
+	if a, ok := cs[id]; ok {
+		ret, okay = a.rtype, true
+	}
+	return
 }
 
-func (mm *ModelMaker) AddClass(cls ...interface{}) {
-	mm.classes = append(mm.classes, cls...)
+func (cs Classes) RegisterType(rtype r.Type) (err error) {
+	_, err = cs.addClass(rtype.Elem())
+	return
 }
 
-func (mm *ModelMaker) AddInstance(inst ...interface{}) {
-	mm.instances = append(mm.instances, inst...)
+func (cs Classes) addClass(rtype r.Type) (ret *RefClass, err error) {
+	clsid := id.MakeId(rtype.Name())
+	// does the class already exist?
+	if cls, exists := cs[clsid]; exists {
+		// does the id and class match?
+		if cls.rtype != rtype {
+			err = errutil.New("class name needs to be unique", cls.rtype.Name(), clsid)
+		} else {
+			ret = cls
+		}
+	} else {
+		// make a new class:
+		cls := &RefClass{id: clsid, rtype: rtype}
+		cs[clsid] = cls
+
+		// parse the properties
+		if ptype, pidx, props, e := MakeProperties(rtype, &cls.meta); e != nil {
+			err = e
+		} else {
+			cls.props = props
+			if ptype == nil {
+				ret = cls
+			} else {
+				if p, e := cs.addClass(ptype); e != nil {
+					err = e
+				} else {
+					cls.parent = p
+					cls.parentIdx = pidx
+					ret = cls
+				}
+			}
+		}
+	}
+	return
 }
 
 // questions:
 // how far do you want to take pointers?
 // suck in their references if set? what about their class definitions?
-func MakeModel(instances ...interface{}) (*RefModel, error) {
-	mm := &ModelMaker{instances: instances}
-	return mm.MakeModel()
-}
-
-func (mm *ModelMaker) MakeModel() (ret *RefModel, err error) {
-	// tasks: walk the instances to extract some classes.
-	if cs, e := mm.createClasses(); e != nil {
-		err = e
-	} else if m, e := mm.createModel(cs); e != nil {
-		err = e
-	} else {
-		ret = m
-	}
-	return
-}
-
-func (mm *ModelMaker) createClasses() (ret ClassSet, err error) {
-	cs := MakeClassSet()
-	for _, cls := range mm.classes {
-		rtype := r.TypeOf(cls).Elem()
-		if _, e := cs.AddClass(rtype); e != nil {
-			err = e
-			break
-		}
-	}
-	if err == nil {
-		ret = cs
-	}
-	return
-}
-
-func (mm *ModelMaker) createModel(cs ClassSet) (ret *RefModel, err error) {
-	var linearObject []*RefInst
-	objects := make(map[string]*RefInst)
+func (cs Classes) MakeModel(instances []interface{}) (ret Objects, err error) {
+	objects := make(Objects)
 
 	// note: building copies up front because:
 	// 1. error checking
@@ -71,10 +78,10 @@ func (mm *ModelMaker) createModel(cs ClassSet) (ret *RefModel, err error) {
 	// but it does have its down sides....
 	// might be better to use the new iterator instead
 	// with a simple isPod check/er.
-	for i, inst := range mm.instances {
+	for i, inst := range instances {
 		rval := r.ValueOf(inst).Elem()
 		// create the class first:
-		if cls, e := cs.AddClass(rval.Type()); e != nil {
+		if cls, e := cs.addClass(rval.Type()); e != nil {
 			err = e
 			break
 		} else if idField := cls.findId(); len(idField) < 0 {
@@ -93,67 +100,16 @@ func (mm *ModelMaker) createModel(cs ClassSet) (ret *RefModel, err error) {
 				}
 				inst := &RefInst{id: objid, rval: rval, cls: cls}
 				objects[objid] = inst
-				linearObject = append(linearObject, inst)
 			}
 		}
 	}
 	if err == nil {
-		ret = &RefModel{
-			objects:      objects,
-			linearObject: linearObject,
-			classes:      cs.classes,
-			linearClass:  cs.linear,
-		}
+		ret = objects
 	}
 	return
 }
 
-type ClassSet struct {
-	linear  []*RefClass
-	classes map[string]*RefClass
-}
-
-func MakeClassSet() ClassSet {
-	return ClassSet{classes: make(map[string]*RefClass)}
-}
-
-func (cs *ClassSet) AddClass(rtype r.Type) (ret *RefClass, err error) {
-	clsid := id.MakeId(rtype.Name())
-	// does the class already exist?
-	if cls, exists := cs.classes[clsid]; exists {
-		// does the id and class match?
-		if cls.rtype != rtype {
-			err = errutil.New("class name needs to be unique", cls.rtype.Name(), clsid)
-		}
-		ret = cls
-	} else {
-		// make a new class:
-		cls := &RefClass{id: clsid, rtype: rtype}
-		cs.classes[clsid] = cls
-		cs.linear = append(cs.linear, cls)
-
-		// parse the properties
-		if ptype, pidx, props, e := MakeProperties(rtype, &cls.meta); e != nil {
-			err = e
-		} else {
-			cls.props = props
-			if ptype == nil {
-				ret = cls
-			} else {
-				if p, e := cs.AddClass(ptype); e != nil {
-					err = e
-				} else {
-					cls.parent = p
-					cls.parentIdx = pidx
-					ret = cls
-				}
-			}
-		}
-	}
-	return
-}
-
-func MakeProperties(rtype r.Type, pdata *unique.Metadata) (parent r.Type, parentIdx int, props []ref.Property, err error) {
+func MakeProperties(rtype r.Type, pdata *unique.Metadata) (parent r.Type, parentIdx int, props []rt.Property, err error) {
 	ids := make(map[string]string)
 
 	for fw := unique.Fields(rtype); fw.HasNext(); {
@@ -180,9 +136,9 @@ func MakeProperties(rtype r.Type, pdata *unique.Metadata) (parent r.Type, parent
 					err = errutil.New("error categorizing", field.Name, e)
 					break
 				} else {
-					var p ref.Property
+					var p rt.Property
 					base := RefProp{id, field.Index, cat}
-					if cat != ref.State {
+					if cat != rt.State {
 						p = &base
 					} else {
 						if choices, e := EnumFromField(field.StructField); e != nil {
