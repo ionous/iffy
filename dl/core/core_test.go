@@ -4,8 +4,8 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ops"
-	"github.com/ionous/iffy/reflector"
-	"github.com/ionous/iffy/reflector/unique"
+	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
 	"github.com/stretchr/testify/suite"
@@ -52,7 +52,7 @@ func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 		err = e
 	} else {
 
-		cs := make(reflector.Classes)
+		cs := make(ref.Classes)
 		mm := unique.PanicRegistry(cs)
 		unique.RegisterType(mm, (*core.NumberCounter)(nil))
 		unique.RegisterType(mm, (*core.TextCounter)(nil))

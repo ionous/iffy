@@ -3,21 +3,21 @@ package rtm
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/reflector"
+	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
 	r "reflect"
 )
 
 type Rtm struct {
-	reflector.Classes
-	reflector.Objects
+	ref.Classes
+	ref.Objects
 	ScopeStack
 	OutputStack
 	Randomizer
 }
 
-func NewRtm(classes reflector.Classes, objects reflector.Objects) *Rtm {
+func NewRtm(classes ref.Classes, objects ref.Objects) *Rtm {
 	rtm := &Rtm{Classes: classes, Objects: objects}
 	rtm.PushScope(scope.ModelFinder(rtm))
 	rtm.Randomizer.Reset(1) // FIX: time?
@@ -30,7 +30,7 @@ func (rtm *Rtm) NewObject(class string) (ret rt.Object, err error) {
 		err = errutil.New("no such class", class)
 	} else {
 		inst := r.New(cls.Type())
-		ret = reflector.NewInst(cls, inst.Elem())
+		ret = ref.NewInst(cls, inst.Elem())
 	}
 	return
 }

@@ -4,8 +4,8 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/reflector"
-	"github.com/ionous/iffy/reflector/unique"
+	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/builder"
@@ -133,7 +133,7 @@ func (specs *_Specs) AddElement(el spec.Spec) (err error) {
 func setField(dst r.Value, src interface{}) (err error) {
 	switch src := src.(type) {
 	case *_Spec:
-		if e := reflector.CoerceValue(dst, src.targetPtr); e != nil {
+		if e := ref.CoerceValue(dst, src.targetPtr); e != nil {
 			err = errutil.New("couldnt assign command", e)
 		}
 
@@ -164,7 +164,7 @@ func setField(dst r.Value, src interface{}) (err error) {
 				src = literal
 			}
 		}
-		if e := reflector.CoerceValue(dst, src); e != nil {
+		if e := ref.CoerceValue(dst, src); e != nil {
 			err = errutil.New("couldnt assign primitive value", e)
 		}
 

@@ -5,8 +5,8 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/text"
 	"github.com/ionous/iffy/ops"
-	"github.com/ionous/iffy/reflector"
-	"github.com/ionous/iffy/reflector/unique"
+	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
 	. "github.com/ionous/iffy/tests"
@@ -49,7 +49,7 @@ func (t *ArticleSuite) SetupTest() {
 	t.test = t.T()
 
 	/// need a model finder
-	cls := make(reflector.Classes)
+	cls := make(ref.Classes)
 	mm := unique.PanicRegistry(cls)
 	unique.RegisterType(mm, (*Kind)(nil))
 	//

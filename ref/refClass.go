@@ -1,8 +1,8 @@
-package reflector
+package ref
 
 import (
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/reflector/unique"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )

@@ -2,7 +2,7 @@ package ops
 
 import (
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/reflector/unique"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
