@@ -4,8 +4,8 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ops"
-	"github.com/ionous/iffy/ops/unique"
 	"github.com/ionous/iffy/reflector"
+	"github.com/ionous/iffy/reflector/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
 	"github.com/stretchr/testify/suite"
@@ -41,9 +41,10 @@ func (t *CoreSuite) SetupTest() {
 	t.ops = ops.NewOps((*core.Commands)(nil))
 	t.test = t.T()
 	t.unique = unique.NewObjects()
-	t.unique.Types.RegisterType((*core.CycleCounter)(nil))
-	t.unique.Types.RegisterType((*core.ShuffleCounter)(nil))
-	t.unique.Types.RegisterType((*core.StoppingCounter)(nil))
+	reg := unique.PanicRegistry(t.unique)
+	unique.RegisterType(reg, (*core.CycleCounter)(nil))
+	unique.RegisterType(reg, (*core.ShuffleCounter)(nil))
+	unique.RegisterType(reg, (*core.StoppingCounter)(nil))
 }
 
 func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {

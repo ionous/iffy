@@ -4,8 +4,8 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ops/unique"
 	"github.com/ionous/iffy/reflector"
+	"github.com/ionous/iffy/reflector/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/builder"
@@ -20,7 +20,7 @@ type Ops struct {
 func NewOps(blocks ...interface{}) *Ops {
 	ops := &Ops{make(unique.Types)}
 	for _, block := range blocks {
-		if e := ops.RegisterBlock(block); e != nil {
+		if e := unique.RegisterBlock(ops, block); e != nil {
 			panic(e)
 		}
 	}
@@ -56,7 +56,7 @@ type _Factory struct {
 
 // NewSpec implements spec.SpecFactory.
 func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
-	if rtype, ok := fac.ops.Find(name); !ok {
+	if rtype, ok := fac.ops.FindType(name); !ok {
 		err = errutil.New("unknown command", name)
 	} else {
 		targetPtr := r.New(rtype)

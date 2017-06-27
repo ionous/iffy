@@ -21,6 +21,9 @@ type ObjectSuite struct {
 	d *DerivedClass
 }
 
+func (t *ObjectSuite) TearDownTest() {
+	errutil.Panic = false
+}
 func (t *ObjectSuite) SetupTest() {
 	errutil.Panic = true
 	b := &BaseClass{Name: "first", State: Yes, Labeled: true}

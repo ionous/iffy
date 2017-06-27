@@ -2,6 +2,7 @@ package ops
 
 import (
 	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/reflector/unique"
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -55,8 +56,8 @@ type OpsSuite struct {
 
 func (t *OpsSuite) SetupTest() {
 	ops := NewOps()
-	ops.RegisterType((*Container)(nil))
-	ops.RegisterType((*Contents)(nil))
+	unique.RegisterType(ops, (*Container)(nil))
+	unique.RegisterType(ops, (*Contents)(nil))
 	t.ops = ops
 	t.test = t.T()
 }

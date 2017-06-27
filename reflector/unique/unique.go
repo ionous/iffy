@@ -3,7 +3,6 @@ package unique
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/reflector"
 	r "reflect"
 	"strconv"
 )
@@ -26,7 +25,7 @@ func makeId(scope string, i int) string {
 }
 
 func (u *Objects) Id(cls string) (ret string) {
-	if rtype, ok := u.Types.Find(cls); !ok {
+	if rtype, ok := u.Types.FindType(cls); !ok {
 		e := errutil.New("unknown class", cls)
 		panic(e)
 	} else {
@@ -40,9 +39,9 @@ func (u *Objects) Id(cls string) (ret string) {
 func (u *Objects) Generate() (ret []interface{}, err error) {
 	for rtype, cnt := range u.ids {
 		var idpath []int
-		for fw := reflector.Fields(rtype); fw.HasNext(); {
+		for fw := Fields(rtype); fw.HasNext(); {
 			field := fw.GetNext()
-			tag := reflector.MakeTag(field.Tag)
+			tag := Tag(field.Tag)
 			if _, ok := tag.Find("id"); ok {
 				idpath = append(field.Path, field.Index)
 			}

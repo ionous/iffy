@@ -3,13 +3,14 @@ package reflector
 import (
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/reflector/unique"
 	r "reflect"
 )
 
 type RefClass struct {
 	id        string
 	rtype     r.Type
-	meta      Metadata
+	meta      unique.Metadata
 	parent    *RefClass
 	parentIdx int            // index of parent aggregate in rtype; valid if parent!= nil
 	props     []ref.Property // RefProp, RefEnum, etc.

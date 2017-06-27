@@ -3,6 +3,7 @@ package reflector
 import (
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/reflector/unique"
 	. "github.com/ionous/iffy/tests"
 	"github.com/stretchr/testify/assert"
 	r "reflect"
@@ -91,7 +92,7 @@ func TestClass(t *testing.T) {
 func TestClassProperties(t *testing.T) {
 	assert := assert.New(t)
 	base := r.TypeOf((*BaseClass)(nil)).Elem()
-	var md Metadata
+	var md unique.Metadata
 	if parent, _, props, e := MakeProperties(base, &md); assert.NoError(e) {
 		assert.Nil(parent)
 		for i, v := range expected() {
@@ -104,7 +105,7 @@ func TestClassProperties(t *testing.T) {
 			assert.Equal("base classes", md["plural"])
 		}
 	}
-	var dd Metadata
+	var dd unique.Metadata
 	derived := r.TypeOf((*DerivedClass)(nil)).Elem()
 	if parent, _, props, e := MakeProperties(derived, &dd); assert.NoError(e) {
 		assert.Equal(base, parent)

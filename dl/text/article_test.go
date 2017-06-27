@@ -40,7 +40,7 @@ func (t *ArticleSuite) Lines() (ret []string) {
 }
 
 func (t *ArticleSuite) SetupTest() {
-	errutil.Panic = !true
+	errutil.Panic = false
 	t.ops = ops.NewOps(
 		(*text.Commands)(nil),
 		(*core.Commands)(nil),

@@ -6,17 +6,14 @@ import (
 	r "reflect"
 )
 
-type Types map[string]r.Type
-
-// RegisterBlock registers a structure containing pointers to commands.
-func (reg Types) Find(name string) (r.Type, bool) {
-	id := id.MakeId(name)
-	rtype, ok := reg[id]
-	return rtype, ok
+type Registry interface {
+	// expects a pointer to a struct
+	RegisterType(r.Type) error
+	FindType(name string) (r.Type, bool)
 }
 
 // RegisterBlock registers a structure containing pointers to commands.
-func (reg Types) RegisterBlock(block interface{}) (err error) {
+func RegisterBlock(reg Registry, block interface{}) (err error) {
 	if blockType := r.TypeOf(block); blockType.Kind() != r.Ptr {
 		err = errutil.New("expected (nil) pointer (to a struct).")
 	} else if structType := blockType.Elem(); structType.Kind() != r.Struct {
@@ -24,7 +21,7 @@ func (reg Types) RegisterBlock(block interface{}) (err error) {
 	} else {
 		for i, cnt := 0, structType.NumField(); i < cnt; i++ {
 			field := structType.Field(i)
-			if e := reg.registerType(field.Type); e != nil {
+			if e := reg.RegisterType(field.Type); e != nil {
 				err = errutil.New(field.Name, e)
 				break
 			}
@@ -34,15 +31,24 @@ func (reg Types) RegisterBlock(block interface{}) (err error) {
 }
 
 // RegisterType registers a single pointer to a command.
-func (reg Types) RegisterType(cmd interface{}) (err error) {
-	if e := reg.registerType(r.TypeOf(cmd)); e != nil {
+func RegisterType(reg Registry, cmd interface{}) (err error) {
+	if e := reg.RegisterType(r.TypeOf(cmd)); e != nil {
 		err = errutil.New("command", e)
 	}
 	return
 }
 
-// rtype should be a struct ptr.
-func (reg Types) registerType(cmdType r.Type) (err error) {
+type Types map[string]r.Type
+
+// FindType by name
+func (reg Types) FindType(name string) (r.Type, bool) {
+	id := id.MakeId(name)
+	rtype, ok := reg[id]
+	return rtype, ok
+}
+
+// RegisterTypes implements Registry for a simple map.
+func (reg Types) RegisterType(cmdType r.Type) (err error) {
 	if ptrType := cmdType; ptrType.Kind() != r.Ptr {
 		err = errutil.New("expected (nil) pointer (to a struct).")
 	} else if rtype := ptrType.Elem(); rtype.Kind() != r.Struct {

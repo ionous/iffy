@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/reflector/unique"
 	r "reflect"
 )
 
@@ -67,6 +68,9 @@ func (mm *ModelMaker) createModel(cs ClassSet) (ret *RefModel, err error) {
 	// 1. error checking
 	// 2. simplify coding
 	// 3. basis for inception-style code generation
+	// but it does have its down sides....
+	// might be better to use the new iterator instead
+	// with a simple isPod check/er.
 	for i, inst := range mm.instances {
 		rval := r.ValueOf(inst).Elem()
 		// create the class first:
@@ -149,10 +153,10 @@ func (cs *ClassSet) AddClass(rtype r.Type) (ret *RefClass, err error) {
 	return
 }
 
-func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int, props []ref.Property, err error) {
+func MakeProperties(rtype r.Type, pdata *unique.Metadata) (parent r.Type, parentIdx int, props []ref.Property, err error) {
 	ids := make(map[string]string)
 
-	for fw := Fields(rtype); fw.HasNext(); {
+	for fw := unique.Fields(rtype); fw.HasNext(); {
 		field := fw.GetNext()
 		if field.Target != rtype {
 			break // weve advanced to the parent
@@ -162,7 +166,7 @@ func MakeProperties(rtype r.Type, pdata *Metadata) (parent r.Type, parentIdx int
 			err = errutil.New("expected only exportable fields", field.Name)
 			break
 		} else {
-			MergeMetadata(field.StructField, pdata)
+			unique.MergeMetadata(field.StructField, pdata)
 			//
 			if field.IsParent() {
 				parent = field.Type

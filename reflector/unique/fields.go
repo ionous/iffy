@@ -1,4 +1,4 @@
-package reflector
+package unique
 
 import (
 	"github.com/ionous/errutil"

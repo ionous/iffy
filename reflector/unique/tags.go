@@ -1,4 +1,4 @@
-package reflector
+package unique
 
 import (
 	r "reflect"
@@ -7,22 +7,22 @@ import (
 
 type Metadata map[string]string
 
-func MakeTag(f r.StructTag) Tag {
-	return Tag(f.Get("if"))
+func Tag(f r.StructTag) StructTag {
+	return StructTag(f.Get("if"))
 }
 
-type Tag string
+type StructTag string
 
-func (t Tag) String() string {
+func (t StructTag) String() string {
 	return string(t)
 }
 
-func (t Tag) Split() []string {
+func (t StructTag) Split() []string {
 	s := string(t)
 	return strings.Split(s, ",")
 }
 
-func (t Tag) Find(key string) (ret string, okay bool) {
+func (t StructTag) Find(key string) (ret string, okay bool) {
 	s := string(t)
 	for {
 		// find key in the string;
@@ -54,7 +54,7 @@ func (t Tag) Find(key string) (ret string, okay bool) {
 }
 
 func MergeMetadata(f *r.StructField, m *Metadata) {
-	if s := MakeTag(f.Tag); len(s) > 0 {
+	if s := Tag(f.Tag); len(s) > 0 {
 		if len(*m) == 0 {
 			*m = make(Metadata)
 		}
@@ -68,7 +68,7 @@ func MergeMetadata(f *r.StructField, m *Metadata) {
 // Tags fields are of the format //`if:"key:value"`
 // The tagcontents is the part inside the double quotes.
 // The fill is used when the value part is empty or missing.
-func (m Metadata) AddString(tagcontents Tag, fill string) {
+func (m Metadata) AddString(tagcontents StructTag, fill string) {
 	parts := tagcontents.Split()
 	for _, s := range parts {
 		if len(s) > 0 {

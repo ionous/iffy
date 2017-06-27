@@ -1,4 +1,4 @@
-package reflector
+package unique
 
 import (
 	"github.com/stretchr/testify/suite"
@@ -15,7 +15,7 @@ type MetadataSuite struct {
 }
 
 func (t *MetadataSuite) MakeMetadata(tag string) (out Metadata) {
-	s := MakeTag(r.StructTag(tag))
+	s := Tag(r.StructTag(tag))
 	if len(s) > 0 {
 		out = make(Metadata)
 		out.AddString(s, "fill")
@@ -54,22 +54,22 @@ type MetaTagSuite struct {
 }
 
 func (t *MetaTagSuite) TestInvalidTag() {
-	tag := MakeTag(r.StructTag(`fi:"id"`))
+	tag := Tag(r.StructTag(`fi:"id"`))
 	t.EqualValues("", tag)
 }
 func (t *MetaTagSuite) TestKey() {
-	tag := MakeTag(r.StructTag(`if:"id"`))
+	tag := Tag(r.StructTag(`if:"id"`))
 	if id, ok := tag.Find("id"); t.True(ok) {
 		t.Empty(id)
 	}
 }
 func (t *MetaTagSuite) TestSimilarTag() {
-	tag := MakeTag(r.StructTag(`if:"iddy:5"`))
+	tag := Tag(r.StructTag(`if:"iddy:5"`))
 	_, ok := tag.Find("id")
 	t.False(ok)
 }
 func (t *MetaTagSuite) TestKeyValue() {
-	tag := MakeTag(r.StructTag(`if:"plural:tests"`))
+	tag := Tag(r.StructTag(`if:"plural:tests"`))
 	if _, ok := tag.Find("id"); t.False(ok) {
 		//
 		if res, ok := tag.Find("plural"); t.True(ok) {
@@ -78,7 +78,7 @@ func (t *MetaTagSuite) TestKeyValue() {
 	}
 }
 func (t *MetaTagSuite) TestMultipleKeys() {
-	tag := MakeTag(r.StructTag(`if:"id,other:true,plural:tests"`))
+	tag := Tag(r.StructTag(`if:"id,other:true,plural:tests"`))
 	if id, ok := tag.Find("id"); t.True(ok) {
 		t.Empty(id)
 
@@ -92,7 +92,7 @@ func (t *MetaTagSuite) TestMultipleKeys() {
 	}
 }
 func (t *MetaTagSuite) TestMissingCommas() {
-	tag := MakeTag(r.StructTag(`if:"edge:test:tests"`))
+	tag := Tag(r.StructTag(`if:"edge:test:tests"`))
 	if res, ok := tag.Find("edge"); t.True(ok) {
 		t.Equal("test:tests", res)
 	}
