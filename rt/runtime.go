@@ -12,6 +12,8 @@ type ObjectFinder interface {
 type Runtime interface {
 	ref.Model
 
+	Random(inclusiveMin, exclusiveMax int) int
+
 	ObjectFinder
 	PushScope(ObjectFinder)
 	PopScope()

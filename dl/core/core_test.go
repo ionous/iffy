@@ -1,6 +1,7 @@
 package core_test
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ops"
 	"github.com/ionous/iffy/ops/unique"
@@ -8,6 +9,7 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
 	"github.com/stretchr/testify/suite"
+	r "reflect"
 	"strings"
 	"testing"
 )
@@ -35,10 +37,13 @@ func (t *CoreSuite) Lines() (ret []string) {
 }
 
 func (t *CoreSuite) SetupTest() {
+	errutil.Panic = false
 	t.ops = ops.NewOps((*core.Commands)(nil))
 	t.test = t.T()
 	t.unique = unique.NewObjects()
 	t.unique.Types.RegisterType((*core.CycleCounter)(nil))
+	t.unique.Types.RegisterType((*core.ShuffleCounter)(nil))
+	t.unique.Types.RegisterType((*core.StoppingCounter)(nil))
 }
 
 func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
@@ -49,13 +54,15 @@ func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 		mm := reflector.NewModelMaker()
 		mm.AddClass((*core.NumberCounter)(nil))
 		mm.AddClass((*core.TextCounter)(nil))
-		mm.AddClass((*core.CycleCounter)(nil))
+		// add all the classes we registered in unique
+		for _, rtype := range t.unique.Types {
+			mm.AddClass(r.New(rtype).Interface())
+		}
 
 		if inst, e := t.unique.Generate(); e != nil {
 			err = e
 		} else {
 			if cnt := len(inst); cnt > 0 {
-				t.test.Log("creating", cnt, "instances")
 				mm.AddInstance(inst...)
 			}
 			//
@@ -71,18 +78,26 @@ func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 	return
 }
 
-func (t *CoreSuite) match(
-	build func(c *ops.Builder), expected ...string) {
+func (t *CoreSuite) matchFunc(
+	build func(c *ops.Builder),
+	compare func(expected []string),
+) {
 	var root struct{ Eval rt.Execute }
 	if c, ok := t.ops.NewBuilder(&root); ok {
 		build(c)
 		if run, e := t.newRuntime(c); t.NoError(e) {
 			if e := root.Eval.Execute(run); t.NoError(e) {
-				lines := t.Lines()
-				t.Equal(expected, lines)
+				compare(t.Lines())
 			}
 		}
 	}
+}
+
+func (t *CoreSuite) match(
+	build func(c *ops.Builder), expected ...string) {
+	t.matchFunc(build, func(lines []string) {
+		t.Equal(expected, lines)
+	})
 }
 
 func (t *CoreSuite) TestShortcuts() {

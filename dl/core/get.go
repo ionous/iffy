@@ -6,6 +6,7 @@ import (
 )
 
 // Get retrieves a value from an object.
+// FIX: test all forms of Get
 type Get struct {
 	Obj   rt.ObjectEval
 	Value string
