@@ -4,7 +4,6 @@ import (
 	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/suite"
 	"sort"
-	// "strings"
 	"testing"
 )
 
@@ -25,15 +24,15 @@ func (assert *IndexSuite) TestMajorOrder() {
 		"grace",
 		"sven",
 	)
-	n := Index{0, false, nil}
+	n := Index{}
 	for _, v := range goblins {
-		added := n.Add(MakeLine(v, "", ""))
+		added := n.addInsert(MakeLine(v, "", ""))
 		assert.True(added, v)
 	}
 	if assert.Len(n.Lines, len(goblins)) {
 		var sorted, lines []string
 		for i, l := range n.Lines {
-			lines = append(lines, l.Primary())
+			lines = append(lines, l[Primary])
 			sorted = append(sorted, goblins[i])
 		}
 		sort.Strings(sorted)
@@ -42,7 +41,7 @@ func (assert *IndexSuite) TestMajorOrder() {
 	}
 }
 
-func GetLines(index Index, c Column) (ret []string) {
+func getKeys(index Index, c Column) (ret []string) {
 	for _, l := range index.Lines {
 		ret = append(ret, l[c])
 	}
@@ -60,14 +59,14 @@ func (assert *IndexSuite) TestMinorOrder() {
 	)
 	n := Index{}
 	for _, v := range goblins {
-		added := n.Add(MakeLine("goblin", v, ""))
+		added := n.addInsert(MakeLine("goblin", v, ""))
 		assert.True(added, v)
 	}
 	if assert.Len(n.Lines, len(goblins)) {
 		var sorted, lines []string
 		for i, l := range n.Lines {
-			if assert.Equal("goblin", l.Primary()) {
-				lines = append(lines, l.Secondary())
+			if assert.Equal("goblin", l[Primary]) {
+				lines = append(lines, l[Secondary])
 				sorted = append(sorted, goblins[i])
 			}
 		}
@@ -99,8 +98,8 @@ func (assert *IndexSuite) TestAddInsert() {
 	changed = n.addInsert(MakeLine("claire", "loofah", "loafer"))
 	assert.False(changed)
 	assert.Len(n.Lines, 2)
-	assert.Equal(sliceOf.String("loofah", "rocky"), GetLines(n, Secondary))
-	assert.Equal(sliceOf.String("loafer", "rocko"), GetLines(n, LineData))
+	assert.Equal(sliceOf.String("loofah", "rocky"), getKeys(n, Secondary))
+	assert.Equal(sliceOf.String("loafer", "rocko"), getKeys(n, LineData))
 }
 
 // TestAddReplace verifies a unique index should replace similar records,
@@ -129,9 +128,24 @@ func (assert *IndexSuite) TestAddReplace() {
 func makeLines(src ...string) []*Line {
 	r := make([]*Line, len(src))
 	for i, s := range src {
-		r[i] = MakeLine(s, "", "")
+		r[i] = MakeLine(s, s, "")
 	}
 	return r
+}
+
+// adapt existing tests of deletion to deletion cursor
+func deleteKeys(n *Index, keys []string) (missing []string) {
+	dc := NewDeletionCursor(n)
+	var ok bool
+	for _, k := range keys {
+		if ok = dc.DeletePair(k, k); !ok {
+			missing = append(missing, k)
+		}
+	}
+	if ok {
+		dc.Flush()
+	}
+	return
 }
 
 // TestDeleteOne verifies deleting a single entry.
@@ -140,7 +154,7 @@ func (assert *IndexSuite) TestDeleteOne() {
 	for _, s := range src {
 		n := Index{Lines: makeLines(src...)}
 		assert.Len(n.Lines, 3)
-		if missing := n.DeleteKeys(sliceOf.String(s)); assert.Nil(missing) {
+		if missing := deleteKeys(&n, sliceOf.String(s)); assert.Nil(missing) {
 			assert.Len(n.Lines, 2)
 		}
 	}
@@ -166,51 +180,34 @@ func (assert *IndexSuite) TestDeleteSplit() {
 		}
 		sort.Strings(keys) // the code expects the keys in order
 		sort.Strings(match)
-		t.Log("deleting", keys, "from", GetLines(n, Primary))
-		if missing := n.DeleteKeys(keys); assert.Nil(missing) {
-			assert.EqualValues(match, GetLines(n, Primary))
+		t.Log("deleting", keys, "from", getKeys(n, Primary))
+		if missing := deleteKeys(&n, keys); assert.Nil(missing) {
+			if !assert.EqualValues(match, getKeys(n, Primary)) {
+				break
+			}
+		} else {
+			break
 		}
 	}
 }
 
-//  TestDeleteJoin verifies can delete multiple elements in a row
+//  TestDeleteJoin verifies we can delete multiple elements in a row
 func (assert *IndexSuite) TestDeleteJoin() {
 	n := Index{Lines: makeLines("a", "b", "c", "d")}
-	if missing := n.DeleteKeys(sliceOf.String("b", "c")); assert.Len(missing, 0) {
-		assert.EqualValues(sliceOf.String("a", "d"), GetLines(n, Primary))
-	}
-}
-
-// TestDeleteMulti verifies can delete multiple entries with the same key
-func (assert *IndexSuite) TestDeleteMulti() {
-	t := assert.T()
-	src := sliceOf.String("a", "b", "c", "d")
-	for i, _ := range src {
-		var lines []string
-		lines = append(lines, src[:i]...)
-		for j := 0; j < 3; j++ {
-			lines = append(lines, src[i])
-		}
-		lines = append(lines, src[i:]...)
-		t.Log("before", lines)
-
-		n := Index{Lines: makeLines(lines...)}
-		if missing := n.DeleteKeys(sliceOf.String(src[i])); assert.Len(missing, 0) {
-			assert.Len(n.Lines, 3)
-			t.Log("after", GetLines(n, Primary))
-		}
+	if missing := deleteKeys(&n, sliceOf.String("b", "c")); assert.Len(missing, 0) {
+		assert.EqualValues(sliceOf.String("a", "d"), getKeys(n, Primary))
 	}
 }
 
 // TestDeleteLast verifies we can delete the last element, have more keys, and not die.
 func (assert *IndexSuite) TestDeleteLast() {
 	n := Index{Lines: makeLines("a", "b", "c", "d")}
-	if missing := n.DeleteKeys(sliceOf.String("d", "e")); assert.Len(missing, 1) {
-		assert.EqualValues(sliceOf.String("a", "b", "c"), GetLines(n, Primary))
+	if missing := deleteKeys(&n, sliceOf.String("d", "e")); assert.Len(missing, 1) {
+		assert.EqualValues(sliceOf.String("a", "b", "c"), getKeys(n, Primary))
 	}
 }
 
-// TestDeleteMising verifies can have missing keys in various positions
+// TestDeleteMising verifies we can have missing keys in various positions
 func (assert *IndexSuite) TestDeleteMising() {
 	t := assert.T()
 	src := sliceOf.String("a", "b", "c", "d")
@@ -220,8 +217,8 @@ func (assert *IndexSuite) TestDeleteMising() {
 		lines = append(lines, src[i+1:]...)
 		n := Index{Lines: makeLines(lines...)}
 		t.Log("before", lines)
-		if missing := n.DeleteKeys(sliceOf.String(cut)); assert.Len(missing, 1) {
-			after := GetLines(n, Primary)
+		if missing := deleteKeys(&n, sliceOf.String(cut)); assert.Len(missing, 1) {
+			after := getKeys(n, Primary)
 			assert.EqualValues(lines, after)
 			t.Log("after", after)
 		}
@@ -236,21 +233,49 @@ func makeMinorLines(pk string, src ...string) []*Line {
 	return r
 }
 
-func (assert *IndexSuite) TestRemoveNone() {
-	n := Index{Lines: makeMinorLines("claire", "a", "e", "g", "x")}
-	removed := n.Remove("not claire")
-	assert.Len(removed, 0)
+func (assert *IndexSuite) TestFind() {
+	a := makeMinorLines("abernathy", "a", "b", "c")
+	b := makeMinorLines("claire", "a", "b", "c")
+	c := makeMinorLines("zog", "a", "b", "c")
+	lines := append(a, append(b, c...)...)
+	n := Index{Lines: lines}
+	if i, pk := n.FindFirst(0, "claire"); assert.True(pk, "found claire") {
+		assert.Equal(b[0], lines[i])
+	}
+	//
+	_, nopk := n.FindFirst(0, "not claire")
+	assert.False(nopk, "shouldnt have found not claire")
+	//
+	if i, pair := n.FindPair(0, "claire", "b"); assert.True(pair) {
+		assert.Equal(b[1], lines[i])
+	}
+	//
+	_, nopair := n.FindPair(0, "claire", "missing")
+	assert.False(nopair)
+	//
 }
 
-func (assert *IndexSuite) TestRemoveMany() {
+func (assert *IndexSuite) TestFindDelete() {
 	n := Index{}
-	major := sliceOf.String("alice", "bob", "claire", "max")
-	minor := sliceOf.String("a", "e", "g", "x")
+	major := sliceOf.String("alice", "bob", "claire")
+	minor := sliceOf.String("a", "b", "c")
 	for _, name := range major {
 		m := makeMinorLines(name, minor...)
 		n.Lines = append(n.Lines, m...)
 	}
-	removed := n.Remove("claire")
-	assert.EqualValues(minor, removed)
-	assert.Len(n.Lines, (len(major)-1)*len(minor))
+	t := assert.T()
+	t.Log(n.Lines)
+	if i, ok := n.FindFirst(0, "claire"); assert.True(ok, "found claire") {
+		line := *n.Lines[i]
+		assert.EqualValues("claire", line[Primary])
+		assert.EqualValues("a", line[Secondary])
+		n.Delete(i)
+		t.Log(n.Lines)
+		assert.Len(n.Lines, (len(major)*len(minor) - 1))
+		if i, ok := n.FindFirst(0, "claire"); assert.True(ok, "found claire again") {
+			line := *n.Lines[i]
+			assert.EqualValues("claire", line[Primary])
+			assert.EqualValues("b", line[Secondary])
+		}
+	}
 }
