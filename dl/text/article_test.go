@@ -56,7 +56,7 @@ func (t *ArticleSuite) SetupTest() {
 	if objs, e := cls.MakeModel(kinds); e != nil {
 		panic(e)
 	} else {
-		t.run = rtm.NewRtm(cls, objs)
+		t.run = rtm.NewRtm(cls, objs, ref.MakeRelations(cls))
 		t.run.PushWriter(&t.lines)
 	}
 }

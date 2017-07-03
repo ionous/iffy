@@ -9,6 +9,13 @@ type ObjectFinder interface {
 }
 
 type Runtime interface {
+	// Writer writes standard output.
+	io.Writer
+	// PushWriter to set the active writer.
+	PushWriter(io.Writer)
+	// PopWriter to restore the writer active before the most recent PushWriter.
+	PopWriter()
+
 	Random(inclusiveMin, exclusiveMax int) int
 
 	ObjectFinder
@@ -17,17 +24,12 @@ type Runtime interface {
 
 	// NewObject from the passed class. The object has no name and cannot be found via GetObject()
 	NewObject(class string) (Object, error)
-	// GetObject returns the object with the passed name.
+	// GetObject with the passed name.
 	GetObject(name string) (Object, bool)
-	// GetClass returns the class with the passed name.
+	// GetClass with the passed name.
 	GetClass(name string) (Class, bool)
-
-	// Writer writes standard output.
-	io.Writer
-	// PushWriter to set the active writer.
-	PushWriter(io.Writer)
-	// PopWriter to restore the writer active before the most recent PushWriter.
-	PopWriter()
+	// GetRelation with the passed name.
+	GetRelation(name string) (Relation, bool)
 }
 
 func ExecuteList(run Runtime, x []Execute) (err error) {

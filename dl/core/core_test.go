@@ -56,10 +56,11 @@ func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 		mm := unique.PanicRegistry(cs)
 		unique.RegisterType(mm, (*core.NumberCounter)(nil))
 		unique.RegisterType(mm, (*core.TextCounter)(nil))
-		// add all the classes we registered in unique
+		// add all the helper classes we registered via unique
 		for _, rtype := range t.unique.Types {
 			unique.RegisterType(mm, r.New(rtype).Interface())
 		}
+		rel := ref.MakeRelations(cs)
 
 		if inst, e := t.unique.Generate(); e != nil {
 			err = e
@@ -67,7 +68,7 @@ func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 			if m, e := cs.MakeModel(inst); e != nil {
 				err = e
 			} else {
-				run := rtm.NewRtm(cs, m)
+				run := rtm.NewRtm(cs, m, rel)
 				run.PushWriter(&t.lines)
 				ret = run
 			}

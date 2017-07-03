@@ -1,6 +1,7 @@
 package ref_test
 
 import (
+	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/stretchr/testify/suite"
@@ -34,7 +35,7 @@ type RelSuite struct {
 
 func (assert *RelSuite) SetupTest() {}
 
-func (assert *RelSuite) TestSomething() {
+func (assert *RelSuite) TestRegistration() {
 	type TooFew struct {
 		A *Gremlin `if:"rel:one"`
 	}
@@ -42,16 +43,33 @@ func (assert *RelSuite) TestSomething() {
 		A, B, C *Gremlin `if:"rel:one"`
 	}
 	type TooManyManys struct {
-		A, B *Gremlin `if:"rel:many"`
+		A, B, C *Gremlin `if:"rel:many"`
 	}
-	type JustRightOne struct {
+	type OneToOne struct {
 		A, B *Gremlin `if:"rel:one"`
 	}
-	type JustRightMany struct {
+	type ManyToOne struct {
 		A *Gremlin `if:"rel:many"`
 		B *Gremlin `if:"rel:one"`
 	}
-	reg := unique.PanicRegistry(ref.RelationRegistry{make(unique.Types)})
+	type OneToMany struct {
+		A *Gremlin `if:"rel:one"`
+		B *Gremlin `if:"rel:many"`
+	}
+	type ManyToMany struct {
+		A, B *Gremlin `if:"rel:many"`
+	}
+	type JustRight struct {
+		*OneToOne
+		*ManyToOne
+		*OneToMany
+		*ManyToMany
+	}
+
+	classes := make(ref.Classes)
+	unique.RegisterType(classes, (*Gremlin)(nil))
+	rel := ref.MakeRelations(classes)
+	reg := unique.PanicRegistry(rel)
 	assert.Panics(func() {
 		unique.RegisterType(reg, (*TooFew)(nil))
 	})
@@ -62,15 +80,15 @@ func (assert *RelSuite) TestSomething() {
 		unique.RegisterType(reg, (*TooManyManys)(nil))
 	})
 	assert.NotPanics(func() {
-		unique.RegisterType(reg, (*JustRightOne)(nil))
-	})
-	assert.NotPanics(func() {
-		unique.RegisterType(reg, (*JustRightMany)(nil))
+		unique.RegisterBlock(reg, (*JustRight)(nil))
 	})
 	_, tooFew := reg.FindType("TooFew")
 	assert.False(tooFew)
-	_, rightOne := reg.FindType("JustRightOne")
-	assert.True(rightOne)
-	_, rightMany := reg.FindType("JustRightMany")
-	assert.True(rightMany)
+
+	for i := 0; i < 4; i++ {
+		t := index.Type(i)
+		if r, ok := rel.GetRelation(t.String()); assert.True(ok) {
+			assert.Equal(t, r.GetType(), t.String())
+		}
+	}
 }

@@ -8,8 +8,9 @@ import (
 )
 
 type RefClass struct {
-	id        string
-	rtype     r.Type
+	id    string
+	rtype r.Type // FIX: is there any reasonable way to make this the only member?
+	// it could be shrunk, maybe, for instance, if properties were cached elsewhere.
 	meta      unique.Metadata
 	parent    *RefClass
 	parentIdx int           // index of parent aggregate in rtype; valid if parent!= nil
@@ -26,6 +27,11 @@ func (cls *RefClass) findId() (ret string) {
 		cls = cls.parent
 	}
 	return
+}
+
+func (cls *RefClass) NewObject() *RefObject {
+	inst := r.New(cls.rtype)
+	return NewObject(cls, inst.Elem())
 }
 
 func (cls *RefClass) Type() r.Type {
@@ -69,7 +75,7 @@ func (c *RefClass) GetProperty(name string) (ret rt.Property, okay bool) {
 }
 
 func (c *RefClass) getProperty(id string) (ret rt.Property, path []int, okay bool) {
-	if out, ok := c.FindProperty(func(p rt.Property) (found bool) {
+	if out, ok := c.findProperty(func(p rt.Property) (found bool) {
 		if id == p.GetId() {
 			ret, found = p, true
 		}
@@ -88,7 +94,7 @@ func (c *RefClass) GetPropertyByChoice(choice string) (rt.Property, bool) {
 	return r, r != nil
 }
 
-func (c *RefClass) FindProperty(match func(p rt.Property) bool) (path []int, okay bool) {
+func (c *RefClass) findProperty(match func(p rt.Property) bool) (path []int, okay bool) {
 	var partial []int
 	type getFieldIndex interface {
 		getFieldIndex() int
@@ -112,7 +118,7 @@ func (c *RefClass) FindProperty(match func(p rt.Property) bool) (path []int, oka
 }
 
 func (c *RefClass) getPropertyByChoice(id string) (ret *RefEnum, path []int, value int) {
-	if out, ok := c.FindProperty(func(p rt.Property) (found bool) {
+	if out, ok := c.findProperty(func(p rt.Property) (found bool) {
 		if p, ok := p.(*RefEnum); ok {
 			if i := p.choiceToIndex(id); i >= 0 {
 				ret = p

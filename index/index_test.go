@@ -26,13 +26,13 @@ func (assert *IndexSuite) TestMajorOrder() {
 	)
 	n := Index{}
 	for _, v := range goblins {
-		added := n.addInsert(MakeLine(v, "", ""))
+		_, added := n.addInsert(MakeKey(v, ""))
 		assert.True(added, v)
 	}
 	if assert.Len(n.Lines, len(goblins)) {
 		var sorted, lines []string
 		for i, l := range n.Lines {
-			lines = append(lines, l[Primary])
+			lines = append(lines, l.Key[Primary])
 			sorted = append(sorted, goblins[i])
 		}
 		sort.Strings(sorted)
@@ -43,9 +43,16 @@ func (assert *IndexSuite) TestMajorOrder() {
 
 func getKeys(index Index, c Column) (ret []string) {
 	for _, l := range index.Lines {
-		ret = append(ret, l[c])
+		ret = append(ret, l.Key[c])
 	}
-	return ret
+	return
+}
+
+func getData(index Index) (ret []string) {
+	for _, l := range index.Lines {
+		ret = append(ret, l.Data.(string))
+	}
+	return
 }
 
 // TestMinorOrder verfies (a non-unique) index sorts by minor order.
@@ -59,14 +66,14 @@ func (assert *IndexSuite) TestMinorOrder() {
 	)
 	n := Index{}
 	for _, v := range goblins {
-		added := n.addInsert(MakeLine("goblin", v, ""))
+		_, added := n.addInsert(MakeKey("goblin", v))
 		assert.True(added, v)
 	}
 	if assert.Len(n.Lines, len(goblins)) {
 		var sorted, lines []string
 		for i, l := range n.Lines {
-			if assert.Equal("goblin", l[Primary]) {
-				lines = append(lines, l[Secondary])
+			if assert.Equal("goblin", l.Key[Primary]) {
+				lines = append(lines, l.Key[Secondary])
 				sorted = append(sorted, goblins[i])
 			}
 		}
@@ -82,24 +89,18 @@ func (assert *IndexSuite) TestAddInsert() {
 	n := Index{}
 	//
 	var changed bool
-	changed = n.addInsert(MakeLine("claire", "rocky", "rocko"))
+	_, changed = n.addInsert(MakeKey("claire", "rocky"))
 	assert.True(changed)
 	assert.Len(n.Lines, 1)
 
-	changed = n.addInsert(MakeLine("claire", "loofah", "loofy"))
+	_, changed = n.addInsert(MakeKey("claire", "loofah"))
 	assert.True(changed)
 	assert.Len(n.Lines, 2)
 
 	//
-	changed = n.addInsert(MakeLine("claire", "loofah", "loafer"))
-	assert.True(changed)
-	assert.Len(n.Lines, 2)
-
-	changed = n.addInsert(MakeLine("claire", "loofah", "loafer"))
+	_, changed = n.addInsert(MakeKey("claire", "loofah"))
 	assert.False(changed)
 	assert.Len(n.Lines, 2)
-	assert.Equal(sliceOf.String("loofah", "rocky"), getKeys(n, Secondary))
-	assert.Equal(sliceOf.String("loafer", "rocko"), getKeys(n, LineData))
 }
 
 // TestAddReplace verifies a unique index should replace similar records,
@@ -108,27 +109,23 @@ func (assert *IndexSuite) TestAddReplace() {
 	n := Index{}
 	//
 	var changed bool
-	changed = n.addReplace(MakeLine("claire", "rocky", "rocko"))
+	_, changed = n.addReplace(MakeKey("claire", "rocky"))
 	assert.True(changed)
 	assert.Len(n.Lines, 1)
 
-	changed = n.addReplace(MakeLine("claire", "loofah", "loofy"))
+	_, changed = n.addReplace(MakeKey("claire", "loofah"))
 	assert.True(changed)
 	assert.Len(n.Lines, 1)
 
-	changed = n.addReplace(MakeLine("claire", "loofah", "loafer"))
-	assert.True(changed)
-	assert.Len(n.Lines, 1)
-
-	changed = n.addReplace(MakeLine("claire", "loofah", "loafer"))
+	_, changed = n.addReplace(MakeKey("claire", "loofah"))
 	assert.False(changed)
 	assert.Len(n.Lines, 1)
 }
 
-func makeLines(src ...string) []*Line {
-	r := make([]*Line, len(src))
+func makeLines(src ...string) []*KeyData {
+	r := make([]*KeyData, len(src))
 	for i, s := range src {
-		r[i] = MakeLine(s, s, "")
+		r[i] = MakeKey(s, s)
 	}
 	return r
 }
@@ -225,10 +222,10 @@ func (assert *IndexSuite) TestDeleteMising() {
 	}
 }
 
-func makeMinorLines(pk string, src ...string) []*Line {
-	r := make([]*Line, len(src))
+func makeMinorLines(pk string, src ...string) []*KeyData {
+	r := make([]*KeyData, len(src))
 	for i, s := range src {
-		r[i] = MakeLine(pk, s, "")
+		r[i] = MakeKey(pk, s)
 	}
 	return r
 }
@@ -267,15 +264,15 @@ func (assert *IndexSuite) TestFindDelete() {
 	t.Log(n.Lines)
 	if i, ok := n.FindFirst(0, "claire"); assert.True(ok, "found claire") {
 		line := *n.Lines[i]
-		assert.EqualValues("claire", line[Primary])
-		assert.EqualValues("a", line[Secondary])
+		assert.EqualValues("claire", line.Key[Primary])
+		assert.EqualValues("a", line.Key[Secondary])
 		n.Delete(i)
 		t.Log(n.Lines)
 		assert.Len(n.Lines, (len(major)*len(minor) - 1))
 		if i, ok := n.FindFirst(0, "claire"); assert.True(ok, "found claire again") {
 			line := *n.Lines[i]
-			assert.EqualValues("claire", line[Primary])
-			assert.EqualValues("b", line[Secondary])
+			assert.EqualValues("claire", line.Key[Primary])
+			assert.EqualValues("b", line.Key[Secondary])
 		}
 	}
 }

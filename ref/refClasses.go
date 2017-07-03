@@ -10,22 +10,25 @@ import (
 
 type Classes map[string]*RefClass
 
+// GetClass compatible with rt.Runtime
 func (cs Classes) GetClass(name string) (ret rt.Class, okay bool) {
 	id := id.MakeId(name)
 	ret, okay = cs[id]
 	return
 }
 
+// RegisterType compatible with unique.Registry
+func (cs Classes) RegisterType(rtype r.Type) (err error) {
+	_, err = cs.addClass(rtype.Elem())
+	return
+}
+
+// FindType compatible with unique.Registry
 func (cs Classes) FindType(name string) (ret r.Type, okay bool) {
 	id := id.MakeId(name)
 	if a, ok := cs[id]; ok {
 		ret, okay = a.rtype, true
 	}
-	return
-}
-
-func (cs Classes) RegisterType(rtype r.Type) (err error) {
-	_, err = cs.addClass(rtype.Elem())
 	return
 }
 
@@ -98,7 +101,7 @@ func (cs Classes) MakeModel(instances []interface{}) (ret Objects, err error) {
 					err = errutil.New("instance needs unique name", name, orig, objid)
 					break
 				}
-				inst := &RefInst{id: objid, rval: rval, cls: cls}
+				inst := &RefObject{id: objid, rval: rval, cls: cls}
 				objects[objid] = inst
 			}
 		}
