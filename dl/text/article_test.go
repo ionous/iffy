@@ -15,12 +15,6 @@ import (
 	"testing"
 )
 
-var kinds = []interface{}{
-	&Kind{Name: "Lamp-post"},
-	&Kind{Name: "Soldiers", IndefiniteArticle: "some"},
-	&Kind{Name: "trevor", CommonProper: ProperNamed},
-}
-
 func TestArticles(t *testing.T) {
 	suite.Run(t, new(ArticleSuite))
 }
@@ -29,54 +23,59 @@ func TestArticles(t *testing.T) {
 type ArticleSuite struct {
 	suite.Suite
 	ops   *ops.Ops
-	test  *testing.T
 	run   rt.Runtime
 	lines rtm.LineWriter
 }
 
-func (t *ArticleSuite) Lines() (ret []string) {
-	ret = t.lines.Lines()
-	t.lines = rtm.LineWriter{}
+func (assert *ArticleSuite) Lines() (ret []string) {
+	ret = assert.lines.Lines()
+	assert.lines = rtm.LineWriter{}
 	return
 }
 
-func (t *ArticleSuite) SetupTest() {
+func (assert *ArticleSuite) SetupTest() {
 	errutil.Panic = false
-	t.ops = ops.NewOps(
+	//
+	classes := ref.NewClasses()
+	objects := ref.NewObjects(classes)
+	relations := ref.NewRelations(classes, objects)
+	//
+	assert.ops = ops.NewOps(
 		(*text.Commands)(nil),
 		(*core.Commands)(nil),
 	)
-	t.test = t.T()
 
-	/// need a model finder
-	cls := make(ref.Classes)
-	mm := unique.PanicRegistry(cls)
-	unique.RegisterType(mm, (*Kind)(nil))
+	// need a model finder
+	unique.RegisterTypes(unique.PanicTypes(classes),
+		(*Kind)(nil))
+
+	unique.RegisterValues(unique.PanicValues(objects),
+		&Kind{Name: "Lamp-post"},
+		&Kind{Name: "Soldiers", IndefiniteArticle: "some"},
+		&Kind{Name: "trevor", CommonProper: ProperNamed},
+	)
 	//
-	if objs, e := cls.MakeModel(kinds); e != nil {
-		panic(e)
-	} else {
-		t.run = rtm.NewRtm(cls, objs, ref.MakeRelations(cls))
-		t.run.PushWriter(&t.lines)
-	}
+	assert.run = rtm.NewRtm(classes, objects, relations)
+	assert.run.PushWriter(&assert.lines)
 }
-func (t *ArticleSuite) match(expected string, run func(c *ops.Builder)) {
+
+func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {
 	var root struct{ Eval rt.Execute }
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		run(c)
 
-		if _, e := c.Build(); t.NoError(e) {
-			if e := root.Eval.Execute(t.run); t.NoError(e) {
-				lines := t.Lines()
-				t.Equal(sliceOf.String(expected), lines)
+		if _, e := c.Build(); assert.NoError(e) {
+			if e := root.Eval.Execute(assert.run); assert.NoError(e) {
+				lines := assert.Lines()
+				assert.Equal(sliceOf.String(expected), lines)
 			}
 		}
 	}
 }
 
 // lower a/n
-func (t *ArticleSuite) TestATrailingLampPost() {
-	t.match("You can only just make out a lamp-post.",
+func (assert *ArticleSuite) TestATrailingLampPost() {
+	assert.match("You can only just make out a lamp-post.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -90,8 +89,8 @@ func (t *ArticleSuite) TestATrailingLampPost() {
 		})
 }
 
-func (t *ArticleSuite) TestATrailingTrevor() {
-	t.match("You can only just make out Trevor.",
+func (assert *ArticleSuite) TestATrailingTrevor() {
+	assert.match("You can only just make out Trevor.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -105,8 +104,8 @@ func (t *ArticleSuite) TestATrailingTrevor() {
 		})
 }
 
-func (t *ArticleSuite) TestATrailingSoldiers() {
-	t.match("You can only just make out some soldiers.",
+func (assert *ArticleSuite) TestATrailingSoldiers() {
+	assert.match("You can only just make out some soldiers.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -121,8 +120,8 @@ func (t *ArticleSuite) TestATrailingSoldiers() {
 }
 
 // upper a/n
-func (t *ArticleSuite) TestALeadingLampPost() {
-	t.match("A lamp-post can be made out in the mist.",
+func (assert *ArticleSuite) TestALeadingLampPost() {
+	assert.match("A lamp-post can be made out in the mist.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -135,8 +134,8 @@ func (t *ArticleSuite) TestALeadingLampPost() {
 		})
 }
 
-func (t *ArticleSuite) TestALeadingTrevor() {
-	t.match("Trevor can be made out in the mist.",
+func (assert *ArticleSuite) TestALeadingTrevor() {
+	assert.match("Trevor can be made out in the mist.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -149,8 +148,8 @@ func (t *ArticleSuite) TestALeadingTrevor() {
 		})
 }
 
-func (t *ArticleSuite) TestALeadingSoldiers() {
-	t.match("Some soldiers can be made out in the mist.",
+func (assert *ArticleSuite) TestALeadingSoldiers() {
+	assert.match("Some soldiers can be made out in the mist.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -164,8 +163,8 @@ func (t *ArticleSuite) TestALeadingSoldiers() {
 }
 
 // lower-the
-func (t *ArticleSuite) TestTheTrailingLampPost() {
-	t.match("You can only just make out the lamp-post.",
+func (assert *ArticleSuite) TestTheTrailingLampPost() {
+	assert.match("You can only just make out the lamp-post.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -179,8 +178,8 @@ func (t *ArticleSuite) TestTheTrailingLampPost() {
 		})
 }
 
-func (t *ArticleSuite) TestTheTrailingTrevor() {
-	t.match("You can only just make out Trevor.",
+func (assert *ArticleSuite) TestTheTrailingTrevor() {
+	assert.match("You can only just make out Trevor.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -194,8 +193,8 @@ func (t *ArticleSuite) TestTheTrailingTrevor() {
 		})
 }
 
-func (t *ArticleSuite) TestTheTrailingSoldiers() {
-	t.match("You can only just make out the soldiers.",
+func (assert *ArticleSuite) TestTheTrailingSoldiers() {
+	assert.match("You can only just make out the soldiers.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -210,8 +209,8 @@ func (t *ArticleSuite) TestTheTrailingSoldiers() {
 }
 
 // uppe the
-func (t *ArticleSuite) TestTheLeadingLampPost() {
-	t.match("The lamp-post may be a trick of the mist.",
+func (assert *ArticleSuite) TestTheLeadingLampPost() {
+	assert.match("The lamp-post may be a trick of the mist.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -224,8 +223,8 @@ func (t *ArticleSuite) TestTheLeadingLampPost() {
 		})
 }
 
-func (t *ArticleSuite) TestTheLeadingTrevor() {
-	t.match("Trevor may be a trick of the mist.",
+func (assert *ArticleSuite) TestTheLeadingTrevor() {
+	assert.match("Trevor may be a trick of the mist.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {
@@ -238,8 +237,8 @@ func (t *ArticleSuite) TestTheLeadingTrevor() {
 		})
 }
 
-func (t *ArticleSuite) TestTheLeadingSoldiers() {
-	t.match("The soldiers may be a trick of the mist.",
+func (assert *ArticleSuite) TestTheLeadingSoldiers() {
+	assert.match("The soldiers may be a trick of the mist.",
 		func(c *ops.Builder) {
 			if c.Cmd("print line").Begin() {
 				if c.Cmds().Begin() {

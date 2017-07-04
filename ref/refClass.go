@@ -2,36 +2,16 @@ package ref
 
 import (
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
 type RefClass struct {
-	id    string
-	rtype r.Type // FIX: is there any reasonable way to make this the only member?
-	// it could be shrunk, maybe, for instance, if properties were cached elsewhere.
-	meta      unique.Metadata
+	id        string
+	rtype     r.Type
 	parent    *RefClass
 	parentIdx int           // index of parent aggregate in rtype; valid if parent!= nil
 	props     []rt.Property // RefProp, RefEnum, etc.
-}
-
-// findId returns the field name in rtype containing id.
-func (cls *RefClass) findId() (ret string) {
-	for cls != nil {
-		if id, ok := cls.meta["id"]; ok {
-			ret = id
-			break
-		}
-		cls = cls.parent
-	}
-	return
-}
-
-func (cls *RefClass) NewObject() *RefObject {
-	inst := r.New(cls.rtype)
-	return NewObject(cls, inst.Elem())
 }
 
 func (cls *RefClass) Type() r.Type {

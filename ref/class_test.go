@@ -2,28 +2,19 @@ package ref
 
 import (
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	. "github.com/ionous/iffy/tests"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	r "reflect"
 	"testing"
 )
 
-type BaseClass struct {
-	Name    string `if:"id,plural:base classes"`
-	Num     float64
-	Text    string
-	Object  *BaseClass
-	Nums    []float64
-	Texts   []string
-	Objects []*BaseClass
-	State   TriState
-	Labeled bool
+func TestClassSuite(t *testing.T) {
+	suite.Run(t, new(ClassSuite))
 }
 
-type DerivedClass struct {
-	BaseClass `if:"plural:derives"`
+type ClassSuite struct {
+	suite.Suite
 }
 
 type Expected struct {
@@ -45,21 +36,31 @@ func expected() []Expected {
 	}
 }
 
-func TestClass(t *testing.T) {
-	assert := assert.New(t)
+func (assert *ClassSuite) TestClass() {
 	//
-	cs := make(Classes)
-	base := r.TypeOf((*BaseClass)(nil)).Elem()
+	cs := NewClasses()
+	baseType := r.TypeOf((*BaseClass)(nil)).Elem()
+	derivedType := r.TypeOf((*DerivedClass)(nil)).Elem()
+
+	// id field tests
+	if path := FieldPathOfId(baseType); assert.NotEmpty(path) {
+		field := baseType.FieldByIndex(path)
+		assert.Equal(field.Name, "Name")
+	}
+	if path := FieldPathOfId(derivedType); assert.NotEmpty(path) {
+		field := derivedType.FieldByIndex(path)
+		assert.Equal(field.Name, "Name")
+	}
+
 	// add and retrieve base class:
 	var baseClass *RefClass
-	if ref, e := cs.addClass(base); assert.NoError(e) {
+	if ref, e := cs.RegisterClass(baseType); assert.NoError(e) {
 		baseClass = ref
 		// base class tests:
 		assert.Equal("$baseClass", baseClass.GetId())
 		_, parentExists := baseClass.GetParent()
 		assert.False(parentExists)
-		// id field
-		assert.Equal("Name", baseClass.findId())
+
 		// test the property interfaces:
 		assert.Equal(len(expected()), baseClass.NumProperty())
 		first := baseClass.PropertyNum(0)
@@ -73,45 +74,41 @@ func TestClass(t *testing.T) {
 			}
 		}
 		// derived class tests:
-		derivedType := r.TypeOf((*DerivedClass)(nil)).Elem()
-		if derived, e := cs.addClass(derivedType); assert.NoError(e) {
+		if derived, e := cs.RegisterClass(derivedType); assert.NoError(e) {
 			assert.Equal("$derivedClass", derived.GetId())
 			if p, ok := derived.GetParent(); assert.True(ok) {
 				assert.Equal(baseClass, p)
 				assert.True(p.IsCompatible(p.GetId()))
 			}
-			// id field
-			assert.Equal("Name", derived.findId())
 		}
 		// class set verification:
-		assert.Contains(cs, "$baseClass")
-		assert.Contains(cs, "$derivedClass")
+		assert.Contains(cs.all, "$baseClass")
+		assert.Contains(cs.all, "$derivedClass")
 	}
 }
 
-func TestClassProperties(t *testing.T) {
-	assert := assert.New(t)
-	base := r.TypeOf((*BaseClass)(nil)).Elem()
-	var md unique.Metadata
-	if parent, _, props, e := MakeProperties(base, &md); assert.NoError(e) {
+func (assert *ClassSuite) TestClassProperties() {
+	baseType := r.TypeOf((*BaseClass)(nil)).Elem()
+	if parent, _, props, e := MakeProperties(baseType); assert.NoError(e) {
 		assert.Nil(parent)
 		for i, v := range expected() {
 			p := props[i]
 			assert.Equal(id.MakeId(v.name), p.GetId(), v.name)
 			assert.Equal(v.kind, p.GetType(), v.name)
 		}
-		if assert.Len(md, 2) {
-			assert.Equal("Name", md["id"])
-			assert.Equal("base classes", md["plural"])
-		}
+		// var md unique.Metadata
+		// if assert.Len(md, 2) {
+		// 	assert.Equal("Name", md["id"])
+		// 	assert.Equal("baseType classes", md["plural"])
+		// }
 	}
-	var dd unique.Metadata
 	derived := r.TypeOf((*DerivedClass)(nil)).Elem()
-	if parent, _, props, e := MakeProperties(derived, &dd); assert.NoError(e) {
-		assert.Equal(base, parent)
+	if parent, _, props, e := MakeProperties(derived); assert.NoError(e) {
+		assert.Equal(baseType, parent)
 		assert.Len(props, 0)
 	}
-	if assert.Len(dd, 1) {
-		assert.Equal("derives", dd["plural"])
-	}
+	// var dd unique.Metadata
+	// if assert.Len(dd, 1) {
+	// 	assert.Equal("derives", dd["plural"])
+	// }
 }

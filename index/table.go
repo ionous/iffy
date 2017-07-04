@@ -63,7 +63,6 @@ func (r *Table) Relate(primary, secondary string) (ret *KeyData, changed bool) {
 			changed = r.remove(Primary, primary)
 		} else {
 			l := MakeKey(primary, secondary)
-			// see for this, i dont really care about "changed" -- i care about "new"
 			if _, ok := r.Index[Primary].Update(l); ok {
 				if slot, ok := r.Index[Secondary].Update(l); !ok {
 					err := errutil.New("couldnt update reverse pair", secondary, primary)
@@ -72,6 +71,21 @@ func (r *Table) Relate(primary, secondary string) (ret *KeyData, changed bool) {
 					ret, changed = slot, true
 				}
 			}
+		}
+	}
+	return
+}
+
+func (r *Table) DeletePair(majorKey, minorKey string) (changed bool) {
+	near, far := &r.Index[Primary], &r.Index[Secondary]
+	if n, ok := near.FindPair(0, majorKey, minorKey); ok {
+		if f, ok := far.FindPair(0, minorKey, majorKey); !ok {
+			err := errutil.New("remove couldnt find reverse pair", minorKey, majorKey)
+			panic(err)
+		} else {
+			near.Delete(n)
+			far.Delete(f)
+			changed = true
 		}
 	}
 	return

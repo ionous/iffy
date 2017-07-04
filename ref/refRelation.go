@@ -11,10 +11,11 @@ import (
 
 // RefRelation describes a single relationship "archetype"
 type RefRelation struct {
-	id    string
-	cls   *RefClass // FIX: can we get by with r.Type?
-	props [2]RefInfo
-	table index.Table
+	id        string
+	cls       *RefClass // FIX: can we get by with r.Type?
+	props     [2]RefInfo
+	table     index.Table
+	relations Relations
 }
 
 type RefInfo struct {
@@ -23,7 +24,7 @@ type RefInfo struct {
 	fieldPath []int
 }
 
-func NewRelation(relid string, cls *RefClass, classes Classes) (ret *RefRelation, err error) {
+func (reg Relations) newRelation(relid string, cls *RefClass) (ret *RefRelation, err error) {
 	var t int
 	var i int
 	var props [2]RefInfo
@@ -38,7 +39,7 @@ func NewRelation(relid string, cls *RefClass, classes Classes) (ret *RefRelation
 			err = errutil.New("expected a pointer", field.Name)
 		} else {
 			elem := field.Type.Elem()
-			if cls, ok := classes.GetClass(elem.Name()); !ok {
+			if cls, ok := reg.classes.GetClass(elem.Name()); !ok {
 				err = errutil.New("unknown class", field.Name, elem.Name())
 			} else {
 				p := &props[i]
@@ -70,7 +71,7 @@ OutOfLoop:
 		}
 	}
 	if err == nil {
-		ret = &RefRelation{relid, cls, props, index.MakeTable(choices[t])}
+		ret = &RefRelation{relid, cls, props, index.MakeTable(choices[t]), reg}
 	}
 	return
 }
@@ -90,51 +91,59 @@ func (rel *RefRelation) Relate(src, dst rt.Object) (ret rt.Relative, err error) 
 	if rec, e := rel.relate(src, dst); e != nil {
 		err = e
 	} else {
-		ret = &Relative{rec, rel}
+		ret = &RefRelative{rec, rel}
 	}
 	return
 }
 
 // returns a relation record
-func (rel *RefRelation) relate(objs ...rt.Object) (ret *RefObject, err error) {
-	var ids [2]string // ids of src and dst
+func (rel *RefRelation) relate(src ...rt.Object) (ret *RefObject, err error) {
+	var ids [2]string      // ids of src objects
+	var objs [2]*RefObject // access to internals for setting pointers
 	for i, _ := range ids {
-		if obj := objs[i]; obj != nil {
-			ids[i] = obj.GetId()
+		if src := src[i]; src != nil {
+			if ro, ok := src.(*RefObject); !ok {
+				err = errutil.Fmt("unknown object type %T", src)
+				break
+			} else {
+				ids[i] = ro.id
+				objs[i] = ro
+			}
 		}
 	}
-	// kd can be nil when youve deleted something.
-	// theres no real "relation" at that point, but we can still return a hook with one side or the other.
-	var rec *RefObject
-	if kd, _ := rel.table.Relate(ids[0], ids[1]); kd == nil {
-		rec = rel.cls.NewObject()
-	} else if ref, ok := kd.Data.(*RefObject); !ok {
-		rec = rel.cls.NewObject()
-		kd.Data = rec
-	} else {
-		rec = ref
-	}
-	if e := rel.setup(rec, objs); e != nil {
-		err = e
-	} else {
-		ret = rec
+	if err == nil {
+		// kd can be nil when youve deleted something.
+		// theres no real "relation" at that point, but we can still return a hook with one side or the other.
+		var rec *RefObject
+		if kd, _ := rel.table.Relate(ids[0], ids[1]); kd == nil {
+			rec = rel.relations.objects.newObject(rel.cls)
+		} else if ref, ok := kd.Data.(*RefObject); !ok {
+			rec = rel.relations.objects.newObject(rel.cls)
+			kd.Data = rec
+		} else {
+			rec = ref
+		}
+		if e := rel.setup(rec, objs[:]); e != nil {
+			err = e
+		} else {
+			ret = rec
+		}
 	}
 	return
 }
 
-func (rel *RefRelation) setup(rec *RefObject, objs []rt.Object) (err error) {
+func (rel *RefRelation) setup(rec *RefObject, objs []*RefObject) (err error) {
 	for i, obj := range objs {
 		p := rel.props[i]
 		field := rec.rval.FieldByIndex(p.fieldPath)
-		// if obj == nil {
-		// 	field.Set(r.Value{})
-		// } else {
-		v := r.ValueOf(obj)
-		if !v.Type().ConvertibleTo(field.Type()) {
-			err = errutil.New("couldnt covert")
+		if obj == nil {
+			if !field.IsNil() {
+				field.Set(r.ValueOf(nil))
+			}
+		} else if v := obj.rval.Addr(); !v.Type().ConvertibleTo(field.Type()) {
+			err = errutil.Fmt("couldnt convert to %v from %v", v.Type(), field.Type())
 		} else {
 			field.Set(v)
-			// }
 		}
 	}
 	return

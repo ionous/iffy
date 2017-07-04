@@ -56,8 +56,8 @@ type OpsSuite struct {
 
 func (t *OpsSuite) SetupTest() {
 	ops := NewOps()
-	unique.RegisterType(ops, (*Container)(nil))
-	unique.RegisterType(ops, (*Contents)(nil))
+	unique.RegisterTypes(unique.PanicTypes(ops),
+		(*Container)(nil), (*Contents)(nil))
 	t.ops = ops
 	t.test = t.T()
 }

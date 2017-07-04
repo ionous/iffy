@@ -21,136 +21,142 @@ func TestCore(t *testing.T) {
 // Regular expression to select test suites specified command-line argument "-run". Regular expression to select the methods of test suites specified command-line argument "-m"
 type CoreSuite struct {
 	suite.Suite
-	ops  *ops.Ops
-	test *testing.T
+	ops *ops.Ops
 
 	run   rt.Runtime
 	lines rtm.LineWriter
 
+	classes   *ref.Classes
+	objects   *ref.Objects
+	relations *ref.Relations
+
 	unique *unique.Objects
 }
 
-func (t *CoreSuite) Lines() (ret []string) {
-	ret = t.lines.Lines()
-	t.lines = rtm.LineWriter{}
+func (assert *CoreSuite) Lines() (ret []string) {
+	ret = assert.lines.Lines()
+	assert.lines = rtm.LineWriter{}
 	return
 }
 
-func (t *CoreSuite) SetupTest() {
+func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
-	t.ops = ops.NewOps((*core.Commands)(nil))
-	t.test = t.T()
-	t.unique = unique.NewObjects()
-	reg := unique.PanicRegistry(t.unique)
-	unique.RegisterType(reg, (*core.CycleCounter)(nil))
-	unique.RegisterType(reg, (*core.ShuffleCounter)(nil))
-	unique.RegisterType(reg, (*core.StoppingCounter)(nil))
+	assert.ops = ops.NewOps((*core.Commands)(nil))
+
+	assert.unique = unique.NewObjects()
+	assert.classes = ref.NewClasses()
+	assert.objects = ref.NewObjects(assert.classes)
+	assert.relations = ref.NewRelations(assert.classes, assert.objects)
+
+	unique.RegisterTypes(unique.PanicTypes(assert.unique),
+		(*core.CycleCounter)(nil),
+		(*core.ShuffleCounter)(nil),
+		(*core.StoppingCounter)(nil))
 }
 
-func (t *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
+func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 	if _, e := c.Build(); e != nil {
 		err = e
 	} else {
 
-		cs := make(ref.Classes)
-		mm := unique.PanicRegistry(cs)
-		unique.RegisterType(mm, (*core.NumberCounter)(nil))
-		unique.RegisterType(mm, (*core.TextCounter)(nil))
-		// add all the helper classes we registered via unique
-		for _, rtype := range t.unique.Types {
-			unique.RegisterType(mm, r.New(rtype).Interface())
-		}
-		rel := ref.MakeRelations(cs)
+		mm := unique.PanicTypes(assert.classes)
+		unique.RegisterTypes(mm,
+			(*core.NumberCounter)(nil),
+			(*core.TextCounter)(nil))
 
-		if inst, e := t.unique.Generate(); e != nil {
+		// add all the helper classes we registered via unique
+		for _, rtype := range assert.unique.Types {
+			unique.RegisterTypes(mm, r.New(rtype).Interface())
+		}
+
+		if inst, e := assert.unique.Generate(); e != nil {
 			err = e
 		} else {
-			if m, e := cs.MakeModel(inst); e != nil {
-				err = e
-			} else {
-				run := rtm.NewRtm(cs, m, rel)
-				run.PushWriter(&t.lines)
-				ret = run
-			}
+			unique.RegisterValues(unique.PanicValues(assert.objects), inst...)
+
+			run := rtm.NewRtm(assert.classes, assert.objects, assert.relations)
+			run.PushWriter(&assert.lines)
+			ret = run
 		}
 	}
 	return
 }
 
-func (t *CoreSuite) matchFunc(
+func (assert *CoreSuite) matchFunc(
 	build func(c *ops.Builder),
 	compare func(expected []string),
 ) {
 	var root struct{ Eval rt.Execute }
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		build(c)
-		if run, e := t.newRuntime(c); t.NoError(e) {
-			if e := root.Eval.Execute(run); t.NoError(e) {
-				compare(t.Lines())
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if e := root.Eval.Execute(run); assert.NoError(e) {
+				compare(assert.Lines())
 			}
 		}
 	}
 }
 
-func (t *CoreSuite) match(
+func (assert *CoreSuite) match(
 	build func(c *ops.Builder), expected ...string) {
-	t.matchFunc(build, func(lines []string) {
-		t.Equal(expected, lines)
+	assert.matchFunc(build, func(lines []string) {
+		assert.Equal(expected, lines)
 	})
 }
 
-func (t *CoreSuite) TestShortcuts() {
+func (assert *CoreSuite) TestShortcuts() {
 	var root struct {
 		Eval rt.TextEval
 	}
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		c.Val("shortcut")
-		if run, e := t.newRuntime(c); t.NoError(e) {
-			if res, e := root.Eval.GetText(run); t.NoError(e) {
-				t.EqualValues("shortcut", res)
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if res, e := root.Eval.GetText(run); assert.NoError(e) {
+				assert.EqualValues("shortcut", res)
 			}
 		}
 	}
 }
 
 // TestAllTrue ensure AllTrue operates on boolean literals as "and".
-func (t *CoreSuite) TestAllTrue() {
+func (assert *CoreSuite) TestAllTrue() {
 	var root struct {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := t.ops.NewBuilder(&root); ok {
+		if c, ok := assert.ops.NewBuilder(&root); ok {
 			c.Cmd("all true", c.Cmds(
 				c.Cmd("bool", a),
 				c.Cmd("bool", b)))
 			//
-			if run, e := t.newRuntime(c); t.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); t.NoError(e) {
-					t.EqualValues(res, ok)
+			if run, e := assert.newRuntime(c); assert.NoError(e) {
+				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+					assert.EqualValues(res, ok)
 				}
 			}
 		}
 	}
+	// ******
 	test(true, false, false)
 	test(true, true, true)
 	test(false, false, false)
 }
 
 // TestAnyTrue ensure AnyTrue operates on boolean literals as "or".
-func (t *CoreSuite) TestAnyTrue() {
+func (assert *CoreSuite) TestAnyTrue() {
 	var root struct {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := t.ops.NewBuilder(&root); ok {
+		if c, ok := assert.ops.NewBuilder(&root); ok {
 			if c.Cmd("any true").Begin() {
 				c.Cmds(c.Cmd("bool", a), c.Cmd("bool", b))
 				c.End()
 			}
 			// /
-			if run, e := t.newRuntime(c); t.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); t.NoError(e) {
-					t.EqualValues(res, ok)
+			if run, e := assert.newRuntime(c); assert.NoError(e) {
+				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+					assert.EqualValues(res, ok)
 				}
 			}
 		}
@@ -160,20 +166,20 @@ func (t *CoreSuite) TestAnyTrue() {
 	test(false, false, false)
 }
 
-func (t *CoreSuite) TestCompareNum() {
+func (assert *CoreSuite) TestCompareNum() {
 	var root struct {
 		Eval rt.BoolEval
 	}
 	test := func(a float64, op string, b float64) {
-		if c, ok := t.ops.NewBuilder(&root); ok {
+		if c, ok := assert.ops.NewBuilder(&root); ok {
 			if c.Cmd("compare num").Begin() {
 				c.Val(a).Cmd(op).Val(b)
 				c.End()
 			}
 
-			if run, e := t.newRuntime(c); t.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); t.NoError(e) {
-					t.True(ok)
+			if run, e := assert.newRuntime(c); assert.NoError(e) {
+				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+					assert.True(ok)
 				}
 			}
 		}
@@ -184,17 +190,17 @@ func (t *CoreSuite) TestCompareNum() {
 	test(10, "equal to", 10)
 }
 
-func (t *CoreSuite) TestCompareText() {
+func (assert *CoreSuite) TestCompareText() {
 	var root struct {
 		Eval rt.BoolEval
 	}
 	test := func(a, op, b string) {
-		if c, ok := t.ops.NewBuilder(&root); ok {
+		if c, ok := assert.ops.NewBuilder(&root); ok {
 			c.Cmd("compare text", c.Val(a), c.Cmd(op), c.Val(b))
 			//
-			if run, e := t.newRuntime(c); t.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); t.NoError(e) {
-					t.True(ok, strings.Join([]string{a, op, b}, " "))
+			if run, e := assert.newRuntime(c); assert.NoError(e) {
+				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+					assert.True(ok, strings.Join([]string{a, op, b}, " "))
 				}
 			}
 		}

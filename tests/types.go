@@ -1,5 +1,23 @@
 package tests
 
+// BaseClass provides a simple object with every common type.
+type BaseClass struct {
+	Name    string `if:"id,plural:baseType classes"`
+	Num     float64
+	Text    string
+	Object  *BaseClass
+	Nums    []float64
+	Texts   []string
+	Objects []*BaseClass
+	State   TriState
+	Labeled bool
+}
+
+// DerivedClass does nothing but extend BaseClass
+type DerivedClass struct {
+	BaseClass `if:"plural:derives"`
+}
+
 //go:generate stringer -type=ListeningState
 type ListeningState int
 
