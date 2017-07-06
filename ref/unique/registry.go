@@ -16,17 +16,46 @@ type ValueRegistry interface {
 	FindValue(name string) (r.Value, bool)
 }
 
+// TypePtr turns an interface pointer into a struct r.Type.
+func TypePtr(ptr interface{}) (r.Type, error) {
+	return typePtr(r.TypeOf(ptr))
+}
+
+func typePtr(rtype r.Type) (ret r.Type, err error) {
+	if rtype.Kind() != r.Ptr {
+		err = errutil.New("expected (nil) pointer (to a struct)", rtype)
+	} else if rtype := rtype.Elem(); rtype.Kind() != r.Struct {
+		err = errutil.New("expected a struct pointer", rtype)
+	} else {
+		ret = rtype
+	}
+	return
+}
+
+// ValuePtr turns an interface pointer into a struct r.Value.
+func ValuePtr(ptr interface{}) (ret r.Value, err error) {
+	if rval := r.ValueOf(ptr); rval.Kind() != r.Ptr {
+		err = errutil.New("expected pointer (to a struct)", rval.Type())
+	} else if rval := rval.Elem(); rval.Kind() != r.Struct {
+		err = errutil.New("expected a struct pointer", rval.Type())
+	} else {
+		ret = rval
+	}
+	return
+}
+
 // RegisterBlock registers a structure containing pointers to commands.
 func RegisterBlock(reg TypeRegistry, block interface{}) (err error) {
-	if blockType := r.TypeOf(block); blockType.Kind() != r.Ptr {
-		err = errutil.New("expected (nil) pointer (to a struct).")
-	} else if structType := blockType.Elem(); structType.Kind() != r.Struct {
-		err = errutil.New("expected a struct pointer.")
+	if structType, e := TypePtr(block); e != nil {
+		err = e
 	} else {
 		for i, cnt := 0, structType.NumField(); i < cnt; i++ {
 			field := structType.Field(i)
-			if e := registerType(reg, field.Type); e != nil {
-				err = errutil.New(field.Name, e)
+			if rtype, e := typePtr(field.Type); e != nil {
+				err = errutil.New("RegisterType", i, e)
+				break
+			} else if e := reg.RegisterType(rtype); e != nil {
+				err = errutil.New("RegisterType", i, e)
 				break
 			}
 		}
@@ -37,20 +66,13 @@ func RegisterBlock(reg TypeRegistry, block interface{}) (err error) {
 // RegisterType registers pointers to types.
 func RegisterTypes(reg TypeRegistry, ptr ...interface{}) (err error) {
 	for i, t := range ptr {
-		if e := registerType(reg, r.TypeOf(t)); e != nil {
+		if rtype, e := TypePtr(t); e != nil {
 			err = errutil.New("RegisterType", i, e)
+			break
+		} else if e := reg.RegisterType(rtype); e != nil {
+			err = errutil.New("RegisterType", i, e)
+			break
 		}
-	}
-	return
-}
-
-func registerType(reg TypeRegistry, rtype r.Type) (err error) {
-	if rtype.Kind() != r.Ptr {
-		err = errutil.New("expected (nil) pointer (to a struct)", rtype)
-	} else if rtype := rtype.Elem(); rtype.Kind() != r.Struct {
-		err = errutil.New("expected a struct pointer", rtype)
-	} else {
-		err = reg.RegisterType(rtype)
 	}
 	return
 }
@@ -58,21 +80,13 @@ func registerType(reg TypeRegistry, rtype r.Type) (err error) {
 // RegisterValues registers multiple pointer values.
 func RegisterValues(reg ValueRegistry, value ...interface{}) (err error) {
 	for i, v := range value {
-		if e := registerValue(reg, r.ValueOf(v)); e != nil {
+		if rval, e := ValuePtr(v); e != nil {
+			err = errutil.New("RegisterValue", i, e)
+			break
+		} else if e := reg.RegisterValue(rval); e != nil {
 			err = errutil.New("RegisterValue", i, e)
 			break
 		}
-	}
-	return
-}
-
-func registerValue(reg ValueRegistry, rval r.Value) (err error) {
-	if rval.Kind() != r.Ptr {
-		err = errutil.New("expected pointer (to a struct)", rval.Type())
-	} else if rval := rval.Elem(); rval.Kind() != r.Struct {
-		err = errutil.New("expected a struct pointer", rval.Type())
-	} else {
-		err = reg.RegisterValue(rval)
 	}
 	return
 }

@@ -10,9 +10,10 @@ import (
 
 // Objects with ids, findable by the game.
 type Objects struct {
-	all     map[string]*RefObject
+	ObjectMap
 	classes *Classes
 }
+type ObjectMap map[string]*RefObject
 
 func NewObjects(classes *Classes) *Objects {
 	return &Objects{make(map[string]*RefObject), classes}
@@ -39,12 +40,24 @@ func (or *Objects) newObject(cls *RefClass) *RefObject {
 func (or *Objects) RegisterValue(rval r.Value) (err error) {
 	if id, e := MakeId(rval); e != nil {
 		err = e
-	} else if obj, ok := or.all[id]; ok {
+	} else if obj, ok := or.ObjectMap[id]; ok {
 		err = errutil.New("conflicting objects", id, obj, rval)
 	} else if cls, e := or.classes.GetByType(rval.Type()); e != nil {
 		err = e
 	} else {
-		or.all[id] = &RefObject{id, rval, cls, or}
+		or.ObjectMap[id] = &RefObject{id, rval, cls, or}
+	}
+	return
+}
+
+// Emplace wraps the passed value as an anonymous object.
+// Compatible with rt.Runtime.
+func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
+	rval := valueOf(i)
+	if cls, e := or.classes.GetByType(rval.Type()); e != nil {
+		err = e
+	} else {
+		ret = &RefObject{"", rval, cls, or}
 	}
 	return
 }
@@ -53,7 +66,7 @@ func (or *Objects) RegisterValue(rval r.Value) (err error) {
 // Compatible with unique.ValueRegistry
 func (or *Objects) FindValue(name string) (ret r.Value, okay bool) {
 	id := id.MakeId(name)
-	if obj, ok := or.all[id]; ok {
+	if obj, ok := or.ObjectMap[id]; ok {
 		ret, okay = obj.rval, true
 	}
 	return
@@ -62,7 +75,7 @@ func (or *Objects) FindValue(name string) (ret r.Value, okay bool) {
 // GetObject is compatible with rt.Runtime. The map can also be used directly.
 func (or *Objects) GetObject(name string) (ret rt.Object, okay bool) {
 	id := id.MakeId(name)
-	ret, okay = or.all[id]
+	ret, okay = or.ObjectMap[id]
 	return
 }
 
@@ -73,7 +86,7 @@ func (or *Objects) GetByValue(rval r.Value) (ret *RefObject, err error) {
 		rval := rval.Elem()
 		if id, e := MakeId(rval); e != nil {
 			err = e
-		} else if obj, ok := or.all[id]; !ok {
+		} else if obj, ok := or.ObjectMap[id]; !ok {
 			err = errutil.New("object not found", id)
 		} else if obj.rval.Interface() != rval.Interface() {
 			err = errutil.New("conflicting objects", id, obj, rval)

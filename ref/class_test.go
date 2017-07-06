@@ -82,8 +82,8 @@ func (assert *ClassSuite) TestClass() {
 			}
 		}
 		// class set verification:
-		assert.Contains(cs.all, "$baseClass")
-		assert.Contains(cs.all, "$derivedClass")
+		assert.Contains(cs.ClassMap, "$baseClass")
+		assert.Contains(cs.ClassMap, "$derivedClass")
 	}
 }
 

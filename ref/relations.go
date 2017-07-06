@@ -34,7 +34,7 @@ func (reg *Relations) GetRelation(name string) (ret rt.Relation, okay bool) {
 	id := id.MakeId(name)
 	if ref, ok := reg.cache[id]; ok {
 		ret, okay = ref, true
-	} else if cls, ok := reg.all[id]; ok {
+	} else if cls, ok := reg.ClassMap[id]; ok {
 		if ref, e := reg.newRelation(id, cls); e != nil {
 			println(e.Error())
 		} else {
