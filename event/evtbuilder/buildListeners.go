@@ -88,12 +88,12 @@ func (p phaseOn) On(name string, flags event.Options, fn BuildOps) (err error) {
 			}
 		}
 		//
-		phase := event.BubblePhase
+		listenerType := event.BubbleListener
 		if flags.IsCapture() {
-			phase = event.CapturePhase
+			listenerType = event.CaptureListener
 		}
 		pl := phaseMap[target]
-		pl[phase] = append(pl[phase], &event.Handler{
+		pl[listenerType] = append(pl[listenerType], &event.Handler{
 			flags,
 			p.obj,
 			p.cls,

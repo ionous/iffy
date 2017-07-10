@@ -60,14 +60,14 @@ func (ac *Frame) runAction(h *Handler) (err error) {
 }
 
 // Dispatch the event frame to the passed targets.
-func (ac *Frame) Dispatch(at, path []Target) (err error) {
+func (ac *Frame) DispatchFrame(at, path []Target) (err error) {
 	fullPath := [2][]Target{at, path}
-	if e := ac.dispatchPhase(CapturePhase, fullPath, func(i, cnt int) int {
+	if e := ac.dispatchPhase(CaptureListeners, fullPath, func(i, cnt int) int {
 		return cnt - i - 1
 	}); e != nil {
 		err = e
-	} else if !ac.evt.Stopped() {
-		if e := ac.dispatchPhase(BubblePhase, fullPath, func(i, cnt int) int {
+	} else if !ac.evt.Stopped() && ac.evt.Bubbles {
+		if e := ac.dispatchPhase(BubbleListeners, fullPath, func(i, cnt int) int {
 			return i
 		}); e != nil {
 			err = e
@@ -76,9 +76,8 @@ func (ac *Frame) Dispatch(at, path []Target) (err error) {
 	return
 }
 
-func (ac *Frame) dispatchPhase(phase Phase, fullPath [2][]Target, order func(i, cnt int) int) (err error) {
+func (ac *Frame) dispatchPhase(listenerType ListenerType, fullPath [2][]Target, order func(i, cnt int) int) (err error) {
 	if evt := ac.evt; !evt.Stopped() {
-		evt.Phase = phase
 	OutOfLoop:
 		// walk the lists of parent and target handlers
 		for i, cnt := 0, len(fullPath); i < cnt && !evt.Stopped(); i++ {
@@ -87,14 +86,22 @@ func (ac *Frame) dispatchPhase(phase Phase, fullPath [2][]Target, order func(i, 
 			path := fullPath[which]
 			// the 0th list is always the list of target handlers
 			atTarget := which == 0
+			if atTarget {
+				evt.Phase = AtTarget
+			} else if listenerType == CaptureListeners {
+				evt.Phase = CapturingPhase
+			} else {
+				evt.Phase = BubblingPhase
+			}
 			// walk the list of list of parent or target handlers
 			for i, cnt := 0, len(path); i < cnt; i++ {
 				// allow forward or backward iteration
 				tgt := path[order(i, cnt)]
 				// get the handlers just for this phase: bubble/capture.
-				hs := tgt.handlers[phase]
+				hs := tgt.handlers[listenerType]
 				for i, cnt := 0, len(hs); i < cnt; i++ {
 					// allow forward or backward iteration through the phase
+					// FIX: shouldnt the order of handlers always be last registered first?
 					h := hs[order(i, cnt)]
 					// at target usually this only happens during the bubbles phase.
 					if atTarget == h.IsTargetOnly() {

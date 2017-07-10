@@ -20,11 +20,25 @@ func (opt Options) IsRunAfter() bool {
 	return opt&RunAfter == RunAfter
 }
 
-//go:generate stringer -type=Phase
-type Phase int
+// EventPhase describes the event lifecycle.
+type EventPhase int
 
+//go:generate stringer -type=EventPhase
 const (
-	BubblePhase Phase = iota
-	CapturePhase
+	PhaseNone EventPhase = iota
+	CapturingPhase
+	AtTarget
+	BubblingPhase
 	AfterPhase
+)
+
+// ListenerType separates listeners into two categories.
+// This is an implementation artifact.
+type ListenerType int
+
+//go:generate stringer -type=ListenerType
+const (
+	CaptureListeners ListenerType = iota
+	BubbleListeners
+	ListenerTypes
 )

@@ -15,7 +15,7 @@ type EventListeners struct {
 type PhaseMap map[string]PhaseList
 
 // PhaseList contains capture and bubble handlers.
-type PhaseList [AfterPhase][]*Handler
+type PhaseList [ListenerTypes][]*Handler
 
 type Handler struct {
 	Options

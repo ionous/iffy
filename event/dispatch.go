@@ -36,7 +36,7 @@ func (d *Dispatch) Go(run rt.Runtime, act *Action, target, data rt.Object) (err 
 				ac, e := NewFrame(run, evt)
 				if e != nil {
 					err = e
-				} else if e := ac.Dispatch(at, path); e != nil {
+				} else if e := ac.DispatchFrame(at, path); e != nil {
 					err = e
 				} else if !evt.PreventDefault {
 					evt.Phase = AfterPhase

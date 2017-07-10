@@ -8,7 +8,7 @@ type EventObject struct {
 	Cancelable bool // r/o can this event be canceled
 
 	Target/*Id*/ string        // originator of event
-	Phase                      Phase // event flow phase
+	Phase                      EventPhase // event flow phase
 	CurrentTarget/*Id*/ string // current object processing the event
 
 	PreventDefault           bool // stop the default action from running

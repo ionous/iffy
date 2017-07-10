@@ -78,7 +78,10 @@ func TestSomething(t *testing.T) {
 		c.Cmd("print text", "kissed!")
 	})
 
+	var lines rtm.LineWriter
 	run := rtm.NewRtm(classes, objects, relations)
+	run.PushWriter(&lines)
+
 	dispatch := event.NewDispatch(listen.EventMap)
 
 	// helper for testing:
@@ -104,6 +107,7 @@ func TestSomething(t *testing.T) {
 	}
 
 	Go("bogart", "jump", nil)
+	t.Log(lines.Lines())
 
 	// Go("bogart", "kiss", func(c *ops.Builder) {
 	// 	c.Value("bob")
