@@ -16,15 +16,8 @@ type Ops struct {
 	unique.Types
 }
 
-// NewOps creates a registry, calling RegisterBlock on each passed element.
-func NewOps(blocks ...interface{}) *Ops {
-	ops := &Ops{make(unique.Types)}
-	for _, block := range blocks {
-		if e := unique.RegisterBlock(ops, block); e != nil {
-			panic(e)
-		}
-	}
-	return ops
+func NewOps() *Ops {
+	return &Ops{make(unique.Types)}
 }
 
 type Builder struct {
@@ -191,6 +184,9 @@ func literally(dstType r.Type, src interface{}) (ret interface{}, okay bool) {
 		okay = true
 	case []string:
 		ret = &core.Texts{src}
+		okay = true
+	case int:
+		ret = &core.Num{float64(src)}
 		okay = true
 	case float64:
 		ret = &core.Num{src}

@@ -50,32 +50,30 @@ func TestOps(t *testing.T) {
 
 type OpsSuite struct {
 	suite.Suite
-	ops  *Ops
-	test *testing.T
+	ops *Ops
 }
 
-func (t *OpsSuite) SetupTest() {
+func (assert *OpsSuite) SetupTest() {
 	ops := NewOps()
 	unique.RegisterTypes(unique.PanicTypes(ops),
 		(*Container)(nil), (*Contents)(nil))
-	t.ops = ops
-	t.test = t.T()
+	assert.ops = ops
 }
 
-func (t *OpsSuite) TestKeyValue() {
+func (assert *OpsSuite) TestKeyValue() {
 	var root Container
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		c.Param("Value").Val(4)
 		//
-		if _, e := c.Build(); t.NoError(e) {
-			t.EqualValues(4, root.Value)
+		if _, e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(4, root.Value)
 		}
 	}
 }
 
-func (t *OpsSuite) TestAllAreOne() {
+func (assert *OpsSuite) TestAllAreOne() {
 	var root Container
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		// the simple way:
 		c.Cmd("contents", "all are one")
 		// // cause why not:
@@ -87,9 +85,10 @@ func (t *OpsSuite) TestAllAreOne() {
 			c.Cmd("container", c.Param("value").Val(7))
 			c.End()
 		}
-		if _, e := c.Build(); t.NoError(e) {
-			t.EqualValues(*testData, root)
-			t.test.Log(pretty.Sprint(root))
+		if _, e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(*testData, root)
+			test := assert.T()
+			test.Log(pretty.Sprint(root))
 		}
 	}
 }
@@ -102,7 +101,9 @@ type CommandBlock struct {
 // TestOpsBlock ensures blocks of commands register succesfully.
 func TestOpsBlock(t *testing.T) {
 	assert := assert.New(t)
-	ops := NewOps((*CommandBlock)(nil))
+	ops := NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(ops),
+		(*CommandBlock)(nil))
 	assert.Contains(ops.Types, id.MakeId("Container"))
 	assert.Contains(ops.Types, id.MakeId("Contents"))
 }

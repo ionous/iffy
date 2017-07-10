@@ -35,7 +35,10 @@ func TestSomething(t *testing.T) {
 		With *Kind
 	}
 
-	cmds := ops.NewOps((*core.Commands)(nil))
+	cmds := ops.NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(cmds),
+		(*core.Commands)(nil))
+
 	classes := ref.NewClasses()
 	objects := ref.NewObjects(classes)
 	relations := ref.NewRelations(classes, objects)

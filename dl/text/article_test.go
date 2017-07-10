@@ -22,8 +22,8 @@ func TestArticles(t *testing.T) {
 // Regular expression to select test suites specified command-line argument "-run". Regular expression to select the methods of test suites specified command-line argument "-m"
 type ArticleSuite struct {
 	suite.Suite
-	ops   *ops.Ops
 	run   rt.Runtime
+	ops   *ops.Ops
 	lines rtm.LineWriter
 }
 
@@ -39,8 +39,9 @@ func (assert *ArticleSuite) SetupTest() {
 	classes := ref.NewClasses()
 	objects := ref.NewObjects(classes)
 	relations := ref.NewRelations(classes, objects)
-	//
-	assert.ops = ops.NewOps(
+
+	ops := ops.NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(ops),
 		(*text.Commands)(nil),
 		(*core.Commands)(nil),
 	)
@@ -55,6 +56,7 @@ func (assert *ArticleSuite) SetupTest() {
 		&Kind{Name: "trevor", CommonProper: ProperNamed},
 	)
 	//
+	assert.ops = ops
 	assert.run = rtm.NewRtm(classes, objects, relations)
 	assert.run.PushWriter(&assert.lines)
 }
@@ -63,7 +65,6 @@ func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {
 	var root struct{ Eval rt.Execute }
 	if c, ok := assert.ops.NewBuilder(&root); ok {
 		run(c)
-
 		if _, e := c.Build(); assert.NoError(e) {
 			if e := root.Eval.Execute(assert.run); assert.NoError(e) {
 				lines := assert.Lines()

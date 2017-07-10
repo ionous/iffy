@@ -87,7 +87,7 @@ func (assert *RelSuite) TestRegistration() {
 		unique.RegisterTypes(reg, (*TooManyManys)(nil))
 	})
 	assert.NotPanics(func() {
-		unique.RegisterBlock(reg, (*JustRight)(nil))
+		unique.RegisterBlocks(reg, (*JustRight)(nil))
 	})
 	_, tooFew := reg.FindType("TooFew")
 	assert.False(tooFew)
