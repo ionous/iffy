@@ -22,9 +22,6 @@ type TextEval interface {
 type ObjectEval interface {
 	GetObject(Runtime) (Object, error)
 }
-type StateEval interface {
-	GetState(Runtime) (int, error)
-}
 type NumListEval interface {
 	GetNumberStream(Runtime) (NumberStream, error)
 }

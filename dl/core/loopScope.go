@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/ionous/errutil"
-
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
 )

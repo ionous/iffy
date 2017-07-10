@@ -6,18 +6,17 @@ type AllTrue struct {
 	Test []rt.BoolEval
 }
 
-func (a *AllTrue) GetBool(run rt.Runtime) (ret bool, err error) {
-	prelim := true
-	for _, b := range a.Test {
-		if ok, e := b.GetBool(run); e != nil {
+func (a *AllTrue) GetBool(run rt.Runtime) (okay bool, err error) {
+	i, cnt := 0, len(a.Test)
+	for ; i < cnt; i++ {
+		if ok, e := a.Test[i].GetBool(run); e != nil {
 			err = e
-			break // see also any.
+			break
 		} else if !ok {
-			prelim = false
 			break
 		}
 	}
-	ret = prelim
+	okay = i == cnt
 	return
 }
 
@@ -25,17 +24,15 @@ type AnyTrue struct {
 	Test []rt.BoolEval
 }
 
-func (a *AnyTrue) GetBool(run rt.Runtime) (ret bool, err error) {
-	prelim := false
+func (a *AnyTrue) GetBool(run rt.Runtime) (okay bool, err error) {
 	for _, b := range a.Test {
 		if ok, e := b.GetBool(run); e != nil {
 			err = e
 			break
 		} else if ok {
-			prelim = true
+			okay = true
 			break
 		}
 	}
-	ret = prelim
 	return
 }

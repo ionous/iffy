@@ -53,8 +53,9 @@ func (or *Objects) RegisterValue(rval r.Value) (err error) {
 // Emplace wraps the passed value as an anonymous object.
 // Compatible with rt.Runtime.
 func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
-	rval := valueOf(i)
-	if cls, e := or.classes.GetByType(rval.Type()); e != nil {
+	if rval, e := unique.ValuePtr(i); e != nil {
+		err = e
+	} else if cls, e := or.classes.GetByType(rval.Type()); e != nil {
 		err = e
 	} else {
 		ret = &RefObject{"", rval, cls, or}
