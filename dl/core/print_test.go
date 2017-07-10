@@ -7,11 +7,11 @@ import (
 
 // TestPrintSpacing verifies that print line uses acts like the span printer:
 // adding spaces between words as needed.
-func (t *CoreSuite) TestPrintSpacing() {
+func (assert *CoreSuite) TestPrintSpacing() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		if c.Cmd("print line").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("print text", "hello")
@@ -21,10 +21,10 @@ func (t *CoreSuite) TestPrintSpacing() {
 			}
 			c.End()
 		}
-		if run, e := t.newRuntime(c); t.NoError(e) {
-			if e := root.Eval.Execute(run); t.NoError(e) {
-				lines := t.Lines()
-				t.Equal("hello there, world.", lines[0], "Note the space after the comma, and the lack of space after the period.")
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if e := root.Eval.Execute(run); assert.NoError(e) {
+				lines := assert.Lines()
+				assert.Equal("hello there, world.", lines[0], "Note the space after the comma, and the lack of space after the period.")
 			}
 		}
 	}
@@ -32,11 +32,11 @@ func (t *CoreSuite) TestPrintSpacing() {
 
 // TestMultiLines verifies that iffy printing works similar to sashimi printing.
 // In sashimi, the default printer made every print a new line, we should do the same. This test complements TestSingleLines.
-func (t *CoreSuite) TestMultiLines() {
+func (assert *CoreSuite) TestMultiLines() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("hello", "there", "world"))
 			if c.Param("go").Cmds().Begin() {
@@ -45,10 +45,10 @@ func (t *CoreSuite) TestMultiLines() {
 			}
 			c.End()
 		}
-		if run, e := t.newRuntime(c); t.NoError(e) {
-			if e := root.Eval.Execute(run); t.NoError(e) {
-				lines := t.Lines()
-				t.Equal(sliceOf.String("hello", "there", "world"), lines)
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if e := root.Eval.Execute(run); assert.NoError(e) {
+				lines := assert.Lines()
+				assert.Equal(sliceOf.String("hello", "there", "world"), lines)
 			}
 		}
 	}
@@ -56,11 +56,11 @@ func (t *CoreSuite) TestMultiLines() {
 
 // TestSingleLine verifies the ability of print line to join text.
 // It complements TestMultiLines
-func (t *CoreSuite) TestSingleLines() {
+func (assert *CoreSuite) TestSingleLines() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		if c.Cmd("print line").Begin() {
 			if c.Cmds().Begin() {
 				if c.Cmd("for each text").Begin() {
@@ -74,21 +74,21 @@ func (t *CoreSuite) TestSingleLines() {
 			}
 			c.End()
 		}
-		if run, e := t.newRuntime(c); t.NoError(e) {
-			if e := root.Eval.Execute(run); t.NoError(e) {
-				lines := t.Lines()
-				t.Equal("hello there world", lines[0])
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if e := root.Eval.Execute(run); assert.NoError(e) {
+				lines := assert.Lines()
+				assert.Equal("hello there world", lines[0])
 			}
 		}
 	}
 }
 
 // TestLineIndex verifies the loop index property.
-func (t *CoreSuite) TestLineIndex() {
+func (assert *CoreSuite) TestLineIndex() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
 			if c.Param("go").Cmds().Begin() {
@@ -99,21 +99,21 @@ func (t *CoreSuite) TestLineIndex() {
 			}
 			c.End()
 		}
-		if run, e := t.newRuntime(c); t.NoError(e) {
-			if e := root.Eval.Execute(run); t.NoError(e) {
-				lines := t.Lines()
-				t.Equal(sliceOf.String("1", "2", "3"), lines)
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if e := root.Eval.Execute(run); assert.NoError(e) {
+				lines := assert.Lines()
+				assert.Equal(sliceOf.String("1", "2", "3"), lines)
 			}
 		}
 	}
 }
 
 // TestLineEndings verifies loop first and last properties.
-func (t *CoreSuite) TestLineEndings() {
+func (assert *CoreSuite) TestLineEndings() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := t.ops.NewBuilder(&root); ok {
+	if c, ok := assert.ops.NewBuilder(&root); ok {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
 			if c.Param("go").Cmds().Begin() {
@@ -135,10 +135,10 @@ func (t *CoreSuite) TestLineEndings() {
 			}
 			c.End()
 		}
-		if run, e := t.newRuntime(c); t.NoError(e) {
-			if e := root.Eval.Execute(run); t.NoError(e) {
-				lines := t.Lines()
-				t.Equal(sliceOf.String("first", "two", "last"), lines)
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if e := root.Eval.Execute(run); assert.NoError(e) {
+				lines := assert.Lines()
+				assert.Equal(sliceOf.String("first", "two", "last"), lines)
 			}
 		}
 	}

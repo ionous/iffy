@@ -41,7 +41,9 @@ func (assert *CoreSuite) Lines() (ret []string) {
 
 func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
-	assert.ops = ops.NewOps((*core.Commands)(nil))
+	assert.ops = ops.NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(assert.ops),
+		(*core.Commands)(nil))
 
 	assert.unique = unique.NewObjects()
 	assert.classes = ref.NewClasses()
@@ -97,8 +99,13 @@ func (assert *CoreSuite) matchFunc(
 	}
 }
 
-func (assert *CoreSuite) match(
-	build func(c *ops.Builder), expected ...string) {
+func (assert *CoreSuite) matchLine(expected string,
+	build func(c *ops.Builder)) {
+	assert.matchLines([]string{expected}, build)
+}
+
+func (assert *CoreSuite) matchLines(expected []string,
+	build func(c *ops.Builder)) {
 	assert.matchFunc(build, func(lines []string) {
 		assert.Equal(expected, lines)
 	})

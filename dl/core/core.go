@@ -1,7 +1,11 @@
 package core
 
 type Commands struct {
-	// *AddNum
+	*Add
+	*Sub
+	*Mul
+	*Div
+	//
 	*AllTrue
 	*AnyTrue
 	*Bool
