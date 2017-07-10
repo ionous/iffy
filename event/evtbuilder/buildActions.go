@@ -4,9 +4,9 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ops"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/spec/ops"
 )
 
 func NewActions(classes *ref.Classes, ops *ops.Ops) *Actions {

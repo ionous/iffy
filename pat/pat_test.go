@@ -49,6 +49,12 @@ func (n *Num) GetNumber(rt.Runtime) (float64, error) {
 // http://learnyouahaskell.com/syntax-in-functions
 func ExampleSayMe() {
 	b := patbuilder.NewBuilder()
+	classes := ref.NewClasses()
+	unique.RegisterTypes(unique.PanicTypes(classes),
+		(*Num)(nil))
+	objects := ref.NewObjects(classes)
+	run := rtm.NewRtm(classes, objects, nil)
+	//
 	if e := b.NewPattern("sayMe"); e != nil {
 		fmt.Println("new pat:", e)
 	} else if e := b.AddMatch("sayMe", SayIt("One!"), MatchNumber(1)); e != nil {
@@ -60,16 +66,8 @@ func ExampleSayMe() {
 	} else if e := b.AddMatch("sayMe", SayIt("Not between 1 and 3")); e != nil {
 		fmt.Println("add default:", e)
 	} else {
-		classes := ref.NewClasses()
-		unique.RegisterTypes(unique.PanicTypes(classes),
-			(*Num)(nil))
-		objects := ref.NewObjects(classes)
-
-		run := rtm.NewRtm(classes, objects, nil)
 		p := b.GetPatterns()
 		for i := 1; i <= 4; i++ {
-			// the remaining problem is that obj is not in scope.
-			//
 			if obj, e := objects.Emplace(Int(i)); e != nil {
 				fmt.Println("emplace:", e)
 				break

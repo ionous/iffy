@@ -3,11 +3,11 @@ package core_test
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/ops"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec/ops"
 	"github.com/stretchr/testify/suite"
 	r "reflect"
 	"strings"

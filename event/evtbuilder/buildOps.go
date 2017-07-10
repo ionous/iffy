@@ -2,8 +2,8 @@ package evtbuilder
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ops"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/spec/ops"
 )
 
 type BuildOps func(c *ops.Builder)
