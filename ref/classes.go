@@ -15,6 +15,7 @@ type Classes struct {
 }
 type ClassMap map[string]*RefClass
 
+// FIX: NewClasses should live in a builder, just like event and pat
 func NewClasses() *Classes {
 	return &Classes{make(ClassMap)}
 }
