@@ -43,12 +43,12 @@ func (assert *ClassSuite) TestClass() {
 	derivedType := r.TypeOf((*DerivedClass)(nil)).Elem()
 
 	// id field tests
-	if path := FieldPathOfId(baseType); assert.NotEmpty(path) {
-		field := baseType.FieldByIndex(path)
+	if i, ok := FieldPathOfId(baseType); assert.True(ok) {
+		field := baseType.FieldByIndex(i.FullPath())
 		assert.Equal(field.Name, "Name")
 	}
-	if path := FieldPathOfId(derivedType); assert.NotEmpty(path) {
-		field := derivedType.FieldByIndex(path)
+	if i, ok := FieldPathOfId(derivedType); assert.True(ok) {
+		field := derivedType.FieldByIndex(i.FullPath())
 		assert.Equal(field.Name, "Name")
 	}
 

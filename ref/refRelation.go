@@ -15,7 +15,7 @@ type RefRelation struct {
 	cls       *RefClass // FIX: can we get by with r.Type?
 	props     [2]RefInfo
 	table     index.Table
-	relations Relations
+	relations *Relations
 }
 
 type RefInfo struct {
@@ -24,7 +24,7 @@ type RefInfo struct {
 	fieldPath []int
 }
 
-func (reg Relations) newRelation(relid string, cls *RefClass) (ret *RefRelation, err error) {
+func (reg *Relations) newRelation(relid string, cls *RefClass) (ret *RefRelation, err error) {
 	var t int
 	var i int
 	var props [2]RefInfo
@@ -39,7 +39,7 @@ func (reg Relations) newRelation(relid string, cls *RefClass) (ret *RefRelation,
 			err = errutil.New("expected a pointer", field.Name)
 		} else {
 			elem := field.Type.Elem()
-			if cls, ok := reg.classes.GetClass(elem.Name()); !ok {
+			if cls, ok := reg.objectClasses.GetClass(elem.Name()); !ok {
 				err = errutil.New("unknown class", field.Name, elem.Name())
 			} else {
 				p := &props[i]

@@ -74,7 +74,7 @@ func ExampleSayMe() {
 	} else {
 		p := b.GetPatterns()
 		for i := 1; i <= 4; i++ {
-			if sayMe, e := objects.Emplace(&SayMe{float64(i)}); e != nil {
+			if sayMe, e := run.Emplace(&SayMe{float64(i)}); e != nil {
 				fmt.Println("emplace:", e)
 				break
 			} else if text, e := p.GetTextMatching(run, sayMe); e != nil {
@@ -121,7 +121,7 @@ func TestFactorial(t *testing.T) {
 				err = fmt.Errorf("context not found")
 			} else if e := obj.GetValue("num", &this); e != nil {
 				err = e
-			} else if fact, e := objects.Emplace(&Factorial{float64(this - 1)}); e != nil {
+			} else if fact, e := run.Emplace(&Factorial{float64(this - 1)}); e != nil {
 				err = e
 			} else if next, e := p.GetNumMatching(run, fact); e != nil {
 				err = e
@@ -134,7 +134,7 @@ func TestFactorial(t *testing.T) {
 			run := rtm.New(classes).Objects(objects).Rtm()
 			p = b.GetPatterns()
 			//
-			if fact, e := objects.Emplace(&Factorial{3}); assert.NoError(e) {
+			if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
 				if n, e := p.GetNumMatching(run, fact); assert.NoError(e) {
 					fac := 3 * (2 * (1 * 1))
 					assert.EqualValues(fac, n)

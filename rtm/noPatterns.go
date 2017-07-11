@@ -39,3 +39,7 @@ func (m Thunk) GetTextStreamMatching(data rt.Object) (rt.TextStream, error) {
 func (m Thunk) GetObjStreamMatching(data rt.Object) (rt.ObjectStream, error) {
 	return m.Patterns.GetObjStreamMatching(m.run, data)
 }
+
+func (m Thunk) ExecuteMatching(data rt.Object) (bool, error) {
+	return m.Patterns.ExecuteMatching(m.run, data)
+}

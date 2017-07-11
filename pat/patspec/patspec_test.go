@@ -54,11 +54,11 @@ func (assert *PatternSuite) TestFactorial() {
 			if c.Cmd("number rule", "factorial").Begin() {
 				// FIX? re: "equal to" - can literally detect string and make empty command?
 				c.Param("if").Cmd("compare num", c.Cmd("get", "@", "num"), c.Cmd("equal to"), 0)
-				c.Param("return").Val(1)
+				c.Param("decide").Val(1)
 				c.End()
 			}
 			if c.Cmd("number rule", "factorial").Begin() {
-				if c.Param("return").Cmd("mul", c.Cmd("get", "@", "num")).Begin() {
+				if c.Param("decide").Cmd("mul", c.Cmd("get", "@", "num")).Begin() {
 					if c.Cmd("determine").Begin() {
 						// FIX: we need to be able to construct a factorial object from scratch
 						// treating it just like it were any other command
@@ -91,7 +91,7 @@ func (assert *PatternSuite) TestFactorial() {
 					objects := ref.NewObjects(classes)
 					run := rtm.New(classes).Objects(objects).Patterns(peal).Rtm()
 					//
-					if fact, e := objects.Emplace(&Factorial{3}); assert.NoError(e) {
+					if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
 						if n, e := run.GetNumMatching(fact); assert.NoError(e) {
 							fac := 3 * (2 * (1 * 1))
 							assert.EqualValues(fac, n)

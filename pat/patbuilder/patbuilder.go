@@ -28,6 +28,7 @@ func NewPatterns(objectClasses *ref.Classes) *Patterns {
 			make(pat.NumListMap),
 			make(pat.TextListMap),
 			make(pat.ObjListMap),
+			make(pat.ExecuteMap),
 		},
 	}
 }

@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 	"strconv"
 )
 
@@ -82,30 +83,7 @@ type Numbers struct {
 }
 
 func (l *Numbers) GetNumberStream(rt.Runtime) (rt.NumberStream, error) {
-	return NewNumberStream(l.Values), nil
-}
-
-func NewNumberStream(list []float64) rt.NumberStream {
-	return &NumberIt{list: list}
-}
-
-type NumberIt struct {
-	list []float64
-	idx  int
-}
-
-func (it *NumberIt) HasNext() bool {
-	return it.idx < len(it.list)
-}
-
-func (it *NumberIt) GetNext() (ret float64, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ret = it.list[it.idx]
-		it.idx++
-	}
-	return
+	return stream.NewNumberStream(l.Values), nil
 }
 
 // Texts specifies multiple strings.
@@ -114,30 +92,7 @@ type Texts struct {
 }
 
 func (l *Texts) GetTextStream(rt.Runtime) (rt.TextStream, error) {
-	return &TextIt{list: l.Values}, nil
-}
-
-func NewTextStream(list []string) rt.TextStream {
-	return &TextIt{list: list}
-}
-
-type TextIt struct {
-	list []string
-	idx  int
-}
-
-func (it *TextIt) HasNext() bool {
-	return it.idx < len(it.list)
-}
-
-func (it *TextIt) GetNext() (ret string, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ret = it.list[it.idx]
-		it.idx++
-	}
-	return
+	return stream.NewTextStream(l.Values), nil
 }
 
 // Objects specifies multiple object names.
@@ -146,34 +101,5 @@ type Objects struct {
 }
 
 func (l *Objects) GetObjectStream(run rt.Runtime) (rt.ObjectStream, error) {
-	return &ObjectIt{run: run, list: l.Names}, nil
-}
-
-func NewObjectStream(run rt.Runtime, list []string) rt.ObjectStream {
-	return &ObjectIt{run: run, list: list}
-}
-
-type ObjectIt struct {
-	run  rt.Runtime
-	list []string
-	idx  int
-}
-
-func (it *ObjectIt) HasNext() bool {
-	return it.idx < len(it.list)
-}
-
-func (it *ObjectIt) GetNext() (ret rt.Object, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ref := it.list[it.idx]
-		if obj, ok := it.run.FindObject(ref); !ok {
-			err = errutil.New("couldnt find object", ref)
-		} else {
-			ret = obj
-			it.idx++
-		}
-	}
-	return
+	return stream.NewNameStream(run, l.Names), nil
 }

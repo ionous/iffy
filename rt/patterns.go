@@ -8,4 +8,5 @@ type Patterns interface {
 	GetNumStreamMatching(Object) (NumberStream, error)
 	GetTextStreamMatching(Object) (TextStream, error)
 	GetObjStreamMatching(Object) (ObjectStream, error)
+	ExecuteMatching(Object) (bool, error)
 }

@@ -14,4 +14,5 @@ type Patterns struct {
 	NumListMap
 	TextListMap
 	ObjListMap
+	ExecuteMap
 }

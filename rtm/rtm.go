@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
+	"io"
 )
 
 type Rtm struct {
@@ -20,11 +21,12 @@ type Rtm struct {
 
 type Config struct {
 	classes   *ref.Classes
-	objects   *ref.Objects
-	rel       *ref.Relations
+	objects   *ref.ObjBuilder
+	rel       *ref.RelBuilder
 	ancestors Ancestors
 	patterns  pat.Patterns
 	seed      int64
+	writer    io.Writer
 }
 
 // New to initialize a runtime step-by-step.
@@ -34,7 +36,7 @@ func New(classes *ref.Classes) *Config {
 	return &Config{classes: classes}
 }
 
-func (c *Config) Objects(o *ref.Objects) *Config {
+func (c *Config) Objects(o *ref.ObjBuilder) *Config {
 	c.objects = o
 	return c
 }
@@ -44,7 +46,7 @@ func (c *Config) Ancestors(a Ancestors) *Config {
 	return c
 }
 
-func (c *Config) Relations(r *ref.Relations) *Config {
+func (c *Config) Relations(r *ref.RelBuilder) *Config {
 	c.rel = r
 	return c
 }
@@ -59,15 +61,29 @@ func (c *Config) Patterns(p pat.Patterns) *Config {
 	return c
 }
 
+func (c *Config) Writer(w io.Writer) *Config {
+	c.writer = w
+	return c
+}
+
 func (c *Config) Rtm() *Rtm {
 	a := c.ancestors
 	if a == nil {
 		a = NoAncestors{}
 	}
+	var objects *ref.Objects
+	var rel *ref.Relations
+	if c.objects != nil {
+		objects = c.objects.Build()
+		// /
+		if c.rel != nil {
+			c.rel.Build(objects)
+		}
+	}
 	rtm := &Rtm{
 		Classes:   c.classes,
-		Objects:   c.objects,
-		Relations: c.rel,
+		Objects:   objects,
+		Relations: rel,
 		Ancestors: a,
 	}
 	//
@@ -79,6 +95,9 @@ func (c *Config) Rtm() *Rtm {
 	}
 	rtm.PushScope(scope.ModelFinder(rtm))
 	rtm.Randomizer.Reset(seed) // FIX: time?
+	if w := c.writer; w != nil {
+		rtm.PushWriter(w)
+	}
 	return rtm
 }
 

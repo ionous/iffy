@@ -71,7 +71,11 @@ func TestSomething(t *testing.T) {
 	})
 
 	// we do this the manual way first, and later with spec
-	listen := evtbuilder.NewListeners(actions, objects, classes)
+
+	var lines rtm.LineWriter
+	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
+
+	listen := evtbuilder.NewListeners(actions, run.Objects, classes)
 	// object listener:
 	listen.Object("bogart").On("jump", event.Default, func(c *ops.Builder) {
 		c.Cmd("print text", "bogart jumped!")
@@ -80,15 +84,11 @@ func TestSomething(t *testing.T) {
 		c.Cmd("print text", "kissed!")
 	})
 
-	var lines rtm.LineWriter
-	run := rtm.New(classes).Objects(objects).Rtm()
-	run.PushWriter(&lines)
-
 	dispatch := event.NewDispatch(listen.EventMap)
 
 	// helper for testing:
 	Go := func(object, action string, dataFn evtbuilder.BuildOps) {
-		if obj, ok := objects.GetObject(object); !ok {
+		if obj, ok := run.GetObject(object); !ok {
 			t.Fatal("object not found", object)
 		} else if act, ok := actions.ActionMap[id.MakeId(action)]; !ok {
 			t.Fatal("unknown action", action)

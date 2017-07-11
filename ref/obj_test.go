@@ -34,10 +34,11 @@ func (assert *ObjectSuite) SetupTest() {
 		(*BaseClass)(nil),
 		(*DerivedClass)(nil))
 
-	assert.objects = ref.NewObjects(assert.classes)
-	unique.RegisterValues(unique.PanicValues(assert.objects),
+	objects := ref.NewObjects(assert.classes)
+	unique.RegisterValues(unique.PanicValues(objects),
 		&BaseClass{Name: "first", State: Yes, Labeled: true},
 		&DerivedClass{BaseClass{Name: "second", State: Maybe}})
+	assert.objects = objects.Build()
 }
 
 func (assert *ObjectSuite) TestDerivation() {

@@ -15,11 +15,7 @@ type Objects struct {
 }
 type ObjectMap map[string]*RefObject
 
-func NewObjects(classes *Classes) *Objects {
-	return &Objects{make(map[string]*RefObject), classes}
-}
-
-// NewObject from the passed class.
+// NewObject from the passed class the object is anonymous and cant be found by id.
 // Compatible with rt.Runtime.
 func (or *Objects) NewObject(class string) (ret rt.Object, err error) {
 	if cls, ok := or.classes.GetClass(class); !ok {
@@ -35,21 +31,6 @@ func (or *Objects) newObject(cls *RefClass) *RefObject {
 	return &RefObject{"", rval, cls, or}
 }
 
-// RegisterValue wrapping the passed value.
-// Compatible with unique.ValueRegistry
-func (or *Objects) RegisterValue(rval r.Value) (err error) {
-	if id, e := MakeId(rval); e != nil {
-		err = e
-	} else if obj, ok := or.ObjectMap[id]; ok {
-		err = errutil.New("conflicting objects", id, obj, rval)
-	} else if cls, e := or.classes.GetByType(rval.Type()); e != nil {
-		err = e
-	} else {
-		or.ObjectMap[id] = &RefObject{id, rval, cls, or}
-	}
-	return
-}
-
 // Emplace wraps the passed value as an anonymous object.
 // Compatible with rt.Runtime.
 func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
@@ -59,16 +40,6 @@ func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
 		err = e
 	} else {
 		ret = &RefObject{"", rval, cls, or}
-	}
-	return
-}
-
-// FindValue returns the originally specified object, not the wrapper.
-// Compatible with unique.ValueRegistry
-func (or *Objects) FindValue(name string) (ret r.Value, okay bool) {
-	id := id.MakeId(name)
-	if obj, ok := or.ObjectMap[id]; ok {
-		ret, okay = obj.rval, true
 	}
 	return
 }
@@ -85,12 +56,12 @@ func (or *Objects) GetObject(name string) (ret rt.Object, okay bool) {
 func (or *Objects) GetByValue(rval r.Value) (ret *RefObject, err error) {
 	if !rval.IsNil() {
 		rval := rval.Elem()
-		if id, e := MakeId(rval); e != nil {
+		if id, e := idFromValue(rval); e != nil {
 			err = e
 		} else if obj, ok := or.ObjectMap[id]; !ok {
-			err = errutil.New("object not found", id)
+			err = errutil.Fmt("object not found '%s'", id)
 		} else if obj.rval.Interface() != rval.Interface() {
-			err = errutil.New("conflicting objects", id, obj, rval)
+			err = errutil.Fmt("conflicting objects '%s' %T %T", id, obj, rval)
 		} else {
 			ret = obj
 		}
@@ -102,25 +73,35 @@ func (or *Objects) GetByValue(rval r.Value) (ret *RefObject, err error) {
 // an mru might of type might help,
 // better might be caching the id path in the class,
 // best might be forcing all classes to carry an explict id field as their first member.
-func MakeId(rval r.Value) (ret string, err error) {
+// good for serialization would be store ids as much as possible.
+func IdFromValue(rval r.Value) (ret string, err error) {
+	if !rval.IsNil() {
+		ret, err = idFromValue(rval.Elem())
+	}
+	return
+}
+
+func idFromValue(rval r.Value) (ret string, err error) {
 	rtype := rval.Type()
-	if idField := FieldPathOfId(rtype); len(idField) == 0 {
+	if field, ok := FieldPathOfId(rtype); !ok {
 		err = errutil.New("couldnt find id for", rtype)
-	} else if name := rval.FieldByIndex(idField); name.Kind() != r.String {
-		err = errutil.New("object needs an valid id", rval, rtype)
 	} else {
-		ret = id.MakeId(name.String())
+		field := rval.FieldByIndex(field.FullPath())
+		name := field.String()
+		ret = id.MakeId(name)
 	}
 	return
 }
 
 // FieldPathOfId extracts the index of the id field
-func FieldPathOfId(rtype r.Type) (ret []int) {
+func FieldPathOfId(rtype r.Type) (ret *unique.FieldInfo, okay bool) {
 	for fw := unique.Fields(rtype); fw.HasNext(); {
 		field := fw.GetNext()
 		tag := unique.Tag(field.Tag)
 		if _, ok := tag.Find("id"); ok {
-			ret = append(field.Path, field.Index)
+			if field.Type.Kind() == r.String {
+				ret, okay = &field, true
+			}
 			break
 		}
 	}

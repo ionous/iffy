@@ -4,6 +4,14 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+type Flags int
+
+const (
+	Infix Flags = iota
+	Prefix
+	Postfix
+)
+
 type BoolPattern struct {
 	Filters Filters
 	rt.BoolEval
@@ -32,6 +40,11 @@ type ObjListPattern struct {
 	Filters Filters
 	rt.ObjListEval
 }
+type ExecutePattern struct {
+	Filters Filters
+	rt.Execute
+	Flags
+}
 
 type BoolPatterns []BoolPattern
 type NumberPatterns []NumberPattern
@@ -40,95 +53,130 @@ type ObjectPatterns []ObjectPattern
 type NumListPatterns []NumListPattern
 type TextListPatterns []TextListPattern
 type ObjListPatterns []ObjListPattern
+type ExecutePatterns []ExecutePattern
 
-func (p BoolPatterns) GetBool(run rt.Runtime) (ret bool, err error) {
-	for i, cnt := 0, len(p); i < cnt; i++ {
-		v := p[cnt-i-1]
-		if matched, e := v.Filters.GetBool(run); e != nil {
+func (ps BoolPatterns) GetBool(run rt.Runtime) (ret bool, err error) {
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
 			err = e
 			break
 		} else if matched {
-			ret, err = v.BoolEval.GetBool(run)
+			ret, err = p.BoolEval.GetBool(run)
 			break
 		}
 	}
 	return
 }
-func (p NumberPatterns) GetNumber(run rt.Runtime) (ret float64, err error) {
-	for i, cnt := 0, len(p); i < cnt; i++ {
-		v := p[cnt-i-1]
-		if matched, e := v.Filters.GetBool(run); e != nil {
+func (ps NumberPatterns) GetNumber(run rt.Runtime) (ret float64, err error) {
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
 			err = e
 			break
 		} else if matched {
-			ret, err = v.NumberEval.GetNumber(run)
+			ret, err = p.NumberEval.GetNumber(run)
 			break
 		}
 	}
 	return
 }
-func (p TextPatterns) GetText(run rt.Runtime) (ret string, err error) {
-	for i, cnt := 0, len(p); i < cnt; i++ {
-		v := p[cnt-i-1]
-		if matched, e := v.Filters.GetBool(run); e != nil {
+func (ps TextPatterns) GetText(run rt.Runtime) (ret string, err error) {
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
 			err = e
 			break
 		} else if matched {
-			ret, err = v.TextEval.GetText(run)
+			ret, err = p.TextEval.GetText(run)
 			break
 		}
 	}
 	return
 }
-func (p ObjectPatterns) GetObject(run rt.Runtime) (ret rt.Object, err error) {
-	for i, cnt := 0, len(p); i < cnt; i++ {
-		v := p[cnt-i-1]
-		if matched, e := v.Filters.GetBool(run); e != nil {
+func (ps ObjectPatterns) GetObject(run rt.Runtime) (ret rt.Object, err error) {
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
 			err = e
 			break
 		} else if matched {
-			ret, err = v.ObjectEval.GetObject(run)
+			ret, err = p.ObjectEval.GetObject(run)
 			break
 		}
 	}
 	return
 }
-func (p NumListPatterns) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
-	for i, cnt := 0, len(p); i < cnt; i++ {
-		v := p[cnt-i-1]
-		if matched, e := v.Filters.GetBool(run); e != nil {
+
+func (ps NumListPatterns) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
 			err = e
 			break
 		} else if matched {
-			ret, err = v.NumListEval.GetNumberStream(run)
+			ret, err = p.NumListEval.GetNumberStream(run)
 			break
 		}
 	}
 	return
 }
-func (p TextListPatterns) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
-	for i, cnt := 0, len(p); i < cnt; i++ {
-		v := p[cnt-i-1]
-		if matched, e := v.Filters.GetBool(run); e != nil {
+func (ps TextListPatterns) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
 			err = e
 			break
 		} else if matched {
-			ret, err = v.TextListEval.GetTextStream(run)
+			ret, err = p.TextListEval.GetTextStream(run)
 			break
 		}
 	}
 	return
 }
-func (p ObjListPatterns) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
-	for i, cnt := 0, len(p); i < cnt; i++ {
-		v := p[cnt-i-1]
-		if matched, e := v.Filters.GetBool(run); e != nil {
+func (ps ObjListPatterns) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
 			err = e
 			break
 		} else if matched {
-			ret, err = v.ObjListEval.GetObjectStream(run)
+			ret, err = p.ObjListEval.GetObjectStream(run)
 			break
 		}
+	}
+	return
+}
+
+func (ps ExecutePatterns) Execute(run rt.Runtime) (ret bool, err error) {
+	var post []rt.Execute // a stack
+	var matches int
+	for i, cnt := 0, len(ps); i < cnt; i++ {
+		p := ps[cnt-i-1]
+		if matched, e := p.Filters.GetBool(run); e != nil {
+			err = e
+			break
+		} else if matched {
+			matches++
+			if p.Flags == Postfix {
+				post = append(post, p.Execute)
+			} else if e := p.Execute.Execute(run); e != nil {
+				err = e
+			} else if p.Flags != Prefix {
+				break // Infix ends once its done.
+			}
+		}
+	}
+	if err == nil {
+		// we want to run the most recently added thing first
+		for i, cnt := 0, len(post); i < cnt; i++ {
+			exec := post[cnt-i-1]
+			if e := exec.Execute(run); e != nil {
+				err = e
+				break
+			}
+		}
+		ret = err == nil && matches > 0
 	}
 	return
 }

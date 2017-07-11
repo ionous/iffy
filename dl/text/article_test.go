@@ -45,7 +45,6 @@ func (assert *ArticleSuite) SetupTest() {
 		(*core.Commands)(nil),
 	)
 
-	// need a model finder
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Kind)(nil))
 
@@ -56,8 +55,7 @@ func (assert *ArticleSuite) SetupTest() {
 	)
 	//
 	assert.ops = ops
-	assert.run = rtm.New(classes).Objects(objects).Rtm()
-	assert.run.PushWriter(&assert.lines)
+	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).Rtm()
 }
 
 func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {

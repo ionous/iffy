@@ -12,19 +12,10 @@ import (
 // Relations maps ids to RefReleation.
 // Compatible with unique.TypeRegistry.
 type Relations struct {
-	*Classes          // our own relation classes
-	classes  *Classes // object classes
-	objects  *Objects
-	cache    RelationCache
-}
-
-func NewRelations(classes *Classes, objects *Objects) *Relations {
-	return &Relations{
-		NewClasses(),
-		classes,
-		objects,
-		make(RelationCache),
-	}
+	*Classes               // our own relation objectClasses
+	objectClasses *Classes // object objectClasses
+	objects       *Objects
+	cache         RelationCache
 }
 
 // RelationCache builds dynamically as relations are accessed.
@@ -60,24 +51,6 @@ OutOfLoop:
 				err = errutil.New("unknown relation", rel)
 				break OutOfLoop
 			}
-		}
-	}
-	return
-}
-
-// RegisterType compatible with unique.TypeRegistry
-func (reg *Relations) RegisterType(rtype r.Type) (err error) {
-	// filter then:
-	if one, many, e := CountRelation(rtype); e != nil {
-		err = e
-	} else if err == nil {
-		switch cnt := one + many; {
-		case cnt < 2:
-			err = errutil.New("too few relations specified")
-		case cnt > 2:
-			err = errutil.New("too many relations specified")
-		default:
-			err = reg.Classes.RegisterType(rtype)
 		}
 	}
 	return

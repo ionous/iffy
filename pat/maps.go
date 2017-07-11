@@ -13,6 +13,7 @@ type ObjectMap map[string]ObjectPatterns
 type NumListMap map[string]NumListPatterns
 type TextListMap map[string]TextListPatterns
 type ObjListMap map[string]ObjListPatterns
+type ExecuteMap map[string]ExecutePatterns
 
 func (m BoolMap) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
 	id := data.GetClass().GetId()
@@ -91,6 +92,17 @@ func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 		err = NotFound
 	} else {
 		ret, err = ps.GetObjectStream(run)
+		run.PopScope()
+	}
+	return
+}
+
+func (m ExecuteMap) ExecuteMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
+	id := data.GetClass().GetId()
+	if ps, ok := m[id]; !ok {
+		err = NotFound
+	} else {
+		ret, err = ps.Execute(run)
 		run.PopScope()
 	}
 	return

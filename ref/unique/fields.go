@@ -49,6 +49,10 @@ func (f *FieldInfo) IsPublic() bool {
 	return len(f.PkgPath) == 0
 }
 
+func (f *FieldInfo) FullPath() []int {
+	return append(f.Path, f.Index)
+}
+
 // fill the field info for its current index
 func updateInfo(n *FieldInfo) (okay bool) {
 	for {

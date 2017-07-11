@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 )
 
 // Get retrieves a value from an object.
@@ -54,7 +55,7 @@ func (p *Get) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
 	} else if e := obj.GetValue(p.Prop, &values); e != nil {
 		err = e
 	} else {
-		ret = NewNumberStream(values)
+		ret = stream.NewNumberStream(values)
 	}
 	return
 }
@@ -66,7 +67,7 @@ func (p *Get) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
 	} else if e := obj.GetValue(p.Prop, &values); e != nil {
 		err = e
 	} else {
-		ret = NewTextStream(values)
+		ret = stream.NewTextStream(values)
 	}
 	return
 }

@@ -30,15 +30,9 @@ func TestRelationSuite(t *testing.T) {
 
 type RelSuite struct {
 	suite.Suite
-	classes   *Classes
-	objects   *Objects
-	relations *Relations
 }
 
 func (assert *RelSuite) SetupTest() {
-	assert.classes = NewClasses()
-	assert.objects = NewObjects(assert.classes)
-	assert.relations = NewRelations(assert.classes, assert.objects)
 }
 
 func (assert *RelSuite) TestRegistration() {
@@ -71,12 +65,14 @@ func (assert *RelSuite) TestRegistration() {
 		*OneToMany
 		*ManyToMany
 	}
+	classes := NewClasses()
+	objects := NewObjects(classes)
+	relbuilder := NewRelations(classes)
 
-	unique.RegisterTypes(
-		unique.PanicTypes(assert.classes),
+	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Gremlin)(nil))
 
-	reg := unique.PanicTypes(assert.relations)
+	reg := unique.PanicTypes(relbuilder)
 	assert.Panics(func() {
 		unique.RegisterTypes(reg, (*TooFew)(nil))
 	})
@@ -92,9 +88,10 @@ func (assert *RelSuite) TestRegistration() {
 	_, tooFew := reg.FindType("TooFew")
 	assert.False(tooFew)
 
+	relations := relbuilder.Build(objects.Build())
 	for i := 0; i < 4; i++ {
 		t := index.Type(i)
-		if r, ok := assert.relations.GetRelation(t.String()); assert.True(ok) {
+		if r, ok := relations.GetRelation(t.String()); assert.True(ok) {
 			assert.Equal(t, r.GetType(), t.String())
 		}
 	}
@@ -102,28 +99,35 @@ func (assert *RelSuite) TestRegistration() {
 
 // test a simple one to many relation
 func (assert *RelSuite) TestOneToMany() {
-	unique.RegisterTypes(unique.PanicTypes(assert.classes),
+	classes := NewClasses()
+	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Gremlin)(nil),
 		(*Rock)(nil))
 
-	unique.RegisterTypes(unique.PanicTypes(assert.relations),
-		(*GremlinRocks)(nil))
-
-	unique.RegisterValues(unique.PanicValues(assert.objects),
+	objbuilder := NewObjects(classes)
+	unique.RegisterValues(unique.PanicValues(objbuilder),
 		&Gremlin{Name: "claire"},
 		&Rock{Name: "loofa"},
 		&Rock{Name: "rocky"},
 		&Rock{Name: "petra"})
 
+	relbuilder := NewRelations(classes)
+	unique.RegisterTypes(unique.PanicTypes(relbuilder),
+		(*GremlinRocks)(nil))
+
+	// this test doesnt use runtime, so build manually
+	objects := objbuilder.Build()
+	relations := relbuilder.Build(objects)
+	//
 	Object := func(name string) rt.Object {
-		ret, ok := assert.objects.GetObject(name)
+		ret, ok := objects.GetObject(name)
 		if !ok {
 			assert.Fail("couldnt find obect", name)
 		}
 		return ret
 	}
 
-	if gr, ok := assert.relations.GetRelation("GremlinRocks"); assert.True(ok) {
+	if gr, ok := relations.GetRelation("GremlinRocks"); assert.True(ok) {
 		assert.Equal("$gremlinRocks", gr.GetId())
 		assert.Equal(index.OneToMany, gr.GetType())
 
