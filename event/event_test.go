@@ -41,7 +41,6 @@ func TestSomething(t *testing.T) {
 
 	classes := ref.NewClasses()
 	objects := ref.NewObjects(classes)
-	relations := ref.NewRelations(classes, objects)
 
 	unique.RegisterTypes(
 		unique.PanicTypes(classes),
@@ -82,7 +81,7 @@ func TestSomething(t *testing.T) {
 	})
 
 	var lines rtm.LineWriter
-	run := rtm.NewRtm(classes, objects, relations)
+	run := rtm.New(classes).Objects(objects).Rtm()
 	run.PushWriter(&lines)
 
 	dispatch := event.NewDispatch(listen.EventMap)

@@ -9,7 +9,6 @@ import (
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/stretchr/testify/suite"
-	r "reflect"
 	"strings"
 	"testing"
 )
@@ -26,9 +25,8 @@ type CoreSuite struct {
 	run   rt.Runtime
 	lines rtm.LineWriter
 
-	classes   *ref.Classes
-	objects   *ref.Objects
-	relations *ref.Relations
+	classes *ref.Classes
+	objects *ref.Objects
 
 	unique *unique.Objects
 }
@@ -48,7 +46,6 @@ func (assert *CoreSuite) SetupTest() {
 	assert.unique = unique.NewObjects()
 	assert.classes = ref.NewClasses()
 	assert.objects = ref.NewObjects(assert.classes)
-	assert.relations = ref.NewRelations(assert.classes, assert.objects)
 
 	unique.RegisterTypes(unique.PanicTypes(assert.unique),
 		(*core.CycleCounter)(nil),
@@ -68,7 +65,7 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 
 		// add all the helper classes we registered via unique
 		for _, rtype := range assert.unique.Types {
-			unique.RegisterTypes(mm, r.New(rtype).Interface())
+			mm.RegisterType(rtype)
 		}
 
 		if inst, e := assert.unique.Generate(); e != nil {
@@ -76,7 +73,7 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 		} else {
 			unique.RegisterValues(unique.PanicValues(assert.objects), inst...)
 
-			run := rtm.NewRtm(assert.classes, assert.objects, assert.relations)
+			run := rtm.New(assert.classes).Objects(assert.objects).Rtm()
 			run.PushWriter(&assert.lines)
 			ret = run
 		}

@@ -10,7 +10,7 @@ type Commands struct {
 	*AnyTrue
 	*Bool
 	// *Buffer
-	// *ChangeState
+	*ChangeState
 	*Choose
 	*ChooseNum
 	*ChooseObj
@@ -49,11 +49,12 @@ type Commands struct {
 	*PrintNum
 	*PrintText
 	*Range
+	*SetBool
+	*SetNum
+	*SetText
+	*SetObj
 	*ShuffleText
 	*StoppingText
-	// *SetNumber
-	// *SetObject
-	// *SetText
 	// *State
 	// *StopNow
 	*Text

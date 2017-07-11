@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-// Objects (unique.Objects) generates a sset of unique instances.
+// Objects (unique.Objects) generates a set of unique instances.
 type Objects struct {
 	ids map[r.Type]int
 	Types

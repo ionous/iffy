@@ -46,36 +46,42 @@ func (n *Num) GetNumber(rt.Runtime) (float64, error) {
 	return n.Num, nil
 }
 
-// http://learnyouahaskell.com/syntax-in-functions
 func ExampleSayMe() {
-	b := patbuilder.NewBuilder()
 	classes := ref.NewClasses()
+	b := patbuilder.NewPatterns(classes)
+	//
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Num)(nil))
 	objects := ref.NewObjects(classes)
-	run := rtm.NewRtm(classes, objects, nil)
-	//
-	if e := b.NewPattern("sayMe"); e != nil {
+	run := rtm.New(classes).Objects(objects).Rtm()
+	// SayMe converts numbers to text
+	// http://learnyouahaskell.com/syntax-in-functions
+	type SayMe struct {
+		Num float64
+	}
+	if e := unique.RegisterTypes(b, (*SayMe)(nil)); e != nil {
 		fmt.Println("new pat:", e)
-	} else if e := b.AddMatch("sayMe", SayIt("One!"), MatchNumber(1)); e != nil {
+	} else if e := b.Text("sayMe", MatchNumber(1), SayIt("One!")); e != nil {
 		fmt.Println("add one:", e)
-	} else if e := b.AddMatch("sayMe", SayIt("Two!"), MatchNumber(2)); e != nil {
+	} else if e := b.Text("sayMe", MatchNumber(2), SayIt("Two!")); e != nil {
 		fmt.Println("add two:", e)
-	} else if e := b.AddMatch("sayMe", SayIt("Three!"), MatchNumber(3)); e != nil {
+	} else if e := b.Text("sayMe", MatchNumber(3), SayIt("San!")); e != nil {
+		fmt.Println("add san:", e)
+	} else if e := b.Text("sayMe", MatchNumber(3), SayIt("Three!")); e != nil {
 		fmt.Println("add three:", e)
-	} else if e := b.AddMatch("sayMe", SayIt("Not between 1 and 3")); e != nil {
+	} else if e := b.Text("sayMe", nil, SayIt("Not between 1 and 3")); e != nil {
 		fmt.Println("add default:", e)
 	} else {
 		p := b.GetPatterns()
 		for i := 1; i <= 4; i++ {
-			if obj, e := objects.Emplace(Int(i)); e != nil {
+			if sayMe, e := objects.Emplace(&SayMe{float64(i)}); e != nil {
 				fmt.Println("emplace:", e)
 				break
-			} else if t, e := p.GetTextMatching(run, "sayMe", obj); e != nil {
+			} else if text, e := p.GetTextMatching(run, sayMe); e != nil {
 				fmt.Println("matching:", e)
 				break
 			} else {
-				fmt.Println(fmt.Sprintf("sayMe %d = \"%s\"", i, t))
+				fmt.Println(fmt.Sprintf("sayMe %d = \"%s\"", i, text))
 			}
 		}
 	}
@@ -95,40 +101,43 @@ func (f GetNumber) GetNumber(run rt.Runtime) (float64, error) {
 func TestFactorial(t *testing.T) {
 	assert := assert.New(t)
 	classes := ref.NewClasses()
+	b := patbuilder.NewPatterns(classes)
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Num)(nil))
 	objects := ref.NewObjects(classes)
-	b := patbuilder.NewBuilder()
+	// Factorial computes an integer multiplied by the factorial of the integer below it.
+	type Factorial struct {
+		Num float64
+	}
+	unique.RegisterTypes(unique.PanicTypes(b),
+		(*Factorial)(nil))
 	//
 	var p pat.Patterns
-	if e := b.NewPattern("factorial"); assert.NoError(e) {
+	if e := b.Number("factorial", MatchNumber(0), Int(1)); assert.NoError(e) {
 		//
-		if e := b.AddMatch("factorial", Int(1), MatchNumber(0)); assert.NoError(e) {
+		if e := b.Number("factorial", nil, GetNumber(func(run rt.Runtime) (ret float64, err error) {
+			var this int
+			if obj, ok := run.FindObject("@"); !ok {
+				err = fmt.Errorf("context not found")
+			} else if e := obj.GetValue("num", &this); e != nil {
+				err = e
+			} else if fact, e := objects.Emplace(&Factorial{float64(this - 1)}); e != nil {
+				err = e
+			} else if next, e := p.GetNumMatching(run, fact); e != nil {
+				err = e
+			} else {
+				ret = float64(this) * next
+			}
+			return
+		})); assert.NoError(e) {
+			// suite?
+			run := rtm.New(classes).Objects(objects).Rtm()
+			p = b.GetPatterns()
 			//
-			if e := b.AddMatch("factorial", GetNumber(func(run rt.Runtime) (ret float64, err error) {
-				var this int
-				if obj, ok := run.FindObject("@"); !ok {
-					err = fmt.Errorf("context not found")
-				} else if e := obj.GetValue("num", &this); e != nil {
-					err = e
-				} else if next, e := objects.Emplace(Int(this - 1)); e != nil {
-					err = e
-				} else if next, e := p.GetNumMatching(run, "factorial", next); e != nil {
-					err = e
-				} else {
-					ret = float64(this) * next
-				}
-				return
-			})); assert.NoError(e) {
-				// suite?
-				run := rtm.NewRtm(classes, objects, nil)
-				p = b.GetPatterns()
-				//
-				if obj, e := objects.Emplace(Int(3)); assert.NoError(e) {
-					if n, e := p.GetNumMatching(run, "factorial", obj); assert.NoError(e) {
-						fac := 3 * (2 * (1 * 1))
-						assert.EqualValues(fac, n)
-					}
+			if fact, e := objects.Emplace(&Factorial{3}); assert.NoError(e) {
+				if n, e := p.GetNumMatching(run, fact); assert.NoError(e) {
+					fac := 3 * (2 * (1 * 1))
+					assert.EqualValues(fac, n)
 				}
 			}
 		}

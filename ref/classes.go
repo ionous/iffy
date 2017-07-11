@@ -75,7 +75,7 @@ func (reg *Classes) RegisterClass(rtype r.Type) (ret *RefClass, err error) {
 
 		// parse the properties
 		if ptype, pidx, props, e := MakeProperties(rtype); e != nil {
-			err = e
+			err = errutil.New(rtype, e)
 		} else {
 			cls.props = props
 			if ptype == nil {

@@ -42,7 +42,8 @@ type TextListPatterns []TextListPattern
 type ObjListPatterns []ObjListPattern
 
 func (p BoolPatterns) GetBool(run rt.Runtime) (ret bool, err error) {
-	for _, v := range p {
+	for i, cnt := 0, len(p); i < cnt; i++ {
+		v := p[cnt-i-1]
 		if matched, e := v.Filters.GetBool(run); e != nil {
 			err = e
 			break
@@ -54,7 +55,8 @@ func (p BoolPatterns) GetBool(run rt.Runtime) (ret bool, err error) {
 	return
 }
 func (p NumberPatterns) GetNumber(run rt.Runtime) (ret float64, err error) {
-	for _, v := range p {
+	for i, cnt := 0, len(p); i < cnt; i++ {
+		v := p[cnt-i-1]
 		if matched, e := v.Filters.GetBool(run); e != nil {
 			err = e
 			break
@@ -66,7 +68,8 @@ func (p NumberPatterns) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 func (p TextPatterns) GetText(run rt.Runtime) (ret string, err error) {
-	for _, v := range p {
+	for i, cnt := 0, len(p); i < cnt; i++ {
+		v := p[cnt-i-1]
 		if matched, e := v.Filters.GetBool(run); e != nil {
 			err = e
 			break
@@ -78,7 +81,8 @@ func (p TextPatterns) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 func (p ObjectPatterns) GetObject(run rt.Runtime) (ret rt.Object, err error) {
-	for _, v := range p {
+	for i, cnt := 0, len(p); i < cnt; i++ {
+		v := p[cnt-i-1]
 		if matched, e := v.Filters.GetBool(run); e != nil {
 			err = e
 			break
@@ -90,7 +94,8 @@ func (p ObjectPatterns) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	return
 }
 func (p NumListPatterns) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
-	for _, v := range p {
+	for i, cnt := 0, len(p); i < cnt; i++ {
+		v := p[cnt-i-1]
 		if matched, e := v.Filters.GetBool(run); e != nil {
 			err = e
 			break
@@ -102,7 +107,8 @@ func (p NumListPatterns) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, e
 	return
 }
 func (p TextListPatterns) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
-	for _, v := range p {
+	for i, cnt := 0, len(p); i < cnt; i++ {
+		v := p[cnt-i-1]
 		if matched, e := v.Filters.GetBool(run); e != nil {
 			err = e
 			break
@@ -114,7 +120,8 @@ func (p TextListPatterns) GetTextStream(run rt.Runtime) (ret rt.TextStream, err 
 	return
 }
 func (p ObjListPatterns) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
-	for _, v := range p {
+	for i, cnt := 0, len(p); i < cnt; i++ {
+		v := p[cnt-i-1]
 		if matched, e := v.Filters.GetBool(run); e != nil {
 			err = e
 			break

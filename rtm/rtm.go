@@ -1,7 +1,7 @@
 package rtm
 
 import (
-	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
@@ -15,39 +15,74 @@ type Rtm struct {
 	OutputStack
 	Randomizer
 	Ancestors
+	rt.Patterns
 }
 
-func NewRtm(c *ref.Classes, o *ref.Objects, r *ref.Relations) *Rtm {
+type Config struct {
+	classes   *ref.Classes
+	objects   *ref.Objects
+	rel       *ref.Relations
+	ancestors Ancestors
+	patterns  pat.Patterns
+	seed      int64
+}
+
+// New to initialize a runtime step-by-step.
+// It can be useful for testing to leave some portions of the runtime blank.
+// Classes are the only "required" element.
+func New(classes *ref.Classes) *Config {
+	return &Config{classes: classes}
+}
+
+func (c *Config) Objects(o *ref.Objects) *Config {
+	c.objects = o
+	return c
+}
+
+func (c *Config) Ancestors(a Ancestors) *Config {
+	c.ancestors = a
+	return c
+}
+
+func (c *Config) Relations(r *ref.Relations) *Config {
+	c.rel = r
+	return c
+}
+
+func (c *Config) Randomize(seed int64) *Config {
+	c.seed = seed
+	return c
+}
+
+func (c *Config) Patterns(p pat.Patterns) *Config {
+	c.patterns = p
+	return c
+}
+
+func (c *Config) Rtm() *Rtm {
+	a := c.ancestors
+	if a == nil {
+		a = NoAncestors{}
+	}
 	rtm := &Rtm{
-		Classes:   c,
-		Objects:   o,
-		Relations: r,
-		Ancestors: NoAncestors{},
+		Classes:   c.classes,
+		Objects:   c.objects,
+		Relations: c.rel,
+		Ancestors: a,
+	}
+	//
+	rtm.Patterns = Thunk{rtm, c.patterns}
+	//
+	seed := c.seed
+	if seed == 0 {
+		seed = 1
 	}
 	rtm.PushScope(scope.ModelFinder(rtm))
-	rtm.Randomizer.Reset(1) // FIX: time?
+	rtm.Randomizer.Reset(seed) // FIX: time?
 	return rtm
 }
 
 // Ancestors is compatible with the rt.Runtime
 type Ancestors interface {
 	GetAncestors(rt.Object) (rt.ObjectStream, error)
-}
-
-// NoAncestors provides a default for rtm if one is not set.
-type NoAncestors struct{}
-
-func (NoAncestors) GetAncestors(rt.Object) (rt.ObjectStream, error) {
-	return NotIt{}, nil
-}
-
-// an iterator that always fails
-type NotIt struct{}
-
-func (NotIt) HasNext() bool {
-	return false
-}
-
-func (NotIt) GetNext() (rt.Object, error) {
-	return nil, errutil.New("this never has objects")
 }

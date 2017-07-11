@@ -179,6 +179,9 @@ func setField(dst r.Value, src interface{}) (err error) {
 // ( or, more ugly, have a "shortcut" interface users of core can inject. )
 func literally(dstType r.Type, src interface{}) (ret interface{}, okay bool) {
 	switch src := src.(type) {
+	case bool:
+		ret = &core.Bool{src}
+		okay = true
 	case []float64:
 		ret = &core.Numbers{src}
 		okay = true

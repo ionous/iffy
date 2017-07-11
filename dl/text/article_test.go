@@ -38,7 +38,6 @@ func (assert *ArticleSuite) SetupTest() {
 	//
 	classes := ref.NewClasses()
 	objects := ref.NewObjects(classes)
-	relations := ref.NewRelations(classes, objects)
 
 	ops := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(ops),
@@ -57,7 +56,7 @@ func (assert *ArticleSuite) SetupTest() {
 	)
 	//
 	assert.ops = ops
-	assert.run = rtm.NewRtm(classes, objects, relations)
+	assert.run = rtm.New(classes).Objects(objects).Rtm()
 	assert.run.PushWriter(&assert.lines)
 }
 

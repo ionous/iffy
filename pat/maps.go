@@ -1,7 +1,6 @@
 package pat
 
 import (
-	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
 )
@@ -15,8 +14,8 @@ type NumListMap map[string]NumListPatterns
 type TextListMap map[string]TextListPatterns
 type ObjListMap map[string]ObjListPatterns
 
-func (m BoolMap) GetBoolMatching(run rt.Runtime, name string, data rt.Object) (ret bool, err error) {
-	id := id.MakeId(name)
+func (m BoolMap) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
+	id := data.GetClass().GetId()
 	if ps, ok := m[id]; !ok {
 		err = NotFound
 	} else {
@@ -27,8 +26,8 @@ func (m BoolMap) GetBoolMatching(run rt.Runtime, name string, data rt.Object) (r
 	return
 }
 
-func (m NumberMap) GetNumMatching(run rt.Runtime, name string, data rt.Object) (ret float64, err error) {
-	id := id.MakeId(name)
+func (m NumberMap) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, err error) {
+	id := data.GetClass().GetId()
 	if ps, ok := m[id]; !ok {
 		err = NotFound
 	} else {
@@ -39,8 +38,8 @@ func (m NumberMap) GetNumMatching(run rt.Runtime, name string, data rt.Object) (
 	return
 }
 
-func (m TextMap) GetTextMatching(run rt.Runtime, name string, data rt.Object) (ret string, err error) {
-	id := id.MakeId(name)
+func (m TextMap) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, err error) {
+	id := data.GetClass().GetId()
 	if ps, ok := m[id]; !ok {
 		err = NotFound
 	} else {
@@ -51,8 +50,8 @@ func (m TextMap) GetTextMatching(run rt.Runtime, name string, data rt.Object) (r
 	return
 }
 
-func (m ObjectMap) GetObjectMatching(run rt.Runtime, name string, data rt.Object) (ret rt.Object, err error) {
-	id := id.MakeId(name)
+func (m ObjectMap) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
+	id := data.GetClass().GetId()
 	if ps, ok := m[id]; !ok {
 		err = NotFound
 	} else {
@@ -63,8 +62,8 @@ func (m ObjectMap) GetObjectMatching(run rt.Runtime, name string, data rt.Object
 	return
 }
 
-func (m NumListMap) GetNumStreamMatching(run rt.Runtime, name string, data rt.Object) (ret rt.NumberStream, err error) {
-	id := id.MakeId(name)
+func (m NumListMap) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt.NumberStream, err error) {
+	id := data.GetClass().GetId()
 	if ps, ok := m[id]; !ok {
 		err = NotFound
 	} else {
@@ -75,8 +74,8 @@ func (m NumListMap) GetNumStreamMatching(run rt.Runtime, name string, data rt.Ob
 	return
 }
 
-func (m TextListMap) GetTextStreamMatching(run rt.Runtime, name string, data rt.Object) (ret rt.TextStream, err error) {
-	id := id.MakeId(name)
+func (m TextListMap) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret rt.TextStream, err error) {
+	id := data.GetClass().GetId()
 	if ps, ok := m[id]; !ok {
 		err = NotFound
 	} else {
@@ -86,8 +85,8 @@ func (m TextListMap) GetTextStreamMatching(run rt.Runtime, name string, data rt.
 	return
 }
 
-func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, name string, data rt.Object) (ret rt.ObjectStream, err error) {
-	id := id.MakeId(name)
+func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt.ObjectStream, err error) {
+	id := data.GetClass().GetId()
 	if ps, ok := m[id]; !ok {
 		err = NotFound
 	} else {

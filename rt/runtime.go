@@ -42,4 +42,6 @@ type Runtime interface {
 	// GetAncestors returns a stream of objects starting with the passed object, then walking up whatever hierarchy the particular runtime implementation has defined.
 	// E.g. parent-child containment.
 	GetAncestors(Object) (ObjectStream, error)
+	// Patterns for pattern matching, iffy's equivalent of user methods and functions.
+	Patterns
 }
