@@ -1,6 +1,7 @@
 package patspec
 
 import (
+	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -39,25 +40,38 @@ type ObjListRule struct {
 	If     rt.BoolEval
 	Decide rt.ObjListEval
 }
+type RunRule struct {
+	Name     string
+	If       rt.BoolEval
+	Decide   rt.Execute
+	Continue PatternTiming
+}
 
 func (p *BoolRule) Generate(ps PatternFactory) (err error) {
-	return ps.Bool(p.Name, p.If, p.Decide)
+	return ps.AddBool(p.Name, p.If, p.Decide)
 }
 func (p *NumberRule) Generate(ps PatternFactory) (err error) {
-	return ps.Number(p.Name, p.If, p.Decide)
+	return ps.AddNumber(p.Name, p.If, p.Decide)
 }
 func (p *TextRule) Generate(ps PatternFactory) (err error) {
-	return ps.Text(p.Name, p.If, p.Decide)
+	return ps.AddText(p.Name, p.If, p.Decide)
 }
 func (p *ObjectRule) Generate(ps PatternFactory) (err error) {
-	return ps.Object(p.Name, p.If, p.Decide)
+	return ps.AddObject(p.Name, p.If, p.Decide)
 }
 func (p *NumListRule) Generate(ps PatternFactory) (err error) {
-	return ps.NumList(p.Name, p.If, p.Decide)
+	return ps.AddNumList(p.Name, p.If, p.Decide)
 }
 func (p *TextListRule) Generate(ps PatternFactory) (err error) {
-	return ps.TextList(p.Name, p.If, p.Decide)
+	return ps.AddTextList(p.Name, p.If, p.Decide)
 }
 func (p *ObjListRule) Generate(ps PatternFactory) (err error) {
-	return ps.ObjList(p.Name, p.If, p.Decide)
+	return ps.AddObjList(p.Name, p.If, p.Decide)
+}
+func (p *RunRule) Generate(ps PatternFactory) (err error) {
+	flags := pat.Infix
+	if p.Continue != nil {
+		flags = p.Continue.Flags()
+	}
+	return ps.AddExecList(p.Name, p.If, p.Decide, flags)
 }

@@ -1,21 +1,25 @@
 package patspec
 
 import (
+	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/rt"
 )
 
-type Pattern interface {
+// MakePattern defines an interface for creating patterns.
+type MakePattern interface {
+	// Generate aka finalize ( in the sense of an album or collection. )
 	Generate(PatternFactory) error
 }
 
 type PatternFactory interface {
-	Bool(string, rt.BoolEval, rt.BoolEval) error
-	Number(string, rt.BoolEval, rt.NumberEval) error
-	Text(string, rt.BoolEval, rt.TextEval) error
-	Object(string, rt.BoolEval, rt.ObjectEval) error
-	NumList(string, rt.BoolEval, rt.NumListEval) error
-	TextList(string, rt.BoolEval, rt.TextListEval) error
-	ObjList(string, rt.BoolEval, rt.ObjListEval) error
+	AddBool(string, rt.BoolEval, rt.BoolEval) error
+	AddNumber(string, rt.BoolEval, rt.NumberEval) error
+	AddText(string, rt.BoolEval, rt.TextEval) error
+	AddObject(string, rt.BoolEval, rt.ObjectEval) error
+	AddNumList(string, rt.BoolEval, rt.NumListEval) error
+	AddTextList(string, rt.BoolEval, rt.TextListEval) error
+	AddObjList(string, rt.BoolEval, rt.ObjListEval) error
+	AddExecList(string, rt.BoolEval, rt.Execute, pat.Flags) error
 }
 
 type Commands struct {
@@ -27,4 +31,16 @@ type Commands struct {
 	*TextListRule
 	*ObjListRule
 	*Determine
+}
+
+type PatternSpecs []MakePattern
+
+func (p PatternSpecs) Generate(fac PatternFactory) (err error) {
+	for _, el := range p {
+		if e := el.Generate(fac); e != nil {
+			err = e
+			break
+		}
+	}
+	return
 }

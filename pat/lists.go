@@ -6,6 +6,7 @@ import (
 
 type Flags int
 
+//go:generate stringer -type=Flags
 const (
 	Infix Flags = iota
 	Prefix

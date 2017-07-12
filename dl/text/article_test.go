@@ -55,7 +55,7 @@ func (assert *ArticleSuite) SetupTest() {
 	)
 	//
 	assert.ops = ops
-	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).Rtm()
+	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).NewRtm()
 }
 
 func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {

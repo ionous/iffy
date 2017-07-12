@@ -45,9 +45,10 @@ func (assert *PatternSuite) TestFactorial() {
 	patterns := patbuilder.NewPatterns(classes)
 	unique.RegisterTypes(unique.PanicTypes(patterns),
 		(*Factorial)(nil))
+	assert.Contains(classes.ClassMap, id.MakeId("Factorial"), "adding to patterns should add to classes")
 
 	var root struct {
-		Els []patspec.Pattern
+		Els patspec.PatternSpecs
 	}
 	if c, ok := assert.ops.NewBuilder(&root); ok {
 		if c.Cmds().Begin() {
@@ -76,26 +77,22 @@ func (assert *PatternSuite) TestFactorial() {
 		if _, e := c.Build(); assert.NoError(e) {
 			if els := root.Els; assert.Len(els, 2) {
 				// test.Log(pretty.Sprint(els))
-				for _, el := range els {
-					if e := el.Generate(patterns); e != nil {
-						test.Fatal(e)
-					}
+				if e := els.Generate(patterns); e != nil {
+					test.Fatal(e)
 				}
 			}
-			//
-			peal := patterns.GetPatterns()
-			// test.Log(pretty.Sprint(peal))
-			if numberPatterns := peal.NumberMap; assert.Len(numberPatterns, 1) {
-				if factPattern := numberPatterns[id.MakeId("factorial")]; assert.Len(factPattern, 2) {
-					//
-					objects := ref.NewObjects(classes)
-					run := rtm.New(classes).Objects(objects).Patterns(peal).Rtm()
-					//
-					if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
-						if n, e := run.GetNumMatching(fact); assert.NoError(e) {
-							fac := 3 * (2 * (1 * 1))
-							assert.EqualValues(fac, n)
-						}
+		}
+		//
+		objects := ref.NewObjects(classes)
+		run := rtm.New(classes).Objects(objects).Patterns(patterns).NewRtm()
+		peal := run.GetPatterns()
+		if numberPatterns := peal.NumberMap; assert.Len(numberPatterns, 1) {
+			if factPattern := numberPatterns[id.MakeId("factorial")]; assert.Len(factPattern, 2) {
+				//
+				if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
+					if n, e := run.GetNumMatching(fact); assert.NoError(e) {
+						fac := 3 * (2 * (1 * 1))
+						assert.EqualValues(fac, n)
 					}
 				}
 			}

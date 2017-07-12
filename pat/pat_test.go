@@ -53,7 +53,7 @@ func ExampleSayMe() {
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Num)(nil))
 	objects := ref.NewObjects(classes)
-	run := rtm.New(classes).Objects(objects).Rtm()
+	run := rtm.New(classes).Objects(objects).NewRtm()
 	// SayMe converts numbers to text
 	// http://learnyouahaskell.com/syntax-in-functions
 	type SayMe struct {
@@ -61,18 +61,18 @@ func ExampleSayMe() {
 	}
 	if e := unique.RegisterTypes(b, (*SayMe)(nil)); e != nil {
 		fmt.Println("new pat:", e)
-	} else if e := b.Text("sayMe", MatchNumber(1), SayIt("One!")); e != nil {
+	} else if e := b.AddText("sayMe", MatchNumber(1), SayIt("One!")); e != nil {
 		fmt.Println("add one:", e)
-	} else if e := b.Text("sayMe", MatchNumber(2), SayIt("Two!")); e != nil {
+	} else if e := b.AddText("sayMe", MatchNumber(2), SayIt("Two!")); e != nil {
 		fmt.Println("add two:", e)
-	} else if e := b.Text("sayMe", MatchNumber(3), SayIt("San!")); e != nil {
+	} else if e := b.AddText("sayMe", MatchNumber(3), SayIt("San!")); e != nil {
 		fmt.Println("add san:", e)
-	} else if e := b.Text("sayMe", MatchNumber(3), SayIt("Three!")); e != nil {
+	} else if e := b.AddText("sayMe", MatchNumber(3), SayIt("Three!")); e != nil {
 		fmt.Println("add three:", e)
-	} else if e := b.Text("sayMe", nil, SayIt("Not between 1 and 3")); e != nil {
+	} else if e := b.AddText("sayMe", nil, SayIt("Not between 1 and 3")); e != nil {
 		fmt.Println("add default:", e)
 	} else {
-		p := b.GetPatterns()
+		p := b.Build()
 		for i := 1; i <= 4; i++ {
 			if sayMe, e := run.Emplace(&SayMe{float64(i)}); e != nil {
 				fmt.Println("emplace:", e)
@@ -113,9 +113,9 @@ func TestFactorial(t *testing.T) {
 		(*Factorial)(nil))
 	//
 	var p pat.Patterns
-	if e := b.Number("factorial", MatchNumber(0), Int(1)); assert.NoError(e) {
+	if e := b.AddNumber("factorial", MatchNumber(0), Int(1)); assert.NoError(e) {
 		//
-		if e := b.Number("factorial", nil, GetNumber(func(run rt.Runtime) (ret float64, err error) {
+		if e := b.AddNumber("factorial", nil, GetNumber(func(run rt.Runtime) (ret float64, err error) {
 			var this int
 			if obj, ok := run.FindObject("@"); !ok {
 				err = fmt.Errorf("context not found")
@@ -131,8 +131,8 @@ func TestFactorial(t *testing.T) {
 			return
 		})); assert.NoError(e) {
 			// suite?
-			run := rtm.New(classes).Objects(objects).Rtm()
-			p = b.GetPatterns()
+			run := rtm.New(classes).Objects(objects).NewRtm()
+			p = b.Build()
 			//
 			if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
 				if n, e := p.GetNumMatching(run, fact); assert.NoError(e) {

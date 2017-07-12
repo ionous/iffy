@@ -2,6 +2,7 @@ package rtm
 
 import (
 	"github.com/ionous/iffy/pat"
+	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
@@ -16,7 +17,12 @@ type Rtm struct {
 	OutputStack
 	Randomizer
 	Ancestors
-	rt.Patterns
+	Thunk
+}
+
+// GetPatterns mainly for testing.
+func (rtm *Rtm) GetPatterns() *pat.Patterns {
+	return &rtm.Thunk.Patterns
 }
 
 type Config struct {
@@ -24,7 +30,7 @@ type Config struct {
 	objects   *ref.ObjBuilder
 	rel       *ref.RelBuilder
 	ancestors Ancestors
-	patterns  pat.Patterns
+	patterns  *patbuilder.Patterns
 	seed      int64
 	writer    io.Writer
 }
@@ -56,7 +62,7 @@ func (c *Config) Randomize(seed int64) *Config {
 	return c
 }
 
-func (c *Config) Patterns(p pat.Patterns) *Config {
+func (c *Config) Patterns(p *patbuilder.Patterns) *Config {
 	c.patterns = p
 	return c
 }
@@ -66,13 +72,14 @@ func (c *Config) Writer(w io.Writer) *Config {
 	return c
 }
 
-func (c *Config) Rtm() *Rtm {
+func (c *Config) NewRtm() *Rtm {
 	a := c.ancestors
 	if a == nil {
 		a = NoAncestors{}
 	}
 	var objects *ref.Objects
 	var rel *ref.Relations
+	//
 	if c.objects != nil {
 		objects = c.objects.Build()
 		// /
@@ -86,8 +93,9 @@ func (c *Config) Rtm() *Rtm {
 		Relations: rel,
 		Ancestors: a,
 	}
-	//
-	rtm.Patterns = Thunk{rtm, c.patterns}
+	if c.patterns != nil {
+		rtm.Thunk = Thunk{rtm, c.patterns.Build()}
+	}
 	//
 	seed := c.seed
 	if seed == 0 {

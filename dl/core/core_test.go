@@ -73,7 +73,7 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 		} else {
 			unique.RegisterValues(unique.PanicValues(assert.objects), inst...)
 
-			run := rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).Rtm()
+			run := rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).NewRtm()
 			ret = run
 		}
 	}

@@ -73,7 +73,7 @@ func TestSomething(t *testing.T) {
 	// we do this the manual way first, and later with spec
 
 	var lines rtm.LineWriter
-	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
+	run := rtm.New(classes).Objects(objects).Writer(&lines).NewRtm()
 
 	listen := evtbuilder.NewListeners(actions, run.Objects, classes)
 	// object listener:
