@@ -2,6 +2,7 @@ package ref
 
 import (
 	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
@@ -16,6 +17,12 @@ type RefClass struct {
 
 func (cls *RefClass) Type() r.Type {
 	return cls.rtype
+}
+
+// GetName returns a friendly name: spaces, no caps.
+func (cls *RefClass) GetName() string {
+	n := cls.rtype.Name()
+	return lang.Lowerspace(n)
 }
 
 // String implements fmt.Stringer

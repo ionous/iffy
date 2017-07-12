@@ -2,8 +2,10 @@ package rt
 
 // Class describes a shared class of Objects.
 type Class interface {
-	// GetId returns the unique identifier for this types.
+	// GetId returns the unique identifier for this type.
 	GetId() string
+	// GetName returns the user defined name for this type.
+	GetName() string
 	// GetParentType returns false for types if no parent;
 	GetParent() (Class, bool)
 	// NumProperty returns the number of indexable properties.

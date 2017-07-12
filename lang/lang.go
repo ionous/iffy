@@ -47,6 +47,11 @@ var Capitalize = inflect.Capitalize
 // Titleize returns a new string, starting every word with a capital.
 var Titlecase = inflect.Titleize
 
+func Lowerspace(s string) string {
+	res := inflect.Humanize(s)
+	return Lowercase(res)
+}
+
 func Lowercase(s string) string {
 	return strings.ToLower(s)
 }

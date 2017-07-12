@@ -15,6 +15,7 @@ type Commands struct {
 	*ChooseNum
 	*ChooseObj
 	*ChooseText
+	*ClassName
 	*CompareNum
 	*CompareText
 	*CycleText
@@ -28,9 +29,10 @@ type Commands struct {
 	// *GoCall
 	*GreaterThan
 	// *Inc
-	// *IsEmpty
+	*IsEmpty
 	// *IsFromClass
-	// *IsNot
+	*Includes
+	*IsNot
 	// *IsNum
 	// *IsObj
 	// *IsState
