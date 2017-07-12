@@ -15,95 +15,94 @@ type TextListMap map[string]TextListPatterns
 type ObjListMap map[string]ObjListPatterns
 type ExecuteMap map[string]ExecutePatterns
 
+func setupScope(run rt.Runtime, data rt.Object, cb func(id string)) {
+	id := data.GetClass().GetId()
+	run.PushScope(scope.AtFinder(data))
+	cb(id)
+	run.PopScope()
+}
+
 func (m BoolMap) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		run.PushScope(scope.AtFinder(data))
-		ret, err = ps.GetBool(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.GetBool(run)
+		}
+	})
 	return
 }
-
 func (m NumberMap) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		run.PushScope(scope.AtFinder(data))
-		ret, err = ps.GetNumber(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.GetNumber(run)
+		}
+	})
 	return
 }
-
 func (m TextMap) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		run.PushScope(scope.AtFinder(data))
-		ret, err = ps.GetText(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.GetText(run)
+		}
+	})
 	return
 }
 
 func (m ObjectMap) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		run.PushScope(scope.AtFinder(data))
-		ret, err = ps.GetObject(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.GetObject(run)
+		}
+	})
 	return
 }
-
 func (m NumListMap) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt.NumberStream, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		run.PushScope(scope.AtFinder(data))
-		ret, err = ps.GetNumberStream(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.GetNumberStream(run)
+		}
+	})
 	return
 }
 
 func (m TextListMap) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret rt.TextStream, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		ret, err = ps.GetTextStream(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.GetTextStream(run)
+		}
+	})
 	return
 }
 
 func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt.ObjectStream, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		ret, err = ps.GetObjectStream(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.GetObjectStream(run)
+		}
+	})
 	return
 }
 
 func (m ExecuteMap) ExecuteMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
-	id := data.GetClass().GetId()
-	if ps, ok := m[id]; !ok {
-		err = NotFound
-	} else {
-		ret, err = ps.Execute(run)
-		run.PopScope()
-	}
+	setupScope(run, data, func(id string) {
+		if ps, ok := m[id]; !ok {
+			err = NotFound
+		} else {
+			ret, err = ps.Execute(run)
+		}
+	})
 	return
 }

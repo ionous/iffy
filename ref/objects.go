@@ -60,9 +60,11 @@ func (or *Objects) GetByValue(rval r.Value) (ret *RefObject, err error) {
 			err = e
 		} else if obj, ok := or.ObjectMap[id]; !ok {
 			err = errutil.Fmt("object not found '%s'", id)
-		} else if obj.rval.Interface() != rval.Interface() {
-			err = errutil.Fmt("conflicting objects '%s' %T %T", id, obj, rval)
-		} else {
+		} else /*if obj.rval.Interface() != rval.Interface() {
+			err = errutil.Fmt("conflicting objects '%s' %T %T", id, obj.rval.Interface(), rval.Interface())
+		} else */{
+			// note: we cant test for pointers match b/c of parent/child containment
+			// the object might be stored as "Kind", but the passed pointer might be "Thing"
 			ret = obj
 		}
 	}

@@ -30,6 +30,7 @@ type Commands struct {
 	*NumListRule
 	*TextListRule
 	*ObjListRule
+	*RunRule
 	*Determine
 }
 
