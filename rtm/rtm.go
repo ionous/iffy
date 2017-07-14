@@ -1,6 +1,7 @@
 package rtm
 
 import (
+	"github.com/ionous/iffy/dl/text"
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/ref"
@@ -10,7 +11,7 @@ import (
 )
 
 type Rtm struct {
-	*ref.Classes
+	ref.ClassMap
 	*ref.Objects
 	*ref.Relations
 	ScopeStack
@@ -18,6 +19,7 @@ type Rtm struct {
 	Randomizer
 	Ancestors
 	Thunk
+	text.Plurals
 }
 
 // GetPatterns mainly for testing.
@@ -26,7 +28,7 @@ func (rtm *Rtm) GetPatterns() *pat.Patterns {
 }
 
 type Config struct {
-	classes   *ref.Classes
+	classes   ref.ClassMap
 	objects   *ref.ObjBuilder
 	rel       *ref.RelBuilder
 	ancestors Ancestors
@@ -38,8 +40,8 @@ type Config struct {
 // New to initialize a runtime step-by-step.
 // It can be useful for testing to leave some portions of the runtime blank.
 // Classes are the only "required" element.
-func New(classes *ref.Classes) *Config {
-	return &Config{classes: classes}
+func New(classes *ref.ClassBuilder) *Config {
+	return &Config{classes: classes.ClassMap}
 }
 
 func (c *Config) Objects(o *ref.ObjBuilder) *Config {
@@ -88,7 +90,7 @@ func (c *Config) NewRtm() *Rtm {
 		}
 	}
 	rtm := &Rtm{
-		Classes:   c.classes,
+		ClassMap:  c.classes,
 		Objects:   objects,
 		Relations: rel,
 		Ancestors: a,

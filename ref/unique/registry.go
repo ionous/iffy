@@ -6,14 +6,13 @@ import (
 )
 
 type TypeRegistry interface {
-	// expects a pointer to a struct
+	// RegisterType expects a pointer to a (nil) struct.
 	RegisterType(r.Type) error
-	FindType(name string) (r.Type, bool)
 }
 
 type ValueRegistry interface {
+	// RegisterValue expects a pointer to a (non-nil) struct.
 	RegisterValue(r.Value) error
-	FindValue(name string) (r.Value, bool)
 }
 
 // TypePtr turns an interface pointer into a struct r.Type.

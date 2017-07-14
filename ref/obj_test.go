@@ -18,7 +18,6 @@ func TestObjectSuite(t *testing.T) {
 
 type ObjectSuite struct {
 	suite.Suite
-	classes *ref.Classes
 	objects *ref.Objects
 }
 
@@ -29,12 +28,12 @@ func (assert *ObjectSuite) TearDownTest() {
 func (assert *ObjectSuite) SetupTest() {
 	errutil.Panic = true
 	// reset the registries every time:
-	assert.classes = ref.NewClasses()
-	unique.RegisterTypes(unique.PanicTypes(assert.classes),
+	classes := ref.NewClasses()
+	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*BaseClass)(nil),
 		(*DerivedClass)(nil))
 
-	objects := ref.NewObjects(assert.classes)
+	objects := ref.NewObjects(classes)
 	unique.RegisterValues(unique.PanicValues(objects),
 		&BaseClass{Name: "first", State: Yes, Labeled: true},
 		&DerivedClass{BaseClass{Name: "second", State: Maybe}})

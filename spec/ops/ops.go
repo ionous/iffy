@@ -14,31 +14,29 @@ import (
 
 type Ops struct {
 	unique.Types
+	Constructors unique.Types
 }
 
 func NewOps() *Ops {
-	return &Ops{make(unique.Types)}
+	return &Ops{make(unique.Types), make(unique.Types)}
 }
 
 type Builder struct {
 	builder.Builder
 }
 
-func (ops *Ops) NewBuilder(ptr interface{}) (*Builder, bool) {
-	targetPtr := r.ValueOf(ptr)
+// NewBuilder starts creating a call tree.
+func (ops *Ops) NewBuilder(root interface{}) (*Builder, bool) {
+	targetPtr := r.ValueOf(root).Elem()
 	spec := &_Spec{ops: ops, targetPtr: targetPtr}
 	return &Builder{
 		builder.NewBuilder(&_Factory{ops}, spec),
 	}, true
 }
 
-func (u *Builder) Build() (ret interface{}, err error) {
-	if res, e := u.Builder.Build(); e != nil {
+func (u *Builder) Build() (err error) {
+	if _, e := u.Builder.Build(); e != nil {
 		err = e
-	} else if spec, ok := res.(*_Spec); !ok {
-		err = errutil.Fmt("unknown error")
-	} else {
-		ret = spec.targetPtr.Interface()
 	}
 	return
 }
@@ -47,16 +45,31 @@ type _Factory struct {
 	ops *Ops
 }
 
+// _SpecWriter handles the differences between command structs and constructors.s
+// Commands are implemented by reflect.Value, and _SpecWriter is compatible with reflect's interface.
+// FIX? support aggregate ops by returning unique.Fields()?
+type _SpecWriter interface {
+	Type() r.Type
+	// Field returns the value of the requsted field. To maintain compatibility with reflect.Value: on error, Field returns an invalid Value.
+	Field(int) r.Value
+}
+
 // NewSpec implements spec.SpecFactory.
 func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
-	if rtype, ok := fac.ops.FindType(name); !ok {
-		err = errutil.New("unknown command", name)
-	} else {
-		targetPtr := r.New(rtype)
+	if rtype, ok := fac.ops.FindType(name); ok {
+		targetPtr := r.New(rtype).Elem()
 		ret = &_Spec{
 			ops:       fac.ops,
 			targetPtr: targetPtr,
 		}
+	} else if rtype, ok := fac.ops.Constructors.FindType(name); ok {
+		shadow := &ShadowClass{rtype: rtype}
+		ret = &_Spec{
+			ops:       fac.ops,
+			targetPtr: shadow,
+		}
+	} else {
+		err = errutil.New("unknown command", name)
 	}
 	return
 }
@@ -70,20 +83,23 @@ func (fac *_Factory) NewSpecs() (spec.Specs, error) {
 
 type _Spec struct {
 	ops       *Ops
-	targetPtr r.Value // output object we are building
+	targetPtr _SpecWriter // output object we are building
 	index     int
 }
 
 func (spec *_Spec) Position(arg interface{}) (err error) {
-	tgt := spec.targetPtr.Elem()
-	if cnt := tgt.NumField(); spec.index >= cnt {
-		err = errutil.New("too many arguments. expected", cnt)
+	tgt := spec.targetPtr
+	tgtType := tgt.Type()
+	if cnt := tgtType.NumField(); spec.index >= cnt {
+		err = errutil.New("too many arguments", tgtType, "expected", cnt)
 	} else {
 		field := tgt.Field(spec.index)
-		if e := setField(field, arg); e != nil {
-			parent := spec.targetPtr.Elem().Type().Name()
-			name := tgt.Type().Field(spec.index).Name
-			err = errutil.Fmt("position %d (%s.%s) %v", spec.index, parent, name, e)
+		if !field.IsValid() {
+			fieldName := tgtType.Field(spec.index).Name
+			err = errutil.Fmt("couldnt get value for position %d (%s.%s) %v", spec.index, tgtType, fieldName)
+		} else if e := setField(field, arg); e != nil {
+			fieldName := tgtType.Field(spec.index).Name
+			err = errutil.Fmt("position %d (%s.%s) %v", spec.index, tgtType, fieldName, e)
 		} else {
 			spec.index++
 		}
@@ -93,13 +109,15 @@ func (spec *_Spec) Position(arg interface{}) (err error) {
 
 func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
 	myid := id.MakeId(key)
-	tgt := spec.targetPtr.Elem()
+	tgt := spec.targetPtr
 	tgtType := tgt.Type()
 	for i, cnt := spec.index, tgtType.NumField(); i < cnt; i++ {
 		fieldInfo := tgtType.Field(i)
 		if myid == id.MakeId(fieldInfo.Name) {
 			field := tgt.Field(i)
-			if e := setField(field, arg); e != nil {
+			if !field.IsValid() {
+				err = errutil.New("couldnt get value for", tgtType, fieldInfo.Name)
+			} else if e := setField(field, arg); e != nil {
 				err = errutil.New("field", key, e)
 			}
 			break
@@ -126,7 +144,8 @@ func (specs *_Specs) AddElement(el spec.Spec) (err error) {
 func setField(dst r.Value, src interface{}) (err error) {
 	switch src := src.(type) {
 	case *_Spec:
-		if e := ref.CoerceValue(dst, src.targetPtr); e != nil {
+		rval := valueOf(src.targetPtr).Addr()
+		if e := ref.CoerceValue(dst, rval); e != nil {
 			err = errutil.New("couldnt assign command", e)
 		}
 
@@ -140,12 +159,12 @@ func setField(dst r.Value, src interface{}) (err error) {
 		} else {
 			slice, elType := dst, dst.Type().Elem()
 			for _, spec := range src.els {
-				from := spec.targetPtr.Type()
-				if !from.AssignableTo(elType) {
+				rval := valueOf(spec.targetPtr).Addr()
+				if from := rval.Type(); !from.AssignableTo(elType) {
 					err = errutil.Fmt("incompatible element type. from: %v to: %v", from, elType)
 					break
 				} else {
-					slice = r.Append(slice, spec.targetPtr)
+					slice = r.Append(slice, rval)
 				}
 			}
 			dst.Set(slice)
@@ -218,6 +237,15 @@ func arrayKind(rtype r.Type) (ret r.Kind, isArray bool) {
 	} else {
 		isArray = true
 		ret = rtype.Elem().Kind()
+	}
+	return
+}
+
+func valueOf(i interface{}) (ret r.Value) {
+	if v, ok := i.(r.Value); !ok {
+		ret = r.ValueOf(i)
+	} else {
+		ret = v
 	}
 	return
 }

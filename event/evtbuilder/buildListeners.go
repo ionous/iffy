@@ -11,17 +11,17 @@ import (
 //
 type Listeners struct {
 	event.EventMap
-	actions *Actions
-	objects *ref.Objects
-	classes *ref.Classes
+	actions       *Actions
+	objects       *ref.Objects
+	objectClasses ref.ClassMap
 }
 
 type ListenOn interface {
 	On(name string, flags event.Options, fn BuildOps) error
 }
 
-func NewListeners(actions *Actions, objects *ref.Objects, classes *ref.Classes) *Listeners {
-	return &Listeners{make(event.EventMap), actions, objects, classes}
+func NewListeners(actions *Actions, objects *ref.Objects, classes *ref.ClassBuilder) *Listeners {
+	return &Listeners{make(event.EventMap), actions, objects, classes.ClassMap}
 }
 
 func (l *Listeners) Object(name string) (ret ListenOn) {
@@ -34,7 +34,7 @@ func (l *Listeners) Object(name string) (ret ListenOn) {
 }
 
 func (l *Listeners) Class(name string) (ret ListenOn) {
-	if cls, ok := l.classes.GetClass(name); !ok {
+	if cls, ok := l.objectClasses.GetClass(name); !ok {
 		ret = errOn{errutil.New("unknown object", name)}
 	} else {
 		ret = phaseOn{Listeners: l, cls: cls}

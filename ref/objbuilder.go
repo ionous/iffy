@@ -10,7 +10,7 @@ import (
 // ObjBuilder with ids, findable by the game.
 type ObjBuilder struct {
 	queue   queue
-	classes *Classes
+	classes ClassMap
 	info    infoMap
 }
 
@@ -27,8 +27,8 @@ type queued struct {
 }
 type queue map[string]queued
 
-func NewObjects(classes *Classes) *ObjBuilder {
-	return &ObjBuilder{make(queue), classes, make(infoMap)}
+func NewObjects(classes *ClassBuilder) *ObjBuilder {
+	return &ObjBuilder{make(queue), classes.ClassMap, make(infoMap)}
 }
 
 func (b *ObjBuilder) Build() *Objects {
@@ -50,16 +50,6 @@ func (b *ObjBuilder) RegisterValue(rval r.Value) (err error) {
 		err = e
 	} else {
 		b.queue[id] = queued{rval, cls}
-	}
-	return
-}
-
-// FindValue returns the originally passed value.
-// Compatible with unique.ValueRegistry
-func (b *ObjBuilder) FindValue(name string) (ret r.Value, okay bool) {
-	id := id.MakeId(name)
-	if obj, ok := b.queue[id]; ok {
-		ret, okay = obj.rval, true
 	}
 	return
 }

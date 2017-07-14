@@ -74,7 +74,7 @@ func (assert *PatternSuite) TestFactorial() {
 		}
 		//
 		test := assert.T()
-		if _, e := c.Build(); assert.NoError(e) {
+		if e := c.Build(); assert.NoError(e) {
 			if els := root.Els; assert.Len(els, 2) {
 				// test.Log(pretty.Sprint(els))
 				if e := els.Generate(patterns); e != nil {

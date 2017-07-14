@@ -1,10 +1,10 @@
 package pat
 
-import (
-	"github.com/ionous/errutil"
-)
+type NotFound string
 
-const NotFound errutil.Error = "pattern not found"
+func (nf NotFound) Error() string {
+	return "pattern not found " + string(nf)
+}
 
 type Patterns struct {
 	BoolMap

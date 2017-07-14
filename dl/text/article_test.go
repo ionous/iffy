@@ -36,18 +36,17 @@ func (assert *ArticleSuite) Lines() (ret []string) {
 func (assert *ArticleSuite) SetupTest() {
 	errutil.Panic = false
 	//
-	classes := ref.NewClasses()
-	objects := ref.NewObjects(classes)
-
 	ops := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(ops),
 		(*text.Commands)(nil),
 		(*core.Commands)(nil),
 	)
 
+	classes := ref.NewClasses()
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Kind)(nil))
 
+	objects := ref.NewObjects(classes)
 	unique.RegisterValues(unique.PanicValues(objects),
 		&Kind{Name: "Lamp-post"},
 		&Kind{Name: "Soldiers", IndefiniteArticle: "some"},
@@ -62,7 +61,7 @@ func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {
 	var root struct{ Eval rt.Execute }
 	if c, ok := assert.ops.NewBuilder(&root); ok {
 		run(c)
-		if _, e := c.Build(); assert.NoError(e) {
+		if e := c.Build(); assert.NoError(e) {
 			if e := root.Eval.Execute(assert.run); assert.NoError(e) {
 				lines := assert.Lines()
 				assert.Equal(sliceOf.String(expected), lines)
@@ -244,6 +243,17 @@ func (assert *ArticleSuite) TestTheLeadingSoldiers() {
 					c.Cmd("print text", "may be a trick of the mist.")
 					c.End()
 				}
+				c.End()
+			}
+		})
+}
+
+// FIX: should really be separate -- in a "text" test.
+func (assert *ArticleSuite) TestPluralize() {
+	assert.match("lamps",
+		func(c *ops.Builder) {
+			if c.Cmd("print line").Begin() {
+				c.Cmds(c.Cmd("print text", c.Cmd("pluralize", "lamp")))
 				c.End()
 			}
 		})

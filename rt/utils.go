@@ -25,7 +25,7 @@ func SetValues(obj Object, values Values) (err error) {
 	return
 }
 
-// Unpack extacts a go value from any eval type.
+// Unpack turns an eval into a go value.
 func Unpack(run Runtime, v interface{}) (ret interface{}, err error) {
 	switch eval := v.(type) {
 	case BoolEval:

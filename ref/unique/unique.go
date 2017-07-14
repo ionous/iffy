@@ -13,7 +13,7 @@ type Objects struct {
 	Types
 }
 
-func NewObjects() *Objects {
+func NewObjectGenerator() *Objects {
 	return &Objects{
 		make(map[r.Type]int),
 		make(Types),

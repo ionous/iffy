@@ -14,7 +14,7 @@ func (b BuildOps) Build(ops *ops.Ops) (ret rt.Execute, err error) {
 		err = errutil.New("unknown error")
 	} else {
 		b(c)
-		if _, e := c.Build(); e != nil {
+		if e := c.Build(); e != nil {
 			err = e
 		} else {
 			ret = root.Eval
@@ -29,7 +29,7 @@ func (b BuildOps) Eval(ops *ops.Ops) (ret rt.ObjectEval, err error) {
 		err = errutil.New("unknown error")
 	} else {
 		b(c)
-		if _, e := c.Build(); e != nil {
+		if e := c.Build(); e != nil {
 			err = e
 		} else {
 			ret = root.Obj

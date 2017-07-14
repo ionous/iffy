@@ -11,7 +11,7 @@ import (
 // Objects with ids, findable by the game.
 type Objects struct {
 	ObjectMap
-	classes *Classes
+	classes ClassMap
 }
 type ObjectMap map[string]*RefObject
 

@@ -65,7 +65,7 @@ func (assert *OpsSuite) TestKeyValue() {
 	if c, ok := assert.ops.NewBuilder(&root); ok {
 		c.Param("Value").Val(4)
 		//
-		if _, e := c.Build(); assert.NoError(e) {
+		if e := c.Build(); assert.NoError(e) {
 			assert.EqualValues(4, root.Value)
 		}
 	}
@@ -85,7 +85,7 @@ func (assert *OpsSuite) TestAllAreOne() {
 			c.Cmd("container", c.Param("value").Val(7))
 			c.End()
 		}
-		if _, e := c.Build(); assert.NoError(e) {
+		if e := c.Build(); assert.NoError(e) {
 			assert.EqualValues(*testData, root)
 			test := assert.T()
 			test.Log(pretty.Sprint(root))

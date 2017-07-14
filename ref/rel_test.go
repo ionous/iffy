@@ -85,8 +85,6 @@ func (assert *RelSuite) TestRegistration() {
 	assert.NotPanics(func() {
 		unique.RegisterBlocks(reg, (*JustRight)(nil))
 	})
-	_, tooFew := reg.FindType("TooFew")
-	assert.False(tooFew)
 
 	relations := relbuilder.Build(objects.Build())
 	for i := 0; i < 4; i++ {

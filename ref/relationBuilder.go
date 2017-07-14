@@ -6,28 +6,24 @@ import (
 )
 
 type RelBuilder struct {
-	tables, objectClasses *Classes
+	tables        ClassBuilder
+	objectClasses ClassMap
 }
 
 func (b *RelBuilder) Build(objects *Objects) *Relations {
 	return &Relations{
-		b.tables,
+		b.tables.ClassMap,
 		b.objectClasses,
 		objects,
 		make(RelationCache),
 	}
 }
 
-func NewRelations(objectClasses *Classes) *RelBuilder {
+func NewRelations(objectClasses *ClassBuilder) *RelBuilder {
 	return &RelBuilder{
-		NewClasses(),
-		objectClasses,
+		ClassBuilder{make(ClassMap)},
+		objectClasses.ClassMap,
 	}
-}
-
-// Compatible with unique.TypeRegistry.
-func (b *RelBuilder) FindType(name string) (r.Type, bool) {
-	return b.tables.FindType(name)
 }
 
 // RegisterType compatible with unique.TypeRegistry

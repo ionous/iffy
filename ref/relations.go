@@ -12,8 +12,8 @@ import (
 // Relations maps ids to RefReleation.
 // Compatible with unique.TypeRegistry.
 type Relations struct {
-	*Classes               // our own relation objectClasses
-	objectClasses *Classes // object objectClasses
+	ClassMap               // our own relation objectClasses
+	objectClasses ClassMap // object objectClasses
 	objects       *Objects
 	cache         RelationCache
 }

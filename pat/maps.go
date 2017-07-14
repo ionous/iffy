@@ -25,7 +25,7 @@ func setupScope(run rt.Runtime, data rt.Object, cb func(id string)) {
 func (m BoolMap) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.GetBool(run)
 		}
@@ -35,7 +35,7 @@ func (m BoolMap) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err 
 func (m NumberMap) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.GetNumber(run)
 		}
@@ -45,7 +45,7 @@ func (m NumberMap) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, 
 func (m TextMap) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.GetText(run)
 		}
@@ -56,7 +56,7 @@ func (m TextMap) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, er
 func (m ObjectMap) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.GetObject(run)
 		}
@@ -66,7 +66,7 @@ func (m ObjectMap) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Obj
 func (m NumListMap) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt.NumberStream, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.GetNumberStream(run)
 		}
@@ -77,7 +77,7 @@ func (m NumListMap) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 func (m TextListMap) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret rt.TextStream, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.GetTextStream(run)
 		}
@@ -88,7 +88,7 @@ func (m TextListMap) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret 
 func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt.ObjectStream, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.GetObjectStream(run)
 		}
@@ -99,7 +99,7 @@ func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 func (m ExecuteMap) ExecuteMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
-			err = NotFound
+			err = NotFound(id)
 		} else {
 			ret, err = ps.Execute(run)
 		}

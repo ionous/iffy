@@ -8,60 +8,25 @@ import (
 	r "reflect"
 )
 
-// Classes maps ids to RefClass.
-// Compatible with unique.TypeRegistry
-type Classes struct {
+type ClassBuilder struct {
 	ClassMap
 }
-type ClassMap map[string]*RefClass
 
-// FIX: NewClasses should live in a builder, just like event and pat
-func NewClasses() *Classes {
-	return &Classes{make(ClassMap)}
+func NewClasses() *ClassBuilder {
+	return &ClassBuilder{make(ClassMap)}
 }
 
 // RegisterType and all parent types.
 // Compatible with unique.TypeRegistry
-func (reg *Classes) RegisterType(rtype r.Type) (err error) {
-	_, err = reg.RegisterClass(rtype)
+func (cb *ClassBuilder) RegisterType(rtype r.Type) (err error) {
+	_, err = cb.RegisterClass(rtype)
 	return
 }
 
-// FindType returns the originally specified type, and not the wrapper class.
-// Compatible with unique.TypeRegistry.
-func (reg *Classes) FindType(name string) (ret r.Type, okay bool) {
-	id := id.MakeId(name)
-	if a, ok := reg.ClassMap[id]; ok {
-		ret, okay = a.rtype, true
-	}
-	return
-}
-
-// GetClass compatible with rt.Runtime
-func (reg *Classes) GetClass(name string) (ret rt.Class, okay bool) {
-	id := id.MakeId(name)
-	ret, okay = reg.ClassMap[id]
-	return
-}
-
-// GetByType for cache usage
-func (reg *Classes) GetByType(rtype r.Type) (ret *RefClass, err error) {
-	name := rtype.Name()
-	id := id.MakeId(name)
-	if cls, ok := reg.ClassMap[id]; !ok {
-		err = errutil.New("class not found", name)
-	} else if cls.rtype != rtype {
-		err = errutil.New("class conflict", name, cls, rtype)
-	} else {
-		ret = cls
-	}
-	return
-}
-
-func (reg *Classes) RegisterClass(rtype r.Type) (ret *RefClass, err error) {
+func (cb *ClassBuilder) RegisterClass(rtype r.Type) (ret *RefClass, err error) {
 	clsid := id.MakeId(rtype.Name())
 	// does the class already exist?
-	if cls, exists := reg.ClassMap[clsid]; exists {
+	if cls, exists := cb.ClassMap[clsid]; exists {
 		// does the id and class match?
 		if cls.rtype != rtype {
 			err = errutil.New("class name needs to be unique", cls.rtype.Name(), clsid)
@@ -71,7 +36,7 @@ func (reg *Classes) RegisterClass(rtype r.Type) (ret *RefClass, err error) {
 	} else {
 		// make a new class:
 		cls := &RefClass{id: clsid, rtype: rtype}
-		reg.ClassMap[clsid] = cls
+		cb.ClassMap[clsid] = cls
 
 		// parse the properties
 		if ptype, pidx, props, e := MakeProperties(rtype); e != nil {
@@ -81,7 +46,7 @@ func (reg *Classes) RegisterClass(rtype r.Type) (ret *RefClass, err error) {
 			if ptype == nil {
 				ret = cls
 			} else {
-				if p, e := reg.RegisterClass(ptype); e != nil {
+				if p, e := cb.RegisterClass(ptype); e != nil {
 					err = e
 				} else {
 					cls.parent = p

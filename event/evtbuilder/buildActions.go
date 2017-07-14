@@ -9,14 +9,14 @@ import (
 	"github.com/ionous/iffy/spec/ops"
 )
 
-func NewActions(classes *ref.Classes, ops *ops.Ops) *Actions {
-	return &Actions{classes, ops, ref.NewClasses(), make(event.ActionMap)}
+func NewActions(objectClasses ref.Classes, ops *ops.Ops) *Actions {
+	return &Actions{objectClasses, ref.NewClassStack(objectClasses), ops, make(event.ActionMap)}
 }
 
 type Actions struct {
-	objectClasses *ref.Classes
+	objectClasses ref.Classes
+	dataClasses   ref.Classes
 	ops           *ops.Ops
-	dataClasses   *ref.Classes
 	event.ActionMap
 }
 
@@ -29,7 +29,7 @@ func (a *Actions) Add(name, targetClass string, dataClass interface{}) (err erro
 		err = errutil.New("target class not found", targetClass)
 	} else if rtype, e := unique.TypePtr(dataClass); e != nil {
 		err = e
-	} else if dataCls, e := a.objectClasses.RegisterClass(rtype); e != nil {
+	} else if dataCls, e := a.dataClasses.RegisterClass(rtype); e != nil {
 		err = e
 	} else {
 		a.ActionMap[id] = &event.Action{

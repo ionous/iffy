@@ -4,6 +4,11 @@ import (
 	"io"
 )
 
+// Pluralize turns single words into their plural variants.
+type Pluralize interface {
+	Pluralize(single string) string
+}
+
 // ObjectFinder searches for objects by context.
 type ObjectFinder interface {
 	FindObject(name string) (Object, bool)
@@ -44,4 +49,6 @@ type Runtime interface {
 	GetAncestors(Object) (ObjectStream, error)
 	// Patterns for pattern matching, iffy's equivalent of user methods and functions.
 	Patterns
+	// Pluralize for pluralization of printed nouns.
+	Pluralize
 }

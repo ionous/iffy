@@ -25,7 +25,7 @@ type CoreSuite struct {
 	run   rt.Runtime
 	lines rtm.LineWriter
 
-	classes *ref.Classes
+	classes *ref.ClassBuilder
 	objects *ref.ObjBuilder
 
 	unique *unique.Objects
@@ -43,7 +43,7 @@ func (assert *CoreSuite) SetupTest() {
 	unique.RegisterBlocks(unique.PanicTypes(assert.ops),
 		(*core.Commands)(nil))
 
-	assert.unique = unique.NewObjects()
+	assert.unique = unique.NewObjectGenerator()
 	assert.classes = ref.NewClasses()
 	assert.objects = ref.NewObjects(assert.classes)
 
@@ -54,10 +54,9 @@ func (assert *CoreSuite) SetupTest() {
 }
 
 func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
-	if _, e := c.Build(); e != nil {
+	if e := c.Build(); e != nil {
 		err = e
 	} else {
-
 		mm := unique.PanicTypes(assert.classes)
 		unique.RegisterTypes(mm,
 			(*core.NumberCounter)(nil),
