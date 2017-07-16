@@ -21,7 +21,7 @@ import (
 // go test -run Foo     # Run top-level tests matching "Foo", such as "TestFooBar".
 // go test -run Foo/A=  # For top-level tests matching "Foo", run subtests matching "A=".
 // go test -run /A=1    # For all top-level tests, run subtests matching "A=1".
-func TestStd(t *testing.T) {
+func xTestStd(t *testing.T) {
 	classes := ref.NewClasses()
 	unique.RegisterBlocks(unique.PanicTypes(classes),
 		(*Classes)(nil))

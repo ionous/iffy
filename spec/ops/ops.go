@@ -2,7 +2,7 @@ package ops
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/core" // for literals/literally.
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
@@ -14,7 +14,7 @@ import (
 
 type Ops struct {
 	unique.Types
-	Constructors unique.Types
+	ShadowTypes unique.Types
 }
 
 func NewOps() *Ops {
@@ -27,8 +27,8 @@ type Builder struct {
 
 // NewBuilder starts creating a call tree.
 func (ops *Ops) NewBuilder(root interface{}) (*Builder, bool) {
-	targetPtr := r.ValueOf(root).Elem()
-	spec := &_Spec{ops: ops, targetPtr: targetPtr}
+	target := r.ValueOf(root).Elem()
+	spec := &_Spec{ops: ops, target: target}
 	return &Builder{
 		builder.NewBuilder(&_Factory{ops}, spec),
 	}, true
@@ -45,28 +45,28 @@ type _Factory struct {
 	ops *Ops
 }
 
-// _SpecWriter handles the differences between command structs and constructors.s
-// Commands are implemented by reflect.Value, and _SpecWriter is compatible with reflect's interface.
-// FIX? support aggregate ops by returning unique.Fields()?
-type _SpecWriter interface {
+// _Target handles the differences between command structs and constructors.
+// Commands are implemented by reflect.Value, and _Target is compatible with reflect's interface.
+// FIX? support aggregate ops by using unique.Fields(), FieldByIndex()
+type _Target interface {
 	Type() r.Type
-	// Field returns the value of the requsted field. To maintain compatibility with reflect.Value: on error, Field returns an invalid Value.
-	Field(int) r.Value
+	Field(int) r.Value // Field returns the value of the requsted field. To maintain compatibility with reflect.Value: on error, Field returns an invalid Value.
+	Addr() r.Value
 }
 
 // NewSpec implements spec.SpecFactory.
 func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
 	if rtype, ok := fac.ops.FindType(name); ok {
-		targetPtr := r.New(rtype).Elem()
+		target := r.New(rtype).Elem()
 		ret = &_Spec{
-			ops:       fac.ops,
-			targetPtr: targetPtr,
+			ops:    fac.ops,
+			target: target,
 		}
-	} else if rtype, ok := fac.ops.Constructors.FindType(name); ok {
-		shadow := &ShadowClass{rtype: rtype}
+	} else if rtype, ok := fac.ops.ShadowTypes.FindType(name); ok {
+		shadow := &ShadowClass{rtype, make(map[string]r.Value)}
 		ret = &_Spec{
-			ops:       fac.ops,
-			targetPtr: shadow,
+			ops:    fac.ops,
+			target: shadow,
 		}
 	} else {
 		err = errutil.New("unknown command", name)
@@ -76,19 +76,19 @@ func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
 
 // NewSpecs implements spec.SpecFactory.
 // the spec algorithm creates NewSpecs, and then assigns it to a slot
-// we need the slot to targetPtr the array properly, so we just wait,
+// we need the slot to target the array properly, so we just wait,
 func (fac *_Factory) NewSpecs() (spec.Specs, error) {
 	return &_Specs{ops: fac.ops}, nil
 }
 
 type _Spec struct {
-	ops       *Ops
-	targetPtr _SpecWriter // output object we are building
-	index     int
+	ops    *Ops
+	target _Target // output object we are building
+	index  int
 }
 
 func (spec *_Spec) Position(arg interface{}) (err error) {
-	tgt := spec.targetPtr
+	tgt := spec.target
 	tgtType := tgt.Type()
 	if cnt := tgtType.NumField(); spec.index >= cnt {
 		err = errutil.New("too many arguments", tgtType, "expected", cnt)
@@ -96,7 +96,7 @@ func (spec *_Spec) Position(arg interface{}) (err error) {
 		field := tgt.Field(spec.index)
 		if !field.IsValid() {
 			fieldName := tgtType.Field(spec.index).Name
-			err = errutil.Fmt("couldnt get value for position %d (%s.%s) %v", spec.index, tgtType, fieldName)
+			err = errutil.Fmt("couldnt get value for position %d (%s.%s) %v", spec.index, tgtType, fieldName, arg)
 		} else if e := setField(field, arg); e != nil {
 			fieldName := tgtType.Field(spec.index).Name
 			err = errutil.Fmt("position %d (%s.%s) %v", spec.index, tgtType, fieldName, e)
@@ -109,8 +109,9 @@ func (spec *_Spec) Position(arg interface{}) (err error) {
 
 func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
 	myid := id.MakeId(key)
-	tgt := spec.targetPtr
+	tgt := spec.target
 	tgtType := tgt.Type()
+	// FIX: maybe via unique.Fields() -- almost like a RefClass? -- build a cache of id->field index. searching every assign is annoying.
 	for i, cnt := spec.index, tgtType.NumField(); i < cnt; i++ {
 		fieldInfo := tgtType.Field(i)
 		if myid == id.MakeId(fieldInfo.Name) {
@@ -144,8 +145,9 @@ func (specs *_Specs) AddElement(el spec.Spec) (err error) {
 func setField(dst r.Value, src interface{}) (err error) {
 	switch src := src.(type) {
 	case *_Spec:
-		rval := valueOf(src.targetPtr).Addr()
-		if e := ref.CoerceValue(dst, rval); e != nil {
+		// all commands are interfaces are implemented with pointers
+		targetPtr := src.target.Addr()
+		if e := ref.CoerceValue(dst, targetPtr); e != nil {
 			err = errutil.New("couldnt assign command", e)
 		}
 
@@ -159,29 +161,26 @@ func setField(dst r.Value, src interface{}) (err error) {
 		} else {
 			slice, elType := dst, dst.Type().Elem()
 			for _, spec := range src.els {
-				rval := valueOf(spec.targetPtr).Addr()
-				if from := rval.Type(); !from.AssignableTo(elType) {
+				// all commands are interfaces are implemented with pointers
+				rvalue := spec.target.Addr()
+				if from := rvalue.Type(); !from.AssignableTo(elType) {
 					err = errutil.Fmt("incompatible element type. from: %v to: %v", from, elType)
 					break
 				} else {
-					slice = r.Append(slice, rval)
+					slice = r.Append(slice, rvalue)
 				}
 			}
 			dst.Set(slice)
 		}
-
-	case bool, float64, string, int, []float64, []string:
+	default:
 		if dst.Kind() == r.Interface {
 			if literal, ok := literally(dst.Type(), src); ok {
 				src = literal
 			}
 		}
 		if e := ref.CoerceValue(dst, src); e != nil {
-			err = errutil.New("couldnt assign primitive value", e)
+			err = errutil.New("couldnt assign value", e)
 		}
-
-	default:
-		err = errutil.Fmt("assigning unexpected type %T", src)
 	}
 	return
 }
@@ -199,30 +198,66 @@ func setField(dst r.Value, src interface{}) (err error) {
 func literally(dstType r.Type, src interface{}) (ret interface{}, okay bool) {
 	switch src := src.(type) {
 	case bool:
-		ret = &core.Bool{src}
-		okay = true
-	case []float64:
-		ret = &core.Numbers{src}
-		okay = true
-	case []string:
-		ret = &core.Texts{src}
-		okay = true
-	case int:
-		ret = &core.Num{float64(src)}
-		okay = true
+		ret, okay = &core.Bool{src}, true
 	case float64:
-		ret = &core.Num{src}
-		okay = true
+		ret, okay = &core.Num{src}, true
+	case []float64:
+		ret, okay = &core.Numbers{src}, true
 	case string:
 		// could be text or object --
 		switch dstType {
 		case textEval:
-			ret = &core.Text{src}
-			okay = true
+			ret, okay = &core.Text{src}, true
 		case objEval:
-			ret = &core.Object{src}
-			okay = true
+			ret, okay = &core.Object{src}, true
 		}
+	case []string:
+		switch dstType {
+		case textListEval:
+			ret, okay = &core.Texts{src}, true
+		case objListEval:
+			ret, okay = &core.Objects{src}, true
+		}
+	default:
+		// FIX? a cleaner way to convert any number like thing to float64?
+		if v := r.ValueOf(src); numberKind(v.Kind()) {
+			var num float64
+			if e := ref.CoerceValue(r.ValueOf(&num).Elem(), v); e == nil {
+				ret, okay = &core.Num{num}, true
+			}
+		}
+	}
+	return
+}
+
+// determine what kind of eval can produce the passed type.
+func evalFromType(rtype r.Type) (ret interface{}, okay bool) {
+	switch k := rtype.Kind(); {
+	case k == r.Bool:
+		ret, okay = (*rt.BoolEval)(nil), true
+	case numberKind(k):
+		ret, okay = (*rt.NumberEval)(nil), true
+	case k == r.String:
+		ret, okay = (*rt.TextEval)(nil), true
+	case k == r.Ptr:
+		ret, okay = (*rt.ObjectEval)(nil), true
+	case k == r.Array || k == r.Slice:
+		switch k := rtype.Elem().Kind(); {
+		case numberKind(k):
+			ret, okay = (*rt.NumListEval)(nil), true
+		case k == r.String:
+			ret, okay = (*rt.TextListEval)(nil), true
+		case k == r.Ptr:
+			ret, okay = (*rt.ObjListEval)(nil), true
+		}
+	}
+	return
+}
+
+func numberKind(k r.Kind) (ret bool) {
+	switch k {
+	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64, r.Uint, r.Uint8, r.Uint16, r.Uint32, r.Uint64, r.Float32, r.Float64:
+		ret = true
 	}
 	return
 }
@@ -230,6 +265,8 @@ func literally(dstType r.Type, src interface{}) (ret interface{}, okay bool) {
 // switch doesnt seem to work well dstValue.Interface().(type) b/c dst is usually nil.
 var textEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
 var objEval = r.TypeOf((*rt.ObjectEval)(nil)).Elem()
+var textListEval = r.TypeOf((*rt.TextListEval)(nil)).Elem()
+var objListEval = r.TypeOf((*rt.ObjListEval)(nil)).Elem()
 
 func arrayKind(rtype r.Type) (ret r.Kind, isArray bool) {
 	if k := rtype.Kind(); k != r.Slice {
@@ -237,15 +274,6 @@ func arrayKind(rtype r.Type) (ret r.Kind, isArray bool) {
 	} else {
 		isArray = true
 		ret = rtype.Elem().Kind()
-	}
-	return
-}
-
-func valueOf(i interface{}) (ret r.Value) {
-	if v, ok := i.(r.Value); !ok {
-		ret = r.ValueOf(i)
-	} else {
-		ret = v
 	}
 	return
 }
