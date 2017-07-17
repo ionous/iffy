@@ -63,7 +63,7 @@ func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
 			target: target,
 		}
 	} else if rtype, ok := fac.ops.ShadowTypes.FindType(name); ok {
-		shadow := &ShadowClass{rtype, make(map[string]r.Value)}
+		shadow := &ShadowClass{rtype, make(map[string]_ShadowSlot)}
 		ret = &_Spec{
 			ops:    fac.ops,
 			target: shadow,
@@ -231,24 +231,24 @@ func literally(dstType r.Type, src interface{}) (ret interface{}, okay bool) {
 }
 
 // determine what kind of eval can produce the passed type.
-func evalFromType(rtype r.Type) (ret interface{}, okay bool) {
+func evalFromType(rtype r.Type) (ret r.Type, okay bool) {
 	switch k := rtype.Kind(); {
 	case k == r.Bool:
-		ret, okay = (*rt.BoolEval)(nil), true
+		ret, okay = boolEval, true
 	case numberKind(k):
-		ret, okay = (*rt.NumberEval)(nil), true
+		ret, okay = numEval, true
 	case k == r.String:
-		ret, okay = (*rt.TextEval)(nil), true
+		ret, okay = textEval, true
 	case k == r.Ptr:
-		ret, okay = (*rt.ObjectEval)(nil), true
+		ret, okay = objEval, true
 	case k == r.Array || k == r.Slice:
 		switch k := rtype.Elem().Kind(); {
 		case numberKind(k):
-			ret, okay = (*rt.NumListEval)(nil), true
+			ret, okay = numListEval, true
 		case k == r.String:
-			ret, okay = (*rt.TextListEval)(nil), true
+			ret, okay = textListEval, true
 		case k == r.Ptr:
-			ret, okay = (*rt.ObjListEval)(nil), true
+			ret, okay = objListEval, true
 		}
 	}
 	return
@@ -263,8 +263,11 @@ func numberKind(k r.Kind) (ret bool) {
 }
 
 // switch doesnt seem to work well dstValue.Interface().(type) b/c dst is usually nil.
+var boolEval = r.TypeOf((*rt.BoolEval)(nil)).Elem()
+var numEval = r.TypeOf((*rt.NumberEval)(nil)).Elem()
 var textEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
 var objEval = r.TypeOf((*rt.ObjectEval)(nil)).Elem()
+var numListEval = r.TypeOf((*rt.NumListEval)(nil)).Elem()
 var textListEval = r.TypeOf((*rt.TextListEval)(nil)).Elem()
 var objListEval = r.TypeOf((*rt.ObjListEval)(nil)).Elem()
 
@@ -274,6 +277,105 @@ func arrayKind(rtype r.Type) (ret r.Kind, isArray bool) {
 	} else {
 		isArray = true
 		ret = rtype.Elem().Kind()
+	}
+	return
+}
+
+// unpack the passed value
+func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
+	// note: we cant s.rvalue.Interface()
+	// a single command can implement multiple interfaces;
+	// the type switch will match whichever is listed first.
+	switch rtype, val := s.rtype, s.rvalue.Interface(); rtype {
+	default:
+		err = errutil.New("unknown unpack type", rtype)
+	case boolEval:
+		if eval, ok := val.(rt.BoolEval); !ok {
+			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
+		} else {
+			ret, err = eval.GetBool(run)
+		}
+	case numEval:
+		if eval, ok := val.(rt.NumberEval); !ok {
+			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
+		} else {
+			ret, err = eval.GetNumber(run)
+		}
+	case textEval:
+		if eval, ok := val.(rt.TextEval); !ok {
+			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
+		} else {
+			ret, err = eval.GetText(run)
+		}
+	case objEval:
+		if eval, ok := val.(rt.ObjectEval); !ok {
+			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
+		} else {
+			ret, err = eval.GetObject(run)
+		}
+	case numListEval:
+		if eval, ok := val.(rt.NumListEval); !ok {
+			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
+		} else {
+			var vals []float64
+			if stream, e := eval.GetNumberStream(run); e != nil {
+				err = e
+			} else {
+				for stream.HasNext() {
+					if v, e := stream.GetNext(); e != nil {
+						err = e
+						break
+					} else {
+						vals = append(vals, v)
+					}
+				}
+				if err == nil {
+					ret = vals
+				}
+			}
+		}
+	case textListEval:
+		if eval, ok := val.(rt.TextListEval); !ok {
+			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
+		} else {
+			var vals []string
+			if stream, e := eval.GetTextStream(run); e != nil {
+				err = e
+			} else {
+				for stream.HasNext() {
+					if v, e := stream.GetNext(); e != nil {
+						err = e
+						break
+					} else {
+						vals = append(vals, v)
+					}
+				}
+				if err == nil {
+					ret = vals
+				}
+			}
+		}
+	case objListEval:
+		if eval, ok := val.(rt.ObjListEval); !ok {
+			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
+		} else {
+			var vals []rt.Object
+			if stream, e := eval.GetObjectStream(run); e != nil {
+				err = e
+			} else {
+				for stream.HasNext() {
+					if v, e := stream.GetNext(); e != nil {
+						err = e
+						break
+					} else {
+						vals = append(vals, v)
+					}
+				}
+				if err == nil {
+					ret = vals
+				}
+			}
+		}
 	}
 	return
 }

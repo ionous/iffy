@@ -1,6 +1,7 @@
 package ops
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
@@ -8,23 +9,30 @@ import (
 // ShadowClass implements a command for constructing pod-like types.
 type ShadowClass struct {
 	rtype r.Type
-	evals map[string]r.Value
+	slots map[string]_ShadowSlot
 }
 
-// GetObject for a shadow type generates an object from the evals specified.
+// note: nothing in the slot itself guarantees that the type and value are compatible.
+// that's left up to spec/ops.
+type _ShadowSlot struct {
+	rtype  r.Type  // type of the slot
+	rvalue r.Value // spec will .Set to this value
+}
+
+// GetObject for a shadow type generates an object from the slots specified.
 // It is a constructor.
 func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := run.NewObject(c.rtype.Name()); e != nil {
-		err = e
+		err = errutil.New("shadow class", c.rtype, "couldn't create object")
 	} else {
 		// walk all the fields we recorded and pass them to the new object
-		for k, eval := range c.evals {
+		for k, slot := range c.slots {
 			// Unpack evaluates an interface to get its resulting go value.
-			if v, e := rt.Unpack(run, eval.Interface()); e != nil {
-				err = e
+			if v, e := slot.unpack(run); e != nil {
+				err = errutil.New("shadow class", c.rtype, "couldn't unpack", k, e)
 				break
 			} else if e := obj.SetValue(k, v); e != nil {
-				err = e
+				err = errutil.New("shadow class", c.rtype, "couldn't set value", k, e)
 				break
 			}
 		}
@@ -56,10 +64,10 @@ func (c *ShadowClass) Type() r.Type {
 // ex. TriState ( yes, no, maybe ) cmd.Param("yes").Value("true")
 func (c *ShadowClass) Field(index int) (ret r.Value) {
 	field := c.rtype.Field(index)
-	if et, ok := evalFromType(field.Type); ok {
-		val := r.New(r.TypeOf(et).Elem()).Elem()
-		c.evals[field.Name] = val
-		ret = val
+	if rtype, ok := evalFromType(field.Type); ok {
+		rvalue := r.New(rtype).Elem() // create an empty eval for the user to poke into
+		c.slots[field.Name] = _ShadowSlot{rtype, rvalue}
+		ret = rvalue
 	}
 	return
 }

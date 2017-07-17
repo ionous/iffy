@@ -19,6 +19,8 @@ func TestObjectSuite(t *testing.T) {
 type ObjectSuite struct {
 	suite.Suite
 	objects *ref.Objects
+	first   *BaseClass
+	second  *DerivedClass
 }
 
 func (assert *ObjectSuite) TearDownTest() {
@@ -34,9 +36,13 @@ func (assert *ObjectSuite) SetupTest() {
 		(*DerivedClass)(nil))
 
 	objects := ref.NewObjects(classes)
-	unique.RegisterValues(unique.PanicValues(objects),
-		&BaseClass{Name: "first", State: Yes, Labeled: true},
-		&DerivedClass{BaseClass{Name: "second", State: Maybe}})
+	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
+	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
+	first.Object = &second.BaseClass
+	second.Object = first
+	assert.first = first
+	assert.second = second
+	unique.RegisterValues(unique.PanicValues(objects), first, second)
 	assert.objects = objects.Build()
 }
 
@@ -122,18 +128,18 @@ func (assert *ObjectSuite) TestStateSet() {
 }
 
 // test that normal properties are accessible
-func (assert *ObjectSuite) xTestPropertyAccess() {
+func (assert *ObjectSuite) TestPropertyAccess() {
 	var expected = []struct {
 		name string
 		pv   interface{}
 	}{
-	// {"Name", new(string)},
-	// {"Num", new(float64)},
-	// {"Text", new(string)},
-	// {"Object", rassert.Pointer},
-	// {"Nums", new([]float64)},
-	// {"Texts", rassert.Text | rassert.Array},
-	// {"Objects", rassert.Pointer | rassert.Array},
+		{"Name", new(string)},
+		{"Num", new(float64)},
+		{"Text", new(string)},
+		{"Object", new(*BaseClass)},
+		{"Nums", new([]float64)},
+		{"Texts", new([]string)},
+		{"Objects", new([]*BaseClass)},
 	}
 	test := func(n rt.Object) {
 		for _, v := range expected {
@@ -144,8 +150,12 @@ func (assert *ObjectSuite) xTestPropertyAccess() {
 	}
 	if n, ok := assert.objects.GetObject("first"); assert.True(ok) {
 		test(n)
+		obj := *expected[3].pv.(**BaseClass)
+		assert.Equal(&assert.second.BaseClass, obj)
 	}
 	if d, ok := assert.objects.GetObject("second"); assert.True(ok) {
 		test(d)
+		obj := *expected[3].pv.(**BaseClass)
+		assert.Equal(assert.first, obj)
 	}
 }

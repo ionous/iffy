@@ -1,19 +1,16 @@
 package ops_test
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core" // for interesting evals
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
-	"github.com/ionous/sliceOf"
-	r "reflect"
-	// "github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/spec/ops"
 	. "github.com/ionous/iffy/tests" // BaseClass
+	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
-	// "strconv"
+	r "reflect"
 	"testing"
 )
 
@@ -60,7 +57,6 @@ func TestShadows(t *testing.T) {
 		base, other,
 	)
 	var lines rtm.LineWriter
-	errutil.Panic = true
 	run := rtm.New(classes).Objects(objects).Writer(&lines).NewRtm()
 	if obj, e := root.Object.GetObject(run); assert.NoError(e) {
 		vals := map[string]struct{ match, fail interface{} }{

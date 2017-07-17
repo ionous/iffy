@@ -12,16 +12,11 @@ import (
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
-	// "github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-// go test -run ''      # Run all tests.
-// go test -run Foo     # Run top-level tests matching "Foo", such as "TestFooBar".
-// go test -run Foo/A=  # For top-level tests matching "Foo", run subtests matching "A=".
-// go test -run /A=1    # For all top-level tests, run subtests matching "A=1".
-func xTestStd(t *testing.T) {
+func TestStd(t *testing.T) {
 	classes := ref.NewClasses()
 	unique.RegisterBlocks(unique.PanicTypes(classes),
 		(*Classes)(nil))
@@ -51,6 +46,10 @@ func xTestStd(t *testing.T) {
 		(*patspec.Commands)(nil),
 	)
 
+	unique.RegisterBlocks(unique.PanicTypes(ops.ShadowTypes),
+		(*Patterns)(nil),
+	)
+
 	t.Run("Names", func(t *testing.T) {
 		_assert := assert.New(t)
 		var root struct {
@@ -61,8 +60,9 @@ func xTestStd(t *testing.T) {
 				buildPatterns(c)
 				c.End()
 			}
-			e := c.Build()
-			t.Fatal(e)
+			if e := c.Build(); e != nil {
+				t.Fatal(e)
+			}
 		}
 		// t.Log("patterns", pretty.Sprint(root))
 		if e := root.Patterns.Generate(patterns); e != nil {
@@ -107,8 +107,8 @@ func match(run rt.Runtime, _assert *assert.Assertions, match string, op interfac
 	var lines rtm.LineWriter
 	run.PushWriter(&lines)
 	defer run.PopWriter()
-	if printName, e := run.Emplace(op); _assert.NoError(e) {
-		if _, e := run.ExecuteMatching(printName); _assert.NoError(e) {
+	if patdata, e := run.Emplace(op); _assert.NoError(e) {
+		if _, e := run.ExecuteMatching(patdata); _assert.NoError(e) {
 			okay = _assert.EqualValues(sliceOf.String(match), lines.Lines())
 		}
 	}
@@ -138,16 +138,24 @@ func buildPatterns(c *ops.Builder) {
 	}
 	//
 	if c.Cmd("run rule", "print plural name").Begin() {
-		// FIX no can do -- was trying to turn target into thing
-		// what you need is something like:
-		// c.Cmd("new", "print name", c.Cmd("get", "@", "target"))
-		// where new treats everything
-		c.Param("decide").Cmd("print text", c.Cmd("pluralize", c.Cmd("buffer", c.Cmd("determine", c.Cmd("get", "@", "target")))))
+		if c.Param("decide").Cmd("print text").Begin() {
+			if c.Cmd("pluralize").Begin() {
+				if c.Cmd("buffer").Begin() {
+					if c.Cmds().Begin() {
+						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
+						c.End()
+					}
+					c.End()
+				}
+				c.End()
+			}
+			c.End()
+		}
 		c.End()
 	}
 	if c.Cmd("run rule", "print plural name").Begin() {
 		c.Param("if").Cmd("is not", c.Cmd("is empty", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name")))
-		c.Param("decide").Cmd("print text", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name"))
+		c.Param("decide").Cmd("print text", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name"))
 		c.End()
 	}
 }
