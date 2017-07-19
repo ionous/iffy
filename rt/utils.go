@@ -1,5 +1,9 @@
 package rt
 
+import (
+	"io"
+)
+
 func ExecuteList(run Runtime, x []Execute) (err error) {
 	for _, s := range x {
 		if e := s.Execute(run); e != nil {
@@ -23,4 +27,11 @@ func SetValues(obj Object, values Values) (err error) {
 		}
 	}
 	return
+}
+
+func Write(run Runtime, w io.Writer, cb func() error) error {
+	run.PushWriter(w)
+	e := cb()
+	run.PopWriter()
+	return e
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/stretchr/testify/assert"
@@ -72,8 +73,8 @@ func TestSomething(t *testing.T) {
 
 	// we do this the manual way first, and later with spec
 
-	var lines rtm.LineWriter
-	run := rtm.New(classes).Objects(objects).Writer(&lines).NewRtm()
+	var lines printer.Lines
+	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
 
 	listen := evtbuilder.NewListeners(actions, run.Objects, classes)
 	// object listener:

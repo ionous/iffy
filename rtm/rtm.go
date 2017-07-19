@@ -1,11 +1,11 @@
 package rtm
 
 import (
-	"github.com/ionous/iffy/dl/text"
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rt/scope"
 	"io"
 )
@@ -15,11 +15,11 @@ type Rtm struct {
 	*ref.Objects
 	*ref.Relations
 	ScopeStack
-	OutputStack
+	printer.Stack
 	Randomizer
 	Ancestors
 	Thunk
-	text.Plurals
+	Plurals
 }
 
 // GetPatterns mainly for testing.
@@ -74,7 +74,7 @@ func (c *Config) Writer(w io.Writer) *Config {
 	return c
 }
 
-func (c *Config) NewRtm() *Rtm {
+func (c *Config) Rtm() *Rtm {
 	a := c.ancestors
 	if a == nil {
 		a = NoAncestors{}

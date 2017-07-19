@@ -24,7 +24,29 @@ func (assert *CoreSuite) TestPrintSpacing() {
 		if run, e := assert.newRuntime(c); assert.NoError(e) {
 			if e := root.Eval.Execute(run); assert.NoError(e) {
 				lines := assert.Lines()
-				assert.Equal("hello there, world.", lines[0], "Note the space after the comma, and the lack of space after the period.")
+				assert.Equal(sliceOf.String("hello there, world."), lines, "Note the space after the comma, and the lack of space after the period.")
+			}
+		}
+	}
+}
+
+func (assert *CoreSuite) TestPrintNum() {
+	var root struct {
+		Eval rt.Execute
+	}
+	if c, ok := assert.ops.NewBuilder(&root); ok {
+		if c.Cmd("print line").Begin() {
+			if c.Cmds().Begin() {
+				c.Cmd("print num", 213)
+				c.Cmd("print num word", 213)
+				c.End()
+			}
+			c.End()
+		}
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if e := root.Eval.Execute(run); assert.NoError(e) {
+				lines := assert.Lines()
+				assert.Equal(sliceOf.String("213 two hundred thirteen"), lines)
 			}
 		}
 	}

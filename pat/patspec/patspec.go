@@ -5,9 +5,8 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// MakePattern defines an interface for creating patterns.
+// MakePattern defines an interface for creating runtime patterns.
 type MakePattern interface {
-	// Generate aka finalize ( in the sense of an album or collection. )
 	Generate(PatternFactory) error
 }
 

@@ -84,7 +84,7 @@ func (assert *PatternSuite) TestFactorial() {
 		}
 		//
 		objects := ref.NewObjects(classes)
-		run := rtm.New(classes).Objects(objects).Patterns(patterns).NewRtm()
+		run := rtm.New(classes).Objects(objects).Patterns(patterns).Rtm()
 		peal := run.GetPatterns()
 		if numberPatterns := peal.NumberMap; assert.Len(numberPatterns, 1) {
 			if factPattern := numberPatterns[id.MakeId("factorial")]; assert.Len(factPattern, 2) {

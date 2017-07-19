@@ -7,6 +7,7 @@ import (
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	. "github.com/ionous/iffy/tests"
@@ -24,12 +25,12 @@ type ArticleSuite struct {
 	suite.Suite
 	run   rt.Runtime
 	ops   *ops.Ops
-	lines rtm.LineWriter
+	lines printer.Lines
 }
 
 func (assert *ArticleSuite) Lines() (ret []string) {
 	ret = assert.lines.Lines()
-	assert.lines = rtm.LineWriter{}
+	assert.lines = printer.Lines{}
 	return
 }
 
@@ -54,7 +55,7 @@ func (assert *ArticleSuite) SetupTest() {
 	)
 	//
 	assert.ops = ops
-	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).NewRtm()
+	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).Rtm()
 }
 
 func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {

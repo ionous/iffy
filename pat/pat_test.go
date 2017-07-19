@@ -53,7 +53,7 @@ func ExampleSayMe() {
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Num)(nil))
 	objects := ref.NewObjects(classes)
-	run := rtm.New(classes).Objects(objects).NewRtm()
+	run := rtm.New(classes).Objects(objects).Rtm()
 	// SayMe converts numbers to text
 	// http://learnyouahaskell.com/syntax-in-functions
 	type SayMe struct {
@@ -131,7 +131,7 @@ func TestFactorial(t *testing.T) {
 			return
 		})); assert.NoError(e) {
 			// suite?
-			run := rtm.New(classes).Objects(objects).NewRtm()
+			run := rtm.New(classes).Objects(objects).Rtm()
 			p = patterns.Build()
 			//
 			if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {

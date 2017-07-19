@@ -18,4 +18,10 @@ type PrintPluralName struct {
 type Patterns struct {
 	*PrintName
 	*PrintPluralName
+	// *GroupTogether
+	// *PrintGroup
+}
+
+type Commands struct {
+	// *PrintNondescriptObjects
 }

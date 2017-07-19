@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/stretchr/testify/suite"
@@ -23,7 +24,7 @@ type CoreSuite struct {
 	ops *ops.Ops
 
 	run   rt.Runtime
-	lines rtm.LineWriter
+	lines printer.Lines
 
 	classes *ref.ClassBuilder
 	objects *ref.ObjBuilder
@@ -33,7 +34,7 @@ type CoreSuite struct {
 
 func (assert *CoreSuite) Lines() (ret []string) {
 	ret = assert.lines.Lines()
-	assert.lines = rtm.LineWriter{}
+	assert.lines = printer.Lines{}
 	return
 }
 
@@ -72,7 +73,7 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 		} else {
 			unique.RegisterValues(unique.PanicValues(assert.objects), inst...)
 
-			run := rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).NewRtm()
+			run := rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).Rtm()
 			ret = run
 		}
 	}

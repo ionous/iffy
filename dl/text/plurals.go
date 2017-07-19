@@ -1,7 +1,6 @@
 package text
 
 import (
-	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -15,7 +14,8 @@ type Pluralization interface {
 	AddPlural(single, plural string)
 }
 
-// PluralRule provides a command ( the command ) for specifying single/plural pairings.
+// PluralRule commands the runtime pair the specified singular text with the specified plural text.
+// i.e. for use with the Pluralize command.
 type PluralRule struct {
 	Single, Plural string
 }
@@ -28,26 +28,7 @@ func (r *PluralRule) Generate(p Pluralization) error {
 	return nil
 }
 
-// Plurals holds an all lowercase mapping of single to plural pairs.
-type Plurals map[string]string
-
-// AddPlural overrides the automatic pluralization algorithm with the specified single to plural pairing.
-// Compatible with the Pluralization interface.
-func (p Plurals) AddPlural(single, plural string) {
-	p[single] = plural
-}
-
-// Pluralize returns the plural version of a single word via table based pairs or via automatic pluralization rules.
-// Compatible with the runtime pluralize interface.
-func (p Plurals) Pluralize(single string) (ret string) {
-	if r, ok := p[single]; ok {
-		ret = r
-	} else {
-		ret = lang.Pluralize(single)
-	}
-	return
-}
-
+// Pluralize generates plural text from the passed (presumably singular) text.
 type Pluralize struct {
 	Text rt.TextEval
 }

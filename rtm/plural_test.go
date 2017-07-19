@@ -1,4 +1,4 @@
-package text
+package rtm
 
 import (
 	"testing"

@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	. "github.com/ionous/iffy/tests" // BaseClass
@@ -56,8 +57,8 @@ func TestShadows(t *testing.T) {
 	unique.RegisterValues(unique.PanicValues(objects),
 		base, other,
 	)
-	var lines rtm.LineWriter
-	run := rtm.New(classes).Objects(objects).Writer(&lines).NewRtm()
+	var lines printer.Lines
+	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
 	if obj, e := root.Object.GetObject(run); assert.NoError(e) {
 		vals := map[string]struct{ match, fail interface{} }{
 			"Num":     {3, 5},

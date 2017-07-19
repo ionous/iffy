@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/printer"
 )
 
 // Buffer collects text said by other statements via a SpanPrinter, and returns it as a string.
@@ -10,7 +11,7 @@ type Buffer struct {
 }
 
 func (buf *Buffer) GetText(run rt.Runtime) (ret string, err error) {
-	var span SpanPrinter
+	var span printer.Span
 	run.PushWriter(&span)
 	if e := rt.ExecuteList(run, buf.Buffer); e != nil {
 		err = e
