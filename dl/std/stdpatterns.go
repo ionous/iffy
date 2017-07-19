@@ -6,6 +6,11 @@ import (
 
 // FIX: this has to go into the std library
 func BuildPatterns(c *ops.Builder) {
+	namePatterns(c)
+	groupPatterns(c)
+}
+
+func namePatterns(c *ops.Builder) {
 	// its a little heavy to do this with patterns, but -- its a good test of the system.
 	// print the class name if all else fails
 	if c.Cmd("run rule", "print name").Begin() {
@@ -47,4 +52,8 @@ func BuildPatterns(c *ops.Builder) {
 		c.Param("decide").Cmd("print text", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name"))
 		c.End()
 	}
+}
+
+func groupPatterns(c *ops.Builder) {
+
 }

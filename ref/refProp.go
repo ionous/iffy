@@ -34,8 +34,7 @@ func Categorize(rtype r.Type) (ret rt.PropertyType, err error) {
 		ret = rt.Text
 	case r.Bool, r.Int:
 		ret = rt.State
-	case r.Ptr:
-		// FIX: how far do you want to take this?
+	case r.Ptr, r.Interface:
 		ret = rt.Pointer
 	case r.Slice:
 		if elem, e := Categorize(rtype.Elem()); e != nil {

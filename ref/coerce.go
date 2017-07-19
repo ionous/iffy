@@ -126,17 +126,17 @@ func copyObjects(dst, src r.Value) (err error) {
 func copyPtr(src r.Value, set func(r.Value) bool) (err error) {
 	if obj, ok := src.Interface().(*RefObject); ok {
 		src := obj.rval.Addr()
-		err = upcastPtr(src, set)
+		err = Upcast(src, set)
 	} else if src.Kind() == r.Ptr {
-		err = upcastPtr(src, set)
+		err = Upcast(src, set)
 	} else {
 		err = errutil.New("unknown src", src.Type())
 	}
 	return
 }
 
-// src is a *Something
-func upcastPtr(src r.Value, set func(r.Value) bool) (err error) {
+// Upcast src is a *Something, for each version of the pointer, we call set()
+func Upcast(src r.Value, set func(r.Value) bool) (err error) {
 Upcast:
 	for !set(src) {
 		el := src.Elem()

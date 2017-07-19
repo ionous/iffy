@@ -1,8 +1,7 @@
-package std_test
+package std
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/dl/text"
 	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/pat/patspec"
@@ -22,7 +21,7 @@ import (
 //   alt: revisit builders
 // . object needs Objects for get/pointer, which ties objects to classes early;
 //   alt: get rid of pointers/object lookup.
-func xTestGroup(t *testing.T) {
+func TestGroup(t *testing.T) {
 	assert := testify.New(t)
 
 	classes := ref.NewClasses()
@@ -32,55 +31,35 @@ func xTestGroup(t *testing.T) {
 	objects := ref.NewObjects(classes)
 	unique.RegisterValues(unique.PanicValues(objects),
 		thingList...)
-	ops := ops.NewOps()
-	unique.RegisterBlocks(unique.PanicTypes(ops),
+	cmds := ops.NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil),
 		(*text.Commands)(nil),
 		(*Commands)(nil),
 		(*patspec.Commands)(nil),
 	)
-	unique.RegisterBlocks(unique.PanicTypes(ops.ShadowTypes),
+	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
 		(*Patterns)(nil),
 	)
 	//
-	patterns, e := patbuilder.NewPatternMaster(ops, classes,
-		(*Patterns)(nil)).Build(BuildPatterns)
+	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
+		(*Patterns)(nil)).Build(
+		namePatterns,
+	)
 	assert.NoError(e)
 
-	var lines printer.Lines
+	var lines printer.Span
 	run := rtm.New(classes).Objects(objects).Patterns(patterns).Writer(&lines).Rtm()
 
-	prn := &PrintNondescriptObjects{&core.Objects{nameList}}
+	os := &core.Objects{nameList}
+	// test the underlying grouping alg:
+	if grps, e := makeGroups(run, os); assert.NoError(e) {
+		assert.Empty(grps.Grouped)
+		assert.Len(grps.Ungrouped, 4)
+	}
+	// then test the actual output:
+	prn := &PrintNondescriptObjects{os}
 	if e := prn.Execute(run); assert.NoError(e) {
-		t.Log(lines.Lines())
+		assert.Equal("pen, plastic sword, thing, and thing", lines.String())
 	}
 }
-
-var thingMap = map[string]*Thing{
-	// some unnamed things
-	// this relies on the internal means of naming unnamed objects
-	"thing#1": &Thing{},
-	"thing#2": &Thing{},
-	// a named thing
-	"pen": &Thing{
-		Kind: Kind{Name: "pen"},
-	},
-	// a thing with a printed name
-	"sword": &Thing{
-		Kind: Kind{Name: "sword", PrintedName: "plastic sword"},
-	},
-}
-
-var thingList = func(src map[string]*Thing) (ret []interface{}) {
-	for _, v := range src {
-		ret = append(ret, v)
-	}
-	return
-}(thingMap)
-
-var nameList = func(src map[string]*Thing) (ret []string) {
-	for n, _ := range src {
-		ret = append(ret, n)
-	}
-	return
-}(thingMap)

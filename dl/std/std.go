@@ -5,3 +5,14 @@ type Classes struct {
 	*Room
 	*Thing
 }
+
+type Patterns struct {
+	*PrintName
+	*PrintPluralName
+	*GroupTogether
+	*PrintGroup
+}
+
+type Commands struct {
+	*PrintNondescriptObjects
+}
