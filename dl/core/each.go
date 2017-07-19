@@ -5,6 +5,10 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+type DoNothing struct{}
+
+func (DoNothing) Execute(rt.Runtime) error { return nil }
+
 type EachEndStatus int
 
 // EachCounter is a dl class used during ForEach* loops.

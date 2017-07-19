@@ -19,7 +19,7 @@ type Commands struct {
 	*CompareNum
 	*CompareText
 	*CycleText
-	// *DoNothing
+	*DoNothing
 	*EqualTo
 	// *Error
 	*ForEachNum
