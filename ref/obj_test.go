@@ -111,7 +111,16 @@ func (assert *ObjectSuite) TestStateSet() {
 				assert.True(res)
 			}
 		}
+		//
+		n.GetValue("yes", &res)
+		assert.False(res)
+		assert.NotPanics(func() {
+			n.SetValue("state", "yes")
+		})
+		n.GetValue("yes", &res)
+		assert.True(res)
 	}
+	// check, change, and check the labeled bool.
 	toggle := func(name, prop string, goal bool) {
 		if n, ok := assert.objects.GetObject(name); assert.True(ok) {
 			var res bool

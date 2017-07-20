@@ -67,6 +67,7 @@ func (enum Enumeration) InverseIndex(idx int) (ret int, err error) {
 	return
 }
 
+// -1 if not found
 func (enum Enumeration) ChoiceToIndex(choice string) (ret int) {
 	id := id.MakeId(choice)
 	return enum.choiceToIndex(id)

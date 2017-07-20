@@ -62,17 +62,14 @@ func CoerceValue(dst, src interface{}) error {
 }
 
 func coerceValue(dst, src r.Value) (err error) {
-	if dst := valueOf(dst); !dst.CanSet() {
+	// act as if dst is probably a primitive or []primitive
+	if !dst.CanSet() {
 		err = errutil.New("destination not settable")
+	} else if !src.Type().ConvertibleTo(dst.Type()) {
+		err = errutil.New("incompatible types", dst.Type(), src.Type())
 	} else {
-		src := valueOf(src)
-		// act as if dst is probably a primitive or []primitive
-		if !src.Type().ConvertibleTo(dst.Type()) {
-			err = errutil.New("incompatible types", dst.Type(), src.Type())
-		} else {
-			v := src.Convert(dst.Type())
-			dst.Set(v)
-		}
+		v := src.Convert(dst.Type())
+		dst.Set(v)
 	}
 	return
 }

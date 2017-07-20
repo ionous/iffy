@@ -80,13 +80,23 @@ func (n *RefObject) setValue(id string, v interface{}) (err error) {
 				err = p.setValue(field, idx, val)
 			}
 		}
-	} else if _, path, ok := n.cls.getProperty(id); !ok {
+	} else if p, path, ok := n.cls.getProperty(id); !ok {
 		err = errutil.New("property not found", id)
 	} else if field := n.rval.FieldByIndex(path); !field.IsValid() {
 		err = errutil.New("field not found", id)
 	} else {
 		src := r.ValueOf(v)
-		err = n.objects.coerce(field, src)
+		enumish := field.Kind() == r.Int && src.Kind() == r.String
+		if !enumish {
+			err = n.objects.coerce(field, src)
+		} else {
+			enum, choice := p.(*RefEnum), src.String()
+			if i := enum.ChoiceToIndex(choice); i < 0 {
+				err = errutil.New("set state unknown choice", choice)
+			} else {
+				err = coerceValue(field, r.ValueOf(i))
+			}
+		}
 	}
 	return
 }
