@@ -1,66 +1,59 @@
 package printer
 
 import (
-	"bytes"
 	"io"
 )
 
 // Sep implements io.Writer, treating every Write a new word.
 type Sep struct {
-	mid, last string
-	lines     []string
+	io.Writer
+	mid, last string // seperators
+	queue     string // last string sent to Write()
+	cnt       int    // number of non-zero writes to the underlying writer.
 }
 
 // AndSeparator creates a phrase: a, b, c, and d.
 // Note: spacing between words is left to printer.Span.
-func AndSeparator() *Sep {
-	return &Sep{mid: ",", last: ", and"}
+func AndSeparator(w io.Writer) *Sep {
+	return &Sep{Writer: w, mid: ",", last: ", and"}
 }
 
 // OrSeparator creates a phrase: a, b, c, or d.
 // Note: spacing between words is left to printer.Span.
-func OrSeparator() *Sep {
-	return &Sep{mid: ",", last: ", or"}
+func OrSeparator(w io.Writer) *Sep {
+	return &Sep{Writer: w, mid: ",", last: ", or"}
 }
 
-// WriteTo writes all current lines, with appropriate separators, to the passed output.
-// FIX? a slightly better interface might be to pass a writer to Sep, write a little bit -- delayed by one -- at a time, and use io.Closer to flush.
-func (l *Sep) WriteTo(w io.Writer) (ret int64, err error) {
-	if cnt := len(l.lines); cnt > 0 {
-		write := func(s string) bool {
-			r, e := io.WriteString(w, s)
-			ret += int64(r)
-			err = e
-			return err == nil
-		}
-		for i := 0; i < cnt; i++ {
-			if i != 0 {
-				var sep string
-				if more := i+1 < cnt; more {
-					sep = l.mid
-				} else {
-					sep = l.last
-				}
-				if !write(sep) {
-					break
-				}
-			}
-			if !write(l.lines[i]) {
-				break
-			}
-		}
+// Write implements io.Writer, spacing
+func (l *Sep) Write(p []byte) (ret int, err error) {
+	if len(p) > 0 {
+		s := string(p)
+		err = l.flush(l.mid)
+		l.queue = s
+		ret = len(s)
 	}
 	return
 }
 
-// Write implements io.Writer, treating every Write as a new line.
-func (l *Sep) Write(p []byte) (ret int, err error) {
-	var buf bytes.Buffer
-	if r, e := buf.Write(p); e != nil {
-		err = e
-	} else {
-		l.lines = append(l.lines, buf.String())
-		ret = r
+// Close writes all current lines, with appropriate separators, to the passed output.
+// It does not Close the wrapped stream.
+func (l *Sep) Close() (err error) {
+	return l.flush(l.last)
+}
+
+// Flush empties the queue
+func (l *Sep) flush(sep string) (err error) {
+	if len(l.queue) > 0 {
+		if l.cnt != 0 {
+			_, e := io.WriteString(l.Writer, sep)
+			err = e
+		}
+		if err == nil {
+			_, e := io.WriteString(l.Writer, l.queue)
+			err = e
+		}
+		l.queue = ""
+		l.cnt++
 	}
 	return
 }

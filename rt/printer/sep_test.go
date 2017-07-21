@@ -9,27 +9,24 @@ import (
 func TestPrintSep(t *testing.T) {
 	assert := testify.New(t)
 	//
-	if s, e := write(AndSeparator(), "pizza"); assert.NoError(e) {
+	if s, e := write(AndSeparator, "pizza"); assert.NoError(e) {
 		assert.Equal("pizza", s)
 	}
-	if s, e := write(AndSeparator(), "apple", "hedgehog", "washington", "mushroom"); assert.NoError(e) {
+	if s, e := write(AndSeparator, "apple", "hedgehog", "washington", "mushroom"); assert.NoError(e) {
 		assert.Equal("apple, hedgehog, washington, and mushroom", s)
 	}
 	//
-	if s, e := write(OrSeparator(), "pistachio"); assert.NoError(e) {
+	if s, e := write(OrSeparator, "pistachio"); assert.NoError(e) {
 		assert.Equal("pistachio", s)
 	}
-	if s, e := write(OrSeparator(), "apple", "hedgehog", "washington", "mushroom"); assert.NoError(e) {
+	if s, e := write(OrSeparator, "apple", "hedgehog", "washington", "mushroom"); assert.NoError(e) {
 		assert.Equal("apple, hedgehog, washington, or mushroom", s)
 	}
 }
 
-type sepwriter interface {
-	io.Writer
-	io.WriterTo
-}
-
-func write(w sepwriter, names ...string) (ret string, err error) {
+func write(sep func(w io.Writer) *Sep, names ...string) (ret string, err error) {
+	var buffer Span
+	w := sep(&buffer)
 	for _, n := range names {
 		if _, e := io.WriteString(w, n); e != nil {
 			err = e
@@ -37,8 +34,8 @@ func write(w sepwriter, names ...string) (ret string, err error) {
 		}
 	}
 	if err == nil {
-		var buffer Span
-		if _, e := w.WriteTo(&buffer); e != nil {
+		// normally PopWriter would call close, but we arent using the runtime here.
+		if e := w.Close(); e != nil {
 			err = e
 		} else {
 			ret = buffer.String()
