@@ -4,7 +4,9 @@ import (
 	"io"
 )
 
-func ExecuteList(run Runtime, x []Execute) (err error) {
+type ExecuteList []Execute
+
+func (x ExecuteList) Execute(run Runtime) (err error) {
 	for _, s := range x {
 		if e := s.Execute(run); e != nil {
 			err = e

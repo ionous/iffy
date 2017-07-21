@@ -87,7 +87,7 @@ func (op *Choose) Execute(run rt.Runtime) (err error) {
 		} else {
 			next = op.False
 		}
-		err = rt.ExecuteList(run, next)
+		err = rt.ExecuteList(next).Execute(run)
 	}
 	return
 }

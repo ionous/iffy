@@ -29,7 +29,7 @@ type SetObj struct {
 	Val  rt.ObjectEval
 }
 
-type ChangeState struct {
+type SetState struct {
 	Ref   rt.ObjectEval
 	State string
 }
@@ -126,22 +126,22 @@ func (p *SetObj) exec(run rt.Runtime) (ret rt.Object, err error) {
 	return
 }
 
-func (p *ChangeState) Execute(run rt.Runtime) error {
+func (p *SetState) Execute(run rt.Runtime) error {
 	_, err := p.exec(run)
 	return err
 }
 
-func (p *ChangeState) GetObject(run rt.Runtime) (rt.Object, error) {
+func (p *SetState) GetObject(run rt.Runtime) (rt.Object, error) {
 	return p.exec(run)
 }
 
-func (p *ChangeState) exec(run rt.Runtime) (ret rt.Object, err error) {
+func (p *SetState) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Ref.GetObject(run); e != nil {
-		err = errutil.New("ChangeState.Ref", e)
+		err = errutil.New("SetState.Ref", e)
 	} else if prop, ok := obj.GetClass().GetPropertyByChoice(p.State); !ok {
-		err = errutil.New("ChangeState", obj, "does not have choice", p.State)
+		err = errutil.New("SetState", obj, "does not have choice", p.State)
 	} else if e := obj.SetValue(prop.GetId(), p.State); e != nil {
-		err = errutil.New("ChangeState", e)
+		err = errutil.New("SetState", e)
 	} else {
 		ret = obj
 	}

@@ -2,7 +2,6 @@ package std
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/text"
 	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/pat/patspec"
 	"github.com/ionous/iffy/ref"
@@ -23,13 +22,13 @@ func TestStd(t *testing.T) {
 
 	objects := ref.NewObjects(classes)
 	unique.RegisterValues(unique.PanicValues(objects),
-		thingList...)
+		objectList...)
 
 	ops := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(ops),
 		(*core.Commands)(nil),
-		(*text.Commands)(nil),
 		(*patspec.Commands)(nil),
+		(*Commands)(nil),
 	)
 
 	unique.RegisterBlocks(unique.PanicTypes(ops.ShadowTypes),
@@ -49,34 +48,34 @@ func TestStd(t *testing.T) {
 		run := rtm.New(classes).Objects(objects).Patterns(patterns).Rtm()
 		//
 		t.Run("printed name", func(t *testing.T) {
-			plasticSword := thingMap["sword"]
-			match(run, testify.New(t), "plastic sword", &PrintName{&plasticSword.Kind})
+			plasticSword := objectMap["apple"].(*Thing)
+			match(run, testify.New(t), "empire apple", &PrintName{&plasticSword.Kind})
 		})
 		t.Run("named", func(t *testing.T) {
-			genericPen := thingMap["pen"]
+			genericPen := objectMap["pen"].(*Thing)
 			match(run, testify.New(t), "pen", &PrintName{&genericPen.Kind})
 		})
 		t.Run("unnamed", func(t *testing.T) {
-			unnamedThing := thingMap["thing#1"]
+			unnamedThing := objectMap["thing#1"].(*Thing)
 			match(run, testify.New(t), "thing", &PrintName{&unnamedThing.Kind})
 		})
 		//
 		t.Run("plural printed name", func(t *testing.T) {
-			plasticSword := thingMap["sword"]
-			match(run, testify.New(t), "plastic swords", &PrintPluralName{&plasticSword.Kind})
+			plasticSword := objectMap["apple"].(*Thing)
+			match(run, testify.New(t), "empire apples", &PrintPluralName{&plasticSword.Kind})
 		})
 		t.Run("plural named", func(t *testing.T) {
-			genericPen := thingMap["pen"]
+			genericPen := objectMap["pen"].(*Thing)
 			match(run, testify.New(t), "pens", &PrintPluralName{&genericPen.Kind})
 		})
 		t.Run("plural unnamed", func(t *testing.T) {
-			unnamedThing := thingMap["thing#1"]
+			unnamedThing := objectMap["thing#1"].(*Thing)
 			match(run, testify.New(t), "things", &PrintPluralName{&unnamedThing.Kind})
 		})
 		//
 		t.Run("printed plural name", func(t *testing.T) {
 			forced := "party favors"
-			plasticSword := thingMap["sword"]
+			plasticSword := objectMap["apple"].(*Thing)
 			plasticSword.PrintedPluralName = forced
 			match(run, testify.New(t), forced, &PrintPluralName{&plasticSword.Kind})
 		})

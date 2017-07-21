@@ -98,9 +98,9 @@ func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 
 func (m ExecuteMap) ExecuteMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
 	setupScope(run, data, func(id string) {
-		if ps, ok := m[id]; !ok {
-			err = NotFound(id)
-		} else {
+		// NOTE: if we need to differentiate between "ran" and "not found",
+		// "didnt run" should become an error code.
+		if ps, ok := m[id]; ok {
 			ret, err = ps.Execute(run)
 		}
 	})

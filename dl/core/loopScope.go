@@ -41,7 +41,7 @@ func (l *Looper) RunNext(name string, value interface{}, hasNext bool) (err erro
 	} else if e := l.obj.SetValue(name, value); e != nil {
 		err = e
 	} else if l.loop != nil {
-		if e := rt.ExecuteList(l.run, l.loop); e != nil {
+		if e := rt.ExecuteList(l.loop).Execute(l.run); e != nil {
 			err = errutil.New("each", name, e)
 		}
 	}

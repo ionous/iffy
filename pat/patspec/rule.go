@@ -43,7 +43,7 @@ type ObjListRule struct {
 type RunRule struct {
 	Name     string
 	If       rt.BoolEval
-	Decide   rt.Execute
+	Decide   rt.ExecuteList
 	Continue PatternTiming
 }
 

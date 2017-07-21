@@ -60,3 +60,11 @@ type Thing struct {
 	// Note: nothing on top of an "undescribed" supporter will be visible in a room description.
 
 }
+
+// Actor "not necessarily a human being, but anything animate enough to envisage having a conversation with, or bartering with."
+type Actor struct {
+	Thing
+	// Usually male not female.
+	// Usually not neuter.
+	// Can have carrying capacity (number).
+}

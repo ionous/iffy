@@ -1,4 +1,4 @@
-package text
+package std
 
 import (
 	"github.com/ionous/iffy/rt"

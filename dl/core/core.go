@@ -10,7 +10,7 @@ type Commands struct {
 	*AnyTrue
 	*Bool
 	*Buffer
-	*ChangeState
+	*SetState
 	*Choose
 	*ChooseNum
 	*ChooseObj

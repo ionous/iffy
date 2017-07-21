@@ -4,6 +4,7 @@ type Classes struct {
 	*Kind
 	*Room
 	*Thing
+	*Actor
 }
 
 type Patterns struct {
@@ -14,5 +15,13 @@ type Patterns struct {
 }
 
 type Commands struct {
+	// Runtime
 	*PrintNondescriptObjects
+	*UpperThe
+	*LowerThe
+	*UpperAn
+	*LowerAn
+	*Pluralize
+	// Pluralizer
+	*PluralRule
 }

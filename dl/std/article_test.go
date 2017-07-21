@@ -1,16 +1,16 @@
-package text_test
+package std
 
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/text"
+	"github.com/ionous/iffy/pat/patbuilder"
+	"github.com/ionous/iffy/pat/patspec"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
-	. "github.com/ionous/iffy/tests"
 	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -24,7 +24,7 @@ func TestArticles(t *testing.T) {
 type ArticleSuite struct {
 	suite.Suite
 	run   rt.Runtime
-	ops   *ops.Ops
+	cmds  *ops.Ops
 	lines printer.Lines
 }
 
@@ -37,10 +37,14 @@ func (assert *ArticleSuite) Lines() (ret []string) {
 func (assert *ArticleSuite) SetupTest() {
 	errutil.Panic = false
 	//
-	ops := ops.NewOps()
-	unique.RegisterBlocks(unique.PanicTypes(ops),
-		(*text.Commands)(nil),
+	cmds := ops.NewOps()
+
+	// FIX? i dont like that article suite depends on patterns
+	// can we provide a default print name somehow?
+	unique.RegisterBlocks(unique.PanicTypes(cmds),
+		(*Commands)(nil),
 		(*core.Commands)(nil),
+		(*patspec.Commands)(nil),
 	)
 
 	classes := ref.NewClasses()
@@ -53,14 +57,23 @@ func (assert *ArticleSuite) SetupTest() {
 		&Kind{Name: "Soldiers", IndefiniteArticle: "some"},
 		&Kind{Name: "trevor", CommonProper: ProperNamed},
 	)
+	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
+		(*Patterns)(nil),
+	)
 	//
-	assert.ops = ops
-	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).Rtm()
+	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
+		(*Patterns)(nil)).Build(
+		namePatterns,
+	)
+	assert.NoError(e)
+
+	assert.cmds = cmds
+	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).Patterns(patterns).Rtm()
 }
 
 func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {
 	var root struct{ Eval rt.Execute }
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		run(c)
 		if e := c.Build(); assert.NoError(e) {
 			if e := root.Eval.Execute(assert.run); assert.NoError(e) {

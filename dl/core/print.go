@@ -27,7 +27,7 @@ type PrintText struct {
 func (p *PrintLine) Execute(run rt.Runtime) (err error) {
 	var buf printer.Span
 	run.PushWriter(&buf)
-	err = rt.ExecuteList(run, p.Block)
+	err = rt.ExecuteList(p.Block).Execute(run)
 	run.PopWriter()
 	if err == nil {
 		_, err = run.Write(buf.Bytes())
@@ -57,8 +57,12 @@ func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 	return err
 }
 
-func (p *PrintText) Execute(run rt.Runtime) (err error) {
-	if s, e := p.Text.GetText(run); e != nil {
+func (p *PrintText) Execute(run rt.Runtime) error {
+	return Print(run, p.Text)
+}
+
+func Print(run rt.Runtime, text rt.TextEval) (err error) {
+	if s, e := text.GetText(run); e != nil {
 		err = e
 	} else {
 		_, err = io.WriteString(run, s)

@@ -13,7 +13,7 @@ type Buffer struct {
 func (buf *Buffer) GetText(run rt.Runtime) (ret string, err error) {
 	var span printer.Span
 	run.PushWriter(&span)
-	if e := rt.ExecuteList(run, buf.Buffer); e != nil {
+	if e := rt.ExecuteList(buf.Buffer).Execute(run); e != nil {
 		err = e
 	} else {
 		ret = span.String()
