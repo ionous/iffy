@@ -5,6 +5,10 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+type Len interface {
+	Len() int
+}
+
 func NewNumberStream(list []float64) rt.NumberStream {
 	return &NumberIt{list: list}
 }
@@ -60,6 +64,10 @@ type ObjectIt struct {
 	idx  int // FIX? can we just slice elements from list, and always use index 0?
 }
 
+func (it *ObjectIt) Len() int {
+	return len(it.list)
+}
+
 func (it *ObjectIt) HasNext() bool {
 	return it.idx < len(it.list)
 }
@@ -82,6 +90,10 @@ type NameIt struct {
 	run  rt.Runtime
 	list []string
 	idx  int
+}
+
+func (it *NameIt) Len() int {
+	return len(it.list)
 }
 
 func (it *NameIt) HasNext() bool {

@@ -21,6 +21,7 @@ type Patterns struct {
 type Commands struct {
 	// Runtime
 	*PrintNondescriptObjects
+	*PrintObjects
 	*UpperThe
 	*LowerThe
 	*UpperAn

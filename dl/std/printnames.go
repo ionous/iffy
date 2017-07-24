@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
+	"github.com/ionous/iffy/rt/stream"
 	r "reflect"
 )
 
@@ -21,9 +22,9 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 		var buffer printer.Span
 		run.PushWriter(printer.AndSeparator(&buffer))
 		//
-		if e := printWithArticles(run, ungrouped); e != nil {
+		if e := printWithArticles(run, stream.NewObjectStream(ungrouped)); e != nil {
 			err = e
-		} else if e := printGroups(run, groups); e != nil {
+		} else if e := groups.Print(run); e != nil {
 			err = e
 		}
 		run.PopWriter()

@@ -26,11 +26,11 @@ var Thingaverse = ObjetctMap{
 	"mildred": &Actor{
 		Thing{Kind: Kind{Name: "mildred", CommonProper: ProperNamed}},
 	},
-	"x": &ScrabbleTile{Thing{Kind: Kind{Name: "x"}}},
-	"w": &ScrabbleTile{Thing{Kind: Kind{Name: "w"}}},
-	"f": &ScrabbleTile{Thing{Kind: Kind{Name: "f"}}},
-	"y": &ScrabbleTile{Thing{Kind: Kind{Name: "y"}}},
-	"z": &ScrabbleTile{Thing{Kind: Kind{Name: "z"}}},
+	"x": &ScrabbleTile{Thing{Kind: Kind{Name: "X"}}},
+	"w": &ScrabbleTile{Thing{Kind: Kind{Name: "W"}}},
+	"f": &ScrabbleTile{Thing{Kind: Kind{Name: "F"}}},
+	"y": &ScrabbleTile{Thing{Kind: Kind{Name: "Y"}}},
+	"z": &ScrabbleTile{Thing{Kind: Kind{Name: "Z"}}},
 }
 
 type ScrabbleTile struct {

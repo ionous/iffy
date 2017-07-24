@@ -6,7 +6,7 @@ import (
 
 // GroupedObject reverses the mapping between object and group.
 type GroupedObject struct {
-	Group  *Key
+	Key    Key
 	Object rt.Object
 }
 
@@ -15,9 +15,9 @@ type GroupedObject struct {
 type GroupedObjects []GroupedObject
 
 // Distill returns a list of ungrouped objects
-func (r GroupedObjects) Distill(groups PendingGroups) (ret []rt.Object) {
+func (r GroupedObjects) Distill(groups ObjectGroups) (ret []rt.Object) {
 	for _, x := range r {
-		if x.Group == nil || len(groups[*x.Group].Objects) == 1 {
+		if groups[x.Key].Len() < 2 {
 			ret = append(ret, x.Object)
 		}
 	}

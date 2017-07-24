@@ -72,14 +72,14 @@ func (p *Get) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
 	return
 }
 
-// func (p *Get) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
-// 	var values []ident.Id
-// 	if obj, e := p.Obj.GetObject(run); e != nil {
-// 		err = e
-// 	} else if e := obj.GetValue(p.Prop, &values); e != nil {
-// 		err = e
-// 	} else {
-// 		ret = NewObjectStream(run, values)
-// 	}
-// 	return
-// }
+func (p *Get) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
+	var values []rt.Object
+	if obj, e := p.Obj.GetObject(run); e != nil {
+		err = e
+	} else if e := obj.GetValue(p.Prop, &values); e != nil {
+		err = e
+	} else {
+		ret = stream.NewObjectStream(values)
+	}
+	return
+}

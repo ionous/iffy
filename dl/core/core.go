@@ -39,6 +39,7 @@ type Commands struct {
 	// *IsState
 	// *IsText
 	// *IsValid
+	*Len
 	*LesserThan
 	*NotEqualTo
 	*Num

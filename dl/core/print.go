@@ -9,7 +9,7 @@ import (
 )
 
 type PrintLine struct {
-	Block []rt.Execute
+	Block rt.ExecuteList
 }
 
 type PrintNum struct {
@@ -27,7 +27,7 @@ type PrintText struct {
 func (p *PrintLine) Execute(run rt.Runtime) (err error) {
 	var buf printer.Span
 	run.PushWriter(&buf)
-	err = rt.ExecuteList(p.Block).Execute(run)
+	err = p.Block.Execute(run)
 	run.PopWriter()
 	if err == nil {
 		_, err = run.Write(buf.Bytes())

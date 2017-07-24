@@ -4,9 +4,9 @@ package group
 
 import "fmt"
 
-const _ObjectGrouping_name = "WithoutArticlesWithArticlesWithoutObjects"
+const _ObjectGrouping_name = "WithoutObjectsWithoutArticlesWithArticles"
 
-var _ObjectGrouping_index = [...]uint8{0, 15, 27, 41}
+var _ObjectGrouping_index = [...]uint8{0, 14, 29, 41}
 
 func (i ObjectGrouping) String() string {
 	if i < 0 || i >= ObjectGrouping(len(_ObjectGrouping_index)-1) {

@@ -3,11 +3,27 @@ package core
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 )
 
 type DoNothing struct{}
 
 func (DoNothing) Execute(rt.Runtime) error { return nil }
+
+type Len struct {
+	List rt.ObjListEval
+}
+
+func (op *Len) GetNumber(run rt.Runtime) (ret float64, err error) {
+	if os, e := op.List.GetObjectStream(run); e != nil {
+		err = e
+	} else if l, ok := os.(stream.Len); !ok {
+		err = errutil.Fmt("unknown list type %T", os)
+	} else {
+		ret = float64(l.Len())
+	}
+	return
+}
 
 type EachEndStatus int
 

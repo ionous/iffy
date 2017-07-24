@@ -9,35 +9,42 @@ type GroupList struct {
 	Objects []rt.Object
 }
 
-func (l *GroupList) Empty() bool {
-	return len(l.Objects) == 0
+func (l GroupList) Len() int {
+	return len(l.Objects)
 }
 
-func (l *GroupList) Append(obj rt.Object) {
-	l.Objects = append(l.Objects, obj)
+type ObjectGroups map[Key]GroupList
+
+type PendingGroups struct {
+	Groups  ObjectGroups
+	Objects GroupedObjects
 }
 
-type PendingGroups map[Key]GroupList
-
-func (groups PendingGroups) Add(k Key, obj rt.Object) {
-	if list := groups[k]; !list.Empty() {
-		list.Append(obj)
-		groups[k] = list
-	} else {
-		groups[k] = GroupList{
-			len(groups),
-			[]rt.Object{obj},
+func (p *PendingGroups) Add(key Key, obj rt.Object) {
+	// add all objects to the list
+	p.Objects = append(p.Objects, GroupedObject{key, obj})
+	// but only valid groups to the map
+	if key.IsValid() {
+		if list, ok := p.Groups[key]; ok {
+			list.Objects = append(list.Objects, obj)
+			p.Groups[key] = list
+		} else {
+			order := len(p.Groups)
+			p.Groups[key] = GroupList{
+				order,
+				[]rt.Object{obj},
+			}
 		}
 	}
 }
 
-func (groups PendingGroups) Sort() []Collection {
-	// we need to walk groups in some consistent order.
-	sorted := make([]Collection, len(groups))
-	for k, list := range groups {
-		if i, objs := list.Order, list.Objects; len(objs) > 1 {
-			sorted[i] = Collection{k, objs}
+func (p *PendingGroups) Sort() (Collections, []rt.Object) {
+	// we need to walk p in some consistent order.
+	sorted := make(Collections, len(p.Groups))
+	for key, list := range p.Groups {
+		if i, objs := list.Order, list.Objects; list.Len() > 1 {
+			sorted[i] = Collection{key, objs}
 		}
 	}
-	return sorted
+	return sorted, p.Objects.Distill(p.Groups)
 }

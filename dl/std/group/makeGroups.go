@@ -6,12 +6,11 @@ import (
 
 // MakeGroups breaks the passed stream of objects into separated units.
 // Note: not all returned groups will have objects.
-func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups []Collection, ungrouped []rt.Object, err error) {
+func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups Collections, ungrouped []rt.Object, err error) {
 	if os, e := ol.GetObjectStream(run); e != nil {
 		err = e
 	} else {
-		var ungroup GroupedObjects
-		pending := make(PendingGroups)
+		pending := PendingGroups{make(ObjectGroups), nil}
 		//
 		for os.HasNext() {
 			if obj, e := os.GetNext(); e != nil {
@@ -23,23 +22,18 @@ func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups []Collection, ungroup
 				if grouped, e := run.Emplace(&group); e != nil {
 					err = e
 					break
-				} else if ran, e := run.ExecuteMatching(grouped); e != nil {
+				} else if _, e := run.ExecuteMatching(grouped); e != nil {
 					err = e
 					break
 				} else {
-					var key *Key
-					if ran {
-						k := Key{group.Label, group.Innumerable, group.ObjectGrouping}
-						pending.Add(k, obj)
-						key = &k
-					}
-					ungroup = append(ungroup, GroupedObject{key, obj})
+					// if nothing was set, then the key is invalid, and the object is considered ungrouped.
+					key := Key{group.Label, group.Innumerable, group.ObjectGrouping}
+					pending.Add(key, obj)
 				}
 			}
 		}
 		if err == nil {
-			groups = pending.Sort()
-			ungrouped = ungroup.Distill(pending)
+			groups, ungrouped = pending.Sort()
 		}
 	}
 	return

@@ -6,8 +6,8 @@ import (
 
 type Choose struct {
 	If    rt.BoolEval
-	True  []rt.Execute
-	False []rt.Execute
+	True  rt.ExecuteList
+	False rt.ExecuteList
 }
 
 type ChooseNum struct {
@@ -81,13 +81,13 @@ func (op *Choose) Execute(run rt.Runtime) (err error) {
 	if b, e := op.If.GetBool(run); e != nil {
 		err = e
 	} else {
-		var next []rt.Execute
+		var next rt.ExecuteList
 		if b {
 			next = op.True
 		} else {
 			next = op.False
 		}
-		err = rt.ExecuteList(next).Execute(run)
+		err = next.Execute(run)
 	}
 	return
 }
