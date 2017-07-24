@@ -23,14 +23,16 @@ type PatternFactory interface {
 
 type Commands struct {
 	*BoolRule
+	*ContinueAfter
+	*ContinueBefore
+	*Determine
 	*NumberRule
-	*TextRule
-	*ObjectRule
 	*NumListRule
-	*TextListRule
+	*ObjectRule
 	*ObjListRule
 	*RunRule
-	*Determine
+	*TextListRule
+	*TextRule
 }
 
 type PatternSpecs []MakePattern
