@@ -97,6 +97,8 @@ func (c *Config) Rtm() *Rtm {
 	}
 	if c.patterns != nil {
 		rtm.Thunk = Thunk{rtm, c.patterns.Build()}
+	} else {
+		rtm.Thunk.run = rtm
 	}
 	//
 	seed := c.seed
