@@ -29,9 +29,10 @@ type Commands struct {
 	// *GoCall
 	*GreaterThan
 	// *Inc
-	*IsEmpty
-	// *IsFromClass
 	*Includes
+	*IsEmpty
+	*IsSameClass
+	*IsSimilarClass
 	*IsNot
 	// *IsNum
 	// *IsObj

@@ -2,60 +2,51 @@ package std
 
 import (
 	"github.com/divan/num2words"
+	"github.com/ionous/iffy/dl/std/group"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"io"
 )
 
-// sort the groups
-type Sorted struct {
-	*Group
-	objs []rt.Object
-}
+func printGroups(run rt.Runtime, groups []group.Collection) (err error) {
+	for _, g := range groups {
+		if len(g.Objects) > 0 {
+			var buffer printer.Span
+			run.PushWriter(printer.AndSeparator(&buffer))
 
-func printGroups(run rt.Runtime, groups map[Group]ObjectList) (err error) {
-	sorted := make([]Sorted, len(groups))
-	for group, list := range groups {
-		s := &(sorted[list.Order])
-		s.Group = &group
-		s.objs = list.Objects
-	}
-	// print each group
-	for _, g := range sorted {
-		var buffer printer.Span
-		run.PushWriter(printer.AndSeparator(&buffer))
-
-		if printGroupPattern, e := run.Emplace(&PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.objs}); e != nil {
-			err = e
-			break
-		} else {
-			if ran, e := run.ExecuteMatching(printGroupPattern); e != nil {
+			if printGroupPattern, e := run.Emplace(&group.PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.Objects}); e != nil {
 				err = e
 				break
-			} else if !ran {
-				if e := defaultPrintGroup(run, g); e != nil {
+			} else {
+				if ran, e := run.ExecuteMatching(printGroupPattern); e != nil {
 					err = e
 					break
+				} else if !ran {
+					if e := defaultPrintGroup(run, g); e != nil {
+						err = e
+						break
+					}
 				}
 			}
-		}
 
-		run.PopWriter()
-		// flush the group memebers to the output as a single unit
-		if _, e := run.Write(buffer.Bytes()); e != nil {
-			err = e
-			break
+			run.PopWriter()
+			// flush the group memebers to the output as a single unit
+			if _, e := run.Write(buffer.Bytes()); e != nil {
+				err = e
+				break
+			}
 		}
 	}
 	return
 }
 
-func defaultPrintGroup(run rt.Runtime, g Sorted) (err error) {
+// FIX? move into a pattern
+func defaultPrintGroup(run rt.Runtime, g group.Collection) (err error) {
 	var buffer printer.Span
 	run.PushWriter(&buffer)
 	//
 	if len(g.Label) > 0 {
-		n := len(g.objs)
+		n := len(g.Objects)
 		//
 		if !g.Innumerable {
 			if s := num2words.Convert(int(n)); len(s) > 0 {
@@ -69,14 +60,14 @@ func defaultPrintGroup(run rt.Runtime, g Sorted) (err error) {
 		io.WriteString(&buffer, l)
 	}
 	//
-	if g.ObjectGrouping != GroupWithoutObjects {
+	if g.ObjectGrouping != group.WithoutObjects {
 		bracket := printer.Bracket{Writer: &buffer}
 		run.PushWriter(&bracket)
 		//
-		if g.ObjectGrouping == GroupWithArticles {
-			err = printWithArticles(run, g.objs)
+		if g.ObjectGrouping == group.WithArticles {
+			err = printWithArticles(run, g.Objects)
 		} else {
-			err = printWithoutArticles(run, g.objs)
+			err = printWithoutArticles(run, g.Objects)
 		}
 		run.PopWriter()
 	}
@@ -86,6 +77,7 @@ func defaultPrintGroup(run rt.Runtime, g Sorted) (err error) {
 	return e
 }
 
+// FIX? move into a pattern
 func printWithArticles(run rt.Runtime, objs []rt.Object) (err error) {
 	for _, obj := range objs {
 		if text, e := articleName(run, "", obj); e != nil {
@@ -99,6 +91,7 @@ func printWithArticles(run rt.Runtime, objs []rt.Object) (err error) {
 	return
 }
 
+// FIX? move into a pattern
 func printWithoutArticles(run rt.Runtime, objs []rt.Object) (err error) {
 	for _, obj := range objs {
 		if e := printName(run, obj); e != nil {

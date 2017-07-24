@@ -7,28 +7,29 @@ import (
 // Sep implements io.Writer, treating every Write a new word.
 type Sep struct {
 	io.Writer
-	mid, last string // seperators
-	queue     string // last string sent to Write()
-	cnt       int    // number of non-zero writes to the underlying writer.
+	last  string // seperators
+	queue string // last string sent to Write()
+	cnt   int    // number of non-zero writes to the underlying writer.
 }
 
 // AndSeparator creates a phrase: a, b, c, and d.
 // Note: spacing between words is left to printer.Span.
 func AndSeparator(w io.Writer) *Sep {
-	return &Sep{Writer: w, mid: ",", last: ", and"}
+	return &Sep{Writer: w, last: "and"}
 }
 
 // OrSeparator creates a phrase: a, b, c, or d.
 // Note: spacing between words is left to printer.Span.
 func OrSeparator(w io.Writer) *Sep {
-	return &Sep{Writer: w, mid: ",", last: ", or"}
+	return &Sep{Writer: w, last: "or"}
 }
 
 // Write implements io.Writer, spacing
 func (l *Sep) Write(p []byte) (ret int, err error) {
+	const mid = ","
 	if len(p) > 0 {
 		s := string(p)
-		err = l.flush(l.mid)
+		err = l.flush(mid)
 		l.queue = s
 		ret = len(s)
 	}
@@ -37,8 +38,14 @@ func (l *Sep) Write(p []byte) (ret int, err error) {
 
 // Close writes all current lines, with appropriate separators, to the passed output.
 // It does not Close the wrapped stream.
-func (l *Sep) Close() (err error) {
-	return l.flush(l.last)
+func (l *Sep) Close() error {
+	var fini string
+	if l.cnt > 2 {
+		fini = ", " + l.last
+	} else {
+		fini = l.last
+	}
+	return l.flush(fini)
 }
 
 // Flush empties the queue

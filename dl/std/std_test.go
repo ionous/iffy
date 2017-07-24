@@ -22,7 +22,7 @@ func TestStd(t *testing.T) {
 
 	objects := ref.NewObjects(classes)
 	unique.RegisterValues(unique.PanicValues(objects),
-		objectList...)
+		Thingaverse.objects(sliceOf.String("apple", "pen", "thing#1", "thing#2"))...)
 
 	ops := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(ops),
@@ -48,41 +48,39 @@ func TestStd(t *testing.T) {
 		run := rtm.New(classes).Objects(objects).Patterns(patterns).Rtm()
 		//
 		t.Run("printed name", func(t *testing.T) {
-			plasticSword := objectMap["apple"].(*Thing)
-			match(run, testify.New(t), "empire apple", &PrintName{&plasticSword.Kind})
+			apple := Thingaverse["apple"].(*Thing)
+			match(run, testify.New(t), "empire apple", &PrintName{&apple.Kind})
 		})
 		t.Run("named", func(t *testing.T) {
-			genericPen := objectMap["pen"].(*Thing)
+			genericPen := Thingaverse["pen"].(*Thing)
 			match(run, testify.New(t), "pen", &PrintName{&genericPen.Kind})
 		})
 		t.Run("unnamed", func(t *testing.T) {
-			unnamedThing := objectMap["thing#1"].(*Thing)
+			unnamedThing := Thingaverse["thing#1"].(*Thing)
 			match(run, testify.New(t), "thing", &PrintName{&unnamedThing.Kind})
 		})
 		//
 		t.Run("plural printed name", func(t *testing.T) {
-			plasticSword := objectMap["apple"].(*Thing)
-			match(run, testify.New(t), "empire apples", &PrintPluralName{&plasticSword.Kind})
+			apple := Thingaverse["apple"].(*Thing)
+			match(run, testify.New(t), "empire apples", &PrintPluralName{&apple.Kind})
 		})
 		t.Run("plural named", func(t *testing.T) {
-			genericPen := objectMap["pen"].(*Thing)
+			genericPen := Thingaverse["pen"].(*Thing)
 			match(run, testify.New(t), "pens", &PrintPluralName{&genericPen.Kind})
 		})
 		t.Run("plural unnamed", func(t *testing.T) {
-			unnamedThing := objectMap["thing#1"].(*Thing)
+			unnamedThing := Thingaverse["thing#1"].(*Thing)
 			match(run, testify.New(t), "things", &PrintPluralName{&unnamedThing.Kind})
 		})
 		//
 		t.Run("printed plural name", func(t *testing.T) {
 			forced := "party favors"
-			plasticSword := objectMap["apple"].(*Thing)
-			plasticSword.PrintedPluralName = forced
-			match(run, testify.New(t), forced, &PrintPluralName{&plasticSword.Kind})
+			apple := Thingaverse["apple"].(*Thing)
+			apple.PrintedPluralName = forced
+			match(run, testify.New(t), forced, &PrintPluralName{&apple.Kind})
 		})
 		//
 	})
-	// <tear-down code>
-
 }
 
 func match(run rt.Runtime, assert *testify.Assertions, match string, op interface{}) (okay bool) {

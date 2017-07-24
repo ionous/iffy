@@ -2,28 +2,12 @@ package std
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/std/group"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	r "reflect"
 )
-
-// PrintName executes a pattern to print the target's name.
-// The standard rules print the "printed name" property of the target,
-// or the object name ( if the target lacks a "printed name" ),
-// or the object's class name ( for unnamed objects. )
-// A "printed name" can change during the course of play; object names never change.
-type PrintName struct {
-	Target *Kind
-}
-
-// PrintPluralName executes a pattern to print the plural of the target's name.
-// The standard rules print the target's "printed plural name",
-// or, if the target lacks that property, the plural of the "print name" pattern.
-// It uses the runtime's pluralization table, or if needed, automated pluralization.
-type PrintPluralName struct {
-	Target *Kind
-}
 
 // PrintNondescriptObjects commands the runtime to print a bunch of objects, in groups if possible.
 type PrintNondescriptObjects struct {
@@ -31,15 +15,15 @@ type PrintNondescriptObjects struct {
 }
 
 func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
-	if groups, e := MakeGroups(run, p.Objects); e != nil {
+	if groups, ungrouped, e := group.MakeGroups(run, p.Objects); e != nil {
 		err = e
 	} else {
 		var buffer printer.Span
 		run.PushWriter(printer.AndSeparator(&buffer))
 		//
-		if e := printWithArticles(run, groups.Ungrouped); e != nil {
+		if e := printWithArticles(run, ungrouped); e != nil {
 			err = e
-		} else if e := printGroups(run, groups.Grouped); e != nil {
+		} else if e := printGroups(run, groups); e != nil {
 			err = e
 		}
 		run.PopWriter()

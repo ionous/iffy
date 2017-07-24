@@ -1,10 +1,15 @@
 package std
 
-import (
-	"sort"
-)
+type ObjetctMap map[string]interface{}
 
-var objectMap = map[string]interface{}{
+func (om ObjetctMap) objects(names []string) (ret []interface{}) {
+	for _, n := range names {
+		ret = append(ret, om[n])
+	}
+	return
+}
+
+var Thingaverse = ObjetctMap{
 	// some unnamed things
 	// this relies on the internal means of naming unnamed objects
 	"thing#1": &Thing{},
@@ -21,19 +26,13 @@ var objectMap = map[string]interface{}{
 	"mildred": &Actor{
 		Thing{Kind: Kind{Name: "mildred", CommonProper: ProperNamed}},
 	},
+	"x": &ScrabbleTile{Thing{Kind: Kind{Name: "x"}}},
+	"w": &ScrabbleTile{Thing{Kind: Kind{Name: "w"}}},
+	"f": &ScrabbleTile{Thing{Kind: Kind{Name: "f"}}},
+	"y": &ScrabbleTile{Thing{Kind: Kind{Name: "y"}}},
+	"z": &ScrabbleTile{Thing{Kind: Kind{Name: "z"}}},
 }
 
-var objectList = func(src map[string]interface{}) (ret []interface{}) {
-	for _, v := range src {
-		ret = append(ret, v)
-	}
-	return
-}(objectMap)
-
-var nameList = func(src map[string]interface{}) (ret []string) {
-	for n, _ := range src {
-		ret = append(ret, n)
-	}
-	sort.Strings(ret)
-	return
-}(objectMap)
+type ScrabbleTile struct {
+	Thing
+}

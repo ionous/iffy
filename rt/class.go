@@ -18,6 +18,7 @@ type Class interface {
 	GetProperty(string) (Property, bool)
 	// GetPropertyByChoice evaluates all properties to find an enumeration which can store the passed choice
 	GetPropertyByChoice(string) (Property, bool)
-	// IsCompatible checks whether this Class is a child of the passed named parent.
+	// IsCompatible checks whether this class can be used as the named class.
+	// ie. this is the named class, or a descendant of it.
 	IsCompatible(string) bool
 }

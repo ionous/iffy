@@ -75,7 +75,7 @@ func groupPatterns(c *ops.Builder) {
 		c.Param("if").Cmd("includes", c.Cmd("get", c.Cmd("get", "@", "target"), "name"), "#")
 		if c.Param("decide").Cmds().Begin() {
 			c.Cmd("set text", "@", "label", c.Cmd("class name", c.Cmd("get", "@", "target")))
-			c.Cmd("set state", "@", "group without objects")
+			c.Cmd("set bool", "@", "without objects", true)
 			c.End()
 		}
 		c.End()

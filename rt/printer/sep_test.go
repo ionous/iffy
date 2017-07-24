@@ -15,12 +15,18 @@ func TestPrintSep(t *testing.T) {
 	if s, e := write(AndSeparator, "apple", "hedgehog", "washington", "mushroom"); assert.NoError(e) {
 		assert.Equal("apple, hedgehog, washington, and mushroom", s)
 	}
+	if s, e := write(AndSeparator, "apple", "hedgehog"); assert.NoError(e) {
+		assert.Equal("apple and hedgehog", s, "serial comma only after two items")
+	}
 	//
 	if s, e := write(OrSeparator, "pistachio"); assert.NoError(e) {
 		assert.Equal("pistachio", s)
 	}
 	if s, e := write(OrSeparator, "apple", "hedgehog", "washington", "mushroom"); assert.NoError(e) {
 		assert.Equal("apple, hedgehog, washington, or mushroom", s)
+	}
+	if s, e := write(OrSeparator, "washington", "mushroom"); assert.NoError(e) {
+		assert.Equal("washington or mushroom", s, "serial comma only after two items")
 	}
 }
 
