@@ -89,10 +89,13 @@ func copyObjects(dst, src r.Value) (err error) {
 		err = errutil.New("dst is not a slice")
 	} else if src.Kind() != r.Slice {
 		err = errutil.New("src is not a slice")
+	} else if dst.Type() == src.Type() {
+		// example: []rt.Object to []rt.Object
+		err = coerceValue(dst, src)
 	} else {
 		slice, elType := dst, dst.Type().Elem()
 		if elType.Kind() != r.Ptr {
-			err = errutil.New("unknown dst", dst.Type().Name(), "for slice", src.Type())
+			err = errutil.New("unknown dst", dst.Type(), "for slice", src.Type())
 		} else {
 			// assume user is asking for []*Something
 			for i := 0; i < src.Len(); i++ {
