@@ -90,7 +90,7 @@ func (assert *PatternSuite) TestFactorial() {
 			if factPattern := numberPatterns[id.MakeId("factorial")]; assert.Len(factPattern, 2) {
 				//
 				if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
-					if n, e := run.GetNumMatching(fact); assert.NoError(e) {
+					if n, e := run.GetNumMatching(run, fact); assert.NoError(e) {
 						fac := 3 * (2 * (1 * 1))
 						assert.EqualValues(fac, n)
 					}

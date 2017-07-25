@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-type PrintLine struct {
+type PrintSpan struct {
 	Block rt.ExecuteList
 }
 
@@ -24,13 +24,12 @@ type PrintText struct {
 	Text rt.TextEval
 }
 
-func (p *PrintLine) Execute(run rt.Runtime) (err error) {
-	var buf printer.Span
-	run.PushWriter(&buf)
-	err = p.Block.Execute(run)
-	run.PopWriter()
-	if err == nil {
-		_, err = run.Write(buf.Bytes())
+func (p *PrintSpan) Execute(run rt.Runtime) (err error) {
+	span := printer.Spanner{Writer: run}
+	if e := p.Block.Execute(rt.Writer(run, &span)); e != nil {
+		err = e
+	} else {
+		err = span.Flush()
 	}
 	return
 }

@@ -1,12 +1,12 @@
 package rt
 
 type Patterns interface {
-	GetBoolMatching(Object) (bool, error)
-	GetNumMatching(Object) (float64, error)
-	GetTextMatching(Object) (string, error)
-	GetObjectMatching(Object) (Object, error)
-	GetNumStreamMatching(Object) (NumberStream, error)
-	GetTextStreamMatching(Object) (TextStream, error)
-	GetObjStreamMatching(Object) (ObjectStream, error)
-	ExecuteMatching(Object) (bool, error)
+	GetBoolMatching(Runtime, Object) (bool, error)
+	GetNumMatching(Runtime, Object) (float64, error)
+	GetTextMatching(Runtime, Object) (string, error)
+	GetObjectMatching(Runtime, Object) (Object, error)
+	GetNumStreamMatching(Runtime, Object) (NumberStream, error)
+	GetTextStreamMatching(Runtime, Object) (TextStream, error)
+	GetObjStreamMatching(Runtime, Object) (ObjectStream, error)
+	ExecuteMatching(Runtime, Object) error
 }

@@ -85,10 +85,9 @@ func TestStd(t *testing.T) {
 
 func match(run rt.Runtime, assert *testify.Assertions, match string, op interface{}) (okay bool) {
 	var lines printer.Lines
-	run.PushWriter(&lines)
-	defer run.PopWriter()
+	run = rt.Writer(run, &lines)
 	if patdata, e := run.Emplace(op); assert.NoError(e) {
-		if _, e := run.ExecuteMatching(patdata); assert.NoError(e) {
+		if e := run.ExecuteMatching(run, patdata); assert.NoError(e) {
 			okay = assert.EqualValues(sliceOf.String(match), lines.Lines())
 		}
 	}

@@ -49,7 +49,7 @@ type Commands struct {
 	// *ObjListContains
 	// *ObjListIsEmpty
 	// *Object
-	*PrintLine
+	*PrintSpan
 	*PrintNum
 	*PrintNumWord
 	*PrintText

@@ -4,6 +4,7 @@ import (
 	"io"
 )
 
+// ExecuteList runs a block of statements.
 type ExecuteList []Execute
 
 func (x ExecuteList) Execute(run Runtime) (err error) {
@@ -31,9 +32,16 @@ func SetValues(obj Object, values Values) (err error) {
 	return
 }
 
-func Write(run Runtime, w io.Writer, cb func() error) error {
-	run.PushWriter(w)
-	e := cb()
-	run.PopWriter()
-	return e
+// Writer returns a new runtime that uses the passed writer for its output.
+func Writer(run Runtime, w io.Writer) Runtime {
+	return _Writer{run, w}
+}
+
+type _Writer struct {
+	Runtime
+	Writer io.Writer
+}
+
+func (l _Writer) Write(p []byte) (int, error) {
+	return l.Writer.Write(p)
 }

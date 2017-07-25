@@ -19,28 +19,20 @@ func (op *PrintObjects) Execute(run rt.Runtime) (err error) {
 	} else if brackets, e := op.Brackets.GetBool(run); e != nil {
 		err = e
 	} else {
-		var buffer printer.Span
 		if brackets {
-			bracket := printer.Bracket{Writer: &buffer}
-			run.PushWriter(&bracket)
+			bracket := printer.Bracket{Writer: run}
+			run = rt.Writer(run, &bracket)
+			defer bracket.Flush()
 		}
 		// keep and separator outside of print so print could run by line as well.
-		{
-			var buffer printer.Span
-			run.PushWriter(printer.AndSeparator(&buffer))
-
-			if articles {
-				err = printWithArticles(run, objs)
-			} else {
-				err = printWithoutArticles(run, objs)
-			}
-
-			run.PopWriter()
-			run.Write(buffer.Bytes())
-		}
-		if brackets {
-			run.PopWriter()
-			run.Write(buffer.Bytes())
+		sep := printer.AndSeparator(run)
+		run = rt.Writer(run, sep)
+		defer sep.Flush()
+		//
+		if articles {
+			err = printWithArticles(run, objs)
+		} else {
+			err = printWithoutArticles(run, objs)
 		}
 	}
 	return

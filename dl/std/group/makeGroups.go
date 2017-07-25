@@ -22,7 +22,7 @@ func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups Collections, ungroupe
 				if grouped, e := run.Emplace(&group); e != nil {
 					err = e
 					break
-				} else if _, e := run.ExecuteMatching(grouped); e != nil {
+				} else if e := run.ExecuteMatching(run, grouped); e != nil {
 					err = e
 					break
 				} else {

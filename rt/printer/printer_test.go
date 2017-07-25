@@ -13,7 +13,7 @@ func TestBracket(t *testing.T) {
 	w := &Bracket{Writer: &buffer}
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
-	w.Close()
+	w.Flush()
 	assert.Equal("( hello you )", buffer.String())
 }
 

@@ -41,7 +41,7 @@ func (d *Dispatch) Go(run rt.Runtime, act *Action, target, data rt.Object) (err 
 				} else if !evt.PreventDefault {
 					evt.Phase = AfterPhase
 					// FIX: set hint to target class
-					if e := rt.ExecuteList(act.DefaultActions).Execute(run); e != nil {
+					if e := act.DefaultActions.Execute(run); e != nil {
 						err = e
 					} else {
 						err = ac.Flush()

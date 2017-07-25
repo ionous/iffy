@@ -150,7 +150,7 @@ func (ps ObjListPatterns) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, 
 }
 
 func (ps ExecutePatterns) Execute(run rt.Runtime) (ret bool, err error) {
-	var post []rt.Execute // a stack
+	var post rt.ExecuteList // a stack
 	var matches int
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]

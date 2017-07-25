@@ -50,14 +50,14 @@ type TextCounter struct {
 // If the list is empty, it executes an alternative block of statements.
 type ForEachNum struct {
 	In       rt.NumListEval
-	Go, Else []rt.Execute
+	Go, Else rt.ExecuteList
 }
 
 func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 	if it, e := f.In.GetNumberStream(run); e != nil {
 		err = e
 	} else if !it.HasNext() {
-		if e := rt.ExecuteList(f.Else).Execute(run); e != nil {
+		if e := f.Else.Execute(run); e != nil {
 			err = errutil.New("failed each num else", e)
 		}
 	} else if l, e := NewLooper(run, "NumberCounter", f.Go); e != nil {
@@ -82,14 +82,14 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 // If the list is empty, it executes an alternative block of statements.
 type ForEachText struct {
 	In       rt.TextListEval
-	Go, Else []rt.Execute
+	Go, Else rt.ExecuteList
 }
 
 func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	if it, e := f.In.GetTextStream(run); e != nil {
 		err = e
 	} else if !it.HasNext() {
-		if e := rt.ExecuteList(f.Else).Execute(run); e != nil {
+		if e := f.Else.Execute(run); e != nil {
 			err = errutil.New("failed each num else", e)
 		}
 	} else if l, e := NewLooper(run, "TextCounter", f.Go); e != nil {

@@ -15,16 +15,16 @@ type Rtm struct {
 	*ref.Objects
 	*ref.Relations
 	ScopeStack
-	printer.Stack
+	io.Writer
 	Randomizer
 	Ancestors
-	Thunk
+	pat.Patterns
 	Plurals
 }
 
 // GetPatterns mainly for testing.
 func (rtm *Rtm) GetPatterns() *pat.Patterns {
-	return &rtm.Thunk.Patterns
+	return &rtm.Patterns
 }
 
 type Config struct {
@@ -89,16 +89,22 @@ func (c *Config) Rtm() *Rtm {
 			c.rel.Build(objects)
 		}
 	}
+	var w io.Writer
+	if cw := c.writer; cw != nil {
+		w = cw
+	} else {
+		var cw printer.Lines
+		w = &cw
+	}
 	rtm := &Rtm{
 		ClassMap:  c.classes,
 		Objects:   objects,
 		Relations: rel,
 		Ancestors: a,
+		Writer:    w,
 	}
 	if c.patterns != nil {
-		rtm.Thunk = Thunk{rtm, c.patterns.Build()}
-	} else {
-		rtm.Thunk.run = rtm
+		rtm.Patterns = c.patterns.Build()
 	}
 	//
 	seed := c.seed
@@ -107,9 +113,7 @@ func (c *Config) Rtm() *Rtm {
 	}
 	rtm.PushScope(scope.ModelFinder(rtm))
 	rtm.Randomizer.Reset(seed) // FIX: time?
-	if w := c.writer; w != nil {
-		rtm.PushWriter(w)
-	}
+
 	return rtm
 }
 

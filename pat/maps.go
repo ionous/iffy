@@ -96,12 +96,12 @@ func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 	return
 }
 
-func (m ExecuteMap) ExecuteMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
+func (m ExecuteMap) ExecuteMatching(run rt.Runtime, data rt.Object) (err error) {
 	setupScope(run, data, func(id string) {
 		// NOTE: if we need to differentiate between "ran" and "not found",
 		// "didnt run" should become an error code.
 		if ps, ok := m[id]; ok {
-			ret, err = ps.Execute(run)
+			_, err = ps.Execute(run)
 		}
 	})
 	return

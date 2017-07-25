@@ -124,9 +124,10 @@ func articleName(run rt.Runtime, article string, obj rt.Object) (ret string, err
 // FIX? i think filters would be better -- especically in printWithArticles -- but this matches existing code.
 func getName(run rt.Runtime, obj rt.Object) (ret string, err error) {
 	var buffer printer.Span
-	run.PushWriter(&buffer)
-	err = printName(run, obj)
-	run.PopWriter()
-	ret = buffer.String()
+	if e := printName(rt.Writer(run, &buffer), obj); e != nil {
+		err = e
+	} else {
+		ret = buffer.String()
+	}
 	return
 }

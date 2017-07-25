@@ -11,5 +11,5 @@ type Action struct {
 	Name           string
 	TargetClass    rt.Class
 	DataClass      rt.Class
-	DefaultActions []rt.Execute
+	DefaultActions rt.ExecuteList
 }

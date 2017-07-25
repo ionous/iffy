@@ -57,32 +57,42 @@ func TestGrouping(t *testing.T) {
 	// Before listing contents: group Scrabble pieces together.
 	// Before grouping together Scrabble pieces, say "the tiles ".
 	// After grouping together Scrabble pieces, say " from a Scrabble set".
-	// t.Run("fancy grouping", func(t *testing.T) {
-	// 	groupTest(t,
-	// 		"Mildred, and the tiles X, W, F, Y and Z from a Scrabble set",
-	// 		sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-	// 		printPatterns, group.GroupPatterns, func(c *ops.Builder) {
-	// 			if c.Cmd("run rule", "group together").Begin() {
-	// 				c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
-	// 				if c.Param("decide").Cmds().Begin() {
-	// 					c.Cmd("set text", "@", "label", "the tiles")
-	// 					c.Cmd("set bool", "@", "innumerable", true)
-	// 					c.Cmd("set bool", "@", "without articles", true)
-	// 					c.End()
-	// 				}
-	// 				c.End()
-	// 			}
-	// 			if c.Cmd("run rule", "print group").Begin() {
-	// 				c.Param("if").Cmd("compare text", c.Cmd("get", "@", "label"), c.Cmd("equal to"), "the tiles")
-	// 				c.Param("continue").Cmd("continue before")
-	// 				if c.Param("decide").Cmds().Begin() {
-	// 					c.Cmd("print text", "from a Scrabble set")
-	// 					c.End()
-	// 				}
-	// 				c.End()
-	// 			}
-	// 		})
-	// })
+	t.Run("fancy", func(t *testing.T) {
+		fancy := func(c *ops.Builder) {
+			if c.Cmd("run rule", "group together").Begin() {
+				c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
+				if c.Param("decide").Cmds().Begin() {
+					c.Cmd("set text", "@", "label", "the tiles")
+					c.Cmd("set bool", "@", "innumerable", true)
+					c.Cmd("set bool", "@", "without articles", true)
+					c.End()
+				}
+				c.End()
+			}
+			if c.Cmd("run rule", "print group").Begin() {
+				c.Param("if").Cmd("compare text", c.Cmd("get", "@", "label"), c.Cmd("equal to"), "the tiles")
+				c.Param("continue").Cmd("continue before")
+				if c.Param("decide").Cmds().Begin() {
+					c.Cmd("print text", "from a Scrabble set")
+					c.End()
+				}
+				c.End()
+			}
+		}
+		t.Run("tiles", func(t *testing.T) {
+			groupTest(t,
+				"the tiles X, W, F, Y, and Z from a Scrabble set",
+				sliceOf.String("x", "w", "f", "y", "z"),
+				printPatterns, group.GroupPatterns, fancy)
+		})
+		t.Run("more", func(t *testing.T) {
+			groupTest(t,
+				"Mildred and the tiles X, W, F, Y, and Z from a Scrabble set",
+				sliceOf.String("mildred", "x", "w", "f", "y", "z"),
+				printPatterns, group.GroupPatterns, fancy)
+		})
+	})
+
 	// //group utensils together as "text".
 	// t.Run("parenthetical", func(t *testing.T) {
 	// 	groupTest(t, "Mildred, and five scrabble tiles ( X, W, F, Y and Z )",

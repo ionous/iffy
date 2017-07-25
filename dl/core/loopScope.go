@@ -10,10 +10,10 @@ import (
 type Looper struct {
 	run  rt.Runtime
 	obj  rt.Object
-	loop []rt.Execute
+	loop rt.ExecuteList
 }
 
-func NewLooper(run rt.Runtime, cls string, loop []rt.Execute) (ret *Looper, err error) {
+func NewLooper(run rt.Runtime, cls string, loop rt.ExecuteList) (ret *Looper, err error) {
 	if temp, e := run.NewObject(cls); e != nil {
 		err = e
 	} else {
@@ -41,7 +41,7 @@ func (l *Looper) RunNext(name string, value interface{}, hasNext bool) (err erro
 	} else if e := l.obj.SetValue(name, value); e != nil {
 		err = e
 	} else if l.loop != nil {
-		if e := rt.ExecuteList(l.loop).Execute(l.run); e != nil {
+		if e := l.loop.Execute(l.run); e != nil {
 			err = errutil.New("each", name, e)
 		}
 	}

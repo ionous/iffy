@@ -62,7 +62,7 @@ func TestSomething(t *testing.T) {
 
 	// default action:
 	actions.On("jump", func(c *ops.Builder) {
-		if c.Cmd("print line").Begin() {
+		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				// FIX: to print names need to include articles
 				// probably want a simple named object in core.

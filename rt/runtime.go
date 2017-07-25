@@ -29,10 +29,6 @@ type Runtime interface {
 	Model
 	// Writer writes standard output.
 	io.Writer
-	// PushWriter to set the active writer.
-	PushWriter(io.Writer)
-	// PopWriter to restore the writer active before the most recent PushWriter.
-	PopWriter()
 	// Random picks a pseudo-random value from a range. Can return any number including the lower bound, and up-to, but not including, the upper bound.
 	Random(inclusiveMin, exclusiveMax int) int
 

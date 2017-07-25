@@ -24,7 +24,7 @@ func OrSeparator(w io.Writer) *Sep {
 	return &Sep{Writer: w, last: "or"}
 }
 
-// Write implements io.Writer, spacing
+// Write implements io.Writer, spacing writes with separators.
 func (l *Sep) Write(p []byte) (ret int, err error) {
 	const mid = ","
 	if len(p) > 0 {
@@ -36,9 +36,8 @@ func (l *Sep) Write(p []byte) (ret int, err error) {
 	return
 }
 
-// Close writes all current lines, with appropriate separators, to the passed output.
-// It does not Close the wrapped stream.
-func (l *Sep) Close() error {
+// Flush writes all pending lines with appropriate separators.
+func (l *Sep) Flush() error {
 	var fini string
 	if l.cnt > 2 {
 		fini = ", " + l.last

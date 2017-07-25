@@ -5,14 +5,13 @@ import (
 	"github.com/ionous/sliceOf"
 )
 
-// TestPrintSpacing verifies that print line uses acts like the span printer:
-// adding spaces between words as needed.
+// TestPrintSpacing verifies that print span adds spaces between words as needed.
 func (assert *CoreSuite) TestPrintSpacing() {
 	var root struct {
 		Eval rt.Execute
 	}
 	if c, ok := assert.ops.NewBuilder(&root); ok {
-		if c.Cmd("print line").Begin() {
+		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("print text", "hello")
 				c.Cmd("print text", "there,")
@@ -35,7 +34,7 @@ func (assert *CoreSuite) TestPrintNum() {
 		Eval rt.Execute
 	}
 	if c, ok := assert.ops.NewBuilder(&root); ok {
-		if c.Cmd("print line").Begin() {
+		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("print num", 213)
 				c.Cmd("print num word", 213)
@@ -76,14 +75,14 @@ func (assert *CoreSuite) TestMultiLines() {
 	}
 }
 
-// TestSingleLine verifies the ability of print line to join text.
+// TestSingleLine verifies the ability of print to join text.
 // It complements TestMultiLines
 func (assert *CoreSuite) TestSingleLines() {
 	var root struct {
 		Eval rt.Execute
 	}
 	if c, ok := assert.ops.NewBuilder(&root); ok {
-		if c.Cmd("print line").Begin() {
+		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				if c.Cmd("for each text").Begin() {
 					c.Param("in").Val(sliceOf.String("hello", "there", "world"))

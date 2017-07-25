@@ -66,40 +66,50 @@ func GroupPatterns(c *ops.Builder) {
 	}
 	if c.Cmd("run rule", "print group").Begin() {
 		if c.Param("decide").Cmds().Begin() {
-			if c.Cmd("print line").Begin() {
+			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					if c.Cmd("choose", c.Cmd("is empty", c.Cmd("get", "@", "label"))).Begin() {
-						// has a label?
+						// no label: then the group is an inline list of things ( and no brackets. )
+						if c.Param("true").Cmds().Begin() {
+							if c.Cmd("print objects", c.Cmd("get", "@", "objects")).Begin() {
+								c.Param("articles").Cmd("get", "@", "with articles")
+								c.End() // print objects
+							}
+							c.End() // true, no label
+						}
+						// the label is not empty: then the group is a block of things.
 						if c.Param("false").Cmds().Begin() {
+							// before the label, possibly write the number of objects:
 							if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
 								if c.Param("false").Cmds().Begin() {
-									// not innumerable, then print the number before the label
 									c.Cmd("print num word", c.Cmd("len", c.Cmd("get", "@", "objects")))
 									c.End()
 								}
-								c.End() // choose innumerable
+								c.End()
 							}
+							// now the label:
 							c.Cmd("print text", c.Cmd("get", "@", "label"))
-							c.End() // no label
-						}
-						c.End() // choose label
-					}
-					if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
-						if c.Param("false").Cmds().Begin() {
-							if c.Cmd("print objects", c.Cmd("get", "@", "objects")).Begin() {
-								c.Param("articles").Cmd("get", "@", "with articles")
-								// if they are not inumerable, they are numerable.
-								// if they are numerable, then they get a number in front of some backets.
-								c.Param("brackets").Cmd("is not", c.Cmd("get", "@", "innumerable"))
-								c.End() // print objects
+							// after the label, possibly write the objects:
+							if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
+								if c.Param("false").Cmds().Begin() {
+									if c.Cmd("print objects", c.Cmd("get", "@", "objects")).Begin() {
+										// if they are not inumerable, they are numerable.
+										// if they are numerable, then they got a number... in front of some backets.
+										c.Param("brackets").Cmd("is not", c.Cmd("get", "@", "innumerable"))
+										c.Param("articles").Cmd("get", "@", "with articles")
+										c.End() // print objects
+									}
+									c.End() // false, not without objects
+								}
+								c.End() // choose objects
 							}
-							c.End()
+							c.End() // false, has label
 						}
 						c.End() // end of choose
 					}
 					c.End() // end of line statements
 				}
-				c.End() // end of print line
+				c.End() // end of print
 			}
 			c.End() // end of decide
 		}

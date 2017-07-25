@@ -41,7 +41,7 @@ func write(sep func(w io.Writer) *Sep, names ...string) (ret string, err error) 
 	}
 	if err == nil {
 		// normally PopWriter would call close, but we arent using the runtime here.
-		if e := w.Close(); e != nil {
+		if e := w.Flush(); e != nil {
 			err = e
 		} else {
 			ret = buffer.String()
