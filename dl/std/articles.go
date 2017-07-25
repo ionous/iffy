@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
+	"io"
 )
 
 // UpperThe is equivalent to Inform7's [The]
@@ -81,60 +82,56 @@ func (a *LowerAn) Execute(run rt.Runtime) error {
 	return core.Print(run, a)
 }
 
+func printArticle(run rt.Runtime, article string, obj rt.Object) (err error) {
+	if text, e := articleName(run, "", obj); e != nil {
+		err = e
+	} else if _, e := io.WriteString(run, text); e != nil {
+		err = e
+	}
+	return
+}
+
 // You can only just make out the lamp-post.", or "You can only just make out _ Trevor.", or "You can only just make out the soldiers."
 func articleName(run rt.Runtime, article string, obj rt.Object) (ret string, err error) {
-	if name, e := getName(run, obj); e != nil {
-		err = e
-	} else {
-		ret, err = articleNamed(obj, article, name)
-	}
-	return
-}
-
-func articleNamed(obj rt.Object, article, name string) (ret string, err error) {
-	var proper bool
-	if e := obj.GetValue("proper-named", &proper); e != nil {
-		err = e
-	} else if proper {
-		ret = lang.Titlecase(name)
-	} else {
-		if len(article) == 0 {
-			var indefinite string
-			if e := obj.GetValue("indefinite article", &indefinite); e != nil {
-				err = e
-			} else {
-				article = indefinite
-				if len(article) == 0 {
-					var plural bool
-					if e := obj.GetValue("plural-named", &plural); e != nil {
-						err = e
-					} else {
-						if plural {
-							article = "some"
-						} else if lang.StartsWithVowel(name) {
-							article = "an"
-						} else {
-							article = "a"
-						}
-					}
-				}
-			}
-		}
-		// by now, article should exist; except if err is set.
-		if len(article) > 0 {
-			ret = article + " " + name
-		}
-	}
-	return
-}
-
-// FIX? i think filters would be better -- especically in printWithArticles -- but this matches existing code.
-func getName(run rt.Runtime, obj rt.Object) (ret string, err error) {
+	// FIX? i think filters would be better -- especically in printWithArticles -- but this matches existing code.
 	var buffer printer.Span
 	if e := printName(rt.Writer(run, &buffer), obj); e != nil {
 		err = e
 	} else {
-		ret = buffer.String()
+		name := buffer.String()
+		var proper bool
+		if e := obj.GetValue("proper-named", &proper); e != nil {
+			err = e
+		} else if proper {
+			ret = lang.Titlecase(name)
+		} else {
+			if len(article) == 0 {
+				var indefinite string
+				if e := obj.GetValue("indefinite article", &indefinite); e != nil {
+					err = e
+				} else {
+					article = indefinite
+					if len(article) == 0 {
+						var plural bool
+						if e := obj.GetValue("plural-named", &plural); e != nil {
+							err = e
+						} else {
+							if plural {
+								article = "some"
+							} else if lang.StartsWithVowel(name) {
+								article = "an"
+							} else {
+								article = "a"
+							}
+						}
+					}
+				}
+			}
+			// by now, article should exist; except if err is set.
+			if len(article) > 0 {
+				ret = article + " " + name
+			}
+		}
 	}
 	return
 }

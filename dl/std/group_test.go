@@ -30,6 +30,43 @@ func TestGrouping(t *testing.T) {
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
 			printPatterns, group.GroupPatterns)
 	})
+	//
+	several := func(c *ops.Builder) {
+		if c.Cmd("run rule", "group together").Begin() {
+			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
+			if c.Param("decide").Cmds().Begin() {
+				c.Cmd("set bool", "@", "with articles", true)
+				c.End()
+			}
+			c.End()
+		}
+		if c.Cmd("run rule", "print several").Begin() {
+			c.Param("if").Cmd("all true", c.Cmds(
+				c.Cmd("is same class", c.Cmd("get", "@", "target"), "thing"),
+				c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)),
+			)
+			//
+			if c.Param("decide").Cmds().Begin() {
+				c.Cmd("print text", "a few things")
+				c.End()
+			}
+			c.End() // print several
+		}
+	}
+	t.Run("several", func(t *testing.T) {
+		// note: we are grouping together the things, they become a single unit --
+		// therefore no comma between Mildred the person and the single unit of all things.
+		groupTest(t, "Mildred and an empire apple, a pen, and a few things",
+			//
+			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
+			printPatterns, group.GroupPatterns, several)
+	})
+	t.Run("not several", func(t *testing.T) {
+		groupTest(t, "Mildred and an empire apple, a pen, and a thing",
+			//
+			sliceOf.String("mildred", "apple", "pen", "thing#1"),
+			printPatterns, group.GroupPatterns, several)
+	})
 	// Rule for grouping together utensils: say "the usual utensils".
 	replacement := func(c *ops.Builder) {
 		if c.Cmd("run rule", "group together").Begin() {

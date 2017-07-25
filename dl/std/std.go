@@ -16,6 +16,7 @@ type Patterns struct {
 	*group.PrintGroup
 	*PrintName
 	*PrintPluralName
+	*PrintSeveral
 }
 
 type Commands struct {
@@ -36,6 +37,8 @@ type Commands struct {
 // or the object name ( if the target lacks a "printed name" ),
 // or the object's class name ( for unnamed objects. )
 // A "printed name" can change during the course of play; object names never change.
+// Analogous to Inform's "Printing the name of something."
+// http://inform7.com/learn/man/WI_18_10.html
 type PrintName struct {
 	Target *Kind
 }
@@ -44,6 +47,17 @@ type PrintName struct {
 // The standard rules print the target's "printed plural name",
 // or, if the target lacks that property, the plural of the "print name" pattern.
 // It uses the runtime's pluralization table, or if needed, automated pluralization.
+// Analogous to Inform's "Printing the plural name of something."
+// http://inform7.com/learn/man/WI_18_11.html
 type PrintPluralName struct {
 	Target *Kind
+}
+
+// PrintSeveral executes a pattern to print information about a generic group of objects.
+// The standard rules print the group size in words, then prints the plural name of the target.
+// Analogous to Inform's "Printing a number of something."
+// http://inform7.com/learn/man/WI_18_12.html
+type PrintSeveral struct {
+	Target    *Kind
+	GroupSize float64
 }

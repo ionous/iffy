@@ -58,6 +58,17 @@ func printPluralName(run rt.Runtime, obj rt.Object) (err error) {
 	return
 }
 
+func printSeveral(run rt.Runtime, obj rt.Object, cnt int) (err error) {
+	if kind, e := kindOf(run, obj); e != nil {
+		err = e
+	} else if printName, e := run.Emplace(&PrintSeveral{kind, float64(cnt)}); e != nil {
+		err = e
+	} else {
+		err = run.ExecuteMatching(run, printName)
+	}
+	return
+}
+
 func kindOf(run rt.Runtime, obj rt.Object) (ret *Kind, err error) {
 	if src, ok := obj.(*ref.RefObject); !ok {
 		err = errutil.Fmt("unknown object %T", obj)

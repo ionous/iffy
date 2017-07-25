@@ -68,4 +68,19 @@ func printPatterns(c *ops.Builder) {
 		}
 		c.End()
 	}
+	//
+	if c.Cmd("run rule", "print several").Begin() {
+		if c.Param("decide").Cmds().Begin() {
+			if c.Cmd("print span").Begin() {
+				if c.Cmds().Begin() {
+					c.Cmd("print num word", c.Cmd("get", "@", "group size"))
+					c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
+					c.End()
+				}
+				c.End()
+			}
+			c.End()
+		}
+		c.End()
+	}
 }
