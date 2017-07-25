@@ -74,7 +74,18 @@ func printPatterns(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("print num word", c.Cmd("get", "@", "group size"))
-					c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
+					c.Cmd("print text", "other")
+					if c.Cmd("choose", c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)).Begin() {
+						if c.Param("true").Cmds().Begin() {
+							c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
+							c.End()
+						}
+						if c.Param("false").Cmds().Begin() {
+							c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
+							c.End()
+						}
+						c.End()
+					}
 					c.End()
 				}
 				c.End()

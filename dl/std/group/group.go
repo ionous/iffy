@@ -37,8 +37,8 @@ const (
 )
 
 // GroupTogether executes a pattern to collect objects.
-// FIX: ideally the member here would be "Key", but we need op/spec to handle aggregates.
 type GroupTogether struct {
+	// FIX: ideally the member here would be "Key", but we need op/spec to handle aggregates.
 	Label          string
 	Innumerable    bool
 	ObjectGrouping ObjectGrouping
@@ -46,8 +46,8 @@ type GroupTogether struct {
 }
 
 // PrintGroup executes a pattern to print a collection of objects.
-// FIX: ideally the member here would be "Key", but we need op/spec to handle aggregates.
 type PrintGroup struct {
+	// FIX: ideally the member here would be "Key", but we need op/spec to handle aggregates.
 	Label          string
 	Innumerable    bool
 	ObjectGrouping ObjectGrouping

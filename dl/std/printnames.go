@@ -11,6 +11,7 @@ import (
 )
 
 // PrintNondescriptObjects commands the runtime to print a bunch of objects, in groups if possible.
+// Similar to Inform's "Listing contents of something", except this is a command and that is an activity.
 type PrintNondescriptObjects struct {
 	Objects rt.ObjListEval
 }

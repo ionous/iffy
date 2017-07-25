@@ -77,11 +77,7 @@ func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (err error) {
 		}
 	}
 	if err == nil {
-		if len(nonames) == 1 {
-			err = printArticle(run, "", nonames[0])
-		} else {
-			err = nonames.Print(run)
-		}
+		err = nonames.Print(run)
 	}
 	return
 }
@@ -103,11 +99,7 @@ func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (err error) {
 		}
 	}
 	if err == nil {
-		if len(nonames) == 1 {
-			err = printName(run, nonames[0])
-		} else {
-			err = nonames.Print(run)
-		}
+		err = nonames.Print(run)
 	}
 	return
 }

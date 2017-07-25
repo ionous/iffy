@@ -18,7 +18,7 @@ import (
 func TestGrouping(t *testing.T) {
 	// note: even without grouping rules, our article printing still gathers unnamed items.
 	t.Run("no grouping", func(t *testing.T) {
-		groupTest(t, "Mildred, an empire apple, a pen, and two things",
+		groupTest(t, "Mildred, an empire apple, a pen, and two other things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
 			printPatterns)
@@ -62,7 +62,7 @@ func TestGrouping(t *testing.T) {
 			printPatterns, group.GroupPatterns, several)
 	})
 	t.Run("not several", func(t *testing.T) {
-		groupTest(t, "Mildred and an empire apple, a pen, and a thing",
+		groupTest(t, "Mildred and an empire apple, a pen, and one other thing",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1"),
 			printPatterns, group.GroupPatterns, several)
@@ -164,21 +164,28 @@ func TestGrouping(t *testing.T) {
 				}
 			})
 	})
-	t.Run("edge case", func(t *testing.T) {
-		groupTest(t, "Mildred and four things ( an empire apple, a pen, and two things )",
+	unnamedThings := func(c *ops.Builder) {
+		if c.Cmd("run rule", "group together").Begin() {
+			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
+			if c.Param("decide").Cmds().Begin() {
+				c.Cmd("set text", "@", "label", "things")
+				c.Cmd("set bool", "@", "with articles", true)
+				c.End()
+			}
+			c.End()
+		}
+	}
+	t.Run("edge one", func(t *testing.T) {
+		groupTest(t, "Mildred and three things ( an empire apple, a pen, and one other thing )",
+			//
+			sliceOf.String("mildred", "apple", "pen", "thing#1"),
+			printPatterns, group.GroupPatterns, unnamedThings)
+	})
+	t.Run("edge two", func(t *testing.T) {
+		groupTest(t, "Mildred and four things ( an empire apple, a pen, and two other things )",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			printPatterns, group.GroupPatterns, func(c *ops.Builder) {
-				if c.Cmd("run rule", "group together").Begin() {
-					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
-					if c.Param("decide").Cmds().Begin() {
-						c.Cmd("set text", "@", "label", "things")
-						c.Cmd("set bool", "@", "with articles", true)
-						c.End()
-					}
-					c.End()
-				}
-			})
+			printPatterns, group.GroupPatterns, unnamedThings)
 	})
 }
 
