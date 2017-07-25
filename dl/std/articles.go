@@ -27,16 +27,28 @@ type LowerAn struct {
 	Obj rt.ObjectEval
 }
 
-func (the *UpperThe) GetText(run rt.Runtime) (string, error) {
-	return articleNamed(run, the.Obj, "The")
+func (the *UpperThe) GetText(run rt.Runtime) (ret string, err error) {
+	if obj, e := the.Obj.GetObject(run); e != nil {
+		err = e
+	} else {
+		ret, err = articleName(run, "The", obj)
+	}
+	return
 }
 
-func (the *LowerThe) GetText(run rt.Runtime) (string, error) {
-	return articleNamed(run, the.Obj, "the")
+func (the *LowerThe) GetText(run rt.Runtime) (ret string, err error) {
+	if obj, e := the.Obj.GetObject(run); e != nil {
+		err = e
+	} else {
+		ret, err = articleName(run, "the", obj)
+	}
+	return
 }
 
 func (an *UpperAn) GetText(run rt.Runtime) (ret string, err error) {
-	if txt, e := articleNamed(run, an.Obj, ""); e != nil {
+	if obj, e := an.Obj.GetObject(run); e != nil {
+		err = e
+	} else if txt, e := articleName(run, "", obj); e != nil {
 		err = e
 	} else {
 		ret = lang.Capitalize(txt)
@@ -45,10 +57,10 @@ func (an *UpperAn) GetText(run rt.Runtime) (ret string, err error) {
 }
 
 func (a *LowerAn) GetText(run rt.Runtime) (ret string, err error) {
-	if txt, e := articleNamed(run, a.Obj, ""); e != nil {
+	if obj, e := a.Obj.GetObject(run); e != nil {
 		err = e
 	} else {
-		ret = txt
+		ret, err = articleName(run, "", obj)
 	}
 	return
 }
@@ -70,52 +82,47 @@ func (a *LowerAn) Execute(run rt.Runtime) error {
 }
 
 // You can only just make out the lamp-post.", or "You can only just make out _ Trevor.", or "You can only just make out the soldiers."
-func articleNamed(run rt.Runtime, noun rt.ObjectEval, article string) (ret string, err error) {
-	if obj, e := noun.GetObject(run); e != nil {
-		err = e
-	} else {
-		ret, err = articleName(run, article, obj)
-	}
-	return
-}
-
 func articleName(run rt.Runtime, article string, obj rt.Object) (ret string, err error) {
 	if name, e := getName(run, obj); e != nil {
 		err = e
 	} else {
-		var proper bool
-		if e := obj.GetValue("proper-named", &proper); e != nil {
-			err = e
-		} else if proper {
-			ret = lang.Titlecase(name)
-		} else {
-			name = lang.Lowercase(name)
-			if len(article) == 0 {
-				var indefinite string
-				if e := obj.GetValue("indefinite article", &indefinite); e != nil {
-					err = e
-				} else {
-					article = indefinite
-					if len(article) == 0 {
-						var plural bool
-						if e := obj.GetValue("plural-named", &plural); e != nil {
-							err = e
+		ret, err = articleNamed(obj, article, name)
+	}
+	return
+}
+
+func articleNamed(obj rt.Object, article, name string) (ret string, err error) {
+	var proper bool
+	if e := obj.GetValue("proper-named", &proper); e != nil {
+		err = e
+	} else if proper {
+		ret = lang.Titlecase(name)
+	} else {
+		if len(article) == 0 {
+			var indefinite string
+			if e := obj.GetValue("indefinite article", &indefinite); e != nil {
+				err = e
+			} else {
+				article = indefinite
+				if len(article) == 0 {
+					var plural bool
+					if e := obj.GetValue("plural-named", &plural); e != nil {
+						err = e
+					} else {
+						if plural {
+							article = "some"
+						} else if lang.StartsWithVowel(name) {
+							article = "an"
 						} else {
-							if plural {
-								article = "some"
-							} else if lang.StartsWithVowel(name) {
-								article = "an"
-							} else {
-								article = "a"
-							}
+							article = "a"
 						}
 					}
 				}
 			}
-			// by now, article should exist; except if err is set.
-			if len(article) > 0 {
-				ret = article + " " + name
-			}
+		}
+		// by now, article should exist; except if err is set.
+		if len(article) > 0 {
+			ret = article + " " + name
 		}
 	}
 	return

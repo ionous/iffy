@@ -54,8 +54,8 @@ func (assert *ArticleSuite) SetupTest() {
 
 	objects := ref.NewObjects(classes)
 	unique.RegisterValues(unique.PanicValues(objects),
-		&Kind{Name: "Lamp-post"},
-		&Kind{Name: "Soldiers", IndefiniteArticle: "some"},
+		&Kind{Name: "lamp-post"},
+		&Kind{Name: "soldiers", IndefiniteArticle: "some"},
 		&Kind{Name: "trevor", CommonProper: ProperNamed},
 	)
 	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),

@@ -37,18 +37,35 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 // it would be **alot** simpler if the * was an ident.Id
 // we'd still have "emplace" -- you could maybe someday make it static -- thatd be tons better.
 func printName(run rt.Runtime, obj rt.Object) (err error) {
-	var kind *Kind
-	if src, ok := obj.(*ref.RefObject); !ok {
-		err = errutil.Fmt("unknown object %T", obj)
-	} else if e := ref.Upcast(src.Value().Addr(), func(ptr r.Value) (okay bool) {
-		kind, okay = ptr.Interface().(*Kind)
-		return
-	}); e != nil {
+	if kind, e := kindOf(run, obj); e != nil {
 		err = e
 	} else if printName, e := run.Emplace(&PrintName{kind}); e != nil {
 		err = e
 	} else {
 		err = run.ExecuteMatching(run, printName)
+	}
+	return
+}
+
+func printPluralName(run rt.Runtime, obj rt.Object) (err error) {
+	if kind, e := kindOf(run, obj); e != nil {
+		err = e
+	} else if printName, e := run.Emplace(&PrintPluralName{kind}); e != nil {
+		err = e
+	} else {
+		err = run.ExecuteMatching(run, printName)
+	}
+	return
+}
+
+func kindOf(run rt.Runtime, obj rt.Object) (ret *Kind, err error) {
+	if src, ok := obj.(*ref.RefObject); !ok {
+		err = errutil.Fmt("unknown object %T", obj)
+	} else if e := ref.Upcast(src.Value().Addr(), func(ptr r.Value) (okay bool) {
+		ret, okay = ptr.Interface().(*Kind)
+		return
+	}); e != nil {
+		err = e
 	}
 	return
 }

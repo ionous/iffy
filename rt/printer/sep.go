@@ -39,7 +39,7 @@ func (l *Sep) Write(p []byte) (ret int, err error) {
 // Flush writes all pending lines with appropriate separators.
 func (l *Sep) Flush() error {
 	var fini string
-	if l.cnt > 2 {
+	if l.cnt > 1 {
 		fini = ", " + l.last
 	} else {
 		fini = l.last

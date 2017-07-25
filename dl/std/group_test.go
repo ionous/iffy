@@ -16,12 +16,14 @@ import (
 )
 
 func TestGrouping(t *testing.T) {
+	// note: even without grouping rules, our article printing still gathers unnamed items.
 	t.Run("no grouping", func(t *testing.T) {
-		groupTest(t, "Mildred, an empire apple, a pen, a thing, and a thing",
+		groupTest(t, "Mildred, an empire apple, a pen, and two things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
 			printPatterns)
 	})
+	//
 	t.Run("default grouping", func(t *testing.T) {
 		groupTest(t, "Mildred, an empire apple, a pen, and two things",
 			//
@@ -80,36 +82,67 @@ func TestGrouping(t *testing.T) {
 			}
 		}
 		t.Run("tiles", func(t *testing.T) {
-			groupTest(t,
-				"the tiles X, W, F, Y, and Z from a Scrabble set",
+			groupTest(t, "the tiles X, W, F, Y, and Z from a Scrabble set",
+				//
 				sliceOf.String("x", "w", "f", "y", "z"),
 				printPatterns, group.GroupPatterns, fancy)
 		})
 		t.Run("more", func(t *testing.T) {
-			groupTest(t,
-				"Mildred and the tiles X, W, F, Y, and Z from a Scrabble set",
+			groupTest(t, "Mildred and the tiles X, W, F, Y, and Z from a Scrabble set",
+				//
 				sliceOf.String("mildred", "x", "w", "f", "y", "z"),
 				printPatterns, group.GroupPatterns, fancy)
 		})
 	})
-
 	// //group utensils together as "text".
-	// t.Run("parenthetical", func(t *testing.T) {
-	// 	groupTest(t, "Mildred, and five scrabble tiles ( X, W, F, Y and Z )",
-	// 		sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-
-	// 		printPatterns, group.GroupPatterns)
-	// })
-	// t.Run("article parenthetical", func(t *testing.T) {
-	// 	groupTest(t, "Mildred, and five scrabble tiles ( a X, a W, a F, a Y and a Z )",
-	// 		sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-	// 		printPatterns, group.GroupPatterns)
-	// })
-	// t.Run("edge case", func(t *testing.T) {
-	// 	groupTest(t, "Mildred, and four things ( a pen, an empire apple, and two things )",
-	// 		sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-	// 		printPatterns, group.GroupPatterns)
-	// })
+	t.Run("parenthetical", func(t *testing.T) {
+		groupTest(t, "Mildred and five scrabble tiles ( X, W, F, Y, and Z )",
+			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
+			//
+			printPatterns, group.GroupPatterns, func(c *ops.Builder) {
+				if c.Cmd("run rule", "group together").Begin() {
+					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
+					if c.Param("decide").Cmds().Begin() {
+						c.Cmd("set text", "@", "label", "scrabble tiles")
+						c.Cmd("set bool", "@", "without articles", true)
+						c.End()
+					}
+					c.End()
+				}
+			})
+	})
+	t.Run("article parenthetical", func(t *testing.T) {
+		groupTest(t, "Mildred and five scrabble tiles ( a X, a W, a F, a Y, and a Z )",
+			//
+			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
+			printPatterns, group.GroupPatterns, func(c *ops.Builder) {
+				if c.Cmd("run rule", "group together").Begin() {
+					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
+					if c.Param("decide").Cmds().Begin() {
+						c.Cmd("set text", "@", "label", "scrabble tiles")
+						c.Cmd("set bool", "@", "with articles", true)
+						c.End()
+					}
+					c.End()
+				}
+			})
+	})
+	t.Run("edge case", func(t *testing.T) {
+		groupTest(t, "Mildred and four things ( an empire apple, a pen, and two things )",
+			//
+			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
+			printPatterns, group.GroupPatterns, func(c *ops.Builder) {
+				if c.Cmd("run rule", "group together").Begin() {
+					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
+					if c.Param("decide").Cmds().Begin() {
+						c.Cmd("set text", "@", "label", "things")
+						c.Cmd("set bool", "@", "with articles", true)
+						c.End()
+					}
+					c.End()
+				}
+			})
+	})
 }
 
 // FIX: things limiting reuse across tests:
