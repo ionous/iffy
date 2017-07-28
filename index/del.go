@@ -30,7 +30,7 @@ func (dc *DeletionCursor) DeletePair(majorKey, minorKey string) (okay bool) {
 	} else {
 		// later, check the direct next slot first in the hopes of consolidating cuts.
 		a, major, minor := dc.Lines, dc.Major, (dc.Major+1)&1
-		if n := dc.next; n < len(a) && a[n].Key[major] == majorKey && a[n].Key[minor] == minorKey {
+		if n := dc.next; n < len(a) && a[n][major] == majorKey && a[n][minor] == minorKey {
 			dc.next, okay = n+1, true
 			// println("consolidated", dc.start, dc.next)
 		} else {

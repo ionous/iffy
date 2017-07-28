@@ -6,18 +6,18 @@ import "sort"
 type Index struct {
 	Major  Column
 	Unique bool
-	Lines  []*KeyData
+	Lines  []Row
 }
 
-func (index *Index) Walk(majorKey string, visit func(other string, data interface{}) bool) (ret int) {
+func (index *Index) Walk(majorKey string, visit func(other string) bool) (ret int) {
 	a, major, minor := index.Lines, index.Major, (index.Major+1)&1
 	if i, ok := index.FindFirst(0, majorKey); ok {
 		for ; i < len(a); i++ {
-			if line := a[i]; line.Key[major] != majorKey {
+			if line := a[i]; line[major] != majorKey {
 				break
 			} else {
 				ret++
-				if visit(line.Key[minor], line.Data) {
+				if visit(line[minor]) {
 					break
 				}
 			}
@@ -31,9 +31,9 @@ func (index *Index) Walk(majorKey string, visit func(other string, data interfac
 func (index *Index) FindFirst(n int, majorKey string) (int, bool) {
 	a, major := index.Lines, index.Major
 	i := n + sort.Search(len(a)-n, func(i int) bool {
-		return a[i+n].Key[major] >= majorKey
+		return a[i+n][major] >= majorKey
 	})
-	exact := i < len(a) && a[i].Key[major] == majorKey
+	exact := i < len(a) && a[i][major] == majorKey
 	return i, exact
 }
 
@@ -42,14 +42,14 @@ func (index *Index) FindFirst(n int, majorKey string) (int, bool) {
 func (index *Index) FindPair(n int, majorKey, minorKey string) (int, bool) {
 	a, major, minor := index.Lines, index.Major, (index.Major+1)&1
 	i := n + sort.Search(len(a)-n, func(i int) (greatOrEqual bool) {
-		if aMajor := a[i+n].Key[major]; aMajor > majorKey {
+		if aMajor := a[i+n][major]; aMajor > majorKey {
 			greatOrEqual = true
 		} else if aMajor == majorKey {
-			greatOrEqual = a[i+n].Key[minor] >= minorKey
+			greatOrEqual = a[i+n][minor] >= minorKey
 		}
 		return
 	})
-	exact := i < len(a) && a[i].Key[major] == majorKey && a[i].Key[minor] == minorKey
+	exact := i < len(a) && a[i][major] == majorKey && a[i][minor] == minorKey
 	return i, exact
 }
 
@@ -63,52 +63,46 @@ func (index *Index) Delete(i int) {
 // It will never remove a key, and it always returns avalid pointer.
 // It returns the previously existing row data if any.
 // Note: the value of data is ignored.
-func (index *Index) Update(kd *KeyData) (ret *KeyData, changed bool) {
+func (index *Index) UpdateRow(p, s string) (old string) {
 	if index.Unique {
-		ret, changed = index.addReplace(kd)
+		old = index.addReplace(p, s)
 	} else {
-		ret, changed = index.addInsert(kd)
+		index.addInsert(p, s)
 	}
 	return
 }
 
-func (index *Index) addReplace(kd *KeyData) (ret *KeyData, changed bool) {
+// old is empty if the element gets added; otherwise its the previous pairing
+func (index *Index) addReplace(p, s string) (old string) {
+	row := Row{p, s}
 	a, major, minor := index.Lines, index.Major, (index.Major+1)&1
 	// opt: since unique means one major key, we dont have to look at the minor key.
-	if i, ok := index.FindFirst(0, kd.Key[major]); !ok {
+	if i, ok := index.FindFirst(0, row[major]); !ok {
 		// if we didn't find the element, insert
-		index.insert(i, kd)
-		ret, changed = kd, true
-	} else if al := a[i]; kd.Key[minor] != al.Key[minor] {
+		index.insert(i, row)
+	} else if prev, next := a[i][minor], row[minor]; prev != next {
 		// otherwise, if the secondary key is different, replace it.
-		// return existing key/data so "views" of this are similarly updated.
-		al.Key[minor] = kd.Key[minor]
-		ret, changed = al, true
-	} else {
-		ret = al
+		old, a[i][minor] = prev, next
 	}
 	return
 }
 
-func (index *Index) addInsert(kd *KeyData) (ret *KeyData, changed bool) {
-	a, major, minor := index.Lines, index.Major, (index.Major+1)&1
-	if i, ok := index.FindPair(0, kd.Key[major], kd.Key[minor]); !ok {
+// true if the pair was inserted; false if the pair already existed.
+func (index *Index) addInsert(p, s string) (changed bool) {
+	row := Row{p, s}
+	major, minor := index.Major, (index.Major+1)&1
+	if i, ok := index.FindPair(0, row[major], row[minor]); !ok {
 		// if we didn't find the element, insert
-		index.insert(i, kd)
-		ret, changed = kd, true
-	} else {
-
-		// otherwise, by definition our major and minor keys are equal
-		// return existing key/data so "views" of this are similarly updated.
-		ret = a[i]
+		index.insert(i, row)
+		changed = true
 	}
 	return
 }
 
 // insert the passed line at i
-func (index *Index) insert(i int, kd *KeyData) {
-	a := append(index.Lines, nil)
+func (index *Index) insert(i int, row Row) {
+	a := append(index.Lines, Row{})
 	copy(a[i+1:], a[i:])
-	a[i] = kd
+	a[i] = row
 	index.Lines = a
 }

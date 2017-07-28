@@ -47,7 +47,7 @@ type Thing struct {
 	// mentioned not unmentioned
 
 	Scenery bool // unmentioned in the room description
-	Handled bool // controls use of the initial apperance
+	Handled bool // controls use of the initial appearance
 
 	// Usually unlit not lit,
 	// inedible not edible,
@@ -55,7 +55,7 @@ type Thing struct {
 	// matching key (object).
 	// Usually not wearable, pushable between rooms
 	//
-	// described not undescribed: Used to exclude things from room descriptions ( ex. the player "yourself".) Assumes some other text already reveals or implies the item' existance. If the item isn't intended to move, it's better to make it "scenery".
+	// described not undescribed: Used to exclude things from room descriptions ( ex. the player "yourself".) Assumes some other text already reveals or implies the item' existence. If the item isn't intended to move, it's better to make it "scenery".
 	// Note: objects become "described" when carried or worn by the player.
 	// Note: nothing on top of an "undescribed" supporter will be visible in a room description.
 
@@ -67,4 +67,21 @@ type Actor struct {
 	// Usually male not female.
 	// Usually not neuter.
 	// Can have carrying capacity (number).
+}
+
+type Latch struct {
+	Closed   bool // doors are usually closed
+	Openable bool // doors are usually openabled
+	Locked   bool
+	Lockable bool
+}
+
+// Container represents something with an inside and an outside, into which portable things can be placed. For example, a teachest or a handbag; but not a large space such as a room ( which generally has multiple exits ), nor an actor ( actors generally carry or hold items. )
+type Container struct {
+	Thing
+	Latch
+	Transparent bool
+
+	// Enterable bool
+	// CarryingCapacity float64
 }

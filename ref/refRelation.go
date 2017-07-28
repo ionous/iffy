@@ -87,7 +87,8 @@ func (rel *RefRelation) GetType() index.Type {
 }
 
 // Relate defines a connection between two objects.
-func (rel *RefRelation) Relate(src, dst rt.Object) (ret rt.Relative, err error) {
+func (rel *RefRelation) Relate(src, dst rt.Object, data interface{}) (prev interface{}, err error) {
+	var donotforgetdata, orprev interface{}
 	if rec, e := rel.relate(src, dst); e != nil {
 		err = e
 	} else {
@@ -96,54 +97,33 @@ func (rel *RefRelation) Relate(src, dst rt.Object) (ret rt.Relative, err error) 
 	return
 }
 
-// returns a relation record
-func (rel *RefRelation) relate(src ...rt.Object) (ret *RefObject, err error) {
-	var ids [2]string      // ids of src objects
-	var objs [2]*RefObject // access to internals for setting pointers
-	for i, _ := range ids {
-		if src := src[i]; src != nil {
-			if ro, ok := src.(*RefObject); !ok {
-				err = errutil.Fmt("unknown object type %T", src)
-				break
-			} else {
-				ids[i] = ro.id
-				objs[i] = ro
-			}
-		}
-	}
-	if err == nil {
-		// kd can be nil when youve deleted something.
-		// theres no real "relation" at that point, but we can still return a hook with one side or the other.
-		var rec *RefObject
-		if kd, _ := rel.table.Relate(ids[0], ids[1]); kd == nil {
-			rec = rel.relations.objects.newObject(rel.cls)
-		} else if ref, ok := kd.Data.(*RefObject); !ok {
-			rec = rel.relations.objects.newObject(rel.cls)
-			kd.Data = rec
-		} else {
-			rec = ref
-		}
-		if e := rel.setup(rec, objs[:]); e != nil {
-			err = e
-		} else {
-			ret = rec
-		}
+func reduce(obj rt.Object) (id string, okay bool) {
+	if obj != nil {
+		id = obj.GetId()
+		okay = len(id) > 0
 	}
 	return
 }
 
-func (rel *RefRelation) setup(rec *RefObject, objs []*RefObject) (err error) {
-	for i, obj := range objs {
-		p := rel.props[i]
-		field := rec.rval.FieldByIndex(p.fieldPath)
-		if obj == nil {
-			if !field.IsNil() {
-				field.Set(r.ValueOf(nil))
+// returns a relation record
+func (rel *RefRelation) relate(src, dst rt.Object) (ret *RefObject, err error) {
+	if s, ok := reduce(src); !ok {
+		err = errutil.Fmt("primary object is anonymous", src.GetClass())
+	} else if d, ok := reduce(dst); !ok {
+		err = errutil.Fmt("secondary object is anonymous", dst.GetClass())
+	} else {
+		onInsert := func(old interface{}) (ret interface{}, err error) {
+			if ref, ok := old.(*RefObject); !ok {
+				ret = rel.relations.objects.newObject(rel.cls)
+			} else {
+				ret = ref
 			}
-		} else if v := obj.rval.Addr(); !v.Type().ConvertibleTo(field.Type()) {
-			err = errutil.Fmt("couldnt convert to %v from %v", v.Type(), field.Type())
+			return
+		}
+		if rec, e := rel.table.Relate(s, d, onInsert); e != nil {
+			err = e
 		} else {
-			field.Set(v)
+			ret = rec.(*RefObject)
 		}
 	}
 	return
