@@ -9,16 +9,5 @@ import (
 type NoAncestors struct{}
 
 func (NoAncestors) GetAncestors(rt.Object) (rt.ObjectStream, error) {
-	return NotIt{}, nil
-}
-
-// an iterator that always fails
-type NotIt struct{}
-
-func (NotIt) HasNext() bool {
-	return false
-}
-
-func (NotIt) GetNext() (rt.Object, error) {
-	return nil, errutil.New("this never has objects")
+	return rt.EmptyObjects{}, nil
 }

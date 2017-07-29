@@ -36,7 +36,7 @@ func (t *Table) Type() (ret Type) {
 	return
 }
 
-func MakeTable(rt Type) Table {
+func NewTable(rt Type) *Table {
 	var uni, que bool
 	switch rt {
 	case ManyToMany:
@@ -48,7 +48,7 @@ func MakeTable(rt Type) Table {
 		uni, que = true, true
 	}
 
-	return Table{
+	return &Table{
 		Index{uni, nil},
 		Index{que, nil},
 		make(map[Row]interface{}),

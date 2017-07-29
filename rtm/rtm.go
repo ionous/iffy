@@ -13,7 +13,7 @@ import (
 type Rtm struct {
 	ref.ClassMap
 	*ref.Objects
-	*ref.Relations
+	ref.Relations
 	ScopeStack
 	io.Writer
 	Randomizer
@@ -80,14 +80,14 @@ func (c *Config) Rtm() *Rtm {
 		a = NoAncestors{}
 	}
 	var objects *ref.Objects
-	var rel *ref.Relations
+	var rel ref.Relations
 	//
 	if c.objects != nil {
 		objects = c.objects.Build()
-		// /
-		if c.rel != nil {
-			c.rel.Build(objects)
-		}
+	}
+	//
+	if c.rel != nil {
+		rel = c.rel.Build()
 	}
 	var w io.Writer
 	if cw := c.writer; cw != nil {

@@ -26,7 +26,7 @@ var pairs = []struct {
 }
 
 func (assert *RelSuite) MakeRelation() (ret *Table) {
-	n := MakeTable(OneToMany)
+	n := NewTable(OneToMany)
 	for _, pair := range pairs {
 		for _, v := range pair.secondary {
 			changed, e := n.Relate(pair.primary, v, NoData)
@@ -56,7 +56,7 @@ func (assert *RelSuite) TestTypes() {
 	}
 	for i := 0; i < 4; i++ {
 		i := Type(i)
-		n := MakeTable(i)
+		n := NewTable(i)
 		assert.Equal(i, n.Type())
 		test := m[i]
 		assert.Equal(test.uni, n.Primary.Unique)

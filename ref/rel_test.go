@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
-	"github.com/stretchr/testify/suite"
+	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -18,85 +18,9 @@ type Rock struct {
 	// BeneficentOne *Gremlin
 }
 
-type GremlinRocks struct {
-	BeneficentOne *Gremlin `if:"rel:one"`
-	Pet           *Rock    `if:"rel:many"`
-	Nickname      string
-}
-
-func TestRelationSuite(t *testing.T) {
-	suite.Run(t, new(RelSuite))
-}
-
-type RelSuite struct {
-	suite.Suite
-}
-
-func (assert *RelSuite) SetupTest() {
-}
-
-func (assert *RelSuite) TestRegistration() {
-	type TooFew struct {
-		A *Gremlin `if:"rel:one"`
-	}
-	type TooMany struct {
-		A, B, C *Gremlin `if:"rel:one"`
-	}
-	type TooManyManys struct {
-		A, B, C *Gremlin `if:"rel:many"`
-	}
-	type OneToOne struct {
-		A, B *Gremlin `if:"rel:one"`
-	}
-	type ManyToOne struct {
-		A *Gremlin `if:"rel:many"`
-		B *Gremlin `if:"rel:one"`
-	}
-	type OneToMany struct {
-		A *Gremlin `if:"rel:one"`
-		B *Gremlin `if:"rel:many"`
-	}
-	type ManyToMany struct {
-		A, B *Gremlin `if:"rel:many"`
-	}
-	type JustRight struct {
-		*OneToOne
-		*ManyToOne
-		*OneToMany
-		*ManyToMany
-	}
-	classes := NewClasses()
-	objects := NewObjects(classes)
-	relbuilder := NewRelations(classes)
-
-	unique.RegisterTypes(unique.PanicTypes(classes),
-		(*Gremlin)(nil))
-
-	reg := unique.PanicTypes(relbuilder)
-	assert.Panics(func() {
-		unique.RegisterTypes(reg, (*TooFew)(nil))
-	})
-	assert.Panics(func() {
-		unique.RegisterTypes(reg, (*TooMany)(nil))
-	})
-	assert.Panics(func() {
-		unique.RegisterTypes(reg, (*TooManyManys)(nil))
-	})
-	assert.NotPanics(func() {
-		unique.RegisterBlocks(reg, (*JustRight)(nil))
-	})
-
-	relations := relbuilder.Build(objects.Build())
-	for i := 0; i < 4; i++ {
-		t := index.Type(i)
-		if r, ok := relations.GetRelation(t.String()); assert.True(ok) {
-			assert.Equal(t, r.GetType(), t.String())
-		}
-	}
-}
-
 // test a simple one to many relation
-func (assert *RelSuite) TestOneToMany() {
+func TestOneToMany(t *testing.T) {
+	assert := testify.New(t)
 	classes := NewClasses()
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Gremlin)(nil),
@@ -109,52 +33,53 @@ func (assert *RelSuite) TestOneToMany() {
 		&Rock{Name: "rocky"},
 		&Rock{Name: "petra"})
 
-	relbuilder := NewRelations(classes)
-	unique.RegisterTypes(unique.PanicTypes(relbuilder),
-		(*GremlinRocks)(nil))
+	relbuilder := NewRelations()
+	relbuilder.NewRelation("GremlinRocks", index.OneToMany)
 
 	// this test doesnt use runtime, so build manually
 	objects := objbuilder.Build()
-	relations := relbuilder.Build(objects)
+	relations := relbuilder.Build()
 	//
 	Object := func(name string) rt.Object {
 		ret, ok := objects.GetObject(name)
 		if !ok {
-			assert.Fail("couldnt find obect", name)
+			assert.Fail("couldnt find object", name)
 		}
 		return ret
 	}
 
 	if gr, ok := relations.GetRelation("GremlinRocks"); assert.True(ok) {
-		assert.Equal("$gremlinRocks", gr.GetId())
+		gr := gr.(*RefRelation)
+		contains := func(i index.Index, n string) bool {
+			_, ok := i.FindFirst(0, n)
+			return ok
+		}
 		assert.Equal(index.OneToMany, gr.GetType())
 
-		if rel, e := gr.Relate(Object("claire"), Object("loofa")); assert.NoError(e) {
-			gr := gr.(*RefRelation)
-			contains := func(i index.Column, n string) bool {
-				_, ok := gr.table.Index[i].FindFirst(0, n)
-				return ok
-			}
-			var bene, pet rt.Object
-			if e := rel.GetValue("beneficent one", &bene); assert.NoError(e) {
-				assert.Equal(Object("claire"), bene)
-				if e := rel.GetValue("pet", &pet); assert.NoError(e) {
-					assert.Equal(Object("loofa"), pet)
-					assert.True(contains(index.Primary, "$claire"))
-					//
-					if e := rel.SetValue("pet", nil); assert.NoError(e) {
-						assert.False(contains(index.Primary, "$claire"))
-						// testing: nil pointers return error
-						assert.Error(rel.GetValue("pet", &pet))
-					}
-					//
-					if e := rel.SetValue("pet", Object("petra")); assert.NoError(e) {
-						assert.True(contains(index.Primary, "$claire"))
-						// NOTE: if you clear via Relates(), you wont see the change from a relation.
-						if _, e := gr.Relate(Object("claire"), Object("loofa")); assert.NoError(e) {
-							assert.True(contains(index.Secondary, "$loofa"))
-							assert.True(contains(index.Secondary, "$petra"))
-						}
+		claire, loofa, petra := Object("claire"), Object("loofa"), Object("petra")
+		assert.False(contains(gr.Table.Primary, "$claire"))
+		assert.False(contains(gr.Table.Secondary, "$loofa"))
+		assert.False(contains(gr.Table.Secondary, "$petra"))
+		//
+		if c, e := gr.Relate(claire, loofa, index.NoData); assert.NoError(e) && assert.True(c) {
+			assert.True(contains(gr.Table.Primary, "$claire"))
+			assert.True(contains(gr.Table.Secondary, "$loofa"))
+			assert.False(contains(gr.Table.Secondary, "$petra"))
+
+			if c, e := gr.Relate(nil, loofa, nil); assert.NoError(e) && assert.True(c) {
+				assert.False(contains(gr.Table.Primary, "$claire"))
+				assert.False(contains(gr.Table.Secondary, "$loofa"))
+				assert.False(contains(gr.Table.Secondary, "$petra"))
+
+				if c, e := gr.Relate(claire, petra, index.NoData); assert.NoError(e) && assert.True(c) {
+					assert.True(contains(gr.Table.Primary, "$claire"))
+					assert.False(contains(gr.Table.Secondary, "$loofa"))
+					assert.True(contains(gr.Table.Secondary, "$petra"))
+
+					if c, e := gr.Relate(claire, loofa, index.NoData); assert.NoError(e) && assert.True(c) {
+						assert.True(contains(gr.Table.Primary, "$claire"))
+						assert.True(contains(gr.Table.Secondary, "$loofa"))
+						assert.True(contains(gr.Table.Secondary, "$petra"))
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 package rt
 
 import (
+	"github.com/ionous/errutil"
 	"io"
 )
 
@@ -44,4 +45,15 @@ type _Writer struct {
 
 func (l _Writer) Write(p []byte) (int, error) {
 	return l.Writer.Write(p)
+}
+
+// an object iterator that always fails
+type EmptyObjects struct{}
+
+func (EmptyObjects) HasNext() bool {
+	return false
+}
+
+func (EmptyObjects) GetNext() (Object, error) {
+	return nil, errutil.New("empty objects never has objects")
 }
