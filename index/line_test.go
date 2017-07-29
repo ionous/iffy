@@ -1,8 +1,12 @@
 package index
 
-import "strings"
+import (
+	"github.com/ionous/sliceOf"
+
+	"strings"
+)
 
 // String only exists in test builds because i dont want the dependency on strings
-func (l Row) String() string {
-	return strings.Join(l[:], ", ")
+func (r Row) String() string {
+	return strings.Join(sliceOf.String(r.Major, r.Minor), ", ")
 }

@@ -2,13 +2,24 @@ package index
 
 import "github.com/ionous/errutil"
 
+// Type describes which columns are unique.
+type Type int
+
+//go:generate stringer -type=Type
+const (
+	OneToOne Type = iota
+	ManyToOne
+	OneToMany
+	ManyToMany
+)
+
 type Table struct {
-	Index [Columns]Index
-	Data  map[Row]interface{}
+	Primary, Secondary Index
+	Data               map[Row]interface{}
 }
 
 func (t *Table) Type() (ret Type) {
-	uni, que := t.Index[Primary].Unique, t.Index[Secondary].Unique
+	uni, que := t.Primary.Unique, t.Secondary.Unique
 	if uni {
 		if que {
 			ret = OneToOne
@@ -25,17 +36,6 @@ func (t *Table) Type() (ret Type) {
 	return
 }
 
-// Type describes which columns are unique.
-type Type int
-
-//go:generate stringer -type=Type
-const (
-	OneToOne Type = iota
-	ManyToOne
-	OneToMany
-	ManyToMany
-)
-
 func MakeTable(rt Type) Table {
 	var uni, que bool
 	switch rt {
@@ -49,10 +49,8 @@ func MakeTable(rt Type) Table {
 	}
 
 	return Table{
-		[2]Index{
-			Index{Primary, uni, nil},
-			Index{Secondary, que, nil},
-		},
+		Index{uni, nil},
+		Index{que, nil},
 		make(map[Row]interface{}),
 	}
 }
@@ -66,19 +64,19 @@ func NoData(interface{}) (ret interface{}, err error) {
 func (r *Table) Relate(primary, secondary string, onInsert OnInsert) (ret bool, err error) {
 	if len(primary) > 0 || len(secondary) > 0 {
 		if len(primary) == 0 {
-			ret = r.remove(Secondary, secondary)
+			ret = r.remove(secondary, &r.Secondary, &r.Primary)
 		} else if len(secondary) == 0 {
-			ret = r.remove(Primary, primary)
+			ret = r.remove(primary, &r.Primary, &r.Secondary)
 		} else {
 			row := Row{primary, secondary}
 			if newData, e := onInsert(r.Data[row]); e != nil {
 				err = e
 			} else {
-				near, far := &r.Index[Primary], &r.Index[Secondary]
+				near, far := &r.Primary, &r.Secondary
 				if old := near.UpdateRow(primary, secondary); len(old) > 0 {
 					delete(r.Data, Row{primary, old})
 				}
-				if old := far.UpdateRow(primary, secondary); len(old) > 0 {
+				if old := far.UpdateRow(secondary, primary); len(old) > 0 {
 					delete(r.Data, Row{old, secondary})
 				}
 				r.Data[row] = newData
@@ -89,51 +87,61 @@ func (r *Table) Relate(primary, secondary string, onInsert OnInsert) (ret bool, 
 	return
 }
 
-func (r *Table) DeletePair(majorKey, minorKey string) (changed bool) {
-	near, far := &r.Index[Primary], &r.Index[Secondary]
-	if n, ok := near.FindPair(0, majorKey, minorKey); ok {
-		if f, ok := far.FindPair(0, minorKey, majorKey); !ok {
-			err := errutil.New("remove couldnt find reverse pair", minorKey, majorKey)
+func (r *Table) DeletePair(major, minor string) (changed bool) {
+	pn, sn := &r.Primary, &r.Secondary
+	if pr, ok := pn.FindPair(0, major, minor); ok {
+		if sr, ok := sn.FindPair(0, minor, major); !ok {
+			err := errutil.New("remove couldnt find reverse pair", minor, major)
 			panic(err)
 		} else {
-			near.Delete(n)
-			far.Delete(f)
+			pn.Delete(pr)
+			sn.Delete(sr)
+			delete(r.Data, Row{major, minor})
 			changed = true
 		}
 	}
 	return
 }
 
-func (r *Table) remove(c Column, majorKey string) (changed bool) {
-	major, minor := c, (c+1)&1
-	near, far := &r.Index[major], &r.Index[minor]
-	if i, ok := near.FindFirst(0, majorKey); ok {
+// major is the major key in near, a minor key in far
+func (r *Table) remove(major string, near, far *Index) (changed bool) {
+	rev := near == &r.Secondary
+	if i, ok := near.FindFirst(0, major); ok {
 		changed = true // otherwise we panic
 		if near.Unique {
-			// if we are unique, there's only one item pair with the matching key.
-			minorKey := near.Lines[i][minor] // note: line[major] == key
+			// if we are unique, there's only one item pair with the matching major.
+			minor := near.Rows[i].Minor // note: line.Major == major
 			near.Delete(i)
-			if i, ok := far.FindPair(0, minorKey, majorKey); ok {
+			if i, ok := far.FindPair(0, minor, major); ok {
 				far.Delete(i)
 			} else {
-				err := errutil.New("remove couldnt find reverse pair", minorKey, majorKey)
+				err := errutil.New("remove couldnt find reverse pair", minor, major)
 				panic(err)
+			}
+			if rev {
+				delete(r.Data, Row{minor, major})
+			} else {
+				delete(r.Data, Row{major, minor})
 			}
 		} else {
 			// if we are not unique, then we may have a lot of pairs.
 			// we will want to delete those pairs here in near, and there in far.
-			a, n, dc := near.Lines, i, NewDeletionCursor(far)
+			a, n, dc := near.Rows, i, NewDeletionCursor(far)
 			for {
-				// note the minor keys are sorted, so they are ever increasing.
-				if minorKey := a[n][minor]; !dc.DeletePair(minorKey, majorKey) {
-					err := errutil.New("remove couldnt find reverse pairs", minorKey, majorKey)
+				// note the minor majors are sorted, so they are ever increasing.
+				if minor := a[n].Minor; !dc.DeletePair(minor, major) {
+					err := errutil.New("remove couldnt find reverse pairs", minor, major)
 					panic(err)
+				} else if rev {
+					delete(r.Data, Row{minor, major})
+				} else {
+					delete(r.Data, Row{major, minor})
 				}
-				if n = n + 1; n == len(a) || a[n][major] != majorKey {
+				if n = n + 1; n == len(a) || a[n].Major != major {
 					break
 				}
 			}
-			// cut all of the pairs with the requested key
+			// cut all of the pairs with the requested major
 			a = a[:i+copy(a[i:], a[n:])]
 			// cut all (remaining) things in the far side
 			dc.Flush()

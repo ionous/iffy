@@ -2,22 +2,20 @@ package index
 
 import "sort"
 
-// Index stores lines sorted by two keys, a major and a minor
+// Index stores Rows sorted by two keys, a major and a minor
 type Index struct {
-	Major  Column
 	Unique bool
-	Lines  []Row
+	Rows   []Row
 }
 
-func (index *Index) Walk(majorKey string, visit func(other string) bool) (ret int) {
-	a, major, minor := index.Lines, index.Major, (index.Major+1)&1
-	if i, ok := index.FindFirst(0, majorKey); ok {
-		for ; i < len(a); i++ {
-			if line := a[i]; line[major] != majorKey {
+func (index *Index) Walk(major string, visit func(other string) bool) (ret int) {
+	if i, ok := index.FindFirst(0, major); ok {
+		for a := index.Rows; i < len(a); i++ {
+			if line := a[i]; line.Major != major {
 				break
 			} else {
 				ret++
-				if visit(line[minor]) {
+				if visit(line.Minor) {
 					break
 				}
 			}
@@ -28,81 +26,79 @@ func (index *Index) Walk(majorKey string, visit func(other string) bool) (ret in
 
 // FindFirst major key in this index starting from row n.
 // Returns the index of the key if true, or the insert point for the pair if false.
-func (index *Index) FindFirst(n int, majorKey string) (int, bool) {
-	a, major := index.Lines, index.Major
+func (index *Index) FindFirst(n int, major string) (int, bool) {
+	a := index.Rows
 	i := n + sort.Search(len(a)-n, func(i int) bool {
-		return a[i+n][major] >= majorKey
+		return a[i+n].Major >= major
 	})
-	exact := i < len(a) && a[i][major] == majorKey
+	exact := i < len(a) && a[i].Major == major
 	return i, exact
 }
 
 // Find a unique pair of keys n this index starting from row n.
 // Returns the index of the pair if true, or the insert point for the pair if false.
-func (index *Index) FindPair(n int, majorKey, minorKey string) (int, bool) {
-	a, major, minor := index.Lines, index.Major, (index.Major+1)&1
+func (index *Index) FindPair(n int, major, minor string) (int, bool) {
+	a := index.Rows
 	i := n + sort.Search(len(a)-n, func(i int) (greatOrEqual bool) {
-		if aMajor := a[i+n][major]; aMajor > majorKey {
+		if aMajor := a[i+n].Major; aMajor > major {
 			greatOrEqual = true
-		} else if aMajor == majorKey {
-			greatOrEqual = a[i+n][minor] >= minorKey
+		} else if aMajor == major {
+			greatOrEqual = a[i+n].Minor >= minor
 		}
 		return
 	})
-	exact := i < len(a) && a[i][major] == majorKey && a[i][minor] == minorKey
+	exact := i < len(a) && a[i].Major == major && a[i].Minor == minor
 	return i, exact
 }
 
 // Delete the passed row.
 func (index *Index) Delete(i int) {
-	a := index.Lines
-	index.Lines = a[:i+copy(a[i:], a[i+1:])]
+	a := index.Rows
+	index.Rows = a[:i+copy(a[i:], a[i+1:])]
 }
 
 // Update adds, inserts, or sets the passed key if needed.
 // It will never remove a key, and it always returns avalid pointer.
 // It returns the previously existing row data if any.
 // Note: the value of data is ignored.
-func (index *Index) UpdateRow(p, s string) (old string) {
+func (index *Index) UpdateRow(major, minor string) (old string) {
 	if index.Unique {
-		old = index.addReplace(p, s)
+		old = index.addReplace(major, minor)
 	} else {
-		index.addInsert(p, s)
+		index.addInsert(major, minor)
 	}
 	return
 }
 
 // old is empty if the element gets added; otherwise its the previous pairing
-func (index *Index) addReplace(p, s string) (old string) {
-	row := Row{p, s}
-	a, major, minor := index.Lines, index.Major, (index.Major+1)&1
+func (index *Index) addReplace(major, minor string) (old string) {
+	a := index.Rows
 	// opt: since unique means one major key, we dont have to look at the minor key.
-	if i, ok := index.FindFirst(0, row[major]); !ok {
+	if i, ok := index.FindFirst(0, major); !ok {
 		// if we didn't find the element, insert
-		index.insert(i, row)
-	} else if prev, next := a[i][minor], row[minor]; prev != next {
-		// otherwise, if the secondary key is different, replace it.
-		old, a[i][minor] = prev, next
+		index.insert(i, major, minor)
+	} else if prev := a[i].Minor; prev != minor {
+		// otherwise, if the minor key is different, replace it.
+		old = prev
+		a[i].Minor = minor
 	}
 	return
 }
 
 // true if the pair was inserted; false if the pair already existed.
-func (index *Index) addInsert(p, s string) (changed bool) {
-	row := Row{p, s}
-	major, minor := index.Major, (index.Major+1)&1
-	if i, ok := index.FindPair(0, row[major], row[minor]); !ok {
+func (index *Index) addInsert(major, minor string) (changed bool) {
+	if i, ok := index.FindPair(0, major, minor); !ok {
 		// if we didn't find the element, insert
-		index.insert(i, row)
+		index.insert(i, major, minor)
 		changed = true
 	}
 	return
 }
 
 // insert the passed line at i
-func (index *Index) insert(i int, row Row) {
-	a := append(index.Lines, Row{})
+func (index *Index) insert(i int, major, minor string) {
+	a := append(index.Rows, Row{})
 	copy(a[i+1:], a[i:])
-	a[i] = row
-	index.Lines = a
+	a[i] = Row{major, minor}
+	index.Rows = a
 }

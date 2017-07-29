@@ -39,8 +39,8 @@ func (assert *RelSuite) MakeRelation() (ret *Table) {
 
 func (assert *RelSuite) TestConstruct() {
 	t, n := assert.T(), assert.MakeRelation()
-	t.Log("primary", getKeys(n.Index[Primary], 0))
-	t.Log("secondary", getKeys(n.Index[Secondary], 1))
+	t.Log("primary", getKeys(n.Primary, unpackMajor))
+	t.Log("secondary", getKeys(n.Secondary, unpackMinor))
 	for _, pair := range pairs {
 		collect := collect(t, n, pair.primary)
 		assert.EqualValues(pair.secondary, collect, pair.primary)
@@ -59,14 +59,14 @@ func (assert *RelSuite) TestTypes() {
 		n := MakeTable(i)
 		assert.Equal(i, n.Type())
 		test := m[i]
-		assert.Equal(test.uni, n.Index[Primary].Unique)
-		assert.Equal(test.que, n.Index[Secondary].Unique)
+		assert.Equal(test.uni, n.Primary.Unique)
+		assert.Equal(test.que, n.Secondary.Unique)
 	}
 }
 
-func (assert *RelSuite) TestRemoveSecondary() {
+func (assert *RelSuite) TestRemoveMinor() {
 	t, n := assert.T(), assert.MakeRelation()
-	t.Log(n.Index[0].Lines)
+	t.Log(n.Primary.Rows)
 	for _, pair := range pairs {
 		name, remove := pair.primary, pair.secondary[0]
 		before := collect(t, n, name)
@@ -83,7 +83,7 @@ func (assert *RelSuite) TestRemoveSecondary() {
 }
 
 func collect(t *testing.T, n *Table, key string) (ret []string) {
-	visits := n.Index[Primary].Walk(key, func(other string) bool {
+	visits := n.Primary.Walk(key, func(other string) bool {
 		ret = append(ret, other)
 		return false
 	})
