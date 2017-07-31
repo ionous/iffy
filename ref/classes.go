@@ -61,19 +61,15 @@ func (cb *ClassBuilder) RegisterClass(rtype r.Type) (ret *RefClass, err error) {
 
 func MakeProperties(rtype r.Type) (parent r.Type, parentIdx int, props []rt.Property, err error) {
 	ids := make(map[string]string)
-
-	for fw := unique.Fields(rtype); fw.HasNext(); {
-		field := fw.GetNext()
-		if field.Target != rtype {
-			break // weve advanced to the parent
-		}
+	for i := 0; i < rtype.NumField(); i++ {
+		field := rtype.Field(i)
 		//
-		if !field.IsPublic() {
+		if !unique.IsPublic(field) {
 			err = errutil.New("expected only exportable fields", field.Name)
 			break
-		} else if field.IsParent() {
+		} else if parent == nil && unique.IsEmbedded(field) {
 			parent = field.Type
-			parentIdx = field.Index
+			parentIdx = i
 		} else {
 			id := id.MakeId(field.Name)
 			if was := ids[id]; len(was) > 0 {
@@ -84,11 +80,11 @@ func MakeProperties(rtype r.Type) (parent r.Type, parentIdx int, props []rt.Prop
 				break
 			} else {
 				var p rt.Property
-				base := RefProp{id, field.Index, cat}
+				base := RefProp{id, i, cat}
 				if cat != rt.State {
 					p = &base
 				} else {
-					if choices, e := EnumFromField(field.StructField); e != nil {
+					if choices, e := EnumFromField(&field); e != nil {
 						err = errutil.New("error enumerating", field.Name, field.Type, e)
 						break
 					} else {

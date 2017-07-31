@@ -141,10 +141,10 @@ Upcast:
 	for !set(src) {
 		el := src.Elem()
 		walk := el.Type()
-		for fw := unique.Fields(walk); fw.HasNext(); {
-			f := fw.GetNext()
-			if f.IsParent() {
-				src = el.Field(f.Index).Addr()
+		for i := 0; i < walk.NumField(); i++ {
+			field := walk.Field(i)
+			if unique.IsEmbedded(field) {
+				src = el.Field(i).Addr()
 				continue Upcast
 			}
 		}

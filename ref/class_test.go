@@ -2,6 +2,7 @@ package ref
 
 import (
 	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	. "github.com/ionous/iffy/tests"
 	"github.com/stretchr/testify/suite"
@@ -9,6 +10,7 @@ import (
 	"testing"
 )
 
+//
 func TestClassSuite(t *testing.T) {
 	suite.Run(t, new(ClassSuite))
 }
@@ -43,12 +45,12 @@ func (assert *ClassSuite) TestClass() {
 	derivedType := r.TypeOf((*DerivedClass)(nil)).Elem()
 
 	// id field tests
-	if i, ok := FieldPathOfId(baseType); assert.True(ok) {
-		field := baseType.FieldByIndex(i.FullPath())
+	if path, ok := unique.PathOf(baseType, "id"); assert.True(ok) {
+		field := baseType.FieldByIndex(path)
 		assert.Equal(field.Name, "Name")
 	}
-	if i, ok := FieldPathOfId(derivedType); assert.True(ok) {
-		field := derivedType.FieldByIndex(i.FullPath())
+	if path, ok := unique.PathOf(derivedType, "id"); assert.True(ok) {
+		field := derivedType.FieldByIndex(path)
 		assert.Equal(field.Name, "Name")
 	}
 

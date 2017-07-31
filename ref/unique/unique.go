@@ -38,15 +38,7 @@ func (u *Objects) Id(cls string) (ret string) {
 
 func (u *Objects) Generate() (ret []interface{}, err error) {
 	for rtype, cnt := range u.ids {
-		var idpath []int
-		for fw := Fields(rtype); fw.HasNext(); {
-			field := fw.GetNext()
-			tag := Tag(field.Tag)
-			if _, ok := tag.Find("id"); ok {
-				idpath = append(field.Path, field.Index)
-			}
-		}
-		if len(idpath) == 0 {
+		if idpath, ok := PathOf(rtype, "id"); !ok {
 			err = errutil.New("couldn't find id field in", rtype)
 			break
 		} else {

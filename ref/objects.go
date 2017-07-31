@@ -85,27 +85,13 @@ func IdFromValue(rval r.Value) (ret string, err error) {
 
 func idFromValue(rval r.Value) (ret string, err error) {
 	rtype := rval.Type()
-	if field, ok := FieldPathOfId(rtype); !ok {
+	if path, ok := unique.PathOf(rtype, "id"); !ok {
 		err = errutil.New("couldnt find id for", rtype)
+	} else if field := rval.FieldByIndex(path); field.Kind() != r.String {
+		err = errutil.New("id was not a string", field)
 	} else {
-		field := rval.FieldByIndex(field.FullPath())
 		name := field.String()
 		ret = id.MakeId(name)
-	}
-	return
-}
-
-// FieldPathOfId extracts the index of the id field
-func FieldPathOfId(rtype r.Type) (ret *unique.FieldInfo, okay bool) {
-	for fw := unique.Fields(rtype); fw.HasNext(); {
-		field := fw.GetNext()
-		tag := unique.Tag(field.Tag)
-		if _, ok := tag.Find("id"); ok {
-			if field.Type.Kind() == r.String {
-				ret, okay = &field, true
-			}
-			break
-		}
 	}
 	return
 }

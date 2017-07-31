@@ -3,6 +3,7 @@ package ref
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ref/unique"
 	r "reflect"
 	"strconv"
 )
@@ -59,10 +60,10 @@ func (b *ObjBuilder) MakeId(rval r.Value) (ret string, err error) {
 
 	info, ok := b.info[rtype]
 	if !ok {
-		if field, ok := FieldPathOfId(rtype); !ok {
+		if path, ok := unique.PathOf(rtype, "id"); !ok {
 			err = errutil.New("couldnt find id for", rtype)
 		} else {
-			info.pathOfId = field.FullPath()
+			info.pathOfId = path
 			b.info[rtype] = info
 		}
 	}
