@@ -36,9 +36,9 @@ func (t *Table) Type() (ret Type) {
 	return
 }
 
-func NewTable(rt Type) *Table {
+func NewTable(relation Type) *Table {
 	var uni, que bool
-	switch rt {
+	switch relation {
 	case ManyToMany:
 	case ManyToOne:
 		uni = true
@@ -61,7 +61,11 @@ func NoData(interface{}) (ret interface{}, err error) {
 	return
 }
 
-func (r *Table) Relate(primary, secondary string, onInsert OnInsert) (ret bool, err error) {
+func (r *Table) GetData(p, s string) (ret interface{}, okay bool) {
+	ret, okay = r.Data[Row{p, s}]
+	return
+}
+func (r *Table) RelatePair(primary, secondary string, onInsert OnInsert) (ret bool, err error) {
 	if len(primary) > 0 || len(secondary) > 0 {
 		if len(primary) == 0 {
 			ret = r.remove(secondary, &r.Secondary, &r.Primary)
@@ -72,30 +76,43 @@ func (r *Table) Relate(primary, secondary string, onInsert OnInsert) (ret bool, 
 			if newData, e := onInsert(r.Data[row]); e != nil {
 				err = e
 			} else {
-				near, far := &r.Primary, &r.Secondary
-				if old := near.UpdateRow(primary, secondary); len(old) > 0 {
+				if old := r.Primary.UpdateRow(primary, secondary); len(old) > 0 {
 					delete(r.Data, Row{primary, old})
+					ret = true
 				}
-				if old := far.UpdateRow(secondary, primary); len(old) > 0 {
+				if old := r.Secondary.UpdateRow(secondary, primary); len(old) > 0 {
 					delete(r.Data, Row{old, secondary})
+					ret = true
 				}
 				r.Data[row] = newData
-				ret = true
 			}
 		}
 	}
 	return
 }
 
+func (r *Table) AddPair(primary, secondary string, onInsert OnInsert) (err error) {
+	row := Row{primary, secondary}
+	if newData, e := onInsert(r.Data[row]); e != nil {
+		err = e
+	} else if old := r.Primary.AddRow(primary, secondary); len(old) > 0 {
+		err = errutil.New("paring already exists", primary, old)
+	} else if old := r.Secondary.AddRow(secondary, primary); len(old) > 0 {
+		err = errutil.New("paring already exists", secondary, old)
+	} else {
+		r.Data[row] = newData
+	}
+	return
+}
+
 func (r *Table) DeletePair(major, minor string) (changed bool) {
-	pn, sn := &r.Primary, &r.Secondary
-	if pr, ok := pn.FindPair(0, major, minor); ok {
-		if sr, ok := sn.FindPair(0, minor, major); !ok {
+	if pr, ok := r.Primary.FindPair(0, major, minor); ok {
+		if sr, ok := r.Secondary.FindPair(0, minor, major); !ok {
 			err := errutil.New("remove couldnt find reverse pair", minor, major)
 			panic(err)
 		} else {
-			pn.Delete(pr)
-			sn.Delete(sr)
+			r.Primary.Delete(pr)
+			r.Secondary.Delete(sr)
 			delete(r.Data, Row{major, minor})
 			changed = true
 		}

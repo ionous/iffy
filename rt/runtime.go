@@ -24,6 +24,13 @@ type Model interface {
 	GetRelation(name string) (Relation, bool)
 }
 
+// Ancestors
+type Ancestors interface {
+	// GetAncestors returns a stream of objects starting with the passed object, then walking up whatever hierarchy the particular runtime implementation has defined.
+	// E.g. parent-child containment.
+	GetAncestors(Runtime, Object) (ObjectStream, error)
+}
+
 type Runtime interface {
 	// Model describes the predefined world
 	Model
@@ -40,9 +47,8 @@ type Runtime interface {
 	NewObject(class string) (Object, error)
 	// Emplace adds an anonymous object to the runtime. The object has no name and cannot be found via GetObject().
 	Emplace(mem interface{}) (Object, error)
-	// GetAncestors returns a stream of objects starting with the passed object, then walking up whatever hierarchy the particular runtime implementation has defined.
-	// E.g. parent-child containment.
-	GetAncestors(Object) (ObjectStream, error)
+	//
+	Ancestors
 	// Patterns for pattern matching, iffy's equivalent of user methods and functions.
 	Patterns
 	// Pluralize for pluralization of printed nouns.

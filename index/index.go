@@ -58,29 +58,39 @@ func (index *Index) Delete(i int) {
 }
 
 // Update adds, inserts, or sets the passed key if needed.
-// It will never remove a key, and it always returns avalid pointer.
 // It returns the previously existing row data if any.
 // Note: the value of data is ignored.
 func (index *Index) UpdateRow(major, minor string) (old string) {
 	if index.Unique {
-		old = index.addReplace(major, minor)
+		prev, _ := index.addReplace(major, minor)
+		old = prev
 	} else {
 		index.addInsert(major, minor)
 	}
 	return
 }
 
-// old is empty if the element gets added; otherwise its the previous pairing
-func (index *Index) addReplace(major, minor string) (old string) {
-	a := index.Rows
+func (index *Index) AddRow(major, minor string) (old string) {
+	if !index.Unique {
+		index.addInsert(major, minor)
+	} else if prev, at := index.addReplace(major, minor); len(prev) > 0 {
+		index.Rows[at].Minor = prev // restore what replace just did
+		old = prev
+	}
+	return
+}
+
+// old is empty if the element gets added; otherwise its the previous minor key
+func (index *Index) addReplace(major, minor string) (old string, at int) {
 	// opt: since unique means one major key, we dont have to look at the minor key.
 	if i, ok := index.FindFirst(0, major); !ok {
 		// if we didn't find the element, insert
 		index.insert(i, major, minor)
-	} else if prev := a[i].Minor; prev != minor {
+		at = i
+	} else if prev := index.Rows[i].Minor; prev != minor {
 		// otherwise, if the minor key is different, replace it.
-		old = prev
-		a[i].Minor = minor
+		index.Rows[i].Minor = minor
+		old, at = prev, i
 	}
 	return
 }

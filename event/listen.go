@@ -32,7 +32,7 @@ type Target struct {
 
 // CollectAncestors to create targets from the parents of the pased object. The  target order is: instance's parent, parent classes, container instance, repeat.
 func (els EventListeners) CollectAncestors(run rt.Runtime, obj rt.Object) (ret []Target, err error) {
-	if at, e := run.GetAncestors(obj); e != nil {
+	if at, e := run.GetAncestors(run, obj); e != nil {
 		err = e
 	} else {
 		var tgt []Target

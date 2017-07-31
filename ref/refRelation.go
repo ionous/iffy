@@ -38,7 +38,7 @@ func (rel *RefRelation) Relate(src, dst rt.Object, onInsert index.OnInsert) (cha
 	} else if d, ok := reduce(dst); !ok {
 		err = errutil.Fmt("secondary object is anonymous", dst.GetClass())
 	} else {
-		changed, err = rel.Table.Relate(s, d, onInsert)
+		changed, err = rel.Table.RelatePair(s, d, onInsert)
 	}
 	return
 }

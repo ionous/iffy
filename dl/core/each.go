@@ -90,14 +90,14 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else if !it.HasNext() {
 		if e := f.Else.Execute(run); e != nil {
-			err = errutil.New("failed each num else", e)
+			err = errutil.New("failed each text else", e)
 		}
 	} else if l, e := NewLooper(run, "TextCounter", f.Go); e != nil {
 		err = e
 	} else {
 		for it.HasNext() {
 			if v, e := it.GetNext(); e != nil {
-				err = errutil.New("failed each num get", e)
+				err = errutil.New("failed each text get", e)
 				break
 			} else if e := l.RunNext("Text", v, it.HasNext()); e != nil {
 				err = e

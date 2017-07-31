@@ -107,15 +107,15 @@ func (assert *IndexSuite) TestAddReplace() {
 	n := Index{}
 	//
 	var was string
-	was = n.addReplace("claire", "rocky")
+	was, _ = n.addReplace("claire", "rocky")
 	assert.Empty(was)
 	assert.Len(n.Rows, 1)
 
-	was = n.addReplace("claire", "loofah")
+	was, _ = n.addReplace("claire", "loofah")
 	assert.Equal(was, "rocky")
 	assert.Len(n.Rows, 1)
 
-	was = n.addReplace("claire", "loofah")
+	was, _ = n.addReplace("claire", "loofah")
 	assert.Empty(was)
 	assert.Len(n.Rows, 1)
 }

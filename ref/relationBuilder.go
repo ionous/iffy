@@ -6,27 +6,40 @@ import (
 	"github.com/ionous/iffy/index"
 )
 
-type RelBuilder struct {
-	types map[string]index.Type
-}
+type RelationBuilder map[string]index.Type
 
-func (b *RelBuilder) Build() Relations {
+func (b RelationBuilder) Build() Relations {
 	r := make(Relations)
-	for id, t := range b.types {
+	for id, t := range b {
 		r[id] = &RefRelation{id, index.NewTable(t)}
 	}
 	return r
 }
 
-func NewRelations() *RelBuilder {
-	return &RelBuilder{make(map[string]index.Type)}
+func NewRelations() RelationBuilder {
+	return make(map[string]index.Type)
+}
+
+type RelationDesc struct {
+	Name string
+	Type index.Type
+}
+
+func RegisterRelations(b RelationBuilder, desc ...RelationDesc) (err error) {
+	for _, d := range desc {
+		if e := b.NewRelation(d.Name, d.Type); e != nil {
+			err = e
+			break
+		}
+	}
+	return
 }
 
 // RegisterType compatible with unique.TypeRegistry
-func (b *RelBuilder) NewRelation(name string, kind index.Type) (err error) {
+func (b RelationBuilder) NewRelation(name string, kind index.Type) (err error) {
 	id := id.MakeId(name)
-	if k, ok := b.types[id]; !ok {
-		b.types[id] = kind
+	if k, ok := b[id]; !ok {
+		b[id] = kind
 	} else if k != kind {
 		err = errutil.New("mismatched relations", k, kind)
 	}

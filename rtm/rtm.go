@@ -17,7 +17,7 @@ type Rtm struct {
 	ScopeStack
 	io.Writer
 	Randomizer
-	Ancestors
+	rt.Ancestors
 	pat.Patterns
 	Plurals
 }
@@ -30,8 +30,8 @@ func (rtm *Rtm) GetPatterns() *pat.Patterns {
 type Config struct {
 	classes   ref.ClassMap
 	objects   *ref.ObjBuilder
-	rel       *ref.RelBuilder
-	ancestors Ancestors
+	rel       *ref.RelationBuilder
+	ancestors rt.Ancestors
 	patterns  *patbuilder.Patterns
 	seed      int64
 	writer    io.Writer
@@ -49,12 +49,12 @@ func (c *Config) Objects(o *ref.ObjBuilder) *Config {
 	return c
 }
 
-func (c *Config) Ancestors(a Ancestors) *Config {
+func (c *Config) Ancestors(a rt.Ancestors) *Config {
 	c.ancestors = a
 	return c
 }
 
-func (c *Config) Relations(r *ref.RelBuilder) *Config {
+func (c *Config) Relations(r *ref.RelationBuilder) *Config {
 	c.rel = r
 	return c
 }
@@ -115,9 +115,4 @@ func (c *Config) Rtm() *Rtm {
 	rtm.Randomizer.Reset(seed) // FIX: time?
 
 	return rtm
-}
-
-// Ancestors is compatible with the rt.Runtime
-type Ancestors interface {
-	GetAncestors(rt.Object) (rt.ObjectStream, error)
 }

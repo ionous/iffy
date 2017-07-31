@@ -61,7 +61,7 @@ func TestOneToMany(t *testing.T) {
 		assert.False(contains(gr.Table.Secondary, "$loofa"))
 		assert.False(contains(gr.Table.Secondary, "$petra"))
 		//
-		if c, e := gr.Relate(claire, loofa, index.NoData); assert.NoError(e) && assert.True(c) {
+		if c, e := gr.Relate(claire, loofa, index.NoData); assert.NoError(e) && assert.False(c) {
 			assert.True(contains(gr.Table.Primary, "$claire"))
 			assert.True(contains(gr.Table.Secondary, "$loofa"))
 			assert.False(contains(gr.Table.Secondary, "$petra"))
@@ -71,12 +71,12 @@ func TestOneToMany(t *testing.T) {
 				assert.False(contains(gr.Table.Secondary, "$loofa"))
 				assert.False(contains(gr.Table.Secondary, "$petra"))
 
-				if c, e := gr.Relate(claire, petra, index.NoData); assert.NoError(e) && assert.True(c) {
+				if c, e := gr.Relate(claire, petra, index.NoData); assert.NoError(e) && assert.False(c) {
 					assert.True(contains(gr.Table.Primary, "$claire"))
 					assert.False(contains(gr.Table.Secondary, "$loofa"))
 					assert.True(contains(gr.Table.Secondary, "$petra"))
 
-					if c, e := gr.Relate(claire, loofa, index.NoData); assert.NoError(e) && assert.True(c) {
+					if c, e := gr.Relate(claire, loofa, index.NoData); assert.NoError(e) && assert.False(c) {
 						assert.True(contains(gr.Table.Primary, "$claire"))
 						assert.True(contains(gr.Table.Secondary, "$loofa"))
 						assert.True(contains(gr.Table.Secondary, "$petra"))

@@ -29,12 +29,11 @@ func (assert *RelSuite) MakeRelation() (ret *Table) {
 	n := NewTable(OneToMany)
 	for _, pair := range pairs {
 		for _, v := range pair.secondary {
-			changed, e := n.Relate(pair.primary, v, NoData)
+			e := n.AddPair(pair.primary, v, NoData)
 			assert.NoError(e)
-			assert.True(changed)
 		}
 	}
-	return &n
+	return n
 }
 
 func (assert *RelSuite) TestConstruct() {
@@ -73,7 +72,7 @@ func (assert *RelSuite) TestRemoveMinor() {
 		assert.Len(before, len(pair.secondary))
 		assert.Contains(before, remove)
 		t.Log("removing", remove, "from", name)
-		if changed, e := n.Relate("", remove, nil); assert.True(changed) && assert.NoError(e) {
+		if changed, e := n.RelatePair("", remove, nil); assert.True(changed) && assert.NoError(e) {
 			after := collect(t, n, name)
 			t.Log("after", after)
 			assert.Len(after, len(pair.secondary)-1)
