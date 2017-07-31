@@ -2,7 +2,6 @@ package ref
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ref/unique"
 	r "reflect"
 )
 
@@ -143,7 +142,7 @@ Upcast:
 		walk := el.Type()
 		for i := 0; i < walk.NumField(); i++ {
 			field := walk.Field(i)
-			if unique.IsEmbedded(field) {
+			if IsParentField(&field) {
 				src = el.Field(i).Addr()
 				continue Upcast
 			}

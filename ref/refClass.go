@@ -11,7 +11,7 @@ type RefClass struct {
 	id        string
 	rtype     r.Type
 	parent    *RefClass
-	parentIdx int           // index of parent aggregate in rtype; valid if parent!= nil
+	parentIdx []int         // index of parent aggregate in rtype; valid if parent!= nil
 	props     []rt.Property // RefProp, RefEnum, etc.
 }
 
@@ -84,13 +84,13 @@ func (c *RefClass) GetPropertyByChoice(choice string) (rt.Property, bool) {
 func (c *RefClass) findProperty(match func(p rt.Property) bool) (path []int, okay bool) {
 	var partial []int
 	type getFieldIndex interface {
-		getFieldIndex() int
+		getFieldIndex() []int
 	}
 	for {
 		for _, p := range c.props {
 			if match(p) {
 				idx := p.(getFieldIndex).getFieldIndex()
-				path = append(partial, idx)
+				path = append(partial, idx...)
 				okay = true
 				break
 			}
@@ -98,7 +98,7 @@ func (c *RefClass) findProperty(match func(p rt.Property) bool) (path []int, oka
 		if okay || c.parent == nil {
 			break
 		} else {
-			c, partial = c.parent, append(partial, c.parentIdx)
+			c, partial = c.parent, append(partial, c.parentIdx...)
 		}
 	}
 	return

@@ -15,7 +15,7 @@ type BaseClass struct {
 
 // DerivedClass does nothing but extend BaseClass
 type DerivedClass struct {
-	BaseClass `if:"plural:derives"`
+	BaseClass `if:"parent,plural:derives"`
 }
 
 //go:generate stringer -type=ListeningState

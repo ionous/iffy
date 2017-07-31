@@ -8,7 +8,7 @@ import (
 
 type RefProp struct {
 	id       string
-	fieldIdx int //  index in parent rtype
+	fieldIdx []int //  index in parent rtype
 	propType rt.PropertyType
 }
 
@@ -21,7 +21,7 @@ func (p *RefProp) GetType() rt.PropertyType {
 	return p.propType
 }
 
-func (p *RefProp) getFieldIndex() int {
+func (p *RefProp) getFieldIndex() []int {
 	return p.fieldIdx
 }
 

@@ -9,6 +9,7 @@ type Classes struct {
 	*Room
 	*Thing
 	*Actor
+	*Container
 }
 
 type Patterns struct {

@@ -58,10 +58,11 @@ func (b *ObjBuilder) RegisterValue(rval r.Value) (err error) {
 func (b *ObjBuilder) MakeId(rval r.Value) (ret string, err error) {
 	rtype := rval.Type()
 
+	// cache the id path
 	info, ok := b.info[rtype]
 	if !ok {
 		if path, ok := unique.PathOf(rtype, "id"); !ok {
-			err = errutil.New("couldnt find id for", rtype)
+			err = errutil.New("make id couldnt find id for", rtype)
 		} else {
 			info.pathOfId = path
 			b.info[rtype] = info

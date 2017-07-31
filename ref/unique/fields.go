@@ -26,7 +26,10 @@ func findPathOf(base []int, rtype r.Type, tag string) (ret []int, okay bool) {
 				ret, okay = append(base, i), true
 				break
 			} else if IsEmbedded(field) {
-				ret, okay = findPathOf(append(base, i), field.Type, tag)
+				if path, ok := findPathOf(append(base, i), field.Type, tag); ok {
+					ret, okay = path, ok
+					break
+				}
 			}
 		}
 	}

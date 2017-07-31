@@ -30,7 +30,7 @@ type Kind struct {
 
 // Room "Represents geographical locations, both indoor and outdoor, which are not necessarily areas in a building. A player in one room is mostly unable to sense, or interact with, anything in a different room. Rooms are arranged in a map."
 type Room struct {
-	Kind
+	Kind        `if:"parent"`
 	Dark        bool
 	Visited     bool
 	Description string
@@ -38,7 +38,7 @@ type Room struct {
 
 // Thing "Represents anything interactive in the model world that is not a room. People, pieces of scenery, furniture, doors and mislaid umbrellas might all be examples, and so might more surprising things like the sound of birdsong or a shaft of sunlight."
 type Thing struct {
-	Kind
+	Kind        `if:"parent"`
 	Description string
 	Brief       string // known as "initial appearance"
 
@@ -46,12 +46,12 @@ type Thing struct {
 	// unmarked for listing not marked for listing,
 	// mentioned not unmentioned
 
-	Scenery bool // unmentioned in the room description
-	Handled bool // controls use of the initial appearance
+	Scenery      bool // unmentioned in the room description
+	Handled      bool // controls use of the initial appearance
+	FixedInPlace bool // portable not fixed in place,
 
 	// Usually unlit not lit,
 	// inedible not edible,
-	// portable not fixed in place,
 	// matching key (object).
 	// Usually not wearable, pushable between rooms
 	//
@@ -63,7 +63,7 @@ type Thing struct {
 
 // Actor "not necessarily a human being, but anything animate enough to envisage having a conversation with, or bartering with."
 type Actor struct {
-	Thing
+	Thing `if:"parent"`
 	// Usually male not female.
 	// Usually not neuter.
 	// Can have carrying capacity (number).
@@ -78,7 +78,7 @@ type Latch struct {
 
 // Container represents something with an inside and an outside, into which portable things can be placed. For example, a teachest or a handbag; but not a large space such as a room ( which generally has multiple exits ), nor an actor ( actors generally carry or hold items. )
 type Container struct {
-	Thing
+	Thing `if:"parent"`
 	Latch
 	Transparent bool
 

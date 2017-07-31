@@ -22,6 +22,13 @@ var Thingaverse = ObjetctMap{
 	"apple": &Thing{
 		Kind: Kind{Name: "apple", PrintedName: "empire apple"},
 	},
+	"box": &Container{
+		Thing: Thing{Kind: Kind{Name: "box"}},
+		Latch: Latch{Openable: true},
+	},
+	"cake": &Thing{
+		Kind: Kind{Name: "cake"},
+	},
 	// someone with a proper name
 	"mildred": &Actor{
 		Thing{Kind: Kind{Name: "mildred", CommonProper: ProperNamed}},
@@ -34,5 +41,5 @@ var Thingaverse = ObjetctMap{
 }
 
 type ScrabbleTile struct {
-	Thing
+	Thing `if:"parent"`
 }
