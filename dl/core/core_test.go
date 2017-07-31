@@ -21,7 +21,7 @@ func TestCore(t *testing.T) {
 // Regular expression to select test suites specified command-line argument "-run". Regular expression to select the methods of test suites specified command-line argument "-m"
 type CoreSuite struct {
 	suite.Suite
-	ops *ops.Ops
+	cmds *ops.Ops
 
 	run   rt.Runtime
 	lines printer.Lines
@@ -40,8 +40,8 @@ func (assert *CoreSuite) Lines() (ret []string) {
 
 func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
-	assert.ops = ops.NewOps()
-	unique.RegisterBlocks(unique.PanicTypes(assert.ops),
+	assert.cmds = ops.NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(assert.cmds),
 		(*core.Commands)(nil))
 
 	assert.unique = unique.NewObjectGenerator()
@@ -73,8 +73,7 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 		} else {
 			unique.RegisterValues(unique.PanicValues(assert.objects), inst...)
 
-			run := rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).Rtm()
-			ret = run
+			ret = rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).Rtm()
 		}
 	}
 	return
@@ -85,7 +84,7 @@ func (assert *CoreSuite) matchFunc(
 	compare func(expected []string),
 ) {
 	var root struct{ Eval rt.Execute }
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		build(c)
 		if run, e := assert.newRuntime(c); assert.NoError(e) {
 			if e := root.Eval.Execute(run); assert.NoError(e) {
@@ -111,7 +110,7 @@ func (assert *CoreSuite) TestShortcuts() {
 	var root struct {
 		Eval rt.TextEval
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		c.Val("shortcut")
 		if run, e := assert.newRuntime(c); assert.NoError(e) {
 			if res, e := root.Eval.GetText(run); assert.NoError(e) {
@@ -127,7 +126,7 @@ func (assert *CoreSuite) TestAllTrue() {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := assert.ops.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewBuilder(&root); ok {
 			c.Cmd("all true", c.Cmds(
 				c.Cmd("bool", a),
 				c.Cmd("bool", b)))
@@ -151,7 +150,7 @@ func (assert *CoreSuite) TestAnyTrue() {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := assert.ops.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewBuilder(&root); ok {
 			if c.Cmd("any true").Begin() {
 				c.Cmds(c.Cmd("bool", a), c.Cmd("bool", b))
 				c.End()
@@ -174,7 +173,7 @@ func (assert *CoreSuite) TestCompareNum() {
 		Eval rt.BoolEval
 	}
 	test := func(a float64, op string, b float64) {
-		if c, ok := assert.ops.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewBuilder(&root); ok {
 			if c.Cmd("compare num").Begin() {
 				c.Val(a).Cmd(op).Val(b)
 				c.End()
@@ -198,7 +197,7 @@ func (assert *CoreSuite) TestCompareText() {
 		Eval rt.BoolEval
 	}
 	test := func(a, op, b string) {
-		if c, ok := assert.ops.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewBuilder(&root); ok {
 			c.Cmd("compare text", c.Val(a), c.Cmd(op), c.Val(b))
 			//
 			if run, e := assert.newRuntime(c); assert.NoError(e) {

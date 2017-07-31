@@ -9,14 +9,14 @@ import (
 	"github.com/ionous/iffy/spec/ops"
 )
 
-func NewActions(objectClasses ref.Classes, ops *ops.Ops) *Actions {
-	return &Actions{objectClasses, ref.NewClassStack(objectClasses), ops, make(event.ActionMap)}
+func NewActions(objectClasses ref.Classes, cmds *ops.Ops) *Actions {
+	return &Actions{objectClasses, ref.NewClassStack(objectClasses), cmds, make(event.ActionMap)}
 }
 
 type Actions struct {
 	objectClasses ref.Classes
 	dataClasses   ref.Classes
-	ops           *ops.Ops
+	cmds          *ops.Ops
 	event.ActionMap
 }
 
@@ -48,7 +48,7 @@ func (a *Actions) On(name string, fn BuildOps) (err error) {
 	id := id.MakeId(name)
 	if act, exists := a.ActionMap[id]; !exists {
 		err = errutil.New("unknown action", name)
-	} else if exec, e := fn.Build(a.ops); e != nil {
+	} else if exec, e := fn.Build(a.cmds); e != nil {
 		err = e
 	} else {
 		act.DefaultActions = append(act.DefaultActions, exec)

@@ -9,15 +9,15 @@ import (
 )
 
 type Pm struct {
-	ops      *ops.Ops
+	cmds     *ops.Ops
 	patterns *Patterns
 	err      error
 }
 
-func NewPatternMaster(ops *ops.Ops, classes ref.Classes, block ...interface{}) Pm {
+func NewPatternMaster(cmds *ops.Ops, classes ref.Classes, block ...interface{}) Pm {
 	patterns := NewPatterns(classes)
 	err := unique.RegisterBlocks(patterns, block...)
-	return Pm{ops, patterns, err}
+	return Pm{cmds, patterns, err}
 }
 
 // FIX: too many steps here. look at simplifying the process a bit.
@@ -30,7 +30,7 @@ func (pm Pm) Build(buildPatterns ...func(c *ops.Builder)) (ret *Patterns, err er
 			Patterns patspec.PatternSpecs
 		}
 
-		if c, ok := pm.ops.NewBuilder(&root); !ok {
+		if c, ok := pm.cmds.NewBuilder(&root); !ok {
 			err = errutil.New("why does this return okay anyway?")
 		} else if c.Param("patterns").Cmds().Begin() {
 			for _, b := range buildPatterns {

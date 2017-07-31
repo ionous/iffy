@@ -35,7 +35,7 @@ func (assert *CoreSuite) TestMultiply() {
 // TestDivide tests numbers directly.
 func (assert *CoreSuite) TestDivide() {
 	var root struct{ Eval rt.NumberEval }
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		c.Cmd("div", 10, 2)
 		//
 		if run, e := assert.newRuntime(c); assert.NoError(e) {
@@ -49,7 +49,7 @@ func (assert *CoreSuite) TestDivide() {
 // TestDivideByZero should not panic, but simply error.
 func (assert *CoreSuite) TestDivideByZero() {
 	var root struct{ Eval rt.NumberEval }
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		c.Cmd("div", 10, 0)
 		//
 		if run, e := assert.newRuntime(c); assert.NoError(e) {

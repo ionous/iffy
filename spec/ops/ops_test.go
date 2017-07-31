@@ -44,13 +44,13 @@ var testData = &Container{
 // 1. test unknown commands
 // 2. mismatched element types
 func TestOps(t *testing.T) {
-	ops := NewOps()
-	unique.RegisterTypes(unique.PanicTypes(ops),
+	cmds := NewOps()
+	unique.RegisterTypes(unique.PanicTypes(cmds),
 		(*Container)(nil), (*Contents)(nil))
 	t.Run("KeyValue", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		if c, ok := ops.NewBuilder(&root); assert.True(ok) {
+		if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
 			c.Param("Value").Val(4)
 			//
 			if e := c.Build(); assert.NoError(e) {
@@ -61,7 +61,7 @@ func TestOps(t *testing.T) {
 	t.Run("AllAreOne", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		if c, ok := ops.NewBuilder(&root); assert.True(ok) {
+		if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
 			// the simple way:
 			c.Cmd("contents", "all are one")
 			// // cause why not:
@@ -89,9 +89,9 @@ type CommandBlock struct {
 // TestOpsBlock ensures blocks of commands register succesfully.
 func TestOpsBlock(t *testing.T) {
 	assert := assert.New(t)
-	ops := NewOps()
-	unique.RegisterBlocks(unique.PanicTypes(ops),
+	cmds := NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*CommandBlock)(nil))
-	assert.Contains(ops.Types, id.MakeId("Container"))
-	assert.Contains(ops.Types, id.MakeId("Contents"))
+	assert.Contains(cmds.Types, id.MakeId("Container"))
+	assert.Contains(cmds.Types, id.MakeId("Contents"))
 }

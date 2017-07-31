@@ -61,7 +61,7 @@ func (p phaseOn) On(name string, flags event.Options, fn BuildOps) (err error) {
 	// verify the action is well known.
 	if _, ok := p.actions.ActionMap[id]; !ok {
 		err = errutil.New("unknown action", name)
-	} else if exec, e := fn.Build(p.actions.ops); e != nil {
+	} else if exec, e := fn.Build(p.actions.cmds); e != nil {
 		err = e
 	} else {
 		var target string

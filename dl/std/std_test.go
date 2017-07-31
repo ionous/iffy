@@ -24,14 +24,14 @@ func TestStd(t *testing.T) {
 	unique.RegisterValues(unique.PanicValues(objects),
 		Thingaverse.objects(sliceOf.String("apple", "pen", "thing#1", "thing#2"))...)
 
-	ops := ops.NewOps()
-	unique.RegisterBlocks(unique.PanicTypes(ops),
+	cmds := ops.NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil),
 		(*patspec.Commands)(nil),
 		(*Commands)(nil),
 	)
 
-	unique.RegisterBlocks(unique.PanicTypes(ops.ShadowTypes),
+	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
 		(*Patterns)(nil),
 	)
 
@@ -39,7 +39,7 @@ func TestStd(t *testing.T) {
 		assert := testify.New(t)
 
 		//
-		patterns, e := patbuilder.NewPatternMaster(ops, classes,
+		patterns, e := patbuilder.NewPatternMaster(cmds, classes,
 			(*Patterns)(nil)).Build(printPatterns)
 		assert.NoError(e)
 

@@ -20,15 +20,15 @@ func TestPattern(assert *testing.T) {
 
 type PatternSuite struct {
 	suite.Suite
-	ops *ops.Ops
+	cmds *ops.Ops
 }
 
 func (assert *PatternSuite) SetupTest() {
-	ops := ops.NewOps()
-	unique.RegisterBlocks(unique.PanicTypes(ops),
+	cmds := ops.NewOps()
+	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*patspec.Commands)(nil),
 		(*core.Commands)(nil))
-	assert.ops = ops
+	assert.cmds = cmds
 }
 
 func Int(i int) *core.Num {
@@ -50,7 +50,7 @@ func (assert *PatternSuite) TestFactorial() {
 	var root struct {
 		Els patspec.PatternSpecs
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmds().Begin() {
 			if c.Cmd("number rule", "factorial").Begin() {
 				// FIX? re: "equal to" - can literally detect string and make empty command?

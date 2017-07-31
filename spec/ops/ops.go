@@ -28,7 +28,7 @@ type Builder struct {
 // NewBuilder starts creating a call tree.
 func (ops *Ops) NewBuilder(root interface{}) (*Builder, bool) {
 	target := r.ValueOf(root).Elem()
-	spec := &_Spec{ops: ops, target: target}
+	spec := &_Spec{cmds: ops, target: target}
 	return &Builder{
 		builder.NewBuilder(&_Factory{ops}, spec),
 	}, true
@@ -42,7 +42,7 @@ func (u *Builder) Build() (err error) {
 }
 
 type _Factory struct {
-	ops *Ops
+	cmds *Ops
 }
 
 // _Target handles the differences between command structs and constructors.
@@ -56,16 +56,16 @@ type _Target interface {
 
 // NewSpec implements spec.SpecFactory.
 func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
-	if rtype, ok := fac.ops.FindType(name); ok {
+	if rtype, ok := fac.cmds.FindType(name); ok {
 		target := r.New(rtype).Elem()
 		ret = &_Spec{
-			ops:    fac.ops,
+			cmds:   fac.cmds,
 			target: target,
 		}
-	} else if rtype, ok := fac.ops.ShadowTypes.FindType(name); ok {
+	} else if rtype, ok := fac.cmds.ShadowTypes.FindType(name); ok {
 		shadow := &ShadowClass{rtype, make(map[string]_ShadowSlot)}
 		ret = &_Spec{
-			ops:    fac.ops,
+			cmds:   fac.cmds,
 			target: shadow,
 		}
 	} else {
@@ -78,11 +78,11 @@ func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
 // the spec algorithm creates NewSpecs, and then assigns it to a slot
 // we need the slot to target the array properly, so we just wait,
 func (fac *_Factory) NewSpecs() (spec.Specs, error) {
-	return &_Specs{ops: fac.ops}, nil
+	return &_Specs{cmds: fac.cmds}, nil
 }
 
 type _Spec struct {
-	ops    *Ops
+	cmds   *Ops
 	target _Target // output object we are building
 	index  int
 }
@@ -128,8 +128,8 @@ func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
 }
 
 type _Specs struct {
-	ops *Ops
-	els []*_Spec
+	cmds *Ops
+	els  []*_Spec
 }
 
 func (specs *_Specs) AddElement(el spec.Spec) (err error) {

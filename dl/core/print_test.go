@@ -10,7 +10,7 @@ func (assert *CoreSuite) TestPrintSpacing() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("print text", "hello")
@@ -33,7 +33,7 @@ func (assert *CoreSuite) TestPrintNum() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("print num", 213)
@@ -57,7 +57,7 @@ func (assert *CoreSuite) TestMultiLines() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("hello", "there", "world"))
 			if c.Param("go").Cmds().Begin() {
@@ -81,7 +81,7 @@ func (assert *CoreSuite) TestSingleLines() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				if c.Cmd("for each text").Begin() {
@@ -109,7 +109,7 @@ func (assert *CoreSuite) TestLineIndex() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
 			if c.Param("go").Cmds().Begin() {
@@ -134,7 +134,7 @@ func (assert *CoreSuite) TestLineEndings() {
 	var root struct {
 		Eval rt.Execute
 	}
-	if c, ok := assert.ops.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
 			if c.Param("go").Cmds().Begin() {
