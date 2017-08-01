@@ -45,6 +45,12 @@ type TextCounter struct {
 	Text string // current value of ForEachText
 }
 
+// ObjCounter is a dl class used during ForEachObj loops.
+type ObjCounter struct {
+	EachCounter
+	Obj rt.Object // current value of ForEachObj
+}
+
 // ForEacNum visits values in a list of numbers.
 // For each value visited it executes a block of statements, pushing a NumberCounter object into the scope as @.
 // If the list is empty, it executes an alternative block of statements.
@@ -100,6 +106,38 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 				err = errutil.New("failed each text get", e)
 				break
 			} else if e := l.RunNext("Text", v, it.HasNext()); e != nil {
+				err = e
+				break
+			}
+		}
+		l.End()
+	}
+	return
+}
+
+// ForEachObj visits each object in a list of objects,
+// executing a block of statements with an ObjCounter in scope as @.
+// If the list is empty, it executes an alternative block of statements.
+type ForEachObj struct {
+	In       rt.ObjListEval
+	Go, Else rt.ExecuteList
+}
+
+func (f *ForEachObj) Execute(run rt.Runtime) (err error) {
+	if it, e := f.In.GetObjectStream(run); e != nil {
+		err = e
+	} else if !it.HasNext() {
+		if e := f.Else.Execute(run); e != nil {
+			err = errutil.New("failed for each obj else", e)
+		}
+	} else if l, e := NewLooper(run, "ObjCounter", f.Go); e != nil {
+		err = e
+	} else {
+		for it.HasNext() {
+			if v, e := it.GetNext(); e != nil {
+				err = errutil.New("failed for each obj get", e)
+				break
+			} else if e := l.RunNext("Obj", v, it.HasNext()); e != nil {
 				err = e
 				break
 			}

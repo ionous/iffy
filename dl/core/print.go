@@ -8,18 +8,32 @@ import (
 	"strconv"
 )
 
+// PrintSpan writes text inline, with spaces between words.
 type PrintSpan struct {
 	Block rt.ExecuteList
 }
 
+// PrintSpan sandwiches text inside parenthesis.
+type PrintBracket struct {
+	Block rt.ExecuteList
+}
+
+// PrintList writes words separated with commas, ending with an "and".
+type PrintList struct {
+	Block rt.ExecuteList
+}
+
+// PrintNum writes a number using numerals, eg. "1".
 type PrintNum struct {
 	Num rt.NumberEval
 }
 
+// PrintNumWord writes a number using english: eg. "one".
 type PrintNumWord struct {
 	Num rt.NumberEval
 }
 
+// PrintText writes a piece of text.
 type PrintText struct {
 	Text rt.TextEval
 }
@@ -30,6 +44,26 @@ func (p *PrintSpan) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else {
 		err = span.Flush()
+	}
+	return
+}
+
+func (p *PrintBracket) Execute(run rt.Runtime) (err error) {
+	bracket := printer.Bracket{Writer: run}
+	if e := p.Block.Execute(rt.Writer(run, &bracket)); e != nil {
+		err = e
+	} else {
+		err = bracket.Flush()
+	}
+	return
+}
+
+func (p *PrintList) Execute(run rt.Runtime) (err error) {
+	sep := printer.AndSeparator(run)
+	if e := p.Block.Execute(rt.Writer(run, sep)); e != nil {
+		err = e
+	} else {
+		err = sep.Flush()
 	}
 	return
 }

@@ -30,7 +30,7 @@ func (rtm *Rtm) GetPatterns() *pat.Patterns {
 type Config struct {
 	classes   ref.ClassMap
 	objects   *ref.ObjBuilder
-	rel       *ref.RelationBuilder
+	rel       ref.RelationBuilder
 	ancestors rt.Ancestors
 	patterns  *patbuilder.Patterns
 	seed      int64
@@ -54,7 +54,7 @@ func (c *Config) Ancestors(a rt.Ancestors) *Config {
 	return c
 }
 
-func (c *Config) Relations(r *ref.RelationBuilder) *Config {
+func (c *Config) Relations(r ref.RelationBuilder) *Config {
 	c.rel = r
 	return c
 }
@@ -80,15 +80,11 @@ func (c *Config) Rtm() *Rtm {
 		a = NoAncestors{}
 	}
 	var objects *ref.Objects
-	var rel ref.Relations
-	//
 	if c.objects != nil {
 		objects = c.objects.Build()
 	}
 	//
-	if c.rel != nil {
-		rel = c.rel.Build()
-	}
+	rel := c.rel.Build()
 	var w io.Writer
 	if cw := c.writer; cw != nil {
 		w = cw

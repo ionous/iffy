@@ -12,7 +12,7 @@ func (assert *CoreSuite) TestSeqCycle() {
 				c.Param("in").Cmd("range", 7)
 				if c.Param("go").Cmds().Begin() {
 					c.Cmd("print text", c.Cmd("cycle text",
-						assert.unique.Id("cycle counter"),
+						assert.gen.Id("cycle counter"),
 						sliceOf.String("a", "b", "c"),
 					))
 					c.End()
@@ -28,7 +28,7 @@ func (assert *CoreSuite) TestSeqShuffle() {
 			c.Param("in").Cmd("range", 9)
 			if c.Param("go").Cmds().Begin() {
 				c.Cmd("print text", c.Cmd("shuffle text",
-					assert.unique.Id("shuffle counter"),
+					assert.gen.Id("shuffle counter"),
 					sliceOf.String("a", "b", "c"),
 				))
 				c.End()
@@ -63,7 +63,7 @@ func (assert *CoreSuite) TestSeqStopping() {
 				c.Param("in").Cmd("range", 7)
 				if c.Param("go").Cmds().Begin() {
 					c.Cmd("print text", c.Cmd("stopping text",
-						assert.unique.Id("stopping counter"),
+						assert.gen.Id("stopping counter"),
 						sliceOf.String("a", "b", "c"),
 					))
 					c.End()

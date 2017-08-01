@@ -1,5 +1,17 @@
 package core
 
+type Classes struct {
+	*NumberCounter
+	*TextCounter
+	*ObjCounter
+}
+
+type Counters struct {
+	*CycleCounter
+	*ShuffleCounter
+	*StoppingCounter
+}
+
 type Commands struct {
 	*Add
 	*Sub
@@ -23,20 +35,20 @@ type Commands struct {
 	*EqualTo
 	// *Error
 	*ForEachNum
-	// *ForEachObj
+	*ForEachObj
 	*ForEachText
 	*Get
 	// *GoCall
 	*GreaterThan
 	// *Inc
 	*Includes
+	// *Is/State -> use Get
 	*IsEmpty
 	*IsSameClass
 	*IsSimilarClass
 	*IsNot
 	// *IsNum
 	// *IsObj
-	// *IsState
 	// *IsText
 	// *IsValid
 	*Len
@@ -49,11 +61,15 @@ type Commands struct {
 	// *ObjListContains
 	// *ObjListIsEmpty
 	// *Object
-	*PrintSpan
+	*PrintBracket
+	*PrintList
 	*PrintNum
 	*PrintNumWord
+	*PrintSpan
 	*PrintText
 	*Range
+	*RelatedList
+	*RelationEmpty
 	*SetBool
 	*SetNum
 	*SetText

@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// Range specifies multiple float values.
+// Range generates a series of float values.
 // FIX: look more at python frange
 // FIX: add tests
 type Range struct {

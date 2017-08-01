@@ -24,7 +24,7 @@ var Thingaverse = ObjetctMap{
 	},
 	"box": &Container{
 		Thing: Thing{Kind: Kind{Name: "box"}},
-		Latch: Latch{Openable: true},
+		Latch: Latch{Openable: true, Closed: true},
 	},
 	"cake": &Thing{
 		Kind: Kind{Name: "cake"},

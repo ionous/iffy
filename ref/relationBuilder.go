@@ -6,42 +6,36 @@ import (
 	"github.com/ionous/iffy/index"
 )
 
-type RelationBuilder map[string]index.Type
+type RelationBuilder map[string]*index.Table
 
 func (b RelationBuilder) Build() Relations {
 	r := make(Relations)
 	for id, t := range b {
-		r[id] = &RefRelation{id, index.NewTable(t)}
+		r[id] = &RefRelation{id, t}
 	}
 	return r
 }
 
 func NewRelations() RelationBuilder {
-	return make(map[string]index.Type)
+	return make(map[string]*index.Table)
 }
 
-type RelationDesc struct {
-	Name string
-	Type index.Type
-}
-
-func RegisterRelations(b RelationBuilder, desc ...RelationDesc) (err error) {
-	for _, d := range desc {
-		if e := b.NewRelation(d.Name, d.Type); e != nil {
-			err = e
-			break
-		}
+func (b RelationBuilder) NewRelation(name string, kind index.Type) (err error) {
+	id := id.MakeId(name)
+	if t, exists := b[id]; !exists {
+		b[id] = index.NewTable(kind)
+	} else if k := t.Type(); k != kind {
+		err = errutil.New("mismatched relations", k, kind)
 	}
 	return
 }
 
-// RegisterType compatible with unique.TypeRegistry
-func (b RelationBuilder) NewRelation(name string, kind index.Type) (err error) {
+func (b RelationBuilder) AddTable(name string, t *index.Table) (err error) {
 	id := id.MakeId(name)
-	if k, ok := b[id]; !ok {
-		b[id] = kind
-	} else if k != kind {
-		err = errutil.New("mismatched relations", k, kind)
+	if _, exists := b[id]; !exists {
+		b[id] = t
+	} else {
+		err = errutil.New("table already exists", name, id)
 	}
 	return
 }

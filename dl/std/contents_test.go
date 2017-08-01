@@ -16,17 +16,19 @@ import (
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
 func TestContents(t *testing.T) {
 	classes := ref.NewClasses()
 	unique.RegisterBlocks(unique.PanicTypes(classes),
+		(*core.Classes)(nil),
 		(*Classes)(nil))
 
 	objects := ref.NewObjects(classes)
 	unique.RegisterValues(unique.PanicValues(objects),
-		Thingaverse.objects(sliceOf.String("box", "cake"))...)
+		Thingaverse.objects(sliceOf.String("box", "cake", "apple", "pen"))...)
 
 	cmds := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
@@ -39,20 +41,22 @@ func TestContents(t *testing.T) {
 		(*Patterns)(nil),
 	)
 
-	//t.Run("Names", func(t *testing.T) {
+	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-
 	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-		(*Patterns)(nil)).Build(printPatterns)
+		(*Patterns)(nil)).Build(printNamePatterns, printObjectPatterns)
 	assert.NoError(e)
 
-	pc := locate.Locale{index.NewTable(index.OneToMany)}
 	type OpsCb func(c *ops.Builder)
-	type Match func(lines []string) error
-	test := func(build, exec OpsCb, match Match) (err error) {
+	type Match func(run rt.Runtime, lines []string) bool
+	test := func(t *testing.T, build, exec OpsCb, match Match) (err error) {
+		relations := ref.NewRelations()
+		pc := locate.Locale{index.NewTable(index.OneToMany)}
+		relations.AddTable("locale", pc.Table)
+
 		var src struct{ initial.Statements }
 		if c, ok := cmds.NewBuilder(&src); !ok {
-			err = errutil.New("no buidler")
+			err = errutil.New("no builder")
 		} else {
 			if c.Cmds().Begin() {
 				build(c)
@@ -95,9 +99,7 @@ func TestContents(t *testing.T) {
 							break
 						}
 					}
-
 				}
-
 			}
 		}
 		if err == nil {
@@ -113,11 +115,11 @@ func TestContents(t *testing.T) {
 					err = e
 				} else {
 					var lines printer.Lines
-					run := rtm.New(classes).Objects(objects).Patterns(patterns).Writer(&lines).Rtm()
+					run := rtm.New(classes).Objects(objects).Patterns(patterns).Relations(relations).Writer(&lines).Rtm()
 					if e := root.Execute(run); e != nil {
 						err = e
-					} else {
-						err = match(lines.Lines())
+					} else if res := lines.Lines(); match(run, res) {
+						t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
 					}
 				}
 			}
@@ -125,21 +127,50 @@ func TestContents(t *testing.T) {
 		return
 	}
 	//
-
 	t.Run("contains", func(t *testing.T) {
 		assert := testify.New(t)
-		e := test(func(c *ops.Builder) {
+		e := test(t, func(c *ops.Builder) {
 			c.Cmd("Location", "box", locate.Contains, "cake")
 		}, func(c *ops.Builder) {
 			//
-		}, func(lines []string) (nil error) {
-			// verify relation:
-			if in, ok := pc.GetData("$box", "$cake"); assert.True(ok) {
-				assert.EqualValues(locate.Contains, in)
+		}, func(run rt.Runtime, lines []string) (okay bool) {
+			if pc, ok := run.GetRelation("locale"); assert.True(ok) {
+				if in, ok := pc.GetTable().GetData("$box", "$cake"); assert.True(ok) {
+					okay = assert.EqualValues(locate.Contains, in)
+				}
 			}
 			return
 		})
 		assert.NoError(e)
 	})
-
+	//
+	t.Run("print empty content", func(t *testing.T) {
+		assert := testify.New(t)
+		e := test(t, func(c *ops.Builder) {
+			// c.Cmd("Location", "box", locate.Contains, "cake")
+		}, func(c *ops.Builder) {
+			if c.Cmd("print span").Begin() {
+				c.Cmds(c.Cmd("determine", c.Cmd("print content", "box")))
+				c.End()
+			}
+		}, func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("empty"), lines)
+		})
+		assert.NoError(e)
+	})
+	t.Run("print some contents", func(t *testing.T) {
+		assert := testify.New(t)
+		e := test(t, func(c *ops.Builder) {
+			c.Cmd("Location", "box", locate.Contains, "cake")
+			c.Cmd("Location", "box", locate.Contains, "apple")
+			c.Cmd("Location", "box", locate.Contains, "pen")
+		}, func(c *ops.Builder) {
+			c.Cmd("determine", c.Cmd("print content", "box"))
+		}, func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("empire apple", "cake", "pen"), lines)
+		})
+		assert.NoError(e)
+	})
+	// print summary: closed, open but empty, containing a few items ( a few to test and )
+	// print object: simple name, name with summary ( for a container )
 }

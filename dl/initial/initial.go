@@ -44,6 +44,7 @@ type Location struct {
 // 	return
 // }
 func (l *Location) Assert(f *Facts) (nil error) {
+	// FIX: check for parent-child loops.
 	f.Locations = append(f.Locations, *l)
 	return
 }

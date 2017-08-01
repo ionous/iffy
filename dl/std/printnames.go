@@ -10,8 +10,10 @@ import (
 	r "reflect"
 )
 
-// PrintNondescriptObjects commands the runtime to print a bunch of objects, in groups if possible.
-// Similar to Inform's "Listing contents of something", except this is a command and that is an activity.
+// PrintNondescriptObjects prints a bunch of objects, in groups if possible,
+// using the GroupTogether, PrintGroup, and PrintName patterns.
+// This is similar to the Inform activity "Listing contents of something" and its I6 "standard contents listing rule".
+// http://inform7.com/learn/man/WI_18_13.html
 type PrintNondescriptObjects struct {
 	Objects rt.ObjListEval
 }
@@ -24,7 +26,7 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 		run, ungrouped := rt.Writer(run, sep), stream.NewObjectStream(ungrouped)
 		if e := printWithArticles(run, ungrouped); e != nil {
 			err = e
-		} else if e := groups.Print(run); e != nil {
+		} else if e := groups.PrintGroups(run); e != nil {
 			err = e
 		}
 		sep.Flush()

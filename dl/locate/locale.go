@@ -10,6 +10,11 @@ type Locale struct {
 	*index.Table
 }
 
+func (l *Locale) Empty(p rt.Object) bool {
+	_, hasChild := l.Primary.FindFirst(0, p.GetId())
+	return !hasChild
+
+}
 func (l *Locale) SetLocation(p, c rt.Object, now Containment) (err error) {
 	types := map[Containment]struct {
 		Parent, Child string
@@ -27,7 +32,7 @@ func (l *Locale) SetLocation(p, c rt.Object, now Containment) (err error) {
 	} else if !c.GetClass().IsCompatible(check.Child) {
 		err = errutil.New("expected child", check.Child)
 	} else {
-		err = l.Table.AddPair(p.GetId(), c.GetId(), func(old interface{}) (ret interface{}, err error) {
+		err = l.AddPair(p.GetId(), c.GetId(), func(old interface{}) (ret interface{}, err error) {
 			if c, ok := old.(Containment); ok && c != now {
 				err = errutil.New("was", c, "now", now)
 			} else {

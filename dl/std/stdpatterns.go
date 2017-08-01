@@ -7,12 +7,12 @@ import (
 
 // FIX: this has to go into the std library
 func StdPatterns(c *ops.Builder) {
-	printPatterns(c)
+	printNamePatterns(c)
+	printObjectPatterns(c)
 	group.GroupPatterns(c)
 }
 
-func printPatterns(c *ops.Builder) {
-	// its a little heavy to do this with patterns, but -- its a good test of the system.
+func printNamePatterns(c *ops.Builder) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "print name").Begin() {
 		if c.Param("decide").Cmds().Begin() {
@@ -86,6 +86,82 @@ func printPatterns(c *ops.Builder) {
 						}
 						c.End()
 					}
+					c.End()
+				}
+				c.End()
+			}
+			c.End()
+		}
+		c.End()
+	}
+}
+
+func printObjectPatterns(c *ops.Builder) {
+	// print the name and summary if all else fails
+	if c.Cmd("run rule", "print object").Begin() {
+		if c.Param("decide").Cmds().Begin() {
+			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
+			if c.Cmd("print bracket").Begin() {
+				c.Cmds(c.Cmd("determine", c.Cmd("print summary", c.Cmd("get", "@", "target"))))
+				c.End()
+			}
+			c.End()
+		}
+		c.End()
+	}
+	if c.Cmd("run rule", "print summary").Begin() {
+		c.Param("if").Cmd("all true", c.Cmds(
+			c.Cmd("is similar class", c.Cmd("get", "@", "target"), "container"),
+			c.Cmd("get", c.Cmd("get", "@", "target"), "closed"),
+		))
+		if c.Param("decide").Cmds().Begin() {
+			c.Cmd("print text", "closed")
+			c.End()
+		}
+		c.End()
+	}
+	// is it better to have multiple patterns, or just one?
+	if c.Cmd("run rule", "print summary").Begin() {
+		c.Param("if").Cmd("is similar class", c.Cmd("get", "@", "target"), "container")
+		if c.Param("decide").Cmds().Begin() {
+			if c.Cmd("choose", c.Cmd("get", c.Cmd("get", "@", "target"), "closed")).Begin() {
+				c.Param("true").Cmds(c.Cmd("print text", "closed"))
+				if c.Param("false").Cmds().Begin() {
+					// FIX FIX FIX register locale
+					if c.Cmd("choose", c.Cmd("relation empty", "locale", c.Cmd("get", "@", "target"))).Begin() {
+						c.Param("false").Cmds(c.Cmd("print text", "open but empty"))
+						if c.Param("true").Cmds().Begin() {
+							if c.Cmd("print list").Begin() {
+								if c.Cmds().Begin() {
+									c.Cmd("determine", c.Cmd("print content", c.Cmd("get", "@", "target")))
+									c.End()
+								}
+								c.End()
+							}
+							c.End()
+						}
+						c.End()
+					}
+					c.End()
+				}
+				c.End()
+			}
+			c.End()
+		}
+		c.End()
+	}
+	// keeping the pattern itself bare of parens, etc.
+	// that way the caller has some control over how its printed.
+	if c.Cmd("run rule", "print content").Begin() {
+		if c.Param("decide").Cmds().Begin() {
+			if c.Cmd("for each obj").Begin() {
+				c.Param("in").Cmd("related list", "locale", c.Cmd("get", "@", "target"))
+				if c.Param("go").Cmds().Begin() {
+					c.Cmd("determine", c.Cmd("print object", c.Cmd("get", "@", "obj")))
+					c.End()
+				}
+				if c.Param("else").Cmds().Begin() {
+					c.Cmd("print text", "empty")
 					c.End()
 				}
 				c.End()

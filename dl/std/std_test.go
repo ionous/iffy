@@ -40,7 +40,7 @@ func TestStd(t *testing.T) {
 
 		//
 		patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-			(*Patterns)(nil)).Build(printPatterns)
+			(*Patterns)(nil)).Build(printNamePatterns)
 		assert.NoError(e)
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".

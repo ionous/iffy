@@ -5,9 +5,9 @@ import (
 	"github.com/ionous/iffy/rt/printer"
 )
 
-func (c Collections) Print(run rt.Runtime) (err error) {
+func (c Collections) PrintGroups(run rt.Runtime) (err error) {
 	for _, g := range c {
-		if e := g.Print(run); e != nil {
+		if e := g.PrintGroup(run); e != nil {
 			err = e
 			break
 		}
@@ -15,7 +15,7 @@ func (c Collections) Print(run rt.Runtime) (err error) {
 	return
 }
 
-func (g Collection) Print(run rt.Runtime) (err error) {
+func (g Collection) PrintGroup(run rt.Runtime) (err error) {
 	if len(g.Objects) > 0 {
 		// a label means we want to treat the group as a block
 		// including all pre and post test into that same block.

@@ -21,14 +21,14 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred, an empire apple, a pen, and two other things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			printPatterns)
+			printNamePatterns)
 	})
 	//
 	t.Run("default grouping", func(t *testing.T) {
 		groupTest(t, "Mildred, an empire apple, a pen, and two things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			printPatterns, group.GroupPatterns)
+			printNamePatterns, group.GroupPatterns)
 	})
 	//
 	several := func(c *ops.Builder) {
@@ -59,13 +59,13 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and an empire apple, a pen, and a few things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			printPatterns, group.GroupPatterns, several)
+			printNamePatterns, group.GroupPatterns, several)
 	})
 	t.Run("not several", func(t *testing.T) {
 		groupTest(t, "Mildred and an empire apple, a pen, and one other thing",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1"),
-			printPatterns, group.GroupPatterns, several)
+			printNamePatterns, group.GroupPatterns, several)
 	})
 	// Rule for grouping together utensils: say "the usual utensils".
 	replacement := func(c *ops.Builder) {
@@ -84,14 +84,14 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and some things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			printPatterns, group.GroupPatterns, replacement)
+			printNamePatterns, group.GroupPatterns, replacement)
 	})
 	// verify: if there arent multiple things to group, then we shouldnt be grouping
 	t.Run("replacement none", func(t *testing.T) {
 		groupTest(t, "Mildred and an empire apple",
 			//
 			sliceOf.String("mildred", "apple"),
-			printPatterns, group.GroupPatterns, replacement)
+			printNamePatterns, group.GroupPatterns, replacement)
 	})
 	// Before listing contents: group Scrabble pieces together.
 	// Before grouping together Scrabble pieces, say "the tiles ".
@@ -122,13 +122,13 @@ func TestGrouping(t *testing.T) {
 			groupTest(t, "the tiles X, W, F, Y, and Z from a Scrabble set",
 				//
 				sliceOf.String("x", "w", "f", "y", "z"),
-				printPatterns, group.GroupPatterns, fancy)
+				printNamePatterns, group.GroupPatterns, fancy)
 		})
 		t.Run("more", func(t *testing.T) {
 			groupTest(t, "Mildred and the tiles X, W, F, Y, and Z from a Scrabble set",
 				//
 				sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-				printPatterns, group.GroupPatterns, fancy)
+				printNamePatterns, group.GroupPatterns, fancy)
 		})
 	})
 	// //group utensils together as "text".
@@ -136,7 +136,7 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and five scrabble tiles ( X, W, F, Y, and Z )",
 			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
 			//
-			printPatterns, group.GroupPatterns, func(c *ops.Builder) {
+			printNamePatterns, group.GroupPatterns, func(c *ops.Builder) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
 					if c.Param("decide").Cmds().Begin() {
@@ -152,7 +152,7 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and five scrabble tiles ( a X, a W, a F, a Y, and a Z )",
 			//
 			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-			printPatterns, group.GroupPatterns, func(c *ops.Builder) {
+			printNamePatterns, group.GroupPatterns, func(c *ops.Builder) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
 					if c.Param("decide").Cmds().Begin() {
@@ -179,13 +179,13 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and three things ( an empire apple, a pen, and one other thing )",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1"),
-			printPatterns, group.GroupPatterns, unnamedThings)
+			printNamePatterns, group.GroupPatterns, unnamedThings)
 	})
 	t.Run("edge two", func(t *testing.T) {
 		groupTest(t, "Mildred and four things ( an empire apple, a pen, and two other things )",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			printPatterns, group.GroupPatterns, unnamedThings)
+			printNamePatterns, group.GroupPatterns, unnamedThings)
 	})
 }
 

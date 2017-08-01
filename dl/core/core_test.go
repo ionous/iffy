@@ -29,7 +29,7 @@ type CoreSuite struct {
 	classes *ref.ClassBuilder
 	objects *ref.ObjBuilder
 
-	unique *unique.Objects
+	gen *unique.Objects
 }
 
 func (assert *CoreSuite) Lines() (ret []string) {
@@ -44,35 +44,27 @@ func (assert *CoreSuite) SetupTest() {
 	unique.RegisterBlocks(unique.PanicTypes(assert.cmds),
 		(*core.Commands)(nil))
 
-	assert.unique = unique.NewObjectGenerator()
+	assert.gen = unique.NewObjectGenerator()
 	assert.classes = ref.NewClasses()
 	assert.objects = ref.NewObjects(assert.classes)
 
-	unique.RegisterTypes(unique.PanicTypes(assert.unique),
-		(*core.CycleCounter)(nil),
-		(*core.ShuffleCounter)(nil),
-		(*core.StoppingCounter)(nil))
+	unique.RegisterBlocks(unique.PanicTypes(assert.gen),
+		(*core.Counters)(nil))
+
+	unique.RegisterBlocks(unique.PanicTypes(assert.classes),
+		(*core.Classes)(nil),
+		(*core.Counters)(nil),
+	)
 }
 
 func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) {
 	if e := c.Build(); e != nil {
 		err = e
 	} else {
-		mm := unique.PanicTypes(assert.classes)
-		unique.RegisterTypes(mm,
-			(*core.NumberCounter)(nil),
-			(*core.TextCounter)(nil))
-
-		// add all the helper classes we registered via unique
-		for _, rtype := range assert.unique.Types {
-			mm.RegisterType(rtype)
-		}
-
-		if inst, e := assert.unique.Generate(); e != nil {
+		if objs, e := assert.gen.Generate(); e != nil {
 			err = e
 		} else {
-			unique.RegisterValues(unique.PanicValues(assert.objects), inst...)
-
+			unique.RegisterValues(unique.PanicValues(assert.objects), objs...)
 			ret = rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).Rtm()
 		}
 	}

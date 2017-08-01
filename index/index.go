@@ -8,6 +8,7 @@ type Index struct {
 	Rows   []Row
 }
 
+// Walk until visit returns true.
 func (index *Index) Walk(major string, visit func(other string) bool) (ret int) {
 	if i, ok := index.FindFirst(0, major); ok {
 		for a := index.Rows; i < len(a); i++ {
