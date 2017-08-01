@@ -127,10 +127,9 @@ func printObjectPatterns(c *ops.Builder) {
 			if c.Cmd("choose", c.Cmd("get", c.Cmd("get", "@", "target"), "closed")).Begin() {
 				c.Param("true").Cmds(c.Cmd("print text", "closed"))
 				if c.Param("false").Cmds().Begin() {
-					// FIX FIX FIX register locale
 					if c.Cmd("choose", c.Cmd("relation empty", "locale", c.Cmd("get", "@", "target"))).Begin() {
-						c.Param("false").Cmds(c.Cmd("print text", "open but empty"))
-						if c.Param("true").Cmds().Begin() {
+						c.Param("true").Cmds(c.Cmd("print text", "open but empty"))
+						if c.Param("false").Cmds().Begin() {
 							if c.Cmd("print list").Begin() {
 								if c.Cmds().Begin() {
 									c.Cmd("determine", c.Cmd("print content", c.Cmd("get", "@", "target")))

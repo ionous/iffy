@@ -144,33 +144,86 @@ func TestContents(t *testing.T) {
 		assert.NoError(e)
 	})
 	//
-	t.Run("print empty content", func(t *testing.T) {
+	emptyBox := func(c *ops.Builder) {
+	}
+	boxContents := func(c *ops.Builder) {
+		c.Cmd("Location", "box", locate.Contains, "cake")
+		c.Cmd("Location", "box", locate.Contains, "apple")
+		c.Cmd("Location", "box", locate.Contains, "pen")
+	}
+	printContent := func(c *ops.Builder) {
+		c.Cmd("determine", c.Cmd("print content", "box"))
+	}
+	t.Run("empty", func(t *testing.T) {
 		assert := testify.New(t)
-		e := test(t, func(c *ops.Builder) {
-			// c.Cmd("Location", "box", locate.Contains, "cake")
-		}, func(c *ops.Builder) {
-			if c.Cmd("print span").Begin() {
-				c.Cmds(c.Cmd("determine", c.Cmd("print content", "box")))
-				c.End()
-			}
-		}, func(run rt.Runtime, lines []string) bool {
+		e := test(t, emptyBox, printContent, func(run rt.Runtime, lines []string) bool {
 			return assert.EqualValues(sliceOf.String("empty"), lines)
 		})
 		assert.NoError(e)
 	})
-	t.Run("print some contents", func(t *testing.T) {
+	t.Run("has contents", func(t *testing.T) {
 		assert := testify.New(t)
-		e := test(t, func(c *ops.Builder) {
-			c.Cmd("Location", "box", locate.Contains, "cake")
-			c.Cmd("Location", "box", locate.Contains, "apple")
-			c.Cmd("Location", "box", locate.Contains, "pen")
-		}, func(c *ops.Builder) {
-			c.Cmd("determine", c.Cmd("print content", "box"))
-		}, func(run rt.Runtime, lines []string) bool {
+		e := test(t, boxContents, printContent, func(run rt.Runtime, lines []string) bool {
 			return assert.EqualValues(sliceOf.String("empire apple", "cake", "pen"), lines)
 		})
 		assert.NoError(e)
 	})
-	// print summary: closed, open but empty, containing a few items ( a few to test and )
+	// summary tests:
+	printSummary := func(c *ops.Builder) {
+		if c.Cmd("print span").Begin() {
+			if c.Cmds().Begin() {
+				c.Cmd("determine", c.Cmd("print summary", "box"))
+				c.End()
+			}
+			c.End()
+		}
+	}
+	t.Run("closed", func(t *testing.T) {
+		assert := testify.New(t)
+		Thingaverse["box"].(*Container).Closed = true
+		e := test(t, boxContents, printSummary, func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("closed"), lines)
+		})
+		assert.NoError(e)
+	})
+	t.Run("open but empty", func(t *testing.T) {
+		assert := testify.New(t)
+		Thingaverse["box"].(*Container).Closed = false
+		e := test(t, emptyBox, printSummary, func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("open but empty"), lines)
+		})
+		assert.NoError(e)
+	})
+	t.Run("open contents", func(t *testing.T) {
+		assert := testify.New(t)
+		Thingaverse["box"].(*Container).Closed = false
+		e := test(t, boxContents, printSummary, func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("empire apple, cake, and pen"), lines)
+		})
+		assert.NoError(e)
+	})
 	// print object: simple name, name with summary ( for a container )
+	printObject := func(name string) OpsCb {
+		return func(c *ops.Builder) {
+			if c.Cmd("print span").Begin() {
+				c.Cmds(c.Cmd("determine", c.Cmd("print object", name)))
+				c.End()
+			}
+		}
+	}
+	t.Run("without summary", func(t *testing.T) {
+		assert := testify.New(t)
+		e := test(t, emptyBox, printObject("pen"), func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("pen"), lines)
+		})
+		assert.NoError(e)
+	})
+	t.Run("with summary", func(t *testing.T) {
+		assert := testify.New(t)
+		Thingaverse["box"].(*Container).Closed = true
+		e := test(t, emptyBox, printObject("box"), func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("box ( closed )"), lines)
+		})
+		assert.NoError(e)
+	})
 }
