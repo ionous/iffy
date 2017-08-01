@@ -57,9 +57,9 @@ func (or *Objects) GetByValue(rval r.Value) (ret *RefObject, err error) {
 	if !rval.IsNil() {
 		rval := rval.Elem()
 		if id, e := idFromValue(rval); e != nil {
-			err = e
+			err = errutil.New("get by value", e)
 		} else if obj, ok := or.ObjectMap[id]; !ok {
-			err = errutil.Fmt("object not found '%s'", id)
+			err = errutil.Fmt("get by value, object not found '%s'", id)
 		} else /*if obj.rval.Interface() != rval.Interface() {
 			err = errutil.Fmt("conflicting objects '%s' %T %T", id, obj.rval.Interface(), rval.Interface())
 		} else */{

@@ -43,14 +43,17 @@ func (or *Objects) coerce(dst, src r.Value) (err error) {
 
 // give a value, which might be either an interface or a ptr, return the reflected value of *RefObject
 func (or *Objects) getByValue(src r.Value) (ret *RefObject, err error) {
-	if src.IsNil() {
-		err = errutil.New("nil pointers return error")
-	} else if src.Kind() == r.Ptr {
-		ret, err = or.GetByValue(src)
-	} else if obj, ok := src.Interface().(*RefObject); !ok {
-		err = errutil.New("unknown src", src.Type())
-	} else {
-		ret = obj
+	switch k := src.Kind(); k {
+	case r.Ptr, r.Interface:
+		if src.IsNil() {
+			err = errutil.New("nil pointers return error")
+		} else if obj, ok := src.Interface().(*RefObject); ok {
+			ret = obj
+		} else {
+			ret, err = or.GetByValue(src)
+		}
+	default:
+		err = errutil.New("unexpected type", k)
 	}
 	return
 }

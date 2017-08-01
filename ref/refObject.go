@@ -32,6 +32,12 @@ func (n *RefObject) GetClass() (ret rt.Class) {
 // GetValue stores the value into the pointer pv.
 // Values include rt.Objects for relations and pointers, numbers, and text. For numbers, pv can be any numberic type: float64, int, etc.
 func (n *RefObject) GetValue(name string, pv interface{}) (err error) {
+	if e := n.getValue(name, pv); e != nil {
+		err = errutil.New(n.id, e, name)
+	}
+	return
+}
+func (n *RefObject) getValue(name string, pv interface{}) (err error) {
 	if pdst := r.ValueOf(pv); pdst.Kind() != r.Ptr {
 		err = errutil.New("get expected a pointer outvalue")
 	} else {
@@ -39,9 +45,9 @@ func (n *RefObject) GetValue(name string, pv interface{}) (err error) {
 		// a bool is an indicator of state lookup
 		if dst.Kind() == r.Bool {
 			if enum, path, idx := n.cls.getPropertyByChoice(id); enum == nil {
-				err = errutil.New("get choice not found", name)
+				err = errutil.New("get choice not found")
 			} else if field := n.rval.FieldByIndex(path); !field.IsValid() {
-				err = errutil.New("get field not found", name)
+				err = errutil.New("get field not found")
 			} else if field.Kind() == r.Bool {
 				dst.SetBool(field.Bool())
 			} else {
@@ -49,9 +55,9 @@ func (n *RefObject) GetValue(name string, pv interface{}) (err error) {
 				dst.SetBool(match)
 			}
 		} else if _, path, ok := n.cls.getProperty(id); !ok {
-			err = errutil.New("get property not found", name)
+			err = errutil.New("get property not found")
 		} else if field := n.rval.FieldByIndex(path); !field.IsValid() {
-			err = errutil.New("get field not found", name)
+			err = errutil.New("get field not found")
 		} else {
 			err = n.objects.coerce(dst, field)
 		}
