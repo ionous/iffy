@@ -130,13 +130,12 @@ func printObjectPatterns(c *ops.Builder) {
 					if c.Cmd("choose", c.Cmd("relation empty", "locale", c.Cmd("get", "@", "target"))).Begin() {
 						c.Param("true").Cmds(c.Cmd("print text", "open but empty"))
 						if c.Param("false").Cmds().Begin() {
-							if c.Cmd("print list").Begin() {
-								if c.Cmds().Begin() {
-									c.Cmd("determine", c.Cmd("print content", c.Cmd("get", "@", "target")))
-									c.End()
-								}
-								c.End()
-							}
+							c.Cmd("determine",
+								c.Cmd("print content",
+									c.Cmd("get", "@", "target"),
+									c.Param("header").Val("in which is"),
+									c.Param("articles").Val(true),
+								))
 							c.End()
 						}
 						c.End()
@@ -153,12 +152,13 @@ func printObjectPatterns(c *ops.Builder) {
 	// that way the caller has some control over how its printed.
 	if c.Cmd("run rule", "print content").Begin() {
 		if c.Param("decide").Cmds().Begin() {
-			if c.Cmd("for each obj").Begin() {
-				c.Param("in").Cmd("related list", "locale", c.Cmd("get", "@", "target"))
-				if c.Param("go").Cmds().Begin() {
-					c.Cmd("determine", c.Cmd("print object", c.Cmd("get", "@", "obj")))
-					c.End()
-				}
+			if c.Cmd("print objects").Begin() {
+				c.Param("objects").Cmd("related list", "locale", c.Cmd("get", "@", "target"))
+				// transfer our print content settings to print objects
+				c.Param("header").Cmd("get", "@", "header")
+				c.Param("articles").Cmd("get", "@", "articles")
+				c.Param("tersely").Cmd("get", "@", "tersely")
+				// and handle our fairly magical else
 				if c.Param("else").Cmds().Begin() {
 					c.Cmd("print text", "empty")
 					c.End()

@@ -2,48 +2,47 @@ package std
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/optional"
 	"github.com/ionous/iffy/rt/printer"
+	"io"
 	"strings"
 )
 
 type PrintObjects struct {
-	Objects            rt.ObjListEval
-	Articles, Brackets rt.BoolEval
-}
-
-func getBool(run rt.Runtime, eval rt.BoolEval) (ret bool, err error) {
-	if eval != nil {
-		if ok, e := eval.GetBool(run); e != nil {
-			err = e
-		} else {
-			ret = ok
-		}
-	}
-	return
+	Objects           rt.ObjListEval
+	Header            rt.TextEval
+	Articles, Tersely rt.BoolEval
+	Else              rt.ExecuteList
 }
 
 func (op *PrintObjects) Execute(run rt.Runtime) (err error) {
 	if objs, e := op.Objects.GetObjectStream(run); e != nil {
 		err = e
-	} else if articles, e := getBool(run, op.Articles); e != nil {
+	} else if articles, e := optional.Bool(run, op.Articles); e != nil {
 		err = e
-	} else if brackets, e := getBool(run, op.Brackets); e != nil {
+	} else if tersely, e := optional.Bool(run, op.Tersely); e != nil {
+		err = e
+	} else if header, e := optional.Text(run, op.Header); e != nil {
 		err = e
 	} else {
-		if brackets {
-			bracket := printer.Bracket{Writer: run}
-			run = rt.Writer(run, &bracket)
-			defer bracket.Flush()
+		if len(header) > 0 {
+			io.WriteString(run, header)
 		}
-		// keep and separator outside of print so print could run by line as well.
-		sep := printer.AndSeparator(run)
-		run = rt.Writer(run, sep)
-		defer sep.Flush()
+		// control and separator so print could run by line as well.
+		if !tersely {
+			sep := printer.AndSeparator(run)
+			run = rt.Writer(run, sep)
+			defer sep.Flush()
+		}
 		//
+		var cnt int
 		if articles {
-			err = printWithArticles(run, objs)
+			cnt, err = printWithArticles(run, objs)
 		} else {
-			err = printWithoutArticles(run, objs)
+			cnt, err = printWithoutArticles(run, objs)
+		}
+		if err == nil && cnt == 0 {
+			err = op.Else.Execute(run)
 		}
 	}
 	return
@@ -60,9 +59,9 @@ func (n NoNames) Print(run rt.Runtime) (err error) {
 	return
 }
 
-func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (err error) {
+func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error) {
 	var nonames NoNames
-	for objs.HasNext() {
+	for ; objs.HasNext(); ret++ {
 		if obj, e := objs.GetNext(); e != nil {
 			err = e
 			break
@@ -82,9 +81,9 @@ func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (err error) {
 	return
 }
 
-func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (err error) {
+func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error) {
 	var nonames NoNames
-	for objs.HasNext() {
+	for ; objs.HasNext(); ret++ {
 		if obj, e := objs.GetNext(); e != nil {
 			err = e
 			break

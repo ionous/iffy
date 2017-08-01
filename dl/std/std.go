@@ -86,5 +86,7 @@ type PrintSummary struct {
 }
 
 type PrintContent struct {
-	Target *Kind
+	Target            *Kind
+	Header            string
+	Articles, Tersely bool
 }

@@ -92,12 +92,21 @@ func GroupPatterns(c *ops.Builder) {
 							// after the label, possibly write the objects:
 							if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
 								if c.Param("false").Cmds().Begin() {
-									if c.Cmd("print objects", c.Cmd("get", "@", "objects")).Begin() {
+									if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
 										// if they are not inumerable, they are numerable.
 										// if they are numerable, then they got a number... in front of some backets.
-										c.Param("brackets").Cmd("is not", c.Cmd("get", "@", "innumerable"))
-										c.Param("articles").Cmd("get", "@", "with articles")
-										c.End() // print objects
+										if c.Param("false").Cmds().Begin() {
+											c.Cmd("print bracket", c.Cmds(
+												c.Cmd("print objects", c.Cmd("get", "@", "objects"),
+													c.Param("articles").Cmd("get", "@", "with articles"))))
+											c.End()
+										}
+										if c.Param("true").Cmds().Begin() {
+											c.Cmd("print objects", c.Cmd("get", "@", "objects"),
+												c.Param("articles").Cmd("get", "@", "with articles"))
+											c.End()
+										}
+										c.End()
 									}
 									c.End() // false, not without objects
 								}

@@ -152,7 +152,7 @@ func TestContents(t *testing.T) {
 		c.Cmd("Location", "box", locate.Contains, "pen")
 	}
 	printContent := func(c *ops.Builder) {
-		c.Cmd("determine", c.Cmd("print content", "box"))
+		c.Cmd("determine", c.Cmd("print content", "box", c.Param("tersely").Val(true)))
 	}
 	t.Run("empty", func(t *testing.T) {
 		assert := testify.New(t)
@@ -198,7 +198,7 @@ func TestContents(t *testing.T) {
 		assert := testify.New(t)
 		Thingaverse["box"].(*Container).Closed = false
 		e := test(t, boxContents, printSummary, func(run rt.Runtime, lines []string) bool {
-			return assert.EqualValues(sliceOf.String("empire apple, cake, and pen"), lines)
+			return assert.EqualValues(sliceOf.String("in which is an empire apple, a cake, and a pen"), lines)
 		})
 		assert.NoError(e)
 	})
@@ -218,11 +218,19 @@ func TestContents(t *testing.T) {
 		})
 		assert.NoError(e)
 	})
-	t.Run("with summary", func(t *testing.T) {
+	t.Run("with closed summary", func(t *testing.T) {
 		assert := testify.New(t)
 		Thingaverse["box"].(*Container).Closed = true
 		e := test(t, emptyBox, printObject("box"), func(run rt.Runtime, lines []string) bool {
 			return assert.EqualValues(sliceOf.String("box ( closed )"), lines)
+		})
+		assert.NoError(e)
+	})
+	t.Run("with open summary", func(t *testing.T) {
+		assert := testify.New(t)
+		Thingaverse["box"].(*Container).Closed = false
+		e := test(t, boxContents, printObject("box"), func(run rt.Runtime, lines []string) bool {
+			return assert.EqualValues(sliceOf.String("box ( in which is an empire apple, a cake, and a pen )"), lines)
 		})
 		assert.NoError(e)
 	})
