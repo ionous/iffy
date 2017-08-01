@@ -44,7 +44,7 @@ func TestSpec(t *testing.T) {
 				// 	// cycles:
 				c.Cmd("match output", sliceOf.String("a", "b", "c", "d"))
 				if c.Cmd("match output", sliceOf.String("a", "b", "c", "d")).Begin() {
-					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Begin() {
+					if c.Cmd("for each", sliceOf.Float(1, 2, 3, 4)).Begin() {
 						a := c.Cmd("cycle", sliceOf.String("a", "b", "c"))
 						c.Cmd("print text", a).End()
 					}
@@ -52,7 +52,7 @@ func TestSpec(t *testing.T) {
 				}
 				// stopping:
 				if c.Cmd("match output", sliceOf.String("a", "b", "c", "c")).Begin() {
-					if c.Cmd("for each num", sliceOf.Float(1, 2, 3, 4)).Begin() {
+					if c.Cmd("for each", sliceOf.Float(1, 2, 3, 4)).Begin() {
 						c.Cmd("print text", c.Cmd("stopping", sliceOf.String("a", "b", "c")))
 						c.End()
 					}
