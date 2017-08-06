@@ -25,23 +25,25 @@ type Ranking struct {
 
 func (ctx *Context) Advance() (ret bool) {
 	for try, at := true, 0; try && at < len(ctx.Words); try, at = ctx.Soft, at+1 {
-		cs := Cursor{at + ctx.Word, ctx.Words}
-		if r := ctx.Match.Scan(ctx, &cs); r > 0 {
-			ctx.Match, ret = ctx.Match.GetNext(), true
+		cs := Cursor(at + ctx.Word)
+		if advance, ok := ctx.Match.Scan(cs, ctx); ok {
+			ctx.Word += advance
+			ctx.Match = ctx.Match.GetNext()
+			ret = true
 		}
 	}
 	return
 }
 
-type Cursor struct {
-	ofs   int
-	words []string
+type Cursor int
+
+func (cs Cursor) Next(i int) Cursor {
+	return cs + Cursor(i)
 }
 
-func (cs *Cursor) NextWord() (ret string, okay bool) {
-	if cs.ofs < len(cs.words) {
-		ret, okay = cs.words[cs.ofs], true
-		cs.ofs++
+func (cs Cursor) NextWord(ctx *Context) (ret string, okay bool) {
+	if int(cs) < len(ctx.Words) {
+		ret, okay = ctx.Words[cs], true
 	}
 	return
 }

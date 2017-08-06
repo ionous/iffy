@@ -1,48 +1,73 @@
 package parser
 
-// import (
-// 	"strings"
-// )
+import (
+	"strings"
+)
 
-// // Word matches one word.
-// type Word struct {
-// 	Word string
+// Word matches one word.
+type Word struct {
+	Word string
+}
+
+func (w *Word) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
+	if n, ok := scan.NextWord(ctx); ok {
+		if strings.EqualFold(n, w.Word) {
+			ret, okay = 1, true
+		}
+	}
+	return
+}
+
+// AnyOf matches any one of the passed scanners; whichever first matches.
+type AnyOf struct {
+	Match []Scanner
+}
+
+func (m *AnyOf) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
+	for _, s := range m.Match {
+		if advance, ok := s.Scan(scan, ctx); ok {
+			ret, okay = advance, true
+			break
+		}
+	}
+	return
+}
+
+// AllOf matches the passed matchers in order.
+type AllOf struct {
+	Match []Scanner
+}
+
+func (m *AllOf) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
+	i, cnt, ofs := 0, len(m.Match), 0
+	for ; i < cnt; i++ {
+		s := m.Match[i]
+		if advance, ok := s.Scan(scan.Next(ofs), ctx); !ok {
+			break
+		} else {
+			ofs += advance
+		}
+	}
+	if i == cnt {
+		ret, okay = ofs, true
+	}
+	return
+}
+
+// BestOf matches any one of the passed scanners; whichever eats the most words.
+// type BestOf struct {
+// 	Match []Scanner
 // }
 
-// func (try *Word) Try(ctx *Context, cs *Cursor) (okay bool) {
-// 	if n, ok := cs.NextWord(); ok {
-// 		okay = strings.EqualFold(n, try.Word)
-// 	}
-// 	return
-// }
-
-// // AnyOf matches any one of the passed matchers.
-// type AnyOf struct {
-// 	AnyOf []Tryer
-// }
-
-// func (try *AnyOf) Try(ctx *Context, cs *Cursor) (okay bool) {
-// 	for _, s := range try.AnyOf {
-// 		cs := *cs // reset the cursor each time
-// 		if s.Try(cs) {
-// 			okay = true
-// 			break
+// func (m *BestOf) Try(scan Cursor, ctx *Context) (ret int, okay bool) {
+// var best int
+// for _, s := range m.Match {
+// 		if next, ok := s.Scan(scan); ok && next > best {
+// 			best= next
 // 		}
 // 	}
-// 	return
-// }
-
-// // AllOf matches the passed matchers in order.
-// type AllOf struct {
-// 	AllOf []Tryer
-// }
-
-// func (try *AllOf) Try(ctx *Context, cs *Cursor) (okay bool) {
-// 	for _, s := range try.AllOf {
-// 		if s.Try(cs) {
-// 			okay = true
-// 			break
-// 		}
-// 	}
+//  if best > 0 {
+//    ret, okay= best, true
+//  }
 // 	return
 // }

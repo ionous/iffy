@@ -7,7 +7,7 @@ type Grammar struct {
 
 type Scanner interface {
 	// Store results in Context, return the number of words to advance.
-	Scan(*Context, *Cursor) int
+	Scan(Cursor, *Context) (int, bool)
 }
 
 type Matcher interface {
