@@ -9,9 +9,9 @@ import (
 
 func TestWord(t *testing.T) {
 	match := func(input, goal string) bool {
-		ctx := Context{
+		ctx := TestContext{
 			Words: strings.Fields(input),
-			Match: &Match{Scanner: &Word{goal}},
+			Match: &Word{goal},
 		}
 		return ctx.Advance()
 	}
@@ -32,9 +32,9 @@ func TestVariousOf(t *testing.T) {
 	}
 
 	match := func(input string, goal Scanner) bool {
-		ctx := Context{
+		ctx := TestContext{
 			Words: strings.Fields(input),
-			Match: &Match{Scanner: goal},
+			Match: goal,
 		}
 		return ctx.Advance()
 	}
@@ -56,12 +56,12 @@ func TestVariousOf(t *testing.T) {
 			testify.True(t, match("Beep BLOX", &AllOf{wordList}))
 		})
 		t.Run("mismatch", func(t *testing.T) {
-			testify.False(t, match("BLOX Beep", &AllOf{wordList}))
-			testify.False(t, match("Beep", &AllOf{wordList}))
-			testify.False(t, match("BLOX", &AllOf{wordList}))
-			testify.False(t, match("Boop", &AllOf{wordList}))
-			testify.False(t, match("", &AllOf{wordList}))
-			testify.False(t, match("", &AllOf{}))
+			testify.False(t, match("BLOX Beep", &AllOf{wordList}), "rev phrase")
+			testify.False(t, match("Beep", &AllOf{wordList}), "one word")
+			testify.False(t, match("BLOX", &AllOf{wordList}), "the other word")
+			testify.False(t, match("Boop", &AllOf{wordList}), "missing word")
+			testify.False(t, match("", &AllOf{wordList}), "empty match")
+			testify.False(t, match("", &AllOf{}), "empty empty")
 		})
 	})
 }

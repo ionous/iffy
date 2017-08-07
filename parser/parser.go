@@ -1,23 +1,8 @@
 package parser
 
-type Grammar struct {
-	Name string
-	Matcher
-}
-
 type Scanner interface {
 	// Store results in Context, return the number of words to advance.
 	Scan(Cursor, *Context) (int, bool)
-}
-
-type Matcher interface {
-	Scanner
-	GetNext() Matcher
-}
-
-type Match struct {
-	Scanner
-	Next Matcher
 }
 
 // // Series matches any set of words.
@@ -36,11 +21,24 @@ type Match struct {
 // type Actor struct {
 // }
 
-func (m *Match) GetNext() Matcher {
-	return m.Next
-}
-
 // // FIX: return a flag, set a flag, for "greedy" -- i want everything that the next thing cant use.
 // func (w *Series) Parse(x *Context) (err error) {
 // 	x.Soft = true
 // }
+
+// Action terminates a matcher sequence by setting the context to the desired action.
+type Action struct {
+	Name string
+}
+
+// Scan matches only if the cursor has finished with all words.
+func (a *Action) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
+	_, exists := scan.GetNext()
+	// println("trying", a.Name, scan.Word, !exists)
+	if !exists {
+		// FIX: can we make this a return?
+		ctx.Results.Action = a.Name
+		okay = true
+	}
+	return
+}

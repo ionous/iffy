@@ -10,7 +10,7 @@ type Word struct {
 }
 
 func (w *Word) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
-	if n, ok := scan.NextWord(ctx); ok {
+	if n, ok := scan.GetNext(); ok {
 		if strings.EqualFold(n, w.Word) {
 			ret, okay = 1, true
 		}
@@ -39,17 +39,18 @@ type AllOf struct {
 }
 
 func (m *AllOf) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
-	i, cnt, ofs := 0, len(m.Match), 0
-	for ; i < cnt; i++ {
-		s := m.Match[i]
-		if advance, ok := s.Scan(scan.Next(ofs), ctx); !ok {
-			break
-		} else {
-			ofs += advance
+	if i, cnt, ofs := 0, len(m.Match), 0; cnt > 0 {
+		for ; i < cnt; i++ {
+			s := m.Match[i]
+			if advance, ok := s.Scan(scan.Step(ofs), ctx); !ok {
+				break
+			} else {
+				ofs += advance
+			}
 		}
-	}
-	if i == cnt {
-		ret, okay = ofs, true
+		if i == cnt {
+			ret, okay = ofs, true
+		}
 	}
 	return
 }

@@ -97,10 +97,27 @@ func TestScope(t *testing.T) {
 		matching(scope, "nothing"))
 }
 
+type TestContext struct {
+	Scope   Scope
+	Match   Scanner
+	Words   []string
+	Results Results
+}
+
+func (tc *TestContext) Advance() (okay bool) {
+	pos := Cursor{Words: tc.Words}
+	ctx := Context{Scope: tc.Scope}
+	if a, ok := tc.Match.Scan(pos, &ctx); ok {
+		tc.Results = ctx.Results
+		okay = a == len(tc.Words)
+	}
+	return
+}
+
 func matching(scope Scope, phrase string) (ret []Ranking) {
-	ctx := Context{
+	ctx := TestContext{
 		Scope: scope,
-		Match: &Match{Scanner: &Object{}},
+		Match: &Object{},
 		Words: strings.Fields(phrase),
 	}
 	if ctx.Advance() {
@@ -110,9 +127,9 @@ func matching(scope Scope, phrase string) (ret []Ranking) {
 }
 
 func matchingFilter(scope Scope, phrase, attr, class string) (ret []Ranking) {
-	ctx := Context{
+	ctx := TestContext{
 		Scope: scope,
-		Match: &Match{Scanner: &Object{Filters{&HasAttr{attr}, &HasClass{class}}}},
+		Match: &Object{Filters{&HasAttr{attr}, &HasClass{class}}},
 		Words: strings.Fields(phrase),
 	}
 	if ctx.Advance() {

@@ -1,162 +1,180 @@
 package parser_test
 
-// import (
-// 	"strings"
-// 	// "github.com/ionous/iffy/parser"
-// 	"github.com/ionous/sliceOf"
-// 	"testing"
-// )
+import (
+	. "github.com/ionous/iffy/parser"
+	"github.com/ionous/sliceOf"
+	testify "github.com/stretchr/testify/assert"
+	"strings"
+	"testing"
+)
 
-// type ParserTest struct {
-// 	Output Step
-// 	Input  []string
-// 	// test will expect the number of clarifications and the number of steps to match
-// 	Clarify []string
-// }
+func anyOf(s ...Scanner) (ret Scanner) {
+	if len(s) == 1 {
+		ret = s[0]
+	} else {
+		ret = &AnyOf{s}
+	}
+	return
+}
 
-// type Context struct {
-// }
+func allOf(s ...Scanner) (ret Scanner) {
+	if len(s) == 1 {
+		ret = s[0]
+	} else {
+		ret = &AllOf{s}
+	}
+	return
+}
 
-// type Step interface {
-// 	// Process the passed input, and return the next step
-// 	// returns nil when finished.
-// 	NextStep(*Context, string) (*Step, error)
-// }
+func words(s string) (ret Scanner) {
+	if split := strings.Split(s, "/"); len(split) == 1 {
+		ret = &Word{s}
+	} else {
+		var words []Scanner
+		for _, g := range split {
+			words = append(words, &Word{g})
+		}
+		ret = &AnyOf{words}
+	}
+	return
+}
 
-// // Debig
-// type Response struct {
-// 	Prompt string
-// 	Step   *Step
-// }
+func noun() Scanner {
+	return &Object{}
+}
 
-// // probably not a string, but instead:
-// type Result struct {
-// 	Action string
-// 	Nouns  []string
-// }
+func TestParser(t *testing.T) {
+	obj := func(names ...string) MyObject {
+		return MyObject{Id: names[0], Names: names}
+	}
+	scope := MyScope{
+		obj("something"),
+	}
 
-// func (Response) NextStep(context *Context, input string) (ret *Step, err error) {
-// 	return
-// }
+	grammar :=
+		allOf(words("look/l"), anyOf(
+			allOf(&Action{"Look"}),
+			allOf(words("at"), noun(), &Action{"Examine"}),
+			allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
+			allOf(words("under"), noun(), &Action{"LookUnder"}),
+		))
 
-// // for multi-action/ held reponses: take before insert
-// // func (Results) NextStep(context *Context, input string) (ret *Step, err error) {
-// // 	return
-// // }
+		// first, we want to test a simple set of example actions,
+		// all of which start the same way, but end with different actions.
+		// later, we will test disambiguation; errors; multiple objects: etc.
+	t.Run("look", func(t *testing.T) {
+		parse(t, scope, grammar,
+			"look/l", &Result{
+				Action: "Look",
+			})
+	})
+	t.Run("examine", func(t *testing.T) {
+		parse(t, scope, grammar,
+			"look/l at something", &Result{
+				Action: "Examine",
+				Nouns:  sliceOf.String("something"),
+			})
+	})
+	t.Run("search", func(t *testing.T) {
+		parse(t, scope, grammar,
+			"look/l inside/in/into/through/on something",
+			&Result{
+				Action: "Search",
+				Nouns:  sliceOf.String("something"),
+			})
+	})
+	t.Run("look under", func(t *testing.T) {
+		parse(t, scope, grammar,
+			"look/l under something",
+			&Result{
+				Action: "LookUnder",
+				Nouns:  sliceOf.String("something"),
+			})
+	})
 
-// func (Result) NextStep(context *Context, input string) (ret *Step, err error) {
-// 	return
-// }
+}
 
-// func (p *ParserTest) Run(t *testing.T) {
-// }
+type Result struct {
+	Action string
+	Nouns  []string
+}
 
-// var shortDirections = sliceOf.String(
-// 	"n", "s", "e", "w", "ne", "nw", "se", "sw",
-// 	"u", "up", "ceiling", "above", "sky",
-// 	"d", "down", "floor", "below", "ground",
-// )
-// var directions = sliceOf.String(
-// 	"north",
-// 	"south",
-// 	"east",
-// 	"west",
-// 	"northeast",
-// 	"northwest",
-// 	"southeast",
-// 	"southwest",
-// 	"up",   // "up above",
-// 	"down", // "ground",
-// 	"inside",
-// 	"outside")
+func parse(t *testing.T, scope Scope, match Scanner, phrase string, goal *Result) {
+	assert := testify.New(t)
+	for _, in := range MakePhrases(phrase) {
+		// Parse:
+		if res, ok := Parse(scope, match, in); assert.True(ok, in) {
+			if !assert.Equal(goal.Action, res.Action) {
+				break
+			}
+			var nouns []string
+			for _, rank := range res.Matches {
+				nouns = append(nouns, rank.Nouns...)
+			}
+			if !assert.Equal(goal.Nouns, nouns) {
+				break
+			}
+		}
+	}
+}
 
-// var ADirection = append(shortDirections, directions...)
+// // var shortDirections = (
+// // 	"n", "s", "e", "w", "ne", "nw", "se", "sw",
+// // 	"u", "up", "ceiling", "above", "sky",
+// // 	"d", "down", "floor", "below", "ground",
+// // )
+// // var directions = (
+// // 	"north",
+// // 	"south",
+// // 	"east",
+// // 	"west",
+// // 	"northeast",
+// // 	"northwest",
+// // 	"southeast",
+// // 	"southwest",
+// // 	"up",   // "up above",
+// // 	"down", // "ground",
+// // 	"inside",
+// // 	"outside")
 
-// func TestParser(t *testing.T) {
-// 	// first, we want to test a simple set of example actions,
-// 	// all of which start the same way, but end with different actions.
-// 	// later, we will test disambiguation; errors; multiple objects: etc.
-// 	t.Run("looking", func(t *testing.T) {
-// 		t.Run("look", func(t *testing.T) {
-// 			p := ParserTest{
-// 				Verb: sliceOf.String("look", "l"),
-// 				Output: Result{
-// 					Action: "Look",
-// 				},
-// 			}
-// 			p.Run(t)
-// 		})
-// 		t.Run("examine", func(t *testing.T) {
-// 			p := ParserTest{
-// 				Verb:   sliceOf.String("look", "l"),
-// 				Phrase: "at something",
-// 				Output: Result{
-// 					Action: "Examine",
-// 					Nouns:  sliceOf.String("something"),
-// 				},
-// 			}
-// 			p.Run(t)
-// 		})
-// 		t.Run("search", func(t *testing.T) {
-// 			p := ParserTest{
-// 				Verb:   sliceOf.String("look", "l"),
-// 				Phrase: "inside/in/into/through/on something",
-// 				Output: Result{
-// 					Action: "Search",
-// 					Nouns:  sliceOf.String("something"),
-// 				},
-// 			}
-// 			p.Run(t)
-// 		})
-// 		t.Run("look under", func(t *testing.T) {
-// 			p := ParserTest{
-// 				Verb:   sliceOf.String("look", "l"),
-// 				Phrase: "under something",
-// 				Output: Result{
-// 					Action: "LookUnder",
-// 					Nouns:  sliceOf.String("something"),
-// 				},
-// 			}
-// 			p.Run(t)
-// 		})
+// // var ADirection = append(shortDirections, directions...)
 
-// 		t.Run("consult", func(t *testing.T) {
-// 			p := ParserTest{
-// 				Verb:   sliceOf.String("look", "l"),
-// 				Phrase: "under something",
-// 				Output: Result{
-// 					Action: "LookUnder",
-// 					Nouns:  sliceOf.String("something"),
-// 				},
-// 			}
-// 			p.Run(t)
-// 		})
+// // 		t.Run("consult", func(t *testing.T) {
+// // 			parse(t, scope, grammar,
+// // 				   "look/l",
+// // 				"under something",
+// // 				&Result{
+// // 					Action: "LookUnder",
+// // 					Nouns:  ("something"),
+// // 				},
+// // 			}
+// //
+// // 		})
 
-// 		t.Run("examine dir", func(t *testing.T) {
-// 			for _, dir := range ADirection {
-// 				p := ParserTest{
-// 					Verb:   sliceOf.String("look", "l"),
-// 					Phrase: dir,
-// 					Output: Result{
-// 						Action: "Examine",
-// 						Nouns:  sliceOf.String(dir),
-// 					},
-// 				}
-// 			}
-// 			p.Run(t)
-// 		})
-// 		t.Run("examine to dir", func(t *testing.T) {
-// 			for _, dir := range ADirection {
-// 				p := ParserTest{
-// 					Verb:   sliceOf.String("look to", "l to"),
-// 					Phrase: dir,
-// 					Output: Result{
-// 						Action: "Examine",
-// 						Nouns:  sliceOf.String(dir),
-// 					},
-// 				}
-// 				p.Run(t)
-// 			}
-// 		})
-// 	})
-// }
+// // 		t.Run("examine dir", func(t *testing.T) {
+// // 			for _, dir := range ADirection {
+// // 				parse(t, scope, grammar,
+// // 					   "look/l",
+// // 					dir,
+// // 					&Result{
+// // 						Action: "Examine",
+// // 						Nouns:  (dir),
+// // 					},
+// // 				}
+// // 			}
+// //
+// // 		})
+// // 		t.Run("examine to dir", func(t *testing.T) {
+// // 			for _, dir := range ADirection {
+// // 				parse(t, scope, grammar,
+// // 					   ("look to", "l to"),
+// // 					dir,
+// // 					&Result{
+// // 						Action: "Examine",
+// // 						Nouns:  (dir),
+// // 					},
+// // 				}
+// //
+// // 			}
+// // 		})
+// // 	})
