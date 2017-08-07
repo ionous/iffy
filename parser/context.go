@@ -1,12 +1,8 @@
 package parser
 
-import (
-	"strings"
-)
-
 type Context struct {
 	Scope
-	Soft bool // when Soft is enabled, we can try many matches
+	// Soft bool // when Soft is enabled, we can try many matches
 	// i almost wonder, could Span just simply take over with a new context implementation?
 	// return its own Next's Next token transparently
 	Results
@@ -16,7 +12,22 @@ type Results struct {
 	Actor  string
 	Action string
 	// Prep   []Action -- take because prefererably held
-	Matches []Ranking
+	Matches   []Ranking
+	NeedsNoun bool
+}
+
+func (r *Results) Complete() (ret bool) {
+	// there will be more --
+	if !r.NeedsNoun {
+		i, cnt := 0, len(r.Matches)
+		for ; i < cnt; i++ {
+			if m := r.Matches[i]; len(m.Nouns) > 1 {
+				break // we are not complete if we matched more than one noun
+			}
+		}
+		ret = i == cnt
+	}
+	return
 }
 
 type Ranking struct {
@@ -24,12 +35,13 @@ type Ranking struct {
 	Nouns []string
 }
 
-func Parse(scope Scope, match Scanner, in string) (ret Results, okay bool) {
+// in should be split on fields -- currently just space.
+func Parse(scope Scope, match Scanner, in []string) (ret Results, okay bool) {
 	ctx := Context{
 		Scope: scope,
 	}
 	pos := Cursor{
-		Words: strings.Fields(in),
+		Words: in,
 	}
 	if r, ok := match.Scan(pos, &ctx); ok {
 		if len(pos.Words) == r {

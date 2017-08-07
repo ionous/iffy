@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"github.com/ionous/errutil"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
@@ -52,48 +53,41 @@ func TestParser(t *testing.T) {
 	}
 	scope = append(scope, Directions()...)
 
-	grammar :=
-		allOf(words("look/l"), anyOf(
+	grammar := allOf(words("look/l"),
+		anyOf(
 			allOf(&Action{"Look"}),
 			allOf(words("at"), noun(), &Action{"Examine"}),
-			allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
-			allOf(words("under"), noun(), &Action{"LookUnder"}),
+			// before "look into", since into is also direction.
 			allOf(noun(&HasClass{"direction"}), &Action{"Examine"}),
 			allOf(words("to"), noun(&HasClass{"direction"}), &Action{"Examine"}),
+			allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
+			allOf(words("under"), noun(), &Action{"LookUnder"}),
 		))
 
-		// first, we want to test a simple set of example actions,
-		// all of which start the same way, but end with different actions.
-		// later, we will test disambiguation; errors; multiple objects: etc.
 	t.Run("look", func(t *testing.T) {
 		parse(t, scope, grammar,
 			Phrases("look/l"),
-			&Result{
-				Action: "Look",
-			})
+			&ActionGoal{"Look", nil})
 	})
 	t.Run("examine", func(t *testing.T) {
 		parse(t, scope, grammar,
 			Phrases("look/l at something"),
-			&Result{
-				Action: "Examine",
-				Nouns:  sliceOf.String("something"),
+			&ActionGoal{
+				"Examine", sliceOf.String("something"),
 			})
 	})
 	t.Run("search", func(t *testing.T) {
 		parse(t, scope, grammar,
 			Phrases("look/l inside/in/into/through/on something"),
-			&Result{
-				Action: "Search",
-				Nouns:  sliceOf.String("something"),
+			&ActionGoal{
+				"Search", sliceOf.String("something"),
 			})
 	})
 	t.Run("look under", func(t *testing.T) {
 		parse(t, scope, grammar,
 			Phrases("look/l under something"),
-			&Result{
-				Action: "LookUnder",
-				Nouns:  sliceOf.String("something"),
+			&ActionGoal{
+				"LookUnder", sliceOf.String("something"),
 			})
 	})
 	t.Run("look dir", func(t *testing.T) {
@@ -102,10 +96,7 @@ func TestParser(t *testing.T) {
 			d := sliceOf.String(d)
 			parse(t, scope, grammar,
 				permute(look, d),
-				&Result{
-					Action: "Examine",
-					Nouns:  d,
-				})
+				&ActionGoal{"Examine", d})
 		}
 	})
 	t.Run("look no dir", func(t *testing.T) {
@@ -119,69 +110,94 @@ func TestParser(t *testing.T) {
 			d := sliceOf.String(d)
 			parse(t, scope, grammar,
 				permute(lookTo, d),
-				&Result{
-					Action: "Examine",
-					Nouns:  d,
-				})
+				&ActionGoal{"Examine", d})
 		}
 	})
 }
 
-type Result struct {
+type Goal interface {
+	Goal() Goal // marker: retuns self
+}
+
+type ActionGoal struct {
 	Action string
 	Nouns  []string
 }
 
-func parse(t *testing.T, scope Scope, match Scanner, phrases []string, goal *Result) {
-	assert := testify.New(t)
+type ClarifyGoal struct {
+	// do we print the text here or not?
+	// it might be nice for testing sake --
+	// What do you want to examine
+	// What do you want to look at?
+	// and note, yu eed the matched "verb"?
+	Noun string
+}
+
+func (a *ActionGoal) Goal() Goal {
+	return a
+}
+
+func (a *ClarifyGoal) Goal() Goal {
+	return a
+}
+
+func parse(t *testing.T, scope Scope, match Scanner, phrases []string, goals ...Goal) {
+
 	for _, in := range phrases {
-		// Parse:
+		in := strings.Fields(in)
+		if e := innerParse(scope, match, in, goals); e != nil {
+			e = errutil.Fmt("%v for '%s'", e, in)
+			t.Fatal(e)
+			break
+		}
+	}
+	return
+}
+
+// FIX: will need a "GetScope(actor)" empty *my* box, empty chairman's box.
+func innerParse(scope Scope, match Scanner, in []string, goals []Goal) (err error) {
+	if len(goals) == 0 {
+		err = errutil.New("expected some goals")
+	} else {
+		goal, goals := goals[0], goals[1:]
 		res, ok := Parse(scope, match, in)
-		if goal == nil && ok {
-			t.Fatal("expected failure:", in)
-		} else if goal != nil && !ok {
-			t.Fatal("expected:", in)
-		} else if ok {
-			if !assert.Equal(goal.Action, res.Action) {
-				break
+		if !ok {
+			if goal != nil {
+				err = errutil.New("unexpected failure")
 			}
-			var nouns []string
-			for _, rank := range res.Matches {
-				nouns = append(nouns, rank.Nouns...)
+		} else if goal == nil {
+			err = errutil.New("unexpected success")
+		} else if !res.Complete() {
+			if clarify, ok := goal.(*ClarifyGoal); !ok {
+				err = errutil.New("expected clarification")
+			} else {
+				if res.NeedsNoun {
+					// option 1: reparse the tere
+					// option 2: keep a pointer, and reparse from there.
+					// for good or for ill, object already matched:
+					// (maybe it should have returned a partial?)
+					// so reparse is the only method.
+					extend := append(in, clarify.Noun)
+					err = innerParse(scope, match, extend, goals)
+				} else {
+					err = errutil.New("not implemented")
+				}
 			}
-			if !assert.Equal(goal.Nouns, nouns) {
-				break
+		} else if act, ok := goal.(*ActionGoal); !ok {
+			err = errutil.New("unexpected result:", in, res)
+		} else {
+			if !strings.EqualFold(act.Action, res.Action) {
+				err = errutil.New("expected action", act.Action, "got", res.Action)
+			} else {
+				var nouns []string
+				for _, rank := range res.Matches {
+					nouns = append(nouns, rank.Nouns...)
+				}
+				if !testify.ObjectsAreEqual(act.Nouns, nouns) {
+					err = errutil.New("expected nouns", strings.Join(act.Nouns, ","), "got", strings.Join(nouns, ","))
+				}
 			}
 		}
 	}
+	return
 }
-
-// // var ADirection = append(shortDirections, directions...)
-
-// // 		t.Run("examine dir", func(t *testing.T) {
-// // 			for _, dir := range ADirection {
-// // 				parse(t, scope, grammar,
-// // 					   "look/l",
-// // 					dir,
-// // 					&Result{
-// // 						Action: "Examine",
-// // 						Nouns:  (dir),
-// // 					},
-// // 				}
-// // 			}
-// //
-// // 		})
-// // 		t.Run("examine to dir", func(t *testing.T) {
-// // 			for _, dir := range ADirection {
-// // 				parse(t, scope, grammar,
-// // 					   ("look to", "l to"),
-// // 					dir,
-// // 					&Result{
-// // 						Action: "Examine",
-// // 						Nouns:  (dir),
-// // 					},
-// // 				}
-// //
-// // 			}
-// // 		})
-// // 	})

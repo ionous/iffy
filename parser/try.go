@@ -25,7 +25,9 @@ type AnyOf struct {
 
 func (m *AnyOf) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
 	for _, s := range m.Match {
-		if advance, ok := s.Scan(scan, ctx); ok {
+		if advance, ok := s.Scan(scan, ctx); !ok {
+			ctx.Results = Results{} // reset results on failure.
+		} else {
 			ret, okay = advance, true
 			break
 		}
@@ -54,21 +56,3 @@ func (m *AllOf) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
 	}
 	return
 }
-
-// BestOf matches any one of the passed scanners; whichever eats the most words.
-// type BestOf struct {
-// 	Match []Scanner
-// }
-
-// func (m *BestOf) Try(scan Cursor, ctx *Context) (ret int, okay bool) {
-// var best int
-// for _, s := range m.Match {
-// 		if next, ok := s.Scan(scan); ok && next > best {
-// 			best= next
-// 		}
-// 	}
-//  if best > 0 {
-//    ret, okay= best, true
-//  }
-// 	return
-// }
