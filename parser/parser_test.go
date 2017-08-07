@@ -39,8 +39,8 @@ func words(s string) (ret Scanner) {
 	return
 }
 
-func noun() Scanner {
-	return &Object{}
+func noun(f ...Filter) Scanner {
+	return &Object{f}
 }
 
 func TestParser(t *testing.T) {
@@ -50,6 +50,7 @@ func TestParser(t *testing.T) {
 	scope := MyScope{
 		obj("something"),
 	}
+	scope = append(scope, Directions()...)
 
 	grammar :=
 		allOf(words("look/l"), anyOf(
@@ -57,6 +58,8 @@ func TestParser(t *testing.T) {
 			allOf(words("at"), noun(), &Action{"Examine"}),
 			allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
 			allOf(words("under"), noun(), &Action{"LookUnder"}),
+			allOf(noun(&HasClass{"direction"}), &Action{"Examine"}),
+			allOf(words("to"), noun(&HasClass{"direction"}), &Action{"Examine"}),
 		))
 
 		// first, we want to test a simple set of example actions,
@@ -64,20 +67,22 @@ func TestParser(t *testing.T) {
 		// later, we will test disambiguation; errors; multiple objects: etc.
 	t.Run("look", func(t *testing.T) {
 		parse(t, scope, grammar,
-			"look/l", &Result{
+			Phrases("look/l"),
+			&Result{
 				Action: "Look",
 			})
 	})
 	t.Run("examine", func(t *testing.T) {
 		parse(t, scope, grammar,
-			"look/l at something", &Result{
+			Phrases("look/l at something"),
+			&Result{
 				Action: "Examine",
 				Nouns:  sliceOf.String("something"),
 			})
 	})
 	t.Run("search", func(t *testing.T) {
 		parse(t, scope, grammar,
-			"look/l inside/in/into/through/on something",
+			Phrases("look/l inside/in/into/through/on something"),
 			&Result{
 				Action: "Search",
 				Nouns:  sliceOf.String("something"),
@@ -85,13 +90,41 @@ func TestParser(t *testing.T) {
 	})
 	t.Run("look under", func(t *testing.T) {
 		parse(t, scope, grammar,
-			"look/l under something",
+			Phrases("look/l under something"),
 			&Result{
 				Action: "LookUnder",
 				Nouns:  sliceOf.String("something"),
 			})
 	})
-
+	t.Run("look dir", func(t *testing.T) {
+		look := Phrases("look/l")
+		for _, d := range directions {
+			d := sliceOf.String(d)
+			parse(t, scope, grammar,
+				permute(look, d),
+				&Result{
+					Action: "Examine",
+					Nouns:  d,
+				})
+		}
+	})
+	t.Run("look no dir", func(t *testing.T) {
+		parse(t, scope, grammar,
+			Phrases("look something"),
+			nil)
+	})
+	t.Run("look to dir", func(t *testing.T) {
+		lookTo := Phrases("look/l to")
+		for _, d := range directions {
+			d := sliceOf.String(d)
+			parse(t, scope, grammar,
+				permute(lookTo, d),
+				&Result{
+					Action: "Examine",
+					Nouns:  d,
+				})
+		}
+	})
 }
 
 type Result struct {
@@ -99,11 +132,16 @@ type Result struct {
 	Nouns  []string
 }
 
-func parse(t *testing.T, scope Scope, match Scanner, phrase string, goal *Result) {
+func parse(t *testing.T, scope Scope, match Scanner, phrases []string, goal *Result) {
 	assert := testify.New(t)
-	for _, in := range MakePhrases(phrase) {
+	for _, in := range phrases {
 		// Parse:
-		if res, ok := Parse(scope, match, in); assert.True(ok, in) {
+		res, ok := Parse(scope, match, in)
+		if goal == nil && ok {
+			t.Fatal("expected failure:", in)
+		} else if goal != nil && !ok {
+			t.Fatal("expected:", in)
+		} else if ok {
 			if !assert.Equal(goal.Action, res.Action) {
 				break
 			}
@@ -118,38 +156,7 @@ func parse(t *testing.T, scope Scope, match Scanner, phrase string, goal *Result
 	}
 }
 
-// // var shortDirections = (
-// // 	"n", "s", "e", "w", "ne", "nw", "se", "sw",
-// // 	"u", "up", "ceiling", "above", "sky",
-// // 	"d", "down", "floor", "below", "ground",
-// // )
-// // var directions = (
-// // 	"north",
-// // 	"south",
-// // 	"east",
-// // 	"west",
-// // 	"northeast",
-// // 	"northwest",
-// // 	"southeast",
-// // 	"southwest",
-// // 	"up",   // "up above",
-// // 	"down", // "ground",
-// // 	"inside",
-// // 	"outside")
-
 // // var ADirection = append(shortDirections, directions...)
-
-// // 		t.Run("consult", func(t *testing.T) {
-// // 			parse(t, scope, grammar,
-// // 				   "look/l",
-// // 				"under something",
-// // 				&Result{
-// // 					Action: "LookUnder",
-// // 					Nouns:  ("something"),
-// // 				},
-// // 			}
-// //
-// // 		})
 
 // // 		t.Run("examine dir", func(t *testing.T) {
 // // 			for _, dir := range ADirection {
