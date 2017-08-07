@@ -44,25 +44,38 @@ func noun(f ...Filter) Scanner {
 	return &Object{f}
 }
 
-func TestParser(t *testing.T) {
-	obj := func(names ...string) MyObject {
-		return MyObject{Id: names[0], Names: names}
-	}
-	scope := MyScope{
-		obj("something"),
-	}
-	scope = append(scope, Directions()...)
+var lookGrammar = allOf(words("look/l"),
+	anyOf(
+		allOf(&Action{"Look"}),
+		allOf(words("at"), noun(), &Action{"Examine"}),
+		// before "look into", since into is also direction.
+		allOf(noun(&HasClass{"direction"}), &Action{"Examine"}),
+		allOf(words("to"), noun(&HasClass{"direction"}), &Action{"Examine"}),
+		allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
+		allOf(words("under"), noun(), &Action{"LookUnder"}),
+	))
 
-	grammar := allOf(words("look/l"),
-		anyOf(
-			allOf(&Action{"Look"}),
-			allOf(words("at"), noun(), &Action{"Examine"}),
-			// before "look into", since into is also direction.
-			allOf(noun(&HasClass{"direction"}), &Action{"Examine"}),
-			allOf(words("to"), noun(&HasClass{"direction"}), &Action{"Examine"}),
-			allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
-			allOf(words("under"), noun(), &Action{"LookUnder"}),
-		))
+func makeObject(names ...string) MyObject {
+	return MyObject{Id: names[0], Names: names}
+}
+
+var scope = func() (ret MyScope) {
+	ret = MyScope{makeObject("something")}
+	return append(ret, Directions()...)
+}()
+
+func TestDisambiguation(t *testing.T) {
+	grammar := lookGrammar
+	t.Run("trailing noun", func(t *testing.T) {
+		parse(t, scope, grammar,
+			Phrases("look at"),
+			&ClarifyGoal{"something"},
+			&ActionGoal{"Examine", sliceOf.String("something")})
+	})
+}
+
+func TestParser(t *testing.T) {
+	grammar := lookGrammar
 
 	t.Run("look", func(t *testing.T) {
 		parse(t, scope, grammar,
@@ -142,10 +155,9 @@ func (a *ClarifyGoal) Goal() Goal {
 }
 
 func parse(t *testing.T, scope Scope, match Scanner, phrases []string, goals ...Goal) {
-
 	for _, in := range phrases {
-		in := strings.Fields(in)
-		if e := innerParse(scope, match, in, goals); e != nil {
+		fields := strings.Fields(in)
+		if e := innerParse(scope, match, fields, goals); e != nil {
 			e = errutil.Fmt("%v for '%s'", e, in)
 			t.Fatal(e)
 			break
