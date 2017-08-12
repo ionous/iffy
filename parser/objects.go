@@ -10,38 +10,45 @@ import (
 type Object struct {
 	Filters Filters
 }
+type Ranking struct {
+	Rank int
+	Ids  []string
+}
 
-func (try *Object) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
-	var best Ranking
+func (try *Object) Scan(scope Scope, scan Cursor) (ret Result, err error) {
 	if !scan.HasNext() {
-		// the player hasnt typed anything else, but we are the last noun
-		// ask them which object they mean.
-		ctx.NeedsNoun = true
-		okay = true
+		err = MissingObject{Depth(scan.Pos)}
 	} else {
-		ctx.SearchScope(func(n Noun) bool {
+		var best Ranking
+		scope.SearchScope(func(n Noun) bool {
 			if matchName(n, scan) && try.Filters.MatchesNoun(n) {
-				cs := scan.Step(1)
-				// keep eating words as long as they match this object.
-				// FUTURE? reverse ambiguity, allow the next match to grow backwards if it can, increasing the ambiguity of the phrase
-				// ex. look inside: did you mean look to the inside, or look inside something...
+				cs := scan.Skip(1)
+				// determine the ranking of this object by eating words as long as they match.
 				var rank int
 				for ; matchName(n, cs); rank++ {
-					cs = cs.Step(1)
+					cs = cs.Skip(1)
 				}
 				switch id := n.GetId(); {
 				case rank > best.Rank:
 					best = Ranking{rank, sliceOf.String(id)}
 				case rank == best.Rank:
-					best.Nouns = append(best.Nouns, id)
+					best.Ids = append(best.Ids, id)
 				}
 			}
-			return false // keep going
+			return false // always keep going
 		})
-		if len(best.Nouns) > 0 {
-			// FIX: can we make this a return?
-			ctx.Results.Matches = append(ctx.Results.Matches, best)
-			ret, okay = best.Rank+1, true // number of words
+
+		ids := best.Ids
+		if cnt := len(ids); cnt == 0 {
+			err = UnknownObject{Depth(scan.Pos)}
+		} else {
+			last := scan.Pos + best.Rank + 1
+			if cnt == 1 {
+				words := scan.Words[scan.Pos:last]
+				ret = ResolvedObject{ids[0], words}
+			} else {
+				err = AmbiguousObject{ids, Depth(last)}
+			}
 		}
 	}
 	return

@@ -1,19 +1,39 @@
 package parser
 
 import (
+	"github.com/ionous/errutil"
 	"strings"
 )
+
+// // Series matches any set of words.
+// type Series struct {
+// 	Next Rule
+// }
+// // Number matches any series of digits
+// // FUTURE: commas? and words.
+// type Number struct {
+// }
+
+// // Reverse queues the next match till later.
+// type Reverse struct {
+// }
+
+// // Actor handles addressing actors by name. For example: "name, "
+// type Actor struct {
+// }
 
 // Word matches one word.
 type Word struct {
 	Word string
 }
 
-func (w *Word) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
-	if n, ok := scan.GetNext(); ok {
-		if strings.EqualFold(n, w.Word) {
-			ret, okay = 1, true
-		}
+func (w *Word) Scan(scope Scope, scan Cursor) (ret Result, err error) {
+	if n, ok := scan.GetNext(); !ok {
+		err = Underflow{Depth(scan.Pos)}
+	} else if !strings.EqualFold(n, w.Word) {
+		err = MismatchedWord{n, Depth(scan.Pos)}
+	} else {
+		ret = ResolvedWord{n}
 	}
 	return
 }
@@ -23,13 +43,19 @@ type AnyOf struct {
 	Match []Scanner
 }
 
-func (m *AnyOf) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
-	for _, s := range m.Match {
-		if advance, ok := s.Scan(scan, ctx); !ok {
-			ctx.Results = Results{} // reset results on failure.
-		} else {
-			ret, okay = advance, true
-			break
+func (m *AnyOf) Scan(scope Scope, cs Cursor) (ret Result, err error) {
+	if cnt := len(m.Match); cnt == 0 {
+		err = errutil.New("no rules specified for any of")
+	} else {
+		i, errorDepth := 0, -1 // keep the most informative error
+		for ; i < cnt; i++ {
+			if res, e := m.Match[i].Scan(scope, cs); e == nil {
+				ret, err = res, nil
+				break
+			} else if d := DepthOf(e); d > errorDepth {
+				err, errorDepth = e, d
+				// keep looking for success
+			}
 		}
 	}
 	return
@@ -40,18 +66,23 @@ type AllOf struct {
 	Match []Scanner
 }
 
-func (m *AllOf) Scan(scan Cursor, ctx *Context) (ret int, okay bool) {
-	if i, cnt, ofs := 0, len(m.Match), 0; cnt > 0 {
+func (m *AllOf) Scan(scope Scope, cs Cursor) (ret Result, err error) {
+	var rl ResultList
+	if cnt := len(m.Match); cnt == 0 {
+		err = errutil.New("no rules specified for all of")
+	} else {
+		var i int
 		for ; i < cnt; i++ {
-			s := m.Match[i]
-			if advance, ok := s.Scan(scan.Step(ofs), ctx); !ok {
+			if res, e := m.Match[i].Scan(scope, cs); e != nil {
+				err = e
 				break
 			} else {
-				ofs += advance
+				rl.AddResult(res)
+				cs = cs.Skip(res.ResultLen())
 			}
 		}
 		if i == cnt {
-			ret, okay = ofs, true
+			ret = &rl
 		}
 	}
 	return

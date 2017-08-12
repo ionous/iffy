@@ -8,18 +8,19 @@ import (
 )
 
 func TestWord(t *testing.T) {
-	match := func(input, goal string) bool {
-		ctx := TestContext{
-			Words: strings.Fields(input),
-			Match: &Word{goal},
-		}
-		return ctx.Advance()
+	match := func(input, goal string) (Result, error) {
+		match := &Word{goal}
+		return match.Scan(nil, Cursor{Words: strings.Fields(input)})
 	}
 	t.Run("match", func(t *testing.T) {
-		testify.True(t, match("Beep", "beep"))
+		if res, e := match("Beep", "beep"); testify.NoError(t, e) {
+			testify.EqualValues(t, ResolvedWord{"Beep"}, res)
+		}
 	})
 	t.Run("mismatch", func(t *testing.T) {
-		testify.False(t, match("Boop", "beep"))
+		if res, e := match("Boop", "beep"); testify.Error(t, e) {
+			testify.Nil(t, res)
+		}
 	})
 }
 
@@ -31,40 +32,64 @@ func TestVariousOf(t *testing.T) {
 		return
 	}
 
-	match := func(input string, goal Scanner) bool {
-		ctx := TestContext{
-			Words: strings.Fields(input),
-			Match: goal,
-		}
-		return ctx.Advance()
+	match := func(input string, goal Scanner) (Result, error) {
+		return goal.Scan(nil, Cursor{Words: strings.Fields(input)})
 	}
 	t.Run("any", func(t *testing.T) {
 		wordList := words("beep", "blox")
 		t.Run("match", func(t *testing.T) {
-			testify.True(t, match("Beep", &AnyOf{wordList}))
-			testify.True(t, match("Blox", &AnyOf{wordList}))
+
+			if res, e := match("Beep", &AnyOf{wordList}); testify.NoError(t, e) {
+				testify.EqualValues(t,
+					ResolvedWord{"Beep"}, res)
+			}
+			if res, e := match("Blox", &AnyOf{wordList}); testify.NoError(t, e) {
+				testify.EqualValues(t,
+					ResolvedWord{"Blox"}, res)
+			}
 		})
 		t.Run("mismatch", func(t *testing.T) {
-			testify.False(t, match("Boop", &AnyOf{wordList}))
-			testify.False(t, match("Beep", &AnyOf{}))
-			testify.False(t, match("", &AnyOf{}))
+			if res, e := match("Boop", &AnyOf{wordList}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
+			if res, e := match("Beep", &AnyOf{}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
+			if res, e := match("", &AnyOf{}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
 		})
 	})
 	t.Run("all", func(t *testing.T) {
 		wordList := words("beep", "blox")
 		t.Run("match", func(t *testing.T) {
-			testify.True(t, match("Beep BLOX", &AllOf{wordList}))
+			if res, e := match("Beep BLOX", &AllOf{wordList}); testify.NoError(t, e) {
+				testify.EqualValues(t,
+					&ResultList{[]Result{
+						ResolvedWord{"Beep"},
+						ResolvedWord{"BLOX"}}, 2,
+					}, res)
+			}
 		})
 		t.Run("mismatch", func(t *testing.T) {
-			testify.False(t, match("BLOX Beep", &AllOf{wordList}), "rev phrase")
-			testify.False(t, match("Beep", &AllOf{wordList}), "one word")
-			testify.False(t, match("BLOX", &AllOf{wordList}), "the other word")
-			testify.False(t, match("Boop", &AllOf{wordList}), "missing word")
-			testify.False(t, match("", &AllOf{wordList}), "empty match")
-			testify.False(t, match("", &AllOf{}), "empty empty")
+			if res, e := match("BLOX Beep", &AllOf{wordList}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
+			if res, e := match("Beep", &AllOf{wordList}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
+			if res, e := match("BLOX", &AllOf{wordList}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
+			if res, e := match("Boop", &AllOf{wordList}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
+			if res, e := match("", &AllOf{wordList}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
+			if res, e := match("", &AllOf{}); testify.Error(t, e) {
+				testify.Nil(t, res)
+			}
 		})
 	})
 }
-
-// 	func TestAllOf(t *testing.T) {
-// 	}

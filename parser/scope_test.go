@@ -85,55 +85,49 @@ func TestScope(t *testing.T) {
 			Classes: strings.Fields("class"),
 		},
 	}
-	assert.EqualValues([]Ranking{{0, []string{"a"}}},
-		matching(scope, "unique"))
-	assert.EqualValues([]Ranking{{1, []string{"c"}}},
-		matching(scope, "exact match"))
-	assert.EqualValues([]Ranking{{0, []string{"d", "e"}}},
-		matching(scope, "inexact"))
-	assert.EqualValues([]Ranking{{0, []string{"f"}}},
-		matchingFilter(scope, "filter", "attr", "class"))
-	assert.Empty(
-		matching(scope, "nothing"))
+	if res, e := matching(scope, "unique"); assert.NoError(e) {
+		assert.EqualValues(ResolvedObject{
+			Id:    "a",
+			Words: sliceOf.String("unique"),
+		}, res)
+	}
+
+	if res, e := matching(scope, "exact match"); assert.NoError(e) {
+		assert.EqualValues(ResolvedObject{
+			Id:    "c",
+			Words: sliceOf.String("exact", "match"),
+		}, res)
+	}
+
+	if res, e := matchingFilter(scope, "filter", "attr", "class"); assert.NoError(e) {
+		assert.EqualValues(ResolvedObject{
+			Id:    "f",
+			Words: sliceOf.String("filter"),
+		}, res)
+	}
+
+	if res, e := matching(scope, "inexact"); assert.Error(e) {
+		assert.Nil(res)
+		assert.EqualValues(AmbiguousObject{
+			Ids: sliceOf.String("d", "e"),
+			// Words: sliceOf.String("inexact"),
+			Depth: 1,
+		}, e)
+	}
+
+	if res, e := matching(scope, "nothing"); assert.Error(e) {
+		assert.Nil(res)
+	}
 }
 
-type TestContext struct {
-	Scope   Scope
-	Match   Scanner
-	Words   []string
-	Results Results
+func matching(scope Scope, phrase string) (ret Result, err error) {
+	match := &Object{}
+	words := strings.Fields(phrase)
+	return match.Scan(scope, Cursor{Words: words})
 }
 
-func (tc *TestContext) Advance() (okay bool) {
-	pos := Cursor{Words: tc.Words}
-	ctx := Context{Scope: tc.Scope}
-	if a, ok := tc.Match.Scan(pos, &ctx); ok {
-		tc.Results = ctx.Results
-		okay = a == len(tc.Words)
-	}
-	return
-}
-
-func matching(scope Scope, phrase string) (ret []Ranking) {
-	ctx := TestContext{
-		Scope: scope,
-		Match: &Object{},
-		Words: strings.Fields(phrase),
-	}
-	if ctx.Advance() {
-		ret = ctx.Results.Matches
-	}
-	return
-}
-
-func matchingFilter(scope Scope, phrase, attr, class string) (ret []Ranking) {
-	ctx := TestContext{
-		Scope: scope,
-		Match: &Object{Filters{&HasAttr{attr}, &HasClass{class}}},
-		Words: strings.Fields(phrase),
-	}
-	if ctx.Advance() {
-		ret = ctx.Results.Matches
-	}
-	return
+func matchingFilter(scope Scope, phrase, attr, class string) (ret Result, err error) {
+	match := &Object{Filters{&HasAttr{attr}, &HasClass{class}}}
+	words := strings.Fields(phrase)
+	return match.Scan(scope, Cursor{Words: words})
 }

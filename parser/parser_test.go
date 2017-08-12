@@ -44,33 +44,93 @@ func noun(f ...Filter) Scanner {
 	return &Object{f}
 }
 
-var lookGrammar = allOf(words("look/l"),
-	anyOf(
-		allOf(&Action{"Look"}),
-		allOf(words("at"), noun(), &Action{"Examine"}),
-		// before "look into", since into is also direction.
-		allOf(noun(&HasClass{"direction"}), &Action{"Examine"}),
-		allOf(words("to"), noun(&HasClass{"direction"}), &Action{"Examine"}),
-		allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
-		allOf(words("under"), noun(), &Action{"LookUnder"}),
-	))
+var lookGrammar = allOf(words("look/l"), anyOf(
+	allOf(&Action{"Look"}),
+	allOf(words("at"), noun(), &Action{"Examine"}),
+	// before "look inside", since inside is also direction.
+	allOf(noun(&HasClass{"direction"}), &Action{"Examine"}),
+	allOf(words("to"), noun(&HasClass{"direction"}), &Action{"Examine"}),
+	allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
+	allOf(words("under"), noun(), &Action{"LookUnder"}),
+))
 
-func makeObject(names ...string) MyObject {
-	return MyObject{Id: names[0], Names: names}
+func makeObject(name string) MyObject {
+	names := strings.Fields(name)
+	return MyObject{Id: strings.Join(names, "-"), Names: names}
 }
 
 var scope = func() (ret MyScope) {
-	ret = MyScope{makeObject("something")}
+	ret = MyScope{
+		makeObject("something"),
+		makeObject("red apple"),
+		makeObject("apple cart"),
+		makeObject("red cart"),
+		makeObject("apple"),
+	}
 	return append(ret, Directions()...)
 }()
 
 func TestDisambiguation(t *testing.T) {
 	grammar := lookGrammar
 	t.Run("trailing noun", func(t *testing.T) {
-		parse(t, scope, grammar,
+		e := parse(scope, grammar,
 			Phrases("look at"),
 			&ClarifyGoal{"something"},
 			&ActionGoal{"Examine", sliceOf.String("something")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+
+	t.Run("shared names", func(t *testing.T) {
+		e := parse(scope, grammar,
+			Phrases("look at red cart"),
+			&ActionGoal{"Examine", sliceOf.String("red-cart")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+
+	t.Run("ambiguous shared names", func(t *testing.T) {
+		e := parse(scope, grammar,
+			Phrases("look at cart"),
+			&ClarifyGoal{"red"},
+			&ActionGoal{"Examine", sliceOf.String("red-cart")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+
+	t.Run("ambiguous loops", func(t *testing.T) {
+		e := parse(scope, grammar,
+			Phrases("look at cart"),
+			&ClarifyGoal{"cart"},
+			&ClarifyGoal{"cart"},
+			&ClarifyGoal{"red"},
+			&ActionGoal{"Examine", sliceOf.String("red-cart")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+
+	// even though it doesn't during normal play.
+	t.Run("exact name works during disambiguation", func(t *testing.T) {
+		e := parse(scope, grammar,
+			Phrases("look at apple"),
+			&ClarifyGoal{"apple"},
+			&ActionGoal{"Examine", sliceOf.String("apple")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+
+	t.Run("doubled names dont match incorrectly", func(t *testing.T) {
+		e := parse(scope, grammar,
+			Phrases("look at apple apple apple cart"),
+			&ActionGoal{"Examine", sliceOf.String("apple-cart")})
+		if e != nil {
+			t.Fatal(e)
+		}
 	})
 }
 
@@ -78,52 +138,73 @@ func TestParser(t *testing.T) {
 	grammar := lookGrammar
 
 	t.Run("look", func(t *testing.T) {
-		parse(t, scope, grammar,
+		e := parse(scope, grammar,
 			Phrases("look/l"),
 			&ActionGoal{"Look", nil})
+		if e != nil {
+			t.Fatal(e)
+		}
 	})
 	t.Run("examine", func(t *testing.T) {
-		parse(t, scope, grammar,
+		e := parse(scope, grammar,
 			Phrases("look/l at something"),
 			&ActionGoal{
 				"Examine", sliceOf.String("something"),
 			})
+		if e != nil {
+			t.Fatal(e)
+		}
 	})
 	t.Run("search", func(t *testing.T) {
-		parse(t, scope, grammar,
+		e := parse(scope, grammar,
 			Phrases("look/l inside/in/into/through/on something"),
 			&ActionGoal{
 				"Search", sliceOf.String("something"),
 			})
+		if e != nil {
+			t.Fatal(e)
+		}
 	})
 	t.Run("look under", func(t *testing.T) {
-		parse(t, scope, grammar,
+		e := parse(scope, grammar,
 			Phrases("look/l under something"),
 			&ActionGoal{
 				"LookUnder", sliceOf.String("something"),
 			})
+		if e != nil {
+			t.Fatal(e)
+		}
 	})
 	t.Run("look dir", func(t *testing.T) {
 		look := Phrases("look/l")
 		for _, d := range directions {
 			d := sliceOf.String(d)
-			parse(t, scope, grammar,
+			if e := parse(scope, grammar,
 				permute(look, d),
-				&ActionGoal{"Examine", d})
+				&ActionGoal{"Examine", d}); e != nil {
+				t.Fatal(e)
+				break
+			}
 		}
 	})
 	t.Run("look no dir", func(t *testing.T) {
-		parse(t, scope, grammar,
+		e := parse(scope, grammar,
 			Phrases("look something"),
 			nil)
+		if e != nil {
+			t.Fatal(e)
+		}
 	})
 	t.Run("look to dir", func(t *testing.T) {
 		lookTo := Phrases("look/l to")
 		for _, d := range directions {
 			d := sliceOf.String(d)
-			parse(t, scope, grammar,
+			if e := parse(scope, grammar,
 				permute(lookTo, d),
-				&ActionGoal{"Examine", d})
+				&ActionGoal{"Examine", d}); e != nil {
+				t.Fatal(e)
+				break
+			}
 		}
 	})
 }
@@ -154,12 +235,11 @@ func (a *ClarifyGoal) Goal() Goal {
 	return a
 }
 
-func parse(t *testing.T, scope Scope, match Scanner, phrases []string, goals ...Goal) {
+func parse(scope Scope, match Scanner, phrases []string, goals ...Goal) (err error) {
 	for _, in := range phrases {
 		fields := strings.Fields(in)
 		if e := innerParse(scope, match, fields, goals); e != nil {
-			e = errutil.Fmt("%v for '%s'", e, in)
-			t.Fatal(e)
+			err = errutil.Fmt("%v for '%s'", e, in)
 			break
 		}
 	}
@@ -172,43 +252,40 @@ func innerParse(scope Scope, match Scanner, in []string, goals []Goal) (err erro
 		err = errutil.New("expected some goals")
 	} else {
 		goal, goals := goals[0], goals[1:]
-		res, ok := Parse(scope, match, in)
-		if !ok {
-			if goal != nil {
-				err = errutil.New("unexpected failure")
+		if res, e := match.Scan(scope, Cursor{Words: in}); e != nil {
+
+			if clarify, clarifies := goal.(*ClarifyGoal); !clarifies {
+				if goal != nil {
+					err = errutil.New("unexpected failure", e)
+				}
+			} else {
+				switch e := e.(type) {
+				case MissingObject:
+					extend := append(in, clarify.Noun)
+					err = innerParse(scope, match, extend, goals)
+				case AmbiguousObject:
+					//
+					// println(strings.Join(in, "/"))
+					next := append(in[:e.Depth], clarify.Noun)
+					next = append(next, in[e.Depth:]...)
+					// println(strings.Join(next, "\\"))
+
+				default:
+					err = errutil.Fmt("clarification not implemented for %T", e)
+				}
 			}
 		} else if goal == nil {
 			err = errutil.New("unexpected success")
-		} else if !res.Complete() {
-			if clarify, ok := goal.(*ClarifyGoal); !ok {
-				err = errutil.New("expected clarification")
-			} else {
-				if res.NeedsNoun {
-					// option 1: reparse the tere
-					// option 2: keep a pointer, and reparse from there.
-					// for good or for ill, object already matched:
-					// (maybe it should have returned a partial?)
-					// so reparse is the only method.
-					extend := append(in, clarify.Noun)
-					err = innerParse(scope, match, extend, goals)
-				} else {
-					err = errutil.New("not implemented")
-				}
-			}
-		} else if act, ok := goal.(*ActionGoal); !ok {
-			err = errutil.New("unexpected result:", in, res)
-		} else {
-			if !strings.EqualFold(act.Action, res.Action) {
-				err = errutil.New("expected action", act.Action, "got", res.Action)
-			} else {
-				var nouns []string
-				for _, rank := range res.Matches {
-					nouns = append(nouns, rank.Nouns...)
-				}
-				if !testify.ObjectsAreEqual(act.Nouns, nouns) {
-					err = errutil.New("expected nouns", strings.Join(act.Nouns, ","), "got", strings.Join(nouns, ","))
-				}
-			}
+		} else if g, ok := goal.(*ActionGoal); !ok {
+			err = errutil.New("unexpected goal", in, goal)
+		} else if list, ok := res.(*ResultList); !ok {
+			err = errutil.New("expected result list %T", res)
+		} else if act, ok := list.Last().(ResolvedAction); !ok {
+			err = errutil.New("expected resolved action %T", list.Last())
+		} else if !strings.EqualFold(act.Name, g.Action) {
+			err = errutil.New("expected action", act, "got", g.Action)
+		} else if objs := list.Objects(); !testify.ObjectsAreEqual(g.Nouns, objs) {
+			err = errutil.New("expected nouns (", strings.Join(g.Nouns, ","), ") got (", strings.Join(objs, ","), ")")
 		}
 	}
 	return
