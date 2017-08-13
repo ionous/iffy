@@ -43,6 +43,14 @@ func words(s string) (ret Scanner) {
 func noun(f ...Filter) Scanner {
 	return &Object{f}
 }
+func nouns(f ...Filter) Scanner {
+	return &Multi{f}
+}
+
+// note: we use things to exclude directions
+func things() Scanner {
+	return nouns(&HasClass{"thing"})
+}
 
 var lookGrammar = allOf(words("look/l"), anyOf(
 	allOf(&Action{"Look"}),
@@ -54,9 +62,14 @@ var lookGrammar = allOf(words("look/l"), anyOf(
 	allOf(words("under"), noun(), &Action{"LookUnder"}),
 ))
 
+var pickGrammar = allOf(words("pick"), anyOf(
+	allOf(words("up"), things(), &Action{"Take"}),
+	allOf(things(), words("up"), &Action{"Take"}),
+))
+
 func makeObject(name string) MyObject {
 	names := strings.Fields(name)
-	return MyObject{Id: strings.Join(names, "-"), Names: names}
+	return MyObject{Id: strings.Join(names, "-"), Names: names, Classes: []string{"thing"}}
 }
 
 var scope = func() (ret MyScope) {
@@ -69,6 +82,38 @@ var scope = func() (ret MyScope) {
 	}
 	return append(ret, Directions()...)
 }()
+
+func TestMulti(t *testing.T) {
+	grammar := pickGrammar
+	pickup := func(which string) []string {
+		return sliceOf.String(
+			strings.Join(sliceOf.String("pick", "up", which), " "),
+			strings.Join(sliceOf.String("pick", which, "up"), " "),
+		)
+	}
+	t.Run("all", func(t *testing.T) {
+		e := parse(scope, grammar,
+			pickup("all"),
+			&ActionGoal{"Take", sliceOf.String("something",
+				"red-apple",
+				"apple-cart",
+				"red-cart",
+				"apple")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+	t.Run("some", func(t *testing.T) {
+		e := parse(scope, grammar,
+			pickup("all red"),
+			&ActionGoal{"Take", sliceOf.String(
+				"red-apple",
+				"red-cart")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+}
 
 func TestDisambiguation(t *testing.T) {
 	grammar := lookGrammar

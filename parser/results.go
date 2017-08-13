@@ -13,6 +13,10 @@ type ResolvedAction struct {
 // ResolvedNumber
 // ResolvedWords
 
+type ResolvedMulti struct {
+	Ids   []string
+	Words []string // what the user said to identify the objects
+}
 type ResolvedObject struct {
 	Id    string
 	Words []string // what the user said to identify the object
@@ -23,6 +27,9 @@ type ResolvedWord struct {
 
 func (f ResolvedAction) ResultLen() int {
 	return 0
+}
+func (f ResolvedMulti) ResultLen() int {
+	return len(f.Words) + 1 // 1 extra for the unmentioned all
 }
 func (f ResolvedObject) ResultLen() int {
 	return len(f.Words)

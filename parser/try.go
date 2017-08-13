@@ -27,13 +27,13 @@ type Word struct {
 	Word string
 }
 
-func (w *Word) Scan(scope Scope, scan Cursor) (ret Result, err error) {
-	if n, ok := scan.GetNext(); !ok {
-		err = Underflow{Depth(scan.Pos)}
-	} else if !strings.EqualFold(n, w.Word) {
-		err = MismatchedWord{n, Depth(scan.Pos)}
+func (w *Word) Scan(scope Scope, cs Cursor) (ret Result, err error) {
+	if word, ok := cs.CurrentWord(); !ok {
+		err = Underflow{Depth(cs.Pos)}
+	} else if !strings.EqualFold(word, w.Word) {
+		err = MismatchedWord{word, Depth(cs.Pos)}
 	} else {
-		ret = ResolvedWord{n}
+		ret = ResolvedWord{word}
 	}
 	return
 }

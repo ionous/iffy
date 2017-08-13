@@ -30,11 +30,7 @@ func (cs Cursor) Skip(i int) Cursor {
 	return Cursor{cs.Pos + i, cs.Words}
 }
 
-func (cs Cursor) HasNext() bool {
-	return cs.Pos < len(cs.Words)
-}
-
-func (cs Cursor) GetNext() (ret string, okay bool) {
+func (cs Cursor) CurrentWord() (ret string, okay bool) {
 	if cs.Pos < len(cs.Words) {
 		ret, okay = cs.Words[cs.Pos], true
 	}

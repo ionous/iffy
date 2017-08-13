@@ -6,11 +6,11 @@ type Action struct {
 }
 
 // Scan matches only if the cursor has finished with all words.
-func (a *Action) Scan(scope Scope, scan Cursor) (ret Result, err error) {
-	if !scan.HasNext() {
+func (a *Action) Scan(scope Scope, cs Cursor) (ret Result, err error) {
+	if _, ok := cs.CurrentWord(); !ok {
 		ret = ResolvedAction{a.Name}
 	} else {
-		err = Overflow{Depth(scan.Pos)}
+		err = Overflow{Depth(cs.Pos)}
 	}
 	return
 }

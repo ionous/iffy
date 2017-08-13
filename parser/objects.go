@@ -10,51 +10,65 @@ import (
 type Object struct {
 	Filters Filters
 }
-type Ranking struct {
-	Rank int
-	Ids  []string
+
+func (try *Object) Scan(scope Scope, cs Cursor) (ret Result, err error) {
+	if _, ok := cs.CurrentWord(); !ok {
+		err = MissingObject{Depth(cs.Pos)}
+	} else {
+		ret, err = scanForObject(cs, scope, try.Filters)
+	}
+	return
 }
 
-func (try *Object) Scan(scope Scope, scan Cursor) (ret Result, err error) {
-	if !scan.HasNext() {
-		err = MissingObject{Depth(scan.Pos)}
+func scanForObject(cs Cursor, scope Scope, filters Filters) (ret Result, err error) {
+	if words, ids := matchObjects(cs, scope, filters, false); words == 0 {
+		err = UnknownObject{Depth(cs.Pos)}
 	} else {
-		var best Ranking
-		scope.SearchScope(func(n Noun) bool {
-			if matchName(n, scan) && try.Filters.MatchesNoun(n) {
-				cs := scan.Skip(1)
-				// determine the ranking of this object by eating words as long as they match.
-				var rank int
-				for ; matchName(n, cs); rank++ {
-					cs = cs.Skip(1)
-				}
-				switch id := n.GetId(); {
-				case rank > best.Rank:
-					best = Ranking{rank, sliceOf.String(id)}
-				case rank == best.Rank:
-					best.Ids = append(best.Ids, id)
-				}
-			}
-			return false // always keep going
-		})
-
-		ids := best.Ids
-		if cnt := len(ids); cnt == 0 {
-			err = UnknownObject{Depth(scan.Pos)}
+		last := cs.Pos + words
+		if cnt := len(ids); cnt == 1 {
+			words := cs.Words[cs.Pos:last]
+			ret = ResolvedObject{ids[0], words}
 		} else {
-			last := scan.Pos + best.Rank + 1
-			if cnt == 1 {
-				words := scan.Words[scan.Pos:last]
-				ret = ResolvedObject{ids[0], words}
-			} else {
-				err = AmbiguousObject{ids, Depth(last)}
-			}
+			err = AmbiguousObject{ids, Depth(last)}
 		}
 	}
 	return
 }
 
+var matchAll = Filters{}
+
+// MatchObjects returns a list of objects and the number of words which match them.
+// FIX? for now, when ret is 0, ids is the whole scope.
+func matchObjects(cs Cursor, scope Scope, filters Filters, all bool) (ret int, ids []string) {
+	// visit every object in scope.
+	scope.SearchScope(func(n Noun) bool {
+		if filters.MatchesNoun(n) {
+			if rank := RankNoun(cs, n); rank == 0 && all {
+				ids = append(ids, n.GetId())
+			} else if rank > 0 {
+				all = false
+				switch id := n.GetId(); {
+				case rank > ret:
+					ret, ids = rank, sliceOf.String(id)
+				case rank == ret:
+					ids = append(ids, id)
+				}
+			}
+		}
+		return false // never stop
+	})
+	return
+}
+
+// RankNoun returns how many words in src match the passed noun.
+func RankNoun(src Cursor, n Noun) (rank int) {
+	for ; matchName(n, src); rank++ {
+		src = src.Skip(1)
+	}
+	return
+}
+
 func matchName(n Noun, cs Cursor) bool {
-	name, ok := cs.GetNext()
+	name, ok := cs.CurrentWord()
 	return ok && n.HasName(name)
 }

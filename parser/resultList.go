@@ -30,6 +30,8 @@ func (rs *ResultList) Objects() (objs []string) {
 		switch k := r.(type) {
 		case ResolvedObject:
 			objs = append(objs, k.Id)
+		case ResolvedMulti:
+			objs = append(objs, k.Ids...)
 		}
 	}
 	return
