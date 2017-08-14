@@ -118,6 +118,36 @@ func TestMulti(t *testing.T) {
 			t.Fatal(e)
 		}
 	})
+	t.Run("plurals", func(t *testing.T) {
+		e := parse(ctx, grammar,
+			sliceOf.String("pick up apples"),
+			&ActionGoal{"Take", sliceOf.String(
+				"apple",
+				"red-apple",
+				"crab-apple")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+	t.Run("one plural", func(t *testing.T) {
+		e := parse(ctx, grammar,
+			sliceOf.String("pick up red apples", "pick up apples red"),
+			&ActionGoal{"Take", sliceOf.String(
+				"red-apple")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+	t.Run("empty plural", func(t *testing.T) {
+		e := parse(ctx, grammar,
+			sliceOf.String("pick up red apple carts"),
+			&ActionGoal{"Take", sliceOf.String(
+				"red-apple")})
+		if e != nil {
+			t.Fatal(e)
+		}
+	})
+
 }
 
 func TestDisambiguation(t *testing.T) {

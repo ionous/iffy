@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"bitbucket.org/pkg/inflect"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
@@ -32,8 +33,8 @@ func (m MyScope) Many(rs ...rune) (ret []Noun) {
 func (m MyScope) GetScope() Scope {
 	return m
 }
-func (m MyScope) IsPlural(string) bool {
-	return false
+func (m MyScope) IsPlural(n string) bool {
+	return n != inflect.Singularize(n)
 }
 
 func (m MyScope) SearchScope(v NounVisitor) (ret bool) {
