@@ -29,9 +29,12 @@ func (rs *ResultList) Objects() (objs []string) {
 	for _, r := range rs.List {
 		switch k := r.(type) {
 		case ResolvedObject:
-			objs = append(objs, k.Id)
+			n := k.Noun
+			objs = append(objs, n.GetId())
 		case ResolvedMulti:
-			objs = append(objs, k.Ids...)
+			for _, n := range k.Nouns {
+				objs = append(objs, n.GetId())
+			}
 		}
 	}
 	return

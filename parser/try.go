@@ -27,8 +27,8 @@ type Word struct {
 	Word string
 }
 
-func (w *Word) Scan(scope Scope, cs Cursor) (ret Result, err error) {
-	if word, ok := cs.CurrentWord(); !ok {
+func (w *Word) Scan(ctx Context, cs Cursor) (ret Result, err error) {
+	if word := cs.CurrentWord(); len(word) == 0 {
 		err = Underflow{Depth(cs.Pos)}
 	} else if !strings.EqualFold(word, w.Word) {
 		err = MismatchedWord{word, Depth(cs.Pos)}
@@ -43,13 +43,13 @@ type AnyOf struct {
 	Match []Scanner
 }
 
-func (m *AnyOf) Scan(scope Scope, cs Cursor) (ret Result, err error) {
+func (m *AnyOf) Scan(ctx Context, cs Cursor) (ret Result, err error) {
 	if cnt := len(m.Match); cnt == 0 {
 		err = errutil.New("no rules specified for any of")
 	} else {
 		i, errorDepth := 0, -1 // keep the most informative error
 		for ; i < cnt; i++ {
-			if res, e := m.Match[i].Scan(scope, cs); e == nil {
+			if res, e := m.Match[i].Scan(ctx, cs); e == nil {
 				ret, err = res, nil
 				break
 			} else if d := DepthOf(e); d > errorDepth {
@@ -66,14 +66,14 @@ type AllOf struct {
 	Match []Scanner
 }
 
-func (m *AllOf) Scan(scope Scope, cs Cursor) (ret Result, err error) {
+func (m *AllOf) Scan(ctx Context, cs Cursor) (ret Result, err error) {
 	var rl ResultList
 	if cnt := len(m.Match); cnt == 0 {
 		err = errutil.New("no rules specified for all of")
 	} else {
 		var i int
 		for ; i < cnt; i++ {
-			if res, e := m.Match[i].Scan(scope, cs); e != nil {
+			if res, e := m.Match[i].Scan(ctx, cs); e != nil {
 				err = e
 				break
 			} else {

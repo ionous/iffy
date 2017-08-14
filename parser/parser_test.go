@@ -49,15 +49,15 @@ func nouns(f ...Filter) Scanner {
 
 // note: we use things to exclude directions
 func things() Scanner {
-	return nouns(&HasClass{"thing"})
+	return nouns(&HasClass{"things"})
 }
 
 var lookGrammar = allOf(words("look/l"), anyOf(
 	allOf(&Action{"Look"}),
 	allOf(words("at"), noun(), &Action{"Examine"}),
 	// before "look inside", since inside is also direction.
-	allOf(noun(&HasClass{"direction"}), &Action{"Examine"}),
-	allOf(words("to"), noun(&HasClass{"direction"}), &Action{"Examine"}),
+	allOf(noun(&HasClass{"directions"}), &Action{"Examine"}),
+	allOf(words("to"), noun(&HasClass{"directions"}), &Action{"Examine"}),
 	allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
 	allOf(words("under"), noun(), &Action{"LookUnder"}),
 ))
@@ -67,20 +67,23 @@ var pickGrammar = allOf(words("pick"), anyOf(
 	allOf(things(), words("up"), &Action{"Take"}),
 ))
 
-func makeObject(name string) MyObject {
+func makeObject(s ...string) *MyObject {
+	name, s := s[0], s[1:]
 	names := strings.Fields(name)
-	return MyObject{Id: strings.Join(names, "-"), Names: names, Classes: []string{"thing"}}
+	s = append(s, "things")
+	return &MyObject{Id: strings.Join(names, "-"), Names: names, Classes: s}
 }
 
-var scope = func() (ret MyScope) {
+var ctx = func() (ret MyScope) {
 	ret = MyScope{
 		makeObject("something"),
-		makeObject("red apple"),
-		makeObject("apple cart"),
-		makeObject("red cart"),
-		makeObject("apple"),
+		makeObject("red apple", "apples"),
+		makeObject("crab apple", "apples"),
+		makeObject("apple cart", "carts"),
+		makeObject("red cart", "carts"),
+		makeObject("apple", "apples"),
 	}
-	return append(ret, Directions()...)
+	return append(ret, Directions...)
 }()
 
 func TestMulti(t *testing.T) {
@@ -92,10 +95,12 @@ func TestMulti(t *testing.T) {
 		)
 	}
 	t.Run("all", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			pickup("all"),
-			&ActionGoal{"Take", sliceOf.String("something",
+			&ActionGoal{"Take", sliceOf.String(
+				"something",
 				"red-apple",
+				"crab-apple",
 				"apple-cart",
 				"red-cart",
 				"apple")})
@@ -104,7 +109,7 @@ func TestMulti(t *testing.T) {
 		}
 	})
 	t.Run("some", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			pickup("all red"),
 			&ActionGoal{"Take", sliceOf.String(
 				"red-apple",
@@ -118,7 +123,7 @@ func TestMulti(t *testing.T) {
 func TestDisambiguation(t *testing.T) {
 	grammar := lookGrammar
 	t.Run("trailing noun", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look at"),
 			&ClarifyGoal{"something"},
 			&ActionGoal{"Examine", sliceOf.String("something")})
@@ -128,7 +133,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("shared names", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look at red cart"),
 			&ActionGoal{"Examine", sliceOf.String("red-cart")})
 		if e != nil {
@@ -137,7 +142,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("ambiguous shared names", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look at cart"),
 			&ClarifyGoal{"red"},
 			&ActionGoal{"Examine", sliceOf.String("red-cart")})
@@ -147,7 +152,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("ambiguous loops", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look at cart"),
 			&ClarifyGoal{"cart"},
 			&ClarifyGoal{"cart"},
@@ -160,7 +165,7 @@ func TestDisambiguation(t *testing.T) {
 
 	// even though it doesn't during normal play.
 	t.Run("exact name works during disambiguation", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look at apple"),
 			&ClarifyGoal{"apple"},
 			&ActionGoal{"Examine", sliceOf.String("apple")})
@@ -170,7 +175,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("doubled names dont match incorrectly", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look at apple apple apple cart"),
 			&ActionGoal{"Examine", sliceOf.String("apple-cart")})
 		if e != nil {
@@ -183,7 +188,7 @@ func TestParser(t *testing.T) {
 	grammar := lookGrammar
 
 	t.Run("look", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look/l"),
 			&ActionGoal{"Look", nil})
 		if e != nil {
@@ -191,7 +196,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("examine", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look/l at something"),
 			&ActionGoal{
 				"Examine", sliceOf.String("something"),
@@ -201,7 +206,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("search", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look/l inside/in/into/through/on something"),
 			&ActionGoal{
 				"Search", sliceOf.String("something"),
@@ -211,7 +216,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("look under", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look/l under something"),
 			&ActionGoal{
 				"LookUnder", sliceOf.String("something"),
@@ -224,7 +229,7 @@ func TestParser(t *testing.T) {
 		look := Phrases("look/l")
 		for _, d := range directions {
 			d := sliceOf.String(d)
-			if e := parse(scope, grammar,
+			if e := parse(ctx, grammar,
 				permute(look, d),
 				&ActionGoal{"Examine", d}); e != nil {
 				t.Fatal(e)
@@ -233,7 +238,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("look no dir", func(t *testing.T) {
-		e := parse(scope, grammar,
+		e := parse(ctx, grammar,
 			Phrases("look something"),
 			nil)
 		if e != nil {
@@ -244,7 +249,7 @@ func TestParser(t *testing.T) {
 		lookTo := Phrases("look/l to")
 		for _, d := range directions {
 			d := sliceOf.String(d)
-			if e := parse(scope, grammar,
+			if e := parse(ctx, grammar,
 				permute(lookTo, d),
 				&ActionGoal{"Examine", d}); e != nil {
 				t.Fatal(e)
@@ -280,10 +285,10 @@ func (a *ClarifyGoal) Goal() Goal {
 	return a
 }
 
-func parse(scope Scope, match Scanner, phrases []string, goals ...Goal) (err error) {
+func parse(ctx Context, match Scanner, phrases []string, goals ...Goal) (err error) {
 	for _, in := range phrases {
 		fields := strings.Fields(in)
-		if e := innerParse(scope, match, fields, goals); e != nil {
+		if e := innerParse(ctx, match, fields, goals); e != nil {
 			err = errutil.Fmt("%v for '%s'", e, in)
 			break
 		}
@@ -292,12 +297,12 @@ func parse(scope Scope, match Scanner, phrases []string, goals ...Goal) (err err
 }
 
 // FIX: will need a "GetScope(actor)" empty *my* box, empty chairman's box.
-func innerParse(scope Scope, match Scanner, in []string, goals []Goal) (err error) {
+func innerParse(ctx Context, match Scanner, in []string, goals []Goal) (err error) {
 	if len(goals) == 0 {
 		err = errutil.New("expected some goals")
 	} else {
 		goal, goals := goals[0], goals[1:]
-		if res, e := match.Scan(scope, Cursor{Words: in}); e != nil {
+		if res, e := match.Scan(ctx, Cursor{Words: in}); e != nil {
 
 			if clarify, clarifies := goal.(*ClarifyGoal); !clarifies {
 				if goal != nil {
@@ -307,7 +312,7 @@ func innerParse(scope Scope, match Scanner, in []string, goals []Goal) (err erro
 				switch e := e.(type) {
 				case MissingObject:
 					extend := append(in, clarify.Noun)
-					err = innerParse(scope, match, extend, goals)
+					err = innerParse(ctx, match, extend, goals)
 				case AmbiguousObject:
 					//
 					// println(strings.Join(in, "/"))

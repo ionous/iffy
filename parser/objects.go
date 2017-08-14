@@ -1,74 +1,40 @@
 package parser
 
 import (
-	"github.com/ionous/sliceOf"
-	// "strings"
+	"github.com/ionous/errutil"
 )
 
-// Object matches one object in scope.
+// Object matches one object in ctx.
 // (plus or minus some ambiguity)
 type Object struct {
 	Filters Filters
 }
 
-func (try *Object) Scan(scope Scope, cs Cursor) (ret Result, err error) {
-	if _, ok := cs.CurrentWord(); !ok {
+func (try *Object) Scan(ctx Context, cs Cursor) (ret Result, err error) {
+	if w := cs.CurrentWord(); len(w) == 0 {
 		err = MissingObject{Depth(cs.Pos)}
 	} else {
-		ret, err = scanForObject(cs, scope, try.Filters)
+		r := &RankOne{Filters: try.Filters}
+		if !RankNouns(ctx.GetScope(), cs, r) {
+			err = errutil.New("unexpected error")
+		} else {
+			ret, err = resolveObject(cs, r.Rank, r.Nouns)
+		}
 	}
 	return
 }
 
-func scanForObject(cs Cursor, scope Scope, filters Filters) (ret Result, err error) {
-	if words, ids := matchObjects(cs, scope, filters, false); words == 0 {
+func resolveObject(cs Cursor, wordCount int, nouns []Noun) (ret Result, err error) {
+	if wordCount == 0 {
 		err = UnknownObject{Depth(cs.Pos)}
 	} else {
-		last := cs.Pos + words
-		if cnt := len(ids); cnt == 1 {
+		last := cs.Pos + wordCount
+		if cnt := len(nouns); cnt == 1 {
 			words := cs.Words[cs.Pos:last]
-			ret = ResolvedObject{ids[0], words}
+			ret = ResolvedObject{nouns[0], words}
 		} else {
-			err = AmbiguousObject{ids, Depth(last)}
+			err = AmbiguousObject{nouns, Depth(last)}
 		}
 	}
 	return
-}
-
-var matchAll = Filters{}
-
-// MatchObjects returns a list of objects and the number of words which match them.
-// FIX? for now, when ret is 0, ids is the whole scope.
-func matchObjects(cs Cursor, scope Scope, filters Filters, all bool) (ret int, ids []string) {
-	// visit every object in scope.
-	scope.SearchScope(func(n Noun) bool {
-		if filters.MatchesNoun(n) {
-			if rank := RankNoun(cs, n); rank == 0 && all {
-				ids = append(ids, n.GetId())
-			} else if rank > 0 {
-				all = false
-				switch id := n.GetId(); {
-				case rank > ret:
-					ret, ids = rank, sliceOf.String(id)
-				case rank == ret:
-					ids = append(ids, id)
-				}
-			}
-		}
-		return false // never stop
-	})
-	return
-}
-
-// RankNoun returns how many words in src match the passed noun.
-func RankNoun(src Cursor, n Noun) (rank int) {
-	for ; matchName(n, src); rank++ {
-		src = src.Skip(1)
-	}
-	return
-}
-
-func matchName(n Noun, cs Cursor) bool {
-	name, ok := cs.CurrentWord()
-	return ok && n.HasName(name)
 }

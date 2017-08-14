@@ -4,16 +4,16 @@ import (
 	"github.com/ionous/sliceOf"
 )
 
-func Directions() (ret []MyObject) {
+var Directions = func() (ret []*MyObject) {
 	for _, d := range directions {
-		obj := MyObject{Id: d,
+		obj := &MyObject{Id: d,
 			Names:   sliceOf.String(d),
-			Classes: sliceOf.String("direction"),
+			Classes: sliceOf.String("directions"),
 		}
 		ret = append(ret, obj)
 	}
 	return
-}
+}()
 
 // // var shortDirections = (
 // // 	"n", "s", "e", "w", "ne", "nw", "se", "sw",

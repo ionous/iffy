@@ -14,7 +14,7 @@ func DepthOf(e interface{}) (ret int) {
 }
 
 type AmbiguousObject struct {
-	Ids []string
+	Nouns []Noun
 	Depth
 }
 
@@ -24,6 +24,11 @@ type MismatchedWord struct {
 }
 
 type MissingObject struct {
+	Depth
+}
+
+// NoSuchObjects after asking for multiple items, and finding none.
+type NoSuchObjects struct {
 	Depth
 }
 
@@ -53,6 +58,9 @@ func (MismatchedWord) Error() string {
 }
 func (MissingObject) Error() string {
 	return "expected an object"
+}
+func (NoSuchObjects) Error() string {
+	return "you cant see any such things"
 }
 func (Overflow) Error() string {
 	return "too many words"
