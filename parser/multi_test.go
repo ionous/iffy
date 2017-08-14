@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
 	"strings"
 	"testing"
@@ -15,8 +16,8 @@ func TestMulti(t *testing.T) {
 		)
 	}
 	t.Run("all", func(t *testing.T) {
-		e := parse(ctx, grammar,
-			pickup("all"),
+		e := parse(t, ctx, grammar,
+			Phrases("pick up "+AllPhrase),
 			&ActionGoal{"Take", sliceOf.String(
 				"something",
 				"red-apple",
@@ -30,7 +31,7 @@ func TestMulti(t *testing.T) {
 		}
 	})
 	t.Run("some", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			pickup("all red"),
 			&ActionGoal{"Take", sliceOf.String(
 				"red-apple",
@@ -40,7 +41,7 @@ func TestMulti(t *testing.T) {
 		}
 	})
 	t.Run("plurals", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			sliceOf.String("pick up apples"),
 			&ActionGoal{"Take", sliceOf.String(
 				"apple",
@@ -51,7 +52,7 @@ func TestMulti(t *testing.T) {
 		}
 	})
 	t.Run("one plural", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			sliceOf.String("pick up red apples", "pick up apples red"),
 			&ActionGoal{"Take", sliceOf.String(
 				"red-apple")})
@@ -60,7 +61,7 @@ func TestMulti(t *testing.T) {
 		}
 	})
 	t.Run("empty plural", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			sliceOf.String("pick up red apple carts"),
 			&ActionGoal{"Take", sliceOf.String(
 				"red-apple")})

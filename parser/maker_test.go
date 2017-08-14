@@ -39,7 +39,8 @@ func permute(a, b []string) (ps []string) {
 	} else {
 		for _, a := range a {
 			for _, b := range b {
-				ps = append(ps, strings.Join([]string{a, b}, " "))
+				n := strings.Join([]string{a, b}, " ")
+				ps = append(ps, n)
 			}
 		}
 	}

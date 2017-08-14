@@ -8,7 +8,7 @@ import (
 func TestDisambiguation(t *testing.T) {
 	grammar := lookGrammar
 	t.Run("trailing noun", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look at"),
 			&ClarifyGoal{"something"},
 			&ActionGoal{"Examine", sliceOf.String("something")})
@@ -18,7 +18,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("shared names", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look at red cart"),
 			&ActionGoal{"Examine", sliceOf.String("red-cart")})
 		if e != nil {
@@ -27,7 +27,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("ambiguous shared names", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look at cart"),
 			&ClarifyGoal{"red"},
 			&ActionGoal{"Examine", sliceOf.String("red-cart")})
@@ -37,7 +37,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("ambiguous loops", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look at cart"),
 			&ClarifyGoal{"cart"},
 			&ClarifyGoal{"cart"},
@@ -50,7 +50,7 @@ func TestDisambiguation(t *testing.T) {
 
 	// even though it doesn't during normal play.
 	t.Run("exact name works during disambiguation", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look at apple"),
 			&ClarifyGoal{"apple"},
 			&ActionGoal{"Examine", sliceOf.String("apple")})
@@ -60,7 +60,7 @@ func TestDisambiguation(t *testing.T) {
 	})
 
 	t.Run("doubled names dont match incorrectly", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look at apple apple apple cart"),
 			&ActionGoal{"Examine", sliceOf.String("apple-cart")})
 		if e != nil {

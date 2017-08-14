@@ -2,7 +2,6 @@ package parser
 
 import (
 	"github.com/ionous/errutil"
-	"strings"
 )
 
 // Multi matches one or more objects in ctx.
@@ -11,15 +10,20 @@ type Multi struct {
 	Filters Filters
 }
 
+var AllPhrase = "all/each/every/both/everything"
+var allScanner Scanner
+
 func (try *Multi) Scan(ctx Context, cs Cursor) (ret Result, err error) {
 	if word := cs.CurrentWord(); len(word) == 0 {
 		err = MissingObject{Depth(cs.Pos)}
 	} else {
-		all := strings.EqualFold("all", word)
-		if all {
-			cs = cs.Skip(1)
+		if allScanner == nil {
+			allScanner = Words(AllPhrase)
 		}
-
+		var all bool
+		if _, e := allScanner.Scan(ctx, cs); e == nil {
+			cs, all = cs.Skip(1), true
+		}
 		r := &RankAll{Context: ctx, Filters: try.Filters}
 		if !RankNouns(ctx.GetScope(), cs, r) {
 			err = errutil.New("unexpected error")

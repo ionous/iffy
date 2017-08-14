@@ -25,19 +25,6 @@ func allOf(s ...Scanner) (ret Scanner) {
 	return
 }
 
-func words(s string) (ret Scanner) {
-	if split := strings.Split(s, "/"); len(split) == 1 {
-		ret = &Word{s}
-	} else {
-		var words []Scanner
-		for _, g := range split {
-			words = append(words, &Word{g})
-		}
-		ret = &AnyOf{words}
-	}
-	return
-}
-
 func noun(f ...Filter) Scanner {
 	return &Object{f}
 }
@@ -50,19 +37,19 @@ func things() Scanner {
 	return nouns(&HasClass{"things"})
 }
 
-var lookGrammar = allOf(words("look/l"), anyOf(
+var lookGrammar = allOf(Words("look/l"), anyOf(
 	allOf(&Action{"Look"}),
-	allOf(words("at"), noun(), &Action{"Examine"}),
+	allOf(Words("at"), noun(), &Action{"Examine"}),
 	// before "look inside", since inside is also direction.
 	allOf(noun(&HasClass{"directions"}), &Action{"Examine"}),
-	allOf(words("to"), noun(&HasClass{"directions"}), &Action{"Examine"}),
-	allOf(words("inside/in/into/through/on"), noun(), &Action{"Search"}),
-	allOf(words("under"), noun(), &Action{"LookUnder"}),
+	allOf(Words("to"), noun(&HasClass{"directions"}), &Action{"Examine"}),
+	allOf(Words("inside/in/into/through/on"), noun(), &Action{"Search"}),
+	allOf(Words("under"), noun(), &Action{"LookUnder"}),
 ))
 
-var pickGrammar = allOf(words("pick"), anyOf(
-	allOf(words("up"), things(), &Action{"Take"}),
-	allOf(things(), words("up"), &Action{"Take"}),
+var pickGrammar = allOf(Words("pick"), anyOf(
+	allOf(Words("up"), things(), &Action{"Take"}),
+	allOf(things(), Words("up"), &Action{"Take"}),
 ))
 
 func makeObject(s ...string) *MyObject {
@@ -111,12 +98,19 @@ func (a *ClarifyGoal) Goal() Goal {
 	return a
 }
 
-func parse(ctx Context, match Scanner, phrases []string, goals ...Goal) (err error) {
+type Log interface {
+	Log(args ...interface{})
+	Logf(format string, args ...interface{})
+}
+
+func parse(log Log, ctx Context, match Scanner, phrases []string, goals ...Goal) (err error) {
 	for _, in := range phrases {
 		fields := strings.Fields(in)
 		if e := innerParse(ctx, match, fields, goals); e != nil {
 			err = errutil.Fmt("%v for '%s'", e, in)
 			break
+		} else {
+			log.Log("matched", in)
 		}
 	}
 	return

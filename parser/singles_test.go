@@ -9,7 +9,7 @@ func TestParser(t *testing.T) {
 	grammar := lookGrammar
 
 	t.Run("look", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look/l"),
 			&ActionGoal{"Look", nil})
 		if e != nil {
@@ -17,7 +17,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("examine", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look/l at something"),
 			&ActionGoal{
 				"Examine", sliceOf.String("something"),
@@ -27,7 +27,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("search", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look/l inside/in/into/through/on something"),
 			&ActionGoal{
 				"Search", sliceOf.String("something"),
@@ -37,7 +37,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("look under", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look/l under something"),
 			&ActionGoal{
 				"LookUnder", sliceOf.String("something"),
@@ -50,7 +50,7 @@ func TestParser(t *testing.T) {
 		look := Phrases("look/l")
 		for _, d := range directions {
 			d := sliceOf.String(d)
-			if e := parse(ctx, grammar,
+			if e := parse(t, ctx, grammar,
 				permute(look, d),
 				&ActionGoal{"Examine", d}); e != nil {
 				t.Fatal(e)
@@ -59,7 +59,7 @@ func TestParser(t *testing.T) {
 		}
 	})
 	t.Run("look no dir", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("look something"),
 			nil)
 		if e != nil {
@@ -70,7 +70,7 @@ func TestParser(t *testing.T) {
 		lookTo := Phrases("look/l to")
 		for _, d := range directions {
 			d := sliceOf.String(d)
-			if e := parse(ctx, grammar,
+			if e := parse(t, ctx, grammar,
 				permute(lookTo, d),
 				&ActionGoal{"Examine", d}); e != nil {
 				t.Fatal(e)

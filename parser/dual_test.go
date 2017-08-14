@@ -6,15 +6,15 @@ import (
 	"testing"
 )
 
-var burnGrammar = allOf(words("burn/light"), anyOf(
+var burnGrammar = allOf(Words("burn/light"), anyOf(
 	allOf(things(), &Action{"Burn"}),
-	allOf(things(), words("with"), things(), &Action{"Burn"}),
+	allOf(things(), Words("with"), things(), &Action{"Burn"}),
 ))
 
 func TestDual(t *testing.T) {
 	grammar := burnGrammar
 	t.Run("one", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("burn/light cart"),
 			&ClarifyGoal{"red"},
 			&ActionGoal{"Burn", sliceOf.String("red-cart")})
@@ -24,7 +24,7 @@ func TestDual(t *testing.T) {
 	})
 	//
 	t.Run("two", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			sliceOf.String("burn red cart with torch"),
 			&ActionGoal{"Burn", sliceOf.String("red-cart", "torch")})
 		if e != nil {
@@ -32,7 +32,7 @@ func TestDual(t *testing.T) {
 		}
 	})
 	t.Run("clarify", func(t *testing.T) {
-		e := parse(ctx, grammar,
+		e := parse(t, ctx, grammar,
 			Phrases("light cart"),
 			&ClarifyGoal{"torch"},
 			&ActionGoal{"Burn", sliceOf.String("red-cart", "torch")})
