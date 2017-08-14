@@ -4,14 +4,16 @@ import (
 	"github.com/ionous/errutil"
 )
 
+// Scanner searches words looking for good results.
+// ( perhaps its truly a tokenzer and the results, tokens )
 type Scanner interface {
-	// search the words in cursor, looking for the best results.
+	// Scan for results.
 	// note: by design, cursor may be out of range when scan is called.
-	Scan(Context, Cursor) (Result, error)
+	Scan(Context, Scope, Cursor) (Result, error)
 }
 
 func Parse(ctx Context, match Scanner, in []string) (ret *ResultList, err error) {
-	if r, e := match.Scan(ctx, Cursor{Words: in}); e != nil {
+	if r, e := match.Scan(ctx, ctx.GetPlayerScope(""), Cursor{Words: in}); e != nil {
 		err = e
 	} else if rs, ok := r.(*ResultList); !ok {
 		err = errutil.Fmt("expected result list, got %T", r)

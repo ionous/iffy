@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// note, in reality burn would use only held things.
 var burnGrammar = allOf(Words("burn/light"), anyOf(
 	allOf(things(), &Action{"Burn"}),
 	allOf(things(), Words("with"), things(), &Action{"Burn"}),
@@ -22,7 +23,6 @@ func TestDual(t *testing.T) {
 			t.Fatal(e)
 		}
 	})
-	//
 	t.Run("two", func(t *testing.T) {
 		e := parse(t, ctx, grammar,
 			sliceOf.String("burn red cart with torch"),
@@ -33,7 +33,8 @@ func TestDual(t *testing.T) {
 	})
 	t.Run("clarify", func(t *testing.T) {
 		e := parse(t, ctx, grammar,
-			Phrases("light cart"),
+			Phrases("light cart with"),
+			&ClarifyGoal{"red"},
 			&ClarifyGoal{"torch"},
 			&ActionGoal{"Burn", sliceOf.String("red-cart", "torch")})
 		if e != nil {

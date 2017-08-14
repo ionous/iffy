@@ -17,6 +17,10 @@ type MyObject struct {
 	Attributes []string
 }
 
+func (m *MyObject) String() string {
+	return m.Id
+}
+
 type MyScope []*MyObject
 
 func (m MyScope) Get(r rune) Noun {
@@ -30,7 +34,7 @@ func (m MyScope) Many(rs ...rune) (ret []Noun) {
 	return
 }
 
-func (m MyScope) GetScope() Scope {
+func (m MyScope) GetPlayerScope(name string) Scope {
 	return m
 }
 func (m MyScope) IsPlural(n string) bool {
@@ -149,11 +153,11 @@ func TestScope(t *testing.T) {
 func matching(ctx Context, phrase string) (ret Result, err error) {
 	match := &Object{}
 	words := strings.Fields(phrase)
-	return match.Scan(ctx, Cursor{Words: words})
+	return match.Scan(ctx, ctx.GetPlayerScope(""), Cursor{Words: words})
 }
 
 func matchingFilter(ctx Context, phrase, attr, class string) (ret Result, err error) {
 	match := &Object{Filters{&HasAttr{attr}, &HasClass{class}}}
 	words := strings.Fields(phrase)
-	return match.Scan(ctx, Cursor{Words: words})
+	return match.Scan(ctx, ctx.GetPlayerScope(""), Cursor{Words: words})
 }

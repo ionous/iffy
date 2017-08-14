@@ -24,7 +24,6 @@ func TestMulti(t *testing.T) {
 				"crab-apple",
 				"apple-cart",
 				"red-cart",
-				"apple",
 				"torch")})
 		if e != nil {
 			t.Fatal(e)
@@ -44,9 +43,8 @@ func TestMulti(t *testing.T) {
 		e := parse(t, ctx, grammar,
 			sliceOf.String("pick up apples"),
 			&ActionGoal{"Take", sliceOf.String(
-				"apple",
-				"red-apple",
-				"crab-apple")})
+				"crab-apple",
+				"red-apple")})
 		if e != nil {
 			t.Fatal(e)
 		}

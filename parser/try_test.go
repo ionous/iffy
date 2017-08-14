@@ -10,7 +10,7 @@ import (
 func TestWord(t *testing.T) {
 	match := func(input, goal string) (Result, error) {
 		match := &Word{goal}
-		return match.Scan(nil, Cursor{Words: strings.Fields(input)})
+		return match.Scan(nil, nil, Cursor{Words: strings.Fields(input)})
 	}
 	t.Run("match", func(t *testing.T) {
 		if res, e := match("Beep", "beep"); testify.NoError(t, e) {
@@ -33,7 +33,7 @@ func TestVariousOf(t *testing.T) {
 	}
 
 	match := func(input string, goal Scanner) (Result, error) {
-		return goal.Scan(nil, Cursor{Words: strings.Fields(input)})
+		return goal.Scan(nil, nil, Cursor{Words: strings.Fields(input)})
 	}
 	t.Run("any", func(t *testing.T) {
 		wordList := words("beep", "blox")

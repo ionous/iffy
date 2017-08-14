@@ -61,7 +61,7 @@ func TestParser(t *testing.T) {
 	t.Run("look no dir", func(t *testing.T) {
 		e := parse(t, ctx, grammar,
 			Phrases("look something"),
-			nil)
+			&ErrorGoal{"too many words"})
 		if e != nil {
 			t.Fatal(e)
 		}

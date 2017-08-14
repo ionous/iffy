@@ -1,5 +1,9 @@
 package parser
 
+import (
+	"fmt"
+)
+
 type ErrorDepth interface {
 	ErrorDepth() int
 }
@@ -50,8 +54,8 @@ func (d Depth) ErrorDepth() int {
 	return int(d)
 }
 
-func (AmbiguousObject) Error() string {
-	return "couldnt determine object"
+func (a AmbiguousObject) Error() string {
+	return fmt.Sprint("couldnt determine object", a.Nouns)
 }
 func (MismatchedWord) Error() string {
 	return "too few words"
@@ -68,6 +72,6 @@ func (Overflow) Error() string {
 func (Underflow) Error() string {
 	return "too few words"
 }
-func (UnknownObject) Error() string {
-	return "you cant see any such thing"
+func (e UnknownObject) Error() string {
+	return "you can't see any such thing"
 }

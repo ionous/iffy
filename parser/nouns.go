@@ -8,18 +8,19 @@ type Noun interface {
 	HasAttribute(string) bool
 }
 
-type NounVisitor func(n Noun) bool
-
 type Plurals interface {
 	IsPlural(name string) bool
 }
 
-// note: we use a visitor to support map traversal without copying keys if need be.
 type Context interface {
 	Plurals
-	GetScope() Scope
+	GetPlayerScope(name string) Scope
+	// future: GetActorScope(actorName, scopeName string) Scope
 }
 
+// note: we use a visitor to support map traversal without copying keys if need be.
 type Scope interface {
 	SearchScope(NounVisitor) bool
 }
+
+type NounVisitor func(n Noun) bool

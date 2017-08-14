@@ -10,12 +10,12 @@ type Object struct {
 	Filters Filters
 }
 
-func (try *Object) Scan(ctx Context, cs Cursor) (ret Result, err error) {
+func (try *Object) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
 	if w := cs.CurrentWord(); len(w) == 0 {
 		err = MissingObject{Depth(cs.Pos)}
 	} else {
 		r := &RankOne{Filters: try.Filters}
-		if !RankNouns(ctx.GetScope(), cs, r) {
+		if !RankNouns(scope, cs, r) {
 			err = errutil.New("unexpected error")
 		} else {
 			ret, err = resolveObject(cs, r.Rank, r.Nouns)

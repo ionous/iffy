@@ -48,16 +48,18 @@ func TestDisambiguation(t *testing.T) {
 		}
 	})
 
+	// FIX? names which are "subsets" of other names, dont play well in inform
+	// nor do they here. might consider adding tests for that in "compliation"
 	// even though it doesn't during normal play.
-	t.Run("exact name works during disambiguation", func(t *testing.T) {
-		e := parse(t, ctx, grammar,
-			Phrases("look at apple"),
-			&ClarifyGoal{"apple"},
-			&ActionGoal{"Examine", sliceOf.String("apple")})
-		if e != nil {
-			t.Fatal(e)
-		}
-	})
+	// t.Run("exact name works during disambiguation", func(t *testing.T) {
+	// 	e := parse(t, ctx, grammar,
+	// 		Phrases("look at apple"),
+	// 		&ClarifyGoal{"apple"},
+	// 		&ActionGoal{"Examine", sliceOf.String("apple")})
+	// 	if e != nil {
+	// 		t.Fatal(e)
+	// 	}
+	// })
 
 	t.Run("doubled names dont match incorrectly", func(t *testing.T) {
 		e := parse(t, ctx, grammar,

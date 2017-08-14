@@ -3,6 +3,7 @@ package parser_test
 import (
 	"github.com/ionous/errutil"
 	. "github.com/ionous/iffy/parser"
+	"github.com/kr/pretty"
 	testify "github.com/stretchr/testify/assert"
 	"strings"
 )
@@ -66,7 +67,6 @@ var ctx = func() (ret MyScope) {
 		makeObject("crab apple", "apples"),
 		makeObject("apple cart", "carts"),
 		makeObject("red cart", "carts"),
-		makeObject("apple", "apples"),
 		makeObject("torch", "devices"),
 	}
 	return append(ret, Directions...)
@@ -90,13 +90,13 @@ type ClarifyGoal struct {
 	Noun string
 }
 
-func (a *ActionGoal) Goal() Goal {
-	return a
+type ErrorGoal struct {
+	Error string
 }
 
-func (a *ClarifyGoal) Goal() Goal {
-	return a
-}
+func (a *ActionGoal) Goal() Goal  { return a }
+func (a *ClarifyGoal) Goal() Goal { return a }
+func (a *ErrorGoal) Goal() Goal   { return a }
 
 type Log interface {
 	Log(args ...interface{})
@@ -106,48 +106,52 @@ type Log interface {
 func parse(log Log, ctx Context, match Scanner, phrases []string, goals ...Goal) (err error) {
 	for _, in := range phrases {
 		fields := strings.Fields(in)
-		if e := innerParse(ctx, match, fields, goals); e != nil {
+		if e := innerParse(log, ctx, match, fields, goals); e != nil {
 			err = errutil.Fmt("%v for '%s'", e, in)
 			break
-		} else {
-			log.Log("matched", in)
 		}
 	}
 	return
 }
 
-// FIX: will need a "GetScope(actor)" empty *my* box, empty chairman's box.
-func innerParse(ctx Context, match Scanner, in []string, goals []Goal) (err error) {
+func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) (err error) {
 	if len(goals) == 0 {
 		err = errutil.New("expected some goals")
 	} else {
 		goal, goals := goals[0], goals[1:]
-		if res, e := match.Scan(ctx, Cursor{Words: in}); e != nil {
-
-			if clarify, clarifies := goal.(*ClarifyGoal); !clarifies {
-				if goal != nil {
-					err = errutil.New("unexpected failure", e)
+		if res, e := match.Scan(ctx, ctx.GetPlayerScope(""), Cursor{Words: in}); e != nil {
+			// on error:
+			switch g := goal.(type) {
+			case *ErrorGoal:
+				if e.Error() != g.Error {
+					err = errutil.Fmt("mismatched error want:'%s' got:'%s'", g, e)
+				} else {
+					log.Log("matched error", []error{e})
 				}
-			} else {
+			case *ClarifyGoal:
+				clarify := g
 				switch e := e.(type) {
 				case MissingObject:
 					extend := append(in, clarify.Noun)
-					err = innerParse(ctx, match, extend, goals)
+					err = innerParse(log, ctx, match, extend, goals)
 				case AmbiguousObject:
-					//
 					// println(strings.Join(in, "/"))
-					next := append(in[:e.Depth], clarify.Noun)
-					next = append(next, in[e.Depth:]...)
-					// println(strings.Join(next, "\\"))
-
+					// insert resolution into input.
+					i, s := e.Depth, append(in, "")
+					copy(s[i+1:], s[i:])
+					s[i] = clarify.Noun
+					// println(strings.Join(s, "\\"))
+					err = innerParse(log, ctx, match, s, goals)
 				default:
 					err = errutil.Fmt("clarification not implemented for %T", e)
 				}
+			default:
+				err = errutil.New("unexpected failure", e)
 			}
 		} else if goal == nil {
 			err = errutil.New("unexpected success")
 		} else if g, ok := goal.(*ActionGoal); !ok {
-			err = errutil.New("unexpected goal", in, goal)
+			err = errutil.Fmt("unexpected goal %s %T for result %v", in, goal, pretty.Sprint(res))
 		} else if list, ok := res.(*ResultList); !ok {
 			err = errutil.New("expected result list %T", res)
 		} else if act, ok := list.Last().(ResolvedAction); !ok {
@@ -156,6 +160,8 @@ func innerParse(ctx Context, match Scanner, in []string, goals []Goal) (err erro
 			err = errutil.New("expected action", act, "got", g.Action)
 		} else if objs := list.Objects(); !testify.ObjectsAreEqual(g.Nouns, objs) {
 			err = errutil.New("expected nouns (", strings.Join(g.Nouns, ","), ") got (", strings.Join(objs, ","), ")")
+		} else {
+			log.Logf("matched %v", in)
 		}
 	}
 	return
