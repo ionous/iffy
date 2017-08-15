@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"github.com/ionous/errutil"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
 	"testing"
@@ -11,24 +12,35 @@ var dropGrammar = allOf(Words("drop"), anyOf(
 ))
 
 type MyContext struct {
-	MyScope // world
-	Inv     MyScope
+	MyScope       // world
+	Player, Other Scopes
+	Log
 }
 
-func (m MyContext) GetPlayerScope(n string) (ret Scope) {
-	switch n {
-	case "held":
-		ret = m.Inv
-	default:
+type Scopes map[string]MyScope
+
+func (m MyContext) GetPlayerScope(n string) (ret Scope, err error) {
+	if s, ok := m.Player[n]; ok {
+		m.Log.Log("asking for scope", n, len(s))
+		ret = s
+	} else {
 		ret = m
 	}
 	return
 }
 
+func (m MyContext) GetOtherScope(n string) (ret Scope, err error) {
+	if s, ok := m.Other[n]; ok {
+		m.Log.Log("asking for scope", n, len(s))
+		ret = s
+	} else {
+		err = errutil.New("unknown scope", n)
+	}
+	return
+}
+
 func TestFocus(t *testing.T) {
-
 	grammar := dropGrammar
-
 	scope := MyScope{
 		makeObject("red apple", "apples"),
 		makeObject("apple cart", "carts"),
@@ -38,7 +50,11 @@ func TestFocus(t *testing.T) {
 		makeObject("torch", "devices"),
 		makeObject("crab apple", "apples"),
 	}
-	ctx := MyContext{scope, invScope}
+	ctx := MyContext{
+		Log:     t,
+		MyScope: scope,
+		Player:  Scopes{"held": invScope},
+	}
 
 	t.Run("drop one", func(t *testing.T) {
 		e := parse(t, ctx, grammar,

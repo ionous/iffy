@@ -34,6 +34,10 @@ func nouns(f ...Filter) Scanner {
 }
 
 // note: we use things to exclude directions
+func thing() Scanner {
+	return noun(&HasClass{"things"})
+}
+
 func things() Scanner {
 	return nouns(&HasClass{"things"})
 }
@@ -119,7 +123,9 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 		err = errutil.New("expected some goals")
 	} else {
 		goal, goals := goals[0], goals[1:]
-		if res, e := match.Scan(ctx, ctx.GetPlayerScope(""), Cursor{Words: in}); e != nil {
+		if scope, e := ctx.GetPlayerScope(""); e != nil {
+			err = e
+		} else if res, e := match.Scan(ctx, scope, Cursor{Words: in}); e != nil {
 			// on error:
 			switch g := goal.(type) {
 			case *ErrorGoal:
@@ -146,7 +152,7 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 					err = errutil.Fmt("clarification not implemented for %T", e)
 				}
 			default:
-				err = errutil.New("unexpected failure", e)
+				err = errutil.New("unexpected failure:", e)
 			}
 		} else if goal == nil {
 			err = errutil.New("unexpected success")
@@ -154,8 +160,10 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 			err = errutil.Fmt("unexpected goal %s %T for result %v", in, goal, pretty.Sprint(res))
 		} else if list, ok := res.(*ResultList); !ok {
 			err = errutil.New("expected result list %T", res)
-		} else if act, ok := list.Last().(ResolvedAction); !ok {
-			err = errutil.New("expected resolved action %T", list.Last())
+		} else if last, ok := list.Last(); !ok {
+			err = errutil.New("result list was empty")
+		} else if act, ok := last.(ResolvedAction); !ok {
+			err = errutil.New("expected resolved action %T", last)
 		} else if !strings.EqualFold(act.Name, g.Action) {
 			err = errutil.New("expected action", act, "got", g.Action)
 		} else if objs := list.Objects(); !testify.ObjectsAreEqual(g.Nouns, objs) {

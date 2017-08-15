@@ -20,9 +20,11 @@ func (rs *ResultList) AddResult(r Result) {
 	return
 }
 
-func (rs *ResultList) Last() Result {
-	rl := rs.List
-	return rl[len(rl)-1]
+func (rs *ResultList) Last() (ret Result, okay bool) {
+	if cnt := len(rs.List); cnt > 0 {
+		ret, okay = rs.List[cnt-1], true
+	}
+	return
 }
 
 func (rs *ResultList) Objects() (objs []string) {

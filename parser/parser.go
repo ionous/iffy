@@ -13,7 +13,9 @@ type Scanner interface {
 }
 
 func Parse(ctx Context, match Scanner, in []string) (ret *ResultList, err error) {
-	if r, e := match.Scan(ctx, ctx.GetPlayerScope(""), Cursor{Words: in}); e != nil {
+	if scope, e := ctx.GetPlayerScope(""); e != nil {
+		err = e
+	} else if r, e := match.Scan(ctx, scope, Cursor{Words: in}); e != nil {
 		err = e
 	} else if rs, ok := r.(*ResultList); !ok {
 		err = errutil.Fmt("expected result list, got %T", r)

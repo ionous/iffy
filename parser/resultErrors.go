@@ -23,7 +23,7 @@ type AmbiguousObject struct {
 }
 
 type MismatchedWord struct {
-	Word string
+	Want, Have string
 	Depth
 }
 
@@ -57,11 +57,11 @@ func (d Depth) ErrorDepth() int {
 func (a AmbiguousObject) Error() string {
 	return fmt.Sprint("couldnt determine object", a.Nouns)
 }
-func (MismatchedWord) Error() string {
-	return "too few words"
+func (a MismatchedWord) Error() string {
+	return fmt.Sprintf("mismatched word %s != %s at %d", a.Have, a.Want, a.Depth)
 }
-func (MissingObject) Error() string {
-	return "expected an object"
+func (a MissingObject) Error() string {
+	return fmt.Sprintf("missing an object at %d", a.Depth)
 }
 func (NoSuchObjects) Error() string {
 	return "you cant see any such things"

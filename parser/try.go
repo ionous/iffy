@@ -31,7 +31,7 @@ func (w *Word) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error)
 	if word := cs.CurrentWord(); len(word) == 0 {
 		err = Underflow{Depth(cs.Pos)}
 	} else if !strings.EqualFold(word, w.Word) {
-		err = MismatchedWord{word, Depth(cs.Pos)}
+		err = MismatchedWord{w.Word, word, Depth(cs.Pos)}
 	} else {
 		ret = ResolvedWord{word}
 	}
@@ -66,7 +66,10 @@ type AllOf struct {
 	Match []Scanner
 }
 
-func (m *AllOf) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
+func (m *AllOf) Scan(ctx Context, scope Scope, cs Cursor) (Result, error) {
+	return m.scan(ctx, scope, cs)
+}
+func (m *AllOf) scan(ctx Context, scope Scope, cs Cursor) (ret *ResultList, err error) {
 	var rl ResultList
 	if cnt := len(m.Match); cnt == 0 {
 		err = errutil.New("no rules specified for all of")

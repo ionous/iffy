@@ -14,8 +14,8 @@ type Plurals interface {
 
 type Context interface {
 	Plurals
-	GetPlayerScope(name string) Scope
-	// future: GetActorScope(actorName, scopeName string) Scope
+	GetPlayerScope(name string) (Scope, error)
+	GetOtherScope(name string) (Scope, error)
 }
 
 // note: we use a visitor to support map traversal without copying keys if need be.
