@@ -69,6 +69,7 @@ type AllOf struct {
 func (m *AllOf) Scan(ctx Context, scope Scope, cs Cursor) (Result, error) {
 	return m.scan(ctx, scope, cs)
 }
+
 func (m *AllOf) scan(ctx Context, scope Scope, cs Cursor) (ret *ResultList, err error) {
 	var rl ResultList
 	if cnt := len(m.Match); cnt == 0 {

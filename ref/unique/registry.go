@@ -45,22 +45,32 @@ func ValuePtr(ptr interface{}) (ret r.Value, err error) {
 
 // RegisterBlock registers a structure containing pointers to commands.
 func RegisterBlocks(reg TypeRegistry, block ...interface{}) (err error) {
-OutOfLoop:
 	for _, block := range block {
 		if structType, e := TypePtr(block); e != nil {
 			err = e
-			break OutOfLoop
-		} else {
-			for i, cnt := 0, structType.NumField(); i < cnt; i++ {
-				field := structType.Field(i)
-				if rtype, e := typePtr(field.Type); e != nil {
-					err = errutil.New("RegisterType", i, e)
-					break OutOfLoop
-				} else if e := reg.RegisterType(rtype); e != nil {
-					err = errutil.New("RegisterType", i, e)
-					break OutOfLoop
-				}
+			break
+		} else if e := registerBlock(reg, structType); e != nil {
+			err = e
+			break
+		}
+	}
+	return
+}
+
+func registerBlock(reg TypeRegistry, structType r.Type) (err error) {
+	for i, cnt := 0, structType.NumField(); i < cnt; i++ {
+		field := structType.Field(i)
+		if field.Type.Kind() == r.Struct {
+			if e := registerBlock(reg, field.Type); e != nil {
+				err = e
+				break
 			}
+		} else if rtype, e := typePtr(field.Type); e != nil {
+			err = errutil.New("RegisterType", i, e)
+			break
+		} else if e := reg.RegisterType(rtype); e != nil {
+			err = errutil.New("RegisterType", i, e)
+			break
 		}
 	}
 	return

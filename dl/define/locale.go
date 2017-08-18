@@ -1,16 +1,8 @@
-package initial
+package define
 
 import (
 	"github.com/ionous/iffy/dl/locate"
-	// "github.com/ionous/iffy/index"
 )
-
-type Commands struct {
-	// *Relation
-	// *Value
-	// *State
-	*Location
-}
 
 // type Relation struct {
 // 	Name string
@@ -31,19 +23,19 @@ type Location struct {
 	Child    string
 }
 
-// func (r *Relation) Assert(f *Facts) (nil error) {
+// func (r *Relation) Assert(f **Facts) (nil error) {
 // 	f.Relations = append(f.Relations, *r)
 // 	return
 // }
-// func (v *Value) Assert(f *Facts) (nil error) {
+// func (v *Value) Assert(f **Facts) (nil error) {
 // 	f.Values = append(f.Values, *v)
 // 	return
 // }
-// func (s *State) Assert(f *Facts) (nil error) {
+// func (s *State) Assert(f **Facts) (nil error) {
 // 	f.Values = append(f.Values, Value{s.Obj, s.Name, true})
 // 	return
 // }
-func (l *Location) Assert(f *Facts) (nil error) {
+func (l *Location) Define(f *Facts) (nil error) {
 	// FIX: check for parent-child loops.
 	f.Locations = append(f.Locations, *l)
 	return

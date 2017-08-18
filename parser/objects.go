@@ -4,13 +4,13 @@ import (
 	"github.com/ionous/errutil"
 )
 
-// Object matches one object in ctx.
+// Noun matches one object in ctx.
 // (plus or minus some ambiguity)
-type Object struct {
+type Noun struct {
 	Filters Filters
 }
 
-func (try *Object) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
+func (try *Noun) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
 	if w := cs.CurrentWord(); len(w) == 0 {
 		err = MissingObject{Depth(cs.Pos)}
 	} else {
@@ -24,7 +24,7 @@ func (try *Object) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err er
 	return
 }
 
-func resolveObject(cs Cursor, wordCount int, nouns []Noun) (ret Result, err error) {
+func resolveObject(cs Cursor, wordCount int, nouns []NounVisitor) (ret Result, err error) {
 	if wordCount == 0 {
 		err = UnknownObject{Depth(cs.Pos)}
 	} else {

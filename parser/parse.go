@@ -4,14 +4,6 @@ import (
 	"github.com/ionous/errutil"
 )
 
-// Scanner searches words looking for good results.
-// ( perhaps its truly a tokenzer and the results, tokens )
-type Scanner interface {
-	// Scan for results.
-	// note: by design, cursor may be out of range when scan is called.
-	Scan(Context, Scope, Cursor) (Result, error)
-}
-
 func Parse(ctx Context, match Scanner, in []string) (ret *ResultList, err error) {
 	if scope, e := ctx.GetPlayerScope(""); e != nil {
 		err = e
@@ -23,6 +15,14 @@ func Parse(ctx Context, match Scanner, in []string) (ret *ResultList, err error)
 		ret = rs
 	}
 	return
+}
+
+// Scanner searches words looking for good results.
+// ( perhaps its truly a tokenzer and the results, tokens )
+type Scanner interface {
+	// Scan for results.
+	// note: by design, cursor may be out of range when scan is called.
+	Scan(Context, Scope, Cursor) (Result, error)
 }
 
 type Cursor struct {

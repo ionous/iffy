@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-// MyObject provides an example ( for testing ) of mapping an "Object" to a Noun.
+// MyObject provides an example ( for testing ) of mapping an "Noun" to a NounVisitor.
 type MyObject struct {
 	Id         string
 	Names      []string
@@ -23,11 +23,11 @@ func (m *MyObject) String() string {
 
 type MyScope []*MyObject
 
-func (m MyScope) Get(r rune) Noun {
+func (m MyScope) Get(r rune) NounVisitor {
 	return MyAdapter{m[r-'a']}
 }
 
-func (m MyScope) Many(rs ...rune) (ret []Noun) {
+func (m MyScope) Many(rs ...rune) (ret []NounVisitor) {
 	for _, r := range rs {
 		ret = append(ret, m.Get(r))
 	}
@@ -44,7 +44,7 @@ func (m MyScope) IsPlural(n string) bool {
 	return n != inflect.Singularize(n)
 }
 
-func (m MyScope) SearchScope(v NounVisitor) (ret bool) {
+func (m MyScope) SearchScope(v func(n NounVisitor) bool) (ret bool) {
 	n := MyAdapter{}
 	for _, k := range m {
 		n.MyObject = k
@@ -120,22 +120,22 @@ func TestScope(t *testing.T) {
 	}
 	if res, e := matching(ctx, "unique"); assert.NoError(e) {
 		assert.EqualValues(ResolvedObject{
-			Noun:  ctx.Get('a'),
-			Words: sliceOf.String("unique"),
+			NounVisitor: ctx.Get('a'),
+			Words:       sliceOf.String("unique"),
 		}, res)
 	}
 
 	if res, e := matching(ctx, "exact match"); assert.NoError(e) {
 		assert.EqualValues(ResolvedObject{
-			Noun:  ctx.Get('c'),
-			Words: sliceOf.String("exact", "match"),
+			NounVisitor: ctx.Get('c'),
+			Words:       sliceOf.String("exact", "match"),
 		}, res)
 	}
 
 	if res, e := matchingFilter(ctx, "filter", "attr", "class"); assert.NoError(e) {
 		assert.EqualValues(ResolvedObject{
-			Noun:  ctx.Get('f'),
-			Words: sliceOf.String("filter"),
+			NounVisitor: ctx.Get('f'),
+			Words:       sliceOf.String("filter"),
 		}, res)
 	}
 
@@ -154,7 +154,7 @@ func TestScope(t *testing.T) {
 }
 
 func matching(ctx Context, phrase string) (ret Result, err error) {
-	match := &Object{}
+	match := &Noun{}
 	words := strings.Fields(phrase)
 	if scope, e := ctx.GetPlayerScope(""); e != nil {
 		err = e
@@ -165,7 +165,7 @@ func matching(ctx Context, phrase string) (ret Result, err error) {
 }
 
 func matchingFilter(ctx Context, phrase, attr, class string) (ret Result, err error) {
-	match := &Object{Filters{&HasAttr{attr}, &HasClass{class}}}
+	match := &Noun{Filters{&HasAttr{attr}, &HasClass{class}}}
 	words := strings.Fields(phrase)
 	if scope, e := ctx.GetPlayerScope(""); e != nil {
 		err = e

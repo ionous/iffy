@@ -22,7 +22,7 @@ func (a *Focus) Scan(ctx Context, _ Scope, cs Cursor) (ret Result, err error) {
 	return
 }
 
-// Target changes the scope of its first scanner in response to the results of its last scanner. Generally, this means that the last scanner should be Object{}.
+// Target changes the scope of its first scanner in response to the results of its last scanner. Generally, this means that the last scanner should be Noun{}.
 type Target struct {
 	Match []Scanner
 }
@@ -44,7 +44,7 @@ func (a *Target) Scan(ctx Context, scope Scope, start Cursor) (ret Result, err e
 		} else if obj, ok := last.(ResolvedObject); !ok {
 			err = errutil.Fmt("expected an object, got %T", last)
 			break
-		} else if scope, e := ctx.GetOtherScope(obj.Noun.GetId()); e != nil {
+		} else if scope, e := ctx.GetOtherScope(obj.NounVisitor.GetId()); e != nil {
 			err = e
 			break
 		} else {

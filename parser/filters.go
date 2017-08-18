@@ -6,7 +6,7 @@ type FilterSpec struct {
 }
 
 type Filter interface {
-	MatchesNoun(Noun) bool
+	MatchesNoun(NounVisitor) bool
 }
 
 type Filters []Filter
@@ -19,15 +19,15 @@ type HasClass struct {
 	Name string
 }
 
-func (f *HasAttr) MatchesNoun(n Noun) bool {
+func (f *HasAttr) MatchesNoun(n NounVisitor) bool {
 	return n.HasAttribute(f.Name)
 }
 
-func (f *HasClass) MatchesNoun(n Noun) bool {
+func (f *HasClass) MatchesNoun(n NounVisitor) bool {
 	return n.HasClass(f.Name)
 }
 
-func (fs Filters) MatchesNoun(n Noun) bool {
+func (fs Filters) MatchesNoun(n NounVisitor) bool {
 	i, cnt := 0, len(fs)
 	for ; i < cnt; i++ {
 		if f := fs[i]; !f.MatchesNoun(n) {
