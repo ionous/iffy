@@ -1,6 +1,7 @@
 package define_test
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/define"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/spec/ops"
@@ -9,28 +10,45 @@ import (
 )
 
 func TestDefines(t *testing.T) {
+	errutil.Panic = true
 	t.Run("empty", func(t *testing.T) {
 		var reg define.Registry
+		//
 		var facts define.Facts
 		e := reg.Define(&facts)
 		testify.NoError(t, e)
 	})
-	//
-	// t.Run("grammar", func(t *testing.T) {
 	{
 		var reg define.Registry
 		reg.Register(defineGrammar)
+		//
 		var facts define.Facts
 		e := reg.Define(&facts)
 		testify.NoError(t, e)
-		//
 		if testify.Len(t, facts.Grammar.Match, 1) {
 			x, ok := facts.Grammar.Match[0].(*parser.AllOf)
 			testify.True(t, ok)
 			testify.Len(t, x.Match, 2) // l/look;action
 		}
-		// })
 	}
+	{
+		var reg define.Registry
+		reg.Register(defineLocation)
+		//
+		var facts define.Facts
+		e := reg.Define(&facts)
+		testify.NoError(t, e)
+		testify.Len(t, facts.Locations, 1)
+	}
+	// {
+	// 	var reg define.Registry
+	// 	reg.Register(defineRules)
+	// 	//
+	// 	var facts define.Facts
+	// 	e := reg.Define(&facts)
+	// 	testify.NoError(t, e)
+	// 	testify.Len(t, facts.Locations, 1)
+	// }
 }
 
 func defineGrammar(c *ops.Builder) {
@@ -59,13 +77,21 @@ func defineGrammar(c *ops.Builder) {
 		c.End()
 	}
 }
-func defineRelatives(*ops.Builder) {
-}
-func defineEventHandler(*ops.Builder) {
-}
-func definePattern(*ops.Builder) {
-}
-func defineRule(*ops.Builder) {
+func defineLocation(c *ops.Builder) {
+	c.Cmd("location", "parent", c.Cmd("supports"), "child")
 }
 
-// future: defineClass, defineInstance, defineRelation, defineEvent,
+func defineRules(c *ops.Builder) {
+	for _, k := range []string{"bool", "number", "text", "object", "num list", "text list", "obj list", "run"} {
+		if c.Cmd(k + " rule").Begin() {
+			c.Param("name").Val(k)
+			c.End()
+		}
+	}
+}
+
+func defineEventHandler(*ops.Builder) {
+
+}
+
+// future: defineEvent, defineInstance, defineRelative, defineClass, definePattern, defineRelation.
