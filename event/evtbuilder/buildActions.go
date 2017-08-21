@@ -27,7 +27,7 @@ func (a *Actions) Add(name, targetClass string, dataClass interface{}) (err erro
 		err = errutil.New("duplicate action registered", name, act.Name)
 	} else if targetCls, ok := a.objectClasses.GetClass(targetClass); !ok {
 		err = errutil.New("target class not found", targetClass)
-	} else if rtype, e := unique.TypePtr(dataClass); e != nil {
+	} else if rtype, e := unique.StructPtr(dataClass); e != nil {
 		err = e
 	} else if dataCls, e := a.dataClasses.RegisterClass(rtype); e != nil {
 		err = e

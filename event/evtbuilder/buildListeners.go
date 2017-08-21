@@ -35,7 +35,7 @@ func (l *Listeners) Object(name string) (ret ListenOn) {
 
 func (l *Listeners) Class(name string) (ret ListenOn) {
 	if cls, ok := l.objectClasses.GetClass(name); !ok {
-		ret = errOn{errutil.New("unknown object", name)}
+		ret = errOn{errutil.New("unknown class", name)}
 	} else {
 		ret = phaseOn{Listeners: l, cls: cls}
 	}

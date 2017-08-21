@@ -3,133 +3,98 @@ package ref
 import (
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/ref/enum"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
+// note: for speed of some of these operations, we could cache the results in a pointer to a struct pooled in a map of rtype->RefClass.
+// equality would work because the pointers are the same,
+// just as equaity works by aliasing r.Type directly.
 type RefClass struct {
-	id        string
-	rtype     r.Type
-	parent    *RefClass
-	parentIdx []int         // index of parent aggregate in rtype; valid if parent!= nil
-	props     []rt.Property // RefProp, RefEnum, etc.
+	r.Type
 }
 
-func (cls *RefClass) Type() r.Type {
-	return cls.rtype
-}
-
-// GetName returns a friendly name: spaces, no caps.
-func (cls *RefClass) GetName() string {
-	n := cls.rtype.Name()
-	return lang.Lowerspace(n)
-}
-
-// String implements fmt.Stringer
-func (c *RefClass) String() string {
-	return c.id
+func makeClass(rtype r.Type) RefClass {
+	return RefClass{rtype}
 }
 
 // GetId returns the unique identifier for this classes.
-func (c *RefClass) GetId() string {
-	return c.id
+func (c RefClass) GetId() string {
+	name := c.Type.Name()
+	return id.MakeId(name)
+}
+
+// GetName returns a friendly name: spaces, no caps.
+func (c RefClass) GetName() string {
+	name := c.Type.Name()
+	return lang.Lowerspace(name)
+}
+
+// String implements fmt.Stringer
+func (c RefClass) String() string {
+	return c.Type.String()
 }
 
 // GetParentType returns false for classes if no parent;
-func (c *RefClass) GetParent() (rt.Class, bool) {
-	return c.parent, c.parent != nil
-}
-
-// Number returns the number of indexable properties.
-// The number of available properties for a given Class never changes at runtime.
-func (c *RefClass) NumProperty() int {
-	return len(c.props)
-}
-
-// PropertyNum returns the indexed property.
-// Panics if the index is greater than Number.
-func (c *RefClass) PropertyNum(i int) rt.Property {
-	return c.props[i]
-}
-
-// GetProperty by name.
-func (c *RefClass) GetProperty(name string) (ret rt.Property, okay bool) {
-	id := id.MakeId(name)
-	if p, _, ok := c.getProperty(id); ok {
-		ret, okay = p, true
+func (c RefClass) GetParent() (ret rt.Class, okay bool) {
+	if path, ok := unique.PathOf(c.Type, "parent"); ok {
+		field := c.Type.FieldByIndex(path)
+		ret, okay = makeClass(field.Type), true
 	}
 	return
 }
 
-func (c *RefClass) getProperty(id string) (ret rt.Property, path []int, okay bool) {
-	if out, ok := c.findProperty(func(p rt.Property) (found bool) {
-		if id == p.GetId() {
-			ret, found = p, true
-		}
-		return
-	}); ok {
-		path = out
-		okay = true
-	}
-	return
-}
-
-// GetPropertyByChoice evaluates all properties to find an enumeration which can store the passed choice
-func (c *RefClass) GetPropertyByChoice(choice string) (rt.Property, bool) {
-	id := id.MakeId(choice)
-	r, _, _ := c.getPropertyByChoice(id)
-	return r, r != nil
-}
-
-func (c *RefClass) findProperty(match func(p rt.Property) bool) (path []int, okay bool) {
-	var partial []int
-	type getFieldIndex interface {
-		getFieldIndex() []int
-	}
-	for {
-		for _, p := range c.props {
-			if match(p) {
-				idx := p.(getFieldIndex).getFieldIndex()
-				path = append(partial, idx...)
-				okay = true
-				break
-			}
-		}
-		if okay || c.parent == nil {
-			break
-		} else {
-			c, partial = c.parent, append(partial, c.parentIdx...)
-		}
-	}
-	return
-}
-
-func (c *RefClass) getPropertyByChoice(id string) (ret *RefEnum, path []int, value int) {
-	if out, ok := c.findProperty(func(p rt.Property) (found bool) {
-		if p, ok := p.(*RefEnum); ok {
-			if i := p.choiceToIndex(id); i >= 0 {
-				ret = p
-				value = i
-				found = true
-			}
-		}
-		return
-	}); ok {
-		path = out
-	}
-	return
-}
-
-func (c *RefClass) IsCompatible(name string) (okay bool) {
-	id := id.MakeId(name)
-	if c.id == id {
+func (c RefClass) IsCompatible(name string) (okay bool) {
+	if idn := id.MakeId(name); c.GetId() == idn {
 		okay = true
 	} else {
-		for p := c.parent; p != nil; p = p.parent {
-			if p.id == id {
+		for {
+			if p, ok := c.GetParent(); !ok {
+				break
+			} else if p.GetId() == idn {
 				okay = true
 				break
 			}
+		}
+	}
+	return
+}
+
+func (c RefClass) getProperty(pid string) (ret []int) {
+	fn := func(f *r.StructField, path []int) (done bool) {
+		if id.MakeId(f.Name) == pid {
+			ret, done = path, true
+		}
+		return
+	}
+	unique.WalkProperties(c.Type, fn)
+	return
+}
+
+// when we dont know if pid is a boolean property or a choice.
+// ex. struct { Openable bool } or struct { Openable }
+func (c RefClass) getAmbigiousProperty(idt string) (ret []int, idx int) {
+	fn := func(f *r.StructField, path []int) (done bool) {
+		if id.MakeId(f.Name) == idt {
+			ret, idx, done = path, -1, true
+		} else if choices := enum.Enumerate(f.Type); len(choices) > 0 {
+			if c, ok := choiceToIndex(idt, choices); ok {
+				ret, idx, done = path, c, true
+			}
+		}
+		return
+	}
+	unique.WalkProperties(c.Type, fn)
+	return
+}
+
+func choiceToIndex(cid string, cs []string) (ret int, okay bool) {
+	for i, q := range cs {
+		if id.MakeId(q) == cid {
+			ret, okay = i, true
+			break
 		}
 	}
 	return

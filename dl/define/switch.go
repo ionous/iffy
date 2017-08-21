@@ -47,7 +47,6 @@ func (a *Pattern) Define(f *Facts) (err error) {
 	return
 }
 func (a *Grammar) Define(f *Facts) (nil error) {
-	println("xxx grammar?")
 	f.Grammar.Match = append(f.Grammar.Match, a.Match)
 	return
 }

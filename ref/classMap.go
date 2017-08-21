@@ -9,7 +9,7 @@ import (
 
 // Classes maps ids to RefClass.
 // Compatible with unique.TypeRegistry
-type ClassMap map[string]*RefClass
+type ClassMap map[string]RefClass
 
 // GetClass compatible with rt.Runtime
 func (cm ClassMap) GetClass(name string) (ret rt.Class, okay bool) {
@@ -19,12 +19,12 @@ func (cm ClassMap) GetClass(name string) (ret rt.Class, okay bool) {
 }
 
 // GetByType for cache usage
-func (cm ClassMap) GetByType(rtype r.Type) (ret *RefClass, err error) {
+func (cm ClassMap) GetByType(rtype r.Type) (ret RefClass, err error) {
 	name := rtype.Name()
 	id := id.MakeId(name)
 	if cls, ok := cm[id]; !ok {
 		err = errutil.New("class not found", name)
-	} else if cls.rtype != rtype {
+	} else if cls.Type != rtype {
 		err = errutil.New("class conflict", name, cls, rtype)
 	} else {
 		ret = cls

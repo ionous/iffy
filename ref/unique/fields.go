@@ -35,3 +35,26 @@ func findPathOf(base []int, rtype r.Type, tag string) (ret []int, okay bool) {
 	}
 	return
 }
+
+type PropertyFunc func(f *r.StructField, path []int) (done bool)
+
+func WalkProperties(rtype r.Type, fn PropertyFunc) (done bool) {
+	return walkProperties(rtype, nil, fn)
+}
+
+func walkProperties(rtype r.Type, base []int, fn PropertyFunc) (done bool) {
+	for i := 0; i < rtype.NumField(); i++ {
+		field := rtype.Field(i)
+		if IsPublic(field) {
+			path := append(base, i)
+			if !IsEmbedded(field) {
+				if fn(&field, path) {
+					break
+				}
+			} else if walkProperties(field.Type, path, fn) {
+				break
+			}
+		}
+	}
+	return
+}
