@@ -1,10 +1,10 @@
-package patspec_test
+package rule_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/pat/patbuilder"
-	"github.com/ionous/iffy/pat/patspec"
+	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
@@ -26,7 +26,7 @@ type PatternSuite struct {
 func (assert *PatternSuite) SetupTest() {
 	cmds := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
-		(*patspec.Commands)(nil),
+		(*rule.Commands)(nil),
 		(*core.Commands)(nil))
 	assert.cmds = cmds
 }
@@ -48,7 +48,7 @@ func (assert *PatternSuite) TestFactorial() {
 	assert.Contains(classes.ClassMap, id.MakeId("Factorial"), "adding to patterns should add to classes")
 
 	var root struct {
-		Els patspec.PatternSpecs
+		rule.Mandates
 	}
 	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmds().Begin() {
@@ -77,7 +77,7 @@ func (assert *PatternSuite) TestFactorial() {
 		if e := c.Build(); assert.NoError(e) {
 			if els := root.Els; assert.Len(els, 2) {
 				// test.Log(pretty.Sprint(els))
-				if e := els.Generate(patterns); e != nil {
+				if e := els.Mandate(patterns); e != nil {
 					test.Fatal(e)
 				}
 			}

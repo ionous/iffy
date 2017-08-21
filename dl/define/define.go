@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/parser"
-	"github.com/ionous/iffy/pat/patspec"
+	"github.com/ionous/iffy/pat/rule"
 )
 
 type Statement interface {
@@ -15,25 +15,30 @@ type Definitions []Statement
 
 type Facts struct {
 	Grammar   parser.AnyOf
-	Pattern   []patspec.PatternSpecs
+	Rules     rule.Mandates
 	Listeners []When
 	Locations []Location
 }
 
 type Commands struct {
 	Core     core.Commands
-	Patterns patspec.Commands
+	Patterns rule.Commands
 	Std      std.Commands
 	Parser   parser.Commands
 
-	Define struct {
-		*The
-		*When
-		*Pattern
-		*Grammar
-		*Plural
-		*Location
-	}
+	// Define:
+	*The
+	*When
+	*Pattern
+	*Grammar
+	*Plural
+	*Location
+	// Locale:
+	*Supports
+	*Contains
+	*Wears
+	*Carries
+	*Holds
 }
 
 type Classes struct {

@@ -37,7 +37,7 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 // FIX: this is patently ridiculous.
 // issue: i cant set an object reference from an object
 // why? in part b/c theres no "base class"
-// it would be **alot** simpler if the * was an ident.Id
+// it would be **alot** simpler if references were an ident.Id
 // we'd still have "emplace" -- you could maybe someday make it static -- thatd be tons better.
 func printName(run rt.Runtime, obj rt.Object) (err error) {
 	if kind, e := kindOf(run, obj); e != nil {

@@ -1,4 +1,4 @@
-package patspec
+package rule
 
 import (
 	"github.com/ionous/iffy/rt"

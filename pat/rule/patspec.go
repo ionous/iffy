@@ -1,16 +1,16 @@
-package patspec
+package rule
 
 import (
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/rt"
 )
 
-// MakePattern defines an interface for creating runtime patterns.
-type MakePattern interface {
-	Generate(PatternFactory) error
+// Mandate defines an interface for creating runtime patterns.
+type Mandate interface {
+	Mandate(RuleFactory) error
 }
 
-type PatternFactory interface {
+type RuleFactory interface {
 	AddBool(string, rt.BoolEval, rt.BoolEval) error
 	AddNumber(string, rt.BoolEval, rt.NumberEval) error
 	AddText(string, rt.BoolEval, rt.TextEval) error
@@ -35,11 +35,11 @@ type Commands struct {
 	*TextRule
 }
 
-type PatternSpecs []MakePattern
+type Mandates []Mandate
 
-func (p PatternSpecs) Generate(fac PatternFactory) (err error) {
+func (p Mandates) Mandate(fac RuleFactory) (err error) {
 	for _, el := range p {
-		if e := el.Generate(fac); e != nil {
+		if e := el.Mandate(fac); e != nil {
 			err = e
 			break
 		}

@@ -2,7 +2,7 @@ package define
 
 import (
 	"github.com/ionous/iffy/parser"
-	"github.com/ionous/iffy/pat/patspec"
+	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -11,7 +11,7 @@ type Grammar struct {
 }
 
 type Pattern struct {
-	Pattern patspec.MakePattern
+	Pattern rule.Mandate
 }
 
 type When struct {
@@ -47,7 +47,6 @@ func (a *Pattern) Define(f *Facts) (err error) {
 	return
 }
 func (a *Grammar) Define(f *Facts) (nil error) {
-	println("xxx grammar?")
 	f.Grammar.Match = append(f.Grammar.Match, a.Match)
 	return
 }

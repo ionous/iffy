@@ -1,4 +1,4 @@
-package patspec
+package rule
 
 import (
 	"github.com/ionous/iffy/pat"
@@ -47,28 +47,28 @@ type RunRule struct {
 	Continue PatternTiming
 }
 
-func (p *BoolRule) Generate(ps PatternFactory) (err error) {
+func (p *BoolRule) Mandate(ps RuleFactory) (err error) {
 	return ps.AddBool(p.Name, p.If, p.Decide)
 }
-func (p *NumberRule) Generate(ps PatternFactory) (err error) {
+func (p *NumberRule) Mandate(ps RuleFactory) (err error) {
 	return ps.AddNumber(p.Name, p.If, p.Decide)
 }
-func (p *TextRule) Generate(ps PatternFactory) (err error) {
+func (p *TextRule) Mandate(ps RuleFactory) (err error) {
 	return ps.AddText(p.Name, p.If, p.Decide)
 }
-func (p *ObjectRule) Generate(ps PatternFactory) (err error) {
+func (p *ObjectRule) Mandate(ps RuleFactory) (err error) {
 	return ps.AddObject(p.Name, p.If, p.Decide)
 }
-func (p *NumListRule) Generate(ps PatternFactory) (err error) {
+func (p *NumListRule) Mandate(ps RuleFactory) (err error) {
 	return ps.AddNumList(p.Name, p.If, p.Decide)
 }
-func (p *TextListRule) Generate(ps PatternFactory) (err error) {
+func (p *TextListRule) Mandate(ps RuleFactory) (err error) {
 	return ps.AddTextList(p.Name, p.If, p.Decide)
 }
-func (p *ObjListRule) Generate(ps PatternFactory) (err error) {
+func (p *ObjListRule) Mandate(ps RuleFactory) (err error) {
 	return ps.AddObjList(p.Name, p.If, p.Decide)
 }
-func (p *RunRule) Generate(ps PatternFactory) (err error) {
+func (p *RunRule) Mandate(ps RuleFactory) (err error) {
 	flags := pat.Infix
 	if p.Continue != nil {
 		flags = p.Continue.Flags()

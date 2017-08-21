@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/std/group"
 	"github.com/ionous/iffy/pat/patbuilder"
-	"github.com/ionous/iffy/pat/patspec"
+	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt/printer"
@@ -214,7 +214,7 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(*
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil),
 		(*Commands)(nil),
-		(*patspec.Commands)(nil),
+		(*rule.Commands)(nil),
 	)
 	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
 		(*Patterns)(nil),

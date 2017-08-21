@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/pat/patbuilder"
-	"github.com/ionous/iffy/pat/patspec"
+	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -33,7 +33,7 @@ func TestContents(t *testing.T) {
 	cmds := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil),
-		(*patspec.Commands)(nil),
+		(*rule.Commands)(nil),
 		(*Commands)(nil),
 		(*initial.Commands)(nil),
 	)

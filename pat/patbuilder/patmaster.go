@@ -2,7 +2,7 @@ package patbuilder
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/pat/patspec"
+	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/spec/ops"
@@ -26,9 +26,7 @@ func (pm Pm) Build(buildPatterns ...func(c *ops.Builder)) (ret *Patterns, err er
 		err = pm.err
 	} else {
 		// Accumulate patterns into root.
-		var root struct {
-			Patterns patspec.PatternSpecs
-		}
+		var root struct{ rule.Mandates }
 
 		if c, ok := pm.cmds.NewBuilder(&root); !ok {
 			err = errutil.New("why does this return okay anyway?")
@@ -40,7 +38,7 @@ func (pm Pm) Build(buildPatterns ...func(c *ops.Builder)) (ret *Patterns, err er
 			// Execute the accumulated pattern definitions
 			if e := c.Build(); e != nil {
 				err = e
-			} else if e := root.Patterns.Generate(pm.patterns); e != nil {
+			} else if e := root.Mandate(pm.patterns); e != nil {
 				err = e
 			} else {
 				ret = pm.patterns
