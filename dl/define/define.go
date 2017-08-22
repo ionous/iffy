@@ -15,30 +15,32 @@ type Definitions []Statement
 
 type Facts struct {
 	Grammar   parser.AnyOf
-	Rules     rule.Mandates
-	Listeners []When
+	Listeners []ListenTo
 	Locations []Location
+	Mandates  rule.Mandates
 }
 
 type Commands struct {
-	Core     core.Commands
-	Patterns rule.Commands
-	Std      std.Commands
-	Parser   parser.Commands
+	Core   core.Commands
+	Rules  rule.Commands
+	Std    std.Commands
+	Parser parser.Commands
 
 	// Define:
-	*The
-	*When
-	*Pattern
 	*Grammar
-	*Plural
+	*ListenTo
 	*Location
+	*Mandate
 	// Locale:
 	*Supports
 	*Contains
 	*Wears
 	*Carries
 	*Holds
+	// EventOptions
+	*Capture
+	*RunAfter
+	*TargetOnly
 }
 
 type Classes struct {

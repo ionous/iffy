@@ -27,7 +27,8 @@ func Register(cb func(c *ops.Builder)) {
 // Define implements Statement by using all Register(ed) definitions.
 func (r Registry) Define(f *Facts) (err error) {
 	classes := ref.NewClasses()
-	unique.RegisterBlocks(unique.PanicTypes(classes),
+	unique.RegisterBlocks(
+		unique.PanicTypes(classes),
 		(*Classes)(nil),
 	)
 
@@ -36,11 +37,13 @@ func (r Registry) Define(f *Facts) (err error) {
 	// 	Thingaverse.objects(sliceOf.String("apple", "pen", "thing#1", "thing#2"))...)
 
 	cmds := ops.NewOps()
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.RegisterBlocks(
+		unique.PanicTypes(cmds),
 		(*Commands)(nil),
 	)
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
+	unique.RegisterBlocks(
+		unique.PanicTypes(cmds.ShadowTypes),
 		(*Patterns)(nil),
 	)
 
