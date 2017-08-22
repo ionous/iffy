@@ -50,12 +50,15 @@ func (c RefClass) IsCompatible(name string) (okay bool) {
 	if idn := id.MakeId(name); c.GetId() == idn {
 		okay = true
 	} else {
-		for {
+		var c rt.Class = c
+		for i := 0; i < 250; i++ {
 			if p, ok := c.GetParent(); !ok {
 				break
 			} else if p.GetId() == idn {
 				okay = true
 				break
+			} else {
+				c = p
 			}
 		}
 	}

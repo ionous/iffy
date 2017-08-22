@@ -64,7 +64,7 @@ func (assert *ArticleSuite) SetupTest() {
 	//
 	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
 		(*Patterns)(nil)).Build(
-		printNamePatterns,
+		PrintNamePatterns,
 	)
 	assert.NoError(e)
 

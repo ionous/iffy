@@ -1,7 +1,8 @@
-package std
+package std_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/pat/patspec"
 	"github.com/ionous/iffy/ref"
@@ -40,7 +41,7 @@ func TestStd(t *testing.T) {
 
 		//
 		patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-			(*Patterns)(nil)).Build(printNamePatterns)
+			(*Patterns)(nil)).Build(PrintNamePatterns)
 		assert.NoError(e)
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".
