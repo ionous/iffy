@@ -15,13 +15,11 @@ type EventListeners struct {
 type PhaseMap map[string]PhaseList
 
 // PhaseList contains capture and bubble handlers.
-type PhaseList [ListenerTypes][]*Handler
+type PhaseList [ListenerTypes][]Handler
 
 type Handler struct {
 	Options
-	Object rt.Object
-	Class  rt.Class
-	Exec   rt.Execute
+	Exec rt.Execute
 }
 
 type Target struct {

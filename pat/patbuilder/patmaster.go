@@ -15,8 +15,13 @@ type Pm struct {
 }
 
 func NewPatternMaster(cmds *ops.Ops, classes ref.Classes, block ...interface{}) Pm {
+	var err error
 	patterns := NewPatterns(classes)
-	err := unique.RegisterBlocks(patterns, block...)
+	if e := unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes), block...); e != nil {
+		err = e
+	} else {
+		err = unique.RegisterBlocks(patterns, block...)
+	}
 	return Pm{cmds, patterns, err}
 }
 

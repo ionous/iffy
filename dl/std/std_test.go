@@ -31,10 +31,6 @@ func TestStd(t *testing.T) {
 		(*Commands)(nil),
 	)
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
-		(*Patterns)(nil),
-	)
-
 	t.Run("Names", func(t *testing.T) {
 		assert := testify.New(t)
 

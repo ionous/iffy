@@ -14,9 +14,6 @@ func NewDispatch(events EventMap) *Dispatch {
 
 // note: in the future, other things may raise events.
 // for instance, object state change.
-// perhaps those have "default actions", but there's a difference b/t game actions --
-// "default actions" here are simply functions.
-// they have no event flow associated with them.
 func (d *Dispatch) Go(run rt.Runtime, act *Action, target, data rt.Object) (err error) {
 	if els, ok := d.events[act.Id]; ok {
 		if path, e := els.CollectAncestors(run, target); e != nil {
@@ -26,11 +23,11 @@ func (d *Dispatch) Go(run rt.Runtime, act *Action, target, data rt.Object) (err 
 			if len(path) > 0 || len(at) > 0 {
 				evt := &EventObject{
 					Name:          act.Name,
-					Data:          data.GetId(),
+					Data:          data,
 					Bubbles:       true,
 					Cancelable:    true,
-					Target:        target.GetId(),
-					CurrentTarget: target.GetId(),
+					Target:        target,
+					CurrentTarget: target,
 				}
 				// FIX: class finder and hints
 				ac, e := NewFrame(run, evt)
@@ -40,11 +37,12 @@ func (d *Dispatch) Go(run rt.Runtime, act *Action, target, data rt.Object) (err 
 					err = e
 				} else if !evt.PreventDefault {
 					evt.Phase = AfterPhase
+					evt.CurrentTarget = target
 					// FIX: set hint to target class
 					if e := act.DefaultActions.Execute(run); e != nil {
 						err = e
 					} else {
-						err = ac.Flush()
+						err = ac.queue.Flush(run, evt)
 					}
 				}
 				// cleanup regardless of error

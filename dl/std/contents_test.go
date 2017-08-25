@@ -37,9 +37,6 @@ func TestContents(t *testing.T) {
 		(*Commands)(nil),
 		(*initial.Commands)(nil),
 	)
-	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
-		(*Patterns)(nil),
-	)
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)

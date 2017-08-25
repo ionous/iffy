@@ -8,7 +8,7 @@ import (
 type Frame struct {
 	run    rt.Runtime
 	evt    *EventObject
-	queue  []*Handler
+	queue  QueuedActions
 	pushed bool
 }
 
@@ -33,30 +33,6 @@ func (ac *Frame) Destroy() {
 		ac.run.PopScope()
 		ac.pushed = false
 	}
-}
-
-// Flush queued actions
-func (ac *Frame) Flush() (err error) {
-	// FIX? do we want the event object in scope during after handlers?
-	// for consistancy's sake probably so.
-	for _, h := range ac.queue {
-		if e := ac.runAction(h); e != nil {
-			err = e
-			break
-		}
-	}
-	return
-}
-
-func (ac *Frame) queueAction(h *Handler) {
-	ac.queue = append(ac.queue, h)
-}
-
-func (ac *Frame) runAction(h *Handler) (err error) {
-	// FIX: set hint via hint pointer into scope
-	evt := ac.evt
-	evt.CurrentTarget = h.Object.GetId()
-	return h.Exec.Execute(ac.run)
 }
 
 // Dispatch the event frame to the passed targets.
@@ -106,9 +82,11 @@ func (ac *Frame) dispatchPhase(listenerType ListenerType, fullPath [2][]Target, 
 					// at target usually this only happens during the bubbles phase.
 					if atTarget == h.IsTargetOnly() {
 						if h.IsRunAfter() {
-							ac.queueAction(h)
+							ac.queue = ac.queue.Add(tgt.obj, h.Exec)
 						} else {
-							if e := ac.runAction(h); e != nil {
+							// FIX: set hint via hint pointer into scope
+							evt.CurrentTarget = tgt.obj
+							if e := h.Exec.Execute(ac.run); e != nil {
 								err = e
 								break OutOfLoop
 							} else if evt.StopImmediatePropagation {

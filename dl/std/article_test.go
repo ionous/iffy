@@ -58,10 +58,6 @@ func (assert *ArticleSuite) SetupTest() {
 		&Kind{Name: "soldiers", IndefiniteArticle: "some"},
 		&Kind{Name: "trevor", CommonProper: ProperNamed},
 	)
-	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
-		(*Patterns)(nil),
-	)
-	//
 	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
 		(*Patterns)(nil)).Build(
 		printNamePatterns,

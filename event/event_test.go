@@ -54,22 +54,37 @@ func TestSomething(t *testing.T) {
 		&Kind{"Coffin"},
 		&Kind{"Skeleton Key"})
 
+	dataClasses := ref.NewClassStack(objectClasses)
+	unique.RegisterTypes(dataClasses,
+		(*Jumping)(nil),
+		(*Kissing)(nil),
+		(*Kissing)(nil),
+	)
+
 	// this isnt parser
-	actions := evtbuilder.NewActions(classes, cmds)
-	actions.Add("jump", "kind", (*Jumping)(nil))
-	actions.Add("kiss", "kind", (*Kissing)(nil))
-	actions.Add("unlock", "kind", (*Unlocking)(nil))
+	actions := make(evtbuilder.Actions)
+	if kind, ok := classes.GetClass("kind"); assert.True(ok) {
+		actions.Add("jump", kind, (*Jumping)(nil))
+		actions.Add("kiss", kind, (*Kissing)(nil))
+		actions.Add("unlock", kind, (*Unlocking)(nil))
+	}
 
 	// default action:
-	actions.On("jump", func(c *ops.Builder) {
+	if jumped, e := cmds.Execute(func(c *ops.Builder) {
 		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				// FIX: to print names need to include articles
 				// probably want a simple named object in core.
 				c.Cmd("print text", "jumped!")
+				c.End()
 			}
+			c.End()
 		}
-	})
+	}); e != nil {
+		t.Fatal(e)
+	} else {
+		actions.On("jump", jumped)
+	}
 
 	// we do this the manual way first, and later with spec
 
@@ -78,24 +93,33 @@ func TestSomething(t *testing.T) {
 
 	listen := evtbuilder.NewListeners(actions, run.Objects, classes)
 	// object listener:
-	listen.Object("bogart").On("jump", event.Default, func(c *ops.Builder) {
+	if jump, e := cmds.Execute(func(c *ops.Builder) {
 		c.Cmd("print text", "bogart jumped!")
-	})
-	listen.Class("kind").On("kiss", event.Default, func(c *ops.Builder) {
+	}); e != nil {
+		t.Fatal(e)
+	} else {
+		listen.Object("bogart").On("jump", event.Default, jump)
+	}
+
+	if kiss, e := cmds.Execute(func(c *ops.Builder) {
 		c.Cmd("print text", "kissed!")
-	})
+	}); e != nil {
+		t.Fatal(e)
+	} else {
+		listen.Class("kind").On("kiss", event.Default, kiss)
+	}
 
 	dispatch := event.NewDispatch(listen.EventMap)
 
 	// helper for testing:
-	Go := func(object, action string, dataFn evtbuilder.BuildOps) {
+	Go := func(object, action string) {
 		if obj, ok := run.GetObject(object); !ok {
 			t.Fatal("object not found", object)
 		} else if act, ok := actions.ActionMap[id.MakeId(action)]; !ok {
 			t.Fatal("unknown action", action)
 		} else {
 			var data rt.Object
-			if dataFn != nil {
+			/*if dataFn != nil {
 				if dataEval, e := dataFn.Eval(cmds); e != nil {
 					t.Fatal(e)
 				} else if got, e := dataEval.GetObject(run); e != nil {
@@ -103,13 +127,13 @@ func TestSomething(t *testing.T) {
 				} else {
 					data = got
 				}
-			}
+			}*/
 			e := dispatch.Go(run, act, obj, data)
 			assert.NoError(e)
 		}
 	}
 
-	Go("bogart", "jump", nil)
+	Go("bogart", "jump")
 	t.Log(lines.Lines())
 
 	// Go("bogart", "kiss", func(c *ops.Builder) {

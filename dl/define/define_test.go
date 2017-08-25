@@ -105,8 +105,6 @@ func defineRules(c *ops.Builder, mandates []string) {
 	}
 }
 
-// future: defineEvent, defineInstance, defineRelative, defineClass, definePattern, defineRelation.
-
 func defineEventHandler(c *ops.Builder) {
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
 		if c.Param("go").Cmds().Begin() {
@@ -140,5 +138,3 @@ func defineEventHandler(c *ops.Builder) {
 		c.End()
 	}
 }
-
-// future: defineEvent, defineInstance, defineRelative, defineClass, definePattern, defineRelation, definePlural

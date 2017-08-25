@@ -4,49 +4,36 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 )
 
 //
 type Listeners struct {
 	event.EventMap
-	actions       *Actions
-	objects       *ref.Objects
-	objectClasses ref.ClassMap
+	actions Actions
 }
 
 type ListenOn interface {
-	On(name string, flags event.Options, fn BuildOps) error
+	On(string, event.Options, rt.Execute) error
 }
 
-func NewListeners(actions *Actions, objects *ref.Objects, classes *ref.ClassBuilder) *Listeners {
-	return &Listeners{make(event.EventMap), actions, objects, classes.ClassMap}
+func NewListeners(actions Actions) *Listeners {
+	return &Listeners{make(event.EventMap), actions}
 }
 
-func (l *Listeners) Object(name string) (ret ListenOn) {
-	if obj, ok := l.objects.GetObject(name); !ok {
-		ret = errOn{errutil.New("unknown object", name)}
-	} else {
-		ret = phaseOn{Listeners: l, obj: obj, cls: obj.GetClass()}
-	}
-	return
+func (l *Listeners) Object(obj rt.Object) ListenOn {
+	return phaseOn{Listeners: l, obj: obj, cls: obj.GetClass()}
 }
 
-func (l *Listeners) Class(name string) (ret ListenOn) {
-	if cls, ok := l.objectClasses.GetClass(name); !ok {
-		ret = errOn{errutil.New("unknown object", name)}
-	} else {
-		ret = phaseOn{Listeners: l, cls: cls}
-	}
-	return
+func (l *Listeners) Class(cls rt.Class) ListenOn {
+	return phaseOn{Listeners: l, cls: cls}
 }
 
 type errOn struct {
 	err error
 }
 
-func (errOn errOn) On(string, event.Options, BuildOps) error {
+func (errOn errOn) On(string, event.Options, rt.Execute) error {
 	return errOn.err
 }
 
@@ -56,13 +43,11 @@ type phaseOn struct {
 	cls rt.Class
 }
 
-func (p phaseOn) On(name string, flags event.Options, fn BuildOps) (err error) {
+func (p phaseOn) On(name string, flags event.Options, exec rt.Execute) (err error) {
 	id := id.MakeId(name)
 	// verify the action is well known.
-	if _, ok := p.actions.ActionMap[id]; !ok {
+	if _, ok := p.actions[id]; !ok {
 		err = errutil.New("unknown action", name)
-	} else if exec, e := fn.Build(p.actions.cmds); e != nil {
-		err = e
 	} else {
 		var target string
 		var phaseMap event.PhaseMap
@@ -93,10 +78,8 @@ func (p phaseOn) On(name string, flags event.Options, fn BuildOps) (err error) {
 			listenerType = event.CaptureListeners
 		}
 		pl := phaseMap[target]
-		pl[listenerType] = append(pl[listenerType], &event.Handler{
+		pl[listenerType] = append(pl[listenerType], event.Handler{
 			flags,
-			p.obj,
-			p.cls,
 			exec,
 		})
 		phaseMap[target] = pl

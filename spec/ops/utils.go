@@ -1,19 +1,16 @@
-package evtbuilder
+package ops
 
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/spec/ops"
 )
 
-type BuildOps func(c *ops.Builder)
-
-func (b BuildOps) Build(ops *ops.Ops) (ret rt.Execute, err error) {
+func (ops *Ops) Execute(fn func(c *Builder)) (ret rt.Execute, err error) {
 	var root struct{ Eval rt.Execute }
 	if c, ok := ops.NewBuilder(&root); !ok {
 		err = errutil.New("unknown error")
 	} else {
-		b(c)
+		fn(c)
 		if e := c.Build(); e != nil {
 			err = e
 		} else {
@@ -23,12 +20,12 @@ func (b BuildOps) Build(ops *ops.Ops) (ret rt.Execute, err error) {
 	return
 }
 
-func (b BuildOps) Eval(ops *ops.Ops) (ret rt.ObjectEval, err error) {
+func (ops *Ops) ObjectEval(fn func(c *Builder)) (ret rt.ObjectEval, err error) {
 	var root struct{ Obj rt.ObjectEval }
 	if c, ok := ops.NewBuilder(&root); !ok {
 		err = errutil.New("unknown error")
 	} else {
-		b(c)
+		fn(c)
 		if e := c.Build(); e != nil {
 			err = e
 		} else {

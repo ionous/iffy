@@ -216,10 +216,6 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(*
 		(*Commands)(nil),
 		(*rule.Commands)(nil),
 	)
-	unique.RegisterBlocks(unique.PanicTypes(cmds.ShadowTypes),
-		(*Patterns)(nil),
-	)
-	//
 	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
 		(*Patterns)(nil)).Build(
 		patternSpec...,
