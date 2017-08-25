@@ -24,7 +24,7 @@ type classInfo struct {
 
 type queued struct {
 	rval r.Value
-	cls  *RefClass
+	cls  RefClass
 }
 type queue map[string]queued
 
@@ -35,7 +35,7 @@ func NewObjects(classes *ClassBuilder) *ObjBuilder {
 func (b *ObjBuilder) Build() *Objects {
 	objs := &Objects{make(ObjectMap), b.classes}
 	for id, q := range b.queue {
-		objs.ObjectMap[id] = &RefObject{id, q.rval, q.cls, objs}
+		objs.ObjectMap[id] = &RefObject{q.rval, objs}
 	}
 	return objs
 }

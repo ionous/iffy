@@ -1,4 +1,8 @@
-package std
+package std_test
+
+import (
+	. "github.com/ionous/iffy/dl/std"
+)
 
 type ObjetctMap map[string]interface{}
 

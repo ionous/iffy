@@ -1,7 +1,6 @@
 package ref_test
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -23,12 +22,7 @@ type ObjectSuite struct {
 	second  *DerivedClass
 }
 
-func (assert *ObjectSuite) TearDownTest() {
-	errutil.Panic = false
-}
-
 func (assert *ObjectSuite) SetupTest() {
-	errutil.Panic = true
 	// reset the registries every time:
 	classes := ref.NewClasses()
 	unique.RegisterTypes(unique.PanicTypes(classes),
@@ -102,10 +96,10 @@ func (assert *ObjectSuite) TestStateSet() {
 				// and maybe should now be true
 				n.GetValue("maybe", &res)
 				assert.True(res)
-				assert.Panics(func() {
-					// try to change states in an illegal way:
-					n.SetValue("maybe", false)
-				})
+				// try to change states in an illegal way:
+				e := n.SetValue("maybe", false)
+				assert.Error(e)
+
 				// add verify it didnt change:
 				n.GetValue("maybe", &res)
 				assert.True(res)
@@ -113,12 +107,17 @@ func (assert *ObjectSuite) TestStateSet() {
 		}
 		//
 		n.GetValue("yes", &res)
-		assert.False(res)
-		assert.NotPanics(func() {
-			n.SetValue("state", "yes")
-		})
-		n.GetValue("yes", &res)
-		assert.True(res)
+		if assert.False(res) {
+			//
+			e := n.SetValue("state", "yes")
+			if assert.NoError(e) {
+				//
+				e := n.GetValue("yes", &res)
+				if assert.NoError(e) {
+					assert.True(res)
+				}
+			}
+		}
 	}
 	// check, change, and check the labeled bool.
 	toggle := func(name, prop string, goal bool) {

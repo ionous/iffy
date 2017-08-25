@@ -138,9 +138,7 @@ func (p *SetState) GetObject(run rt.Runtime) (rt.Object, error) {
 func (p *SetState) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Ref.GetObject(run); e != nil {
 		err = errutil.New("SetState.Ref", e)
-	} else if prop, ok := obj.GetClass().GetPropertyByChoice(p.State); !ok {
-		err = errutil.New("SetState", obj, "does not have choice", p.State)
-	} else if e := obj.SetValue(prop.GetId(), p.State); e != nil {
+	} else if e := obj.SetValue(p.State, true); e != nil {
 		err = errutil.New("SetState", e)
 	} else {
 		ret = obj

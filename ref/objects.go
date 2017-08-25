@@ -21,14 +21,14 @@ func (or *Objects) NewObject(class string) (ret rt.Object, err error) {
 	if cls, ok := or.classes.GetClass(class); !ok {
 		err = errutil.New("no such class", class)
 	} else {
-		ret = or.newObject(cls.(*RefClass))
+		ret = or.newObject(cls.(RefClass))
 	}
 	return
 }
 
-func (or *Objects) newObject(cls *RefClass) *RefObject {
-	rval := r.New(cls.rtype).Elem()
-	return &RefObject{"", rval, cls, or}
+func (or *Objects) newObject(cls RefClass) *RefObject {
+	rval := r.New(cls.Type).Elem()
+	return &RefObject{rval, or}
 }
 
 // Emplace wraps the passed value as an anonymous object.
@@ -36,10 +36,8 @@ func (or *Objects) newObject(cls *RefClass) *RefObject {
 func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
 	if rval, e := unique.ValuePtr(i); e != nil {
 		err = e
-	} else if cls, e := or.classes.GetByType(rval.Type()); e != nil {
-		err = e
 	} else {
-		ret = &RefObject{"", rval, cls, or}
+		ret = &RefObject{rval, or}
 	}
 	return
 }

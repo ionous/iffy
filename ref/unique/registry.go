@@ -15,16 +15,20 @@ type ValueRegistry interface {
 	RegisterValue(r.Value) error
 }
 
-// TypePtr turns an interface pointer into a struct r.Type.
-func TypePtr(ptr interface{}) (r.Type, error) {
-	return typePtr(r.TypeOf(ptr))
+// StructPtr turns an interface pointer into a struct r.Type.
+func StructPtr(ptr interface{}) (r.Type, error) {
+	return TypePtr(r.Struct, ptr)
 }
 
-func typePtr(rtype r.Type) (ret r.Type, err error) {
+func TypePtr(kind r.Kind, ptr interface{}) (r.Type, error) {
+	return typePtr(kind, r.TypeOf(ptr))
+}
+
+func typePtr(kind r.Kind, rtype r.Type) (ret r.Type, err error) {
 	if rtype.Kind() != r.Ptr {
-		err = errutil.New("expected (nil) pointer (to a struct)", rtype)
-	} else if rtype := rtype.Elem(); rtype.Kind() != r.Struct {
-		err = errutil.New("expected a struct pointer", rtype)
+		err = errutil.Fmt("expected (nil) pointer (to a %s) %s", kind, rtype)
+	} else if rtype := rtype.Elem(); rtype.Kind() != kind {
+		err = errutil.Fmt("expected a %s pointer %s", kind, rtype)
 	} else {
 		ret = rtype
 	}
@@ -46,7 +50,7 @@ func ValuePtr(ptr interface{}) (ret r.Value, err error) {
 // RegisterBlock registers a structure containing pointers to commands.
 func RegisterBlocks(reg TypeRegistry, block ...interface{}) (err error) {
 	for _, block := range block {
-		if structType, e := TypePtr(block); e != nil {
+		if structType, e := StructPtr(block); e != nil {
 			err = e
 			break
 		} else if e := registerBlock(reg, structType); e != nil {
@@ -65,7 +69,7 @@ func registerBlock(reg TypeRegistry, structType r.Type) (err error) {
 				err = e
 				break
 			}
-		} else if rtype, e := typePtr(field.Type); e != nil {
+		} else if rtype, e := typePtr(r.Struct, field.Type); e != nil {
 			err = errutil.New("RegisterType", i, e)
 			break
 		} else if e := reg.RegisterType(rtype); e != nil {
@@ -79,7 +83,7 @@ func registerBlock(reg TypeRegistry, structType r.Type) (err error) {
 // RegisterType registers pointers to types.
 func RegisterTypes(reg TypeRegistry, ptr ...interface{}) (err error) {
 	for i, t := range ptr {
-		if rtype, e := TypePtr(t); e != nil {
+		if rtype, e := StructPtr(t); e != nil {
 			err = errutil.New("RegisterType", i, e)
 			break
 		} else if e := reg.RegisterType(rtype); e != nil {
