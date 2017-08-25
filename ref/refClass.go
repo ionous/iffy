@@ -16,7 +16,7 @@ type RefClass struct {
 	r.Type
 }
 
-func makeClass(rtype r.Type) RefClass {
+func MakeClass(rtype r.Type) RefClass {
 	return RefClass{rtype}
 }
 
@@ -41,7 +41,7 @@ func (c RefClass) String() string {
 func (c RefClass) GetParent() (ret rt.Class, okay bool) {
 	if path, ok := unique.PathOf(c.Type, "parent"); ok {
 		field := c.Type.FieldByIndex(path)
-		ret, okay = makeClass(field.Type), true
+		ret, okay = MakeClass(field.Type), true
 	}
 	return
 }

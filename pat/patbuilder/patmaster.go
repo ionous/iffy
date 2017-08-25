@@ -35,7 +35,7 @@ func (pm Pm) Build(buildPatterns ...func(c *ops.Builder)) (ret *Patterns, err er
 
 		if c, ok := pm.cmds.NewBuilder(&root); !ok {
 			err = errutil.New("why does this return okay anyway?")
-		} else if c.Param("patterns").Cmds().Begin() {
+		} else if c.Param("mandates").Cmds().Begin() {
 			for _, b := range buildPatterns {
 				b(c)
 			}

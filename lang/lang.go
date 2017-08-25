@@ -36,20 +36,43 @@ func StripArticle(str string) string {
 }
 
 //
-var Singularize = inflect.Singularize
+func Singularize(s string) (ret string) {
+	if len(s) > 0 {
+		ret = inflect.Singularize(s)
+	}
+	return
+}
 
 //
-var Pluralize = inflect.Pluralize
+func Pluralize(s string) (ret string) {
+	if len(s) > 0 {
+		ret = inflect.Pluralize(s)
+	}
+	return
+}
 
 // Capitalize returns a new string, starting the first word with a capital.
-var Capitalize = inflect.Capitalize
+func Capitalize(s string) (ret string) {
+	if len(s) > 0 {
+		ret = inflect.Capitalize(s)
+	}
+	return
+}
 
-// Titleize returns a new string, starting every word with a capital.
-var Titlecase = inflect.Titleize
+// Titlecase returns a new string, starting every word with a capital.
+func Titlecase(s string) (ret string) {
+	if len(s) > 0 {
+		ret = inflect.Titleize(s)
+	}
+	return
+}
 
-func Lowerspace(s string) string {
-	res := inflect.Humanize(s)
-	return Lowercase(res)
+func Lowerspace(s string) (ret string) {
+	if len(s) > 0 {
+		res := inflect.Humanize(s)
+		ret = Lowercase(res)
+	}
+	return
 }
 
 func Lowercase(s string) string {

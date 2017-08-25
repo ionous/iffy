@@ -34,7 +34,7 @@ func (cb *ClassBuilder) RegisterClass(rtype r.Type) (ret RefClass, err error) {
 		}
 	} else {
 		// make a new class:
-		cls := makeClass(rtype)
+		cls := MakeClass(rtype)
 		cb.ClassMap[clsid] = cls
 
 		// parse the properties, including parents....

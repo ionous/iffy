@@ -40,7 +40,7 @@ func (n RefObject) GetClass() rt.Class {
 }
 
 func (n RefObject) getClass() RefClass {
-	return makeClass(n.rval.Type())
+	return MakeClass(n.rval.Type())
 }
 
 // GetValue stores the value into the pointer pv.

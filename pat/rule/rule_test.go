@@ -47,9 +47,7 @@ func (assert *PatternSuite) TestFactorial() {
 		(*Factorial)(nil))
 	assert.Contains(classes.ClassMap, id.MakeId("Factorial"), "adding to patterns should add to classes")
 
-	var root struct {
-		rule.Mandates
-	}
+	var root struct{ rule.Mandates }
 	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmds().Begin() {
 			if c.Cmd("number rule", "factorial").Begin() {
@@ -75,7 +73,7 @@ func (assert *PatternSuite) TestFactorial() {
 		//
 		test := assert.T()
 		if e := c.Build(); assert.NoError(e) {
-			if els := root.Els; assert.Len(els, 2) {
+			if els := root.Mandates; assert.Len(els, 2) {
 				// test.Log(pretty.Sprint(els))
 				if e := els.Mandate(patterns); e != nil {
 					test.Fatal(e)

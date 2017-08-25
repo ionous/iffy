@@ -68,7 +68,7 @@ func coerceValue(dst, src r.Value) (err error) {
 	if !dst.CanSet() {
 		err = errutil.New("destination not settable")
 	} else if !src.Type().ConvertibleTo(dst.Type()) {
-		err = errutil.New("incompatible types", dst.Type(), src.Type())
+		err = errutil.New("src", src.Type(), "not compatible with dst", dst.Type())
 	} else {
 		v := src.Convert(dst.Type())
 		dst.Set(v)

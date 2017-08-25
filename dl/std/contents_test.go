@@ -92,7 +92,7 @@ func TestContents(t *testing.T) {
 						} else if c, ok := objs.GetObject(l.Child); !ok {
 							err = errutil.New("unknown", l.Child)
 							break
-						} else if e := pc.SetLocation(p, c, l.Relative); e != nil {
+						} else if e := pc.SetLocation(p, c, l.Locale.Locale()); e != nil {
 							err = e
 							break
 						}
@@ -128,7 +128,7 @@ func TestContents(t *testing.T) {
 	t.Run("contains", func(t *testing.T) {
 		assert := testify.New(t)
 		e := test(t, func(c *ops.Builder) {
-			c.Cmd("Location", "box", locate.Contains, "cake")
+			c.Cmd("Location", "box", c.Cmd("contains"), "cake")
 		}, func(c *ops.Builder) {
 			//
 		}, func(run rt.Runtime, lines []string) (okay bool) {
@@ -145,9 +145,9 @@ func TestContents(t *testing.T) {
 	emptyBox := func(c *ops.Builder) {
 	}
 	boxContents := func(c *ops.Builder) {
-		c.Cmd("Location", "box", locate.Contains, "cake")
-		c.Cmd("Location", "box", locate.Contains, "apple")
-		c.Cmd("Location", "box", locate.Contains, "pen")
+		c.Cmd("Location", "box", c.Cmd("contains"), "cake")
+		c.Cmd("Location", "box", c.Cmd("contains"), "apple")
+		c.Cmd("Location", "box", c.Cmd("contains"), "pen")
 	}
 	printContent := func(c *ops.Builder) {
 		c.Cmd("determine", c.Cmd("print content", "box", c.Param("tersely").Val(true)))

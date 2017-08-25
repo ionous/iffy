@@ -54,20 +54,26 @@ func TestSomething(t *testing.T) {
 		&Kind{"Coffin"},
 		&Kind{"Skeleton Key"})
 
-	dataClasses := ref.NewClassStack(objectClasses)
+	dataClasses := ref.NewClassStack(classes)
 	unique.RegisterTypes(dataClasses,
 		(*Jumping)(nil),
 		(*Kissing)(nil),
-		(*Kissing)(nil),
+		(*Unlocking)(nil),
 	)
 
 	// this isnt parser
 	actions := make(evtbuilder.Actions)
-	if kind, ok := classes.GetClass("kind"); assert.True(ok) {
-		actions.Add("jump", kind, (*Jumping)(nil))
-		actions.Add("kiss", kind, (*Kissing)(nil))
-		actions.Add("unlock", kind, (*Unlocking)(nil))
-	}
+	kind, ok := classes.GetClass("kind")
+	assert.True(ok)
+
+	jumping, _ := dataClasses.GetClass("jumping")
+	actions.Add("jump", kind, jumping)
+
+	kissing, _ := dataClasses.GetClass("kissing")
+	actions.Add("kiss", kind, kissing)
+
+	unlocking, _ := dataClasses.GetClass("unlocking")
+	actions.Add("unlock", kind, unlocking)
 
 	// default action:
 	if jumped, e := cmds.Execute(func(c *ops.Builder) {
@@ -91,14 +97,15 @@ func TestSomething(t *testing.T) {
 	var lines printer.Lines
 	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
 
-	listen := evtbuilder.NewListeners(actions, run.Objects, classes)
+	listen := evtbuilder.NewListeners(actions)
 	// object listener:
 	if jump, e := cmds.Execute(func(c *ops.Builder) {
 		c.Cmd("print text", "bogart jumped!")
 	}); e != nil {
 		t.Fatal(e)
 	} else {
-		listen.Object("bogart").On("jump", event.Default, jump)
+		bogart, _ := run.GetObject("bogart")
+		listen.Object(bogart).On("jump", event.Default, jump)
 	}
 
 	if kiss, e := cmds.Execute(func(c *ops.Builder) {
@@ -106,7 +113,7 @@ func TestSomething(t *testing.T) {
 	}); e != nil {
 		t.Fatal(e)
 	} else {
-		listen.Class("kind").On("kiss", event.Default, kiss)
+		listen.Class(kind).On("kiss", event.Default, kiss)
 	}
 
 	dispatch := event.NewDispatch(listen.EventMap)
@@ -115,7 +122,7 @@ func TestSomething(t *testing.T) {
 	Go := func(object, action string) {
 		if obj, ok := run.GetObject(object); !ok {
 			t.Fatal("object not found", object)
-		} else if act, ok := actions.ActionMap[id.MakeId(action)]; !ok {
+		} else if act, ok := actions[id.MakeId(action)]; !ok {
 			t.Fatal("unknown action", action)
 		} else {
 			var data rt.Object
