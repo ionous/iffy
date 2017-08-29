@@ -17,9 +17,12 @@ import (
 
 func TestShadows(t *testing.T) {
 	assert := testify.New(t)
-	ops := ops.NewOps()
+	classes := make(unique.Types)
+	ops := ops.NewOps(classes)
+
 	unique.RegisterBlocks(unique.PanicTypes(ops),
 		(*core.Commands)(nil))
+
 	unique.RegisterTypes(unique.PanicTypes(ops.ShadowTypes),
 		(*BaseClass)(nil))
 	//
@@ -47,18 +50,15 @@ func TestShadows(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-	// FIX: combine as needed with ShadowTypes
-	classes := ref.NewClasses()
-	unique.RegisterTypes(unique.PanicTypes(classes),
-		(*BaseClass)(nil))
 
-	objects := ref.NewObjects(classes)
+	objects := ref.NewObjects()
 	base, other := &BaseClass{Name: "base"}, &BaseClass{Name: "other"}
 	unique.RegisterValues(unique.PanicValues(objects),
 		base, other,
 	)
 	var lines printer.Lines
 	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
+	// "shadow class tests.BaseClass couldn't create object"
 	if obj, e := root.Object.GetObject(run); assert.NoError(e) {
 		vals := map[string]struct{ match, fail interface{} }{
 			"Num":     {3, 5},

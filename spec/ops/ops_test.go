@@ -44,7 +44,7 @@ var testData = &Container{
 // 1. test unknown commands
 // 2. mismatched element types
 func TestOps(t *testing.T) {
-	cmds := NewOps()
+	cmds := NewOps(nil)
 	unique.RegisterTypes(unique.PanicTypes(cmds),
 		(*Container)(nil), (*Contents)(nil))
 	t.Run("KeyValue", func(t *testing.T) {
@@ -89,7 +89,7 @@ type CommandBlock struct {
 // TestOpsBlock ensures blocks of commands register succesfully.
 func TestOpsBlock(t *testing.T) {
 	assert := assert.New(t)
-	cmds := NewOps()
+	cmds := NewOps(nil)
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*CommandBlock)(nil))
 	assert.Contains(cmds.Types, id.MakeId("Container"))

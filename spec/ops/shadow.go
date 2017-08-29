@@ -2,14 +2,25 @@ package ops
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
-// ShadowClass implements a command for constructing pod-like types.
+// ShadowClass provides a factory for constructing pod-like types.
+// Each field in the target is assigned an eval capable of filling that field.
+// ShadowClass then implements GetObject to which evalutes the fields and constructs the object.
 type ShadowClass struct {
-	rtype r.Type
-	slots map[string]_ShadowSlot
+	rtype  r.Type
+	fields []FieldIndex
+	slots  map[string]_ShadowSlot
+}
+
+func Shadow(rtype r.Type) *ShadowClass {
+	var fields []FieldIndex
+	flatten(rtype, nil, &fields)
+	return &ShadowClass{rtype, fields, make(map[string]_ShadowSlot)}
 }
 
 // note: nothing in the slot itself guarantees that the type and value are compatible.
@@ -22,7 +33,7 @@ type _ShadowSlot struct {
 // GetObject for a shadow type generates an object from the slots specified.
 // It is a constructor.
 func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {
-	if obj, e := run.NewObject(c.rtype.Name()); e != nil {
+	if obj, e := run.Emplace(r.New(c.rtype).Interface()); e != nil {
 		err = errutil.New("shadow class", c.rtype, "couldn't create object")
 	} else {
 		// walk all the fields we recorded and pass them to the new object
@@ -62,10 +73,30 @@ func (c *ShadowClass) Type() r.Type {
 // The spec will provide some type-safety on assignment to this value.
 // FIX? one thing this cant handle is setting a state via an enumerated value.
 // ex. TriState ( yes, no, maybe ) cmd.Param("yes").Value("true")
-func (c *ShadowClass) Field(index int) (ret r.Value) {
-	field := c.rtype.Field(index)
+func (c *ShadowClass) Field(n int) (ret r.Value) {
+	if n < len(c.fields) {
+		ret = c.FieldByIndex(c.fields[n])
+	}
+	return
+}
+
+func (c *ShadowClass) FieldByName(n string) (ret r.Value) {
+	k := id.MakeId(n)
+	unique.WalkProperties(c.rtype, func(f *r.StructField, idx []int) (done bool) {
+		if k == id.MakeId(f.Name) {
+			ret, done = c.FieldByIndex(idx), true
+		}
+		return
+	})
+	return
+}
+
+func (c *ShadowClass) FieldByIndex(n []int) (ret r.Value) {
+	field := c.rtype.FieldByIndex(n)
+	// determine what kind of eval can produce the passed type.
 	if rtype, ok := evalFromType(field.Type); ok {
-		rvalue := r.New(rtype).Elem() // create an empty eval for the user to poke into
+		// create an empty eval for the user to poke into
+		rvalue := r.New(rtype).Elem()
 		c.slots[field.Name] = _ShadowSlot{rtype, rvalue}
 		ret = rvalue
 	}

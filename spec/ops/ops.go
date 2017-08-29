@@ -3,7 +3,6 @@ package ops
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core" // for literals/literally.
-	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -14,11 +13,11 @@ import (
 
 type Ops struct {
 	unique.Types
-	ShadowTypes unique.Types
+	ShadowTypes *unique.Stack
 }
 
-func NewOps() *Ops {
-	return &Ops{make(unique.Types), make(unique.Types)}
+func NewOps(classes unique.TypeRegistry) *Ops {
+	return &Ops{make(unique.Types), unique.NewStack(classes)}
 }
 
 type Builder struct {
@@ -27,8 +26,7 @@ type Builder struct {
 
 // NewBuilder starts creating a call tree.
 func (ops *Ops) NewBuilder(root interface{}) (*Builder, bool) {
-	target := r.ValueOf(root).Elem()
-	spec := &_Spec{cmds: ops, target: target}
+	spec := &_Spec{cmds: ops, target: InPlace(root)}
 	return &Builder{
 		builder.NewBuilder(&_Factory{ops}, spec),
 	}, true
@@ -45,28 +43,17 @@ type _Factory struct {
 	cmds *Ops
 }
 
-// _Target handles the differences between command structs and constructors.
-// Commands are implemented by reflect.Value, and _Target is compatible with reflect's interface.
-// FIX? support aggregate ops by using unique.Fields(), FieldByIndex()
-type _Target interface {
-	Type() r.Type
-	Field(int) r.Value // Field returns the value of the requsted field. To maintain compatibility with reflect.Value: on error, Field returns an invalid Value.
-	Addr() r.Value
-}
-
 // NewSpec implements spec.SpecFactory.
 func (fac *_Factory) NewSpec(name string) (ret spec.Spec, err error) {
 	if rtype, ok := fac.cmds.FindType(name); ok {
-		target := r.New(rtype).Elem()
 		ret = &_Spec{
 			cmds:   fac.cmds,
-			target: target,
+			target: NewTarget(rtype),
 		}
 	} else if rtype, ok := fac.cmds.ShadowTypes.FindType(name); ok {
-		shadow := &ShadowClass{rtype, make(map[string]_ShadowSlot)}
 		ret = &_Spec{
 			cmds:   fac.cmds,
-			target: shadow,
+			target: Shadow(rtype),
 		}
 	} else {
 		err = errutil.New("unknown command", name)
@@ -83,7 +70,7 @@ func (fac *_Factory) NewSpecs() (spec.Specs, error) {
 
 type _Spec struct {
 	cmds   *Ops
-	target _Target // output object we are building
+	target Target // output object we are building
 	index  int
 }
 
@@ -108,21 +95,11 @@ func (spec *_Spec) Position(arg interface{}) (err error) {
 }
 
 func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
-	myid := id.MakeId(key)
-	tgt := spec.target
-	tgtType := tgt.Type()
-	// FIX: maybe via unique.Fields() -- almost like a rt.Class? -- build a cache of id->field index. searching every assign is annoying.
-	for i, cnt := spec.index, tgtType.NumField(); i < cnt; i++ {
-		fieldInfo := tgtType.Field(i)
-		if myid == id.MakeId(fieldInfo.Name) {
-			field := tgt.Field(i)
-			if !field.IsValid() {
-				err = errutil.New("couldnt get value for", tgtType, fieldInfo.Name)
-			} else if e := setField(field, arg); e != nil {
-				err = errutil.New("field", key, e)
-			}
-			break
-		}
+	field := spec.target.FieldByName(key)
+	if !field.IsValid() {
+		err = errutil.Fmt("couldnt get value for '%v'", key)
+	} else if e := setField(field, arg); e != nil {
+		err = errutil.New("field", key, e)
 	}
 	return
 }
