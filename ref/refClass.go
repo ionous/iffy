@@ -1,10 +1,7 @@
 package ref
 
 import (
-	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/lang"
-	"github.com/ionous/iffy/ref/enum"
-	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
@@ -12,6 +9,7 @@ import (
 // note: for speed of some of these operations, we could cache the results in a pointer to a struct pooled in a map of rtype->RefClass.
 // equality would work because the pointers are the same,
 // just as equaity works by aliasing r.Type directly.
+// note: r.Type is an interface, and go doesn't allow you to define methods for an interface type, even if you type define it as something else. ( which, frankly is just odd. you can add methods to typed primitives for goodness sake. why would typed interfaces be any different? they shouldn't be. )
 type RefClass struct {
 	r.Type
 }
@@ -22,83 +20,22 @@ func MakeClass(rtype r.Type) RefClass {
 
 // GetId returns the unique identifier for this classes.
 func (c RefClass) GetId() string {
-	name := c.Type.Name()
-	return id.MakeId(name)
+	return class.Id(c.Type)
 }
 
 // GetName returns a friendly name: spaces, no caps.
 func (c RefClass) GetName() string {
-	name := c.Type.Name()
-	return lang.Lowerspace(name)
-}
-
-// String implements fmt.Stringer
-func (c RefClass) String() string {
-	return c.Type.String()
+	return class.FriendlyName(c.Type)
 }
 
 // GetParentType returns false for classes if no parent;
 func (c RefClass) GetParent() (ret rt.Class, okay bool) {
-	if path, ok := unique.PathOf(c.Type, "parent"); ok {
-		field := c.Type.FieldByIndex(path)
-		ret, okay = MakeClass(field.Type), true
+	if cls, ok := class.Parent(c.Type); ok {
+		ret, okay = MakeClass(cls), true
 	}
 	return
 }
 
 func (c RefClass) IsCompatible(name string) (okay bool) {
-	if idn := id.MakeId(name); c.GetId() == idn {
-		okay = true
-	} else {
-		var c rt.Class = c
-		for i := 0; i < 250; i++ {
-			if p, ok := c.GetParent(); !ok {
-				break
-			} else if p.GetId() == idn {
-				okay = true
-				break
-			} else {
-				c = p
-			}
-		}
-	}
-	return
-}
-
-func (c RefClass) getProperty(pid string) (ret []int) {
-	fn := func(f *r.StructField, path []int) (done bool) {
-		if id.MakeId(f.Name) == pid {
-			ret, done = path, true
-		}
-		return
-	}
-	unique.WalkProperties(c.Type, fn)
-	return
-}
-
-// when we dont know if pid is a boolean property or a choice.
-// ex. struct { Openable bool } or struct { Openable }
-func (c RefClass) getAmbigiousProperty(idt string) (ret []int, idx int) {
-	fn := func(f *r.StructField, path []int) (done bool) {
-		if id.MakeId(f.Name) == idt {
-			ret, idx, done = path, -1, true
-		} else if choices := enum.Enumerate(f.Type); len(choices) > 0 {
-			if c, ok := choiceToIndex(idt, choices); ok {
-				ret, idx, done = path, c, true
-			}
-		}
-		return
-	}
-	unique.WalkProperties(c.Type, fn)
-	return
-}
-
-func choiceToIndex(cid string, cs []string) (ret int, okay bool) {
-	for i, q := range cs {
-		if id.MakeId(q) == cid {
-			ret, okay = i, true
-			break
-		}
-	}
-	return
+	return class.IsCompatible(c.Type, name)
 }

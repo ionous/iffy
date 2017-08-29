@@ -3,6 +3,7 @@ package ref
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/ref/enum"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -14,7 +15,7 @@ type RefObject struct {
 	objects *Objects
 }
 
-// Value is primarily for testing
+// Value exposed for testing
 func (n RefObject) Value() r.Value {
 	return n.rval
 }
@@ -36,10 +37,6 @@ func (n RefObject) String() string {
 
 // GetClass returns the variety of object.
 func (n RefObject) GetClass() rt.Class {
-	return n.getClass()
-}
-
-func (n RefObject) getClass() RefClass {
 	return MakeClass(n.rval.Type())
 }
 
@@ -56,11 +53,11 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 	if pdst := r.ValueOf(pv); pdst.Kind() != r.Ptr {
 		err = errutil.New("get expected a pointer outvalue")
 	} else {
-		cls := n.getClass()
 		pid, dst := id.MakeId(name), pdst.Elem()
+		rtype := n.rval.Type()
 		// a bool is an indicator of state lookup
 		if dst.Kind() == r.Bool {
-			if path, idx := cls.getAmbigiousProperty(pid); len(path) == 0 {
+			if path, idx := enum.PropertyPath(rtype, pid); len(path) == 0 {
 				err = errutil.New("get choice not found")
 			} else {
 				field := n.rval.FieldByIndex(path)
@@ -73,7 +70,7 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 				}
 			}
 		} else {
-			if path := cls.getProperty(pid); len(path) == 0 {
+			if path := class.PropertyPath(rtype, pid); len(path) == 0 {
 				err = errutil.New("get property not found")
 			} else {
 				field := n.rval.FieldByIndex(path)
@@ -98,8 +95,8 @@ func (n RefObject) setValue(pid string, v interface{}) (err error) {
 	if val, ok := v.(bool); ok {
 		err = n.setBool(pid, val)
 	} else {
-		cls := n.getClass()
-		if path := cls.getProperty(pid); len(path) == 0 {
+		rtype := n.rval.Type()
+		if path := class.PropertyPath(rtype, pid); len(path) == 0 {
 			err = errutil.New("set property not found", n)
 		} else {
 			field := n.rval.FieldByIndex(path)
@@ -112,7 +109,7 @@ func (n RefObject) setValue(pid string, v interface{}) (err error) {
 					err = errutil.New("not an enumerated field", pid)
 				} else {
 					choice := id.MakeId(src.String())
-					if i, ok := choiceToIndex(choice, choices); !ok {
+					if i, ok := enum.ChoiceToIndex(choice, choices); !ok {
 						err = errutil.New("set unknown choice", choice, choices)
 					} else {
 						err = coerceValue(field, r.ValueOf(i))
@@ -125,8 +122,8 @@ func (n RefObject) setValue(pid string, v interface{}) (err error) {
 }
 
 func (n RefObject) setBool(pid string, val bool) (err error) {
-	cls := n.getClass()
-	if path, idx := cls.getAmbigiousProperty(pid); len(path) == 0 {
+	rtype := n.rval.Type()
+	if path, idx := enum.PropertyPath(rtype, pid); len(path) == 0 {
 		err = errutil.New("set choice not found", pid)
 	} else {
 		field := n.rval.FieldByIndex(path)
