@@ -33,6 +33,14 @@ func TestClass(t *testing.T) {
 	assert.Equal("$derivedClass", Id(derivedClass))
 	assert.Equal("derived class", FriendlyName(derivedClass))
 
+	if p, ok := Parent(baseClass); assert.False(ok) {
+		assert.Nil(p)
+	}
+
+	if p, ok := Parent(derivedClass); assert.True(ok) {
+		assert.Equal(baseClass, p)
+	}
+
 	assert.True(IsCompatible(baseClass, "base class"))
 	assert.False(IsCompatible(baseClass, "derived class"))
 

@@ -40,24 +40,12 @@ func (assert *ObjectSuite) SetupTest() {
 	assert.objects = objects.Build()
 }
 
-func (assert *ObjectSuite) TestDerivation() {
+func (assert *ObjectSuite) TestRegistration() {
 	if n, ok := assert.objects.GetObject("first"); assert.True(ok) {
 		assert.Equal("$first", n.GetId())
-		cls := n.GetClass()
-		assert.NotNil(cls)
-		assert.Equal("$baseClass", cls.GetId())
-		parent, ok := cls.GetParent()
-		assert.Nil(parent)
-		assert.False(ok)
 	}
 	if d, ok := assert.objects.GetObject("second"); assert.True(ok) {
 		assert.Equal("$second", d.GetId())
-		cls := d.GetClass()
-		assert.NotNil(cls)
-		assert.Equal("$derivedClass", cls.GetId())
-		if parent, ok := cls.GetParent(); assert.True(ok) {
-			assert.Equal("$baseClass", parent.GetId())
-		}
 	}
 }
 
