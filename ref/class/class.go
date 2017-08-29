@@ -31,7 +31,7 @@ func Parent(rtype r.Type) (ret r.Type, okay bool) {
 
 // IsCompatible tests whether the passed type can be used as the named class.
 // ie. is the named type a Parent() of the passed type?
-// FIX: this would be better as Type vs. Type, leaving the name -> Type lookup as part of the registry.
+// FIX? would this be better as Type vs. Type, leaving the name -> Type lookup as part of a registry.
 func IsCompatible(rtype r.Type, name string) (okay bool) {
 	if id := id.MakeId(name); Id(rtype) == id {
 		okay = true

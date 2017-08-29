@@ -111,7 +111,7 @@ func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
 	myid := id.MakeId(key)
 	tgt := spec.target
 	tgtType := tgt.Type()
-	// FIX: maybe via unique.Fields() -- almost like a RefClass? -- build a cache of id->field index. searching every assign is annoying.
+	// FIX: maybe via unique.Fields() -- almost like a rt.Class? -- build a cache of id->field index. searching every assign is annoying.
 	for i, cnt := spec.index, tgtType.NumField(); i < cnt; i++ {
 		fieldInfo := tgtType.Field(i)
 		if myid == id.MakeId(fieldInfo.Name) {

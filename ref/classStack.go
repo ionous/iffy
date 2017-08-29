@@ -7,8 +7,8 @@ import (
 )
 
 type Classes interface {
-	// FIX? the RefClass return is currently needed only for making property parents -- could it be rt.Class instead?
-	RegisterClass(r.Type) (RefClass, error)
+	// FIX? the rt.Class return is currently needed only for making property parents -- could it be rt.Class instead?
+	RegisterClass(r.Type) (rt.Class, error)
 
 	// GetClass compatible with Runtime
 	GetClass(string) (rt.Class, bool)
@@ -36,7 +36,7 @@ func (cs *ClassStack) RegisterType(rtype r.Type) (err error) {
 }
 
 // RegisterClass chains the call to the parent registry.
-func (cs *ClassStack) RegisterClass(rtype r.Type) (ret RefClass, err error) {
+func (cs *ClassStack) RegisterClass(rtype r.Type) (ret rt.Class, err error) {
 	if cls, e := cs.parent.RegisterClass(rtype); e != nil {
 		err = e
 	} else {

@@ -1,6 +1,7 @@
 package pat
 
 import (
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
 )
@@ -16,7 +17,7 @@ type ObjListMap map[string]ObjListPatterns
 type ExecuteMap map[string]ExecutePatterns
 
 func setupScope(run rt.Runtime, data rt.Object, cb func(id string)) {
-	id := data.GetClass().GetId()
+	id := class.Id(data.GetClass())
 	run.PushScope(scope.AtFinder(data))
 	cb(id)
 	run.PopScope()

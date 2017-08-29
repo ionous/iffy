@@ -1,5 +1,9 @@
 package rt
 
+import r "reflect"
+
+type Class r.Type
+
 // Object represents a tangible or intangible piece of the game world.
 type Object interface {
 	// GetId returns the unique identifier for this Object.

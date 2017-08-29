@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 	"strings"
 )
@@ -45,7 +46,7 @@ func (op *ClassName) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := op.Obj.GetObject(run); e != nil {
 		err = errutil.New("ClassName.Obj", e)
 	} else {
-		ret = obj.GetClass().GetName()
+		ret = class.FriendlyName(obj.GetClass())
 	}
 	return
 }

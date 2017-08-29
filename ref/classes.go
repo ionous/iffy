@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
@@ -22,19 +23,19 @@ func (cb *ClassBuilder) RegisterType(rtype r.Type) (err error) {
 	return
 }
 
-func (cb *ClassBuilder) RegisterClass(rtype r.Type) (ret RefClass, err error) {
+func (cb *ClassBuilder) RegisterClass(rtype r.Type) (ret rt.Class, err error) {
 	clsid := id.MakeId(rtype.Name())
 	// does the class already exist?
 	if cls, exists := cb.ClassMap[clsid]; exists {
 		// does the id and class match?
-		if cls.Type != rtype {
-			err = errutil.New("class name needs to be unique", cls.Type.Name(), clsid)
+		if cls != rtype {
+			err = errutil.New("class name needs to be unique", cls.Name(), clsid)
 		} else {
 			ret = cls
 		}
 	} else {
 		// make a new class:
-		cls := MakeClass(rtype)
+		cls := rtype
 		cb.ClassMap[clsid] = cls
 
 		// parse the properties, including parents....

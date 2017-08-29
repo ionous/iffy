@@ -1,2 +1,3 @@
-// note: for speed of some of these operations, we could cache the results in a pointer to a struct pooled in a map of rtype->RefClass.
+// Package class adds an inheritance mechanism for aggregated structs.
+// note: for speed's sake we could cache results in a hidden map.
 package class

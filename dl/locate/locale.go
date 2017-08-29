@@ -3,6 +3,7 @@ package locate
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/index"
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -27,9 +28,9 @@ func (l *Locale) SetLocation(p, c rt.Object, now Containment) (err error) {
 	}
 	if check, ok := types[now]; !ok {
 		err = errutil.New("relation not supported", now)
-	} else if !p.GetClass().IsCompatible(check.Parent) {
+	} else if !class.IsCompatible(p.GetClass(), check.Parent) {
 		err = errutil.New("expected parent", check.Parent)
-	} else if !c.GetClass().IsCompatible(check.Child) {
+	} else if !class.IsCompatible(c.GetClass(), check.Child) {
 		err = errutil.New("expected child", check.Child)
 	} else {
 		err = l.AddPair(p.GetId(), c.GetId(), func(old interface{}) (ret interface{}, err error) {

@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rt"
 	r "reflect"
 	"strconv"
 )
@@ -24,7 +25,7 @@ type classInfo struct {
 
 type queued struct {
 	rval r.Value
-	cls  RefClass
+	cls  rt.Class
 }
 type queue map[string]queued
 

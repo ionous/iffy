@@ -5,13 +5,14 @@ import (
 	"github.com/ionous/iffy/dl/core" // for AllTrue
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 	"sort"
 )
 
 type Patterns struct {
-	classes  ref.Classes
+	ref.Classes
 	patterns pat.Patterns
 }
 
@@ -49,15 +50,15 @@ func ExpandFilters(eval rt.BoolEval) (ret []rt.BoolEval) {
 // RegisterType creates a new pattern.
 // Compatible with unique.TypeRegistry
 func (b *Patterns) RegisterType(rtype r.Type) error {
-	_, e := b.classes.RegisterClass(rtype)
+	_, e := b.RegisterClass(rtype)
 	return e
 }
 
 func (b *Patterns) getPattern(name string) (ret string, err error) {
-	if cls, exists := b.classes.GetClass(name); !exists {
+	if cls, exists := b.GetClass(name); !exists {
 		err = errutil.New("unknown pattern", name)
 	} else {
-		ret = cls.GetId()
+		ret = class.Id(cls)
 	}
 	return
 }

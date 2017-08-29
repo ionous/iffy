@@ -37,7 +37,7 @@ func (n RefObject) String() string {
 
 // GetClass returns the variety of object.
 func (n RefObject) GetClass() rt.Class {
-	return MakeClass(n.rval.Type())
+	return n.rval.Type()
 }
 
 // GetValue stores the value into the pointer pv.

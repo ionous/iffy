@@ -21,13 +21,13 @@ func (or *Objects) NewObject(class string) (ret rt.Object, err error) {
 	if cls, ok := or.classes.GetClass(class); !ok {
 		err = errutil.New("no such class", class)
 	} else {
-		ret = or.newObject(cls.(RefClass))
+		ret = or.newObject(cls.(rt.Class))
 	}
 	return
 }
 
-func (or *Objects) newObject(cls RefClass) *RefObject {
-	rval := r.New(cls.Type).Elem()
+func (or *Objects) newObject(cls rt.Class) *RefObject {
+	rval := r.New(cls).Elem()
 	return &RefObject{rval, or}
 }
 
