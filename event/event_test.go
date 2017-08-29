@@ -101,14 +101,36 @@ func TestSomething(t *testing.T) {
 
 	listen := evtbuilder.NewListeners(eventClasses.ClassMap)
 	// object listener:
-	if jump, e := cmds.Execute(func(c *ops.Builder) {
-		c.Cmd("print text", "bogart's jumping!")
-	}); e != nil {
-		t.Fatal(e)
-	} else {
-		bogart, _ := run.GetObject("bogart")
-		e := listen.Object(bogart).On("jump", event.Default, jump)
-		assert.NoError(e)
+	bogart, _ := run.GetObject("bogart")
+	{
+		if jump, e := cmds.Execute(func(c *ops.Builder) {
+			c.Cmd("print text", "bogart's jumping!")
+		}); e != nil {
+			t.Fatal(e)
+		} else {
+			e := listen.Object(bogart).On("jump", event.Default, jump)
+			assert.NoError(e)
+		}
+	}
+	{
+		if jump, e := cmds.Execute(func(c *ops.Builder) {
+			c.Cmd("print text", "bogart's going to jump!")
+		}); e != nil {
+			t.Fatal(e)
+		} else {
+			e := listen.Object(bogart).On("jump", event.Capture, jump)
+			assert.NoError(e)
+		}
+	}
+	{
+		if jump, e := cmds.Execute(func(c *ops.Builder) {
+			c.Cmd("print text", "bogart's tired of jumping.")
+		}); e != nil {
+			t.Fatal(e)
+		} else {
+			e := listen.Object(bogart).On("jump", event.RunAfter, jump)
+			assert.NoError(e)
+		}
 	}
 
 	// kind, ok := classes.GetClass("kind")
@@ -143,8 +165,6 @@ func TestSomething(t *testing.T) {
 	// 			assert.NoError(e)
 	// 		}
 
-	bogart, _ := run.GetObject("bogart")
-
 	jump, e := run.Objects.Emplace(&Jump{
 		Jumper: bogart.(*ref.RefObject).Value.Addr().Interface().(*Kind),
 	})
@@ -157,11 +177,26 @@ func TestSomething(t *testing.T) {
 		assert.Len(at, 1)
 	}
 
-	// t.Log(pretty.Sprint(listen.EventMpap))
+	assert.NoError(event.Trigger(run, listen.EventMap, jump))
+	assert.Equal(sliceOf.String("bogart's going to jump!", "bogart's jumping!", "jumped!", "bogart's tired of jumping."), lines.Lines())
 
-	e = event.Trigger(run, listen.EventMap, jump)
-	assert.NoError(e)
-	assert.Equal(sliceOf.String("bogart's jumping!", "jumped!"), lines.Lines())
+	{
+		if jump, e := cmds.Execute(func(c *ops.Builder) {
+			c.Cmd("print text", "don't do it bogart!")
+			c.Cmd("set bool", "@", "stop immediate propagation", true)
+			c.Cmd("set bool", "@", "prevent default", true)
+		}); e != nil {
+			t.Fatal(e)
+		} else {
+			e := listen.Object(bogart).On("jump", event.Capture, jump)
+			assert.NoError(e)
+		}
+	}
+	lines = printer.Lines{}
+	run.Writer = &lines
+	//
+	assert.NoError(event.Trigger(run, listen.EventMap, jump))
+	assert.Equal(sliceOf.String("don't do it bogart!"), lines.Lines())
 
 	// Go("bogart", "kiss", func(c *ops.Builder) {
 	// 	c.Value("bob")

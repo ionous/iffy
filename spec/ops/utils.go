@@ -6,11 +6,14 @@ import (
 )
 
 func (ops *Ops) Execute(fn func(c *Builder)) (ret rt.Execute, err error) {
-	var root struct{ Eval rt.Execute }
+	var root struct{ Eval rt.ExecuteList }
 	if c, ok := ops.NewBuilder(&root); !ok {
 		err = errutil.New("unknown error")
 	} else {
-		fn(c)
+		if c.Cmds().Begin() {
+			fn(c)
+			c.End()
+		}
 		if e := c.Build(); e != nil {
 			err = e
 		} else {
