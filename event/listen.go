@@ -1,6 +1,7 @@
 package event
 
 import (
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -12,9 +13,10 @@ type EventListeners struct {
 	Classes, Objects PhaseMap
 }
 
+// id ( either class or object ) to list
 type PhaseMap map[string]PhaseList
 
-// PhaseList contains capture and bubble handlers.
+// PhaseList contains lists of capture and bubble handlers.
 type PhaseList [ListenerTypes][]Handler
 
 type Handler struct {
@@ -56,11 +58,11 @@ func (els EventListeners) CollectTargets(obj rt.Object, tgt []Target) []Target {
 	}
 	// check class listeners
 	for cls := obj.GetClass(); ; {
-		if ls, ok := els.Objects[cls.GetId()]; ok {
+		if ls, ok := els.Classes[class.Id(cls)]; ok {
 			tgt = append(tgt, Target{obj: obj, cls: cls, handlers: ls})
 		}
 		// move to parent class
-		if next, ok := cls.GetParent(); !ok {
+		if next, ok := class.Parent(cls); !ok {
 			break
 		} else {
 			cls = next

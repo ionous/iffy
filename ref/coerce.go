@@ -5,6 +5,7 @@ import (
 	r "reflect"
 )
 
+// we use the list of objects to convert into
 func (or *Objects) coerce(dst, src r.Value) (err error) {
 	switch dstType := dst.Type(); dstType.Kind() {
 	case r.Interface: // dst is probably rt.Object
@@ -34,7 +35,6 @@ func (or *Objects) coerce(dst, src r.Value) (err error) {
 			// dst is probably []primitive
 			err = coerceValue(dst, src)
 		}
-
 	default: // dst is probably primitive or []primitive
 		err = coerceValue(dst, src)
 	}

@@ -69,6 +69,7 @@ func (ac *Frame) dispatchPhase(listenerType ListenerType, fullPath [2][]Target, 
 			} else {
 				evt.Phase = BubblingPhase
 			}
+
 			// walk the list of list of parent or target handlers
 			for i, cnt := 0, len(path); i < cnt; i++ {
 				// allow forward or backward iteration
@@ -79,8 +80,8 @@ func (ac *Frame) dispatchPhase(listenerType ListenerType, fullPath [2][]Target, 
 					// allow forward or backward iteration through the phase
 					// FIX: shouldnt the order of handlers always be last registered first?
 					h := hs[order(i, cnt)]
-					// at target usually this only happens during the bubbles phase.
-					if atTarget == h.IsTargetOnly() {
+					// at target usually only happens during the bubbles phase.
+					if atTarget || !h.IsTargetOnly() {
 						if h.IsRunAfter() {
 							ac.queue = ac.queue.Add(tgt.obj, h.Exec)
 						} else {

@@ -13,6 +13,7 @@ type Objects struct {
 	ObjectMap
 	classes ClassMap
 }
+
 type ObjectMap map[string]*RefObject
 
 // NewObject from the passed class the object is anonymous and cant be found by id.
@@ -21,7 +22,7 @@ func (or *Objects) NewObject(class string) (ret rt.Object, err error) {
 	if cls, ok := or.classes.GetClass(class); !ok {
 		err = errutil.New("no such class", class)
 	} else {
-		ret = or.newObject(cls.(rt.Class))
+		ret = or.newObject(cls)
 	}
 	return
 }

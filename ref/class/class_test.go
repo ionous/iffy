@@ -6,24 +6,22 @@ import (
 	"testing"
 )
 
-// BaseClass provides a simple object with every common type.
-type BaseClass struct {
-	Name      string `if:"id"`
-	MyProp    string
-	Overriden string
-}
-
-// DerivedClass extends BaseClass, and "hides" the property called Overriden.
-type DerivedClass struct {
-	BaseClass `if:"parent"`
-	Overriden string
-}
-
-//
 func TestClass(t *testing.T) {
 	assert := testify.New(t)
 
-	//
+	// BaseClass provides a simple object with every common type.
+	type BaseClass struct {
+		Name      string `if:"id"`
+		MyProp    string
+		Overriden string
+	}
+
+	// DerivedClass extends BaseClass, and "hides" the property called Overriden.
+	type DerivedClass struct {
+		BaseClass `if:"parent"`
+		Overriden string
+	}
+
 	baseClass := r.TypeOf((*BaseClass)(nil)).Elem()
 	derivedClass := r.TypeOf((*DerivedClass)(nil)).Elem()
 

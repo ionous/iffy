@@ -11,7 +11,6 @@ type EventObject struct {
 	Bubbles    bool // r/o does this bubble
 	Cancelable bool // r/o can this event be canceled
 
-	Target        rt.Object  // originator of event
 	Phase         EventPhase // event flow phase
 	CurrentTarget rt.Object  // current object processing the event
 
