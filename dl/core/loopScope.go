@@ -13,8 +13,8 @@ type Looper struct {
 	loop rt.ExecuteList
 }
 
-func NewLooper(run rt.Runtime, cls string, loop rt.ExecuteList) (ret *Looper, err error) {
-	if temp, e := run.NewObject(cls); e != nil {
+func NewLooper(run rt.Runtime, temp interface{}, loop rt.ExecuteList) (ret *Looper, err error) {
+	if temp, e := run.Emplace(temp); e != nil {
 		err = e
 	} else {
 		run.PushScope(scope.MultiFinder(

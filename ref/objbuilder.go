@@ -11,9 +11,8 @@ import (
 
 // ObjBuilder with ids, findable by the game.
 type ObjBuilder struct {
-	queue   queue
-	classes ClassMap
-	info    infoMap
+	queue queue
+	info  infoMap
 }
 
 type infoMap map[r.Type]classInfo
@@ -29,12 +28,12 @@ type queued struct {
 }
 type queue map[string]queued
 
-func NewObjects(classes *ClassBuilder) *ObjBuilder {
-	return &ObjBuilder{make(queue), classes.ClassMap, make(infoMap)}
+func NewObjects() *ObjBuilder {
+	return &ObjBuilder{make(queue), make(infoMap)}
 }
 
 func (b *ObjBuilder) Build() *Objects {
-	objs := &Objects{make(ObjectMap), b.classes}
+	objs := &Objects{make(ObjectMap)}
 	for id, q := range b.queue {
 		objs.ObjectMap[id] = &RefObject{q.rval, objs}
 	}
@@ -48,10 +47,8 @@ func (b *ObjBuilder) RegisterValue(rval r.Value) (err error) {
 		err = e
 	} else if obj, ok := b.queue[id]; ok {
 		err = errutil.New("duplicate object", id, obj, rval)
-	} else if cls, e := b.classes.GetByType(rval.Type()); e != nil {
-		err = e
 	} else {
-		b.queue[id] = queued{rval, cls}
+		b.queue[id] = queued{rval, rval.Type()}
 	}
 	return
 }

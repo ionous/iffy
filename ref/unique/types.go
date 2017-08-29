@@ -19,10 +19,10 @@ func (reg Types) FindType(name string) (r.Type, bool) {
 // RegisterTypes implements TypeRegistry for a simple map.
 func (reg Types) RegisterType(rtype r.Type) (err error) {
 	id := id.MakeId(rtype.Name())
-	if was, exists := reg[id]; exists && was != rtype {
-		err = errutil.New("has conflicting names, id:", id, "was:", was, "type:", rtype)
-	} else {
+	if was, ok := reg[id]; !ok {
 		reg[id] = rtype
+	} else if was != rtype {
+		err = errutil.New("duplicate type", id, was, rtype)
 	}
 	return
 }

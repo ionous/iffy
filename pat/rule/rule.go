@@ -1,24 +1,12 @@
 package rule
 
 import (
-	"github.com/ionous/iffy/pat"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/ref/unique"
 )
 
-// Mandate defines an interface for creating runtime patterns.
+// Mandate defines an interface for creating rules.
 type Mandate interface {
-	Mandate(RuleFactory) error
-}
-
-type RuleFactory interface {
-	AddBool(string, rt.BoolEval, rt.BoolEval) error
-	AddNumber(string, rt.BoolEval, rt.NumberEval) error
-	AddText(string, rt.BoolEval, rt.TextEval) error
-	AddObject(string, rt.BoolEval, rt.ObjectEval) error
-	AddNumList(string, rt.BoolEval, rt.NumListEval) error
-	AddTextList(string, rt.BoolEval, rt.TextListEval) error
-	AddObjList(string, rt.BoolEval, rt.ObjListEval) error
-	AddExecList(string, rt.BoolEval, rt.Execute, pat.Flags) error
+	Mandate(unique.Types, Rules) error
 }
 
 type MandateCmds struct {
@@ -49,9 +37,9 @@ type Commands struct {
 
 type Mandates []Mandate
 
-func (p Mandates) Mandate(fac RuleFactory) (err error) {
+func (p Mandates) Mandate(pt unique.Types, fac Rules) (err error) {
 	for _, el := range p {
-		if e := el.Mandate(fac); e != nil {
+		if e := el.Mandate(pt, fac); e != nil {
 			err = e
 			break
 		}

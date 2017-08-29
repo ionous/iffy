@@ -2,6 +2,7 @@ package ref
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ref/unique"
 	r "reflect"
 )
 
@@ -154,4 +155,9 @@ Upcast:
 		break
 	}
 	return
+}
+
+func IsParentField(f *r.StructField) bool {
+	_, ok := unique.Tag(f.Tag).Find("parent")
+	return ok
 }

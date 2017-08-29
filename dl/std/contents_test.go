@@ -7,7 +7,8 @@ import (
 	"github.com/ionous/iffy/dl/locate"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/index"
-	"github.com/ionous/iffy/pat/patbuilder"
+	"github.com/ionous/iffy/pat/rule"
+
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -21,16 +22,21 @@ import (
 )
 
 func TestContents(t *testing.T) {
-	classes := ref.NewClasses()
+	classes := make(unique.Types)                 // all types known to iffy
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
+	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
+
 	unique.RegisterBlocks(unique.PanicTypes(classes),
 		(*core.Classes)(nil),
 		(*Classes)(nil))
 
-	objects := ref.NewObjects(classes)
+	unique.RegisterBlocks(unique.PanicTypes(patterns),
+		(*Patterns)(nil))
+
+	objects := ref.NewObjects()
 	unique.RegisterValues(unique.PanicValues(objects),
 		Thingaverse.objects(sliceOf.String("box", "cake", "apple", "pen"))...)
 
-	cmds := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		// (*core.Commands)(nil),
 		// (*rule.Commands)(nil),
@@ -41,8 +47,7 @@ func TestContents(t *testing.T) {
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-		(*Patterns)(nil)).Build(PrintNamePatterns, PrintObjectPatterns)
+	rules, e := rule.Master(cmds, patterns, PrintNameRules, PrintObjectRules)
 	assert.NoError(e)
 
 	type OpsCb func(c *ops.Builder)
@@ -113,7 +118,7 @@ func TestContents(t *testing.T) {
 					err = e
 				} else {
 					var lines printer.Lines
-					run := rtm.New(classes).Objects(objects).Patterns(patterns).Relations(relations).Writer(&lines).Rtm()
+					run := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm()
 					if e := root.Execute(run); e != nil {
 						err = e
 					} else if res := lines.Lines(); match(run, res) {

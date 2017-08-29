@@ -24,12 +24,12 @@ type ObjectSuite struct {
 
 func (assert *ObjectSuite) SetupTest() {
 	// reset the registries every time:
-	classes := ref.NewClasses()
+	classes := make(unique.Types)
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*BaseClass)(nil),
 		(*DerivedClass)(nil))
 
-	objects := ref.NewObjects(classes)
+	objects := ref.NewObjects()
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
 	first.Object = &second.BaseClass

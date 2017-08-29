@@ -1,9 +1,11 @@
 package rtm
 
 import (
+	"github.com/ionous/iffy/id"
 	"github.com/ionous/iffy/pat"
-	"github.com/ionous/iffy/pat/patbuilder"
+	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rt/scope"
@@ -11,7 +13,7 @@ import (
 )
 
 type Rtm struct {
-	ref.ClassMap
+	unique.Types
 	*ref.Objects
 	ref.Relations
 	ScopeStack
@@ -27,21 +29,29 @@ func (rtm *Rtm) GetPatterns() *pat.Patterns {
 	return &rtm.Patterns
 }
 
+// GetClass with the passed name.
+func (rtm *Rtm) GetClass(name string) (ret rt.Class, okay bool) {
+	id := id.MakeId(name)
+	if cls, ok := rtm.Types[id]; ok {
+		ret, okay = cls, ok
+	}
+	return
+}
+
 type Config struct {
-	classes   ref.ClassMap
+	classes   unique.Types
 	objects   *ref.ObjBuilder
 	rel       ref.RelationBuilder
 	ancestors rt.Ancestors
-	patterns  *patbuilder.Patterns
+	patterns  *pat.Patterns
 	seed      int64
 	writer    io.Writer
 }
 
 // New to initialize a runtime step-by-step.
 // It can be useful for testing to leave some portions of the runtime blank.
-// Classes are the only "required" element.
-func New(classes *ref.ClassBuilder) *Config {
-	return &Config{classes: classes.ClassMap}
+func New(classes unique.Types) *Config {
+	return &Config{classes: classes}
 }
 
 func (c *Config) Objects(o *ref.ObjBuilder) *Config {
@@ -64,8 +74,9 @@ func (c *Config) Randomize(seed int64) *Config {
 	return c
 }
 
-func (c *Config) Patterns(p *patbuilder.Patterns) *Config {
-	c.patterns = p
+func (c *Config) Rules(p rule.Rules) *Config {
+	p.Sort()
+	c.patterns = &p.Patterns
 	return c
 }
 
@@ -93,14 +104,14 @@ func (c *Config) Rtm() *Rtm {
 		w = &cw
 	}
 	rtm := &Rtm{
-		ClassMap:  c.classes,
+		Types:     c.classes,
 		Objects:   objects,
 		Relations: rel,
 		Ancestors: a,
 		Writer:    w,
 	}
 	if c.patterns != nil {
-		rtm.Patterns = c.patterns.Build()
+		rtm.Patterns = *c.patterns
 	}
 	//
 	seed := c.seed

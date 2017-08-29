@@ -4,7 +4,6 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/event/evtbuilder"
-	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
@@ -48,18 +47,24 @@ func TestSomething(t *testing.T) {
 		*Unlock
 	}
 
-	cmds := ops.NewOps()
+	classes := make(unique.Types)                 // all types known to iffy
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
+	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
+	events := unique.NewStack(patterns)           // all events become default action patterns
+
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil))
-
-	classes := ref.NewClasses()
-	objects := ref.NewObjects(classes)
 
 	unique.RegisterTypes(
 		unique.PanicTypes(classes),
 		(*Kind)(nil))
 
+	unique.RegisterBlocks(
+		unique.PanicTypes(events),
+		(*Events)(nil))
+
+	objects := ref.NewObjects()
 	unique.RegisterValues(
 		unique.PanicValues(objects),
 		&Kind{"Bogart"},
@@ -85,21 +90,16 @@ func TestSomething(t *testing.T) {
 			c.End()
 		}
 	}
-	pm := patbuilder.NewPatternMaster(cmds, classes, (*Events)(nil))
 
-	patterns, e := pm.Build(DefaultActions)
+	rules, e := rule.Master(cmds, patterns, DefaultActions)
 	assert.NoError(e)
-
-	// ugh. should use class stack -- but the order of creation for patterns and rules needs fixing.
-	eventClasses := ref.NewClasses()
-	unique.RegisterBlocks(eventClasses, (*Events)(nil))
 
 	// we do this the manual way first, and later with spec
 
 	var lines printer.Lines
-	run := rtm.New(classes).Objects(objects).Patterns(patterns).Writer(&lines).Rtm()
+	run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
 
-	listen := evtbuilder.NewListeners(eventClasses.ClassMap)
+	listen := evtbuilder.NewListeners(events.Types)
 	// object listener:
 	bogart, _ := run.GetObject("bogart")
 	{
@@ -132,9 +132,6 @@ func TestSomething(t *testing.T) {
 			assert.NoError(e)
 		}
 	}
-
-	// kind, ok := classes.GetClass("kind")
-	// assert.True(ok)
 
 	// if kiss, e := cmds.Execute(func(c *ops.Builder) {
 	// 	c.Cmd("print text", "kissed!")

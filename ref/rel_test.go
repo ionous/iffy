@@ -21,12 +21,12 @@ type Rock struct {
 // test a simple one to many relation
 func TestOneToMany(t *testing.T) {
 	assert := testify.New(t)
-	classes := NewClasses()
+	classes := make(unique.Types)
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Gremlin)(nil),
 		(*Rock)(nil))
 
-	objbuilder := NewObjects(classes)
+	objbuilder := NewObjects()
 	unique.RegisterValues(unique.PanicValues(objbuilder),
 		&Gremlin{Name: "claire"},
 		&Rock{Name: "loofa"},

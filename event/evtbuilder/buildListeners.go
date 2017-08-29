@@ -4,14 +4,14 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/class"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 )
 
 //
 type Listeners struct {
-	classes ref.ClassMap
+	eventTypes unique.Types
 	event.EventMap
 }
 
@@ -19,8 +19,8 @@ type ListenOn interface {
 	On(string, event.Options, rt.Execute) error
 }
 
-func NewListeners(classes ref.ClassMap) *Listeners {
-	return &Listeners{classes, make(event.EventMap)}
+func NewListeners(eventTypes unique.Types) *Listeners {
+	return &Listeners{eventTypes, make(event.EventMap)}
 }
 
 func (l *Listeners) Object(obj rt.Object) ListenOn {
@@ -47,7 +47,7 @@ type phaseOn struct {
 
 func (p phaseOn) On(name string, flags event.Options, exec rt.Execute) (err error) {
 	id := id.MakeId(name)
-	if _, ok := p.classes[id]; !ok {
+	if _, ok := p.eventTypes[id]; !ok {
 		err = errutil.New("unknown event", name)
 	} else {
 		var target string

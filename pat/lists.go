@@ -13,50 +13,50 @@ const (
 	Postfix
 )
 
-type BoolPattern struct {
+type BoolRule struct {
 	Filters Filters
 	rt.BoolEval
 }
-type NumberPattern struct {
+type NumberRule struct {
 	Filters Filters
 	rt.NumberEval
 }
-type TextPattern struct {
+type TextRule struct {
 	Filters Filters
 	rt.TextEval
 }
-type ObjectPattern struct {
+type ObjectRule struct {
 	Filters Filters
 	rt.ObjectEval
 }
-type NumListPattern struct {
+type NumListRule struct {
 	Filters Filters
 	rt.NumListEval
 }
-type TextListPattern struct {
+type TextListRule struct {
 	Filters Filters
 	rt.TextListEval
 }
-type ObjListPattern struct {
+type ObjListRule struct {
 	Filters Filters
 	rt.ObjListEval
 }
-type ExecutePattern struct {
+type ExecuteRule struct {
 	Filters Filters
 	rt.Execute
 	Flags
 }
 
-type BoolPatterns []BoolPattern
-type NumberPatterns []NumberPattern
-type TextPatterns []TextPattern
-type ObjectPatterns []ObjectPattern
-type NumListPatterns []NumListPattern
-type TextListPatterns []TextListPattern
-type ObjListPatterns []ObjListPattern
-type ExecutePatterns []ExecutePattern
+type BoolRules []BoolRule
+type NumberRules []NumberRule
+type TextRules []TextRule
+type ObjectRules []ObjectRule
+type NumListRules []NumListRule
+type TextListRules []TextListRule
+type ObjListRules []ObjListRule
+type ExecuteRules []ExecuteRule
 
-func (ps BoolPatterns) GetBool(run rt.Runtime) (ret bool, err error) {
+func (ps BoolRules) GetBool(run rt.Runtime) (ret bool, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
 		if matched, e := p.Filters.GetBool(run); e != nil {
@@ -69,7 +69,7 @@ func (ps BoolPatterns) GetBool(run rt.Runtime) (ret bool, err error) {
 	}
 	return
 }
-func (ps NumberPatterns) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (ps NumberRules) GetNumber(run rt.Runtime) (ret float64, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
 		if matched, e := p.Filters.GetBool(run); e != nil {
@@ -82,7 +82,7 @@ func (ps NumberPatterns) GetNumber(run rt.Runtime) (ret float64, err error) {
 	}
 	return
 }
-func (ps TextPatterns) GetText(run rt.Runtime) (ret string, err error) {
+func (ps TextRules) GetText(run rt.Runtime) (ret string, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
 		if matched, e := p.Filters.GetBool(run); e != nil {
@@ -95,7 +95,7 @@ func (ps TextPatterns) GetText(run rt.Runtime) (ret string, err error) {
 	}
 	return
 }
-func (ps ObjectPatterns) GetObject(run rt.Runtime) (ret rt.Object, err error) {
+func (ps ObjectRules) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
 		if matched, e := p.Filters.GetBool(run); e != nil {
@@ -109,7 +109,7 @@ func (ps ObjectPatterns) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	return
 }
 
-func (ps NumListPatterns) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
+func (ps NumListRules) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
 		if matched, e := p.Filters.GetBool(run); e != nil {
@@ -122,7 +122,7 @@ func (ps NumListPatterns) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, 
 	}
 	return
 }
-func (ps TextListPatterns) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
+func (ps TextListRules) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
 		if matched, e := p.Filters.GetBool(run); e != nil {
@@ -135,7 +135,7 @@ func (ps TextListPatterns) GetTextStream(run rt.Runtime) (ret rt.TextStream, err
 	}
 	return
 }
-func (ps ObjListPatterns) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
+func (ps ObjListRules) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
 		if matched, e := p.Filters.GetBool(run); e != nil {
@@ -149,7 +149,7 @@ func (ps ObjListPatterns) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, 
 	return
 }
 
-func (ps ExecutePatterns) Execute(run rt.Runtime) (ret bool, err error) {
+func (ps ExecuteRules) Execute(run rt.Runtime) (ret bool, err error) {
 	var post rt.ExecuteList // a stack
 	var matches int
 	for i, cnt := 0, len(ps); i < cnt; i++ {

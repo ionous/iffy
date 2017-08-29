@@ -1,9 +1,6 @@
 package define
 
 import (
-	// "github.com/ionous/iffy/dl/std"
-	// "github.com/ionous/iffy/pat/patbuilder"
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/spec/ops"
 )
@@ -26,17 +23,17 @@ func Register(cb func(c *ops.Builder)) {
 
 // Define implements Statement by using all Register(ed) definitions.
 func (r Registry) Define(f *Facts) (err error) {
-	classes := ref.NewClasses()
+	classes := make(unique.Types)
 	unique.RegisterBlocks(
 		unique.PanicTypes(classes),
 		(*Classes)(nil),
 	)
 
-	// objects := ref.NewObjects(classes)
+	// objects := ref.NewObjects()
 	// unique.RegisterValues(unique.PanicValues(objects),
 	// 	Thingaverse.objects(sliceOf.String("apple", "pen", "thing#1", "thing#2"))...)
 
-	cmds := ops.NewOps()
+	cmds := ops.NewOps(classes)
 	unique.RegisterBlocks(
 		unique.PanicTypes(cmds),
 		(*Commands)(nil),
@@ -46,11 +43,6 @@ func (r Registry) Define(f *Facts) (err error) {
 		unique.PanicTypes(cmds.ShadowTypes),
 		(*Patterns)(nil),
 	)
-
-	// if patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-	// 	(*Patterns)(nil)).Build(std.StdPatterns); e != nil {
-	// 	err = e
-	// } else {
 
 	var root struct{ Definitions }
 	if c, ok := cmds.NewBuilder(&root); ok {

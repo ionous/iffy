@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/dl/std/group"
-	"github.com/ionous/iffy/pat/patbuilder"
+
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
@@ -22,14 +22,14 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred, an empire apple, a pen, and two other things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			PrintNamePatterns)
+			PrintNameRules)
 	})
 	//
 	t.Run("default grouping", func(t *testing.T) {
 		groupTest(t, "Mildred, an empire apple, a pen, and two things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			PrintNamePatterns, group.GroupPatterns)
+			PrintNameRules, group.GroupRules)
 	})
 	//
 	several := func(c *ops.Builder) {
@@ -60,13 +60,13 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and an empire apple, a pen, and a few things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			PrintNamePatterns, group.GroupPatterns, several)
+			PrintNameRules, group.GroupRules, several)
 	})
 	t.Run("not several", func(t *testing.T) {
 		groupTest(t, "Mildred and an empire apple, a pen, and one other thing",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1"),
-			PrintNamePatterns, group.GroupPatterns, several)
+			PrintNameRules, group.GroupRules, several)
 	})
 	// Rule for grouping together utensils: say "the usual utensils".
 	replacement := func(c *ops.Builder) {
@@ -85,14 +85,14 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and some things",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			PrintNamePatterns, group.GroupPatterns, replacement)
+			PrintNameRules, group.GroupRules, replacement)
 	})
 	// verify: if there arent multiple things to group, then we shouldnt be grouping
 	t.Run("replacement none", func(t *testing.T) {
 		groupTest(t, "Mildred and an empire apple",
 			//
 			sliceOf.String("mildred", "apple"),
-			PrintNamePatterns, group.GroupPatterns, replacement)
+			PrintNameRules, group.GroupRules, replacement)
 	})
 	// Before listing contents: group Scrabble pieces together.
 	// Before grouping together Scrabble pieces, say "the tiles ".
@@ -123,13 +123,13 @@ func TestGrouping(t *testing.T) {
 			groupTest(t, "the tiles X, W, F, Y, and Z from a Scrabble set",
 				//
 				sliceOf.String("x", "w", "f", "y", "z"),
-				PrintNamePatterns, group.GroupPatterns, fancy)
+				PrintNameRules, group.GroupRules, fancy)
 		})
 		t.Run("more", func(t *testing.T) {
 			groupTest(t, "Mildred and the tiles X, W, F, Y, and Z from a Scrabble set",
 				//
 				sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-				PrintNamePatterns, group.GroupPatterns, fancy)
+				PrintNameRules, group.GroupRules, fancy)
 		})
 	})
 	// //group utensils together as "text".
@@ -137,7 +137,7 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and five scrabble tiles ( X, W, F, Y, and Z )",
 			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
 			//
-			PrintNamePatterns, group.GroupPatterns, func(c *ops.Builder) {
+			PrintNameRules, group.GroupRules, func(c *ops.Builder) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
 					if c.Param("decide").Cmds().Begin() {
@@ -153,7 +153,7 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and five scrabble tiles ( a X, a W, a F, a Y, and a Z )",
 			//
 			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-			PrintNamePatterns, group.GroupPatterns, func(c *ops.Builder) {
+			PrintNameRules, group.GroupRules, func(c *ops.Builder) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
 					if c.Param("decide").Cmds().Begin() {
@@ -180,13 +180,13 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and three things ( an empire apple, a pen, and one other thing )",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1"),
-			PrintNamePatterns, group.GroupPatterns, unnamedThings)
+			PrintNameRules, group.GroupRules, unnamedThings)
 	})
 	t.Run("edge two", func(t *testing.T) {
 		groupTest(t, "Mildred and four things ( an empire apple, a pen, and two other things )",
 			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
-			PrintNamePatterns, group.GroupPatterns, unnamedThings)
+			PrintNameRules, group.GroupRules, unnamedThings)
 	})
 }
 
@@ -200,30 +200,34 @@ func TestGrouping(t *testing.T) {
 func groupTest(t *testing.T, match string, names []string, patternSpec ...func(*ops.Builder)) {
 	assert := testify.New(t)
 
-	classes := ref.NewClasses()
+	classes := make(unique.Types)                 // all types known to iffy
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
+	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
+
 	unique.RegisterBlocks(unique.PanicTypes(classes),
 		(*Classes)(nil))
+
+	unique.RegisterBlocks(unique.PanicTypes(patterns),
+		(*Patterns)(nil))
+
 	// for testing:
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*ScrabbleTile)(nil))
 
-	objects := ref.NewObjects(classes)
+	objects := ref.NewObjects()
 	unique.RegisterValues(unique.PanicValues(objects),
 		Thingaverse.objects(names)...)
 
-	cmds := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil),
 		(*Commands)(nil),
 		(*rule.Commands)(nil),
 	)
-	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-		(*Patterns)(nil)).Build(
-		patternSpec...,
-	)
+	rules, e := rule.Master(cmds, patterns, patternSpec...)
+
 	if assert.NoError(e) {
 		var lines printer.Span
-		run := rtm.New(classes).Objects(objects).Patterns(patterns).Writer(&lines).Rtm()
+		run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
 
 		prn := &PrintNondescriptObjects{&core.Objects{names}}
 		if e := prn.Execute(run); assert.NoError(e) {

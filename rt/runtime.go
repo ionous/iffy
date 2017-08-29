@@ -43,9 +43,7 @@ type Runtime interface {
 	PushScope(ObjectFinder)
 	PopScope()
 
-	// NewObject from the passed class. The object is anonymous. It has no name and cannot be found via GetObject()
-	NewObject(class string) (Object, error)
-	// Emplace adds an anonymous object to the runtime. The object has no name and cannot be found via GetObject().
+	// Emplace adds an anonymous object to the runtime. The object cannot be found via GetObject().
 	Emplace(mem interface{}) (Object, error)
 	//
 	Ancestors

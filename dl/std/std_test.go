@@ -3,7 +3,7 @@ package std_test
 import (
 	"github.com/ionous/iffy/dl/core"
 	. "github.com/ionous/iffy/dl/std"
-	"github.com/ionous/iffy/pat/patbuilder"
+
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
@@ -17,15 +17,20 @@ import (
 )
 
 func TestStd(t *testing.T) {
-	classes := ref.NewClasses()
+	classes := make(unique.Types)                 // all types known to iffy
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
+	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
+
 	unique.RegisterBlocks(unique.PanicTypes(classes),
 		(*Classes)(nil))
 
-	objects := ref.NewObjects(classes)
+	unique.RegisterBlocks(unique.PanicTypes(patterns),
+		(*Patterns)(nil))
+
+	objects := ref.NewObjects()
 	unique.RegisterValues(unique.PanicValues(objects),
 		Thingaverse.objects(sliceOf.String("apple", "pen", "thing#1", "thing#2"))...)
 
-	cmds := ops.NewOps()
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil),
@@ -36,13 +41,12 @@ func TestStd(t *testing.T) {
 		assert := testify.New(t)
 
 		//
-		patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-			(*Patterns)(nil)).Build(PrintNamePatterns)
+		rules, e := rule.Master(cmds, patterns, PrintNameRules)
 		assert.NoError(e)
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".
 		// TODO: add test for: A novel is a kind of thing. Dr Zhivago and Persuasion are novels. Before printing the name of a novel, say "[italic type]". After printing the name of a novel, say "[roman type]".”
-		run := rtm.New(classes).Objects(objects).Patterns(patterns).Rtm()
+		run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
 		//
 		t.Run("printed name", func(t *testing.T) {
 			apple := Thingaverse["apple"].(*Thing)

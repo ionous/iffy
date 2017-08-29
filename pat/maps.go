@@ -7,14 +7,14 @@ import (
 )
 
 // FIX? consider rewriting using reflect so that all patterns are stored together and if the interface doesnt match the expectation it errors.
-type BoolMap map[string]BoolPatterns
-type NumberMap map[string]NumberPatterns
-type TextMap map[string]TextPatterns
-type ObjectMap map[string]ObjectPatterns
-type NumListMap map[string]NumListPatterns
-type TextListMap map[string]TextListPatterns
-type ObjListMap map[string]ObjListPatterns
-type ExecuteMap map[string]ExecutePatterns
+type Bools map[string]BoolRules
+type Numbers map[string]NumberRules
+type Text map[string]TextRules
+type Objects map[string]ObjectRules
+type NumLists map[string]NumListRules
+type TextLists map[string]TextListRules
+type ObjLists map[string]ObjListRules
+type Executes map[string]ExecuteRules
 
 func setupScope(run rt.Runtime, data rt.Object, cb func(id string)) {
 	id := class.Id(data.GetClass())
@@ -23,7 +23,32 @@ func setupScope(run rt.Runtime, data rt.Object, cb func(id string)) {
 	run.PopScope()
 }
 
-func (m BoolMap) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
+func (m Bools) AddRule(id string, f Filters, k rt.BoolEval) {
+	m[id] = append(m[id], BoolRule{f, k})
+}
+func (m Numbers) AddRule(id string, f Filters, k rt.NumberEval) {
+	m[id] = append(m[id], NumberRule{f, k})
+}
+func (m Text) AddRule(id string, f Filters, k rt.TextEval) {
+	m[id] = append(m[id], TextRule{f, k})
+}
+func (m Objects) AddRule(id string, f Filters, k rt.ObjectEval) {
+	m[id] = append(m[id], ObjectRule{f, k})
+}
+func (m NumLists) AddRule(id string, f Filters, k rt.NumListEval) {
+	m[id] = append(m[id], NumListRule{f, k})
+}
+func (m TextLists) AddRule(id string, f Filters, k rt.TextListEval) {
+	m[id] = append(m[id], TextListRule{f, k})
+}
+func (m ObjLists) AddRule(id string, f Filters, k rt.ObjListEval) {
+	m[id] = append(m[id], ObjListRule{f, k})
+}
+func (m Executes) AddRule(id string, f Filters, k rt.Execute, flags Flags) {
+	m[id] = append(m[id], ExecuteRule{f, k, flags})
+}
+
+func (m Bools) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id)
@@ -33,7 +58,7 @@ func (m BoolMap) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err 
 	})
 	return
 }
-func (m NumberMap) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, err error) {
+func (m Numbers) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id)
@@ -43,7 +68,7 @@ func (m NumberMap) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, 
 	})
 	return
 }
-func (m TextMap) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, err error) {
+func (m Text) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id)
@@ -54,7 +79,7 @@ func (m TextMap) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, er
 	return
 }
 
-func (m ObjectMap) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
+func (m Objects) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id)
@@ -64,7 +89,7 @@ func (m ObjectMap) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Obj
 	})
 	return
 }
-func (m NumListMap) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt.NumberStream, err error) {
+func (m NumLists) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt.NumberStream, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id)
@@ -75,7 +100,7 @@ func (m NumListMap) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 	return
 }
 
-func (m TextListMap) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret rt.TextStream, err error) {
+func (m TextLists) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret rt.TextStream, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id)
@@ -86,7 +111,7 @@ func (m TextListMap) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret 
 	return
 }
 
-func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt.ObjectStream, err error) {
+func (m ObjLists) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt.ObjectStream, err error) {
 	setupScope(run, data, func(id string) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id)
@@ -97,7 +122,7 @@ func (m ObjListMap) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 	return
 }
 
-func (m ExecuteMap) ExecuteMatching(run rt.Runtime, data rt.Object) (err error) {
+func (m Executes) ExecuteMatching(run rt.Runtime, data rt.Object) (err error) {
 	setupScope(run, data, func(id string) {
 		// NOTE: if we need to differentiate between "ran" and "not found",
 		// "didnt run" should become an error code.

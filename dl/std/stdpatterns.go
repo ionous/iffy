@@ -6,13 +6,13 @@ import (
 )
 
 // FIX: this has to go into the std library
-func StdPatterns(c *ops.Builder) {
-	PrintNamePatterns(c)
-	PrintObjectPatterns(c)
-	group.GroupPatterns(c)
+func StdRules(c *ops.Builder) {
+	PrintNameRules(c)
+	PrintObjectRules(c)
+	group.GroupRules(c)
 }
 
-func PrintNamePatterns(c *ops.Builder) {
+func PrintNameRules(c *ops.Builder) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "print name").Begin() {
 		if c.Param("decide").Cmds().Begin() {
@@ -96,7 +96,7 @@ func PrintNamePatterns(c *ops.Builder) {
 	}
 }
 
-func PrintObjectPatterns(c *ops.Builder) {
+func PrintObjectRules(c *ops.Builder) {
 	// print the name and summary if all else fails
 	if c.Cmd("run rule", "print object").Begin() {
 		if c.Param("decide").Cmds().Begin() {

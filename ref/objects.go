@@ -11,26 +11,9 @@ import (
 // Objects with ids, findable by the game.
 type Objects struct {
 	ObjectMap
-	classes ClassMap
 }
 
 type ObjectMap map[string]*RefObject
-
-// NewObject from the passed class the object is anonymous and cant be found by id.
-// Compatible with rt.Runtime.
-func (or *Objects) NewObject(class string) (ret rt.Object, err error) {
-	if cls, ok := or.classes.GetClass(class); !ok {
-		err = errutil.New("no such class", class)
-	} else {
-		ret = or.newObject(cls)
-	}
-	return
-}
-
-func (or *Objects) newObject(cls rt.Class) *RefObject {
-	rval := r.New(cls).Elem()
-	return &RefObject{rval, or}
-}
 
 // Emplace wraps the passed value as an anonymous object.
 // Compatible with rt.Runtime.

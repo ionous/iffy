@@ -54,7 +54,7 @@ type PrintGroup struct {
 	Objects        []rt.Object
 }
 
-func GroupPatterns(c *ops.Builder) {
+func GroupRules(c *ops.Builder) {
 	// all unnamed objects go into a group w/ text the plural of the class name.
 	if c.Cmd("run rule", "group together").Begin() {
 		c.Param("if").Cmd("includes", c.Cmd("get", c.Cmd("get", "@", "target"), "name"), "#")

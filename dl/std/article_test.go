@@ -3,7 +3,6 @@ package std
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
@@ -37,35 +36,33 @@ func (assert *ArticleSuite) Lines() (ret []string) {
 
 func (assert *ArticleSuite) SetupTest() {
 	errutil.Panic = false
-	//
-	cmds := ops.NewOps()
 
-	// FIX? i dont like that article suite depends on patterns
-	// can we provide a default print name somehow?
+	classes := make(unique.Types)                 // all types known to iffy
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
+	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
+
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*Commands)(nil),
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil),
 	)
-
-	classes := ref.NewClasses()
 	unique.RegisterTypes(unique.PanicTypes(classes),
 		(*Kind)(nil))
+	unique.RegisterBlocks(unique.PanicTypes(patterns),
+		(*Patterns)(nil))
 
-	objects := ref.NewObjects(classes)
+	objects := ref.NewObjects()
 	unique.RegisterValues(unique.PanicValues(objects),
 		&Kind{Name: "lamp-post"},
 		&Kind{Name: "soldiers", IndefiniteArticle: "some"},
 		&Kind{Name: "trevor", CommonProper: ProperNamed},
 	)
-	patterns, e := patbuilder.NewPatternMaster(cmds, classes,
-		(*Patterns)(nil)).Build(
-		PrintNamePatterns,
-	)
+
+	rules, e := rule.Master(cmds, patterns, PrintNameRules)
 	assert.NoError(e)
 
 	assert.cmds = cmds
-	assert.run = rtm.New(classes).Objects(objects).Writer(&assert.lines).Patterns(patterns).Rtm()
+	assert.run = rtm.New(classes).Objects(objects).Rules(rules).Writer(&assert.lines).Rtm()
 }
 
 func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {

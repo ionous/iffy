@@ -26,7 +26,7 @@ type CoreSuite struct {
 	run   rt.Runtime
 	lines printer.Lines
 
-	classes *ref.ClassBuilder
+	classes unique.Types
 	objects *ref.ObjBuilder
 
 	gen *unique.Objects
@@ -40,13 +40,14 @@ func (assert *CoreSuite) Lines() (ret []string) {
 
 func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
-	assert.cmds = ops.NewOps()
+	classes := make(unique.Types)
+	assert.cmds = ops.NewOps(classes)
 	unique.RegisterBlocks(unique.PanicTypes(assert.cmds),
 		(*core.Commands)(nil))
 
 	assert.gen = unique.NewObjectGenerator()
-	assert.classes = ref.NewClasses()
-	assert.objects = ref.NewObjects(assert.classes)
+	assert.classes = classes
+	assert.objects = ref.NewObjects()
 
 	unique.RegisterBlocks(unique.PanicTypes(assert.gen),
 		(*core.Counters)(nil))

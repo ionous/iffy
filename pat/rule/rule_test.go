@@ -3,13 +3,11 @@ package rule_test
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/id"
-	"github.com/ionous/iffy/pat/patbuilder"
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
-	// "github.com/kr/pretty"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -24,7 +22,7 @@ type PatternSuite struct {
 }
 
 func (assert *PatternSuite) SetupTest() {
-	cmds := ops.NewOps()
+	cmds := ops.NewOps(nil)
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*rule.Commands)(nil),
 		(*core.Commands)(nil))
@@ -41,11 +39,11 @@ type Factorial struct {
 }
 
 func (assert *PatternSuite) TestFactorial() {
-	classes := ref.NewClasses()
-	patterns := patbuilder.NewPatterns(classes)
+	classes := make(unique.Types)
+	patterns := unique.NewStack(classes)
 	unique.RegisterTypes(unique.PanicTypes(patterns),
 		(*Factorial)(nil))
-	assert.Contains(classes.ClassMap, id.MakeId("Factorial"), "adding to patterns should add to classes")
+	assert.Contains(classes, id.MakeId("Factorial"), "adding to patterns should add to classes")
 
 	var root struct{ rule.Mandates }
 	if c, ok := assert.cmds.NewBuilder(&root); ok {
@@ -72,19 +70,21 @@ func (assert *PatternSuite) TestFactorial() {
 		}
 		//
 		test := assert.T()
+		rules := rule.MakeRules()
+
 		if e := c.Build(); assert.NoError(e) {
 			if els := root.Mandates; assert.Len(els, 2) {
 				// test.Log(pretty.Sprint(els))
-				if e := els.Mandate(patterns); e != nil {
+				if e := els.Mandate(patterns.Types, rules); e != nil {
 					test.Fatal(e)
 				}
 			}
 		}
 		//
-		objects := ref.NewObjects(classes)
-		run := rtm.New(classes).Objects(objects).Patterns(patterns).Rtm()
+		objects := ref.NewObjects()
+		run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
 		peal := run.GetPatterns()
-		if numberPatterns := peal.NumberMap; assert.Len(numberPatterns, 1) {
+		if numberPatterns := peal.Numbers; assert.Len(numberPatterns, 1) {
 			if factPattern := numberPatterns[id.MakeId("factorial")]; assert.Len(factPattern, 2) {
 				//
 				if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
