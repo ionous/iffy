@@ -75,7 +75,7 @@ func printSeveral(run rt.Runtime, obj rt.Object, cnt int) (err error) {
 func kindOf(run rt.Runtime, obj rt.Object) (ret *Kind, err error) {
 	if src, ok := obj.(*ref.RefObject); !ok {
 		err = errutil.Fmt("unknown object %T", obj)
-	} else if e := ref.Upcast(src.Value().Addr(), func(ptr r.Value) (okay bool) {
+	} else if e := ref.Upcast(src.Addr(), func(ptr r.Value) (okay bool) {
 		ret, okay = ptr.Interface().(*Kind)
 		return
 	}); e != nil {

@@ -127,7 +127,7 @@ func copyObjects(dst, src r.Value) (err error) {
 // ( that's going to be especially true of names. )
 func copyPtr(src r.Value, set func(r.Value) bool) (err error) {
 	if obj, ok := src.Interface().(*RefObject); ok {
-		src := obj.rval.Addr()
+		src := obj.Addr()
 		err = Upcast(src, set)
 	} else if src.Kind() == r.Ptr {
 		err = Upcast(src, set)

@@ -13,7 +13,7 @@ type BaseClass struct {
 	Overriden string
 }
 
-// DerivedClass does nothing but extend BaseClass
+// DerivedClass extends BaseClass, and "hides" the property called Overriden.
 type DerivedClass struct {
 	BaseClass `if:"parent"`
 	Overriden string
