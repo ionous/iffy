@@ -37,9 +37,9 @@ type Commands struct {
 
 type Mandates []Mandate
 
-func (p Mandates) Mandate(pt unique.Types, fac Rules) (err error) {
+func (p Mandates) Mandate(patterns unique.Types, rules Rules) (err error) {
 	for _, el := range p {
-		if e := el.Mandate(pt, fac); e != nil {
+		if e := el.Mandate(patterns, rules); e != nil {
 			err = e
 			break
 		}
