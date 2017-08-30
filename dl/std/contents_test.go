@@ -4,7 +4,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/locate"
-	"github.com/ionous/iffy/dl/play"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/pat/rule"
@@ -20,7 +19,21 @@ import (
 	"testing"
 )
 
+type Locate interface {
+	Locate() Locate
+}
+type Location struct {
+	Parent string
+	Locale locate.Containment
+	Child  string
+}
+
+func (l Location) Locate() Locate {
+	return l
+}
+
 func TestContents(t *testing.T) {
+
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
@@ -37,11 +50,12 @@ func TestContents(t *testing.T) {
 		Thingaverse.objects(sliceOf.String("box", "cake", "apple", "pen"))...)
 
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
-		// (*core.Commands)(nil),
-		// (*rule.Commands)(nil),
-		// (*Commands)(nil),
-		// (*initial.Commands)(nil),
-		(*play.Commands)(nil),
+		(*core.Commands)(nil),
+		(*rule.Commands)(nil),
+		(*Commands)(nil),
+	)
+	unique.RegisterTypes(unique.PanicTypes(cmds),
+		(*Location)(nil),
 	)
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
@@ -56,8 +70,8 @@ func TestContents(t *testing.T) {
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
 		relations.AddTable("locale", pc.Table)
 
-		var src struct{ play.Definitions }
-		if c, ok := cmds.NewBuilder(&src); !ok {
+		var facts struct{ Locations []Locate }
+		if c, ok := cmds.NewBuilder(&facts); !ok {
 			err = errutil.New("no builder")
 		} else {
 			if c.Cmds().Begin() {
@@ -67,39 +81,20 @@ func TestContents(t *testing.T) {
 			if e := c.Build(); e != nil {
 				err = e
 			} else {
-				var facts play.Facts
-				if e := src.Define(&facts); e != nil {
-					err = e
-				} else {
-					objs := objects.Build()
-					// for _, v := range facts.Values {
-					// 	if obj, ok := objs.GetObject(v.Obj); !ok {
-					// 		t.Fatal("couldnt find", v.Obj)
-					// 		break
-					// 	} else if e := obj.SetValue(v.Prop, v.Val); e != nil {
-					// 		t.Fatal(e)
-					// 		break
-					// 	}
-					// }
-					// for _, r := range facts.Relations {
-					// 	if e := relations.NewRelation(r.Name, index.NewTable(r.Type)); e != nil {
-					// 		t.Fatal(e)
-					// 		break
-					// 	}
-					// }
+				objs := objects.Build()
 
-					for _, l := range facts.Locations {
-						// in this case we're probably a command too
-						if p, ok := objs.GetObject(l.Parent); !ok {
-							err = errutil.New("unknown", l.Parent)
-							break
-						} else if c, ok := objs.GetObject(l.Child); !ok {
-							err = errutil.New("unknown", l.Child)
-							break
-						} else if e := pc.SetLocation(p, c, l.Locale.Locale()); e != nil {
-							err = e
-							break
-						}
+				for _, l := range facts.Locations {
+					l := l.(*Location)
+					// in this case we're probably a command too
+					if p, ok := objs.GetObject(l.Parent); !ok {
+						err = errutil.New("unknown", l.Parent)
+						break
+					} else if c, ok := objs.GetObject(l.Child); !ok {
+						err = errutil.New("unknown", l.Child)
+						break
+					} else if e := pc.SetLocation(p, c, l.Locale); e != nil {
+						err = e
+						break
 					}
 				}
 			}
@@ -132,7 +127,7 @@ func TestContents(t *testing.T) {
 	t.Run("contains", func(t *testing.T) {
 		assert := testify.New(t)
 		e := test(t, func(c *ops.Builder) {
-			c.Cmd("Location", "box", c.Cmd("contains"), "cake")
+			c.Cmd("Location", "box", locate.Contains, "cake")
 		}, func(c *ops.Builder) {
 			//
 		}, func(run rt.Runtime, lines []string) (okay bool) {
@@ -149,9 +144,9 @@ func TestContents(t *testing.T) {
 	emptyBox := func(c *ops.Builder) {
 	}
 	boxContents := func(c *ops.Builder) {
-		c.Cmd("Location", "box", c.Cmd("contains"), "cake")
-		c.Cmd("Location", "box", c.Cmd("contains"), "apple")
-		c.Cmd("Location", "box", c.Cmd("contains"), "pen")
+		c.Cmd("Location", "box", locate.Contains, "cake")
+		c.Cmd("Location", "box", locate.Contains, "apple")
+		c.Cmd("Location", "box", locate.Contains, "pen")
 	}
 	printContent := func(c *ops.Builder) {
 		c.Cmd("determine", c.Cmd("print content", "box", c.Param("tersely").Val(true)))
