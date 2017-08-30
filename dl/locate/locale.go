@@ -14,8 +14,8 @@ type Locale struct {
 func (l *Locale) Empty(p rt.Object) bool {
 	_, hasChild := l.Primary.FindFirst(0, p.Id().Name)
 	return !hasChild
-
 }
+
 func (l *Locale) SetLocation(p, c rt.Object, now Containment) (err error) {
 	types := map[Containment]struct {
 		Parent, Child string
