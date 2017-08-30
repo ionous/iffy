@@ -11,12 +11,27 @@ type Id struct {
 	Name string
 }
 
-func IdOf(str string) Id {
-	name := NameOf(str)
-	w := fnv.New64a()
-	io.WriteString(w, name)
-	sum := w.Sum64()
-	return Id{sum, name}
+func (id Id) IsValid() bool {
+	return id.Hash != 0
+}
+
+func (id Id) String() (ret string) {
+	if id.Hash != 0 {
+		ret = id.Name
+	} else {
+		ret = "<invalid id>"
+	}
+	return
+}
+
+func IdOf(str string) (ret Id) {
+	if name := NameOf(str); len(name) > 0 {
+		w := fnv.New64a()
+		io.WriteString(w, name)
+		sum := w.Sum64()
+		ret = Id{sum, name}
+	}
+	return
 }
 
 // NameOf creates a new string id from the passed raw string.

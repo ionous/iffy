@@ -22,7 +22,7 @@ func findPathOf(base []int, rtype r.Type, tag string) (ret []int, okay bool) {
 		field := rtype.Field(i)
 		if IsPublic(field) {
 			t := Tag(field.Tag)
-			if _, ok := t.Find(tag); ok {
+			if q, ok := t.Find(tag); ok && len(q) == 0 {
 				ret, okay = append(base, i), true
 				break
 			} else if IsEmbedded(field) {

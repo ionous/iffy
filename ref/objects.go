@@ -21,7 +21,7 @@ func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
 	if rval, e := unique.ValuePtr(i); e != nil {
 		err = e
 	} else {
-		ret = &RefObject{rval, or}
+		ret = &RefObject{value: rval, objects: or}
 	}
 	return
 }
@@ -35,7 +35,7 @@ func (or *Objects) GetObject(name string) (ret rt.Object, okay bool) {
 
 // GetByValue expects a pointer to a value, and it returns the ref object which wraps it.
 // WARNING: it can return nil without error
-func (or *Objects) GetByValue(rval r.Value) (ret *RefObject, err error) {
+func (or *Objects) GetByValue(rval r.Value) (ret rt.Object, err error) {
 	if !rval.IsNil() {
 		rval := rval.Elem()
 		if id, e := idFromValue(rval); e != nil {

@@ -5,38 +5,27 @@ import (
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/ref/enum"
-	"github.com/ionous/iffy/ref/unique"
-	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
 type RefObject struct {
-	r.Value // stores the concrete value. ex. Rock, not *Rock.
+	id      ident.Id
+	value   r.Value // stores the concrete value. ex. Rock, not *Rock.
 	objects *Objects
 }
 
-// GetId returns the unique identifier for this Object.
+// Id returns the unique identifier for this Object.
 // Blank for anonymous and temporary objects.
-func (n RefObject) GetId() (ret ident.Id) {
-	if path, ok := unique.PathOf(n.Type(), "id"); ok {
-		field := n.FieldByIndex(path)
-		name := field.String()
-		ret = ident.IdOf(name)
-	}
-	return
+func (n RefObject) Id() ident.Id {
+	return n.id
 }
 
 func (n RefObject) String() (ret string) {
-	if path, ok := unique.PathOf(n.Type(), "id"); ok {
-		field := n.FieldByIndex(path)
-		ret = field.String()
-	}
-	return
+	return n.id.Name
 }
 
-// GetClass returns the variety of object.
-func (n RefObject) GetClass() rt.Class {
-	return n.Type()
+func (n RefObject) Type() r.Type {
+	return n.value.Type()
 }
 
 // GetValue stores the value into the pointer pv.
@@ -53,13 +42,13 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 		err = errutil.New("get expected a pointer outvalue")
 	} else {
 		pid, dst := ident.IdOf(name), pdst.Elem()
-		rtype := n.Type()
+		rtype := n.value.Type()
 		// a bool is an indicator of state lookup
 		if dst.Kind() == r.Bool {
 			if path, idx := enum.PropertyPath(rtype, pid.Name); len(path) == 0 {
 				err = errutil.New("get choice not found")
 			} else {
-				field := n.FieldByIndex(path)
+				field := n.value.FieldByIndex(path)
 				if field.Kind() == r.Bool {
 					dst.SetBool(field.Bool())
 				} else {
@@ -72,7 +61,7 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 			if path := class.PropertyPath(rtype, pid.Name); len(path) == 0 {
 				err = errutil.New("get property not found")
 			} else {
-				field := n.FieldByIndex(path)
+				field := n.value.FieldByIndex(path)
 				err = n.objects.coerce(dst, field)
 			}
 		}
@@ -94,11 +83,11 @@ func (n RefObject) setValue(pid ident.Id, v interface{}) (err error) {
 	if val, ok := v.(bool); ok {
 		err = n.setBool(pid, val)
 	} else {
-		rtype := n.Type()
+		rtype := n.value.Type()
 		if path := class.PropertyPath(rtype, pid.Name); len(path) == 0 {
 			err = errutil.New("set property not found", n)
 		} else {
-			field := n.FieldByIndex(path)
+			field := n.value.FieldByIndex(path)
 			src := r.ValueOf(v)
 			enumish := field.Kind() == r.Int && src.Kind() == r.String
 			if !enumish {
@@ -121,11 +110,11 @@ func (n RefObject) setValue(pid ident.Id, v interface{}) (err error) {
 }
 
 func (n RefObject) setBool(pid ident.Id, val bool) (err error) {
-	rtype := n.Type()
+	rtype := n.value.Type()
 	if path, idx := enum.PropertyPath(rtype, pid.Name); len(path) == 0 {
 		err = errutil.New("set choice not found", pid.Name)
 	} else {
-		field := n.FieldByIndex(path)
+		field := n.value.FieldByIndex(path)
 		if field.Kind() == r.Bool {
 			err = CoerceValue(field, val)
 		} else if val {

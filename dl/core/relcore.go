@@ -22,7 +22,7 @@ func (a *RelationEmpty) GetBool(run rt.Runtime) (okay bool, err error) {
 	} else if obj, e := a.Object.GetObject(run); e != nil {
 		err = e
 	} else {
-		_, hasChild := r.GetTable().Primary.FindFirst(0, obj.GetId().Name)
+		_, hasChild := r.GetTable().Primary.FindFirst(0, obj.Id().Name)
 		okay = !hasChild
 	}
 	return
@@ -37,7 +37,7 @@ func (a *RelatedList) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err 
 		// for now, copy everything all at once.
 		// in the far future, could have some sort of lock.
 		var list []rt.Object
-		r.GetTable().Primary.Walk(obj.GetId().Name, func(other string) (done bool) {
+		r.GetTable().Primary.Walk(obj.Id().Name, func(other string) (done bool) {
 			if obj, ok := run.GetObject(other); !ok {
 				err = errutil.New("unknown related object", a.Object, a.Relation, other)
 				done = true

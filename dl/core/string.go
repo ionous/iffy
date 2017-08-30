@@ -46,7 +46,7 @@ func (op *ClassName) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := op.Obj.GetObject(run); e != nil {
 		err = errutil.New("ClassName.Obj", e)
 	} else {
-		ret = class.FriendlyName(obj.GetClass())
+		ret = class.FriendlyName(obj.Type())
 	}
 	return
 }

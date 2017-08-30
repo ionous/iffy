@@ -58,7 +58,7 @@ func TestOneToMany(t *testing.T) {
 		assert.Equal(index.OneToMany, gr.GetType())
 
 		claire, loofa, petra := Object("claire"), Object("loofa"), Object("petra")
-		assert.EqualValues(ident.IdOf("$claire"), claire.GetId())
+		assert.EqualValues(ident.IdOf("$claire"), claire.Id())
 		assert.False(contains(gr.Table.Primary, "$claire"))
 		assert.False(contains(gr.Table.Secondary, "$loofa"))
 		assert.False(contains(gr.Table.Secondary, "$petra"))

@@ -54,11 +54,11 @@ func (els EventListeners) CollectAncestors(run rt.Runtime, obj rt.Object) (ret [
 
 func (els EventListeners) CollectTargets(obj rt.Object, tgt []Target) []Target {
 	// check instance listeners
-	if ls, ok := els.Objects[obj.GetId()]; ok {
+	if ls, ok := els.Objects[obj.Id()]; ok {
 		tgt = append(tgt, Target{obj: obj, handlers: ls})
 	}
 	// check class listeners
-	for cls := obj.GetClass(); ; {
+	for cls := obj.Type(); ; {
 		if ls, ok := els.Classes[class.Id(cls)]; ok {
 			tgt = append(tgt, Target{obj: obj, cls: cls, handlers: ls})
 		}

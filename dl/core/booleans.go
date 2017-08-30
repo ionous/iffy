@@ -33,7 +33,7 @@ func (op *IsSameClass) GetBool(run rt.Runtime) (ret bool, err error) {
 	if obj, e := op.Obj.GetObject(run); e != nil {
 		err = e
 	} else if cls, ok := run.GetClass(op.Class); ok {
-		ret = cls == obj.GetClass()
+		ret = cls == obj.Type()
 	}
 	return
 }
@@ -41,7 +41,7 @@ func (op *IsSameClass) GetBool(run rt.Runtime) (ret bool, err error) {
 func (op *IsSimilarClass) GetBool(run rt.Runtime) (ret bool, err error) {
 	if obj, e := op.Obj.GetObject(run); e != nil {
 		err = e
-	} else if cls := obj.GetClass(); class.IsCompatible(cls, op.Class) {
+	} else if cls := obj.Type(); class.IsCompatible(cls, op.Class) {
 		ret = true
 	}
 	return

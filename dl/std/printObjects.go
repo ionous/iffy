@@ -65,14 +65,17 @@ func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error
 		if obj, e := objs.GetNext(); e != nil {
 			err = e
 			break
-		} else if kind, e := kindOf(run, obj); e != nil {
-			err = e
-			break
-		} else if unnamed := strings.Contains(kind.Name, "#"); unnamed {
-			nonames = append(nonames, obj)
-		} else if e := printArticle(run, "", obj); e != nil {
-			err = e
-			break
+		} else {
+			var name string
+			if obj.GetValue("name", &name); e != nil {
+				err = e
+				break
+			} else if unnamed := strings.Contains(name, "#"); unnamed {
+				nonames = append(nonames, obj)
+			} else if e := printArticle(run, "", obj); e != nil {
+				err = e
+				break
+			}
 		}
 	}
 	if err == nil {
@@ -87,14 +90,17 @@ func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err er
 		if obj, e := objs.GetNext(); e != nil {
 			err = e
 			break
-		} else if kind, e := kindOf(run, obj); e != nil {
-			err = e
-			break
-		} else if unnamed := strings.Contains(kind.Name, "#"); unnamed {
-			nonames = append(nonames, obj)
-		} else if e := printName(run, obj); e != nil {
-			err = e
-			break
+		} else {
+			var name string
+			if obj.GetValue("name", &name); e != nil {
+				err = e
+				break
+			} else if unnamed := strings.Contains(name, "#"); unnamed {
+				nonames = append(nonames, obj)
+			} else if e := printName(run, obj); e != nil {
+				err = e
+				break
+			}
 		}
 	}
 	if err == nil {

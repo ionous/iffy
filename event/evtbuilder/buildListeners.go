@@ -24,7 +24,7 @@ func NewListeners(eventTypes unique.Types) *Listeners {
 }
 
 func (l *Listeners) Object(obj rt.Object) ListenOn {
-	return phaseOn{Listeners: l, obj: obj, cls: obj.GetClass()}
+	return phaseOn{Listeners: l, obj: obj, cls: obj.Type()}
 }
 
 func (l *Listeners) Class(cls rt.Class) ListenOn {
@@ -54,7 +54,7 @@ func (p phaseOn) On(name string, flags event.Options, exec rt.Execute) (err erro
 		var phaseMap event.PhaseMap
 		listeners := p.EventMap[id]
 		if p.obj != nil {
-			target = p.obj.GetId()
+			target = p.obj.Id()
 			if listeners.Objects != nil {
 				phaseMap = listeners.Objects
 			} else {

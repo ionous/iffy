@@ -1,7 +1,7 @@
-package define_test
+package play_test
 
 import (
-	"github.com/ionous/iffy/dl/define"
+	"github.com/ionous/iffy/dl/play"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/spec/ops"
 	testify "github.com/stretchr/testify/assert"
@@ -9,17 +9,17 @@ import (
 )
 
 func TestEmpty(t *testing.T) {
-	var reg define.Registry
-	var facts define.Facts
+	var reg play.Registry
+	var facts play.Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 }
 
 func TestGrammar(t *testing.T) {
-	var reg define.Registry
+	var reg play.Registry
 	reg.Register(defineGrammar)
 	//
-	var facts define.Facts
+	var facts play.Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 	if testify.Len(t, facts.Grammar.Match, 1) {
@@ -30,33 +30,33 @@ func TestGrammar(t *testing.T) {
 }
 
 func TestLocation(t *testing.T) {
-	var reg define.Registry
+	var reg play.Registry
 	reg.Register(defineLocation)
 	//
-	var facts define.Facts
+	var facts play.Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 	testify.Len(t, facts.Locations, 1)
 }
 
 func TestRules(t *testing.T) {
-	var reg define.Registry
+	var reg play.Registry
 	mandates := []string{"bool", "number", "text", "object", "num list", "text list", "obj list", "run"}
 	reg.Register(func(c *ops.Builder) {
 		defineRules(c, mandates)
 	})
 	//
-	var facts define.Facts
+	var facts play.Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 	testify.Len(t, facts.Mandates, len(mandates))
 }
 
 func TestEvents(t *testing.T) {
-	var reg define.Registry
+	var reg play.Registry
 	reg.Register(defineEventHandler)
 	//
-	var facts define.Facts
+	var facts play.Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 	testify.Len(t, facts.Listeners, 1)

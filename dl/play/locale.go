@@ -1,4 +1,4 @@
-package define
+package play
 
 import (
 	"github.com/ionous/iffy/dl/locate"

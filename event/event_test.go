@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
@@ -28,18 +29,18 @@ func TestSomething(t *testing.T) {
 	// FIX: add test to find target
 	// ex. put it as the second object in a structure.
 	type Jump struct {
-		Jumper *Kind
+		Jumper rt.Object `if:"cls:kind"`
 	}
 
 	type Kiss struct {
-		Kisser   *Kind
-		KissWhom *Kind
+		Kisser   rt.Object `if:"cls:kind"`
+		KissWhom rt.Object `if:"cls:kind"`
 	}
 
 	type Unlock struct {
-		Unlocker *Kind
-		Lock     *Kind
-		With     *Kind
+		Unlocker rt.Object `if:"cls:kind"`
+		Lock     rt.Object `if:"cls:kind"`
+		With     rt.Object `if:"cls:kind"`
 	}
 
 	type Events struct {
@@ -164,7 +165,7 @@ func TestSomething(t *testing.T) {
 	// 		}
 
 	jump, e := run.Objects.Emplace(&Jump{
-		Jumper: bogart.(*ref.RefObject).Value.Addr().Interface().(*Kind),
+		Jumper: bogart,
 	})
 	if obj, e := event.TargetOf(jump); assert.NoError(e) {
 		assert.Equal(bogart, obj)

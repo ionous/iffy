@@ -3,12 +3,11 @@ package std_test
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/define"
 	"github.com/ionous/iffy/dl/locate"
+	"github.com/ionous/iffy/dl/play"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/pat/rule"
-
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -42,7 +41,7 @@ func TestContents(t *testing.T) {
 		// (*rule.Commands)(nil),
 		// (*Commands)(nil),
 		// (*initial.Commands)(nil),
-		(*define.Commands)(nil),
+		(*play.Commands)(nil),
 	)
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
@@ -57,7 +56,7 @@ func TestContents(t *testing.T) {
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
 		relations.AddTable("locale", pc.Table)
 
-		var src struct{ define.Definitions }
+		var src struct{ play.Definitions }
 		if c, ok := cmds.NewBuilder(&src); !ok {
 			err = errutil.New("no builder")
 		} else {
@@ -68,7 +67,7 @@ func TestContents(t *testing.T) {
 			if e := c.Build(); e != nil {
 				err = e
 			} else {
-				var facts define.Facts
+				var facts play.Facts
 				if e := src.Define(&facts); e != nil {
 					err = e
 				} else {

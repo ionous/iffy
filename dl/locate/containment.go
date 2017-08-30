@@ -58,7 +58,7 @@ func (ps *ParentStream) GetNext() (ret rt.Object, err error) {
 
 // note: can return nil object.
 func nextParent(run rt.Runtime, table *index.Table, child rt.Object) (ret rt.Object, err error) {
-	if i, ok := table.Secondary.FindFirst(0, child.GetId().Name); ok {
+	if i, ok := table.Secondary.FindFirst(0, child.Id().Name); ok {
 		if pid := table.Secondary.Rows[i].Major; len(pid) > 0 {
 			if parent, ok := run.GetObject(pid); !ok {
 				err = errutil.New("couldnt find parent", pid)

@@ -1,13 +1,10 @@
 package std
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/std/group"
-	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rt/stream"
-	r "reflect"
 )
 
 // PrintNondescriptObjects prints a bunch of objects, in groups if possible,
@@ -34,15 +31,8 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-// FIX: this is patently ridiculous.
-// issue: i cant set an object reference from an object
-// why? in part b/c theres no "base class"
-// it would be **alot** simpler if references were an ident.Id
-// we'd still have "emplace" -- you could maybe someday make it static -- thatd be tons better.
 func printName(run rt.Runtime, obj rt.Object) (err error) {
-	if kind, e := kindOf(run, obj); e != nil {
-		err = e
-	} else if printName, e := run.Emplace(&PrintName{kind}); e != nil {
+	if printName, e := run.Emplace(&PrintName{obj}); e != nil {
 		err = e
 	} else {
 		err = run.ExecuteMatching(run, printName)
@@ -51,9 +41,7 @@ func printName(run rt.Runtime, obj rt.Object) (err error) {
 }
 
 func printPluralName(run rt.Runtime, obj rt.Object) (err error) {
-	if kind, e := kindOf(run, obj); e != nil {
-		err = e
-	} else if printName, e := run.Emplace(&PrintPluralName{kind}); e != nil {
+	if printName, e := run.Emplace(&PrintPluralName{obj}); e != nil {
 		err = e
 	} else {
 		err = run.ExecuteMatching(run, printName)
@@ -62,24 +50,10 @@ func printPluralName(run rt.Runtime, obj rt.Object) (err error) {
 }
 
 func printSeveral(run rt.Runtime, obj rt.Object, cnt int) (err error) {
-	if kind, e := kindOf(run, obj); e != nil {
-		err = e
-	} else if printName, e := run.Emplace(&PrintSeveral{kind, float64(cnt)}); e != nil {
+	if printName, e := run.Emplace(&PrintSeveral{obj, float64(cnt)}); e != nil {
 		err = e
 	} else {
 		err = run.ExecuteMatching(run, printName)
-	}
-	return
-}
-
-func kindOf(run rt.Runtime, obj rt.Object) (ret *Kind, err error) {
-	if src, ok := obj.(*ref.RefObject); !ok {
-		err = errutil.Fmt("unknown object %T", obj)
-	} else if e := ref.Upcast(src.Addr(), func(ptr r.Value) (okay bool) {
-		ret, okay = ptr.Interface().(*Kind)
-		return
-	}); e != nil {
-		err = e
 	}
 	return
 }

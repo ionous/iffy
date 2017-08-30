@@ -18,7 +18,7 @@ type ObjLists map[ident.Id]ObjListRules
 type Executes map[ident.Id]ExecuteRules
 
 func setupScope(run rt.Runtime, data rt.Object, cb func(ident.Id)) {
-	id := class.Id(data.GetClass())
+	id := class.Id(data.Type())
 	run.PushScope(scope.AtFinder(data))
 	cb(id)
 	run.PopScope()

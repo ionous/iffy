@@ -83,7 +83,7 @@ func (spec *_Spec) Position(arg interface{}) (err error) {
 		field := tgt.Field(spec.index)
 		if !field.IsValid() {
 			fieldName := tgtType.Field(spec.index).Name
-			err = errutil.Fmt("couldnt get value for position %d (%s.%s) %v", spec.index, tgtType, fieldName, arg)
+			err = errutil.Fmt("couldnt get value for %T position %d (%s.%s)", tgt, spec.index, tgtType, fieldName)
 		} else if e := setField(field, arg); e != nil {
 			fieldName := tgtType.Field(spec.index).Name
 			err = errutil.Fmt("position %d (%s.%s) %v", spec.index, tgtType, fieldName, e)
@@ -217,6 +217,8 @@ func evalFromType(rtype r.Type) (ret r.Type, okay bool) {
 	case k == r.String:
 		ret, okay = textEval, true
 	case k == r.Ptr:
+		ret, okay = objEval, true
+	case k == r.Interface:
 		ret, okay = objEval, true
 	case k == r.Array || k == r.Slice:
 		switch k := rtype.Elem().Kind(); {

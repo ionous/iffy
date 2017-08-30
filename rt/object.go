@@ -10,9 +10,9 @@ type Class r.Type
 // Object represents a tangible or intangible piece of the game world.
 type Object interface {
 	// GetId returns a somewhat unique identifier.
-	GetId() ident.Id
+	Id() ident.Id
 	// GetClass returns the variety of object.
-	GetClass() Class
+	Type() r.Type
 	// GetValue stores the value into the pointer pv.
 	// Values include meta.Objects for relations and pointers, numbers, and text. For numbers, pv can be any numberic type: float64, int, etc.
 	GetValue(name string, pv interface{}) error

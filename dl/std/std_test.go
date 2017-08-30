@@ -49,36 +49,39 @@ func TestStd(t *testing.T) {
 		run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
 		//
 		t.Run("printed name", func(t *testing.T) {
-			apple := Thingaverse["apple"].(*Thing)
-			match(run, testify.New(t), "empire apple", &PrintName{&apple.Kind})
+			apple, _ := run.GetObject("apple")
+			match(run, testify.New(t), "empire apple", &PrintName{apple})
 		})
 		t.Run("named", func(t *testing.T) {
-			genericPen := Thingaverse["pen"].(*Thing)
-			match(run, testify.New(t), "pen", &PrintName{&genericPen.Kind})
+			genericPen, _ := run.GetObject("pen")
+			match(run, testify.New(t), "pen", &PrintName{genericPen})
 		})
 		t.Run("unnamed", func(t *testing.T) {
-			unnamedThing := Thingaverse["thing#1"].(*Thing)
-			match(run, testify.New(t), "thing", &PrintName{&unnamedThing.Kind})
+			unnamedThing, _ := run.GetObject("thing#1")
+			match(run, testify.New(t), "thing", &PrintName{unnamedThing})
 		})
 		//
 		t.Run("plural printed name", func(t *testing.T) {
-			apple := Thingaverse["apple"].(*Thing)
-			match(run, testify.New(t), "empire apples", &PrintPluralName{&apple.Kind})
+			apple, _ := run.GetObject("apple")
+			match(run, testify.New(t), "empire apples", &PrintPluralName{apple})
 		})
 		t.Run("plural named", func(t *testing.T) {
-			genericPen := Thingaverse["pen"].(*Thing)
-			match(run, testify.New(t), "pens", &PrintPluralName{&genericPen.Kind})
+			genericPen, _ := run.GetObject("pen")
+			match(run, testify.New(t), "pens", &PrintPluralName{genericPen})
 		})
 		t.Run("plural unnamed", func(t *testing.T) {
-			unnamedThing := Thingaverse["thing#1"].(*Thing)
-			match(run, testify.New(t), "things", &PrintPluralName{&unnamedThing.Kind})
+			unnamedThing, _ := run.GetObject("thing#1")
+			match(run, testify.New(t), "things", &PrintPluralName{unnamedThing})
 		})
 		//
 		t.Run("printed plural name", func(t *testing.T) {
 			forced := "party favors"
-			apple := Thingaverse["apple"].(*Thing)
-			apple.PrintedPluralName = forced
-			match(run, testify.New(t), forced, &PrintPluralName{&apple.Kind})
+			apple, _ := run.GetObject("apple")
+			if e := apple.SetValue("printed plural name", forced); e != nil {
+				t.Fatal(e)
+			}
+
+			match(run, testify.New(t), forced, &PrintPluralName{apple})
 		})
 		//
 	})

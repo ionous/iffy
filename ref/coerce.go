@@ -3,6 +3,7 @@ package ref
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
@@ -42,8 +43,8 @@ func (or *Objects) coerce(dst, src r.Value) (err error) {
 	return
 }
 
-// give a value, which might be either an interface or a ptr, return the reflected value of *RefObject
-func (or *Objects) getByValue(src r.Value) (ret *RefObject, err error) {
+// give a value, which might be either an interface or a ptr, return the reflected value of RefObject
+func (or *Objects) getByValue(src r.Value) (ret rt.Object, err error) {
 	switch k := src.Kind(); k {
 	case r.Ptr, r.Interface:
 		if src.IsNil() {
@@ -128,7 +129,7 @@ func copyObjects(dst, src r.Value) (err error) {
 // ( that's going to be especially true of names. )
 func copyPtr(src r.Value, set func(r.Value) bool) (err error) {
 	if obj, ok := src.Interface().(*RefObject); ok {
-		src := obj.Addr()
+		src := obj.value.Addr()
 		err = Upcast(src, set)
 	} else if src.Kind() == r.Ptr {
 		err = Upcast(src, set)

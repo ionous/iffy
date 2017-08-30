@@ -24,7 +24,7 @@ func (rel *RefRelation) GetType() index.Type {
 }
 
 func (rel *RefRelation) GetRelative(src, dst rt.Object) (ret interface{}, okay bool) {
-	ret, okay = rel.Table.Data[index.Row{src.GetId().Name, dst.GetId().Name}]
+	ret, okay = rel.Table.Data[index.Row{src.Id().Name, dst.Id().Name}]
 	return
 }
 
@@ -35,9 +35,9 @@ func (rel *RefRelation) GetTable() *index.Table {
 // Relate defines a connection between two objects.
 func (rel *RefRelation) Relate(src, dst rt.Object, onInsert index.OnInsert) (changed bool, err error) {
 	if s, ok := reduce(src); !ok {
-		err = errutil.Fmt("primary object is anonymous", src.GetClass())
+		err = errutil.Fmt("primary object is anonymous", src.Type())
 	} else if d, ok := reduce(dst); !ok {
-		err = errutil.Fmt("secondary object is anonymous", dst.GetClass())
+		err = errutil.Fmt("secondary object is anonymous", dst.Type())
 	} else {
 		changed, err = rel.Table.RelatePair(s, d, onInsert)
 	}
@@ -48,7 +48,7 @@ func reduce(obj rt.Object) (id string, okay bool) {
 	if obj == nil {
 		okay = true
 	} else {
-		id = obj.GetId().Name
+		id = obj.Id().Name
 		okay = len(id) > 0
 	}
 	return
