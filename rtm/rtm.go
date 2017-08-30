@@ -1,7 +1,7 @@
 package rtm
 
 import (
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
@@ -31,7 +31,7 @@ func (rtm *Rtm) GetPatterns() *pat.Patterns {
 
 // GetClass with the passed name.
 func (rtm *Rtm) GetClass(name string) (ret rt.Class, okay bool) {
-	id := id.MakeId(name)
+	id := ident.IdOf(name)
 	if cls, ok := rtm.Types[id]; ok {
 		ret, okay = cls, ok
 	}

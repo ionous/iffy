@@ -1,16 +1,16 @@
 package class
 
 import (
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/ref/unique"
 	r "reflect"
 )
 
 // Id returns a normalized identifier. Normalized identifiers are often used in registries to find types by name.
-func Id(rtype r.Type) string {
+func Id(rtype r.Type) ident.Id {
 	name := rtype.Name()
-	return id.MakeId(name)
+	return ident.IdOf(name)
 }
 
 // FriendlyName returns a printable string.
@@ -33,7 +33,7 @@ func Parent(rtype r.Type) (ret r.Type, okay bool) {
 // ie. is the named type a Parent() of the passed type?
 // FIX? would this be better as Type vs. Type, leaving the name -> Type lookup as part of a registry.
 func IsCompatible(rtype r.Type, name string) (okay bool) {
-	if id := id.MakeId(name); Id(rtype) == id {
+	if id := ident.IdOf(name); Id(rtype) == id {
 		okay = true
 	} else {
 		for i := 0; i < 250; i++ {
@@ -52,9 +52,9 @@ func IsCompatible(rtype r.Type, name string) (okay bool) {
 
 // PropertyPath searches the passed type for a field with the passed name.
 func PropertyPath(rtype r.Type, name string) (ret []int) {
-	pid := id.MakeId(name)
+	pid := ident.IdOf(name)
 	fn := func(f *r.StructField, path []int) (done bool) {
-		if id.MakeId(f.Name) == pid {
+		if ident.IdOf(f.Name) == pid {
 			ret, done = path, true
 		}
 		return

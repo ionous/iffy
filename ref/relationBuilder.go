@@ -2,11 +2,11 @@ package ref
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/index"
 )
 
-type RelationBuilder map[string]*index.Table
+type RelationBuilder map[ident.Id]*index.Table
 
 func (b RelationBuilder) Build() Relations {
 	r := make(Relations)
@@ -17,11 +17,11 @@ func (b RelationBuilder) Build() Relations {
 }
 
 func NewRelations() RelationBuilder {
-	return make(map[string]*index.Table)
+	return make(RelationBuilder)
 }
 
 func (b RelationBuilder) NewRelation(name string, kind index.Type) (err error) {
-	id := id.MakeId(name)
+	id := ident.IdOf(name)
 	if t, exists := b[id]; !exists {
 		b[id] = index.NewTable(kind)
 	} else if k := t.Type(); k != kind {
@@ -31,7 +31,7 @@ func (b RelationBuilder) NewRelation(name string, kind index.Type) (err error) {
 }
 
 func (b RelationBuilder) AddTable(name string, t *index.Table) (err error) {
-	id := id.MakeId(name)
+	id := ident.IdOf(name)
 	if _, exists := b[id]; !exists {
 		b[id] = t
 	} else {

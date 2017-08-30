@@ -1,6 +1,7 @@
 package ref
 
 import (
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -57,7 +58,7 @@ func TestOneToMany(t *testing.T) {
 		assert.Equal(index.OneToMany, gr.GetType())
 
 		claire, loofa, petra := Object("claire"), Object("loofa"), Object("petra")
-		assert.EqualValues("$claire", claire.GetId())
+		assert.EqualValues(ident.IdOf("$claire"), claire.GetId())
 		assert.False(contains(gr.Table.Primary, "$claire"))
 		assert.False(contains(gr.Table.Secondary, "$loofa"))
 		assert.False(contains(gr.Table.Secondary, "$petra"))

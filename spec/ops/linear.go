@@ -1,7 +1,7 @@
 package ops
 
 import (
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	r "reflect"
 )
@@ -26,9 +26,9 @@ func (c Linear) Field(n int) (ret r.Value) {
 
 func (c Linear) FieldByName(n string) (ret r.Value) {
 	// FIX: searching every assign is annoying.
-	k := id.MakeId(n)
+	k := ident.IdOf(n)
 	unique.WalkProperties(c.Type(), func(f *r.StructField, idx []int) (done bool) {
-		if k == id.MakeId(f.Name) {
+		if k == ident.IdOf(f.Name) {
 			ret, done = c.FieldByIndex(idx), true
 		}
 		return

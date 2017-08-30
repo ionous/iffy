@@ -2,7 +2,7 @@ package ref
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
@@ -26,7 +26,7 @@ type queued struct {
 	rval r.Value
 	cls  rt.Class
 }
-type queue map[string]queued
+type queue map[ident.Id]queued
 
 func NewObjects() *ObjBuilder {
 	return &ObjBuilder{make(queue), make(infoMap)}
@@ -43,7 +43,7 @@ func (b *ObjBuilder) Build() *Objects {
 // RegisterValue the passed value as a future object.
 // Compatible with unique.ValueRegistry
 func (b *ObjBuilder) RegisterValue(rval r.Value) (err error) {
-	if id, e := b.MakeId(rval); e != nil {
+	if id, e := b.IdOf(rval); e != nil {
 		err = e
 	} else if obj, ok := b.queue[id]; ok {
 		err = errutil.New("duplicate object", id, obj, rval)
@@ -53,7 +53,7 @@ func (b *ObjBuilder) RegisterValue(rval r.Value) (err error) {
 	return
 }
 
-func (b *ObjBuilder) MakeId(rval r.Value) (ret string, err error) {
+func (b *ObjBuilder) IdOf(rval r.Value) (ret ident.Id, err error) {
 	rtype := rval.Type()
 
 	// cache the id path
@@ -76,7 +76,7 @@ func (b *ObjBuilder) MakeId(rval r.Value) (ret string, err error) {
 			name = rtype.Name() + "#" + strconv.Itoa(info.unnamed)
 			field.SetString(name)
 		}
-		ret = id.MakeId(name)
+		ret = ident.IdOf(name)
 	}
 
 	return

@@ -1,7 +1,7 @@
 package ops
 
 import (
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/kr/pretty"
 	"github.com/stretchr/testify/assert"
@@ -92,6 +92,6 @@ func TestOpsBlock(t *testing.T) {
 	cmds := NewOps(nil)
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*CommandBlock)(nil))
-	assert.Contains(cmds.Types, id.MakeId("Container"))
-	assert.Contains(cmds.Types, id.MakeId("Contents"))
+	assert.Contains(cmds.Types, ident.IdOf("Container"))
+	assert.Contains(cmds.Types, ident.IdOf("Contents"))
 }

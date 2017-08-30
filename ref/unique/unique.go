@@ -2,7 +2,7 @@ package unique
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	r "reflect"
 	"strconv"
 )
@@ -20,8 +20,8 @@ func NewObjectGenerator() *Objects {
 	}
 }
 
-func makeId(scope string, i int) string {
-	return id.MakeId(scope + "#" + strconv.Itoa(i))
+func makeId(scope string, i int) ident.Id {
+	return ident.IdOf(scope + "#" + strconv.Itoa(i))
 }
 
 func (u *Objects) Id(cls string) (ret string) {
@@ -31,7 +31,7 @@ func (u *Objects) Id(cls string) (ret string) {
 	} else {
 		cnt := u.ids[rtype] + 1
 		u.ids[rtype] = cnt
-		ret = makeId(rtype.Name(), cnt)
+		ret = makeId(rtype.Name(), cnt).Name
 	}
 	return
 }
@@ -46,7 +46,8 @@ func (u *Objects) Generate() (ret []interface{}, err error) {
 			for i := 0; i < cnt; i++ {
 				n := r.New(rtype)
 				idea := n.Elem().FieldByIndex(idpath)
-				idea.SetString(makeId(scope, i+1)) //ids are 1 based
+				id := makeId(scope, i+1) // ids are 1 based
+				idea.SetString(id.Name)  // the id path points to the string field which generates an id
 				ret = append(ret, n.Interface())
 			}
 		}

@@ -3,7 +3,7 @@ package rule
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -48,8 +48,8 @@ type RunRule struct {
 	Continue PatternTiming
 }
 
-func (p *Rule) Init(pt unique.Types) (ret string, filters []rt.BoolEval, err error) {
-	pid := id.MakeId(p.Name)
+func (p *Rule) Init(pt unique.Types) (ret ident.Id, filters []rt.BoolEval, err error) {
+	pid := ident.IdOf(p.Name)
 	if _, ok := pt[pid]; !ok {
 		err = errutil.New("unknown pattern", p.Name)
 	} else {

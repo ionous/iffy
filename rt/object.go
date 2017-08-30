@@ -1,13 +1,16 @@
 package rt
 
-import r "reflect"
+import (
+	"github.com/ionous/iffy/ident"
+	r "reflect"
+)
 
 type Class r.Type
 
 // Object represents a tangible or intangible piece of the game world.
 type Object interface {
-	// GetId returns the unique identifier for this Object.
-	GetId() string
+	// GetId returns a somewhat unique identifier.
+	GetId() ident.Id
 	// GetClass returns the variety of object.
 	GetClass() Class
 	// GetValue stores the value into the pointer pv.

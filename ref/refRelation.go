@@ -2,18 +2,19 @@ package ref
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/rt"
 )
 
 // RefRelation describes a single relationship "archetype"
 type RefRelation struct {
-	Id    string
+	Id    ident.Id
 	Table *index.Table
 }
 
 // GetId returns the unique identifier for this types.
-func (rel *RefRelation) GetId() string {
+func (rel *RefRelation) GetId() ident.Id {
 	return rel.Id
 }
 
@@ -23,7 +24,7 @@ func (rel *RefRelation) GetType() index.Type {
 }
 
 func (rel *RefRelation) GetRelative(src, dst rt.Object) (ret interface{}, okay bool) {
-	ret, okay = rel.Table.Data[index.Row{src.GetId(), dst.GetId()}]
+	ret, okay = rel.Table.Data[index.Row{src.GetId().Name, dst.GetId().Name}]
 	return
 }
 
@@ -47,7 +48,7 @@ func reduce(obj rt.Object) (id string, okay bool) {
 	if obj == nil {
 		okay = true
 	} else {
-		id = obj.GetId()
+		id = obj.GetId().Name
 		okay = len(id) > 0
 	}
 	return

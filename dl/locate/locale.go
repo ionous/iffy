@@ -12,7 +12,7 @@ type Locale struct {
 }
 
 func (l *Locale) Empty(p rt.Object) bool {
-	_, hasChild := l.Primary.FindFirst(0, p.GetId())
+	_, hasChild := l.Primary.FindFirst(0, p.GetId().Name)
 	return !hasChild
 
 }
@@ -33,7 +33,7 @@ func (l *Locale) SetLocation(p, c rt.Object, now Containment) (err error) {
 	} else if !class.IsCompatible(c.GetClass(), check.Child) {
 		err = errutil.New("expected child", check.Child)
 	} else {
-		err = l.AddPair(p.GetId(), c.GetId(), func(old interface{}) (ret interface{}, err error) {
+		err = l.AddPair(p.GetId().Name, c.GetId().Name, func(old interface{}) (ret interface{}, err error) {
 			if c, ok := old.(Containment); ok && c != now {
 				err = errutil.New("was", c, "now", now)
 			} else {

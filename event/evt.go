@@ -1,11 +1,12 @@
 package event
 
 import (
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/rt"
 )
 
 type EventObject struct {
-	Name string    // name of event
+	Id   ident.Id  // name of event
 	Data rt.Object // data for the event
 
 	Bubbles    bool // r/o does this bubble

@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/event/evtbuilder"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
@@ -145,7 +146,7 @@ func TestSomething(t *testing.T) {
 	// Go := func(object, action string) {
 	// 		if obj, ok := run.GetObject(object); !ok {
 	// 			t.Fatal("object not found", object)
-	// 		} else if act, ok := actions[id.MakeId(action)]; !ok {
+	// 		} else if act, ok := actions[ident.IdOf(action)]; !ok {
 	// 			t.Fatal("unknown action", action)
 	// 		} else {
 	// 			var data rt.Object
@@ -169,7 +170,7 @@ func TestSomething(t *testing.T) {
 		assert.Equal(bogart, obj)
 	}
 
-	if els, ok := listen.EventMap["$jump"]; assert.True(ok) {
+	if els, ok := listen.EventMap[ident.IdOf("jump")]; assert.True(ok) {
 		at := els.CollectTargets(bogart, nil)
 		assert.Len(at, 1)
 	}

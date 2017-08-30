@@ -24,7 +24,7 @@ func Trigger(run rt.Runtime, events EventMap, data rt.Object) (err error) {
 			err = run.ExecuteMatching(run, data)
 		} else {
 			evt := &EventObject{
-				Name:          id,
+				Id:            id,
 				Data:          data,
 				Bubbles:       true,
 				Cancelable:    true,

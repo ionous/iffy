@@ -1,6 +1,7 @@
 package class
 
 import (
+	"github.com/ionous/iffy/ident"
 	testify "github.com/stretchr/testify/assert"
 	r "reflect"
 	"testing"
@@ -25,10 +26,10 @@ func TestClass(t *testing.T) {
 	baseClass := r.TypeOf((*BaseClass)(nil)).Elem()
 	derivedClass := r.TypeOf((*DerivedClass)(nil)).Elem()
 
-	assert.Equal("$baseClass", Id(baseClass))
+	assert.Equal(ident.IdOf("baseClass"), Id(baseClass))
 	assert.Equal("base class", FriendlyName(baseClass))
 
-	assert.Equal("$derivedClass", Id(derivedClass))
+	assert.Equal(ident.IdOf("$derivedClass"), Id(derivedClass))
 	assert.Equal("derived class", FriendlyName(derivedClass))
 
 	if p, ok := Parent(baseClass); assert.False(ok) {

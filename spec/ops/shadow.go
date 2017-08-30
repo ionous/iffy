@@ -2,7 +2,7 @@ package ops
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
@@ -81,9 +81,9 @@ func (c *ShadowClass) Field(n int) (ret r.Value) {
 }
 
 func (c *ShadowClass) FieldByName(n string) (ret r.Value) {
-	k := id.MakeId(n)
+	k := ident.IdOf(n)
 	unique.WalkProperties(c.rtype, func(f *r.StructField, idx []int) (done bool) {
-		if k == id.MakeId(f.Name) {
+		if k == ident.IdOf(f.Name) {
 			ret, done = c.FieldByIndex(idx), true
 		}
 		return

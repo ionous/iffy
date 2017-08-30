@@ -2,7 +2,7 @@ package ref
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
@@ -13,7 +13,7 @@ type Objects struct {
 	ObjectMap
 }
 
-type ObjectMap map[string]*RefObject
+type ObjectMap map[ident.Id]*RefObject
 
 // Emplace wraps the passed value as an anonymous object.
 // Compatible with rt.Runtime.
@@ -28,7 +28,7 @@ func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
 
 // GetObject is compatible with rt.Runtime. The map can also be used directly.
 func (or *Objects) GetObject(name string) (ret rt.Object, okay bool) {
-	id := id.MakeId(name)
+	id := ident.IdOf(name)
 	ret, okay = or.ObjectMap[id]
 	return
 }
@@ -58,14 +58,14 @@ func (or *Objects) GetByValue(rval r.Value) (ret *RefObject, err error) {
 // better might be caching the id path in the class,
 // best might be forcing all classes to carry an explict id field as their first member.
 // good for serialization would be store ids as much as possible.
-func IdFromValue(rval r.Value) (ret string, err error) {
+func IdFromValue(rval r.Value) (ret ident.Id, err error) {
 	if !rval.IsNil() {
 		ret, err = idFromValue(rval.Elem())
 	}
 	return
 }
 
-func idFromValue(rval r.Value) (ret string, err error) {
+func idFromValue(rval r.Value) (ret ident.Id, err error) {
 	rtype := rval.Type()
 	if path, ok := unique.PathOf(rtype, "id"); !ok {
 		err = errutil.New("couldnt find id for", rtype)
@@ -73,7 +73,7 @@ func idFromValue(rval r.Value) (ret string, err error) {
 		err = errutil.New("id was not a string", field)
 	} else {
 		name := field.String()
-		ret = id.MakeId(name)
+		ret = ident.IdOf(name)
 	}
 	return
 }

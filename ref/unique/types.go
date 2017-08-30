@@ -2,23 +2,23 @@ package unique
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	r "reflect"
 )
 
 // Types implements a simple TypeRegistry.
-type Types map[string]r.Type
+type Types map[ident.Id]r.Type
 
 // FindType by name.
 func (reg Types) FindType(name string) (r.Type, bool) {
-	id := id.MakeId(name)
+	id := ident.IdOf(name)
 	rtype, ok := reg[id]
 	return rtype, ok
 }
 
 // RegisterTypes implements TypeRegistry for a simple map.
 func (reg Types) RegisterType(rtype r.Type) (err error) {
-	id := id.MakeId(rtype.Name())
+	id := ident.IdOf(rtype.Name())
 	if was, ok := reg[id]; !ok {
 		reg[id] = rtype
 	} else if was != rtype {

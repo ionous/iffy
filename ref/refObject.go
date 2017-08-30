@@ -2,7 +2,7 @@ package ref
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/ref/enum"
 	"github.com/ionous/iffy/ref/unique"
@@ -17,17 +17,21 @@ type RefObject struct {
 
 // GetId returns the unique identifier for this Object.
 // Blank for anonymous and temporary objects.
-func (n RefObject) GetId() (ret string) {
+func (n RefObject) GetId() (ret ident.Id) {
 	if path, ok := unique.PathOf(n.Type(), "id"); ok {
 		field := n.FieldByIndex(path)
 		name := field.String()
-		ret = id.MakeId(name)
+		ret = ident.IdOf(name)
 	}
 	return
 }
 
-func (n RefObject) String() string {
-	return n.GetId()
+func (n RefObject) String() (ret string) {
+	if path, ok := unique.PathOf(n.Type(), "id"); ok {
+		field := n.FieldByIndex(path)
+		ret = field.String()
+	}
+	return
 }
 
 // GetClass returns the variety of object.
@@ -48,11 +52,11 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 	if pdst := r.ValueOf(pv); pdst.Kind() != r.Ptr {
 		err = errutil.New("get expected a pointer outvalue")
 	} else {
-		pid, dst := id.MakeId(name), pdst.Elem()
+		pid, dst := ident.IdOf(name), pdst.Elem()
 		rtype := n.Type()
 		// a bool is an indicator of state lookup
 		if dst.Kind() == r.Bool {
-			if path, idx := enum.PropertyPath(rtype, pid); len(path) == 0 {
+			if path, idx := enum.PropertyPath(rtype, pid.Name); len(path) == 0 {
 				err = errutil.New("get choice not found")
 			} else {
 				field := n.FieldByIndex(path)
@@ -65,7 +69,7 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 				}
 			}
 		} else {
-			if path := class.PropertyPath(rtype, pid); len(path) == 0 {
+			if path := class.PropertyPath(rtype, pid.Name); len(path) == 0 {
 				err = errutil.New("get property not found")
 			} else {
 				field := n.FieldByIndex(path)
@@ -79,19 +83,19 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 // GetValue can return error when the value violates a property constraint,
 // if the value is not of the requested type, or if the targeted property holder is read-only. Read-only values include the "many" side of a relation.
 func (n RefObject) SetValue(name string, v interface{}) (err error) {
-	pid := id.MakeId(name)
+	pid := ident.IdOf(name)
 	if e := n.setValue(pid, v); e != nil {
 		err = errutil.New(e, name)
 	}
 	return
 }
 
-func (n RefObject) setValue(pid string, v interface{}) (err error) {
+func (n RefObject) setValue(pid ident.Id, v interface{}) (err error) {
 	if val, ok := v.(bool); ok {
 		err = n.setBool(pid, val)
 	} else {
 		rtype := n.Type()
-		if path := class.PropertyPath(rtype, pid); len(path) == 0 {
+		if path := class.PropertyPath(rtype, pid.Name); len(path) == 0 {
 			err = errutil.New("set property not found", n)
 		} else {
 			field := n.FieldByIndex(path)
@@ -101,9 +105,9 @@ func (n RefObject) setValue(pid string, v interface{}) (err error) {
 				err = n.objects.coerce(field, src)
 			} else {
 				if choices := enum.Enumerate(field.Type()); len(choices) == 0 {
-					err = errutil.New("not an enumerated field", pid)
+					err = errutil.New("not an enumerated field", pid.Name)
 				} else {
-					choice := id.MakeId(src.String())
+					choice := ident.IdOf(src.String())
 					if i, ok := enum.ChoiceToIndex(choice, choices); !ok {
 						err = errutil.New("set unknown choice", choice, choices)
 					} else {
@@ -116,10 +120,10 @@ func (n RefObject) setValue(pid string, v interface{}) (err error) {
 	return
 }
 
-func (n RefObject) setBool(pid string, val bool) (err error) {
+func (n RefObject) setBool(pid ident.Id, val bool) (err error) {
 	rtype := n.Type()
-	if path, idx := enum.PropertyPath(rtype, pid); len(path) == 0 {
-		err = errutil.New("set choice not found", pid)
+	if path, idx := enum.PropertyPath(rtype, pid.Name); len(path) == 0 {
+		err = errutil.New("set choice not found", pid.Name)
 	} else {
 		field := n.FieldByIndex(path)
 		if field.Kind() == r.Bool {
@@ -130,7 +134,7 @@ func (n RefObject) setBool(pid string, val bool) (err error) {
 		} else {
 			// we have to try to generate an opposite value.
 			if choices := enum.Enumerate(field.Type()); len(choices) == 0 {
-				err = errutil.New("not an enumerated field", pid)
+				err = errutil.New("not an enumerated field", pid.Name)
 			} else if cnt := len(choices); cnt > 2 {
 				err = errutil.New("no opposite value. too many choices", pid, cnt)
 			} else {

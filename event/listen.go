@@ -1,12 +1,13 @@
 package event
 
 import (
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 )
 
 // Map event id to listener list
-type EventMap map[string]EventListeners
+type EventMap map[ident.Id]EventListeners
 
 // we have two kinds of listeners, class listeners, and object listeners.
 type EventListeners struct {
@@ -14,7 +15,7 @@ type EventListeners struct {
 }
 
 // id ( either class or object ) to list
-type PhaseMap map[string]PhaseList
+type PhaseMap map[ident.Id]PhaseList
 
 // PhaseList contains lists of capture and bubble handlers.
 type PhaseList [ListenerTypes][]Handler

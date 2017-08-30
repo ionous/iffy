@@ -2,9 +2,9 @@ package pat_test
 
 import (
 	"fmt"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/pat/rule"
-
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -68,11 +68,11 @@ func ExampleSayMe() {
 	if e := unique.RegisterTypes(patterns, (*SayMe)(nil)); e != nil {
 		fmt.Println("new pat:", e)
 	} else {
-		rules.Text.AddRule("$sayMe", MatchNumber(1), SayIt("One!"))
-		rules.Text.AddRule("$sayMe", MatchNumber(2), SayIt("Two!"))
-		rules.Text.AddRule("$sayMe", MatchNumber(3), SayIt("San!"))
-		rules.Text.AddRule("$sayMe", MatchNumber(3), SayIt("Three!"))
-		rules.Text.AddRule("$sayMe", nil, SayIt("Not between 1 and 3"))
+		rules.Text.AddRule(ident.IdOf("sayMe"), MatchNumber(1), SayIt("One!"))
+		rules.Text.AddRule(ident.IdOf("sayMe"), MatchNumber(2), SayIt("Two!"))
+		rules.Text.AddRule(ident.IdOf("sayMe"), MatchNumber(3), SayIt("San!"))
+		rules.Text.AddRule(ident.IdOf("sayMe"), MatchNumber(3), SayIt("Three!"))
+		rules.Text.AddRule(ident.IdOf("sayMe"), nil, SayIt("Not between 1 and 3"))
 		rules.Sort()
 
 		for i := 1; i <= 4; i++ {
@@ -119,9 +119,9 @@ func TestFactorial(t *testing.T) {
 		unique.PanicTypes(patterns),
 		(*Factorial)(nil))
 	//
-	rules.Numbers.AddRule("$factorial", MatchNumber(0), Int(1))
+	rules.Numbers.AddRule(ident.IdOf("factorial"), MatchNumber(0), Int(1))
 	//
-	rules.Numbers.AddRule("$factorial", nil, GetNumber(func(run rt.Runtime) (ret float64, err error) {
+	rules.Numbers.AddRule(ident.IdOf("factorial"), nil, GetNumber(func(run rt.Runtime) (ret float64, err error) {
 		var this int
 		if obj, ok := run.FindObject("@"); !ok {
 			err = fmt.Errorf("context not found")

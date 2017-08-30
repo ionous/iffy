@@ -2,7 +2,7 @@ package rule_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
@@ -43,7 +43,7 @@ func (assert *PatternSuite) TestFactorial() {
 	patterns := unique.NewStack(classes)
 	unique.RegisterTypes(unique.PanicTypes(patterns),
 		(*Factorial)(nil))
-	assert.Contains(classes, id.MakeId("Factorial"), "adding to patterns should add to classes")
+	assert.Contains(classes, ident.IdOf("Factorial"), "adding to patterns should add to classes")
 
 	var root struct{ rule.Mandates }
 	if c, ok := assert.cmds.NewBuilder(&root); ok {
@@ -85,7 +85,7 @@ func (assert *PatternSuite) TestFactorial() {
 		run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
 		peal := run.GetPatterns()
 		if numberPatterns := peal.Numbers; assert.Len(numberPatterns, 1) {
-			if factPattern := numberPatterns[id.MakeId("factorial")]; assert.Len(factPattern, 2) {
+			if factPattern := numberPatterns[ident.IdOf("factorial")]; assert.Len(factPattern, 2) {
 				//
 				if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
 					if n, e := run.GetNumMatching(run, fact); assert.NoError(e) {

@@ -3,7 +3,7 @@ package evtbuilder
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/event"
-	"github.com/ionous/iffy/id"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -46,11 +46,11 @@ type phaseOn struct {
 }
 
 func (p phaseOn) On(name string, flags event.Options, exec rt.Execute) (err error) {
-	id := id.MakeId(name)
+	id := ident.IdOf(name)
 	if _, ok := p.eventTypes[id]; !ok {
 		err = errutil.New("unknown event", name)
 	} else {
-		var target string
+		var target ident.Id
 		var phaseMap event.PhaseMap
 		listeners := p.EventMap[id]
 		if p.obj != nil {

@@ -1,6 +1,7 @@
 package ref_test
 
 import (
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -42,10 +43,10 @@ func (assert *ObjectSuite) SetupTest() {
 
 func (assert *ObjectSuite) TestRegistration() {
 	if n, ok := assert.objects.GetObject("first"); assert.True(ok) {
-		assert.Equal("$first", n.GetId())
+		assert.Equal(ident.IdOf("$first"), n.GetId())
 	}
 	if d, ok := assert.objects.GetObject("second"); assert.True(ok) {
-		assert.Equal("$second", d.GetId())
+		assert.Equal(ident.IdOf("$second"), d.GetId())
 	}
 }
 
