@@ -2,10 +2,11 @@ package parser
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ident"
 )
 
 func Parse(ctx Context, match Scanner, in []string) (ret *ResultList, err error) {
-	if scope, e := ctx.GetPlayerScope(""); e != nil {
+	if scope, e := ctx.GetPlayerScope(ident.None()); e != nil {
 		err = e
 	} else if r, e := match.Scan(ctx, scope, Cursor{Words: in}); e != nil {
 		err = e

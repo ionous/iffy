@@ -82,7 +82,7 @@ func (m *AllOf) scan(ctx Context, scope Scope, cs Cursor) (ret *ResultList, err 
 				break
 			} else {
 				rl.AddResult(res)
-				cs = cs.Skip(res.ResultLen())
+				cs = cs.Skip(res.WordsMatched())
 			}
 		}
 		if i == cnt {

@@ -1,8 +1,9 @@
 package parser
 
+// Results used by the parser include, a list of results, a resolved object, a resolved action, etc. On success, the parser generally returns a ResultList as its primary result.
 type Result interface {
-	// Len (number) of words used to match this result.
-	ResultLen() int
+	// the number of words used to match this result.
+	WordsMatched() int
 }
 
 type ResolvedAction struct {
@@ -25,15 +26,15 @@ type ResolvedWord struct {
 	Word string
 }
 
-func (f ResolvedAction) ResultLen() int {
+func (f ResolvedAction) WordsMatched() int {
 	return 0
 }
-func (f ResolvedMulti) ResultLen() int {
+func (f ResolvedMulti) WordsMatched() int {
 	return f.WordCount
 }
-func (f ResolvedObject) ResultLen() int {
+func (f ResolvedObject) WordsMatched() int {
 	return len(f.Words)
 }
-func (f ResolvedWord) ResultLen() int {
+func (f ResolvedWord) WordsMatched() int {
 	return 1
 }

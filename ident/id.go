@@ -6,6 +6,10 @@ import (
 	"io"
 )
 
+func None() (invalid Id) {
+	return
+}
+
 type Id struct {
 	Hash uint64
 	Name string

@@ -60,15 +60,20 @@ func TestVariousOf(t *testing.T) {
 			}
 		})
 	})
+
 	t.Run("all", func(t *testing.T) {
 		wordList := words("beep", "blox")
 		t.Run("match", func(t *testing.T) {
-			if res, e := match("Beep BLOX", &AllOf{wordList}); testify.NoError(t, e) {
-				testify.EqualValues(t,
-					&ResultList{[]Result{
+			assert := testify.New(t)
+			if res, e := match("Beep BLOX", &AllOf{wordList}); assert.NoError(e) {
+				if res, ok := res.(*ResultList); assert.True(ok) {
+					matched, res := res.WordsMatched(), res.Results()
+					assert.EqualValues(2, matched)
+					assert.EqualValues([]Result{
 						ResolvedWord{"Beep"},
-						ResolvedWord{"BLOX"}}, 2,
-					}, res)
+						ResolvedWord{"BLOX"}},
+						res)
+				}
 			}
 		})
 		t.Run("mismatch", func(t *testing.T) {

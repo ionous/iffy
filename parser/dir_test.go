@@ -1,12 +1,13 @@
 package parser_test
 
 import (
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/sliceOf"
 )
 
 var Directions = func() (ret []*MyObject) {
 	for _, d := range directions {
-		obj := &MyObject{Id: d,
+		obj := &MyObject{Id: ident.IdOf(d),
 			Names:   sliceOf.String(d),
 			Classes: sliceOf.String("directions"),
 		}

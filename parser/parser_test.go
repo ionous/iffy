@@ -2,6 +2,7 @@ package parser_test
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ident"
 	. "github.com/ionous/iffy/parser"
 	"github.com/kr/pretty"
 	testify "github.com/stretchr/testify/assert"
@@ -61,7 +62,8 @@ func makeObject(s ...string) *MyObject {
 	name, s := s[0], s[1:]
 	names := strings.Fields(name)
 	s = append(s, "things")
-	return &MyObject{Id: strings.Join(names, "-"), Names: names, Classes: s}
+	id := ident.IdOf(strings.Join(names, "-"))
+	return &MyObject{Id: id, Names: names, Classes: s}
 }
 
 var ctx = func() (ret MyScope) {
@@ -83,6 +85,19 @@ type Goal interface {
 type ActionGoal struct {
 	Action string
 	Nouns  []string
+}
+
+func StringIds(strs []string) (ret []ident.Id) {
+	for _, str := range strs {
+		ret = append(ret, ident.IdOf(str))
+	}
+	return
+}
+func IdStrings(ids []ident.Id) (ret []string) {
+	for _, id := range ids {
+		ret = append(ret, id.String())
+	}
+	return
 }
 
 type ClarifyGoal struct {
@@ -123,7 +138,7 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 		err = errutil.New("expected some goals")
 	} else {
 		goal, goals := goals[0], goals[1:]
-		if scope, e := ctx.GetPlayerScope(""); e != nil {
+		if scope, e := ctx.GetPlayerScope(ident.None()); e != nil {
 			err = e
 		} else if res, e := match.Scan(ctx, scope, Cursor{Words: in}); e != nil {
 			// on error:
@@ -166,10 +181,16 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 			err = errutil.New("expected resolved action %T", last)
 		} else if !strings.EqualFold(act.Name, g.Action) {
 			err = errutil.New("expected action", act, "got", g.Action)
-		} else if objs := list.Objects(); !testify.ObjectsAreEqual(g.Nouns, objs) {
-			err = errutil.New("expected nouns (", strings.Join(g.Nouns, ","), ") got (", strings.Join(objs, ","), ")")
 		} else {
-			log.Logf("matched %v", in)
+			nouns := StringIds(g.Nouns)
+			objs := list.Objects()
+			if !testify.ObjectsAreEqual(nouns, objs) {
+				err = errutil.New("expected nouns (",
+					strings.Join(IdStrings(nouns), ","), ") got (",
+					strings.Join(IdStrings(objs), ","), ")")
+			} else {
+				log.Logf("matched %v", in)
+			}
 		}
 	}
 	return

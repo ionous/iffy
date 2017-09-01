@@ -2,6 +2,7 @@ package parser
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ident"
 )
 
 // Focus scanner provides a way to change scope for subsequent scanners.
@@ -9,7 +10,7 @@ import (
 type Focus struct {
 	// future: Who string -- with "" means¥ing player
 	What  Scanner
-	Where string
+	Where ident.Id
 }
 
 //

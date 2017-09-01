@@ -2,6 +2,7 @@ package parser_test
 
 import (
 	"bitbucket.org/pkg/inflect"
+	"github.com/ionous/iffy/ident"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
@@ -11,14 +12,14 @@ import (
 
 // MyObject provides an example ( for testing ) of mapping an "Noun" to a NounVisitor.
 type MyObject struct {
-	Id         string
+	Id         ident.Id
 	Names      []string
 	Classes    []string
 	Attributes []string
 }
 
 func (m *MyObject) String() string {
-	return m.Id
+	return m.Id.Name
 }
 
 type MyScope []*MyObject
@@ -34,14 +35,14 @@ func (m MyScope) Many(rs ...rune) (ret []NounVisitor) {
 	return
 }
 
-func (m MyScope) GetPlayerScope(name string) (Scope, error) {
+func (m MyScope) GetPlayerScope(name ident.Id) (Scope, error) {
 	return m, nil
 }
-func (m MyScope) GetOtherScope(name string) (Scope, error) {
+func (m MyScope) GetOtherScope(name ident.Id) (Scope, error) {
 	return m, nil
 }
-func (m MyScope) IsPlural(n string) bool {
-	return n != inflect.Singularize(n)
+func (m MyScope) IsPlural(word string) bool {
+	return word != inflect.Singularize(word)
 }
 
 func (m MyScope) SearchScope(v func(n NounVisitor) bool) (ret bool) {
@@ -60,7 +61,7 @@ type MyAdapter struct {
 	*MyObject
 }
 
-func (adapt MyAdapter) GetId() string {
+func (adapt MyAdapter) GetId() ident.Id {
 	return adapt.Id
 }
 
@@ -96,24 +97,24 @@ func MatchAny(n string, l []string) (okay bool) {
 func TestScope(t *testing.T) {
 	assert := testify.New(t)
 	ctx := MyScope{
-		&MyObject{Id: "a", Names: sliceOf.String("unique")},
+		&MyObject{Id: ident.IdOf("a"), Names: sliceOf.String("unique")},
 		//
-		&MyObject{Id: "b", Names: strings.Fields("exact")},
-		&MyObject{Id: "c", Names: strings.Fields("exact match")},
+		&MyObject{Id: ident.IdOf("b"), Names: strings.Fields("exact")},
+		&MyObject{Id: ident.IdOf("c"), Names: strings.Fields("exact match")},
 		//
-		&MyObject{Id: "d", Names: strings.Fields("inexact match")},
-		&MyObject{Id: "e", Names: strings.Fields("inexact conflict")},
+		&MyObject{Id: ident.IdOf("d"), Names: strings.Fields("inexact match")},
+		&MyObject{Id: ident.IdOf("e"), Names: strings.Fields("inexact conflict")},
 		//
-		&MyObject{Id: "f",
+		&MyObject{Id: ident.IdOf("f"),
 			Names:      strings.Fields("filter"),
 			Attributes: strings.Fields("attr"),
 			Classes:    strings.Fields("class"),
 		},
-		&MyObject{Id: "g",
+		&MyObject{Id: ident.IdOf("g"),
 			Names:      strings.Fields("filter"),
 			Attributes: strings.Fields("attr"),
 		},
-		&MyObject{Id: "h",
+		&MyObject{Id: ident.IdOf("h"),
 			Names:   strings.Fields("filter"),
 			Classes: strings.Fields("class"),
 		},
@@ -156,7 +157,7 @@ func TestScope(t *testing.T) {
 func matching(ctx Context, phrase string) (ret Result, err error) {
 	match := &Noun{}
 	words := strings.Fields(phrase)
-	if scope, e := ctx.GetPlayerScope(""); e != nil {
+	if scope, e := ctx.GetPlayerScope(ident.None()); e != nil {
 		err = e
 	} else {
 		ret, err = match.Scan(ctx, scope, Cursor{Words: words})
@@ -167,7 +168,7 @@ func matching(ctx Context, phrase string) (ret Result, err error) {
 func matchingFilter(ctx Context, phrase, attr, class string) (ret Result, err error) {
 	match := &Noun{Filters{&HasAttr{attr}, &HasClass{class}}}
 	words := strings.Fields(phrase)
-	if scope, e := ctx.GetPlayerScope(""); e != nil {
+	if scope, e := ctx.GetPlayerScope(ident.None()); e != nil {
 		err = e
 	} else {
 		ret, err = match.Scan(ctx, scope, Cursor{Words: words})

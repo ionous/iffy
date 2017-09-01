@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"github.com/ionous/iffy/ident"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
 	"testing"
@@ -32,8 +33,8 @@ func TestTarget(t *testing.T) {
 		Log:     t,
 		MyScope: scope,
 		Other: Scopes{
-			"apple-cart": appleCart,
-			"red-cart":   redCart},
+			ident.IdOf("apple-cart"): appleCart,
+			ident.IdOf("red-cart"):   redCart},
 	}
 
 	t.Run("take exact", func(t *testing.T) {
