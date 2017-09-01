@@ -1,23 +1,5 @@
 package parser
 
-import (
-	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ident"
-)
-
-func Parse(ctx Context, match Scanner, in []string) (ret *ResultList, err error) {
-	if scope, e := ctx.GetPlayerScope(ident.None()); e != nil {
-		err = e
-	} else if r, e := match.Scan(ctx, scope, Cursor{Words: in}); e != nil {
-		err = e
-	} else if rs, ok := r.(*ResultList); !ok {
-		err = errutil.Fmt("expected result list, got %T", r)
-	} else {
-		ret = rs
-	}
-	return
-}
-
 // Scanner searches words looking for good results.
 // ( perhaps its truly a tokenzer and the results, tokens )
 type Scanner interface {

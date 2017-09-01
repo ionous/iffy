@@ -15,12 +15,12 @@ type ResolvedAction struct {
 // ResolvedWords
 
 type ResolvedMulti struct {
-	Nouns     []NounVisitor
+	Nouns     []NounInstance
 	WordCount int
 }
 type ResolvedObject struct {
-	NounVisitor NounVisitor
-	Words       []string // what the user said to identify the object
+	NounInstance NounInstance
+	Words        []string // what the user said to identify the object
 }
 type ResolvedWord struct {
 	Word string

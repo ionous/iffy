@@ -43,6 +43,7 @@ type AnyOf struct {
 	Match []Scanner
 }
 
+// Scan implements Scanner.
 func (m *AnyOf) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
 	if cnt := len(m.Match); cnt == 0 {
 		err = errutil.New("no rules specified for any of")

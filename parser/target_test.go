@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-// note, in reality burn would use only held things.
 var takeGrammar = allOf(
 	Words("get"),
 	&Target{[]Scanner{things(), Words("from/off"), thing()}},

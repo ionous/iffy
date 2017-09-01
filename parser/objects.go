@@ -24,7 +24,7 @@ func (try *Noun) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err erro
 	return
 }
 
-func resolveObject(cs Cursor, wordCount int, nouns []NounVisitor) (ret Result, err error) {
+func resolveObject(cs Cursor, wordCount int, nouns []NounInstance) (ret Result, err error) {
 	if wordCount == 0 {
 		err = UnknownObject{Depth(cs.Pos)}
 	} else {

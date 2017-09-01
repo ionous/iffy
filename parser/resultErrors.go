@@ -18,7 +18,7 @@ func DepthOf(e interface{}) (ret int) {
 }
 
 type AmbiguousObject struct {
-	Nouns []NounVisitor
+	Nouns []NounInstance
 	Depth
 }
 

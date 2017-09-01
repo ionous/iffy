@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-// MyObject provides an example ( for testing ) of mapping an "Noun" to a NounVisitor.
+// MyObject provides an example ( for testing ) of mapping an "Noun" to a NounInstance.
 type MyObject struct {
 	Id         ident.Id
 	Names      []string
@@ -24,28 +24,28 @@ func (m *MyObject) String() string {
 
 type MyScope []*MyObject
 
-func (m MyScope) Get(r rune) NounVisitor {
+func (m MyScope) Get(r rune) NounInstance {
 	return MyAdapter{m[r-'a']}
 }
 
-func (m MyScope) Many(rs ...rune) (ret []NounVisitor) {
+func (m MyScope) Many(rs ...rune) (ret []NounInstance) {
 	for _, r := range rs {
 		ret = append(ret, m.Get(r))
 	}
 	return
 }
 
-func (m MyScope) GetPlayerScope(name ident.Id) (Scope, error) {
+func (m MyScope) GetPlayerScope(id ident.Id) (Scope, error) {
 	return m, nil
 }
-func (m MyScope) GetOtherScope(name ident.Id) (Scope, error) {
+func (m MyScope) GetOtherScope(id ident.Id) (Scope, error) {
 	return m, nil
 }
 func (m MyScope) IsPlural(word string) bool {
 	return word != inflect.Singularize(word)
 }
 
-func (m MyScope) SearchScope(v func(n NounVisitor) bool) (ret bool) {
+func (m MyScope) SearchScope(v NounVisitor) (ret bool) {
 	n := MyAdapter{}
 	for _, k := range m {
 		n.MyObject = k
@@ -61,8 +61,8 @@ type MyAdapter struct {
 	*MyObject
 }
 
-func (adapt MyAdapter) GetId() ident.Id {
-	return adapt.Id
+func (adapt MyAdapter) Id() ident.Id {
+	return adapt.MyObject.Id
 }
 
 func (adapt MyAdapter) HasName(name string) bool {
@@ -121,22 +121,22 @@ func TestScope(t *testing.T) {
 	}
 	if res, e := matching(ctx, "unique"); assert.NoError(e) {
 		assert.EqualValues(ResolvedObject{
-			NounVisitor: ctx.Get('a'),
-			Words:       sliceOf.String("unique"),
+			NounInstance: ctx.Get('a'),
+			Words:        sliceOf.String("unique"),
 		}, res)
 	}
 
 	if res, e := matching(ctx, "exact match"); assert.NoError(e) {
 		assert.EqualValues(ResolvedObject{
-			NounVisitor: ctx.Get('c'),
-			Words:       sliceOf.String("exact", "match"),
+			NounInstance: ctx.Get('c'),
+			Words:        sliceOf.String("exact", "match"),
 		}, res)
 	}
 
 	if res, e := matchingFilter(ctx, "filter", "attr", "class"); assert.NoError(e) {
 		assert.EqualValues(ResolvedObject{
-			NounVisitor: ctx.Get('f'),
-			Words:       sliceOf.String("filter"),
+			NounInstance: ctx.Get('f'),
+			Words:        sliceOf.String("filter"),
 		}, res)
 	}
 

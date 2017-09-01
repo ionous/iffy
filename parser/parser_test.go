@@ -106,7 +106,7 @@ type ClarifyGoal struct {
 	// What do you want to examine
 	// What do you want to look at?
 	// and note, yu eed the matched "verb"?
-	NounVisitor string
+	NounInstance string
 }
 
 type ErrorGoal struct {
@@ -153,14 +153,14 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 				clarify := g
 				switch e := e.(type) {
 				case MissingObject:
-					extend := append(in, clarify.NounVisitor)
+					extend := append(in, clarify.NounInstance)
 					err = innerParse(log, ctx, match, extend, goals)
 				case AmbiguousObject:
 					// println(strings.Join(in, "/"))
 					// insert resolution into input.
 					i, s := e.Depth, append(in, "")
 					copy(s[i+1:], s[i:])
-					s[i] = clarify.NounVisitor
+					s[i] = clarify.NounInstance
 					// println(strings.Join(s, "\\"))
 					err = innerParse(log, ctx, match, s, goals)
 				default:

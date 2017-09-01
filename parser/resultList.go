@@ -39,16 +39,16 @@ func (rs *ResultList) Last() (ret Result, okay bool) {
 	return
 }
 
-// Objects used by this result. Idenfified via Noun.GetId()
+// Objects used by this result. Idenfified via Noun.Id()
 func (rs *ResultList) Objects() (ret []ident.Id) {
 	for _, r := range rs.list {
 		switch k := r.(type) {
 		case ResolvedObject:
-			n := k.NounVisitor
-			ret = append(ret, n.GetId())
+			n := k.NounInstance
+			ret = append(ret, n.Id())
 		case ResolvedMulti:
 			for _, n := range k.Nouns {
-				ret = append(ret, n.GetId())
+				ret = append(ret, n.Id())
 			}
 		}
 	}

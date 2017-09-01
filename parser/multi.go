@@ -32,7 +32,7 @@ func (try *Multi) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err err
 			// acts just as if one object was wanted.
 			ret, err = resolveObject(cs, r.WordCount, r.Ranking.Nouns)
 		} else {
-			var nouns []NounVisitor
+			var nouns []NounInstance
 			if r.Ranking.Empty() {
 				nouns = r.Implied
 			} else {
