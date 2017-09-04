@@ -3,6 +3,7 @@ package play
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/std"
+	"github.com/ionous/iffy/event/trigger"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/pat/rule"
 )
@@ -14,29 +15,26 @@ type Statement interface {
 type Definitions []Statement
 
 type Facts struct {
-	Grammar   parser.AnyOf
-	Listeners []ListenTo
-	Locations []Location
-	Mandates  rule.Mandates
+	Grammar         parser.AnyOf
+	ObjectListeners []ListenTo
+	ClassListeners  []ListenFor
+	Locations       []Location
+	Mandates        rule.Mandates
 }
 
 type Commands struct {
-	Core   core.Commands
-	Rules  rule.Commands
-	Std    std.Commands
-	Parser parser.Commands
+	Core    core.Commands
+	Rules   rule.Commands
+	Std     std.Commands
+	Parser  parser.Commands
+	Trigger trigger.Commands
 
 	// Define:
 	*Grammar
 	*ListenTo
+	*ListenFor
 	*Location
 	*Mandate
-	// Locale:
-	*Supports
-	*Contains
-	*Wears
-	*Carries
-	*Holds
 	// EventOptions
 	*Capture
 	*RunAfter

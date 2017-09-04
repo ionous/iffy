@@ -68,7 +68,7 @@ func IdFromValue(rval r.Value) (ret ident.Id, err error) {
 func idFromValue(rval r.Value) (ret ident.Id, err error) {
 	rtype := rval.Type()
 	if path, ok := unique.PathOf(rtype, "id"); !ok {
-		err = errutil.New("couldnt find id for", rtype)
+		err = errutil.New("couldnt find id property for", rtype)
 	} else if field := rval.FieldByIndex(path); field.Kind() != r.String {
 		err = errutil.New("id was not a string", field)
 	} else {

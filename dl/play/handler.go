@@ -12,8 +12,24 @@ type ListenTo struct {
 	Options []EventOptions
 }
 
+type ListenFor struct {
+	ListenTo
+}
+
 func (l *ListenTo) Define(f *Facts) (nil error) {
-	f.Listeners = append(f.Listeners, *l)
+	f.ObjectListeners = append(f.ObjectListeners, *l)
+	return
+}
+
+func (l *ListenFor) Define(f *Facts) (nil error) {
+	f.ClassListeners = append(f.ClassListeners, *l)
+	return
+}
+
+func (l *ListenTo) GetOptions() (ret event.Options) {
+	for _, o := range l.Options {
+		ret |= o.Options()
+	}
 	return
 }
 

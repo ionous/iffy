@@ -1,25 +1,78 @@
-package play_test
+package play
 
 import (
-	"github.com/ionous/iffy/dl/play"
+	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/parser"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/spec/ops"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
 
+// for _, v := range facts.Values {
+// 	if obj, ok := objs.GetObject(v.Obj); !ok {
+// 		t.Fatal("couldnt find", v.Obj)
+// 		break
+// 	} else if e := obj.SetValue(v.Prop, v.Val); e != nil {
+// 		t.Fatal(e)
+// 		break
+// 	}
+// }
+// for _, r := range facts.Relations {
+// 	if e := relations.NewRelation(r.Name, index.NewTable(r.Type)); e != nil {
+// 		t.Fatal(e)
+// 		break
+// 	}
+// }
+
+// Define implements Statement by using all AddScript(ed) definitions.
+func (r *Play) Define(f *Facts) (err error) {
+	classes := make(unique.Types)
+	unique.RegisterBlocks(
+		unique.PanicTypes(classes),
+		(*Classes)(nil),
+	)
+
+	cmds := ops.NewOps(classes)
+	unique.RegisterBlocks(
+		unique.PanicTypes(cmds),
+		(*Commands)(nil),
+	)
+
+	unique.RegisterBlocks(
+		unique.PanicTypes(cmds.ShadowTypes),
+		(*Patterns)(nil),
+	)
+
+	var root struct{ Definitions }
+	if c, ok := cmds.NewBuilder(&root); ok {
+		if c.Cmds().Begin() {
+			for _, v := range r.callbacks {
+				v(c)
+			}
+			c.End()
+		}
+		if e := c.Build(); e != nil {
+			err = e
+		} else {
+			err = root.Define(f)
+		}
+	}
+	return
+}
+
 func TestEmpty(t *testing.T) {
-	var reg play.Registry
-	var facts play.Facts
+	var reg Play
+	var facts Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 }
 
 func TestGrammar(t *testing.T) {
-	var reg play.Registry
-	reg.Register(defineGrammar)
+	var reg Play
+	reg.AddScript(defineGrammar)
 	//
-	var facts play.Facts
+	var facts Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 	if testify.Len(t, facts.Grammar.Match, 1) {
@@ -30,36 +83,36 @@ func TestGrammar(t *testing.T) {
 }
 
 func TestLocation(t *testing.T) {
-	var reg play.Registry
-	reg.Register(defineLocation)
+	var reg Play
+	reg.AddScript(defineLocation)
 	//
-	var facts play.Facts
+	var facts Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 	testify.Len(t, facts.Locations, 1)
 }
 
 func TestRules(t *testing.T) {
-	var reg play.Registry
+	var reg Play
 	mandates := []string{"bool", "number", "text", "object", "num list", "text list", "obj list", "run"}
-	reg.Register(func(c *ops.Builder) {
+	reg.AddScript(func(c *ops.Builder) {
 		defineRules(c, mandates)
 	})
 	//
-	var facts play.Facts
+	var facts Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
 	testify.Len(t, facts.Mandates, len(mandates))
 }
 
 func TestEvents(t *testing.T) {
-	var reg play.Registry
-	reg.Register(defineEventHandler)
+	var reg Play
+	reg.AddScript(defineEventHandler)
 	//
-	var facts play.Facts
+	var facts Facts
 	e := reg.Define(&facts)
 	testify.NoError(t, e)
-	testify.Len(t, facts.Listeners, 1)
+	testify.Len(t, facts.ObjectListeners, 1)
 }
 
 func defineGrammar(c *ops.Builder) {
@@ -74,13 +127,7 @@ func defineGrammar(c *ops.Builder) {
 					}
 					c.End()
 				}
-				if c.Cmd("any of").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("action", "look")
-						c.End()
-					}
-					c.End()
-				}
+				c.Cmd("action", "look")
 				c.End()
 			}
 			c.End()
@@ -90,7 +137,7 @@ func defineGrammar(c *ops.Builder) {
 }
 
 func defineLocation(c *ops.Builder) {
-	c.Cmd("location", "parent", c.Cmd("supports"), "child")
+	c.Cmd("location", "parent", locate.Supports, "child")
 }
 
 func defineRules(c *ops.Builder, mandates []string) {

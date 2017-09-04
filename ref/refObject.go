@@ -20,8 +20,17 @@ func (n RefObject) Id() ident.Id {
 	return n.id
 }
 
+func (n RefObject) Value() r.Value {
+	return n.value
+}
+
 func (n RefObject) String() (ret string) {
-	return n.id.Name
+	if n.id.IsValid() {
+		ret = n.id.Name
+	} else {
+		ret = n.value.Type().Name()
+	}
+	return
 }
 
 func (n RefObject) Type() r.Type {
@@ -32,7 +41,7 @@ func (n RefObject) Type() r.Type {
 // Values include rt.Objects for relations and pointers, numbers, and text. For numbers, pv can be any numberic type: float64, int, etc.
 func (n RefObject) GetValue(name string, pv interface{}) (err error) {
 	if e := n.getValue(name, pv); e != nil {
-		err = errutil.New(n, e, name)
+		err = errutil.Fmt("%s %s.%s", e, n, name)
 	}
 	return
 }
@@ -69,7 +78,7 @@ func (n RefObject) getValue(name string, pv interface{}) (err error) {
 	return
 }
 
-// GetValue can return error when the value violates a property constraint,
+// SetValue can return error when the value violates a property constraint,
 // if the value is not of the requested type, or if the targeted property holder is read-only. Read-only values include the "many" side of a relation.
 func (n RefObject) SetValue(name string, v interface{}) (err error) {
 	pid := ident.IdOf(name)

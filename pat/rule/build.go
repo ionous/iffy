@@ -25,7 +25,6 @@ func Master(cmds *ops.Ops, pt *unique.Stack, buildPatterns ...func(c *ops.Builde
 			if e := root.Mandate(pt.Types, rules); e != nil {
 				err = e
 			} else {
-				rules.Sort()
 				ret = rules
 			}
 		}

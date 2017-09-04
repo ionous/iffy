@@ -85,3 +85,8 @@ type Container struct {
 	// Enterable bool
 	// CarryingCapacity float64
 }
+
+type Player struct {
+	Name string `if:"id"` // how the author refers to an instance
+	Pawn *Actor
+}

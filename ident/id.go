@@ -23,7 +23,7 @@ func (id Id) String() (ret string) {
 	if id.Hash != 0 {
 		ret = id.Name
 	} else {
-		ret = "<invalid id>"
+		ret = "<anonyomous>"
 	}
 	return
 }

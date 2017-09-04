@@ -19,43 +19,8 @@ import (
 // }
 type Location struct {
 	Parent string
-	Locale
-	Child string
-}
-
-// Locale, temporary. will replace with enum branch changes
-type Locale interface {
-	Locale() locate.Containment
-}
-
-type Supports struct{}
-
-func (Supports) Locale() locate.Containment {
-	return locate.Supports
-}
-
-type Contains struct{}
-
-func (Contains) Locale() locate.Containment {
-	return locate.Contains
-}
-
-type Wears struct{}
-
-func (Wears) Locale() locate.Containment {
-	return locate.Wears
-}
-
-type Carries struct{}
-
-func (Carries) Locale() locate.Containment {
-	return locate.Carries
-}
-
-type Holds struct{}
-
-func (Holds) Locale() locate.Containment {
-	return locate.Holds
+	Locale locate.Containment
+	Child  string
 }
 
 // func (r *Relation) Assert(f **Facts) (nil error) {
