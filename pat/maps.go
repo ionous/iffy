@@ -4,7 +4,6 @@ import (
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/scope"
 )
 
 // FIX? consider rewriting using reflect so that all patterns are stored together and if the interface doesnt match the expectation it errors.
@@ -17,11 +16,12 @@ type TextLists map[ident.Id]TextListRules
 type ObjLists map[ident.Id]ObjListRules
 type Executes map[ident.Id]ExecuteRules
 
-func setupScope(run rt.Runtime, data rt.Object, cb func(ident.Id)) {
-	id := class.Id(data.Type())
-	run.PushScope(scope.AtFinder(data))
-	cb(id)
-	run.PopScope()
+func setupScope(run rt.Runtime, data rt.Object, cb func(rt.Runtime, ident.Id)) {
+	{
+		run := rt.AtFinder(run, data)
+		id := class.Id(data.Type())
+		cb(run, id)
+	}
 }
 
 func (m Bools) AddRule(id ident.Id, f Filters, k rt.BoolEval) {
@@ -50,7 +50,7 @@ func (m Executes) AddRule(id ident.Id, f Filters, k rt.Execute, flags Flags) {
 }
 
 func (m Bools) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id.Name)
 		} else {
@@ -60,7 +60,7 @@ func (m Bools) GetBoolMatching(run rt.Runtime, data rt.Object) (ret bool, err er
 	return
 }
 func (m Numbers) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id.Name)
 		} else {
@@ -70,7 +70,7 @@ func (m Numbers) GetNumMatching(run rt.Runtime, data rt.Object) (ret float64, er
 	return
 }
 func (m Text) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id.Name)
 		} else {
@@ -81,7 +81,7 @@ func (m Text) GetTextMatching(run rt.Runtime, data rt.Object) (ret string, err e
 }
 
 func (m Objects) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id.Name)
 		} else {
@@ -91,7 +91,7 @@ func (m Objects) GetObjectMatching(run rt.Runtime, data rt.Object) (ret rt.Objec
 	return
 }
 func (m NumLists) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt.NumberStream, err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id.Name)
 		} else {
@@ -102,7 +102,7 @@ func (m NumLists) GetNumStreamMatching(run rt.Runtime, data rt.Object) (ret rt.N
 }
 
 func (m TextLists) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret rt.TextStream, err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id.Name)
 		} else {
@@ -113,7 +113,7 @@ func (m TextLists) GetTextStreamMatching(run rt.Runtime, data rt.Object) (ret rt
 }
 
 func (m ObjLists) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt.ObjectStream, err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		if ps, ok := m[id]; !ok {
 			err = NotFound(id.Name)
 		} else {
@@ -124,7 +124,7 @@ func (m ObjLists) GetObjStreamMatching(run rt.Runtime, data rt.Object) (ret rt.O
 }
 
 func (m Executes) ExecuteMatching(run rt.Runtime, data rt.Object) (err error) {
-	setupScope(run, data, func(id ident.Id) {
+	setupScope(run, data, func(run rt.Runtime, id ident.Id) {
 		// NOTE: if we need to differentiate between "ran" and "not found",
 		// "didnt run" should become an error code.
 		if ps, ok := m[id]; ok {

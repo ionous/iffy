@@ -135,35 +135,6 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	// if kiss, e := cmds.Execute(func(c *ops.Builder) {
-	// 	c.Cmd("print text", "kissed!")
-	// }); e != nil {
-	// 	t.Fatal(e)
-	// } else {
-	// 	listen.Class(kind).On("kiss", event.Default, kiss)
-	// }
-
-	// helper for testing:
-	// Go := func(object, action string) {
-	// 		if obj, ok := run.GetObject(object); !ok {
-	// 			t.Fatal("object not found", object)
-	// 		} else if act, ok := actions[ident.IdOf(action)]; !ok {
-	// 			t.Fatal("unknown action", action)
-	// 		} else {
-	// 			var data rt.Object
-	// 			if dataFn != nil {
-	// 				if dataEval, e := dataFn.Eval(cmds); e != nil {
-	// 					t.Fatal(e)
-	// 				} else if got, e := dataEval.GetObject(run); e != nil {
-	// 					t.Fatal(e)
-	// 				} else {
-	// 					data = got
-	// 				}
-	// 			}
-	// 			e := dispatch.Go(run, act, obj, data)
-	// 			assert.NoError(e)
-	// 		}
-
 	jump, e := run.Objects.Emplace(&Jump{
 		Jumper: bogart,
 	})
@@ -196,13 +167,5 @@ func TestSomething(t *testing.T) {
 	//
 	assert.NoError(event.Trigger(run, listen.EventMap, jump))
 	assert.Equal(sliceOf.String("don't do it bogart!"), lines.Lines())
-
-	// Go("bogart", "kiss", func(c *ops.Builder) {
-	// 	c.Value("bob")
-	// })
-	// Go("bob", "unlock", func(c *ops.Builder) {
-	// 	c.Param("lock", "coffin")
-	// 	c.Param("with", "skeleton key")
-	// })
 
 }

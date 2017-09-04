@@ -40,8 +40,6 @@ type Runtime interface {
 	Random(inclusiveMin, exclusiveMax int) int
 
 	ObjectFinder
-	PushScope(ObjectFinder)
-	PopScope()
 
 	// Emplace adds an anonymous object to the runtime. The object cannot be found via GetObject().
 	Emplace(mem interface{}) (Object, error)

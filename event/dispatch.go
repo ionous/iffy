@@ -44,8 +44,6 @@ func Trigger(run rt.Runtime, events EventMap, data rt.Object) (err error) {
 					err = ac.queue.Flush(run, evt)
 				}
 			}
-			// cleanup regardless of error
-			ac.Destroy()
 		}
 	}
 	return

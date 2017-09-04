@@ -3,7 +3,6 @@ package core
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/scope"
 )
 
 // Looper creates LoopScopes
@@ -17,17 +16,12 @@ func NewLooper(run rt.Runtime, temp interface{}, loop rt.ExecuteList) (ret *Loop
 	if temp, e := run.Emplace(temp); e != nil {
 		err = e
 	} else {
-		run.PushScope(scope.MultiFinder(
-			scope.AtFinder(temp),
-			scope.ModelFinder(run),
-		))
+		run := rt.AtFinder(run, temp)
 		ret = &Looper{run, temp, loop}
 	}
 	return
 }
-func (l *Looper) End() {
-	l.run.PopScope()
-}
+
 func (l *Looper) RunNext(name string, value interface{}, hasNext bool) (err error) {
 	var index int
 	if e := l.obj.GetValue("index", &index); e != nil {

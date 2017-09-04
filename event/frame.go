@@ -2,37 +2,23 @@ package event
 
 import (
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/scope"
 )
 
 type Frame struct {
-	run    rt.Runtime
-	evt    *EventObject
-	queue  QueuedActions
-	pushed bool
+	run   rt.Runtime
+	evt   *EventObject
+	queue QueuedActions
 }
 
 func NewFrame(run rt.Runtime, evt *EventObject) (ret *Frame, err error) {
 	// create event object
-	// FIX: maybe this could be merged with scope?
 	if temp, e := run.Emplace(evt); e != nil {
 		err = e
 	} else {
-		run.PushScope(scope.MultiFinder(
-			scope.AtFinder(temp),
-			scope.ModelFinder(run),
-		))
-		ret = &Frame{run: run, evt: evt, pushed: true}
+		run := rt.AtFinder(run, temp)
+		ret = &Frame{run: run, evt: evt}
 	}
 	return
-}
-
-// Destroy should happen once for every NewFrame
-func (ac *Frame) Destroy() {
-	if ac.pushed {
-		ac.run.PopScope()
-		ac.pushed = false
-	}
 }
 
 // Dispatch the event frame to the passed targets.
