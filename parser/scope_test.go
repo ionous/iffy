@@ -35,10 +35,10 @@ func (m MyScope) Many(rs ...rune) (ret []NounInstance) {
 	return
 }
 
-func (m MyScope) GetPlayerScope(id ident.Id) (Scope, error) {
+func (m MyScope) GetPlayerScope(string) (Scope, error) {
 	return m, nil
 }
-func (m MyScope) GetOtherScope(id ident.Id) (Scope, error) {
+func (m MyScope) GetObjectScope(ident.Id) (Scope, error) {
 	return m, nil
 }
 func (m MyScope) IsPlural(word string) bool {
@@ -157,7 +157,7 @@ func TestScope(t *testing.T) {
 func matching(ctx Context, phrase string) (ret Result, err error) {
 	match := &Noun{}
 	words := strings.Fields(phrase)
-	if scope, e := ctx.GetPlayerScope(ident.None()); e != nil {
+	if scope, e := ctx.GetPlayerScope(""); e != nil {
 		err = e
 	} else {
 		ret, err = match.Scan(ctx, scope, Cursor{Words: words})
@@ -168,7 +168,7 @@ func matching(ctx Context, phrase string) (ret Result, err error) {
 func matchingFilter(ctx Context, phrase, attr, class string) (ret Result, err error) {
 	match := &Noun{Filters{&HasAttr{attr}, &HasClass{class}}}
 	words := strings.Fields(phrase)
-	if scope, e := ctx.GetPlayerScope(ident.None()); e != nil {
+	if scope, e := ctx.GetPlayerScope(""); e != nil {
 		err = e
 	} else {
 		ret, err = match.Scan(ctx, scope, Cursor{Words: words})

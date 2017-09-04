@@ -1,6 +1,6 @@
 package parser
 
-// Action terminates a matcher sequence by setting the context to the desired action.
+// Action terminates a matcher sequence, resolving to the named action.
 type Action struct {
 	Name string
 }

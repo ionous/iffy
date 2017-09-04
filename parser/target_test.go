@@ -31,7 +31,7 @@ func TestTarget(t *testing.T) {
 	ctx := MyContext{
 		Log:     t,
 		MyScope: scope,
-		Other: Scopes{
+		Other: map[ident.Id]Scope{
 			ident.IdOf("apple-cart"): appleCart,
 			ident.IdOf("red-cart"):   redCart},
 	}

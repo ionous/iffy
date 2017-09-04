@@ -7,9 +7,9 @@ import (
 type Context interface {
 	Plurals
 	// ex. "held", for objects held by the player.
-	GetPlayerScope(ident.Id) (Scope, error)
+	GetPlayerScope(string) (Scope, error)
 	// ex. take from a container
-	GetOtherScope(ident.Id) (Scope, error)
+	GetObjectScope(ident.Id) (Scope, error)
 }
 
 type Plurals interface {
@@ -26,9 +26,12 @@ type Scope interface {
 type NounVisitor func(NounInstance) bool
 
 type NounInstance interface {
+	// Id for the noun. Returned via ResultList.Objects() on a successful match.
 	Id() ident.Id
 	HasPlural(string) bool
 	HasName(string) bool
+	// does the noun satisfy the passed named class
 	HasClass(string) bool
+	// does the noun satisfy the passed named class
 	HasAttribute(string) bool
 }

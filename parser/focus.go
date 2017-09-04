@@ -2,7 +2,6 @@ package parser
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ident"
 )
 
 // Focus scanner provides a way to change scope for subsequent scanners.
@@ -10,7 +9,7 @@ import (
 type Focus struct {
 	// future: Who string -- with "" means¥ing player
 	What  Scanner
-	Where ident.Id
+	Where string
 }
 
 //
@@ -45,7 +44,7 @@ func (a *Target) Scan(ctx Context, scope Scope, start Cursor) (ret Result, err e
 		} else if obj, ok := last.(ResolvedObject); !ok {
 			err = errutil.Fmt("expected an object, got %T", last)
 			break
-		} else if scope, e := ctx.GetOtherScope(obj.NounInstance.Id()); e != nil {
+		} else if scope, e := ctx.GetObjectScope(obj.NounInstance.Id()); e != nil {
 			err = e
 			break
 		} else {
