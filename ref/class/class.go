@@ -29,6 +29,14 @@ func Parent(rtype r.Type) (ret r.Type, okay bool) {
 	return
 }
 
+// IsSame tests whether the passed name refers to the passed type.
+func IsSame(rtype r.Type, name string) (okay bool) {
+	if id := ident.IdOf(name); Id(rtype) == id {
+		okay = true
+	}
+	return
+}
+
 // IsCompatible tests whether the passed type can be used as the named class.
 // ie. is the named type a Parent() of the passed type?
 // FIX? would this be better as Type vs. Type, leaving the name -> Type lookup as part of a registry.

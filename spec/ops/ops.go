@@ -24,7 +24,7 @@ type Builder struct {
 	builder.Builder
 }
 
-// NewBuilder starts creating a call tree.
+// NewBuilder starts creating a call tree. Always returns true.
 func (ops *Ops) NewBuilder(root interface{}) (*Builder, bool) {
 	spec := &_Spec{cmds: ops, target: InPlace(root)}
 	return &Builder{

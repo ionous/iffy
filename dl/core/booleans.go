@@ -32,8 +32,8 @@ func (op *IsNot) GetBool(run rt.Runtime) (ret bool, err error) {
 func (op *IsSameClass) GetBool(run rt.Runtime) (ret bool, err error) {
 	if obj, e := op.Obj.GetObject(run); e != nil {
 		err = e
-	} else if cls, ok := run.GetClass(op.Class); ok {
-		ret = cls == obj.Type()
+	} else if cls := obj.Type(); class.IsSame(cls, op.Class) {
+		ret = true
 	}
 	return
 }

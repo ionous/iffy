@@ -17,6 +17,7 @@ type Commands struct {
 	*Sub
 	*Mul
 	*Div
+	*Mod
 	//
 	*AllTrue
 	*AnyTrue
