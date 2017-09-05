@@ -158,8 +158,9 @@ func (r *Table) remove(major string, near, far *Index) (changed bool) {
 					break
 				}
 			}
+			// FIX: add a test that checks near.Rows after a multi-remove.
 			// cut all of the pairs with the requested major
-			a = a[:i+copy(a[i:], a[n:])]
+			near.Rows = a[:i+copy(a[i:], a[n:])]
 			// cut all (remaining) things in the far side
 			dc.Flush()
 		}
