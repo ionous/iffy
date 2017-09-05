@@ -62,6 +62,21 @@ func (t *Text) String() string {
 	return t.Text
 }
 
+// Global asks for an object without considering scope.
+type Global struct {
+	Name string
+}
+
+// GetObject searches through the scope for an object matching Name
+func (op *Global) GetObject(run rt.Runtime) (ret rt.Object, err error) {
+	if obj, ok := run.GetObject(op.Name); !ok {
+		err = errutil.New("Global.GetObject, couldnt find", op.Name)
+	} else {
+		ret = obj
+	}
+	return
+}
+
 // Object searches for objects in the world by name.
 type Object struct {
 	Name string
