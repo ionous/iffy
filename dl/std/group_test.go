@@ -48,7 +48,7 @@ func TestGrouping(t *testing.T) {
 			)
 			//
 			if c.Param("decide").Cmds().Begin() {
-				c.Cmd("print text", "a few things")
+				c.Cmd("say", "a few things")
 				c.End()
 			}
 			c.End() // print several
@@ -113,7 +113,7 @@ func TestGrouping(t *testing.T) {
 				c.Param("if").Cmd("compare text", c.Cmd("get", "@", "label"), c.Cmd("equal to"), "the tiles")
 				c.Param("continue").Cmd("continue before")
 				if c.Param("decide").Cmds().Begin() {
-					c.Cmd("print text", "from a Scrabble set")
+					c.Cmd("say", "from a Scrabble set")
 					c.End()
 				}
 				c.End()

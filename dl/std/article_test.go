@@ -84,9 +84,9 @@ func (assert *ArticleSuite) TestATrailingLampPost() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", "You can only just make out")
-					c.Cmd("print text", c.Cmd("lower a/n", "lamp post"))
-					c.Cmd("print text", ".")
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "lamp post"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 				c.End()
@@ -99,9 +99,9 @@ func (assert *ArticleSuite) TestATrailingTrevor() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", "You can only just make out")
-					c.Cmd("print text", c.Cmd("lower a/n", "trevor"))
-					c.Cmd("print text", ".")
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "trevor"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 				c.End()
@@ -114,9 +114,9 @@ func (assert *ArticleSuite) TestATrailingSoldiers() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", "You can only just make out")
-					c.Cmd("print text", c.Cmd("lower a/n", "soldiers"))
-					c.Cmd("print text", ".")
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "soldiers"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 				c.End()
@@ -130,8 +130,8 @@ func (assert *ArticleSuite) TestALeadingLampPost() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("upper a/n", "lamp post"))
-					c.Cmd("print text", "can be made out in the mist.")
+					c.Cmd("say", c.Cmd("upper a/n", "lamp post"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 				c.End()
@@ -144,8 +144,8 @@ func (assert *ArticleSuite) TestALeadingTrevor() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("upper a/n", "trevor"))
-					c.Cmd("print text", "can be made out in the mist.")
+					c.Cmd("say", c.Cmd("upper a/n", "trevor"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 				c.End()
@@ -158,8 +158,8 @@ func (assert *ArticleSuite) TestALeadingSoldiers() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("upper a/n", "soldiers"))
-					c.Cmd("print text", "can be made out in the mist.")
+					c.Cmd("say", c.Cmd("upper a/n", "soldiers"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 				c.End()
@@ -173,9 +173,9 @@ func (assert *ArticleSuite) TestTheTrailingLampPost() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", "You can only just make out")
-					c.Cmd("print text", c.Cmd("lower the", "lamp post"))
-					c.Cmd("print text", ".")
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "lamp post"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 				c.End()
@@ -188,9 +188,9 @@ func (assert *ArticleSuite) TestTheTrailingTrevor() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", "You can only just make out")
-					c.Cmd("print text", c.Cmd("lower the", "trevor"))
-					c.Cmd("print text", ".")
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "trevor"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 				c.End()
@@ -203,9 +203,9 @@ func (assert *ArticleSuite) TestTheTrailingSoldiers() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", "You can only just make out")
-					c.Cmd("print text", c.Cmd("lower the", "soldiers"))
-					c.Cmd("print text", ".")
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "soldiers"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 				c.End()
@@ -219,8 +219,8 @@ func (assert *ArticleSuite) TestTheLeadingLampPost() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("upper the", "lamp post"))
-					c.Cmd("print text", "may be a trick of the mist.")
+					c.Cmd("say", c.Cmd("upper the", "lamp post"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 				c.End()
@@ -233,8 +233,8 @@ func (assert *ArticleSuite) TestTheLeadingTrevor() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("upper the", "trevor"))
-					c.Cmd("print text", "may be a trick of the mist.")
+					c.Cmd("say", c.Cmd("upper the", "trevor"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 				c.End()
@@ -247,8 +247,8 @@ func (assert *ArticleSuite) TestTheLeadingSoldiers() {
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("upper the", "soldiers"))
-					c.Cmd("print text", "may be a trick of the mist.")
+					c.Cmd("say", c.Cmd("upper the", "soldiers"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 				c.End()
@@ -261,7 +261,7 @@ func (assert *ArticleSuite) TestPluralize() {
 	assert.match("lamps",
 		func(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
-				c.Cmds(c.Cmd("print text", c.Cmd("pluralize", "lamp")))
+				c.Cmds(c.Cmd("say", c.Cmd("pluralize", "lamp")))
 				c.End()
 			}
 		})

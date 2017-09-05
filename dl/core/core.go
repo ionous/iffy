@@ -39,6 +39,7 @@ type Commands struct {
 	*ForEachObj
 	*ForEachText
 	*Get
+	*GetAt
 	*Global
 	*GreaterThan
 	// *Inc
@@ -67,7 +68,7 @@ type Commands struct {
 	*PrintNum
 	*PrintNumWord
 	*PrintSpan
-	*PrintText
+	*Say
 	*Range
 	*RelatedList
 	*RelationEmpty

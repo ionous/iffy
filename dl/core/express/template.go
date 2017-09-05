@@ -20,7 +20,7 @@ func Templatize(tmpl []Token, cmds *ops.Ops) (ret rt.TextEval, err error) {
 				err = e
 				break
 			} else {
-				p := &core.PrintText{n}
+				p := &core.Say{n}
 				buf = append(buf, p)
 			}
 		}

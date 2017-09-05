@@ -67,7 +67,7 @@ func definePlay(c *ops.Builder) {
 				if c.Cmd("print span").Begin() {
 					if c.Cmds().Begin() {
 						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "jumper")))
-						c.Cmd("print text", "jumped!")
+						c.Cmd("say", "jumped!")
 						c.End()
 					}
 					c.End()
@@ -83,7 +83,7 @@ func definePlay(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("upper the", c.Cmd("get", c.Cmd("get", "@", "data"), "jumper"))
-					c.Cmd("print text", "is jumping!")
+					c.Cmd("say", "is jumping!")
 					c.End()
 				}
 				c.End()

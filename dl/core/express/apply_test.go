@@ -19,6 +19,15 @@ func (*TestThe) GetText(run rt.Runtime) (ret string, err error) {
 }
 
 func TestApply(t *testing.T) {
+	const (
+		partStr = "{status.score}/{story.turnCount}"
+		cmdStr  = "{TestThe example}"
+		// noneStr      = ""
+		// emptyStr     = "its {} empty"
+		// nobracketStr = "no quotes"
+		// escapeStr    = "its {{quoted"
+		// ifElseStr    = "{if x}{status.score}{else}{story.turnCount}{endif}"
+	)
 	t.Run("parts", func(t *testing.T) {
 		testEqual(t, partsFn(),
 			templatize(t, partStr, nil))
@@ -46,16 +55,16 @@ func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
 
 func partsFn() rt.TextEval {
 	return &core.Buffer{[]rt.Execute{
-		&core.PrintText{
+		&core.Say{
 			&core.Get{
 				Obj:  &core.Object{Name: "status"},
 				Prop: "score",
 			},
 		},
-		&core.PrintText{
+		&core.Say{
 			&core.Text{"/"},
 		},
-		&core.PrintText{
+		&core.Say{
 			&core.Get{
 				Obj:  &core.Object{Name: "story"},
 				Prop: "turnCount",
@@ -67,7 +76,7 @@ func partsFn() rt.TextEval {
 
 func cmdsFn() rt.TextEval {
 	return &core.Buffer{[]rt.Execute{
-		&core.PrintText{
+		&core.Say{
 			Text: &TestThe{
 				&core.Object{Name: "example"},
 			},

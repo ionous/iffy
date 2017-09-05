@@ -33,8 +33,8 @@ type PrintNumWord struct {
 	Num rt.NumberEval
 }
 
-// PrintText writes a piece of text.
-type PrintText struct {
+// Say writes a piece of text.
+type Say struct {
 	Text rt.TextEval
 }
 
@@ -90,7 +90,7 @@ func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 	return err
 }
 
-func (p *PrintText) Execute(run rt.Runtime) error {
+func (p *Say) Execute(run rt.Runtime) error {
 	return Print(run, p.Text)
 }
 

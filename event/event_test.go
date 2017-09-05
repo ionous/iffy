@@ -82,7 +82,7 @@ func TestSomething(t *testing.T) {
 					if c.Cmds().Begin() {
 						// FIX: to print names need to include articles
 						// probably want a simple named object in core.
-						c.Cmd("print text", "jumped!")
+						c.Cmd("say", "jumped!")
 						c.End()
 					}
 					c.End()
@@ -106,7 +106,7 @@ func TestSomething(t *testing.T) {
 	bogart, _ := run.GetObject("bogart")
 	{
 		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "bogart's jumping!")
+			c.Cmd("say", "bogart's jumping!")
 		}); e != nil {
 			t.Fatal(e)
 		} else {
@@ -116,7 +116,7 @@ func TestSomething(t *testing.T) {
 	}
 	{
 		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "bogart's going to jump!")
+			c.Cmd("say", "bogart's going to jump!")
 		}); e != nil {
 			t.Fatal(e)
 		} else {
@@ -126,7 +126,7 @@ func TestSomething(t *testing.T) {
 	}
 	{
 		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "bogart's tired of jumping.")
+			c.Cmd("say", "bogart's tired of jumping.")
 		}); e != nil {
 			t.Fatal(e)
 		} else {
@@ -152,7 +152,7 @@ func TestSomething(t *testing.T) {
 
 	{
 		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "don't do it bogart!")
+			c.Cmd("say", "don't do it bogart!")
 			c.Cmd("set bool", "@", "stop immediate propagation", true)
 			c.Cmd("set bool", "@", "prevent default", true)
 		}); e != nil {

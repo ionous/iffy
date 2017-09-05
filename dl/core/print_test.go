@@ -13,9 +13,9 @@ func (assert *CoreSuite) TestPrintSpacing() {
 	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
-				c.Cmd("print text", "hello")
-				c.Cmd("print text", "there,")
-				c.Cmd("print text", "world.")
+				c.Cmd("say", "hello")
+				c.Cmd("say", "there,")
+				c.Cmd("say", "world.")
 				c.End()
 			}
 			c.End()
@@ -61,7 +61,7 @@ func (assert *CoreSuite) TestMultiLines() {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("hello", "there", "world"))
 			if c.Param("go").Cmds().Begin() {
-				c.Cmd("print text", c.Cmd("get", "@", "text"))
+				c.Cmd("say", c.Cmd("get", "@", "text"))
 				c.End()
 			}
 			c.End()
@@ -87,7 +87,7 @@ func (assert *CoreSuite) TestSingleLines() {
 				if c.Cmd("for each text").Begin() {
 					c.Param("in").Val(sliceOf.String("hello", "there", "world"))
 					if c.Param("go").Cmds().Begin() {
-						c.Cmd("print text", c.Cmd("get", "@", "text")).End()
+						c.Cmd("say", c.Cmd("get", "@", "text")).End()
 					}
 					c.End()
 				}
@@ -138,7 +138,7 @@ func (assert *CoreSuite) TestLineEndings() {
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
 			if c.Param("go").Cmds().Begin() {
-				if c.Cmd("print text").Begin() {
+				if c.Cmd("say").Begin() {
 					if c.Cmd("choose text").Begin() {
 						c.Param("if").Cmd("get", "@", "last")
 						c.Param("true").Val("last")

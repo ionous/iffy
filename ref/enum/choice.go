@@ -30,7 +30,6 @@ func ChoiceToIndex(id ident.Id, cs []string) (ret int, okay bool) {
 // 	Openable OpenableState = iota
 // 	NotOpenable
 // )
-//
 func PropertyPath(rtype r.Type, name string) (ret []int, idx int) {
 	pid := ident.IdOf(name)
 	fn := func(f *r.StructField, path []int) (done bool) {

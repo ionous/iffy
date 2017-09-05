@@ -157,7 +157,7 @@ func defineEventHandler(c *ops.Builder) {
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
 		if c.Param("go").Cmds().Begin() {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-			c.Cmd("print text", "jumping!")
+			c.Cmd("say", "jumping!")
 			c.End()
 		}
 		if c.Param("options").Cmds().Begin() {
@@ -173,7 +173,7 @@ func defineEventHandler(c *ops.Builder) {
 				if c.Cmd("print span").Begin() {
 					if c.Cmds().Begin() {
 						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-						c.Cmd("print text", "jumped!")
+						c.Cmd("say", "jumped!")
 						c.End()
 					}
 					c.End()

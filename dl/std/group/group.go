@@ -88,7 +88,7 @@ func GroupRules(c *ops.Builder) {
 								c.End()
 							}
 							// now the label:
-							c.Cmd("print text", c.Cmd("get", "@", "label"))
+							c.Cmd("say", c.Cmd("get", "@", "label"))
 							// after the label, possibly write the objects:
 							if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
 								if c.Param("false").Cmds().Begin() {
