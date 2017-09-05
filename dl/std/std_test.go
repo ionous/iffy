@@ -18,7 +18,7 @@ import (
 
 func TestStd(t *testing.T) {
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOps(classes)                   // all shadow types become classes
+	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
 	unique.RegisterBlocks(unique.PanicTypes(classes),

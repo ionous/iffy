@@ -22,7 +22,7 @@ type PatternSuite struct {
 }
 
 func (assert *PatternSuite) SetupTest() {
-	cmds := ops.NewOps(nil)
+	cmds := ops.NewOpsX(nil, core.Xform{})
 	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*rule.Commands)(nil),
 		(*core.Commands)(nil))
@@ -49,7 +49,6 @@ func (assert *PatternSuite) TestFactorial() {
 	if c, ok := assert.cmds.NewBuilder(&root); ok {
 		if c.Cmds().Begin() {
 			if c.Cmd("number rule", "factorial").Begin() {
-				// FIX? re: "equal to" - can literally detect string and make empty command?
 				c.Param("if").Cmd("compare num", c.Cmd("get", "@", "num"), c.Cmd("equal to"), 0)
 				c.Param("decide").Val(1)
 				c.End()
@@ -57,8 +56,9 @@ func (assert *PatternSuite) TestFactorial() {
 			if c.Cmd("number rule", "factorial").Begin() {
 				if c.Param("decide").Cmd("mul", c.Cmd("get", "@", "num")).Begin() {
 					if c.Cmd("determine").Begin() {
-						// FIX: we need to be able to construct a factorial object from scratch
-						// treating it just like it were any other command
+						// alt: register factorial as a shadow class, and trigger a new factorial.
+						// this currently relies on "set num" returning its "this":
+						// therefore "determine" receives the factorial object, and re-runs the pattern.
 						c.Cmd("set num", "@", "num", c.Cmd("sub", c.Cmd("get", "@", "num"), 1))
 						c.End()
 					}

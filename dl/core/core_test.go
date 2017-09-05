@@ -41,7 +41,7 @@ func (assert *CoreSuite) Lines() (ret []string) {
 func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
 	classes := make(unique.Types)
-	assert.cmds = ops.NewOps(classes)
+	assert.cmds = ops.NewOpsX(classes, core.Xform{})
 	unique.RegisterBlocks(unique.PanicTypes(assert.cmds),
 		(*core.Commands)(nil))
 

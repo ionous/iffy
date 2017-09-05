@@ -2,6 +2,7 @@ package play
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/event/evtbuilder"
@@ -79,7 +80,7 @@ func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
 
 func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOps(classes)                   // all shadow types become classes
+	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
 	objects := ref.NewObjects()

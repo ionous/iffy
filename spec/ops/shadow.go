@@ -23,13 +23,6 @@ func Shadow(rtype r.Type) *ShadowClass {
 	return &ShadowClass{rtype, fields, make(map[string]_ShadowSlot)}
 }
 
-// note: nothing in the slot itself guarantees that the type and value are compatible.
-// that's left up to spec/ops.
-type _ShadowSlot struct {
-	rtype  r.Type  // type of the slot
-	rvalue r.Value // spec will .Set to this value
-}
-
 // GetObject for a shadow type generates an object from the slots specified.
 // It is a constructor.
 func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {

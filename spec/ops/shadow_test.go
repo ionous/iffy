@@ -1,7 +1,7 @@
 package ops_test
 
 import (
-	"github.com/ionous/iffy/dl/core" // for interesting evals
+	"github.com/ionous/iffy/dl/core" // for interesting evals, including literals.
 	"github.com/ionous/iffy/ref"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -18,19 +18,19 @@ import (
 func TestShadows(t *testing.T) {
 	assert := testify.New(t)
 	classes := make(unique.Types)
-	ops := ops.NewOps(classes)
+	cmds := ops.NewOpsX(classes, core.Xform{})
 
-	unique.RegisterBlocks(unique.PanicTypes(ops),
+	unique.RegisterBlocks(unique.PanicTypes(cmds),
 		(*core.Commands)(nil))
 
-	unique.RegisterTypes(unique.PanicTypes(ops.ShadowTypes),
+	unique.RegisterTypes(unique.PanicTypes(cmds.ShadowTypes),
 		(*BaseClass)(nil))
 	//
 	var root struct {
 		Num    rt.NumberEval
 		Object rt.ObjectEval
 	}
-	if c, ok := ops.NewBuilder(&root); assert.True(ok) {
+	if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
 		// FIX: without the cmd -- it doesnt error.
 		// FIX: and what about using the same param twice?
 		c.Cmd("add", 1, 2)

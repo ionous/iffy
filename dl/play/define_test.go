@@ -1,6 +1,7 @@
 package play
 
 import (
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/ref/unique"
@@ -33,7 +34,7 @@ func (r *Play) Define(f *Facts) (err error) {
 		(*Classes)(nil),
 	)
 
-	cmds := ops.NewOps(classes)
+	cmds := ops.NewOpsX(classes, core.Xform{})
 	unique.RegisterBlocks(
 		unique.PanicTypes(cmds),
 		(*Commands)(nil),
