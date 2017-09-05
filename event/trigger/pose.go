@@ -35,6 +35,8 @@ func (po Pose) GetValue(name string, pv interface{}) (err error) {
 	case "second noun":
 		err = po.getObject(1, pv)
 		// FUTURE: case text/label.
+	default:
+		err = errutil.New("property not found", name)
 	}
 	return
 }
