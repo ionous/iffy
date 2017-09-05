@@ -56,7 +56,7 @@ func (or *Objects) GetByValue(rval r.Value) (ret rt.Object, err error) {
 // FIX: this is going to be way too slow for *casual use.
 // an mru might of type might help,
 // better might be caching the id path in the class,
-// best might be forcing all classes to carry an explict id field as their first member.
+// best might be forcing all classes to carry an explicit id field as their first member.
 // good for serialization would be store ids as much as possible.
 func IdFromValue(rval r.Value) (ret ident.Id, err error) {
 	if !rval.IsNil() {

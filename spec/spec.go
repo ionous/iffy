@@ -29,7 +29,7 @@ type Specs interface {
 // 	// The block must eventually be terminated with End().
 // 	Cmds(cmds ...Block) Block
 
-// 	// Val specifies a single literal value: whether one primitive value or one array of primitive values. It retuns the current block
+// 	// Val specifies a single literal value: whether one primitive value or one array of primitive values. It returns the current block
 // 	Val(val interface{}) Block
 // }
 

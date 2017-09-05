@@ -93,8 +93,8 @@ func GroupRules(c *ops.Builder) {
 							if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
 								if c.Param("false").Cmds().Begin() {
 									if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
-										// if they are not inumerable, they are numerable.
-										// if they are numerable, then they got a number... in front of some backets.
+										// if they are not innumerable, they are numerable.
+										// if they are numerable, then they got a number... in front of some brackets.
 										if c.Param("false").Cmds().Begin() {
 											c.Cmd("print bracket", c.Cmds(
 												c.Cmd("print objects", c.Cmd("get", "@", "objects"),

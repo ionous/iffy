@@ -86,7 +86,7 @@ type CommandBlock struct {
 	*Contents
 }
 
-// TestOpsBlock ensures blocks of commands register succesfully.
+// TestOpsBlock ensures blocks of commands register successfully.
 func TestOpsBlock(t *testing.T) {
 	assert := assert.New(t)
 	cmds := NewOps(nil)
