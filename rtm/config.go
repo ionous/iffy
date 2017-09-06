@@ -75,7 +75,7 @@ func (c *Config) Rtm() *Rtm {
 	if a == nil {
 		a = NoAncestors{}
 	}
-	var objects *ref.Objects
+	var objects ref.ObjectMap
 	if c.objects != nil {
 		objects = c.objects.Build()
 	}
@@ -91,7 +91,7 @@ func (c *Config) Rtm() *Rtm {
 	//
 	rtm := &Rtm{
 		Types:     c.classes,
-		Objects:   objects,
+		ObjectMap: objects,
 		Relations: rel,
 		Ancestors: a,
 		Writer:    w,

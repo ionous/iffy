@@ -41,7 +41,7 @@ func (m Context) IsPlural(word string) bool {
 func SearchPlayerScope(run rt.Runtime, nv parser.NounVisitor) (ret bool) {
 	// for a bunch of objects in the runtime.
 	rtm := run.(*rtm.Rtm)
-	for _, v := range rtm.Objects.ObjectMap {
+	for _, v := range rtm.ObjectMap {
 		if nv(ObjectNoun{v}) {
 			ret = true
 			break

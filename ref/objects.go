@@ -8,16 +8,11 @@ import (
 	r "reflect"
 )
 
-// Objects with ids, findable by the game.
-type Objects struct {
-	ObjectMap
-}
-
 type ObjectMap map[ident.Id]*RefObject
 
 // Emplace wraps the passed value as an anonymous object.
 // Compatible with rt.Runtime.
-func (or *Objects) Emplace(i interface{}) rt.Object {
+func (or ObjectMap) Emplace(i interface{}) rt.Object {
 	rval, e := unique.ValuePtr(i)
 	if e != nil {
 		panic(e)
@@ -26,20 +21,20 @@ func (or *Objects) Emplace(i interface{}) rt.Object {
 }
 
 // GetObject is compatible with rt.Runtime. The map can also be used directly.
-func (or *Objects) GetObject(name string) (ret rt.Object, okay bool) {
+func (or ObjectMap) GetObject(name string) (ret rt.Object, okay bool) {
 	id := ident.IdOf(name)
-	ret, okay = or.ObjectMap[id]
+	ret, okay = or[id]
 	return
 }
 
 // GetByValue expects a pointer to a value, and it returns the ref object which wraps it.
 // WARNING: it can return nil without error
-func (or *Objects) GetByValue(rval r.Value) (ret rt.Object, err error) {
+func (or ObjectMap) GetByValue(rval r.Value) (ret rt.Object, err error) {
 	if !rval.IsNil() {
 		rval := rval.Elem()
 		if id, e := idFromValue(rval); e != nil {
 			err = errutil.New("get by value", e)
-		} else if obj, ok := or.ObjectMap[id]; !ok {
+		} else if obj, ok := or[id]; !ok {
 			err = errutil.Fmt("get by value, object not found '%s'", id)
 		} else /*if obj.Interface() != rval.Interface() {
 			err = errutil.Fmt("conflicting objects '%s' %T %T", id, obj.Interface(), rval.Interface())

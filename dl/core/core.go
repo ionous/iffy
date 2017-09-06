@@ -59,10 +59,9 @@ type Commands struct {
 	*Num
 	*Numbers
 	*Object
-	// *Objects
+	*Objects
 	// *ObjListContains
 	// *ObjListIsEmpty
-	// *Object
 	*PrintBracket
 	*PrintList
 	*PrintNum

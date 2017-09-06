@@ -128,12 +128,12 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 				Writer(w).
 				Rtm()
 
-			if e := addLocations(run, pc, facts.Locations); e != nil {
+			if e := addLocations(run.ObjectMap, pc, facts.Locations); e != nil {
 				err = e
 			} else {
-				if e := addObjectListeners(run, listen, facts.ObjectListeners); e != nil {
+				if e := addObjectListeners(run.ObjectMap, listen, facts.ObjectListeners); e != nil {
 					err = e
-				} else if e := addClassListeners(run, listen, facts.ClassListeners); e != nil {
+				} else if e := addClassListeners(run.Types, listen, facts.ClassListeners); e != nil {
 					err = e
 				} else {
 					ret = run
@@ -144,13 +144,13 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	return
 }
 
-func addLocations(run *rtm.Rtm, pc locate.Locale, ls []Location) (err error) {
+func addLocations(objs ref.ObjectMap, pc locate.Locale, ls []Location) (err error) {
 	for _, loc := range ls {
 		// in this case we're probably a command too
-		if p, ok := run.GetObject(loc.Parent); !ok {
+		if p, ok := objs.GetObject(loc.Parent); !ok {
 			err = errutil.New("unknown", loc.Parent)
 			break
-		} else if c, ok := run.GetObject(loc.Child); !ok {
+		} else if c, ok := objs.GetObject(loc.Child); !ok {
 			err = errutil.New("unknown", loc.Child)
 			break
 		} else if e := pc.SetLocation(p, c, loc.Locale); e != nil {
@@ -161,10 +161,10 @@ func addLocations(run *rtm.Rtm, pc locate.Locale, ls []Location) (err error) {
 	return
 }
 
-func addObjectListeners(run *rtm.Rtm, listen *evtbuilder.Listeners, ls []ListenTo) (err error) {
+func addObjectListeners(objs ref.ObjectMap, listen *evtbuilder.Listeners, ls []ListenTo) (err error) {
 	for _, l := range ls {
 		opt := l.GetOptions()
-		if obj, ok := run.GetObject(l.Target); !ok {
+		if obj, ok := objs.GetObject(l.Target); !ok {
 			err = errutil.New("couldnt find object", l.Target)
 			break
 		} else if e := listen.Object(obj).On(l.Event, opt, l.Go); e != nil {
@@ -175,10 +175,11 @@ func addObjectListeners(run *rtm.Rtm, listen *evtbuilder.Listeners, ls []ListenT
 	return
 }
 
-func addClassListeners(run *rtm.Rtm, listen *evtbuilder.Listeners, ls []ListenFor) (err error) {
+func addClassListeners(classes unique.Types, listen *evtbuilder.Listeners, ls []ListenFor) (err error) {
 	for _, l := range ls {
 		opt := l.GetOptions()
-		if cls, ok := run.GetClass(l.Target); !ok {
+		// FIX: change to class registry
+		if cls, ok := classes.FindType(l.Target); !ok {
 			err = errutil.New("couldnt find class", l.Target)
 			break
 		} else if e := listen.Class(cls).On(l.Event, opt, l.Go); e != nil {

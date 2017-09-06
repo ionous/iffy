@@ -4,7 +4,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
-	"github.com/ionous/iffy/rt"
 	r "reflect"
 	"strconv"
 )
@@ -24,7 +23,7 @@ type classInfo struct {
 
 type queued struct {
 	rval r.Value
-	cls  rt.Class
+	cls  r.Type
 }
 type queue map[ident.Id]queued
 
@@ -32,10 +31,10 @@ func NewObjects() *ObjBuilder {
 	return &ObjBuilder{make(queue), make(infoMap)}
 }
 
-func (b *ObjBuilder) Build() *Objects {
-	objs := &Objects{make(ObjectMap)}
+func (b *ObjBuilder) Build() ObjectMap {
+	objs := make(ObjectMap)
 	for id, q := range b.queue {
-		objs.ObjectMap[id] = &RefObject{id, q.rval, objs}
+		objs[id] = &RefObject{id, q.rval, objs}
 	}
 	return objs
 }

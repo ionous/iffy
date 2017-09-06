@@ -18,8 +18,6 @@ type ObjectFinder interface {
 type Model interface {
 	// GetObject with the passed name.
 	GetObject(name string) (Object, bool)
-	// GetClass with the passed name.
-	GetClass(name string) (Class, bool)
 	// GetRelation with the passed name.
 	GetRelation(name string) (Relation, bool)
 	// GetValue sets the value of the passed pointer to the value of the named property in the passed object.

@@ -8,7 +8,7 @@ import (
 )
 
 // we use the list of objects to convert into
-func (or *Objects) coerce(dst, src r.Value) (err error) {
+func (or ObjectMap) coerce(dst, src r.Value) (err error) {
 	switch dstType := dst.Type(); dstType.Kind() {
 	case r.Interface: // dst is probably rt.Object
 		if srcobj, e := or.getByValue(src); e != nil {
@@ -44,7 +44,7 @@ func (or *Objects) coerce(dst, src r.Value) (err error) {
 }
 
 // give a value, which might be either an interface or a ptr, return the reflected value of RefObject
-func (or *Objects) getByValue(src r.Value) (ret rt.Object, err error) {
+func (or ObjectMap) getByValue(src r.Value) (ret rt.Object, err error) {
 	switch k := src.Kind(); k {
 	case r.Ptr, r.Interface:
 		if src.IsNil() {
