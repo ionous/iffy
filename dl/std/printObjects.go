@@ -67,7 +67,7 @@ func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error
 			break
 		} else {
 			var name string
-			if obj.GetValue("name", &name); e != nil {
+			if run.GetValue(obj, "name", &name); e != nil {
 				err = e
 				break
 			} else if unnamed := strings.Contains(name, "#"); unnamed {
@@ -92,7 +92,7 @@ func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err er
 			break
 		} else {
 			var name string
-			if obj.GetValue("name", &name); e != nil {
+			if run.GetValue(obj, "name", &name); e != nil {
 				err = e
 				break
 			} else if unnamed := strings.Contains(name, "#"); unnamed {

@@ -36,7 +36,7 @@ func (p *Get) get(run rt.Runtime, pv interface{}) (err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
 		err = e
 	} else {
-		err = obj.GetValue(p.Prop, pv)
+		err = run.GetValue(obj, p.Prop, pv)
 	}
 	return
 }

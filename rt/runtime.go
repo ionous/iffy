@@ -14,7 +14,7 @@ type ObjectFinder interface {
 	FindObject(name string) (Object, bool)
 }
 
-// Model describes the predefined world
+// Model interacts with the predefined world.
 type Model interface {
 	// GetObject with the passed name.
 	GetObject(name string) (Object, bool)
@@ -22,12 +22,15 @@ type Model interface {
 	GetClass(name string) (Class, bool)
 	// GetRelation with the passed name.
 	GetRelation(name string) (Relation, bool)
+	// GetValue sets the value of the passed pointer to the value of the named property in the passed object.
+	GetValue(obj Object, name string, pv interface{}) error
+	// SetValue sets the named property in the passed object to the value.
+	SetValue(obj Object, name string, v interface{}) error
 }
 
-// Ancestors
+// Ancestors customizes the parent-child event hierarchy.
 type Ancestors interface {
-	// GetAncestors returns a stream of objects starting with the passed object, then walking up whatever hierarchy the particular runtime implementation has defined.
-	// E.g. parent-child containment.
+	// GetAncestors returns a stream of objects starting with the parent of the passed object, walking up whatever hierarchy the particular runtime implementation has defined.
 	GetAncestors(Runtime, Object) (ObjectStream, error)
 }
 

@@ -77,7 +77,7 @@ func TestStd(t *testing.T) {
 		t.Run("printed plural name", func(t *testing.T) {
 			forced := "party favors"
 			apple, _ := run.GetObject("apple")
-			if e := apple.SetValue("printed plural name", forced); e != nil {
+			if e := run.SetValue(apple, "printed plural name", forced); e != nil {
 				t.Fatal(e)
 			}
 

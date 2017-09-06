@@ -14,7 +14,7 @@ import (
 // 	if obj, ok := objs.GetObject(v.Obj); !ok {
 // 		t.Fatal("couldnt find", v.Obj)
 // 		break
-// 	} else if e := obj.SetValue(v.Prop, v.Val); e != nil {
+// 	} else if e := run.SetValue(obj,v.Prop, v.Val); e != nil {
 // 		t.Fatal(e)
 // 		break
 // 	}

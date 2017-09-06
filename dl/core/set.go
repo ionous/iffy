@@ -49,7 +49,7 @@ func (p *SetBool) exec(run rt.Runtime) (ret rt.Object, err error) {
 		err = errutil.New("SetBool.Obj", e)
 	} else if val, e := p.Val.GetBool(run); e != nil {
 		err = errutil.New("SetBool.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
+	} else if e := run.SetValue(obj, p.Prop, val); e != nil {
 		err = errutil.New("SetBool.Set", e)
 	} else {
 		ret = obj
@@ -72,7 +72,7 @@ func (p *SetNum) exec(run rt.Runtime) (ret rt.Object, err error) {
 		err = errutil.New("SetNum.Obj", e)
 	} else if val, e := p.Val.GetNumber(run); e != nil {
 		err = errutil.New("SetNum.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
+	} else if e := run.SetValue(obj, p.Prop, val); e != nil {
 		err = errutil.New("SetNum.Set", e)
 	} else {
 		ret = obj
@@ -95,7 +95,7 @@ func (p *SetText) exec(run rt.Runtime) (ret rt.Object, err error) {
 		err = errutil.New("SetText.Obj", e)
 	} else if val, e := p.Val.GetText(run); e != nil {
 		err = errutil.New("SetText.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
+	} else if e := run.SetValue(obj, p.Prop, val); e != nil {
 		err = errutil.New("SetText.Set", e)
 	} else {
 		ret = obj
@@ -118,7 +118,7 @@ func (p *SetObj) exec(run rt.Runtime) (ret rt.Object, err error) {
 		err = errutil.New("SetObj.Obj", e)
 	} else if val, e := p.Val.GetObject(run); e != nil {
 		err = errutil.New("SetObj.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
+	} else if e := run.SetValue(obj, p.Prop, val); e != nil {
 		err = errutil.New("SetObj.Set", e)
 	} else {
 		ret = obj
@@ -138,7 +138,7 @@ func (p *SetState) GetObject(run rt.Runtime) (rt.Object, error) {
 func (p *SetState) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Ref.GetObject(run); e != nil {
 		err = errutil.New("SetState.Ref", e)
-	} else if e := obj.SetValue(p.State, true); e != nil {
+	} else if e := run.SetValue(obj, p.State, true); e != nil {
 		err = errutil.New("SetState", e)
 	} else {
 		ret = obj

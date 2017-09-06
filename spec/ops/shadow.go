@@ -34,7 +34,7 @@ func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 		if v, e := slot.unpack(run); e != nil {
 			err = errutil.New("shadow class", c.rtype, "couldn't unpack", k, e)
 			break
-		} else if e := obj.SetValue(k, v); e != nil {
+		} else if e := run.SetValue(obj, k, v); e != nil {
 			err = errutil.New("shadow class", c.rtype, "couldn't set value", k, e)
 			break
 		}

@@ -23,7 +23,7 @@ func (m matchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
 	var n int
 	if obj, ok := run.FindObject("@"); !ok {
 		err = fmt.Errorf("context not found")
-	} else if e := obj.GetValue("num", &n); e != nil {
+	} else if e := run.GetValue(obj, "num", &n); e != nil {
 		err = e
 	} else {
 		okay = n == int(m)
@@ -124,7 +124,7 @@ func TestFactorial(t *testing.T) {
 		var this int
 		if obj, ok := run.FindObject("@"); !ok {
 			err = fmt.Errorf("context not found")
-		} else if e := obj.GetValue("num", &this); e != nil {
+		} else if e := run.GetValue(obj, "num", &this); e != nil {
 			err = e
 		} else if next, e := rules.GetNumMatching(run, run.Emplace(&Factorial{float64(this - 1)})); e != nil {
 			err = e
