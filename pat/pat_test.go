@@ -76,10 +76,9 @@ func ExampleSayMe() {
 		rules.Sort()
 
 		for i := 1; i <= 4; i++ {
-			if sayMe, e := run.Emplace(&SayMe{float64(i)}); e != nil {
-				fmt.Println("emplace:", e)
-				break
-			} else if text, e := rules.GetTextMatching(run, sayMe); e != nil {
+			sayMe := run.Emplace(&SayMe{float64(i)})
+
+			if text, e := rules.GetTextMatching(run, sayMe); e != nil {
 				fmt.Println("matching:", e)
 				break
 			} else {
@@ -127,9 +126,7 @@ func TestFactorial(t *testing.T) {
 			err = fmt.Errorf("context not found")
 		} else if e := obj.GetValue("num", &this); e != nil {
 			err = e
-		} else if fact, e := run.Emplace(&Factorial{float64(this - 1)}); e != nil {
-			err = e
-		} else if next, e := rules.GetNumMatching(run, fact); e != nil {
+		} else if next, e := rules.GetNumMatching(run, run.Emplace(&Factorial{float64(this - 1)})); e != nil {
 			err = e
 		} else {
 			ret = float64(this) * next
@@ -139,10 +136,8 @@ func TestFactorial(t *testing.T) {
 	// suite?
 	run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
 	//
-	if fact, e := run.Emplace(&Factorial{3}); assert.NoError(e) {
-		if n, e := run.GetNumMatching(run, fact); assert.NoError(e) {
-			fac := 3 * (2 * (1 * 1))
-			assert.EqualValues(fac, n)
-		}
+	if n, e := run.GetNumMatching(run, run.Emplace(&Factorial{3})); assert.NoError(e) {
+		fac := 3 * (2 * (1 * 1))
+		assert.EqualValues(fac, n)
 	}
 }

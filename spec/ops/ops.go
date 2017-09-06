@@ -3,8 +3,8 @@ package ops
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref"
-	"github.com/ionous/iffy/ref/kind"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rt/kind"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/builder"
 	r "reflect"
@@ -181,23 +181,23 @@ func xform(t Transform, v interface{}, dst r.Value) (ret interface{}, err error)
 func evalFromType(rtype r.Type) (ret r.Type, okay bool) {
 	switch k := rtype.Kind(); {
 	case k == r.Bool:
-		ret, okay = boolEval, true
+		ret, okay = kind.BoolEval(), true
 	case kind.IsNumber(k):
-		ret, okay = numEval, true
+		ret, okay = kind.NumberEval(), true
 	case k == r.String:
-		ret, okay = textEval, true
+		ret, okay = kind.TextEval(), true
 	case k == r.Ptr:
-		ret, okay = objEval, true
+		ret, okay = kind.ObjectEval(), true
 	case k == r.Interface:
-		ret, okay = objEval, true
+		ret, okay = kind.ObjectEval(), true
 	case k == r.Array || k == r.Slice:
 		switch k := rtype.Elem().Kind(); {
 		case kind.IsNumber(k):
-			ret, okay = numListEval, true
+			ret, okay = kind.NumListEval(), true
 		case k == r.String:
-			ret, okay = textListEval, true
+			ret, okay = kind.TextListEval(), true
 		case k == r.Ptr:
-			ret, okay = objListEval, true
+			ret, okay = kind.ObjListEval(), true
 		}
 	}
 	return

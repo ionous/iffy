@@ -20,7 +20,17 @@ func (f Token) Fields() []string {
 
 var x *regexp.Regexp
 
-func Tokenize(s string) (ret []Token) {
+type Template []Token
+
+// Tokenize
+func Tokenize(s string) (ret Template, okay bool) {
+	if ts, cnt := tokenize(s); cnt > 0 {
+		ret, okay = ts, true
+	}
+	return
+}
+
+func tokenize(s string) (tokens []Token, symbols int) {
 	if x == nil {
 		x = regexp.MustCompile(`({}|{[^{][^}]*})`)
 	}
@@ -33,21 +43,22 @@ func Tokenize(s string) (ret []Token) {
 		x, y := l[0], l[1]
 		if x > start {
 			plain := s[start:x]
-			ret = append(ret, Token{
+			tokens = append(tokens, Token{
 				Str:   plain,
 				Pos:   start,
 				Plain: true,
 			})
 		}
 		word := s[x+1 : y-1]
-		start, ret = y, append(ret, Token{
+		start, tokens = y, append(tokens, Token{
 			Str: word,
 			Pos: x,
 		})
+		symbols++
 	}
 	if cnt := len(s); cnt > start {
 		plain := s[start:cnt]
-		ret = append(ret, Token{
+		tokens = append(tokens, Token{
 			Str:   plain,
 			Pos:   start,
 			Plain: true,

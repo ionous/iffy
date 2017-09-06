@@ -26,23 +26,21 @@ func Shadow(rtype r.Type) *ShadowClass {
 // GetObject for a shadow type generates an object from the slots specified.
 // It is a constructor.
 func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {
-	if obj, e := run.Emplace(r.New(c.rtype).Interface()); e != nil {
-		err = errutil.New("shadow class", c.rtype, "couldn't create object")
-	} else {
-		// walk all the fields we recorded and pass them to the new object
-		for k, slot := range c.slots {
-			// Unpack evaluates an interface to get its resulting go value.
-			if v, e := slot.unpack(run); e != nil {
-				err = errutil.New("shadow class", c.rtype, "couldn't unpack", k, e)
-				break
-			} else if e := obj.SetValue(k, v); e != nil {
-				err = errutil.New("shadow class", c.rtype, "couldn't set value", k, e)
-				break
-			}
+	obj := run.Emplace(r.New(c.rtype).Interface())
+
+	// walk all the fields we recorded and pass them to the new object
+	for k, slot := range c.slots {
+		// Unpack evaluates an interface to get its resulting go value.
+		if v, e := slot.unpack(run); e != nil {
+			err = errutil.New("shadow class", c.rtype, "couldn't unpack", k, e)
+			break
+		} else if e := obj.SetValue(k, v); e != nil {
+			err = errutil.New("shadow class", c.rtype, "couldn't set value", k, e)
+			break
 		}
-		if err == nil {
-			ret = obj
-		}
+	}
+	if err == nil {
+		ret = obj
 	}
 	return
 }

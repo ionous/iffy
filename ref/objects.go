@@ -17,13 +17,12 @@ type ObjectMap map[ident.Id]*RefObject
 
 // Emplace wraps the passed value as an anonymous object.
 // Compatible with rt.Runtime.
-func (or *Objects) Emplace(i interface{}) (ret rt.Object, err error) {
-	if rval, e := unique.ValuePtr(i); e != nil {
-		err = e
-	} else {
-		ret = &RefObject{value: rval, objects: or}
+func (or *Objects) Emplace(i interface{}) rt.Object {
+	rval, e := unique.ValuePtr(i)
+	if e != nil {
+		panic(e)
 	}
-	return
+	return &RefObject{value: rval, objects: or}
 }
 
 // GetObject is compatible with rt.Runtime. The map can also be used directly.

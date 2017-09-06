@@ -45,7 +45,9 @@ func TestApply(t *testing.T) {
 }
 
 func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
-	if res, e := Templatize(Tokenize(s), cmds); e != nil {
+	if x, ok := Tokenize(s); !ok {
+		t.Fatal("couldnt tokenize", s)
+	} else if res, e := Templatize(x, cmds); e != nil {
 		t.Fatal(e)
 	} else {
 		ret = res
@@ -57,7 +59,7 @@ func partsFn() rt.TextEval {
 	return &core.Buffer{[]rt.Execute{
 		&core.Say{
 			&core.Get{
-				Obj:  &core.Object{Name: "status"},
+				Obj:  &core.GetAt{"status"},
 				Prop: "score",
 			},
 		},
@@ -66,7 +68,7 @@ func partsFn() rt.TextEval {
 		},
 		&core.Say{
 			&core.Get{
-				Obj:  &core.Object{Name: "story"},
+				Obj:  &core.GetAt{"story"},
 				Prop: "turnCount",
 			},
 		},

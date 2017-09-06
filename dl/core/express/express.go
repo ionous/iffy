@@ -3,7 +3,9 @@ package express
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
+	"github.com/kr/pretty"
 	"go/ast"
 	"go/token"
 	r "reflect"
@@ -16,10 +18,12 @@ func ConvertExpr(n ast.Expr, hint r.Type) (ret interface{}, err error) {
 		ret, err = BasicLit(n, hint)
 	case *ast.BinaryExpr:
 		ret, err = BinaryExpr(n, hint)
-	case *ast.SelectorExpr:
-		ret, err = SelectorExpr(n, hint)
 	default:
-		err = errutil.Fmt("unsupported node %T", n)
+		if obj, ok := selectObject(n); !ok {
+			err = errutil.New("unsupported node", pretty.Sprint(n))
+		} else {
+			ret = obj
+		}
 	}
 	return
 }
@@ -50,12 +54,14 @@ func ConvertStmt(l ast.Stmt) (ret rt.Execute, err error) {
 
 func assign(lhs, rhs ast.Expr) (ret rt.Execute, err error) {
 	if n, ok := lhs.(*ast.SelectorExpr); !ok {
+		// FIX: and more so... we should be an object property
 		err = errutil.New("error on left, expected object")
-	} else if obj, e := identifyObject(n); e != nil {
-		err = e
+	} else if x, ok := n.X.(*ast.Ident); !ok {
+		err = errutil.Fmt("expected object identifer, got %T", n.X)
 	} else if v, e := ConvertExpr(rhs, nil); e != nil {
 		err = errutil.New("error on right", e)
 	} else {
+		obj := makeObject(x)
 		switch v := v.(type) {
 		case rt.NumberEval:
 			ret = &core.SetNum{obj, n.Sel.Name, v}
@@ -123,26 +129,23 @@ var binaryMath = map[token.Token]pairFn{
 	},
 }
 
-func SelectorExpr(n *ast.SelectorExpr, hint r.Type) (ret interface{}, err error) {
-	if obj, e := identifyObject(n); e != nil {
-		err = e
-	} else {
-		ret = &core.Get{
-			Obj:  obj,
-			Prop: n.Sel.Name,
+func selectObject(n ast.Expr) (ret rt.ObjectEval, okay bool) {
+	switch n := n.(type) {
+	case *ast.Ident:
+		ret, okay = makeObject(n), true
+	case *ast.SelectorExpr:
+		if obj, ok := selectObject(n.X); ok {
+			ret, okay = &core.Get{obj, n.Sel.Name}, true
 		}
 	}
 	return
 }
 
-func identifyObject(n *ast.SelectorExpr) (ret *core.Object, err error) {
-	if x, ok := n.X.(*ast.Ident); !ok {
-		// FIX? include position here? [ could possibly return an error object with position in it, then use that pos to pretty print an error ]
-		err = errutil.Fmt("expected object identifer, got %T", n.X)
+func makeObject(n *ast.Ident) (ret rt.ObjectEval) {
+	if name := n.Name; lang.IsCapitalized(name) {
+		ret = &core.Global{name}
 	} else {
-		ret = &core.Object{x.Name}
+		ret = &core.GetAt{name}
 	}
-	// Ident includes:
-	// Name, NamePos, and Obj ( which describes a named language entity such as a package, constant, type, variable, function (incl. methods), or label. )
 	return
 }

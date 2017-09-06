@@ -9,63 +9,66 @@ func TestForm(t *testing.T) {
 	const (
 		partStr      = "{status.score}/{story.turnCount}"
 		cmdStr       = "{TestThe example}"
-		noneStr      = ""
 		emptyStr     = "its {} empty"
+		noneStr      = ""
 		nobracketStr = "no quotes"
 		escapeStr    = "its {{quoted"
 		ifElseStr    = "{if x}{status.score}{else}{story.turnCount}{endif}"
 	)
 
 	t.Run("parts", func(t *testing.T) {
-		x := []Token{
+		x := Template{
 			{0, "status.score", false},
 			{14, "/", true},
 			{15, "story.turnCount", false},
 		}
-		res := Tokenize(partStr)
-		testify.Equal(t, x, res)
+		if res, ok := Tokenize(partStr); testify.True(t, ok) {
+			testify.Equal(t, x, res)
+		}
 	})
 	t.Run("cmdStr", func(t *testing.T) {
-		x := []Token{
+		x := Template{
 			{0, "TestThe example", false},
 		}
-		res := Tokenize(cmdStr)
-		testify.Equal(t, x, res)
-	})
-	t.Run("none", func(t *testing.T) {
-		x := []Token(nil)
-		res := Tokenize(noneStr)
-		testify.Equal(t, x, res)
+		if res, ok := Tokenize(cmdStr); testify.True(t, ok) {
+			testify.Equal(t, x, res)
+		}
 	})
 	t.Run("empty", func(t *testing.T) {
-		x := []Token{
+		x := Template{
 			{0, "its ", true},
 			{4, "", false},
 			{6, " empty", true},
 		}
-		res := Tokenize(emptyStr)
-		testify.Equal(t, x, res)
+		if res, ok := Tokenize(emptyStr); testify.True(t, ok) {
+			testify.Equal(t, x, res)
+		}
+	})
+	t.Run("none", func(t *testing.T) {
+		if _, ok := Tokenize(noneStr); ok {
+			t.Fatal("should be false")
+		}
 	})
 	t.Run("nobrackets", func(t *testing.T) {
-		res := Tokenize(nobracketStr)
-		testify.Len(t, res, 1)
+		if _, ok := Tokenize(nobracketStr); ok {
+			t.Fatal("should be false")
+		}
 	})
 	t.Run("escape", func(t *testing.T) {
-		x := []Token{
-			{0, escapeStr, true},
+		if _, ok := Tokenize(escapeStr); ok {
+			t.Fatal("should be false")
 		}
-		res := Tokenize(escapeStr)
-		testify.Equal(t, x, res)
 	})
 	t.Run("else", func(t *testing.T) {
-		x := []Token{
+		x := Template{
 			{0, "if x", false},
 			{6, "status.score", false},
 			{20, "else", false},
 			{26, "story.turnCount", false},
 			{43, "endif", false},
 		}
-		res := Tokenize(ifElseStr)
-		testify.Equal(t, x, res)
+		if res, ok := Tokenize(ifElseStr); testify.True(t, ok) {
+			testify.Equal(t, x, res)
+		}
 	})
 }

@@ -6,11 +6,11 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
 	"strings"
-	"unicode"
 )
 
-// Templatize
-func Templatize(tmpl []Token, cmds *ops.Ops) (ret rt.TextEval, err error) {
+// Templatize is deprecated. Its better to use expressions --
+// tho, there is still a question of command handling.
+func Templatize(tmpl Template, cmds *ops.Ops) (ret rt.TextEval, err error) {
 	if len(tmpl) == 0 {
 		ret = &core.Text{}
 	} else {
@@ -34,8 +34,12 @@ func ReduceToken(t Token, cmds *ops.Ops) (ret rt.TextEval, err error) {
 		ret = &core.Text{s}
 	} else if parts := strings.Fields(s); len(parts) > 1 {
 		ret, err = deduceCmds(cmds, parts)
-	} else if dots := strings.FieldsFunc(s, dotFields); len(dots) > 0 {
-		ret, err = deduceAccess(dots)
+	} else if r, ok := Dedot(s); !ok {
+		err = errutil.Fmt("couldnt create property path", s)
+	} else if r, ok := r.(rt.TextEval); !ok {
+		err = errutil.Fmt("couldnt convert %T to text", r)
+	} else {
+		ret = r
 	}
 	return
 }
@@ -53,49 +57,6 @@ func deduceCmds(cmds *ops.Ops, parts []string) (ret rt.TextEval, err error) {
 		err = e
 	} else {
 		ret = root.TextEval
-	}
-	return
-}
-
-// given a dotted name separted into parts generate a text eval accessor
-// (ex. "example", "example.property")
-// note: it doesnt check if the object exists, and it doesnt check if the property exists.
-func deduceAccess(dots []string) (ret rt.TextEval, err error) {
-	// is upper means a global object
-	isUpper := isCapitalized(dots[0])
-	// length of 1 means no dots at all:
-	if cnt := len(dots); cnt == 1 {
-		if !isUpper {
-			ret = &core.Get{&core.Object{"@"}, dots[0]}
-		} else {
-			// but we have no property accessor --
-			// and, for reasons, we cant print raw name.
-			err = errutil.New("cant say object", dots[0])
-		}
-	} else {
-		var obj rt.ObjectEval
-		if isUpper {
-			obj = &core.Global{dots[0]}
-		} else {
-			obj = &core.Object{dots[0]}
-		}
-		for _, d := range dots[1:] {
-			get := &core.Get{obj, d}
-			obj, ret = get, get
-		}
-	}
-	return
-}
-
-func dotFields(r rune) bool {
-	return r == '.'
-}
-
-// return true if the passed string starts with an upper case letter
-func isCapitalized(n string) (ret bool) {
-	for _, r := range n {
-		ret = unicode.IsUpper(r)
-		break
 	}
 	return
 }

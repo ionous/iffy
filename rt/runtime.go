@@ -42,7 +42,7 @@ type Runtime interface {
 	ObjectFinder
 
 	// Emplace adds an anonymous object to the runtime. The object cannot be found via GetObject().
-	Emplace(mem interface{}) (Object, error)
+	Emplace(mem interface{}) Object
 	//
 	Ancestors
 	// Patterns for pattern matching, iffy's equivalent of user methods and functions.

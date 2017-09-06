@@ -19,10 +19,8 @@ func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups Collections, ungroupe
 			} else {
 				// find the desired group for this object.
 				group := GroupTogether{Target: obj}
-				if grouped, e := run.Emplace(&group); e != nil {
-					err = e
-					break
-				} else if e := run.ExecuteMatching(run, grouped); e != nil {
+				grouped :=run.Emplace(&group)
+				if e := run.ExecuteMatching(run, grouped); e != nil {
 					err = e
 					break
 				} else {
@@ -30,7 +28,7 @@ func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups Collections, ungroupe
 					key := Key{group.Label, group.Innumerable, group.ObjectGrouping}
 					pending.Add(key, obj)
 				}
-			}
+			
 		}
 		if err == nil {
 			groups, ungrouped = pending.Sort()

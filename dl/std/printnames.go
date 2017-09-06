@@ -31,29 +31,17 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-func printName(run rt.Runtime, obj rt.Object) (err error) {
-	if printName, e := run.Emplace(&PrintName{obj}); e != nil {
-		err = e
-	} else {
-		err = run.ExecuteMatching(run, printName)
-	}
-	return
+func printName(run rt.Runtime, obj rt.Object) error {
+	printName := run.Emplace(&PrintName{obj})
+	return run.ExecuteMatching(run, printName)
 }
 
-func printPluralName(run rt.Runtime, obj rt.Object) (err error) {
-	if printName, e := run.Emplace(&PrintPluralName{obj}); e != nil {
-		err = e
-	} else {
-		err = run.ExecuteMatching(run, printName)
-	}
-	return
+func printPluralName(run rt.Runtime, obj rt.Object) error {
+	printName := run.Emplace(&PrintPluralName{obj})
+	return run.ExecuteMatching(run, printName)
 }
 
-func printSeveral(run rt.Runtime, obj rt.Object, cnt int) (err error) {
-	if printName, e := run.Emplace(&PrintSeveral{obj, float64(cnt)}); e != nil {
-		err = e
-	} else {
-		err = run.ExecuteMatching(run, printName)
-	}
-	return
+func printSeveral(run rt.Runtime, obj rt.Object, cnt int) error {
+	printName := run.Emplace(&PrintSeveral{obj, float64(cnt)})
+	return run.ExecuteMatching(run, printName)
 }

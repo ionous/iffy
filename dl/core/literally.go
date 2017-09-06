@@ -1,8 +1,7 @@
 package core
 
 import (
-	"github.com/ionous/iffy/ref/kind"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/kind"
 	r "reflect"
 )
 
@@ -27,6 +26,7 @@ func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, e
 //
 // c.Cmd("get").Begin() { c.Cmd("object", "@") c.Value("text") }
 // c.Cmd("get", "@", "text")
+//
 func literally(v interface{}, dstType r.Type) (ret interface{}, okay bool) {
 	switch v := v.(type) {
 	case bool:
@@ -35,35 +35,30 @@ func literally(v interface{}, dstType r.Type) (ret interface{}, okay bool) {
 		ret, okay = &Num{v}, true
 	case []float64:
 		ret, okay = &Numbers{v}, true
+	// -- string for a command.
 	case string:
 		// could be text or object --
 		switch dstType {
-		case textEval:
+		case kind.TextEval():
 			ret, okay = &Text{v}, true
-		case objEval:
+		case kind.ObjectEval():
 			ret, okay = &Object{v}, true
 		}
 	case []string:
 		switch dstType {
-		case textListEval:
+		case kind.TextListEval():
 			ret, okay = &Texts{v}, true
-		case objListEval:
+		case kind.ObjListEval():
 			ret, okay = &Objects{v}, true
 		}
 	default:
 		{
 			v := r.ValueOf(v)
 			if kind.IsNumber(v.Kind()) {
-				v := v.Convert(rFloat64).Float()
+				v := v.Convert(kind.Number()).Float()
 				ret, okay = &Num{v}, true
 			}
 		}
 	}
 	return
 }
-
-var rFloat64 r.Type = r.TypeOf((*float64)(nil)).Elem()
-var textEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
-var objEval = r.TypeOf((*rt.ObjectEval)(nil)).Elem()
-var textListEval = r.TypeOf((*rt.TextListEval)(nil)).Elem()
-var objListEval = r.TypeOf((*rt.ObjListEval)(nil)).Elem()
