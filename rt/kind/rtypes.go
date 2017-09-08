@@ -1,12 +1,16 @@
 package kind
 
 import (
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
 )
 
 // Number returns reflect.TypeOf(float64)
 func Number() r.Type { return number }
+
+// Number returns reflect.TypeOf(float64)
+func IdentId() r.Type { return identId }
 
 // BoolEval returns reflect.TypeOf(rt.BoolEval)
 func BoolEval() r.Type { return boolEval }
@@ -31,6 +35,7 @@ func ObjListEval() r.Type { return objListEval }
 
 // switches dont work well with .Interface().(type) when dst is nil.
 var number r.Type = r.TypeOf((*float64)(nil)).Elem()
+var identId = r.TypeOf((*ident.Id)(nil)).Elem()
 var boolEval = r.TypeOf((*rt.BoolEval)(nil)).Elem()
 var numEval = r.TypeOf((*rt.NumberEval)(nil)).Elem()
 var textEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
