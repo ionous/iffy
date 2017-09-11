@@ -6,7 +6,7 @@ import (
 	"github.com/ionous/iffy/dl/std/group"
 
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
@@ -204,21 +204,21 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(*
 	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
-	unique.RegisterBlocks(unique.PanicTypes(classes),
+	unique.PanicBlocks(classes,
 		(*Classes)(nil))
 
-	unique.RegisterBlocks(unique.PanicTypes(patterns),
+	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
 	// for testing:
-	unique.RegisterTypes(unique.PanicTypes(classes),
+	unique.PanicTypes(classes,
 		(*ScrabbleTile)(nil))
 
-	objects := ref.NewObjects()
-	unique.RegisterValues(unique.PanicValues(objects),
+	objects := obj.NewObjects()
+	unique.PanicValues(objects,
 		Thingaverse.objects(names)...)
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*Commands)(nil),
 		(*rule.Commands)(nil),

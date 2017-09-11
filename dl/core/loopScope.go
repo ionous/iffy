@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -13,7 +14,7 @@ type Looper struct {
 }
 
 func MakeLooper(run rt.Runtime, temp interface{}, loop rt.ExecuteList) Looper {
-	obj := run.Emplace(temp)
+	obj := obj.Emplace(temp)
 	runat := rt.AtFinder(run, obj)
 	return Looper{runat, obj, loop}
 }

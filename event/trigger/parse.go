@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/parser"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
 	"strings"
@@ -31,7 +32,7 @@ func Parse(run *rtm.Rtm, input string) (err error) {
 		if e := objectify(run, list.Objects(), &p.Noun, &p.SecondNoun); e != nil {
 			err = e
 		} else {
-			run := rt.AtFinder(run, run.Emplace(&p))
+			run := rt.AtFinder(run, obj.Emplace(&p))
 			err = act.Execute(run)
 		}
 	}

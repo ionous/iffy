@@ -2,17 +2,19 @@ package prop
 
 import (
 	"github.com/ionous/iffy/ident"
+	"github.com/ionous/iffy/ref/coerce"
 	r "reflect"
 )
 
 // Field of an object containing a simple value, or an array of simple values.
 type Field struct {
-	parent r.Value // container of fieldValue property
-	field  r.StructField
+	field r.StructField
+	value r.Value // container of Value property
 }
 
-func (p Field) fieldValue() r.Value {
-	return p.parent.FieldByIndex(p.field.Index)
+// MakeField constructor. panics if not value.CanSet().
+func MakeField(field r.StructField, value r.Value) Field {
+	return Field{field, value}
 }
 
 // Id semi-unique identifier of the property slot in its parent object.
@@ -33,13 +35,12 @@ func (p Field) String() string {
 
 // Value returns a snapshot of the current value of the property.
 func (p Field) Value() interface{} {
-	v := p.fieldValue()
-	return v.Interface()
+	return p.value.Interface()
 }
 
 // SetValue to change the current value of the property.
 // Returns an error if the passed value is not compatible with Type().
-func (p Field) SetValue(v interface{}) error {
-	dst, src := p.fieldValue(), r.ValueOf(v)
-	return CoerceValue(dst, src)
+func (p Field) SetValue(v interface{}) (err error) {
+	dst, src := p.value, r.ValueOf(v)
+	return coerce.Value(dst, src)
 }

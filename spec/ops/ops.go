@@ -2,7 +2,7 @@ package ops
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/coerce"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt/kind"
 	"github.com/ionous/iffy/spec"
@@ -105,7 +105,7 @@ func (spec *_Spec) Position(arg interface{}) (err error) {
 func (spec *_Spec) Assign(key string, arg interface{}) (err error) {
 	field := spec.target.FieldByName(key)
 	if !field.IsValid() {
-		err = errutil.Fmt("couldnt get value for '%v'", key)
+		err = errutil.Fmt("couldnt find field %T %v %v", spec.target, spec.target.Type(), key)
 	} else if e := spec.setField(field, arg); e != nil {
 		err = errutil.New("field", key, e)
 	}
@@ -132,7 +132,7 @@ func (spec *_Spec) setField(dst r.Value, src interface{}) (err error) {
 	case *_Spec:
 		// all commands are interfaces are implemented with pointers
 		targetPtr := src.target.Addr()
-		if e := ref.CoerceValue(dst, targetPtr); e != nil {
+		if e := coerce.Value(dst, targetPtr); e != nil {
 			err = errutil.New("couldnt assign command", e)
 		}
 
@@ -160,7 +160,7 @@ func (spec *_Spec) setField(dst r.Value, src interface{}) (err error) {
 	default:
 		if src, e := xform(spec.cmds, src, dst); e != nil {
 			err = e
-		} else if e := ref.CoerceValue(dst, src); e != nil {
+		} else if e := coerce.Value(dst, r.ValueOf(src)); e != nil {
 			err = errutil.New("couldnt assign value", e)
 		}
 	}
@@ -169,6 +169,7 @@ func (spec *_Spec) setField(dst r.Value, src interface{}) (err error) {
 
 // helper to turn dst.Value into dst.Type and transform value
 func xform(t Transform, v interface{}, dst r.Value) (ret interface{}, err error) {
+	// if the destintation slot in the command is an interface -- ie. another command.
 	if dst.Kind() == r.Interface {
 		ret, err = t.TransformValue(v, dst.Type())
 	} else {
@@ -178,26 +179,26 @@ func xform(t Transform, v interface{}, dst r.Value) (ret interface{}, err error)
 }
 
 // determine what kind of eval can produce the passed type.
-func evalFromType(rtype r.Type) (ret r.Type, okay bool) {
+func evalFromType(rtype r.Type) (ret r.Type) {
 	switch k := rtype.Kind(); {
 	case k == r.Bool:
-		ret, okay = kind.BoolEval(), true
+		ret = kind.BoolEval()
 	case kind.IsNumber(k):
-		ret, okay = kind.NumberEval(), true
+		ret = kind.NumberEval()
 	case k == r.String:
-		ret, okay = kind.TextEval(), true
-	case k == r.Ptr:
-		ret, okay = kind.ObjectEval(), true
-	case k == r.Interface:
-		ret, okay = kind.ObjectEval(), true
+		ret = kind.TextEval()
+	case rtype == kind.IdentId():
+		ret = kind.ObjectEval()
+		//
 	case k == r.Array || k == r.Slice:
-		switch k := rtype.Elem().Kind(); {
+		elem := rtype.Elem()
+		switch k := elem.Kind(); {
 		case kind.IsNumber(k):
-			ret, okay = kind.NumListEval(), true
+			ret = kind.NumListEval()
 		case k == r.String:
-			ret, okay = kind.TextListEval(), true
-		case k == r.Ptr:
-			ret, okay = kind.ObjListEval(), true
+			ret = kind.TextListEval()
+		case elem == kind.IdentId():
+			ret = kind.ObjListEval()
 		}
 	}
 	return

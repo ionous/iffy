@@ -2,7 +2,8 @@ package ops_test
 
 import (
 	"github.com/ionous/iffy/dl/core" // for interesting evals, including literals.
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ident"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
@@ -20,10 +21,10 @@ func TestShadows(t *testing.T) {
 	classes := make(unique.Types)
 	cmds := ops.NewOpsX(classes, core.Xform{})
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil))
 
-	unique.RegisterTypes(unique.PanicTypes(cmds.ShadowTypes),
+	unique.PanicTypes(cmds.ShadowTypes,
 		(*BaseClass)(nil))
 	//
 	var root struct {
@@ -51,22 +52,23 @@ func TestShadows(t *testing.T) {
 		}
 	}
 
-	objects := ref.NewObjects()
+	objects := obj.NewObjects()
 	base, other := &BaseClass{Name: "base"}, &BaseClass{Name: "other"}
-	unique.RegisterValues(unique.PanicValues(objects),
+	unique.PanicValues(objects,
 		base, other,
 	)
 	var lines printer.Lines
 	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
 	// "shadow class tests.BaseClass couldn't create object"
 	if obj, e := root.Object.GetObject(run); assert.NoError(e) {
+		baseId, otherId := ident.IdOf("base"), ident.IdOf("other")
 		vals := map[string]struct{ match, fail interface{} }{
 			"Num":     {3, 5},
 			"Text":    {"3", "5"},
-			"Object":  {other, base},
+			"Object":  {otherId, baseId},
 			"Nums":    {sliceOf.Float(1, 2, 3), sliceOf.Float(3, 2, 1)},
 			"Texts":   {sliceOf.String("1", "2", "3"), sliceOf.String("3")},
-			"Objects": {[]*BaseClass{base, other}, []*BaseClass{base}},
+			"Objects": {[]ident.Id{baseId, otherId}, []ident.Id{baseId}},
 			"State":   {Maybe, Yes},
 			"Labeled": {true, false},
 		}

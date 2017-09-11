@@ -17,9 +17,9 @@ func TestBuild(t *testing.T) {
 		rt.NumberEval
 	}
 
-	unique.RegisterTypes(unique.PanicTypes(cmds),
+	unique.PanicTypes(cmds,
 		(*TestScore)(nil))
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil))
 
 	t.Run("property", func(t *testing.T) {
@@ -50,13 +50,13 @@ func TestBuild(t *testing.T) {
 }
 
 // for testing exec if we wanted to...
-// objects := ref.NewObjects()
+// objects := obj.NewObjects()
 // type Target struct {
 // 	Val int
 // }
-// unique.RegisterTypes(unique.PanicTypes(classes),
+// unique.PanicTypes(classes,
 // 	(*Target)(nil))
 // var lines printer.Lines
 // rtm := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
-// obj := rtm.Emplace(&Target{5})
+// obj := obj.Emplace(&Target{5})
 // run := rt.AtFinder(rtm, obj)

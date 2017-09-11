@@ -29,19 +29,14 @@ import (
 // Define implements Statement by using all AddScript(ed) definitions.
 func (r *Play) Define(f *Facts) (err error) {
 	classes := make(unique.Types)
-	unique.RegisterBlocks(
-		unique.PanicTypes(classes),
+	unique.PanicBlocks(classes,
 		(*Classes)(nil),
 	)
-
 	cmds := ops.NewOpsX(classes, core.Xform{})
-	unique.RegisterBlocks(
-		unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*Commands)(nil),
 	)
-
-	unique.RegisterBlocks(
-		unique.PanicTypes(cmds.ShadowTypes),
+	unique.PanicBlocks(cmds.ShadowTypes,
 		(*Patterns)(nil),
 	)
 

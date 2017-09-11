@@ -32,22 +32,13 @@ type Ancestors interface {
 	GetAncestors(Runtime, Object) (ObjectStream, error)
 }
 
+// Runtime environment for an in-progress game.
 type Runtime interface {
-	// Model describes the predefined world
 	Model
-	// Writer writes standard output.
 	io.Writer
-	// Random picks a pseudo-random value from a range. Can return any number including the lower bound, and up-to, but not including, the upper bound.
 	Random(inclusiveMin, exclusiveMax int) int
-
 	ObjectFinder
-
-	// Emplace adds an anonymous object to the runtime. The object cannot be found via GetObject().
-	Emplace(mem interface{}) Object
-	//
 	Ancestors
-	// Patterns for pattern matching, iffy's equivalent of user methods and functions.
 	Patterns
-	// Pluralize for pluralization of printed nouns.
 	Pluralize
 }

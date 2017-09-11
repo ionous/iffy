@@ -2,19 +2,30 @@ package prop
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ref/coerce"
 	"github.com/ionous/iffy/ref/enum"
+	"github.com/ionous/iffy/rt/kind"
 	r "reflect"
 )
 
 // State of a single enumerated value for a field which can hold many different values of some particular enumerated type.
 type State struct {
 	Field
-	index int
+	choice int
+}
+
+func MakeState(pf Field, choice int) State {
+	return State{pf, choice}
+}
+
+// Type returns bool
+func (x State) Type() r.Type {
+	return kind.Bool()
 }
 
 // Value returns true if the parent object is in the state represented by this property; false otherwise.
 func (x State) Value() interface{} {
-	c, idx := x.fieldValue().Int(), x.index
+	c, idx := x.value.Int(), x.choice
 	match := c == int64(idx)
 	return match
 }
@@ -31,10 +42,11 @@ func (x State) SetValue(v interface{}) (err error) {
 
 // Enable (or disable) the state represented by this property,
 func (x State) EnableState(b bool) (err error) {
-	dst := x.fieldValue()
+	dst := x.value
 	if b {
 		// when setting to true, we are asking for this index.
-		err = CoerceValue(dst, r.ValueOf(x.index))
+		idx := x.choice
+		err = coerce.Value(dst, r.ValueOf(idx))
 	} else {
 		// when setting to false, we have to try to generate an opposite value.
 		if choices := enum.Enumerate(x.Type()); len(choices) == 0 {
@@ -45,8 +57,8 @@ func (x State) EnableState(b bool) (err error) {
 			// idx= 0; 2-(0+1)=1
 			// idx= 1; 2-(1+1)=0
 			// ret can be out of range for 1 length enums
-			idx := 2 - (x.index + 1)
-			err = CoerceValue(dst, r.ValueOf(idx))
+			idx := 2 - (x.choice + 1)
+			err = coerce.Value(dst, r.ValueOf(idx))
 		}
 	}
 	return

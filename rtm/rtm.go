@@ -1,11 +1,11 @@
 package rtm
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/pat"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
+	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"io"
@@ -13,8 +13,8 @@ import (
 
 type Rtm struct {
 	unique.Types
-	ref.ObjectMap
-	ref.Relations
+	obj.ObjectMap
+	rel.Relations
 	io.Writer
 	Events event.EventMap
 	Randomizer
@@ -35,21 +35,11 @@ func (rtm *Rtm) FindObject(name string) (rt.Object, bool) {
 }
 
 // GetValue sets the value of the passed pointer to the value of the named property in the passed object.
-func (rtm *Rtm) GetValue(obj rt.Object, name string, pv interface{}) (err error) {
-	if p, ok := obj.Property(name); !ok {
-		err = errutil.Fmt("unknown property %s.%s", obj, name)
-	} else {
-		err = p.GetValue(pv)
-	}
-	return
+func (rtm *Rtm) GetValue(src rt.Object, name string, pv interface{}) error {
+	return obj.UnpackValue(rtm.ObjectMap, src, name, pv)
 }
 
 // SetValue sets the named property in the passed object to the value.
-func (rtm *Rtm) SetValue(obj rt.Object, name string, v interface{}) (err error) {
-	if p, ok := obj.Property(name); !ok {
-		err = errutil.Fmt("unknown property %s.%s", obj, name)
-	} else {
-		err = p.SetValue(v)
-	}
-	return
+func (rtm *Rtm) SetValue(dst rt.Object, name string, v interface{}) error {
+	return obj.PackValue(rtm.ObjectMap, dst, name, v)
 }

@@ -3,6 +3,7 @@ package ops
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
@@ -26,8 +27,7 @@ func Shadow(rtype r.Type) *ShadowClass {
 // GetObject for a shadow type generates an object from the slots specified.
 // It is a constructor.
 func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {
-	obj := run.Emplace(r.New(c.rtype).Interface())
-
+	obj := obj.Emplace(r.New(c.rtype).Interface())
 	// walk all the fields we recorded and pass them to the new object
 	for k, slot := range c.slots {
 		// Unpack evaluates an interface to get its resulting go value.
@@ -85,7 +85,7 @@ func (c *ShadowClass) FieldByName(n string) (ret r.Value) {
 func (c *ShadowClass) FieldByIndex(n []int) (ret r.Value) {
 	field := c.rtype.FieldByIndex(n)
 	// determine what kind of eval can produce the passed type.
-	if rtype, ok := evalFromType(field.Type); ok {
+	if rtype := evalFromType(field.Type); rtype != nil {
 		// create an empty eval for the user to poke into
 		rvalue := r.New(rtype).Elem()
 		c.slots[field.Name] = _ShadowSlot{rtype, rvalue}

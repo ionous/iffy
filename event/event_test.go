@@ -6,9 +6,8 @@ import (
 	"github.com/ionous/iffy/event/evtbuilder"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
-	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
@@ -29,24 +28,18 @@ func TestSomething(t *testing.T) {
 	// FIX: add test to find target
 	// ex. put it as the second object in a structure.
 	type Jump struct {
-		Jumper rt.Object `if:"cls:kind"`
+		Jumper ident.Id `if:"cls:kind"`
 	}
 
 	type Kiss struct {
-		Kisser   rt.Object `if:"cls:kind"`
-		KissWhom rt.Object `if:"cls:kind"`
+		Kisser   ident.Id `if:"cls:kind"`
+		KissWhom ident.Id `if:"cls:kind"`
 	}
 
 	type Unlock struct {
-		Unlocker rt.Object `if:"cls:kind"`
-		Lock     rt.Object `if:"cls:kind"`
-		With     rt.Object `if:"cls:kind"`
-	}
-
-	type Events struct {
-		*Jump
-		*Kiss
-		*Unlock
+		Unlocker ident.Id `if:"cls:kind"`
+		Lock     ident.Id `if:"cls:kind"`
+		With     ident.Id `if:"cls:kind"`
 	}
 
 	classes := make(unique.Types)                 // all types known to iffy
@@ -54,21 +47,18 @@ func TestSomething(t *testing.T) {
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil))
 
-	unique.RegisterTypes(
-		unique.PanicTypes(classes),
+	unique.PanicTypes(classes,
 		(*Kind)(nil))
 
-	unique.RegisterBlocks(
-		unique.PanicTypes(events),
-		(*Events)(nil))
+	unique.RegisterTypes(events,
+		(*Jump)(nil))
 
-	objects := ref.NewObjects()
-	unique.RegisterValues(
-		unique.PanicValues(objects),
+	objects := obj.NewObjects()
+	unique.PanicValues(objects,
 		&Kind{"Bogart"},
 		&Kind{"Bob"},
 		&Kind{"Coffin"},
@@ -135,7 +125,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	jump := run.Emplace(&Jump{Jumper: bogart})
+	jump := obj.Emplace(&Jump{Jumper: bogart.Id()})
 	if obj, e := event.TargetOf(run, jump); assert.NoError(e) {
 		assert.Equal(bogart, obj)
 	}

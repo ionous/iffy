@@ -1,35 +1,22 @@
 package unique
 
-import r "reflect"
-
-type _PanicTypes struct {
-	TypeRegistry
-}
-
-// PanicTypes wraps a registry inorder to panic on any error it encounters.
-func PanicTypes(r TypeRegistry) TypeRegistry {
-	return _PanicTypes{r}
-}
-
-func (r _PanicTypes) RegisterType(rtype r.Type) error {
-	if e := r.TypeRegistry.RegisterType(rtype); e != nil {
+// PanicBlocks wraps RegisterBlocks to panic on error.
+func PanicBlocks(reg TypeRegistry, blks ...interface{}) {
+	if e := RegisterBlocks(reg, blks...); e != nil {
 		panic(e)
 	}
-	return nil
 }
 
-type _PanicValues struct {
-	ValueRegistry
-}
-
-// PanicValues wraps a registry inorder to panic on any error it encounters.
-func PanicValues(r ValueRegistry) ValueRegistry {
-	return _PanicValues{r}
-}
-
-func (r _PanicValues) RegisterValue(rtype r.Value) error {
-	if e := r.ValueRegistry.RegisterValue(rtype); e != nil {
+// PanicBlocks wraps RegisterTypes to panic on error.
+func PanicTypes(reg TypeRegistry, ptrs ...interface{}) {
+	if e := RegisterTypes(reg, ptrs...); e != nil {
 		panic(e)
 	}
-	return nil
+}
+
+// PanicValues wraps RegisterValues to panic on error.
+func PanicValues(reg ValueRegistry, vals ...interface{}) {
+	if e := RegisterValues(reg, vals...); e != nil {
+		panic(e)
+	}
 }

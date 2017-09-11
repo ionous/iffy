@@ -3,7 +3,7 @@ package core_test
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
@@ -27,7 +27,7 @@ type CoreSuite struct {
 	lines printer.Lines
 
 	classes unique.Types
-	objects *ref.ObjBuilder
+	objects *obj.ObjBuilder
 
 	gen *unique.Objects
 }
@@ -42,17 +42,17 @@ func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
 	classes := make(unique.Types)
 	assert.cmds = ops.NewOpsX(classes, core.Xform{})
-	unique.RegisterBlocks(unique.PanicTypes(assert.cmds),
+	unique.PanicBlocks(assert.cmds,
 		(*core.Commands)(nil))
 
 	assert.gen = unique.NewObjectGenerator()
 	assert.classes = classes
-	assert.objects = ref.NewObjects()
+	assert.objects = obj.NewObjects()
 
-	unique.RegisterBlocks(unique.PanicTypes(assert.gen),
+	unique.PanicBlocks(assert.gen,
 		(*core.Counters)(nil))
 
-	unique.RegisterBlocks(unique.PanicTypes(assert.classes),
+	unique.PanicBlocks(assert.classes,
 		(*core.Classes)(nil),
 		(*core.Counters)(nil),
 	)
@@ -65,7 +65,7 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 		if objs, e := assert.gen.Generate(); e != nil {
 			err = e
 		} else {
-			unique.RegisterValues(unique.PanicValues(assert.objects), objs...)
+			unique.PanicValues(assert.objects, objs...)
 			ret = rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).Rtm()
 		}
 	}

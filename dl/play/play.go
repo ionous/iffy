@@ -8,7 +8,8 @@ import (
 	"github.com/ionous/iffy/event/evtbuilder"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
+	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
@@ -83,8 +84,8 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
-	objects := ref.NewObjects()
-	relations := ref.NewRelations()
+	objects := obj.NewObjects()
+	relations := rel.NewRelations()
 
 	//
 	if e := unique.RegisterBlocks(classes, (*Classes)(nil)); e != nil {
@@ -144,7 +145,7 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	return
 }
 
-func addLocations(objs ref.ObjectMap, pc locate.Locale, ls []Location) (err error) {
+func addLocations(objs obj.ObjectMap, pc locate.Locale, ls []Location) (err error) {
 	for _, loc := range ls {
 		// in this case we're probably a command too
 		if p, ok := objs.GetObject(loc.Parent); !ok {
@@ -161,7 +162,7 @@ func addLocations(objs ref.ObjectMap, pc locate.Locale, ls []Location) (err erro
 	return
 }
 
-func addObjectListeners(objs ref.ObjectMap, listen *evtbuilder.Listeners, ls []ListenTo) (err error) {
+func addObjectListeners(objs obj.ObjectMap, listen *evtbuilder.Listeners, ls []ListenTo) (err error) {
 	for _, l := range ls {
 		opt := l.GetOptions()
 		if obj, ok := objs.GetObject(l.Target); !ok {

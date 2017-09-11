@@ -1,6 +1,7 @@
 package group
 
 import (
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -13,19 +14,19 @@ func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups Collections, ungroupe
 		pending := PendingGroups{make(ObjectGroups), nil}
 		//
 		for os.HasNext() {
-			if obj, e := os.GetNext(); e != nil {
+			if tgt, e := os.GetNext(); e != nil {
 				err = e
 				break
 			} else {
 				// find the desired group for this object.
-				group := GroupTogether{Target: obj}
-				if e := run.ExecuteMatching(run, run.Emplace(&group)); e != nil {
+				group := GroupTogether{Target: tgt}
+				if e := run.ExecuteMatching(run, obj.Emplace(&group)); e != nil {
 					err = e
 					break
 				} else {
 					// if nothing was set, then the key is invalid, and the object is considered ungrouped.
 					key := Key{group.Label, group.Innumerable, group.ObjectGrouping}
-					pending.Add(key, obj)
+					pending.Add(key, tgt)
 				}
 			}
 		}

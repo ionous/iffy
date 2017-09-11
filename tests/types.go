@@ -1,14 +1,18 @@
 package tests
 
+import (
+	"github.com/ionous/iffy/ident"
+)
+
 // BaseClass provides a simple object with every common type.
 type BaseClass struct {
 	Name    string `if:"id,plural:baseType classes"`
 	Num     float64
 	Text    string
-	Object  *BaseClass
+	Object  ident.Id `if:"cls:BaseClass"`
 	Nums    []float64
 	Texts   []string
-	Objects []*BaseClass
+	Objects []ident.Id `if:"cls:BaseClass"`
 	State   TriState
 	Labeled bool
 }

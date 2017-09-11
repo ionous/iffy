@@ -1,4 +1,4 @@
-package ref
+package rel
 
 import (
 	"github.com/ionous/iffy/ident"

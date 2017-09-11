@@ -7,7 +7,8 @@ import (
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
+	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
@@ -38,23 +39,23 @@ func TestContents(t *testing.T) {
 	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
-	unique.RegisterBlocks(unique.PanicTypes(classes),
+	unique.PanicBlocks(classes,
 		(*core.Classes)(nil),
 		(*Classes)(nil))
 
-	unique.RegisterBlocks(unique.PanicTypes(patterns),
+	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
-	objects := ref.NewObjects()
-	unique.RegisterValues(unique.PanicValues(objects),
+	objects := obj.NewObjects()
+	unique.PanicValues(objects,
 		Thingaverse.objects(sliceOf.String("box", "cake", "apple", "pen"))...)
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil),
 		(*Commands)(nil),
 	)
-	unique.RegisterTypes(unique.PanicTypes(cmds),
+	unique.PanicTypes(cmds,
 		(*Location)(nil),
 	)
 
@@ -66,7 +67,7 @@ func TestContents(t *testing.T) {
 	type OpsCb func(c *ops.Builder)
 	type Match func(run rt.Runtime, lines []string) bool
 	test := func(t *testing.T, build, exec OpsCb, match Match) (err error) {
-		relations := ref.NewRelations()
+		relations := rel.NewRelations()
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
 		relations.AddTable("locale", pc.Table)
 

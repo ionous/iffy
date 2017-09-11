@@ -1,6 +1,7 @@
 package group
 
 import (
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 )
@@ -24,7 +25,7 @@ func (g Collection) PrintGroup(run rt.Runtime) (err error) {
 			run = rt.Writer(run, &span)
 			defer span.Flush()
 		}
-		printGroup := run.Emplace(&PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.Objects})
+		printGroup := obj.Emplace(&PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.Objects})
 		err = run.ExecuteMatching(run, printGroup)
 	}
 

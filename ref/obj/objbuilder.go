@@ -1,4 +1,4 @@
-package ref
+package obj
 
 import (
 	"github.com/ionous/errutil"
@@ -31,10 +31,11 @@ func NewObjects() *ObjBuilder {
 	return &ObjBuilder{make(queue), make(infoMap)}
 }
 
+// Build returns an ObjectMap
 func (b *ObjBuilder) Build() ObjectMap {
 	objs := make(ObjectMap)
 	for id, q := range b.queue {
-		objs[id] = &RefObject{id, q.rval, objs}
+		objs[id] = RefObject{id, q.rval}
 	}
 	return objs
 }

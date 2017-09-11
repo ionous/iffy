@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
@@ -41,18 +41,18 @@ func (assert *ArticleSuite) SetupTest() {
 	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*Commands)(nil),
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil),
 	)
-	unique.RegisterTypes(unique.PanicTypes(classes),
+	unique.PanicTypes(classes,
 		(*Kind)(nil))
-	unique.RegisterBlocks(unique.PanicTypes(patterns),
+	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
-	objects := ref.NewObjects()
-	unique.RegisterValues(unique.PanicValues(objects),
+	objects := obj.NewObjects()
+	unique.PanicValues(objects,
 		&Kind{Name: "lamp-post"},
 		&Kind{Name: "soldiers", IndefiniteArticle: "some"},
 		&Kind{Name: "trevor", CommonProper: ProperNamed},

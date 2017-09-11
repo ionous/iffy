@@ -1,9 +1,8 @@
-package prop_test
+package coerce_test
 
 import (
-	"github.com/ionous/iffy/ref/prop"
+	"github.com/ionous/iffy/ref/coerce"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/tests"
 	"github.com/ionous/sliceOf"
 	"github.com/kr/pretty"
 	r "reflect"
@@ -22,7 +21,7 @@ func TestCoercion(t *testing.T) {
 	t.Run("bool", func(t *testing.T) {
 		var dst, src bool
 		src = true
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if dst != src {
 			t.Fatal("failed to copy", src, dst)
@@ -31,7 +30,7 @@ func TestCoercion(t *testing.T) {
 	t.Run("string", func(t *testing.T) {
 		var dst, src string
 		src = "text"
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if dst != src {
 			t.Fatal("failed to copy", src, dst)
@@ -40,7 +39,7 @@ func TestCoercion(t *testing.T) {
 	t.Run("eval", func(t *testing.T) {
 		var dst rt.TextEval
 		src := &TestText{"text"}
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if text, _ := dst.GetText(nil); text != src.Text {
 			t.Fatal("failed to copy", src, dst)
@@ -49,7 +48,7 @@ func TestCoercion(t *testing.T) {
 	t.Run("int to float", func(t *testing.T) {
 		var dst float64
 		var src int = 23
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if dst != float64(src) {
 			t.Fatal("failed to copy", src, dst)
@@ -58,7 +57,7 @@ func TestCoercion(t *testing.T) {
 	t.Run("float to int", func(t *testing.T) {
 		var dst int
 		var src float64 = 2.3
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if dst != int(src) {
 			t.Fatal("failed to copy", src, dst)
@@ -67,7 +66,7 @@ func TestCoercion(t *testing.T) {
 	t.Run("strings", func(t *testing.T) {
 		var dst, src []string
 		src = sliceOf.String("ready", "set", "go")
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if diff := pretty.Diff(dst, src); len(diff) > 0 {
 			t.Fatal("failed to copy", diff)
@@ -82,7 +81,7 @@ func TestCoercion(t *testing.T) {
 	t.Run("ints to floats", func(t *testing.T) {
 		dst := sliceOf.Float()
 		src := sliceOf.Int(1, 1, 2, 3)
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if diff := pretty.Diff(dst, sliceOf.Float64(1, 1, 2, 3)); len(diff) > 0 {
 			t.Fatal("failed to copy", diff)
@@ -91,34 +90,11 @@ func TestCoercion(t *testing.T) {
 	t.Run("floats to ints", func(t *testing.T) {
 		dst := sliceOf.Int()
 		src := sliceOf.Float(1.1, 2.3, 5.8)
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
+		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
 			t.Fatal(e)
 		} else if diff := pretty.Diff(dst, sliceOf.Int(1, 2, 5)); len(diff) > 0 {
 			t.Fatal("failed to copy", diff)
 		}
 	})
-	t.Run("state to state", func(t *testing.T) {
-		dst, src := tests.No, tests.Maybe
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
-			t.Fatal(e)
-		} else if dst != src {
-			t.Fatal("failed to copy", src, dst)
-		}
-	})
-	t.Run("state to string", func(t *testing.T) {
-		dst, src := "", tests.Maybe
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
-			t.Fatal(e)
-		} else if dst != src.String() {
-			t.Fatal("failed to copy", src, dst, len(dst))
-		}
-	})
-	t.Run("string to state", func(t *testing.T) {
-		dst, src := tests.No, "Maybe"
-		if e := prop.CoerceValue(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {
-			t.Fatal(e)
-		} else if dst.String() != src {
-			t.Fatal("failed to copy", src, dst)
-		}
-	})
+
 }

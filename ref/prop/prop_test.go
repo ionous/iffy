@@ -17,9 +17,9 @@ func TestProp(t *testing.T) {
 	parent := &PropClass{"foo", 5, tests.Yes}
 	obj := r.ValueOf(parent).Elem()
 
-	str := Field{obj, obj.Type().Field(0)}
-	num := Field{obj, obj.Type().Field(1)}
-	tri := Field{obj, obj.Type().Field(2)}
+	str := Field{obj.Type().Field(0), obj.Field(0)}
+	num := Field{obj.Type().Field(1), obj.Field(1)}
+	tri := Field{obj.Type().Field(2), obj.Field(2)}
 	yes := State{tri, 1}
 	no := State{tri, 0}
 	//

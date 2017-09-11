@@ -18,16 +18,14 @@ type Object interface {
 	Property(name string) (Property, bool)
 }
 
+// Property represents, roughly, the value of a field in an object, but it can also represent the status of an object state, or the relationship between objects.
 type Property interface {
 	// Id returns a somewhat unique identifier.
 	Id() ident.Id
-	// Type returns the variety of property.
+	// Type of the slot ( related to, but not always the same type as the value. )
 	Type() r.Type
-	// GetValue stores the value of this property into the pointer pv.
-	// Values include meta.Objects for relations and pointers, numbers, and text. For numbers, pv can be any numberic type: float64, int, etc.
-	GetValue(pv interface{}) error
-	// SetValue stores the passed value into this property.
-	// This can return error when the value violates a property constraint,
-	// or if the value is not of the requested type.
-	SetValue(v interface{}) error
+	// Value of the property.
+	Value() interface{}
+	// SetValue to change the property.
+	SetValue(interface{}) error
 }

@@ -1,5 +1,9 @@
 package std
 
+import (
+	"github.com/ionous/iffy/ident"
+)
+
 //go:generate stringer -type=SingularPlural
 type SingularPlural int
 
@@ -87,6 +91,6 @@ type Container struct {
 }
 
 type Player struct {
-	Name string `if:"id"` // how the author refers to an instance
-	Pawn *Actor
+	Name string   `if:"id"` // how the author refers to an instance
+	Pawn ident.Id `if:"cls:Actor"`
 }

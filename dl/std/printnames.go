@@ -2,6 +2,7 @@ package std
 
 import (
 	"github.com/ionous/iffy/dl/std/group"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rt/stream"
@@ -31,17 +32,17 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-func printName(run rt.Runtime, obj rt.Object) error {
-	printName := run.Emplace(&PrintName{obj})
+func printName(run rt.Runtime, x rt.Object) error {
+	printName := obj.Emplace(&PrintName{x.Id()})
 	return run.ExecuteMatching(run, printName)
 }
 
-func printPluralName(run rt.Runtime, obj rt.Object) error {
-	printName := run.Emplace(&PrintPluralName{obj})
+func printPluralName(run rt.Runtime, x rt.Object) error {
+	printName := obj.Emplace(&PrintPluralName{x.Id()})
 	return run.ExecuteMatching(run, printName)
 }
 
-func printSeveral(run rt.Runtime, obj rt.Object, cnt int) error {
-	printName := run.Emplace(&PrintSeveral{obj, float64(cnt)})
+func printSeveral(run rt.Runtime, x rt.Object, cnt int) error {
+	printName := obj.Emplace(&PrintSeveral{x.Id(), float64(cnt)})
 	return run.ExecuteMatching(run, printName)
 }

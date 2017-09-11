@@ -2,7 +2,7 @@ package std
 
 import (
 	"github.com/ionous/iffy/dl/std/group"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/ident"
 )
 
 type Classes struct {
@@ -45,7 +45,7 @@ type Commands struct {
 // Analogous to Inform's "Printing the name of something."
 // http://inform7.com/learn/man/WI_18_10.html
 type PrintName struct {
-	Target rt.Object `if:"cls:kind"`
+	Target ident.Id `if:"cls:kind"`
 }
 
 // PrintPluralName defines a pattern to say the plural of the target's name.
@@ -55,7 +55,7 @@ type PrintName struct {
 // Analogous to Inform's "Printing the plural nam e of something."
 // http://inform7.com/learn/man/WI_18_11.html
 type PrintPluralName struct {
-	Target rt.Object `if:"cls:kind"`
+	Target ident.Id `if:"cls:kind"`
 }
 
 // PrintSeveral defines a pattern to say information about a generic group of objects.
@@ -63,7 +63,7 @@ type PrintPluralName struct {
 // Analogous to Inform's "Printing a number of something."
 // http://inform7.com/learn/man/WI_18_12.html
 type PrintSeveral struct {
-	Target    rt.Object `if:"cls:kind"`
+	Target    ident.Id `if:"cls:kind"`
 	GroupSize float64
 }
 
@@ -73,7 +73,7 @@ type PrintSeveral struct {
 // http://inform7.com/learn/man/WI_18_25.html
 // http://inform7.com/learn/man/WI_18_26.html
 type PrintObject struct {
-	Target rt.Object `if:"cls:kind"`
+	Target ident.Id `if:"cls:kind"`
 }
 
 // PrintSummary defines a pattern to say extra information for certain items ( such as containers. )
@@ -83,11 +83,11 @@ type PrintObject struct {
 // http://inform7.com/learn/man/WI_18_16.html
 // http://inform7.com/learn/man/WI_18_17.html
 type PrintSummary struct {
-	Target rt.Object `if:"cls:kind"`
+	Target ident.Id `if:"cls:kind"`
 }
 
 type PrintContent struct {
-	Target            rt.Object `if:"cls:kind"`
+	Target            ident.Id `if:"cls:kind"`
 	Header            string
 	Articles, Tersely bool
 }

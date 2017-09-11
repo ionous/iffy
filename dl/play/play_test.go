@@ -3,7 +3,7 @@ package play
 import (
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/event/trigger"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
@@ -23,7 +23,7 @@ func TestPlay(t *testing.T) {
 	assert := testify.New(t)
 
 	type Jump struct {
-		Jumper rt.Object `if:"cls:kind"`
+		Jumper ident.Id `if:"cls:kind"`
 	}
 	type Events struct {
 		*Jump
@@ -32,7 +32,7 @@ func TestPlay(t *testing.T) {
 	play.AddEvents((*Events)(nil))
 	play.AddScript(definePlay)
 	bogart := &std.Actor{Thing: std.Thing{Kind: std.Kind{Name: "Bogart", CommonProper: std.ProperNamed}}}
-	play.AddObjects(bogart, &std.Player{Name: "player", Pawn: bogart})
+	play.AddObjects(bogart, &std.Player{Name: "player", Pawn: ident.IdOf("bogart")})
 	// errutil.Panic = true
 
 	//couldnt find $printName

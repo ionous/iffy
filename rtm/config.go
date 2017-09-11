@@ -5,7 +5,8 @@ import (
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
+	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
@@ -17,9 +18,9 @@ type Config struct {
 	ancestors rt.Ancestors
 	events    event.EventMap
 	grammar   parser.Scanner
-	objects   *ref.ObjBuilder
+	objects   *obj.ObjBuilder
 	patterns  *pat.Patterns
-	rel       ref.RelationBuilder
+	rel       rel.RelationBuilder
 	seed      int64
 	writer    io.Writer
 }
@@ -44,12 +45,12 @@ func (c *Config) Grammar(r *parser.AnyOf) *Config {
 	return c
 }
 
-func (c *Config) Objects(o *ref.ObjBuilder) *Config {
+func (c *Config) Objects(o *obj.ObjBuilder) *Config {
 	c.objects = o
 	return c
 }
 
-func (c *Config) Relations(r ref.RelationBuilder) *Config {
+func (c *Config) Relations(r rel.RelationBuilder) *Config {
 	c.rel = r
 	return c
 }
@@ -75,7 +76,7 @@ func (c *Config) Rtm() *Rtm {
 	if a == nil {
 		a = NoAncestors{}
 	}
-	var objects ref.ObjectMap
+	var objects obj.ObjectMap
 	if c.objects != nil {
 		objects = c.objects.Build()
 	}

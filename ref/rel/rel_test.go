@@ -1,8 +1,9 @@
-package ref
+package rel
 
 import (
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/index"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	testify "github.com/stretchr/testify/assert"
@@ -23,12 +24,12 @@ type Rock struct {
 func TestOneToMany(t *testing.T) {
 	assert := testify.New(t)
 	classes := make(unique.Types)
-	unique.RegisterTypes(unique.PanicTypes(classes),
+	unique.PanicTypes(classes,
 		(*Gremlin)(nil),
 		(*Rock)(nil))
 
-	objbuilder := NewObjects()
-	unique.RegisterValues(unique.PanicValues(objbuilder),
+	objbuilder := obj.NewObjects()
+	unique.PanicValues(objbuilder,
 		&Gremlin{Name: "claire"},
 		&Rock{Name: "loofa"},
 		&Rock{Name: "rocky"},

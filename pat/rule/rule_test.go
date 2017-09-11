@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
@@ -23,7 +23,7 @@ type PatternSuite struct {
 
 func (assert *PatternSuite) SetupTest() {
 	cmds := ops.NewOpsX(nil, core.Xform{})
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*rule.Commands)(nil),
 		(*core.Commands)(nil))
 	assert.cmds = cmds
@@ -41,7 +41,7 @@ type Factorial struct {
 func (assert *PatternSuite) TestFactorial() {
 	classes := make(unique.Types)
 	patterns := unique.NewStack(classes)
-	unique.RegisterTypes(unique.PanicTypes(patterns),
+	unique.PanicTypes(patterns,
 		(*Factorial)(nil))
 	assert.Contains(classes, ident.IdOf("Factorial"), "adding to patterns should add to classes")
 
@@ -81,13 +81,13 @@ func (assert *PatternSuite) TestFactorial() {
 			}
 		}
 		//
-		objects := ref.NewObjects()
+		objects := obj.NewObjects()
 		run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
 		peal := run.GetPatterns()
 		if numberPatterns := peal.Numbers; assert.Len(numberPatterns, 1) {
 			if factPattern := numberPatterns[ident.IdOf("factorial")]; assert.Len(factPattern, 2) {
 				//
-				if n, e := run.GetNumMatching(run, run.Emplace(&Factorial{3})); assert.NoError(e) {
+				if n, e := run.GetNumMatching(run, obj.Emplace(&Factorial{3})); assert.NoError(e) {
 					fac := 3 * (2 * (1 * 1))
 					assert.EqualValues(fac, n)
 				}
