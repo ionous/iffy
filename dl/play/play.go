@@ -129,10 +129,10 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 				Writer(w).
 				Rtm()
 
-			if e := addLocations(run.ObjectMap, pc, facts.Locations); e != nil {
+			if e := addLocations(run.Objects, pc, facts.Locations); e != nil {
 				err = e
 			} else {
-				if e := addObjectListeners(run.ObjectMap, listen, facts.ObjectListeners); e != nil {
+				if e := addObjectListeners(run.Objects, listen, facts.ObjectListeners); e != nil {
 					err = e
 				} else if e := addClassListeners(run.Types, listen, facts.ClassListeners); e != nil {
 					err = e

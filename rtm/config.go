@@ -92,7 +92,7 @@ func (c *Config) Rtm() *Rtm {
 	//
 	rtm := &Rtm{
 		Types:     c.classes,
-		ObjectMap: objects,
+		Objects:   objects,
 		Relations: rel,
 		Ancestors: a,
 		Writer:    w,
