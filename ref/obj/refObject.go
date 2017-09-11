@@ -78,6 +78,9 @@ func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
 
 /// SetValue sets the named property to the passed value.
 func (n RefObject) SetValue(prop string, v interface{}) (err error) {
+	if v == nil {
+		panic(errutil.New(n, prop, "is nil"))
+	}
 	if p, ok := n.Property(prop); !ok {
 		err = errutil.New(n, prop, "unknown property")
 	} else {

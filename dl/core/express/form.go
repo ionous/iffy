@@ -14,11 +14,14 @@ type Token struct {
 func (f Token) String() string {
 	return f.Str
 }
+
 func (f Token) Fields() []string {
 	return strings.Fields(f.Str)
 }
 
 // Go looks at the token to determine if it's command-like
+// Basically, you cant do complex stuff inside of {} and thats okay.
+// If you need to, you establish a new pattern with simple parameters drawn from the object.
 func (f Token) Go() (ret []string, okay bool) {
 	if !f.Plain {
 		parts := strings.Fields(f.Str)

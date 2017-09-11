@@ -90,7 +90,29 @@ type Container struct {
 	// CarryingCapacity float64
 }
 
-type Player struct {
-	Name string   `if:"id"` // how the author refers to an instance
-	Pawn ident.Id `if:"cls:Actor"`
+// Pawn represents the current viewpoint
+type Pawn struct {
+	Name  string   `if:"id"`
+	Actor ident.Id `if:"cls:Actor"`
+}
+
+//go:generate stringer -type=StoryStatus
+type StoryStatus int
+
+const (
+	Starting StoryStatus = iota
+	Playing
+	Completed
+)
+
+type Story struct {
+	Name                string `if:"id"`
+	Author              string
+	Headline            string
+	Scored              bool
+	Score, MaximumScore float64
+	TurnCount           float64
+	StoryStatus
+	StatusLeft, StatusRight string
+	PlayerInput             string
 }

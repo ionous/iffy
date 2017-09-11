@@ -2,6 +2,7 @@ package ops
 
 import (
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/builder"
 )
 
@@ -36,7 +37,10 @@ func (ops *Ops) NewXBuilder(root interface{}, x Transform) (*Builder, bool) {
 }
 
 // Build generates data into the root passed via NewBuilder()
-func (u *Builder) Build() (err error) {
+func (u *Builder) Build(specs ...func(spec.Block)) (err error) {
+	for _, s := range specs {
+		s(u)
+	}
 	if _, e := u.Builder.Build(); e != nil {
 		err = e
 	}

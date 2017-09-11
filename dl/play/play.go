@@ -105,7 +105,7 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 		err = e
 	} else if e := unique.RegisterValues(objects, r.objects...); e != nil {
 		err = e
-	} else if rules, e := rule.Master(cmds, core.Xform{}, patterns, std.StdRules); e != nil {
+	} else if rules, e := rule.Master(cmds, core.Xform{}, patterns, std.Rules); e != nil {
 		err = e
 	} else if facts, e := r.Build(cmds); e != nil {
 		err = e
@@ -117,7 +117,7 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 		listen := evtbuilder.NewListeners(events.Types)
 
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
-		if e := relations.AddTable("ParentChild", pc.Table); e != nil {
+		if e := relations.AddTable("locale", pc.Table); e != nil {
 			err = e
 		} else {
 			run := rtm.New(classes).
@@ -155,7 +155,7 @@ func addLocations(objs obj.ObjectMap, pc locate.Locale, ls []Location) (err erro
 		} else if c, ok := objs.GetObject(loc.Child); !ok {
 			err = errutil.New("unknown", loc.Child)
 			break
-		} else if e := pc.SetLocation(p, c, loc.Locale); e != nil {
+		} else if e := pc.SetLocation(p, loc.Locale, c); e != nil {
 			err = e
 			break
 		}

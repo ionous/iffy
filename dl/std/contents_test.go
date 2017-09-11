@@ -93,7 +93,7 @@ func TestContents(t *testing.T) {
 					} else if c, ok := objs.GetObject(l.Child); !ok {
 						err = errutil.New("unknown", l.Child)
 						break
-					} else if e := pc.SetLocation(p, c, l.Locale); e != nil {
+					} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
 						err = e
 						break
 					}

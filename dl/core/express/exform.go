@@ -13,6 +13,10 @@ type Xform struct {
 	core.Xform
 }
 
+func MakeXform(cmds *ops.Ops) Xform {
+	return Xform{cmds: cmds}
+}
+
 // TransformValue returns src if no error but couldnt convert.
 func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, err error) {
 	if t, ok := tryTokenize(val); ok {
@@ -27,6 +31,9 @@ func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, e
 func (ts Xform) TransformTemplate(t Template, hint r.Type) (ret interface{}, err error) {
 	// FIX: not just one token? than our output sure better be a text eval
 	if len(t) > 1 {
+		for _, x := range t {
+			println(x.Str)
+		}
 		panic("hint text eval")
 	} else {
 		// look for and chomp templates starting with {go}
@@ -43,7 +50,7 @@ func (ts Xform) TransformTemplate(t Template, hint r.Type) (ret interface{}, err
 				err = e
 			} else {
 				// get the underlying value that ops created.
-				ret = t.(*ops.Command).Target().Interface()
+				ret = cmd.(*ops.Command).Target().Interface()
 			}
 		} else if a, e := convert(t[0].Str); e != nil {
 			err = e

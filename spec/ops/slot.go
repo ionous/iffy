@@ -45,6 +45,9 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
 			ret, err = eval.GetObject(run)
+			if ret == nil {
+				err = errutil.Fmt("nil object from %T", eval)
+			}
 		}
 	case kind.NumListEval():
 		if eval, ok := val.(rt.NumListEval); !ok {

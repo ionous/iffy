@@ -31,8 +31,10 @@ func TestPlay(t *testing.T) {
 	var play Play
 	play.AddEvents((*Events)(nil))
 	play.AddScript(definePlay)
-	bogart := &std.Actor{Thing: std.Thing{Kind: std.Kind{Name: "Bogart", CommonProper: std.ProperNamed}}}
-	play.AddObjects(bogart, &std.Player{Name: "player", Pawn: ident.IdOf("bogart")})
+	play.AddObjects(
+		&std.Actor{Thing: std.Thing{Kind: std.Kind{Name: "Bogart", CommonProper: std.ProperNamed}}},
+		&std.Pawn{"pawn", ident.IdOf("bogart")},
+	)
 	// errutil.Panic = true
 
 	//couldnt find $printName
@@ -52,7 +54,7 @@ func definePlay(c spec.Block) {
 			if c.Cmds().Begin() {
 				c.Cmd("word", "jump")
 				if c.Cmd("trigger").Begin() {
-					c.Cmd("jump", c.Cmd("get", "player", "pawn"))
+					c.Cmd("jump", "player")
 					c.End()
 				}
 				c.End()

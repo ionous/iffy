@@ -6,10 +6,11 @@ import (
 )
 
 // FIX: this has to go into the std library
-func StdRules(c spec.Block) {
+func Rules(c spec.Block) {
 	PrintNameRules(c)
 	PrintObjectRules(c)
 	group.GroupRules(c)
+	commence(c)
 }
 
 func PrintNameRules(c spec.Block) {
