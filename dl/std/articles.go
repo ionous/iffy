@@ -100,20 +100,20 @@ func articleName(run rt.Runtime, article string, obj rt.Object) (ret string, err
 	} else {
 		name := buffer.String()
 		var proper bool
-		if e := run.GetValue(obj, "proper-named", &proper); e != nil {
+		if e := obj.GetValue("proper-named", &proper); e != nil {
 			err = e
 		} else if proper {
 			ret = lang.Titlecase(name)
 		} else {
 			if len(article) == 0 {
 				var indefinite string
-				if e := run.GetValue(obj, "indefinite article", &indefinite); e != nil {
+				if e := obj.GetValue("indefinite article", &indefinite); e != nil {
 					err = e
 				} else {
 					article = indefinite
 					if len(article) == 0 {
 						var plural bool
-						if e := run.GetValue(obj, "plural-named", &plural); e != nil {
+						if e := obj.GetValue("plural-named", &plural); e != nil {
 							err = e
 						} else {
 							if plural {

@@ -1,7 +1,6 @@
 package event
 
 import (
-	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -14,7 +13,7 @@ type Frame struct {
 func NewFrame(run rt.Runtime, evt *EventObject) (ret *Frame, err error) {
 	// create event object
 	{
-		run := rt.AtFinder(run, obj.Emplace(evt))
+		run := rt.AtFinder(run, run.Emplace(evt))
 		ret = &Frame{run: run, evt: evt}
 	}
 	return

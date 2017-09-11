@@ -74,7 +74,7 @@ func TestShadows(t *testing.T) {
 		}
 		for name, test := range vals {
 			cp := r.New(r.ValueOf(test.match).Type()).Elem()
-			if e := run.GetValue(obj, name, cp.Addr().Interface()); !assert.NoError(e) {
+			if e := obj.GetValue(name, cp.Addr().Interface()); !assert.NoError(e) {
 				break
 			} else if !testify.ObjectsAreEqualValues(test.match, cp.Interface()) {
 				t.Fatal("failed to match", name)

@@ -20,10 +20,8 @@ type Model interface {
 	GetObject(name string) (Object, bool)
 	// GetRelation with the passed name.
 	GetRelation(name string) (Relation, bool)
-	// GetValue sets the value of the passed pointer to the value of the named property in the passed object.
-	GetValue(obj Object, name string, pv interface{}) error
-	// SetValue sets the named property in the passed object to the value.
-	SetValue(obj Object, name string, v interface{}) error
+	// Emplace wraps the passed value as an anonymous object.
+	Emplace(i interface{}) Object
 }
 
 // Ancestors customizes the parent-child event hierarchy.

@@ -87,7 +87,7 @@ func (assert *PatternSuite) TestFactorial() {
 		if numberPatterns := peal.Numbers; assert.Len(numberPatterns, 1) {
 			if factPattern := numberPatterns[ident.IdOf("factorial")]; assert.Len(factPattern, 2) {
 				//
-				if n, e := run.GetNumMatching(run, obj.Emplace(&Factorial{3})); assert.NoError(e) {
+				if n, e := run.GetNumMatching(run, run.Emplace(&Factorial{3})); assert.NoError(e) {
 					fac := 3 * (2 * (1 * 1))
 					assert.EqualValues(fac, n)
 				}

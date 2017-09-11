@@ -82,8 +82,7 @@ func TestContents(t *testing.T) {
 			if e := c.Build(); e != nil {
 				err = e
 			} else {
-				objs := objects.Build()
-
+				objs := objects.Build(nil)
 				for _, l := range facts.Locations {
 					l := l.(*Location)
 					// in this case we're probably a command too

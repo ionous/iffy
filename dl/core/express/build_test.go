@@ -48,15 +48,3 @@ func TestBuild(t *testing.T) {
 		}
 	})
 }
-
-// for testing exec if we wanted to...
-// objects := obj.NewObjects()
-// type Target struct {
-// 	Val int
-// }
-// unique.PanicTypes(classes,
-// 	(*Target)(nil))
-// var lines printer.Lines
-// rtm := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
-// obj := obj.Emplace(&Target{5})
-// run := rt.AtFinder(rtm, obj)

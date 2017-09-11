@@ -13,7 +13,7 @@ import (
 
 type packFun func(rtm *Rtm, dst, src r.Value) error
 
-func (rtm *Rtm) pack(dst, src r.Value) (err error) {
+func (rtm *Rtm) Pack(dst, src r.Value) (err error) {
 	if ds, ss := dst.Kind() == r.Slice, src.Kind() == r.Slice; ds != ss {
 		err = errutil.New("slice mismatch")
 	} else {
@@ -161,7 +161,7 @@ func fromObjEval(rtm *Rtm, dst, src r.Value) (err error) {
 		err = e
 	} else {
 		// recurse since we dont know the dst type.
-		err = rtm.pack(dst, r.ValueOf(v))
+		err = rtm.Pack(dst, r.ValueOf(v))
 	}
 	return
 }
@@ -222,7 +222,7 @@ func toTextEval(rtm *Rtm, dst, src r.Value) (err error) {
 }
 func toObjEval(rtm *Rtm, dst, src r.Value) (err error) {
 	var v ident.Id
-	if e := rtm.pack(r.ValueOf(&v).Elem(), src); e != nil {
+	if e := rtm.Pack(r.ValueOf(&v).Elem(), src); e != nil {
 		err = e
 	} else {
 		dst.Set(r.ValueOf(&core.Object{v.Name}))

@@ -19,11 +19,11 @@ func (l *CycleText) GetText(run rt.Runtime) (ret string, err error) {
 	var curr int
 	if obj, ok := run.FindObject(l.Id); !ok {
 		err = errutil.New("couldnt find", l.Id)
-	} else if e := run.GetValue(obj, "curr", &curr); e != nil {
+	} else if e := obj.GetValue("curr", &curr); e != nil {
 		err = e
 	} else {
 		next := (curr + 1) % len(l.Values)
-		if e := run.SetValue(obj, "curr", next); e != nil {
+		if e := obj.SetValue("curr", next); e != nil {
 			err = e
 		} else {
 			ret = l.Values[curr]

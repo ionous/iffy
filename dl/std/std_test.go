@@ -77,7 +77,7 @@ func TestStd(t *testing.T) {
 		t.Run("printed plural name", func(t *testing.T) {
 			forced := "party favors"
 			apple, _ := run.GetObject("apple")
-			if e := run.SetValue(apple, "printed plural name", forced); e != nil {
+			if e := apple.SetValue("printed plural name", forced); e != nil {
 				t.Fatal(e)
 			}
 
@@ -90,7 +90,7 @@ func TestStd(t *testing.T) {
 func match(run rt.Runtime, assert *testify.Assertions, match string, op interface{}) (okay bool) {
 	var lines printer.Lines
 	run = rt.Writer(run, &lines)
-	if e := run.ExecuteMatching(run, obj.Emplace(op)); assert.NoError(e) {
+	if e := run.ExecuteMatching(run, run.Emplace(op)); assert.NoError(e) {
 		okay = assert.EqualValues(sliceOf.String(match), lines.Lines())
 	}
 	return

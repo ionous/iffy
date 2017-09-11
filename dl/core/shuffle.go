@@ -22,9 +22,9 @@ func (l *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
 	} else {
 		var curr int
 		var indices []float64
-		if e := run.GetValue(obj, "curr", &curr); e != nil {
+		if e := obj.GetValue("curr", &curr); e != nil {
 			err = e
-		} else if e := run.GetValue(obj, "indices", &indices); e != nil {
+		} else if e := obj.GetValue("indices", &indices); e != nil {
 			err = e
 		} else if cnt := len(l.Values); cnt > 0 {
 			if len(indices) == 0 {
@@ -32,7 +32,7 @@ func (l *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
 				for i := 0; i < cnt; i++ {
 					indices[i] = float64(i)
 				}
-				if e := run.SetValue(obj, "indices", indices); e != nil {
+				if e := obj.SetValue("indices", indices); e != nil {
 					err = e
 				}
 			}
@@ -44,7 +44,7 @@ func (l *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
 				if curr != j { // switch if they are different locations.
 					indices[curr], indices[j] = indices[j], indices[curr]
 				}
-				if e := run.SetValue(obj, "curr", curr+1); e != nil {
+				if e := obj.SetValue("curr", curr+1); e != nil {
 					err = e
 				} else {
 					sel := int(indices[curr])

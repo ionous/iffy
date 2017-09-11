@@ -125,7 +125,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	jump := obj.Emplace(&Jump{Jumper: bogart.Id()})
+	jump := run.Emplace(&Jump{Jumper: bogart.Id()})
 	if obj, e := event.TargetOf(run, jump); assert.NoError(e) {
 		assert.Equal(bogart, obj)
 	}

@@ -1,7 +1,6 @@
 package group
 
 import (
-	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -20,7 +19,7 @@ func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups Collections, ungroupe
 			} else {
 				// find the desired group for this object.
 				group := GroupTogether{Target: tgt}
-				if e := run.ExecuteMatching(run, obj.Emplace(&group)); e != nil {
+				if e := run.ExecuteMatching(run, run.Emplace(&group)); e != nil {
 					err = e
 					break
 				} else {

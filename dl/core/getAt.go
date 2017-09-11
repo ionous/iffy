@@ -42,7 +42,7 @@ func (p *GetAt) get(run rt.Runtime, pv interface{}) (err error) {
 	if obj, ok := run.FindObject("@"); !ok {
 		err = errutil.New("couldnt find local object")
 	} else {
-		err = run.GetValue(obj, p.Prop, pv)
+		err = obj.GetValue(p.Prop, pv)
 	}
 	return
 }

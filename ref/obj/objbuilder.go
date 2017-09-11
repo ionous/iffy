@@ -32,10 +32,10 @@ func NewObjects() *ObjBuilder {
 }
 
 // Build returns an ObjectMap
-func (b *ObjBuilder) Build() ObjectMap {
+func (b *ObjBuilder) Build(p Packer) ObjectMap {
 	objs := make(ObjectMap)
 	for id, q := range b.queue {
-		objs[id] = RefObject{id, q.rval}
+		objs[id] = RefObject{id, q.rval, p}
 	}
 	return objs
 }

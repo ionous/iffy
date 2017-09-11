@@ -15,11 +15,11 @@ func TestRegistration(t *testing.T) {
 	assert := testify.New(t)
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
-	objs := newObjects(first, second)
-	if n, ok := objs.GetObject("first"); assert.True(ok) {
+	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
+	if n, ok := rtm.GetObject("first"); assert.True(ok) {
 		assert.Equal(ident.IdOf("$first"), n.Id())
 	}
-	if d, ok := objs.GetObject("second"); assert.True(ok) {
+	if d, ok := rtm.GetObject("second"); assert.True(ok) {
 		assert.Equal(ident.IdOf("$second"), d.Id())
 	}
 }
@@ -30,25 +30,27 @@ func TestStateAccess(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
 	//
-	test := func(ptr interface{}, prop string, value bool) {
-		obj := obj.Emplace(ptr)
-		if p, ok := obj.Property(prop); assert.True(ok) {
-			res := p.Value()
-			if !assert.Equal(value, res) {
-				t.Log("mismatched", obj, prop)
+	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
+	test := func(name, prop string, value bool) {
+		if obj, ok := rtm.GetObject(name); assert.True(ok) {
+			var res bool
+			if e := obj.GetValue(prop, &res); assert.NoError(e) {
+				if !assert.Equal(value, res) {
+					t.Log("mismatched", obj, prop)
+				}
 			}
 		}
 	}
 
-	test(first, "yes", true)
-	test(first, "no", false)
-	test(first, "maybe", false)
-	test(first, "labeled", true)
+	test("first", "yes", true)
+	test("first", "no", false)
+	test("first", "maybe", false)
+	test("first", "labeled", true)
 	//
-	test(second, "yes", false)
-	test(second, "no", false)
-	test(second, "maybe", true)
-	test(second, "labeled", false)
+	test("second", "yes", false)
+	test("second", "no", false)
+	test("second", "maybe", true)
+	test("second", "labeled", false)
 }
 
 func TestStateSet(t *testing.T) {
@@ -57,16 +59,14 @@ func TestStateSet(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true, Object: ident.IdOf("second")}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe, Object: ident.IdOf("first")}}
 
-	rtm := &Rtm{
-		Objects: newObjects(first, second),
-	}
+	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
 	unpackValue := func(obj rt.Object, name string, pv interface{}) {
-		if e := rtm.GetValue(obj, name, pv); e != nil {
+		if e := obj.GetValue(name, pv); e != nil {
 			panic(e)
 		}
 	}
 	packValue := func(obj rt.Object, name string, v interface{}) {
-		if e := rtm.SetValue(obj, name, v); e != nil {
+		if e := obj.SetValue(name, v); e != nil {
 			panic(e)
 		}
 	}
@@ -85,7 +85,7 @@ func TestStateSet(t *testing.T) {
 				unpackValue(n, "maybe", &res)
 				assert.True(res)
 				// try to change states in an illegal way:
-				e := rtm.SetValue(n, "maybe", false)
+				e := n.SetValue("maybe", false)
 				assert.Error(e)
 
 				// add verify it didnt change:
@@ -124,19 +124,17 @@ func TestStateSet(t *testing.T) {
 	toggle("second", "labeled", false)
 }
 
-func newObjects(ptrs ...interface{}) obj.ObjectMap {
+func newObjects(ptrs ...interface{}) *obj.ObjBuilder {
 	reg := obj.NewObjects()
 	unique.PanicValues(reg, ptrs...)
-	return reg.Build()
+	return reg
 }
 
 // TestPropertyAccess to ensure normal properties are accessible
 func TestPropertyAccess(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true, Object: ident.IdOf("second")}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe, Object: ident.IdOf("first")}}
-	rtm := &Rtm{
-		Objects: newObjects(first, second),
-	}
+	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
 
 	// we create some slots for values to be unpacked into
 	var expected = []struct {
@@ -153,7 +151,7 @@ func TestPropertyAccess(t *testing.T) {
 	}
 	test := func(n rt.Object) (err error) {
 		for _, v := range expected {
-			if e := rtm.GetValue(n, v.name, v.pv); e != nil {
+			if e := n.GetValue(v.name, v.pv); e != nil {
 				err = e
 				break
 			}

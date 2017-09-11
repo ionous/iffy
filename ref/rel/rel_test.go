@@ -39,7 +39,7 @@ func TestOneToMany(t *testing.T) {
 	relbuilder.NewRelation("GremlinRocks", index.OneToMany)
 
 	// this test doesnt use runtime, so build manually
-	objects := objbuilder.Build()
+	objects := objbuilder.Build(nil)
 	relations := relbuilder.Build()
 	//
 	Object := func(name string) rt.Object {

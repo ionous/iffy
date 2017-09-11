@@ -54,7 +54,7 @@ func Trigger(run rt.Runtime, events EventMap, data rt.Object) (err error) {
 func TargetOf(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
 	if field, ok := Field(data.Type()); !ok {
 		err = errutil.New("no target found", data)
-	} else if e := run.GetValue(data, field.Name, &ret); e != nil {
+	} else if e := data.GetValue(field.Name, &ret); e != nil {
 		err = e
 	}
 	return

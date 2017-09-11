@@ -76,10 +76,7 @@ func (c *Config) Rtm() *Rtm {
 	if a == nil {
 		a = NoAncestors{}
 	}
-	var objects obj.ObjectMap
-	if c.objects != nil {
-		objects = c.objects.Build()
-	}
+
 	//
 	rel := c.rel.Build()
 	var w io.Writer
@@ -92,12 +89,14 @@ func (c *Config) Rtm() *Rtm {
 	//
 	rtm := &Rtm{
 		Types:     c.classes,
-		Objects:   objects,
 		Relations: rel,
 		Ancestors: a,
 		Writer:    w,
 		Scanner:   c.grammar,
 		Events:    c.events,
+	}
+	if c.objects != nil {
+		rtm.Objects = c.objects.Build(rtm)
 	}
 	if c.patterns != nil {
 		rtm.Patterns = *c.patterns
