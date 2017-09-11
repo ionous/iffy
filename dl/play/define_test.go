@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
@@ -32,7 +33,7 @@ func (r *Play) Define(f *Facts) (err error) {
 	unique.PanicBlocks(classes,
 		(*Classes)(nil),
 	)
-	cmds := ops.NewOpsX(classes, core.Xform{})
+	cmds := ops.NewOps(classes)
 	unique.PanicBlocks(cmds,
 		(*Commands)(nil),
 	)
@@ -41,7 +42,7 @@ func (r *Play) Define(f *Facts) (err error) {
 	)
 
 	var root struct{ Definitions }
-	if c, ok := cmds.NewBuilder(&root); ok {
+	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); ok {
 		if c.Cmds().Begin() {
 			for _, v := range r.callbacks {
 				v(c)
@@ -91,7 +92,7 @@ func TestLocation(t *testing.T) {
 func TestRules(t *testing.T) {
 	var reg Play
 	mandates := []string{"bool", "number", "text", "object", "num list", "text list", "obj list", "run"}
-	reg.AddScript(func(c *ops.Builder) {
+	reg.AddScript(func(c spec.Block) {
 		defineRules(c, mandates)
 	})
 	//
@@ -111,7 +112,7 @@ func TestEvents(t *testing.T) {
 	testify.Len(t, facts.ObjectListeners, 1)
 }
 
-func defineGrammar(c *ops.Builder) {
+func defineGrammar(c spec.Block) {
 	if c.Cmd("grammar").Begin() {
 		if c.Cmd("all of").Begin() {
 			if c.Cmds().Begin() {
@@ -132,11 +133,11 @@ func defineGrammar(c *ops.Builder) {
 	}
 }
 
-func defineLocation(c *ops.Builder) {
+func defineLocation(c spec.Block) {
 	c.Cmd("location", "parent", locate.Supports, "child")
 }
 
-func defineRules(c *ops.Builder, mandates []string) {
+func defineRules(c spec.Block, mandates []string) {
 	for _, k := range mandates {
 		if c.Cmd("mandate").Begin() {
 			if c.Cmd(k + " rule").Begin() {
@@ -148,7 +149,7 @@ func defineRules(c *ops.Builder, mandates []string) {
 	}
 }
 
-func defineEventHandler(c *ops.Builder) {
+func defineEventHandler(c spec.Block) {
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
 		if c.Param("go").Cmds().Begin() {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))

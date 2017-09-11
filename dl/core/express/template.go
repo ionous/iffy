@@ -46,14 +46,14 @@ func ReduceToken(t Token, cmds *ops.Ops) (ret rt.TextEval, err error) {
 
 func deduceCmds(cmds *ops.Ops, parts []string) (ret rt.TextEval, err error) {
 	var root struct{ rt.TextEval }
-	b, _ := cmds.NewBuilder(&root)
-	if b.Cmd(parts[0]).Begin() {
+	c, _ := cmds.NewXBuilder(&root, core.Xform{})
+	if c.Cmd(parts[0]).Begin() {
 		for _, val := range parts[1:] {
-			b.Val(val)
+			c.Val(val)
 		}
-		b.End()
+		c.End()
 	}
-	if e := b.Build(); e != nil {
+	if e := c.Build(); e != nil {
 		err = e
 	} else {
 		ret = root.TextEval

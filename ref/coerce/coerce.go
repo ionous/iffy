@@ -57,7 +57,7 @@ type ElementFn func(dst, src r.Value) error
 
 func coerceValue(dst, src r.Value) (err error) {
 	if st, dt := src.Type(), dst.Type(); !st.ConvertibleTo(dt) {
-		err = errutil.New("type mismatch")
+		err = errutil.New("type mismatch", dt, st)
 	} else {
 		v := src.Convert(dt)
 		dst.Set(v)

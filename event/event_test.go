@@ -1,6 +1,7 @@
 package event_test
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/event/evtbuilder"
@@ -8,8 +9,10 @@ import (
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +46,7 @@ func TestSomething(t *testing.T) {
 	}
 
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
 
@@ -65,7 +68,7 @@ func TestSomething(t *testing.T) {
 		&Kind{"Skeleton Key"})
 
 	// default action:
-	DefaultActions := func(c *ops.Builder) {
+	DefaultActions := func(c spec.Block) {
 		if c.Cmd("run rule", "jump").Begin() {
 			if c.Param("decide").Cmds().Begin() {
 				if c.Cmd("print span").Begin() {
@@ -83,7 +86,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	rules, e := rule.Master(cmds, patterns, DefaultActions)
+	rules, e := rule.Master(cmds, core.Xform{}, patterns, DefaultActions)
 	assert.NoError(e)
 
 	// we do this the manual way first, and later with spec
@@ -95,7 +98,7 @@ func TestSomething(t *testing.T) {
 	// object listener:
 	bogart, _ := run.GetObject("bogart")
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
+		if jump, e := Execute(cmds, func(c spec.Block) {
 			c.Cmd("say", "bogart's jumping!")
 		}); e != nil {
 			t.Fatal(e)
@@ -105,7 +108,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
+		if jump, e := Execute(cmds, func(c spec.Block) {
 			c.Cmd("say", "bogart's going to jump!")
 		}); e != nil {
 			t.Fatal(e)
@@ -115,7 +118,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
+		if jump, e := Execute(cmds, func(c spec.Block) {
 			c.Cmd("say", "bogart's tired of jumping.")
 		}); e != nil {
 			t.Fatal(e)
@@ -139,7 +142,7 @@ func TestSomething(t *testing.T) {
 	assert.Equal(sliceOf.String("bogart's going to jump!", "bogart's jumping!", "jumped!", "bogart's tired of jumping."), lines.Lines())
 
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
+		if jump, e := Execute(cmds, func(c spec.Block) {
 			c.Cmd("say", "don't do it bogart!")
 			c.Cmd("set bool", "@", "stop immediate propagation", true)
 			c.Cmd("set bool", "@", "prevent default", true)
@@ -155,5 +158,22 @@ func TestSomething(t *testing.T) {
 	//
 	assert.NoError(event.Trigger(run, listen.EventMap, jump))
 	assert.Equal(sliceOf.String("don't do it bogart!"), lines.Lines())
+}
 
+func Execute(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
+	var root struct{ Eval rt.ExecuteList }
+	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); !ok {
+		err = errutil.New("unknown error")
+	} else {
+		if c.Cmds().Begin() {
+			fn(c)
+			c.End()
+		}
+		if e := c.Build(); e != nil {
+			err = e
+		} else {
+			ret = root.Eval
+		}
+	}
+	return
 }

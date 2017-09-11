@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/event/trigger"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/rt/printer"
-	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
@@ -46,7 +46,7 @@ func TestPlay(t *testing.T) {
 	}
 }
 
-func definePlay(c *ops.Builder) {
+func definePlay(c spec.Block) {
 	if c.Cmd("grammar").Begin() {
 		if c.Cmd("all of").Begin() {
 			if c.Cmds().Begin() {

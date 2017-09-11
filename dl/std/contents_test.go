@@ -13,6 +13,7 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
@@ -36,7 +37,7 @@ func (l Location) Locate() Locate {
 func TestContents(t *testing.T) {
 
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
 	unique.PanicBlocks(classes,
@@ -61,18 +62,18 @@ func TestContents(t *testing.T) {
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-	rules, e := rule.Master(cmds, patterns, PrintNameRules, PrintObjectRules)
+	rules, e := rule.Master(cmds, core.Xform{}, patterns, PrintNameRules, PrintObjectRules)
 	assert.NoError(e)
 
-	type OpsCb func(c *ops.Builder)
+	type OpsCb func(c spec.Block)
 	type Match func(run rt.Runtime, lines []string) bool
 	test := func(t *testing.T, build, exec OpsCb, match Match) (err error) {
 		relations := rel.NewRelations()
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
 		relations.AddTable("locale", pc.Table)
 
-		var facts struct{ Locations []Locate }
-		if c, ok := cmds.NewBuilder(&facts); !ok {
+		var root struct{ Locations []Locate }
+		if c, ok := cmds.NewXBuilder(&root, core.Xform{}); !ok {
 			err = errutil.New("no builder")
 		} else {
 			if c.Cmds().Begin() {
@@ -83,7 +84,7 @@ func TestContents(t *testing.T) {
 				err = e
 			} else {
 				objs := objects.Build(nil)
-				for _, l := range facts.Locations {
+				for _, l := range root.Locations {
 					l := l.(*Location)
 					// in this case we're probably a command too
 					if p, ok := objs.GetObject(l.Parent); !ok {
@@ -101,7 +102,7 @@ func TestContents(t *testing.T) {
 		}
 		if err == nil {
 			var root struct{ rt.ExecuteList }
-			if c, ok := cmds.NewBuilder(&root); !ok {
+			if c, ok := cmds.NewXBuilder(&root, core.Xform{}); !ok {
 				err = errutil.New("no builder")
 			} else {
 				if c.Cmds().Begin() {
@@ -126,9 +127,9 @@ func TestContents(t *testing.T) {
 	//
 	t.Run("contains", func(t *testing.T) {
 		assert := testify.New(t)
-		e := test(t, func(c *ops.Builder) {
+		e := test(t, func(c spec.Block) {
 			c.Cmd("Location", "box", locate.Contains, "cake")
-		}, func(c *ops.Builder) {
+		}, func(c spec.Block) {
 			//
 		}, func(run rt.Runtime, lines []string) (okay bool) {
 			if pc, ok := run.GetRelation("locale"); assert.True(ok) {
@@ -141,14 +142,14 @@ func TestContents(t *testing.T) {
 		assert.NoError(e)
 	})
 
-	emptyBox := func(c *ops.Builder) {
+	emptyBox := func(c spec.Block) {
 	}
-	boxContents := func(c *ops.Builder) {
+	boxContents := func(c spec.Block) {
 		c.Cmd("Location", "box", locate.Contains, "cake")
 		c.Cmd("Location", "box", locate.Contains, "apple")
 		c.Cmd("Location", "box", locate.Contains, "pen")
 	}
-	printContent := func(c *ops.Builder) {
+	printContent := func(c spec.Block) {
 		c.Cmd("determine", c.Cmd("print content", "box", c.Param("tersely").Val(true)))
 	}
 	t.Run("empty", func(t *testing.T) {
@@ -166,7 +167,7 @@ func TestContents(t *testing.T) {
 		assert.NoError(e)
 	})
 	// summary tests:
-	printSummary := func(c *ops.Builder) {
+	printSummary := func(c spec.Block) {
 		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("determine", c.Cmd("print summary", "box"))
@@ -201,7 +202,7 @@ func TestContents(t *testing.T) {
 	})
 	// print object: simple name, name with summary ( for a container )
 	printObject := func(name string) OpsCb {
-		return func(c *ops.Builder) {
+		return func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				c.Cmds(c.Cmd("determine", c.Cmd("print object", name)))
 				c.End()

@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/suite"
@@ -38,7 +39,7 @@ func (assert *ArticleSuite) SetupTest() {
 	errutil.Panic = false
 
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
 	unique.PanicBlocks(cmds,
@@ -58,16 +59,16 @@ func (assert *ArticleSuite) SetupTest() {
 		&Kind{Name: "trevor", CommonProper: ProperNamed},
 	)
 
-	rules, e := rule.Master(cmds, patterns, PrintNameRules)
+	rules, e := rule.Master(cmds, core.Xform{}, patterns, PrintNameRules)
 	assert.NoError(e)
 
 	assert.cmds = cmds
 	assert.run = rtm.New(classes).Objects(objects).Rules(rules).Writer(&assert.lines).Rtm()
 }
 
-func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {
+func (assert *ArticleSuite) match(expected string, run func(c spec.Block)) {
 	var root struct{ Eval rt.Execute }
-	if c, ok := assert.cmds.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
 		run(c)
 		if e := c.Build(); assert.NoError(e) {
 			if e := root.Eval.Execute(assert.run); assert.NoError(e) {
@@ -81,7 +82,7 @@ func (assert *ArticleSuite) match(expected string, run func(c *ops.Builder)) {
 // lower a/n
 func (assert *ArticleSuite) TestATrailingLampPost() {
 	assert.match("You can only just make out a lamp-post.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", "You can only just make out")
@@ -96,7 +97,7 @@ func (assert *ArticleSuite) TestATrailingLampPost() {
 
 func (assert *ArticleSuite) TestATrailingTrevor() {
 	assert.match("You can only just make out Trevor.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", "You can only just make out")
@@ -111,7 +112,7 @@ func (assert *ArticleSuite) TestATrailingTrevor() {
 
 func (assert *ArticleSuite) TestATrailingSoldiers() {
 	assert.match("You can only just make out some soldiers.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", "You can only just make out")
@@ -127,7 +128,7 @@ func (assert *ArticleSuite) TestATrailingSoldiers() {
 // upper a/n
 func (assert *ArticleSuite) TestALeadingLampPost() {
 	assert.match("A lamp-post can be made out in the mist.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", c.Cmd("upper a/n", "lamp post"))
@@ -141,7 +142,7 @@ func (assert *ArticleSuite) TestALeadingLampPost() {
 
 func (assert *ArticleSuite) TestALeadingTrevor() {
 	assert.match("Trevor can be made out in the mist.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", c.Cmd("upper a/n", "trevor"))
@@ -155,7 +156,7 @@ func (assert *ArticleSuite) TestALeadingTrevor() {
 
 func (assert *ArticleSuite) TestALeadingSoldiers() {
 	assert.match("Some soldiers can be made out in the mist.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", c.Cmd("upper a/n", "soldiers"))
@@ -170,7 +171,7 @@ func (assert *ArticleSuite) TestALeadingSoldiers() {
 // lower-the
 func (assert *ArticleSuite) TestTheTrailingLampPost() {
 	assert.match("You can only just make out the lamp-post.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", "You can only just make out")
@@ -185,7 +186,7 @@ func (assert *ArticleSuite) TestTheTrailingLampPost() {
 
 func (assert *ArticleSuite) TestTheTrailingTrevor() {
 	assert.match("You can only just make out Trevor.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", "You can only just make out")
@@ -200,7 +201,7 @@ func (assert *ArticleSuite) TestTheTrailingTrevor() {
 
 func (assert *ArticleSuite) TestTheTrailingSoldiers() {
 	assert.match("You can only just make out the soldiers.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", "You can only just make out")
@@ -216,7 +217,7 @@ func (assert *ArticleSuite) TestTheTrailingSoldiers() {
 // uppe the
 func (assert *ArticleSuite) TestTheLeadingLampPost() {
 	assert.match("The lamp-post may be a trick of the mist.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", c.Cmd("upper the", "lamp post"))
@@ -230,7 +231,7 @@ func (assert *ArticleSuite) TestTheLeadingLampPost() {
 
 func (assert *ArticleSuite) TestTheLeadingTrevor() {
 	assert.match("Trevor may be a trick of the mist.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", c.Cmd("upper the", "trevor"))
@@ -244,7 +245,7 @@ func (assert *ArticleSuite) TestTheLeadingTrevor() {
 
 func (assert *ArticleSuite) TestTheLeadingSoldiers() {
 	assert.match("The soldiers may be a trick of the mist.",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("say", c.Cmd("upper the", "soldiers"))
@@ -259,7 +260,7 @@ func (assert *ArticleSuite) TestTheLeadingSoldiers() {
 // FIX: should really be separate -- in a "text" test.
 func (assert *ArticleSuite) TestPluralize() {
 	assert.match("lamps",
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				c.Cmds(c.Cmd("say", c.Cmd("pluralize", "lamp")))
 				c.End()

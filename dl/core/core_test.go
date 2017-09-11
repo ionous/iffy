@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/stretchr/testify/suite"
 	"strings"
@@ -41,7 +42,7 @@ func (assert *CoreSuite) Lines() (ret []string) {
 func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
 	classes := make(unique.Types)
-	assert.cmds = ops.NewOpsX(classes, core.Xform{})
+	assert.cmds = ops.NewOps(classes)
 	unique.PanicBlocks(assert.cmds,
 		(*core.Commands)(nil))
 
@@ -73,11 +74,11 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 }
 
 func (assert *CoreSuite) matchFunc(
-	build func(c *ops.Builder),
+	build func(c spec.Block),
 	compare func(expected []string),
 ) {
 	var root struct{ Eval rt.Execute }
-	if c, ok := assert.cmds.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
 		build(c)
 		if run, e := assert.newRuntime(c); assert.NoError(e) {
 			if e := root.Eval.Execute(run); assert.NoError(e) {
@@ -88,12 +89,12 @@ func (assert *CoreSuite) matchFunc(
 }
 
 func (assert *CoreSuite) matchLine(expected string,
-	build func(c *ops.Builder)) {
+	build func(c spec.Block)) {
 	assert.matchLines([]string{expected}, build)
 }
 
 func (assert *CoreSuite) matchLines(expected []string,
-	build func(c *ops.Builder)) {
+	build func(c spec.Block)) {
 	assert.matchFunc(build, func(lines []string) {
 		assert.Equal(expected, lines)
 	})
@@ -103,7 +104,7 @@ func (assert *CoreSuite) TestShortcuts() {
 	var root struct {
 		Eval rt.TextEval
 	}
-	if c, ok := assert.cmds.NewBuilder(&root); ok {
+	if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
 		c.Val("shortcut")
 		if run, e := assert.newRuntime(c); assert.NoError(e) {
 			if res, e := root.Eval.GetText(run); assert.NoError(e) {
@@ -119,7 +120,7 @@ func (assert *CoreSuite) TestAllTrue() {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
 			c.Cmd("all true", c.Cmds(
 				c.Cmd("bool", a),
 				c.Cmd("bool", b)))
@@ -143,7 +144,7 @@ func (assert *CoreSuite) TestAnyTrue() {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
 			if c.Cmd("any true").Begin() {
 				c.Cmds(c.Cmd("bool", a), c.Cmd("bool", b))
 				c.End()
@@ -166,7 +167,7 @@ func (assert *CoreSuite) TestCompareNum() {
 		Eval rt.BoolEval
 	}
 	test := func(a float64, op string, b float64) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
 			if c.Cmd("compare num").Begin() {
 				c.Val(a).Cmd(op).Val(b)
 				c.End()
@@ -190,7 +191,7 @@ func (assert *CoreSuite) TestCompareText() {
 		Eval rt.BoolEval
 	}
 	test := func(a, op, b string) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
+		if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
 			c.Cmd("compare text", c.Val(a), c.Cmd(op), c.Val(b))
 			//
 			if run, e := assert.newRuntime(c); assert.NoError(e) {

@@ -8,26 +8,9 @@ import (
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
-	"github.com/stretchr/testify/suite"
+	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
-
-func TestPattern(assert *testing.T) {
-	suite.Run(assert, new(PatternSuite))
-}
-
-type PatternSuite struct {
-	suite.Suite
-	cmds *ops.Ops
-}
-
-func (assert *PatternSuite) SetupTest() {
-	cmds := ops.NewOpsX(nil, core.Xform{})
-	unique.PanicBlocks(cmds,
-		(*rule.Commands)(nil),
-		(*core.Commands)(nil))
-	assert.cmds = cmds
-}
 
 func Int(i int) *core.Num {
 	return &core.Num{float64(i)}
@@ -38,15 +21,20 @@ type Factorial struct {
 	Num float64
 }
 
-func (assert *PatternSuite) TestFactorial() {
+func TestFactorial(t *testing.T) {
+	assert := testify.New(t)
 	classes := make(unique.Types)
+	cmds := ops.NewOps(classes)
+	unique.PanicBlocks(cmds,
+		(*rule.Commands)(nil),
+		(*core.Commands)(nil))
 	patterns := unique.NewStack(classes)
 	unique.PanicTypes(patterns,
 		(*Factorial)(nil))
 	assert.Contains(classes, ident.IdOf("Factorial"), "adding to patterns should add to classes")
 
 	var root struct{ rule.Mandates }
-	if c, ok := assert.cmds.NewBuilder(&root); ok {
+	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); ok {
 		if c.Cmds().Begin() {
 			if c.Cmd("number rule", "factorial").Begin() {
 				c.Param("if").Cmd("compare num", c.Cmd("get", "@", "num"), c.Cmd("equal to"), 0)
@@ -68,15 +56,13 @@ func (assert *PatternSuite) TestFactorial() {
 			}
 			c.End()
 		}
-		//
-		test := assert.T()
 		rules := rule.MakeRules()
 
 		if e := c.Build(); assert.NoError(e) {
 			if els := root.Mandates; assert.Len(els, 2) {
 				// test.Log(pretty.Sprint(els))
 				if e := els.Mandate(patterns.Types, rules); e != nil {
-					test.Fatal(e)
+					t.Fatal(e)
 				}
 			}
 		}

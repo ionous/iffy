@@ -19,7 +19,7 @@ import (
 func TestShadows(t *testing.T) {
 	assert := testify.New(t)
 	classes := make(unique.Types)
-	cmds := ops.NewOpsX(classes, core.Xform{})
+	cmds := ops.NewOps(classes)
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil))
@@ -31,7 +31,7 @@ func TestShadows(t *testing.T) {
 		Num    rt.NumberEval
 		Object rt.ObjectEval
 	}
-	if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
+	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); assert.True(ok) {
 		// FIX: without the cmd -- it doesnt error.
 		// FIX: and what about using the same param twice?
 		c.Cmd("add", 1, 2)

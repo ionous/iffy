@@ -34,7 +34,7 @@ func TestApply(t *testing.T) {
 	})
 	t.Run("cmds", func(t *testing.T) {
 		classes := make(unique.Types)
-		cmds := ops.NewOpsX(classes, core.Xform{})
+		cmds := ops.NewOps(classes)
 		unique.PanicTypes(cmds,
 			(*core.Object)(nil),
 			(*TestThe)(nil))

@@ -9,8 +9,13 @@ type Builder struct {
 	*Memento
 }
 
-func NewBuilder(sf spec.Factory, spec spec.Spec) Builder {
-	factory := &Factory{sf, new(Mementos)}
+type SpecFactory interface {
+	NewSpec(name string) (spec.Spec, error)
+	NewSpecs() (spec.Specs, error)
+}
+
+func NewBuilder(sf SpecFactory, spec spec.Spec) Builder {
+	factory := &_Factory{sf, new(Mementos)}
 	return Builder{factory.blocks.Push(&Memento{
 		factory: factory,
 		spec:    spec,

@@ -5,13 +5,12 @@ import (
 	"github.com/ionous/iffy/spec"
 )
 
-// Factory builds commands.
-type Factory struct {
-	specs  spec.Factory
+type _Factory struct {
+	specs  SpecFactory
 	blocks *Mementos
 }
 
-func (b *Factory) newBlock() (err error) {
+func (b *_Factory) newBlock() (err error) {
 	// another way of thinking about new/Block() is that it elevates the most recent^ memento to block status. parameters are excluded from most recent because they are pulled from the block
 	if block, ok := b.blocks.Top(); !ok {
 		err = errutil.New("block can only be used inside of another block.")
@@ -23,14 +22,14 @@ func (b *Factory) newBlock() (err error) {
 	return
 }
 
-func (b *Factory) endBlock() (err error) {
+func (b *_Factory) endBlock() (err error) {
 	if _, ok := b.blocks.Pop(); !ok {
 		err = errutil.New("mismatched begin/end")
 	}
 	return
 }
 
-func (b *Factory) newCmd(src *Memento, name string, args []interface{}) (ret *Memento, err error) {
+func (b *_Factory) newCmd(src *Memento, name string, args []interface{}) (ret *Memento, err error) {
 	if spec, e := b.specs.NewSpec(name); e != nil {
 		err = e
 	} else {
@@ -48,7 +47,7 @@ func (b *Factory) newCmd(src *Memento, name string, args []interface{}) (ret *Me
 	return
 }
 
-func (b *Factory) newCmds(src *Memento, cmds []*Memento) (ret *Memento, err error) {
+func (b *_Factory) newCmds(src *Memento, cmds []spec.Block) (ret *Memento, err error) {
 	if specs, e := b.specs.NewSpecs(); e != nil {
 		err = e
 	} else {
@@ -71,7 +70,7 @@ func (b *Factory) newCmds(src *Memento, cmds []*Memento) (ret *Memento, err erro
 	return
 }
 
-func (b *Factory) newVal(src *Memento, val interface{}) (ret *Memento, err error) {
+func (b *_Factory) newVal(src *Memento, val interface{}) (ret *Memento, err error) {
 	if _, isMemento := val.(*Memento); isMemento {
 		err = errutil.New("New value requested, but the value is not a primitive.")
 	} else {
@@ -92,7 +91,7 @@ func (b *Factory) newVal(src *Memento, val interface{}) (ret *Memento, err error
 // Move the passed args to the targeted memento, then add the target to the current block.
 // FIX: add a check against the most recent block to ensure it doesnt get pulled --
 // that could happen if the user called .Block inside of a call to Cmd/s
-func (b *Factory) zip(dst *Memento, args []interface{}) (ret *Memento, err error) {
+func (b *_Factory) zip(dst *Memento, args []interface{}) (ret *Memento, err error) {
 	if block, ok := b.blocks.Top(); !ok {
 		err = errutil.New("no active block.")
 	} else if !dst.kids.IsEmpty() {

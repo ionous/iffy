@@ -18,6 +18,19 @@ func (f Token) Fields() []string {
 	return strings.Fields(f.Str)
 }
 
+// Go looks at the token to determine if it's command-like
+func (f Token) Go() (ret []string, okay bool) {
+	if !f.Plain {
+		parts := strings.Fields(f.Str)
+		if len(parts) > 0 {
+			if g := parts[0]; strings.EqualFold(g, "go") {
+				ret, okay = parts[1:], true
+			}
+		}
+	}
+	return
+}
+
 var x *regexp.Regexp
 
 type Template []Token

@@ -1,13 +1,13 @@
 package core_test
 
 import (
-	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/sliceOf"
 )
 
 func (assert *CoreSuite) TestSeqCycle() {
 	assert.matchLines(sliceOf.String("a", "b", "c", "a", "b", "c", "a"),
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("for each num").Begin() {
 				c.Param("in").Cmd("range", 7)
 				if c.Param("go").Cmds().Begin() {
@@ -23,7 +23,7 @@ func (assert *CoreSuite) TestSeqCycle() {
 }
 
 func (assert *CoreSuite) TestSeqShuffle() {
-	assert.matchFunc(func(c *ops.Builder) {
+	assert.matchFunc(func(c spec.Block) {
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", 9)
 			if c.Param("go").Cmds().Begin() {
@@ -58,7 +58,7 @@ func (assert *CoreSuite) TestSeqShuffle() {
 func (assert *CoreSuite) TestSeqStopping() {
 	assert.matchLines(
 		sliceOf.String("a", "b", "c", "c", "c", "c", "c"),
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("for each num").Begin() {
 				c.Param("in").Cmd("range", 7)
 				if c.Param("go").Cmds().Begin() {

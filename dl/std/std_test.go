@@ -18,7 +18,7 @@ import (
 
 func TestStd(t *testing.T) {
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
 	unique.PanicBlocks(classes,
@@ -41,7 +41,7 @@ func TestStd(t *testing.T) {
 		assert := testify.New(t)
 
 		//
-		rules, e := rule.Master(cmds, patterns, PrintNameRules)
+		rules, e := rule.Master(cmds, core.Xform{}, patterns, PrintNameRules)
 		assert.NoError(e)
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".

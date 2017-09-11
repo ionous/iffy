@@ -2,17 +2,17 @@ package std
 
 import (
 	"github.com/ionous/iffy/dl/std/group"
-	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/spec"
 )
 
 // FIX: this has to go into the std library
-func StdRules(c *ops.Builder) {
+func StdRules(c spec.Block) {
 	PrintNameRules(c)
 	PrintObjectRules(c)
 	group.GroupRules(c)
 }
 
-func PrintNameRules(c *ops.Builder) {
+func PrintNameRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "print name").Begin() {
 		if c.Param("decide").Cmds().Begin() {
@@ -96,7 +96,7 @@ func PrintNameRules(c *ops.Builder) {
 	}
 }
 
-func PrintObjectRules(c *ops.Builder) {
+func PrintObjectRules(c spec.Block) {
 	// print the name and summary if all else fails
 	if c.Cmd("run rule", "print object").Begin() {
 		if c.Param("decide").Cmds().Begin() {

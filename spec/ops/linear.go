@@ -6,6 +6,16 @@ import (
 	r "reflect"
 )
 
+func NewTarget(rtype r.Type) Linear {
+	rval := r.New(rtype).Elem()
+	return inplace(rval)
+}
+
+func InPlace(root interface{}) Linear {
+	target := r.ValueOf(root).Elem()
+	return inplace(target)
+}
+
 // Linear flattens a struct and its embedded fields into a nice long list.
 // FIX: what i want, actually, is an iterator that walks the fields in order.
 // and, when we discover a field has been asked for out of order, then we reset.
@@ -34,16 +44,6 @@ func (c Linear) FieldByName(n string) (ret r.Value) {
 		return
 	})
 	return
-}
-
-func NewTarget(rtype r.Type) Linear {
-	rval := r.New(rtype).Elem()
-	return inplace(rval)
-}
-
-func InPlace(root interface{}) Linear {
-	target := r.ValueOf(root).Elem()
-	return inplace(target)
 }
 
 func inplace(rval r.Value) Linear {

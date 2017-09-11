@@ -12,6 +12,7 @@ import (
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"io"
 )
@@ -19,7 +20,7 @@ import (
 var globalPlay Play
 
 type Play struct {
-	callbacks []func(*ops.Builder)
+	callbacks []func(spec.Block)
 	classes   []interface{}
 	cmds      []interface{}
 	patterns  []interface{}
@@ -28,12 +29,12 @@ type Play struct {
 }
 
 // Register definitions globally. Used mainly via go init()
-func (r *Play) AddScript(cb func(c *ops.Builder)) {
+func (r *Play) AddScript(cb func(c spec.Block)) {
 	r.callbacks = append(r.callbacks, cb)
 }
 
 // Register definitions globally. Used mainly via go init()
-// func Register(cb func(c *ops.Builder)) {
+// func Register(cb func(c spec.Block)) {
 // 	globalPlay.Register(cb)
 // }
 
@@ -61,7 +62,7 @@ func (r *Play) AddObjects(objs ...interface{}) {
 func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
 	var f Facts
 	var root struct{ Definitions }
-	if c, ok := cmds.NewBuilder(&root); ok {
+	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); ok {
 		if c.Cmds().Begin() {
 			for _, v := range r.callbacks {
 				v(c)
@@ -81,7 +82,7 @@ func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
 
 func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
 	objects := obj.NewObjects()
@@ -104,7 +105,7 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 		err = e
 	} else if e := unique.RegisterValues(objects, r.objects...); e != nil {
 		err = e
-	} else if rules, e := rule.Master(cmds, patterns, std.StdRules); e != nil {
+	} else if rules, e := rule.Master(cmds, core.Xform{}, patterns, std.StdRules); e != nil {
 		err = e
 	} else if facts, e := r.Build(cmds); e != nil {
 		err = e

@@ -7,7 +7,6 @@ import (
 	testify "github.com/stretchr/testify/assert"
 	"go/ast"
 	"go/parser"
-	r "reflect"
 	"testing"
 )
 
@@ -25,27 +24,27 @@ func TestExpr(t *testing.T) {
 	)
 	t.Run("literal", func(t *testing.T) {
 		testEqual(t, literalFn(),
-			nconvert(t, nparse(t, literalStr), nil))
+			nconvert(t, nparse(t, literalStr)))
 	})
 	t.Run("no dot", func(t *testing.T) {
 		testEqual(t, noDotFn(),
-			nconvert(t, nparse(t, noDotStr), nil))
+			nconvert(t, nparse(t, noDotStr)))
 	})
 	t.Run("big dot", func(t *testing.T) {
 		testEqual(t, bigDotFn(),
-			nconvert(t, nparse(t, bigDotStr), nil))
+			nconvert(t, nparse(t, bigDotStr)))
 	})
 	t.Run("little dot", func(t *testing.T) {
 		testEqual(t, littleDotFn(),
-			nconvert(t, nparse(t, littleDotStr), nil))
+			nconvert(t, nparse(t, littleDotStr)))
 	})
 	t.Run("binary", func(t *testing.T) {
 		testEqual(t, binaryFn(),
-			nconvert(t, nparse(t, binaryStr), nil))
+			nconvert(t, nparse(t, binaryStr)))
 	})
 	t.Run("chain", func(t *testing.T) {
 		testEqual(t, chainFn(),
-			nconvert(t, nparse(t, chainStr), nil))
+			nconvert(t, nparse(t, chainStr)))
 	})
 	t.Run("short", func(t *testing.T) {
 		testEqual(t, shortAssignmentFn(),
@@ -76,8 +75,8 @@ func nparse(t *testing.T, s string) (ret ast.Expr) {
 	return
 }
 
-func nconvert(t *testing.T, n ast.Expr, hint r.Type) (ret interface{}) {
-	if v, e := ConvertExpr(n, hint); e != nil {
+func nconvert(t *testing.T, n ast.Expr) (ret interface{}) {
+	if v, e := ConvertExpr(n); e != nil {
 		t.Fatal(e, pretty.Sprint(n))
 	} else {
 		ret = v

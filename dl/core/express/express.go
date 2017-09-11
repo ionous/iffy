@@ -8,16 +8,15 @@ import (
 	"github.com/kr/pretty"
 	"go/ast"
 	"go/token"
-	r "reflect"
 	"strconv"
 )
 
-func ConvertExpr(n ast.Expr, hint r.Type) (ret interface{}, err error) {
+func ConvertExpr(n ast.Expr) (ret interface{}, err error) {
 	switch n := n.(type) {
 	case *ast.BasicLit:
-		ret, err = BasicLit(n, hint)
+		ret, err = BasicLit(n)
 	case *ast.BinaryExpr:
-		ret, err = BinaryExpr(n, hint)
+		ret, err = BinaryExpr(n)
 	default:
 		if obj, ok := selectObject(n); !ok {
 			err = errutil.New("unsupported node", pretty.Sprint(n))
@@ -58,7 +57,7 @@ func assign(lhs, rhs ast.Expr) (ret rt.Execute, err error) {
 		err = errutil.New("error on left, expected object")
 	} else if x, ok := n.X.(*ast.Ident); !ok {
 		err = errutil.Fmt("expected object identifer, got %T", n.X)
-	} else if v, e := ConvertExpr(rhs, nil); e != nil {
+	} else if v, e := ConvertExpr(rhs); e != nil {
 		err = errutil.New("error on right", e)
 	} else {
 		obj := makeObject(x)
@@ -74,7 +73,7 @@ func assign(lhs, rhs ast.Expr) (ret rt.Execute, err error) {
 	return
 }
 
-func BasicLit(n *ast.BasicLit, hint r.Type) (ret interface{}, err error) {
+func BasicLit(n *ast.BasicLit) (ret interface{}, err error) {
 	switch t, v := n.Kind, n.Value; t {
 	case token.FLOAT, token.INT:
 		if v, e := strconv.ParseFloat(v, 64); e != nil {
@@ -91,11 +90,10 @@ func BasicLit(n *ast.BasicLit, hint r.Type) (ret interface{}, err error) {
 	return
 }
 
-func BinaryExpr(n *ast.BinaryExpr, hint r.Type) (ret interface{}, err error) {
-	// could pass "rt.Number" to hint for binary math
-	if x, e := ConvertExpr(n.X, hint); e != nil {
+func BinaryExpr(n *ast.BinaryExpr) (ret interface{}, err error) {
+	if x, e := ConvertExpr(n.X); e != nil {
 		err = e
-	} else if y, e := ConvertExpr(n.Y, hint); e != nil {
+	} else if y, e := ConvertExpr(n.Y); e != nil {
 		err = e
 	} else if pair, ok := binaryMath[n.Op]; !ok {
 		err = errutil.New("unsupported operation", n.Op)

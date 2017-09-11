@@ -46,12 +46,12 @@ func (u *CommandBuilder) Build() (ret *Command, err error) {
 
 type _Factory struct{}
 
-// NewSpec implements spec.Factory.
+// NewSpec implements builder.SpecFactory.
 func (_Factory) NewSpec(name string) (spec.Spec, error) {
 	return &_Spec{cmd: &Command{Name: name}}, nil
 }
 
-// NewSpecs implements spec.Factory.
+// NewSpecs implements builder.SpecFactory.
 func (_Factory) NewSpecs() (spec.Specs, error) {
 	cmds := &Commands{}
 	return &_Specs{cmds: cmds}, nil

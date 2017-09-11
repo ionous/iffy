@@ -4,12 +4,12 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/dl/std/group"
-
 	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
@@ -32,7 +32,7 @@ func TestGrouping(t *testing.T) {
 			PrintNameRules, group.GroupRules)
 	})
 	//
-	several := func(c *ops.Builder) {
+	several := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
 			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
 			if c.Param("decide").Cmds().Begin() {
@@ -69,7 +69,7 @@ func TestGrouping(t *testing.T) {
 			PrintNameRules, group.GroupRules, several)
 	})
 	// Rule for grouping together utensils: say "the usual utensils".
-	replacement := func(c *ops.Builder) {
+	replacement := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
 			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
 			if c.Param("decide").Cmds().Begin() {
@@ -98,7 +98,7 @@ func TestGrouping(t *testing.T) {
 	// Before grouping together Scrabble pieces, say "the tiles ".
 	// After grouping together Scrabble pieces, say " from a Scrabble set".
 	t.Run("fancy", func(t *testing.T) {
-		fancy := func(c *ops.Builder) {
+		fancy := func(c spec.Block) {
 			if c.Cmd("run rule", "group together").Begin() {
 				c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
 				if c.Param("decide").Cmds().Begin() {
@@ -137,7 +137,7 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and five scrabble tiles ( X, W, F, Y, and Z )",
 			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
 			//
-			PrintNameRules, group.GroupRules, func(c *ops.Builder) {
+			PrintNameRules, group.GroupRules, func(c spec.Block) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
 					if c.Param("decide").Cmds().Begin() {
@@ -153,7 +153,7 @@ func TestGrouping(t *testing.T) {
 		groupTest(t, "Mildred and five scrabble tiles ( a X, a W, a F, a Y, and a Z )",
 			//
 			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
-			PrintNameRules, group.GroupRules, func(c *ops.Builder) {
+			PrintNameRules, group.GroupRules, func(c spec.Block) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
 					if c.Param("decide").Cmds().Begin() {
@@ -165,7 +165,7 @@ func TestGrouping(t *testing.T) {
 				}
 			})
 	})
-	unnamedThings := func(c *ops.Builder) {
+	unnamedThings := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
 			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
 			if c.Param("decide").Cmds().Begin() {
@@ -197,11 +197,11 @@ func TestGrouping(t *testing.T) {
 //   alt: revisit builders
 // . object needs Objects for get/pointer, which ties objects to classes early;
 //   alt: get rid of pointers/object lookup.
-func groupTest(t *testing.T, match string, names []string, patternSpec ...func(*ops.Builder)) {
+func groupTest(t *testing.T, match string, names []string, patternSpec ...func(spec.Block)) {
 	assert := testify.New(t)
 
 	classes := make(unique.Types)                 // all types known to iffy
-	cmds := ops.NewOpsX(classes, core.Xform{})    // all shadow types become classes
+	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
 	unique.PanicBlocks(classes,
@@ -223,7 +223,7 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(*
 		(*Commands)(nil),
 		(*rule.Commands)(nil),
 	)
-	rules, e := rule.Master(cmds, patterns, patternSpec...)
+	rules, e := rule.Master(cmds, core.Xform{}, patterns, patternSpec...)
 
 	if assert.NoError(e) {
 		var lines printer.Span
