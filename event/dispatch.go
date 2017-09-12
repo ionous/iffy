@@ -3,9 +3,9 @@ package event
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref/class"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/kind"
 	r "reflect"
 )
 
@@ -64,7 +64,7 @@ func TargetOf(run rt.Runtime, data rt.Object) (ret rt.Object, err error) {
 func Field(rtype r.Type) (ret *r.StructField, okay bool) {
 	foundDefault := false
 	pathOf := func(f *r.StructField, path []int) (done bool) {
-		if f.Type == kind.IdentId() {
+		if kindOf.IdentId(f.Type) {
 			t := unique.Tag(f.Tag)
 			if _, ok := t.Find("target"); ok {
 				ret, done, okay = f, true, true

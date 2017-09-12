@@ -1,4 +1,4 @@
-package kind
+package kindOf
 
 import (
 	r "reflect"
@@ -16,7 +16,7 @@ func StringLike(rtype r.Type) bool {
 
 // NumberLike if rtype is a bool, or an eval which produces a bool.
 func NumberLike(rtype r.Type) bool {
-	return IsNumber(rtype.Kind()) || rtype == numEval
+	return Number(rtype) || rtype == numEval
 }
 
 // ObjectLike if rtype is a bool, or an eval which produces a bool.

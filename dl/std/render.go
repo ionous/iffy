@@ -4,8 +4,8 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/kind"
 	"github.com/ionous/iffy/rt/printer"
 	"strconv"
 )
@@ -29,7 +29,7 @@ func (p *Render) GetText(run rt.Runtime) (ret string, err error) {
 			default:
 				err = obj.GetValue(prop, &ret)
 
-			case kind.BoolLike(ft):
+			case kindOf.BoolLike(ft):
 				var v bool
 				if e := obj.GetValue(prop, &v); e != nil {
 					err = e
@@ -37,7 +37,7 @@ func (p *Render) GetText(run rt.Runtime) (ret string, err error) {
 					ret = strconv.FormatBool(v)
 				}
 
-			case kind.NumberLike(ft):
+			case kindOf.NumberLike(ft):
 				var v float64
 				if e := obj.GetValue(prop, &v); e != nil {
 					err = e
@@ -45,7 +45,7 @@ func (p *Render) GetText(run rt.Runtime) (ret string, err error) {
 					ret = strconv.FormatFloat(v, 'g', -1, 64)
 				}
 
-			case kind.ObjectLike(ft):
+			case kindOf.ObjectLike(ft):
 				var v ident.Id
 				if e := obj.GetValue(prop, &v); e != nil {
 					err = e

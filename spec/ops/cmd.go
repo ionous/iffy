@@ -3,7 +3,6 @@ package ops
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref/coerce"
-	"github.com/ionous/iffy/rt/kind"
 	r "reflect"
 )
 
@@ -93,32 +92,6 @@ func xform(x Transform, v interface{}, hint r.Type) (ret interface{}, err error)
 		ret, err = x.TransformValue(v, hint)
 	} else {
 		ret = v
-	}
-	return
-}
-
-// determine what kind of eval can produce the passed type.
-func evalFromType(rtype r.Type) (ret r.Type) {
-	switch k := rtype.Kind(); {
-	case k == r.Bool:
-		ret = kind.BoolEval()
-	case kind.IsNumber(k):
-		ret = kind.NumberEval()
-	case k == r.String:
-		ret = kind.TextEval()
-	case rtype == kind.IdentId():
-		ret = kind.ObjectEval()
-		//
-	case k == r.Array || k == r.Slice:
-		elem := rtype.Elem()
-		switch k := elem.Kind(); {
-		case kind.IsNumber(k):
-			ret = kind.NumListEval()
-		case k == r.String:
-			ret = kind.TextListEval()
-		case elem == kind.IdentId():
-			ret = kind.ObjListEval()
-		}
 	}
 	return
 }

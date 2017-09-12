@@ -4,7 +4,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref/coerce"
 	"github.com/ionous/iffy/ref/enum"
-	"github.com/ionous/iffy/rt/kind"
 	r "reflect"
 )
 
@@ -20,7 +19,7 @@ func MakeState(pf Field, choice int) State {
 
 // Type returns bool
 func (x State) Type() r.Type {
-	return kind.Bool()
+	return r.TypeOf((*bool)(nil)).Elem()
 }
 
 // Value returns true if the parent object is in the state represented by this property; false otherwise.

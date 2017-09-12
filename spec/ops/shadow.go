@@ -3,6 +3,7 @@ package ops
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	r "reflect"
@@ -88,7 +89,7 @@ func (c *ShadowClass) FieldByName(n string) (ret r.Value) {
 func (c *ShadowClass) FieldByIndex(n []int) (ret r.Value) {
 	field := c.rtype.FieldByIndex(n)
 	// determine what kind of eval can produce the passed type.
-	if rtype := evalFromType(field.Type); rtype != nil {
+	if rtype := kindOf.EvalType(field.Type); rtype != nil {
 		// create an empty eval for the user to poke into
 		rvalue := r.New(rtype).Elem()
 		c.slots[field.Name] = _ShadowSlot{rtype, rvalue}

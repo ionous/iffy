@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/ionous/iffy/rt/kind"
+	"github.com/ionous/iffy/ref/kindOf"
 	r "reflect"
 )
 
@@ -38,25 +38,28 @@ func literally(v interface{}, dstType r.Type) (ret interface{}, okay bool) {
 	// -- string for a command.
 	case string:
 		// could be text or object --
-		switch dstType {
-		case kind.TextEval():
+		switch {
+		case kindOf.TextEval(dstType):
 			ret, okay = &Text{v}, true
-		case kind.ObjectEval():
+		case kindOf.ObjectEval(dstType):
 			ret, okay = &Object{v}, true
 		}
 	case []string:
-		switch dstType {
-		case kind.TextListEval():
+		switch {
+		case kindOf.TextListEval(dstType):
 			ret, okay = &Texts{v}, true
-		case kind.ObjListEval():
+		case kindOf.ObjListEval(dstType):
 			ret, okay = &Objects{v}, true
 		}
 	default:
 		{
 			v := r.ValueOf(v)
-			if kind.IsNumber(v.Kind()) {
-				v := v.Convert(kind.Number()).Float()
+			if kindOf.Float(v.Type()) {
+				v := v.Float()
 				ret, okay = &Num{v}, true
+			} else if kindOf.Int(v.Type()) {
+				v := v.Int()
+				ret, okay = &Num{float64(v)}, true
 			}
 		}
 	}

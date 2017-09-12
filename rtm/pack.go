@@ -6,8 +6,8 @@ import (
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/coerce"
 	"github.com/ionous/iffy/ref/enum"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/kind"
 	r "reflect"
 )
 
@@ -41,56 +41,56 @@ func (rtm *Rtm) Pack(dst, src r.Value) (err error) {
 
 func getCopyFun(dst, src r.Type) (ret packFun) {
 	switch {
+
+	case kindOf.IdentId(dst):
+		ret = idFromObj
+
+	case kindOf.IdentId(src):
+		ret = objFromId
+
 	case dst.Kind() == r.Int && src.Kind() == r.String:
 		ret = intFromChoice
 
 	case dst.Kind() == r.String && src.Kind() == r.Int:
 		ret = choiceFromInt
 
-	case dst == kind.IdentId():
-		ret = idFromObj
-
-	case src == kind.IdentId():
-		ret = objFromId
-
 		// asking for an eval, presumably given for a primitive
 	case dst.Kind() == r.Interface:
-		switch dst {
-		case kind.BoolEval():
+		switch {
+		case kindOf.BoolEval(dst):
 			ret = toBoolEval
-		case kind.NumberEval():
+		case kindOf.NumberEval(dst):
 			ret = toNumberEval
-		case kind.TextEval():
+		case kindOf.TextEval(dst):
 			ret = toTextEval
-		case kind.ObjectEval():
+		case kindOf.ObjectEval(dst):
 			ret = toObjEval
-		case kind.NumListEval():
+		case kindOf.NumListEval(dst):
 			ret = toNumListEval
-		case kind.TextListEval():
+		case kindOf.TextListEval(dst):
 			ret = toTextListEval
-		case kind.ObjListEval():
+		case kindOf.ObjListEval(dst):
 			ret = toObjListEval
 		}
 
 		// given an eval, presumably asking for a primitive
 	case src.Kind() == r.Interface:
-		switch src {
-		case kind.BoolEval():
+		switch {
+		case kindOf.BoolEval(src):
 			ret = fromBoolEval
-		case kind.NumberEval():
+		case kindOf.NumberEval(src):
 			ret = fromNumberEval
-		case kind.TextEval():
+		case kindOf.TextEval(src):
 			ret = fromTextEval
-		case kind.ObjectEval():
+		case kindOf.ObjectEval(src):
 			ret = fromObjEval
-		case kind.NumListEval():
+		case kindOf.NumListEval(src):
 			ret = fromNumListEval
-		case kind.TextListEval():
+		case kindOf.TextListEval(src):
 			ret = fromTextListEval
-		case kind.ObjListEval():
+		case kindOf.ObjListEval(src):
 			ret = fromObjListEval
 		}
-
 	}
 	return
 }

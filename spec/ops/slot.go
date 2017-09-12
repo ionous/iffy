@@ -2,8 +2,8 @@ package ops
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/kind"
 	r "reflect"
 )
 
@@ -19,28 +19,28 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 	// note: we cant s.rvalue.Interface()
 	// a single command can implement multiple interfaces;
 	// the type switch will match whichever is listed first.
-	switch rtype, val := s.rtype, s.rvalue.Interface(); rtype {
+	switch rtype, val := s.rtype, s.rvalue.Interface(); {
 	default:
 		err = errutil.New("unknown unpack type", rtype)
-	case kind.BoolEval():
+	case kindOf.BoolEval(rtype):
 		if eval, ok := val.(rt.BoolEval); !ok {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
 			ret, err = eval.GetBool(run)
 		}
-	case kind.NumberEval():
+	case kindOf.NumberEval(rtype):
 		if eval, ok := val.(rt.NumberEval); !ok {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
 			ret, err = eval.GetNumber(run)
 		}
-	case kind.TextEval():
+	case kindOf.TextEval(rtype):
 		if eval, ok := val.(rt.TextEval); !ok {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
 			ret, err = eval.GetText(run)
 		}
-	case kind.ObjectEval():
+	case kindOf.ObjectEval(rtype):
 		if eval, ok := val.(rt.ObjectEval); !ok {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
@@ -49,7 +49,7 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 				err = errutil.Fmt("nil object from %T", eval)
 			}
 		}
-	case kind.NumListEval():
+	case kindOf.NumListEval(rtype):
 		if eval, ok := val.(rt.NumListEval); !ok {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
@@ -70,7 +70,7 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 				}
 			}
 		}
-	case kind.TextListEval():
+	case kindOf.TextListEval(rtype):
 		if eval, ok := val.(rt.TextListEval); !ok {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
@@ -91,7 +91,7 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 				}
 			}
 		}
-	case kind.ObjListEval():
+	case kindOf.ObjListEval(rtype):
 		if eval, ok := val.(rt.ObjListEval); !ok {
 			err = errutil.New("mismatched slot", rtype, s.rvalue.Type())
 		} else {
