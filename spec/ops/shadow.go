@@ -58,6 +58,10 @@ func (c *ShadowClass) Type() r.Type {
 	return c.rtype
 }
 
+func (c *ShadowClass) NumField() int {
+	return len(c.fields)
+}
+
 // Field returns the value of the requested field.
 // Compatible with reflect.Value
 // The spec will provide some type-safety on assignment to this value.

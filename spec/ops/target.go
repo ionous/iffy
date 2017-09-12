@@ -8,6 +8,7 @@ import (
 // Its a subset of reflect.Value's functions.
 type Target interface {
 	Type() r.Type
+	NumField() int
 	Field(int) r.Value
 	FieldByName(string) r.Value
 	Addr() r.Value

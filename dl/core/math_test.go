@@ -36,13 +36,12 @@ func (assert *CoreSuite) TestMultiply() {
 // TestDivide tests numbers directly.
 func (assert *CoreSuite) TestDivide() {
 	var root struct{ Eval rt.NumberEval }
-	if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
-		c.Cmd("div", 10, 2)
-		//
-		if run, e := assert.newRuntime(c); assert.NoError(e) {
-			if v, e := root.Eval.GetNumber(run); assert.NoError(e) {
-				assert.EqualValues(5, v)
-			}
+	c := assert.cmds.NewBuilder(&root, core.Xform{})
+	c.Cmd("div", 10, 2)
+	//
+	if run, e := assert.newRuntime(c); assert.NoError(e) {
+		if v, e := root.Eval.GetNumber(run); assert.NoError(e) {
+			assert.EqualValues(5, v)
 		}
 	}
 }
@@ -50,13 +49,11 @@ func (assert *CoreSuite) TestDivide() {
 // TestDivideByZero should not panic, but simply error.
 func (assert *CoreSuite) TestDivideByZero() {
 	var root struct{ Eval rt.NumberEval }
-	if c, ok := assert.cmds.NewXBuilder(&root, core.Xform{}); ok {
-		c.Cmd("div", 10, 0)
-		//
-		if run, e := assert.newRuntime(c); assert.NoError(e) {
-			if _, e := root.Eval.GetNumber(run); assert.Error(e) {
-			}
+	c := assert.cmds.NewBuilder(&root, core.Xform{})
+	c.Cmd("div", 10, 0)
+	//
+	if run, e := assert.newRuntime(c); assert.NoError(e) {
+		if _, e := root.Eval.GetNumber(run); assert.Error(e) {
 		}
 	}
-
 }

@@ -29,7 +29,6 @@ func (l *LocationOf) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	} else {
 		table := rel.GetTable()
 		ret, err = nextParent(run, table, obj)
-		println(ret.Id().Name, obj.Id().Name)
 	}
 	return
 }

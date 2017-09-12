@@ -1,7 +1,6 @@
 package event_test
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/event/evtbuilder"
@@ -162,18 +161,15 @@ func TestSomething(t *testing.T) {
 
 func Execute(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
 	var root struct{ Eval rt.ExecuteList }
-	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); !ok {
-		err = errutil.New("unknown error")
+	c := cmds.NewBuilder(&root, core.Xform{})
+	if c.Cmds().Begin() {
+		fn(c)
+		c.End()
+	}
+	if e := c.Build(); e != nil {
+		err = e
 	} else {
-		if c.Cmds().Begin() {
-			fn(c)
-			c.End()
-		}
-		if e := c.Build(); e != nil {
-			err = e
-		} else {
-			ret = root.Eval
-		}
+		ret = root.Eval
 	}
 	return
 }

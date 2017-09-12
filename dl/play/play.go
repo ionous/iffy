@@ -62,20 +62,19 @@ func (r *Play) AddObjects(objs ...interface{}) {
 func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
 	var f Facts
 	var root struct{ Definitions }
-	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); ok {
-		if c.Cmds().Begin() {
-			for _, v := range r.callbacks {
-				v(c)
-			}
-			c.End()
+	c := cmds.NewBuilder(&root, core.Xform{})
+	if c.Cmds().Begin() {
+		for _, v := range r.callbacks {
+			v(c)
 		}
-		if e := c.Build(); e != nil {
-			err = e
-		} else if e := root.Define(&f); e != nil {
-			err = e
-		} else {
-			ret = f
-		}
+		c.End()
+	}
+	if e := c.Build(); e != nil {
+		err = e
+	} else if e := root.Define(&f); e != nil {
+		err = e
+	} else {
+		ret = f
 	}
 	return
 }

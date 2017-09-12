@@ -26,6 +26,10 @@ type Linear struct {
 
 type FieldIndex []int
 
+func (c Linear) NumField() int {
+	return len(c.fields)
+}
+
 // FieldNum returns the value of the requsted field. To maintain compatibility with reflect.Value: on error, Field returns an invalid Value.
 func (c Linear) Field(n int) (ret r.Value) {
 	if n < len(c.fields) {

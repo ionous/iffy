@@ -50,20 +50,18 @@ func TestArticles(t *testing.T) {
 		var lines printer.Lines
 		var root struct{ rt.Execute }
 		run := rt.Writer(run, &lines)
-		if c, ok := cmds.NewXBuilder(&root, core.Xform{}); ok {
-			if e := c.Build(fn); e != nil {
-				t.Fatal(e)
-			} else if e := root.Execute.Execute(run); e != nil {
-				t.Fatal(e)
-			} else {
-				l := lines.Lines()
-				if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
-					t.Fatal(d)
-				}
+		c := cmds.NewBuilder(&root, core.Xform{})
+		if e := c.Build(fn); e != nil {
+			t.Fatal(e)
+		} else if e := root.Execute.Execute(run); e != nil {
+			t.Fatal(e)
+		} else {
+			l := lines.Lines()
+			if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
+				t.Fatal(d)
 			}
 		}
 	}
-
 	// lower a/n
 	t.Run("A trailing lamp post", func(t *testing.T) {
 		match(t, "You can only just make out a lamp-post.",

@@ -23,17 +23,19 @@ func NewOps(classes unique.TypeRegistry) *Ops {
 	}
 }
 
-// NewBuilder starts creating a call tree. Always returns true.
-func (ops *Ops) NewBuilder(root interface{}) (*Builder, bool) {
-	return ops.NewXBuilder(root, DefaultXform{})
+// NewBuilder with a value transform.
+func (ops *Ops) NewBuilder(root interface{}, x Transform) *Builder {
+	return ops.NewFromTarget(InPlace(root), x)
 }
 
-// NewBuilder with a value transform.
-func (ops *Ops) NewXBuilder(root interface{}, x Transform) (*Builder, bool) {
-	c := &Command{xform: x, target: InPlace(root)}
+func (ops *Ops) NewFromTarget(tgt Target, x Transform) *Builder {
+	if x == nil {
+		x = DefaultXform{}
+	}
+	c := &Command{xform: x, target: tgt}
 	return &Builder{
 		builder.NewBuilder(&Factory{ops, x}, c),
-	}, true
+	}
 }
 
 // Build generates data into the root passed via NewBuilder()

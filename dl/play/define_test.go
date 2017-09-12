@@ -42,18 +42,17 @@ func (r *Play) Define(f *Facts) (err error) {
 	)
 
 	var root struct{ Definitions }
-	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); ok {
-		if c.Cmds().Begin() {
-			for _, v := range r.callbacks {
-				v(c)
-			}
-			c.End()
+	c := cmds.NewBuilder(&root, core.Xform{})
+	if c.Cmds().Begin() {
+		for _, v := range r.callbacks {
+			v(c)
 		}
-		if e := c.Build(); e != nil {
-			err = e
-		} else {
-			err = root.Define(f)
-		}
+		c.End()
+	}
+	if e := c.Build(); e != nil {
+		err = e
+	} else {
+		err = root.Define(f)
 	}
 	return
 }

@@ -18,18 +18,14 @@ func (c *Command) Target() r.Value {
 }
 
 func (c *Command) Position(arg interface{}) (err error) {
-	tgt := c.target
-	tgtType := tgt.Type()
-	if cnt := tgtType.NumField(); c.index >= cnt {
-		err = errutil.New("too many arguments", tgtType, "expected", cnt)
+	if cnt := c.target.NumField(); c.index >= cnt {
+		err = errutil.New("too many arguments", c.target, "expected", cnt)
 	} else {
-		field := tgt.Field(c.index)
+		field := c.target.Field(c.index)
 		if !field.IsValid() {
-			fieldName := tgtType.Field(c.index).Name
-			err = errutil.Fmt("couldnt get value for %T position %d (%s.%s)", tgt, c.index, tgtType, fieldName)
+			err = errutil.New("couldnt get field", c.target, c.index)
 		} else if e := c.setField(field, arg); e != nil {
-			fieldName := tgtType.Field(c.index).Name
-			err = errutil.Fmt("position %d (%s.%s) %v", c.index, tgtType, fieldName, e)
+			err = errutil.New("couldnt get field", c.target, c.index, e)
 		} else {
 			c.index++
 		}
@@ -81,6 +77,8 @@ func (c *Command) setField(dst r.Value, src interface{}) (err error) {
 	default:
 		if v, e := xform(c.xform, src, dst.Type()); e != nil {
 			err = e
+		} else if v == nil {
+			err = errutil.New("transform is empty")
 		} else if e := coerce.Value(dst, r.ValueOf(v)); e != nil {
 			err = errutil.New("couldnt assign value", e)
 		}

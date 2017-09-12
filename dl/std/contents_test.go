@@ -73,53 +73,49 @@ func TestContents(t *testing.T) {
 		relations.AddTable("locale", pc.Table)
 
 		var root struct{ Locations []Locate }
-		if c, ok := cmds.NewXBuilder(&root, core.Xform{}); !ok {
-			err = errutil.New("no builder")
+		c := cmds.NewBuilder(&root, core.Xform{})
+		if c.Cmds().Begin() {
+			build(c)
+			c.End()
+		}
+		if e := c.Build(); e != nil {
+			err = e
 		} else {
-			if c.Cmds().Begin() {
-				build(c)
-				c.End()
-			}
-			if e := c.Build(); e != nil {
-				err = e
-			} else {
-				objs := objects.Build(nil)
-				for _, l := range root.Locations {
-					l := l.(*Location)
-					// in this case we're probably a command too
-					if p, ok := objs.GetObject(l.Parent); !ok {
-						err = errutil.New("unknown", l.Parent)
-						break
-					} else if c, ok := objs.GetObject(l.Child); !ok {
-						err = errutil.New("unknown", l.Child)
-						break
-					} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
-						err = e
-						break
-					}
+			objs := objects.Build(nil)
+			for _, l := range root.Locations {
+				l := l.(*Location)
+				// in this case we're probably a command too
+				if p, ok := objs.GetObject(l.Parent); !ok {
+					err = errutil.New("unknown", l.Parent)
+					break
+				} else if c, ok := objs.GetObject(l.Child); !ok {
+					err = errutil.New("unknown", l.Child)
+					break
+				} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
+					err = e
+					break
+
 				}
 			}
 		}
 		if err == nil {
 			var root struct{ rt.ExecuteList }
-			if c, ok := cmds.NewXBuilder(&root, core.Xform{}); !ok {
-				err = errutil.New("no builder")
+			c := cmds.NewBuilder(&root, core.Xform{})
+			if c.Cmds().Begin() {
+				exec(c)
+				c.End()
+			}
+			if e := c.Build(); e != nil {
+				err = e
 			} else {
-				if c.Cmds().Begin() {
-					exec(c)
-					c.End()
-				}
-				if e := c.Build(); e != nil {
+				var lines printer.Lines
+				run := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm()
+				if e := root.Execute(run); e != nil {
 					err = e
-				} else {
-					var lines printer.Lines
-					run := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm()
-					if e := root.Execute(run); e != nil {
-						err = e
-					} else if res := lines.Lines(); match(run, res) {
-						t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
-					}
+				} else if res := lines.Lines(); match(run, res) {
+					t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
 				}
+
 			}
 		}
 		return

@@ -11,12 +11,12 @@ type Buffer struct {
 	Buffer rt.ExecuteList
 }
 
-func (buf *Buffer) GetText(run rt.Runtime) (ret string, err error) {
-	var span bytes.Buffer
-	if e := buf.Buffer.Execute(rt.Writer(run, &span)); e != nil {
+func (b *Buffer) GetText(run rt.Runtime) (ret string, err error) {
+	var buf bytes.Buffer
+	if e := b.Buffer.Execute(rt.Writer(run, &buf)); e != nil {
 		err = e
 	} else {
-		ret = span.String()
+		ret = buf.String()
 	}
 	return
 }

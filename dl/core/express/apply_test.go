@@ -3,9 +3,11 @@ package express
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
+	r "reflect"
 	"testing"
 )
 
@@ -18,39 +20,39 @@ func (*TestThe) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 
-func TestApply(t *testing.T) {
+func xTestApply(t *testing.T) {
 	const (
-		partStr = "{status.score}/{story.turnCount}"
-		cmdStr  = "{TestThe example}"
-		// noneStr      = ""
-		// emptyStr     = "its {} empty"
-		// nobracketStr = "no quotes"
-		// escapeStr    = "its {{quoted"
+		partStr = "{status.score}"
+		cmdStr  = "{go TestThe example}"
 		// ifElseStr    = "{if x}{status.score}{else}{story.turnCount}{endif}"
 	)
+	classes := make(unique.Types)
+	cmds := ops.NewOps(classes)
+
+	unique.PanicBlocks(cmds,
+		(*std.Commands)(nil), // for Render
+		(*core.Commands)(nil))
+
+	unique.PanicTypes(cmds,
+		(*TestThe)(nil))
+
 	t.Run("parts", func(t *testing.T) {
 		testEqual(t, partsFn(),
-			templatize(t, partStr, nil))
+			templatize(t, partStr, cmds))
 	})
-	t.Run("cmds", func(t *testing.T) {
-		classes := make(unique.Types)
-		cmds := ops.NewOps(classes)
-		unique.PanicTypes(cmds,
-			(*core.Object)(nil),
-			(*TestThe)(nil))
-
-		testEqual(t, cmdsFn(),
-			templatize(t, cmdStr, cmds))
-	})
+	// t.Run("cmds", func(t *testing.T) {
+	// testEqual(t, cmdsFn(),
+	// 	templatize(t, cmdStr, cmds))
+	// })
 }
 
 func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
-	if x, ok := Tokenize(s); !ok {
-		t.Fatal("couldnt tokenize", s)
-	} else if res, e := Templatize(x, cmds); e != nil {
+	xf := Xform{cmds: cmds}
+	rtype := r.TypeOf((*rt.TextEval)(nil)).Elem()
+	if r, e := xf.TransformValue(s, rtype); e != nil {
 		t.Fatal(e)
 	} else {
-		ret = res
+		ret = r.(rt.TextEval)
 	}
 	return
 }

@@ -50,33 +50,32 @@ func TestOps(t *testing.T) {
 	t.Run("KeyValue", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
-			c.Param("Value").Val(4)
-			//
-			if e := c.Build(); assert.NoError(e) {
-				assert.EqualValues(4, root.Value)
-			}
+		c := cmds.NewBuilder(&root, DefaultXform{})
+		c.Param("Value").Val(4)
+		//
+		if e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(4, root.Value)
+
 		}
 	})
 	t.Run("AllAreOne", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
-			// the simple way:
-			c.Cmd("contents", "all are one")
-			// // cause why not:
-			if c.Cmd("contents").Begin() {
-				c.Val("dilute, dilute").End()
-			}
-			if c.Param("more").Cmds().Begin() {
-				c.Cmd("container", c.Param("value").Val(5))
-				c.Cmd("container", c.Param("value").Val(7))
-				c.End()
-			}
-			if e := c.Build(); assert.NoError(e) {
-				assert.EqualValues(*testData, root)
-				t.Log(pretty.Sprint(root))
-			}
+		c := cmds.NewBuilder(&root, DefaultXform{})
+		// the simple way:
+		c.Cmd("contents", "all are one")
+		// // cause why not:
+		if c.Cmd("contents").Begin() {
+			c.Val("dilute, dilute").End()
+		}
+		if c.Param("more").Cmds().Begin() {
+			c.Cmd("container", c.Param("value").Val(5))
+			c.Cmd("container", c.Param("value").Val(7))
+			c.End()
+		}
+		if e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(*testData, root)
+			t.Log(pretty.Sprint(root))
 		}
 	})
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
+	// "github.com/kr/pretty"
 	"go/parser"
 	r "reflect"
 )
@@ -18,57 +19,78 @@ func MakeXform(cmds *ops.Ops) Xform {
 }
 
 // TransformValue returns src if no error but couldnt convert.
-func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, err error) {
+func (xf Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, err error) {
 	if t, ok := tryTokenize(val); ok {
-		ret, err = ts.TransformTemplate(t, hint)
+		ret, err = xf.TransformTemplate(t, hint)
 	} else {
-		ret, err = ts.Xform.TransformValue(val, hint)
+		ret, err = xf.Xform.TransformValue(val, hint)
 	}
 	return
 }
 
 // TransformTemplate
-func (ts Xform) TransformTemplate(t Template, hint r.Type) (ret interface{}, err error) {
-	// FIX: not just one token? than our output sure better be a text eval
-	if len(t) > 1 {
-		for _, x := range t {
-			println(x.Str)
-		}
-		panic("hint text eval")
+func (xf Xform) TransformTemplate(tmpl Template, hint r.Type) (ret interface{}, err error) {
+	t := ops.NewValue(hint)
+	c := xf.cmds.NewFromTarget(t, xf)
+	//
+	if len(tmpl) == 1 {
+		err = xf.convertOne(c, tmpl[0])
 	} else {
-		// look for and chomp templates starting with {go}
-		if g, ok := t[0].Go(); ok {
-			// create a factory for new building comands
-			fac := ops.NewFactory(ts.cmds, ts)
-			// use the raw interface for building commands
-			// b/c we know that we only want to build commands
-			// but the formatting of them are linear in a single string
-			// rather than spread out in iffy blocks.
-			if cmd, e := fac.NewSpec(g[0]); e != nil {
-				err = e
-			} else if e := converts(cmd, g[1:]); e != nil {
-				err = e
-			} else {
-				// get the underlying value that ops created.
-				ret = cmd.(*ops.Command).Target().Interface()
-			}
-		} else if a, e := convert(t[0].Str); e != nil {
+		err = xf.convertMulti(c, tmpl)
+	}
+	//
+	if err == nil {
+		if e := c.Build(); e != nil {
 			err = e
 		} else {
-			ret = a
+			ret = t.Field(0).Interface()
+		}
+	}
+
+	return
+}
+
+// one evaluation
+func (xf Xform) convertOne(c spec.Block, token Token) (err error) {
+	// look for and chomp templates starting with {go}
+	if g, ok := token.Go(); !ok {
+		err = parseExpr(c, token.Str)
+	} else {
+		if c.Cmd(g[0]).Begin() {
+			err = parseExprs(c, g[1:])
+			c.End()
 		}
 	}
 	return
 }
 
-// add the passed strings as parsed expressions to the passed cmd
+// convert multiple evaluations.
+// by definition the evaluations separated by plain text.
+// ( if there were no text seperators, it would be one evaluation )
+func (xf Xform) convertMulti(c spec.Block, tmpl Template) (err error) {
+	// because we are mixing text and evals, we expect the whole thing winds up being text. ( otherwise: what would we do with the intervening text. )
+	if c.Cmd("buffer").Begin() {
+		if c.Cmds().Begin() {
+			for _, token := range tmpl {
+				if token.Plain {
+					c.Cmd("say", token.Str)
+				} else if e := xf.convertOne(c, token); e != nil {
+					err = e
+					break
+				}
+			}
+			c.End()
+		}
+		c.End()
+	}
+	return
+}
+
+// add the passed strings as parsed expressions to the passed c
 // we could probably support keywords using name:something in the string.
-func converts(cmd spec.Spec, strs []string) (err error) {
+func parseExprs(c spec.Block, strs []string) (err error) {
 	for _, s := range strs {
-		if a, e := convert(s); e != nil {
-			err = e
-			break
-		} else if e := cmd.Position(a); e != nil {
+		if e := parseExpr(c, s); e != nil {
 			err = e
 			break
 		}
@@ -76,13 +98,13 @@ func converts(cmd spec.Spec, strs []string) (err error) {
 	return
 }
 
-func convert(s string) (ret interface{}, err error) {
+func parseExpr(c spec.Block, s string) (err error) {
+	// println("converting expression", s)
 	if a, e := parser.ParseExpr(s); e != nil {
 		err = e
-	} else if a, e := ConvertExpr(a); e != nil {
-		err = e
 	} else {
-		ret = a
+		// println(pretty.Sprint(a))
+		err = convertExpr(c, a, true)
 	}
 	return
 }

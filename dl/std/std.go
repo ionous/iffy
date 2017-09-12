@@ -46,5 +46,6 @@ type Commands struct {
 	// Pluralizer
 	*PluralRule
 	*Player
+	*Render
 	*locate.LocationOf
 }

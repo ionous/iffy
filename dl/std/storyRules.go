@@ -4,14 +4,14 @@ import "github.com/ionous/iffy/spec"
 
 func commence(c spec.Block) {
 	// print the class name if all else fails
-	// if c.Cmd("run rule", "commence").Begin() {
-	// 	if c.Param("decide").Cmds().Begin() {
-	// 		c.Cmd("set text", "story", "status left", "{go determine playerSurroundings}")
-	// 		// c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
-	// 		c.End()
-	// 	}
-	// 	c.End()
-	// }
+	if c.Cmd("run rule", "commence").Begin() {
+		if c.Param("decide").Cmds().Begin() {
+			c.Cmd("set text", "story", "status left", "{go determine playerSurroundings}")
+			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
+			c.End()
+		}
+		c.End()
+	}
 	if c.Cmd("text rule", "PlayerSurroundings").Begin() {
 		// player location or darkness
 		if c.Param("decide").Cmd("buffer").Begin() {

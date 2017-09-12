@@ -31,25 +31,24 @@ func TestShadows(t *testing.T) {
 		Num    rt.NumberEval
 		Object rt.ObjectEval
 	}
-	if c, ok := cmds.NewXBuilder(&root, core.Xform{}); assert.True(ok) {
-		// FIX: without the cmd -- it doesnt error.
-		// FIX: and what about using the same param twice?
-		c.Cmd("add", 1, 2)
-		if c.Cmd("BaseClass").Begin() {
-			c.Param("Num").Cmd("add", 1, 2)
-			c.Param("Text").Val("3")
-			c.Param("Nums").Val(sliceOf.Float(1, 2, 3))
-			c.Param("Texts").Val(sliceOf.String("1", "2", "3"))
-			c.Param("State").Val(Maybe) // Note: this turns State into a NumEval
-			c.Param("Labeled").Cmd("is not", false)
-			c.Param("Object").Val("other")
-			c.Param("Objects").Val(sliceOf.String("base", "other"))
-			c.End()
-		}
-		//
-		if e := c.Build(); e != nil {
-			t.Fatal(e)
-		}
+	c := cmds.NewBuilder(&root, core.Xform{})
+	// FIX: without the cmd -- it doesnt error.
+	// FIX: and what about using the same param twice?
+	c.Cmd("add", 1, 2)
+	if c.Cmd("BaseClass").Begin() {
+		c.Param("Num").Cmd("add", 1, 2)
+		c.Param("Text").Val("3")
+		c.Param("Nums").Val(sliceOf.Float(1, 2, 3))
+		c.Param("Texts").Val(sliceOf.String("1", "2", "3"))
+		c.Param("State").Val(Maybe) // Note: this turns State into a NumEval
+		c.Param("Labeled").Cmd("is not", false)
+		c.Param("Object").Val("other")
+		c.Param("Objects").Val(sliceOf.String("base", "other"))
+		c.End()
+	}
+	//
+	if e := c.Build(); e != nil {
+		t.Fatal(e)
 	}
 
 	objects := obj.NewObjects()

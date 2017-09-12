@@ -2,6 +2,7 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
@@ -9,7 +10,7 @@ import (
 )
 
 // TestBuild to ensure that commands are transformed into their appropriate command trees when passing through the builder.
-func TestBuild(t *testing.T) {
+func xTestBuild(t *testing.T) {
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
 
@@ -20,11 +21,12 @@ func TestBuild(t *testing.T) {
 	unique.PanicTypes(cmds,
 		(*TestScore)(nil))
 	unique.PanicBlocks(cmds,
+		(*std.Commands)(nil), // for renderst
 		(*core.Commands)(nil))
 
 	t.Run("property", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
-		c, _ := cmds.NewXBuilder(&root, Xform{cmds: cmds})
+		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
 		c.Cmd("test score", "{val}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
@@ -37,7 +39,7 @@ func TestBuild(t *testing.T) {
 	//
 	t.Run("global", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
-		c, _ := cmds.NewXBuilder(&root, Xform{cmds: cmds})
+		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
 		c.Cmd("test score", "{Story.score}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
@@ -50,7 +52,7 @@ func TestBuild(t *testing.T) {
 	//
 	t.Run("run", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
-		c, _ := cmds.NewXBuilder(&root, Xform{cmds: cmds})
+		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
 		c.Cmd("test score", "{go testScore Story.score}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)

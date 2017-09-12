@@ -21,7 +21,7 @@ import (
 	"testing"
 )
 
-func TestStory(t *testing.T) {
+func xTestStory(t *testing.T) {
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
@@ -69,21 +69,20 @@ func TestStory(t *testing.T) {
 
 	match := func(t *testing.T, expected string, fn func(spec.Block)) {
 		var root struct{ rt.Execute }
-		if c, ok := cmds.NewXBuilder(&root, xform); ok {
-			if e := c.Build(fn); e != nil {
+		c := cmds.NewBuilder(&root, xform)
+		if e := c.Build(fn); e != nil {
+			t.Fatal(e)
+		} else {
+			var lines printer.Lines
+			run := rt.Writer(run, &lines)
+			if e := root.Execute.Execute(run); e != nil {
 				t.Fatal(e)
 			} else {
-				var lines printer.Lines
-				run := rt.Writer(run, &lines)
-				if e := root.Execute.Execute(run); e != nil {
-					t.Fatal(e)
-				} else {
-					l := lines.Lines()
-					if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
-						t.Log("expected", expected)
-						t.Log("got", l)
-						t.Fatal(d)
-					}
+				l := lines.Lines()
+				if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
+					t.Log("expected", expected)
+					t.Log("got", l)
+					t.Fatal(d)
 				}
 			}
 		}
@@ -94,7 +93,6 @@ func TestStory(t *testing.T) {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", c.Cmd("player"))))
 		})
 	})
-
 	t.Run("surroundings", func(t *testing.T) {
 		match(t, "room", func(c spec.Block) {
 			if c.Cmd("say").Begin() {

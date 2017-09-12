@@ -2,7 +2,9 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/spec/ops"
 	"github.com/kr/pretty"
 	testify "github.com/stretchr/testify/assert"
 	"go/ast"
@@ -18,41 +20,41 @@ func TestExpr(t *testing.T) {
 		littleDotStr = "a.b.c"
 		binaryStr    = "A.num * B.num"
 		chainStr     = "5 + A.num * B.num"
-		shortStr     = "A.num= 5"
-		longStr      = "B.num= 5 + A.num * B.num"
 		// paren      = "(A.num) * (B.num + 5)"
 	)
+	cmds := ops.NewOps(nil)
+	unique.PanicBlocks(cmds,
+		(*core.Commands)(nil))
+
 	t.Run("literal", func(t *testing.T) {
-		testEqual(t, literalFn(),
-			nconvert(t, nparse(t, literalStr)))
+		var root struct{ rt.NumberEval }
+		nconvert(t, cmds, &root, nparse(t, literalStr))
+		testEqual(t, literalFn(), root.NumberEval)
 	})
 	t.Run("no dot", func(t *testing.T) {
-		testEqual(t, noDotFn(),
-			nconvert(t, nparse(t, noDotStr)))
+		var root struct{ rt.ObjectEval }
+		nconvert(t, cmds, &root, nparse(t, noDotStr))
+		testEqual(t, noDotFn(), root.ObjectEval)
 	})
 	t.Run("big dot", func(t *testing.T) {
-		testEqual(t, bigDotFn(),
-			nconvert(t, nparse(t, bigDotStr)))
+		var root struct{ rt.ObjectEval }
+		nconvert(t, cmds, &root, nparse(t, bigDotStr))
+		testEqual(t, bigDotFn(), root.ObjectEval)
 	})
 	t.Run("little dot", func(t *testing.T) {
-		testEqual(t, littleDotFn(),
-			nconvert(t, nparse(t, littleDotStr)))
+		var root struct{ rt.ObjectEval }
+		nconvert(t, cmds, &root, nparse(t, littleDotStr))
+		testEqual(t, littleDotFn(), root.ObjectEval)
 	})
 	t.Run("binary", func(t *testing.T) {
-		testEqual(t, binaryFn(),
-			nconvert(t, nparse(t, binaryStr)))
+		var root struct{ rt.NumberEval }
+		nconvert(t, cmds, &root, nparse(t, binaryStr))
+		testEqual(t, binaryFn(), root.NumberEval)
 	})
 	t.Run("chain", func(t *testing.T) {
-		testEqual(t, chainFn(),
-			nconvert(t, nparse(t, chainStr)))
-	})
-	t.Run("short", func(t *testing.T) {
-		testEqual(t, shortAssignmentFn(),
-			sconvert(t, sparse(t, shortStr)))
-	})
-	t.Run("long", func(t *testing.T) {
-		testEqual(t, longAssigmentFn(),
-			sconvert(t, sparse(t, longStr)))
+		var root struct{ rt.NumberEval }
+		nconvert(t, cmds, &root, nparse(t, chainStr))
+		testEqual(t, chainFn(), root.NumberEval)
 	})
 }
 
@@ -75,32 +77,12 @@ func nparse(t *testing.T, s string) (ret ast.Expr) {
 	return
 }
 
-func nconvert(t *testing.T, n ast.Expr) (ret interface{}) {
-	if v, e := ConvertExpr(n); e != nil {
+func nconvert(t *testing.T, cmds *ops.Ops, dst interface{}, n ast.Expr) {
+	c := cmds.NewBuilder(dst, core.Xform{})
+	if e := ConvertExpr(c, n); e != nil {
 		t.Fatal(e, pretty.Sprint(n))
-	} else {
-		ret = v
-	}
-	return
-}
-
-func sparse(t *testing.T, s string) (ret ast.Stmt) {
-	wrap := "func(){" + s + "}"
-	if a, e := parser.ParseExpr(wrap); e != nil {
-		t.Fatal(e)
-	} else if l := a.(*ast.FuncLit).Body.List; len(l) == 0 {
-		t.Fatal("statement is empty")
-	} else {
-		ret = l[0]
-	}
-	return
-}
-
-func sconvert(t *testing.T, n ast.Stmt) (ret rt.Execute) {
-	if v, e := ConvertStmt(n); e != nil {
+	} else if e := c.Build(); e != nil {
 		t.Fatal(e, pretty.Sprint(n))
-	} else {
-		ret = v
 	}
 	return
 }
@@ -141,21 +123,5 @@ func chainFn() rt.NumberEval {
 	return &core.Add{
 		literalFn(),
 		binaryFn(),
-	}
-}
-
-func shortAssignmentFn() rt.Execute {
-	return &core.SetNum{
-		Obj:  &core.Global{"A"},
-		Prop: "num",
-		Val:  literalFn(),
-	}
-}
-
-func longAssigmentFn() rt.Execute {
-	return &core.SetNum{
-		Obj:  &core.Global{"B"},
-		Prop: "num",
-		Val:  chainFn(),
 	}
 }
