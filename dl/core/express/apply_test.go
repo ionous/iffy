@@ -20,10 +20,11 @@ func (*TestThe) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 
-func xTestApply(t *testing.T) {
+func TestApply(t *testing.T) {
 	const (
-		partStr = "{status.score}"
-		cmdStr  = "{go TestThe example}"
+		partStr    = "{status.score}"
+		twoPartStr = "{status.score}/{story.turn}"
+		// cmdStr     = "{go TestThe example}"
 		// ifElseStr    = "{if x}{status.score}{else}{story.turnCount}{endif}"
 	)
 	classes := make(unique.Types)
@@ -39,6 +40,10 @@ func xTestApply(t *testing.T) {
 	t.Run("parts", func(t *testing.T) {
 		testEqual(t, partsFn(),
 			templatize(t, partStr, cmds))
+	})
+	t.Run("two parts", func(t *testing.T) {
+		testEqual(t, twoPartFn(),
+			templatize(t, twoPartStr, cmds))
 	})
 	// t.Run("cmds", func(t *testing.T) {
 	// testEqual(t, cmdsFn(),
@@ -58,23 +63,33 @@ func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
 }
 
 func partsFn() rt.TextEval {
-	return &core.Buffer{[]rt.Execute{
-		&core.Say{
-			&core.Get{
-				Obj:  &core.GetAt{"status"},
-				Prop: "score",
+	return &std.Render{
+		Obj:  &core.GetAt{Prop: "status"},
+		Prop: "score",
+	}
+}
+
+func twoPartFn() rt.TextEval {
+	return &core.Buffer{
+		rt.ExecuteList{
+			// FIX: we should be able to "say" multiple things --
+			// but we need the command array interface to allow one/many/commands more transparently
+			// also, maybe say should implement both get text and execute -- buffer eveerything up in the get text version.
+			&core.Say{
+				&std.Render{
+					Obj:  &core.GetAt{Prop: "status"},
+					Prop: "score",
+				}},
+			&core.Say{
+				&core.Text{"/"},
+			},
+			&core.Say{
+				&std.Render{
+					Obj:  &core.GetAt{Prop: "story"},
+					Prop: "turn",
+				},
 			},
 		},
-		&core.Say{
-			&core.Text{"/"},
-		},
-		&core.Say{
-			&core.Get{
-				Obj:  &core.GetAt{"story"},
-				Prop: "turnCount",
-			},
-		},
-	},
 	}
 }
 

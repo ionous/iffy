@@ -72,11 +72,14 @@ func (xf Xform) convertMulti(c spec.Block, tmpl Template) (err error) {
 	if c.Cmd("buffer").Begin() {
 		if c.Cmds().Begin() {
 			for _, token := range tmpl {
-				if token.Plain {
-					c.Cmd("say", token.Str)
-				} else if e := xf.convertOne(c, token); e != nil {
-					err = e
-					break
+				if c.Cmd("say").Begin() {
+					if token.Plain {
+						c.Val(token.Str)
+					} else if e := xf.convertOne(c, token); e != nil {
+						err = e
+						break
+					}
+					c.End()
 				}
 			}
 			c.End()
