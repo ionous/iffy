@@ -3,7 +3,6 @@ package play
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/std"
-	"github.com/ionous/iffy/dl/story"
 	"github.com/ionous/iffy/event/trigger"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/pat/rule"
@@ -27,7 +26,6 @@ type Commands struct {
 	Core    core.Commands
 	Rules   rule.Commands
 	Std     std.Commands
-	Story   story.Commands
 	Parser  parser.Commands
 	Trigger trigger.Commands
 

@@ -54,7 +54,7 @@ func definePlay(c spec.Block) {
 			if c.Cmds().Begin() {
 				c.Cmd("word", "jump")
 				if c.Cmd("trigger").Begin() {
-					c.Cmd("jump", "player")
+					c.Cmd("jump", c.Cmd("player"))
 					c.End()
 				}
 				c.End()
