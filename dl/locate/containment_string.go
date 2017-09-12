@@ -4,9 +4,9 @@ package locate
 
 import "fmt"
 
-const _Containment_name = "SupportsContainsWearsCarriesHolds"
+const _Containment_name = "SupportsContainsWearsCarriesHas"
 
-var _Containment_index = [...]uint8{0, 8, 16, 21, 28, 33}
+var _Containment_index = [...]uint8{0, 8, 16, 21, 28, 31}
 
 func (i Containment) String() string {
 	if i < 0 || i >= Containment(len(_Containment_index)-1) {

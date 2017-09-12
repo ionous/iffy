@@ -3,11 +3,12 @@ package core_test
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/stretchr/testify/suite"
 	"strings"
@@ -27,7 +28,7 @@ type CoreSuite struct {
 	lines printer.Lines
 
 	classes unique.Types
-	objects *ref.ObjBuilder
+	objects *obj.ObjBuilder
 
 	gen *unique.Objects
 }
@@ -42,17 +43,17 @@ func (assert *CoreSuite) SetupTest() {
 	errutil.Panic = false
 	classes := make(unique.Types)
 	assert.cmds = ops.NewOps(classes)
-	unique.RegisterBlocks(unique.PanicTypes(assert.cmds),
+	unique.PanicBlocks(assert.cmds,
 		(*core.Commands)(nil))
 
 	assert.gen = unique.NewObjectGenerator()
 	assert.classes = classes
-	assert.objects = ref.NewObjects()
+	assert.objects = obj.NewObjects()
 
-	unique.RegisterBlocks(unique.PanicTypes(assert.gen),
+	unique.PanicBlocks(assert.gen,
 		(*core.Counters)(nil))
 
-	unique.RegisterBlocks(unique.PanicTypes(assert.classes),
+	unique.PanicBlocks(assert.classes,
 		(*core.Classes)(nil),
 		(*core.Counters)(nil),
 	)
@@ -65,7 +66,7 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 		if objs, e := assert.gen.Generate(); e != nil {
 			err = e
 		} else {
-			unique.RegisterValues(unique.PanicValues(assert.objects), objs...)
+			unique.PanicValues(assert.objects, objs...)
 			ret = rtm.New(assert.classes).Objects(assert.objects).Writer(&assert.lines).Rtm()
 		}
 	}
@@ -73,27 +74,26 @@ func (assert *CoreSuite) newRuntime(c *ops.Builder) (ret rt.Runtime, err error) 
 }
 
 func (assert *CoreSuite) matchFunc(
-	build func(c *ops.Builder),
+	build func(c spec.Block),
 	compare func(expected []string),
 ) {
 	var root struct{ Eval rt.Execute }
-	if c, ok := assert.cmds.NewBuilder(&root); ok {
-		build(c)
-		if run, e := assert.newRuntime(c); assert.NoError(e) {
-			if e := root.Eval.Execute(run); assert.NoError(e) {
-				compare(assert.Lines())
-			}
+	c := assert.cmds.NewBuilder(&root, core.Xform{})
+	build(c)
+	if run, e := assert.newRuntime(c); assert.NoError(e) {
+		if e := root.Eval.Execute(run); assert.NoError(e) {
+			compare(assert.Lines())
 		}
 	}
 }
 
 func (assert *CoreSuite) matchLine(expected string,
-	build func(c *ops.Builder)) {
+	build func(c spec.Block)) {
 	assert.matchLines([]string{expected}, build)
 }
 
 func (assert *CoreSuite) matchLines(expected []string,
-	build func(c *ops.Builder)) {
+	build func(c spec.Block)) {
 	assert.matchFunc(build, func(lines []string) {
 		assert.Equal(expected, lines)
 	})
@@ -103,14 +103,14 @@ func (assert *CoreSuite) TestShortcuts() {
 	var root struct {
 		Eval rt.TextEval
 	}
-	if c, ok := assert.cmds.NewBuilder(&root); ok {
-		c.Val("shortcut")
-		if run, e := assert.newRuntime(c); assert.NoError(e) {
-			if res, e := root.Eval.GetText(run); assert.NoError(e) {
-				assert.EqualValues("shortcut", res)
-			}
+	c := assert.cmds.NewBuilder(&root, core.Xform{})
+	c.Val("shortcut")
+	if run, e := assert.newRuntime(c); assert.NoError(e) {
+		if res, e := root.Eval.GetText(run); assert.NoError(e) {
+			assert.EqualValues("shortcut", res)
 		}
 	}
+
 }
 
 // TestAllTrue ensure AllTrue operates on boolean literals as "and".
@@ -119,18 +119,18 @@ func (assert *CoreSuite) TestAllTrue() {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
-			c.Cmd("all true", c.Cmds(
-				c.Cmd("bool", a),
-				c.Cmd("bool", b)))
-			//
-			if run, e := assert.newRuntime(c); assert.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
-					assert.EqualValues(res, ok)
-				}
+		c := assert.cmds.NewBuilder(&root, core.Xform{})
+		c.Cmd("all true", c.Cmds(
+			c.Cmd("bool", a),
+			c.Cmd("bool", b)))
+		//
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+				assert.EqualValues(res, ok)
 			}
 		}
 	}
+
 	// ******
 	test(true, false, false)
 	test(true, true, true)
@@ -143,18 +143,18 @@ func (assert *CoreSuite) TestAnyTrue() {
 		Eval rt.BoolEval
 	}
 	test := func(a, b, res bool) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
-			if c.Cmd("any true").Begin() {
-				c.Cmds(c.Cmd("bool", a), c.Cmd("bool", b))
-				c.End()
-			}
-			// /
-			if run, e := assert.newRuntime(c); assert.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
-					assert.EqualValues(res, ok)
-				}
+		c := assert.cmds.NewBuilder(&root, core.Xform{})
+		if c.Cmd("any true").Begin() {
+			c.Cmds(c.Cmd("bool", a), c.Cmd("bool", b))
+			c.End()
+		}
+		// /
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+				assert.EqualValues(res, ok)
 			}
 		}
+
 	}
 	test(true, false, true)
 	test(true, true, true)
@@ -166,18 +166,18 @@ func (assert *CoreSuite) TestCompareNum() {
 		Eval rt.BoolEval
 	}
 	test := func(a float64, op string, b float64) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
-			if c.Cmd("compare num").Begin() {
-				c.Val(a).Cmd(op).Val(b)
-				c.End()
-			}
+		c := assert.cmds.NewBuilder(&root, core.Xform{})
+		if c.Cmd("compare num").Begin() {
+			c.Val(a).Cmd(op).Val(b)
+			c.End()
+		}
 
-			if run, e := assert.newRuntime(c); assert.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
-					assert.True(ok)
-				}
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+				assert.True(ok)
 			}
 		}
+
 	}
 	test(10, "greater than", 1)
 	test(1, "lesser than", 10)
@@ -190,15 +190,15 @@ func (assert *CoreSuite) TestCompareText() {
 		Eval rt.BoolEval
 	}
 	test := func(a, op, b string) {
-		if c, ok := assert.cmds.NewBuilder(&root); ok {
-			c.Cmd("compare text", c.Val(a), c.Cmd(op), c.Val(b))
-			//
-			if run, e := assert.newRuntime(c); assert.NoError(e) {
-				if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
-					assert.True(ok, strings.Join([]string{a, op, b}, " "))
-				}
+		c := assert.cmds.NewBuilder(&root, core.Xform{})
+		c.Cmd("compare text", c.Val(a), c.Cmd(op), c.Val(b))
+		//
+		if run, e := assert.newRuntime(c); assert.NoError(e) {
+			if ok, e := root.Eval.GetBool(run); assert.NoError(e) {
+				assert.True(ok, strings.Join([]string{a, op, b}, " "))
 			}
 		}
+
 	}
 	test("Z", "greater than", "A")
 	test("marzip", "lesser than", "marzipan")

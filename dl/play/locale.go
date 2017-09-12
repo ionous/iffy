@@ -23,15 +23,15 @@ type Location struct {
 	Child  string
 }
 
-// func (r *Relation) Assert(f **Facts) (nil error) {
+// func (r *Relation) Assert(f *Facts) (nil error) {
 // 	f.Relations = append(f.Relations, *r)
 // 	return
 // }
-// func (v *Value) Assert(f **Facts) (nil error) {
+// func (v *Value) Assert(f *Facts) (nil error) {
 // 	f.Values = append(f.Values, *v)
 // 	return
 // }
-// func (s *State) Assert(f **Facts) (nil error) {
+// func (s *State) Assert(f *Facts) (nil error) {
 // 	f.Values = append(f.Values, Value{s.Obj, s.Name, true})
 // 	return
 // }

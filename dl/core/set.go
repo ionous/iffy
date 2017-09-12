@@ -39,7 +39,7 @@ func (p *SetBool) Execute(run rt.Runtime) error {
 	return err
 }
 
-// GetObject executes the command, and returns a reference to the orginal object.
+// GetObject executes the command, and returns a reference to the original object.
 func (p *SetBool) GetObject(run rt.Runtime) (rt.Object, error) {
 	return p.exec(run)
 }
@@ -62,7 +62,7 @@ func (p *SetNum) Execute(run rt.Runtime) error {
 	return err
 }
 
-// GetObject executes the command, and returns a reference to the orginal object.
+// GetObject executes the command, and returns a reference to the original object.
 func (p *SetNum) GetObject(run rt.Runtime) (rt.Object, error) {
 	return p.exec(run)
 }
@@ -85,7 +85,7 @@ func (p *SetText) Execute(run rt.Runtime) error {
 	return err
 }
 
-// GetObject executes the command, and returns a reference to the orginal object.
+// GetObject executes the command, and returns a reference to the original object.
 func (p *SetText) GetObject(run rt.Runtime) (rt.Object, error) {
 	return p.exec(run)
 }
@@ -108,7 +108,7 @@ func (p *SetObj) Execute(run rt.Runtime) error {
 	return err
 }
 
-// GetObject executes the command, and returns a reference to the orginal object.
+// GetObject executes the command, and returns a reference to the original object.
 func (p *SetObj) GetObject(run rt.Runtime) (rt.Object, error) {
 	return p.exec(run)
 }

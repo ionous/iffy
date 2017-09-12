@@ -48,8 +48,8 @@ func ValuePtr(ptr interface{}) (ret r.Value, err error) {
 }
 
 // RegisterBlock registers a structure containing pointers to commands.
-func RegisterBlocks(reg TypeRegistry, block ...interface{}) (err error) {
-	for _, block := range block {
+func RegisterBlocks(reg TypeRegistry, blks ...interface{}) (err error) {
+	for _, block := range blks {
 		if structType, e := StructPtr(block); e != nil {
 			err = e
 			break
@@ -81,8 +81,8 @@ func registerBlock(reg TypeRegistry, structType r.Type) (err error) {
 }
 
 // RegisterType registers pointers to types.
-func RegisterTypes(reg TypeRegistry, ptr ...interface{}) (err error) {
-	for i, t := range ptr {
+func RegisterTypes(reg TypeRegistry, ptrs ...interface{}) (err error) {
+	for i, t := range ptrs {
 		if rtype, e := StructPtr(t); e != nil {
 			err = errutil.New("RegisterType", i, e)
 			break
@@ -95,8 +95,8 @@ func RegisterTypes(reg TypeRegistry, ptr ...interface{}) (err error) {
 }
 
 // RegisterValues registers multiple pointer values.
-func RegisterValues(reg ValueRegistry, value ...interface{}) (err error) {
-	for i, v := range value {
+func RegisterValues(reg ValueRegistry, vals ...interface{}) (err error) {
+	for i, v := range vals {
 		if rval, e := ValuePtr(v); e != nil {
 			err = errutil.New("RegisterValue", i, e)
 			break

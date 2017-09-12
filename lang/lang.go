@@ -4,6 +4,7 @@ import (
 	"bitbucket.org/pkg/inflect"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 var Articles = []string{"the", "a", "an", "our", "some"}
@@ -55,6 +56,15 @@ func Pluralize(s string) (ret string) {
 func Capitalize(s string) (ret string) {
 	if len(s) > 0 {
 		ret = inflect.Capitalize(s)
+	}
+	return
+}
+
+// IsCapitalized returns true if the passed string starts with an upper case letter
+func IsCapitalized(n string) (ret bool) {
+	for _, r := range n {
+		ret = unicode.IsUpper(r)
+		break
 	}
 	return
 }

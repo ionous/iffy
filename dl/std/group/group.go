@@ -2,7 +2,7 @@ package group
 
 import (
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/spec"
 )
 
 // Key partitions objects into groups.
@@ -54,7 +54,7 @@ type PrintGroup struct {
 	Objects        []rt.Object
 }
 
-func GroupRules(c *ops.Builder) {
+func GroupRules(c spec.Block) {
 	// all unnamed objects go into a group w/ text the plural of the class name.
 	if c.Cmd("run rule", "group together").Begin() {
 		c.Param("if").Cmd("includes", c.Cmd("get", c.Cmd("get", "@", "target"), "name"), "#")
@@ -88,13 +88,13 @@ func GroupRules(c *ops.Builder) {
 								c.End()
 							}
 							// now the label:
-							c.Cmd("print text", c.Cmd("get", "@", "label"))
+							c.Cmd("say", c.Cmd("get", "@", "label"))
 							// after the label, possibly write the objects:
 							if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
 								if c.Param("false").Cmds().Begin() {
 									if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
-										// if they are not inumerable, they are numerable.
-										// if they are numerable, then they got a number... in front of some backets.
+										// if they are not innumerable, they are numerable.
+										// if they are numerable, then they got a number... in front of some brackets.
 										if c.Param("false").Cmds().Begin() {
 											c.Cmd("print bracket", c.Cmds(
 												c.Cmd("print objects", c.Cmd("get", "@", "objects"),

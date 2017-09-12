@@ -1,18 +1,16 @@
 package rule
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 )
 
-func Master(cmds *ops.Ops, pt *unique.Stack, buildPatterns ...func(c *ops.Builder)) (ret Rules, err error) {
+func Master(cmds *ops.Ops, xform ops.Transform, pt *unique.Stack, buildPatterns ...func(c spec.Block)) (ret Rules, err error) {
 	// Accumulate rules into root.
 	var root struct{ Mandates }
-
-	if c, ok := cmds.NewBuilder(&root); !ok {
-		err = errutil.New("why does this return okay anyway?")
-	} else if c.Param("mandates").Cmds().Begin() {
+	c := cmds.NewBuilder(&root, xform)
+	if c.Param("mandates").Cmds().Begin() {
 		for _, b := range buildPatterns {
 			b(c)
 		}

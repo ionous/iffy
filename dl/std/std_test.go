@@ -5,7 +5,7 @@ import (
 	. "github.com/ionous/iffy/dl/std"
 
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
@@ -21,17 +21,17 @@ func TestStd(t *testing.T) {
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
-	unique.RegisterBlocks(unique.PanicTypes(classes),
+	unique.PanicBlocks(classes,
 		(*Classes)(nil))
 
-	unique.RegisterBlocks(unique.PanicTypes(patterns),
+	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
-	objects := ref.NewObjects()
-	unique.RegisterValues(unique.PanicValues(objects),
+	objects := obj.NewObjects()
+	unique.PanicValues(objects,
 		Thingaverse.objects(sliceOf.String("apple", "pen", "thing#1", "thing#2"))...)
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil),
 		(*Commands)(nil),
@@ -41,7 +41,7 @@ func TestStd(t *testing.T) {
 		assert := testify.New(t)
 
 		//
-		rules, e := rule.Master(cmds, patterns, PrintNameRules)
+		rules, e := rule.Master(cmds, core.Xform{}, patterns, PrintNameRules)
 		assert.NoError(e)
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".
@@ -50,28 +50,28 @@ func TestStd(t *testing.T) {
 		//
 		t.Run("printed name", func(t *testing.T) {
 			apple, _ := run.GetObject("apple")
-			match(run, testify.New(t), "empire apple", &PrintName{apple})
+			match(run, testify.New(t), "empire apple", &PrintName{apple.Id()})
 		})
 		t.Run("named", func(t *testing.T) {
 			genericPen, _ := run.GetObject("pen")
-			match(run, testify.New(t), "pen", &PrintName{genericPen})
+			match(run, testify.New(t), "pen", &PrintName{genericPen.Id()})
 		})
 		t.Run("unnamed", func(t *testing.T) {
 			unnamedThing, _ := run.GetObject("thing#1")
-			match(run, testify.New(t), "thing", &PrintName{unnamedThing})
+			match(run, testify.New(t), "thing", &PrintName{unnamedThing.Id()})
 		})
 		//
 		t.Run("plural printed name", func(t *testing.T) {
 			apple, _ := run.GetObject("apple")
-			match(run, testify.New(t), "empire apples", &PrintPluralName{apple})
+			match(run, testify.New(t), "empire apples", &PrintPluralName{apple.Id()})
 		})
 		t.Run("plural named", func(t *testing.T) {
 			genericPen, _ := run.GetObject("pen")
-			match(run, testify.New(t), "pens", &PrintPluralName{genericPen})
+			match(run, testify.New(t), "pens", &PrintPluralName{genericPen.Id()})
 		})
 		t.Run("plural unnamed", func(t *testing.T) {
 			unnamedThing, _ := run.GetObject("thing#1")
-			match(run, testify.New(t), "things", &PrintPluralName{unnamedThing})
+			match(run, testify.New(t), "things", &PrintPluralName{unnamedThing.Id()})
 		})
 		//
 		t.Run("printed plural name", func(t *testing.T) {
@@ -81,7 +81,7 @@ func TestStd(t *testing.T) {
 				t.Fatal(e)
 			}
 
-			match(run, testify.New(t), forced, &PrintPluralName{apple})
+			match(run, testify.New(t), forced, &PrintPluralName{apple.Id()})
 		})
 		//
 	})
@@ -90,10 +90,8 @@ func TestStd(t *testing.T) {
 func match(run rt.Runtime, assert *testify.Assertions, match string, op interface{}) (okay bool) {
 	var lines printer.Lines
 	run = rt.Writer(run, &lines)
-	if patdata, e := run.Emplace(op); assert.NoError(e) {
-		if e := run.ExecuteMatching(run, patdata); assert.NoError(e) {
-			okay = assert.EqualValues(sliceOf.String(match), lines.Lines())
-		}
+	if e := run.ExecuteMatching(run, run.Emplace(op)); assert.NoError(e) {
+		okay = assert.EqualValues(sliceOf.String(match), lines.Lines())
 	}
 	return
 }

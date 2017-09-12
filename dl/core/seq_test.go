@@ -1,17 +1,17 @@
 package core_test
 
 import (
-	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/sliceOf"
 )
 
 func (assert *CoreSuite) TestSeqCycle() {
 	assert.matchLines(sliceOf.String("a", "b", "c", "a", "b", "c", "a"),
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("for each num").Begin() {
 				c.Param("in").Cmd("range", 7)
 				if c.Param("go").Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("cycle text",
+					c.Cmd("say", c.Cmd("cycle text",
 						assert.gen.Id("cycle counter"),
 						sliceOf.String("a", "b", "c"),
 					))
@@ -23,11 +23,11 @@ func (assert *CoreSuite) TestSeqCycle() {
 }
 
 func (assert *CoreSuite) TestSeqShuffle() {
-	assert.matchFunc(func(c *ops.Builder) {
+	assert.matchFunc(func(c spec.Block) {
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", 9)
 			if c.Param("go").Cmds().Begin() {
-				c.Cmd("print text", c.Cmd("shuffle text",
+				c.Cmd("say", c.Cmd("shuffle text",
 					assert.gen.Id("shuffle counter"),
 					sliceOf.String("a", "b", "c"),
 				))
@@ -58,11 +58,11 @@ func (assert *CoreSuite) TestSeqShuffle() {
 func (assert *CoreSuite) TestSeqStopping() {
 	assert.matchLines(
 		sliceOf.String("a", "b", "c", "c", "c", "c", "c"),
-		func(c *ops.Builder) {
+		func(c spec.Block) {
 			if c.Cmd("for each num").Begin() {
 				c.Param("in").Cmd("range", 7)
 				if c.Param("go").Cmds().Begin() {
-					c.Cmd("print text", c.Cmd("stopping text",
+					c.Cmd("say", c.Cmd("stopping text",
 						assert.gen.Id("stopping counter"),
 						sliceOf.String("a", "b", "c"),
 					))

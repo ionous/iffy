@@ -11,7 +11,7 @@ func NewDeletionCursor(index *Index) *DeletionCursor {
 	return &DeletionCursor{Index: index}
 }
 
-// Flush preforms the actual deletion. It should only be called after some succesful call to DeletePair.
+// Flush preforms the actual deletion. It should only be called after some successful call to DeletePair.
 func (dc *DeletionCursor) Flush() {
 	a, i, n := dc.Rows, dc.start, dc.next
 	dc.Rows = a[:i+copy(a[i:], a[n:])]

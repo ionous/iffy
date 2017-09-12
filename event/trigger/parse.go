@@ -23,24 +23,33 @@ func Parse(run *rtm.Rtm, input string) (err error) {
 		err = errutil.New("result list was empty")
 	} else if act, ok := last.(ResolvedTrigger); !ok {
 		err = errutil.New("expected resolved action %T", last)
-	} else if objs, e := objectify(run, list.Objects()); e != nil {
-		err = e
 	} else {
-		pose := Pose{objs}
-		run := rt.AtFinder(run, pose)
-		err = act.Execute(run)
+		var p struct {
+			Noun       rt.Object // FIX: ident.Id
+			SecondNoun rt.Object
+		}
+		if e := objectify(run, list.Objects(), &p.Noun, &p.SecondNoun); e != nil {
+			err = e
+		} else {
+			run := rt.AtFinder(run, run.Emplace(&p))
+			err = act.Execute(run)
+		}
 	}
 	return
 }
 
 // turn ids into objects.
-func objectify(run rt.Runtime, ids []ident.Id) (ret []rt.Object, err error) {
-	for _, id := range ids {
-		if obj, ok := run.GetObject(id.Name); !ok {
-			err = errutil.New("couldnt find object", id)
-			break
-		} else {
-			ret = append(ret, obj)
+func objectify(run rt.Runtime, ids []ident.Id, out ...*rt.Object) (err error) {
+	if len(ids) > len(out) {
+		err = errutil.Fmt("too many nouns")
+	} else {
+		for i, id := range ids {
+			if obj, ok := run.GetObject(id.Name); !ok {
+				err = errutil.New("couldnt find object", id)
+				break
+			} else {
+				*(out[i]) = obj
+			}
 		}
 	}
 	return

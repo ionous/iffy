@@ -12,10 +12,8 @@ type Frame struct {
 
 func NewFrame(run rt.Runtime, evt *EventObject) (ret *Frame, err error) {
 	// create event object
-	if temp, e := run.Emplace(evt); e != nil {
-		err = e
-	} else {
-		run := rt.AtFinder(run, temp)
+	{
+		run := rt.AtFinder(run, run.Emplace(evt))
 		ret = &Frame{run: run, evt: evt}
 	}
 	return

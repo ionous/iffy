@@ -2,14 +2,17 @@ package play
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/event/evtbuilder"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
+	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"io"
 )
@@ -17,7 +20,7 @@ import (
 var globalPlay Play
 
 type Play struct {
-	callbacks []func(*ops.Builder)
+	callbacks []func(spec.Block)
 	classes   []interface{}
 	cmds      []interface{}
 	patterns  []interface{}
@@ -26,12 +29,12 @@ type Play struct {
 }
 
 // Register definitions globally. Used mainly via go init()
-func (r *Play) AddScript(cb func(c *ops.Builder)) {
+func (r *Play) AddScript(cb func(c spec.Block)) {
 	r.callbacks = append(r.callbacks, cb)
 }
 
 // Register definitions globally. Used mainly via go init()
-// func Register(cb func(c *ops.Builder)) {
+// func Register(cb func(c spec.Block)) {
 // 	globalPlay.Register(cb)
 // }
 
@@ -59,20 +62,19 @@ func (r *Play) AddObjects(objs ...interface{}) {
 func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
 	var f Facts
 	var root struct{ Definitions }
-	if c, ok := cmds.NewBuilder(&root); ok {
-		if c.Cmds().Begin() {
-			for _, v := range r.callbacks {
-				v(c)
-			}
-			c.End()
+	c := cmds.NewBuilder(&root, core.Xform{})
+	if c.Cmds().Begin() {
+		for _, v := range r.callbacks {
+			v(c)
 		}
-		if e := c.Build(); e != nil {
-			err = e
-		} else if e := root.Define(&f); e != nil {
-			err = e
-		} else {
-			ret = f
-		}
+		c.End()
+	}
+	if e := c.Build(); e != nil {
+		err = e
+	} else if e := root.Define(&f); e != nil {
+		err = e
+	} else {
+		ret = f
 	}
 	return
 }
@@ -82,8 +84,8 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
-	objects := ref.NewObjects()
-	relations := ref.NewRelations()
+	objects := obj.NewObjects()
+	relations := rel.NewRelations()
 
 	//
 	if e := unique.RegisterBlocks(classes, (*Classes)(nil)); e != nil {
@@ -102,7 +104,7 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 		err = e
 	} else if e := unique.RegisterValues(objects, r.objects...); e != nil {
 		err = e
-	} else if rules, e := rule.Master(cmds, patterns, std.StdRules); e != nil {
+	} else if rules, e := rule.Master(cmds, core.Xform{}, patterns, std.Rules); e != nil {
 		err = e
 	} else if facts, e := r.Build(cmds); e != nil {
 		err = e
@@ -114,7 +116,7 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 		listen := evtbuilder.NewListeners(events.Types)
 
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
-		if e := relations.AddTable("ParentChild", pc.Table); e != nil {
+		if e := relations.AddTable("locale", pc.Table); e != nil {
 			err = e
 		} else {
 			run := rtm.New(classes).
@@ -127,12 +129,12 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 				Writer(w).
 				Rtm()
 
-			if e := addLocations(run, pc, facts.Locations); e != nil {
+			if e := addLocations(run.Objects, pc, facts.Locations); e != nil {
 				err = e
 			} else {
-				if e := addObjectListeners(run, listen, facts.ObjectListeners); e != nil {
+				if e := addObjectListeners(run.Objects, listen, facts.ObjectListeners); e != nil {
 					err = e
-				} else if e := addClassListeners(run, listen, facts.ClassListeners); e != nil {
+				} else if e := addClassListeners(run.Types, listen, facts.ClassListeners); e != nil {
 					err = e
 				} else {
 					ret = run
@@ -143,16 +145,16 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	return
 }
 
-func addLocations(run *rtm.Rtm, pc locate.Locale, ls []Location) (err error) {
+func addLocations(objs obj.ObjectMap, pc locate.Locale, ls []Location) (err error) {
 	for _, loc := range ls {
 		// in this case we're probably a command too
-		if p, ok := run.GetObject(loc.Parent); !ok {
+		if p, ok := objs.GetObject(loc.Parent); !ok {
 			err = errutil.New("unknown", loc.Parent)
 			break
-		} else if c, ok := run.GetObject(loc.Child); !ok {
+		} else if c, ok := objs.GetObject(loc.Child); !ok {
 			err = errutil.New("unknown", loc.Child)
 			break
-		} else if e := pc.SetLocation(p, c, loc.Locale); e != nil {
+		} else if e := pc.SetLocation(p, loc.Locale, c); e != nil {
 			err = e
 			break
 		}
@@ -160,10 +162,10 @@ func addLocations(run *rtm.Rtm, pc locate.Locale, ls []Location) (err error) {
 	return
 }
 
-func addObjectListeners(run *rtm.Rtm, listen *evtbuilder.Listeners, ls []ListenTo) (err error) {
+func addObjectListeners(objs obj.ObjectMap, listen *evtbuilder.Listeners, ls []ListenTo) (err error) {
 	for _, l := range ls {
 		opt := l.GetOptions()
-		if obj, ok := run.GetObject(l.Target); !ok {
+		if obj, ok := objs.GetObject(l.Target); !ok {
 			err = errutil.New("couldnt find object", l.Target)
 			break
 		} else if e := listen.Object(obj).On(l.Event, opt, l.Go); e != nil {
@@ -174,10 +176,11 @@ func addObjectListeners(run *rtm.Rtm, listen *evtbuilder.Listeners, ls []ListenT
 	return
 }
 
-func addClassListeners(run *rtm.Rtm, listen *evtbuilder.Listeners, ls []ListenFor) (err error) {
+func addClassListeners(classes unique.Types, listen *evtbuilder.Listeners, ls []ListenFor) (err error) {
 	for _, l := range ls {
 		opt := l.GetOptions()
-		if cls, ok := run.GetClass(l.Target); !ok {
+		// FIX: change to class registry
+		if cls, ok := classes.FindType(l.Target); !ok {
 			err = errutil.New("couldnt find class", l.Target)
 			break
 		} else if e := listen.Class(cls).On(l.Event, opt, l.Go); e != nil {

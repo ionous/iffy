@@ -7,11 +7,13 @@ import (
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
+	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
@@ -38,87 +40,82 @@ func TestContents(t *testing.T) {
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
-	unique.RegisterBlocks(unique.PanicTypes(classes),
+	unique.PanicBlocks(classes,
 		(*core.Classes)(nil),
 		(*Classes)(nil))
 
-	unique.RegisterBlocks(unique.PanicTypes(patterns),
+	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
-	objects := ref.NewObjects()
-	unique.RegisterValues(unique.PanicValues(objects),
+	objects := obj.NewObjects()
+	unique.PanicValues(objects,
 		Thingaverse.objects(sliceOf.String("box", "cake", "apple", "pen"))...)
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil),
 		(*Commands)(nil),
 	)
-	unique.RegisterTypes(unique.PanicTypes(cmds),
+	unique.PanicTypes(cmds,
 		(*Location)(nil),
 	)
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-	rules, e := rule.Master(cmds, patterns, PrintNameRules, PrintObjectRules)
+	rules, e := rule.Master(cmds, core.Xform{}, patterns, PrintNameRules, PrintObjectRules)
 	assert.NoError(e)
 
-	type OpsCb func(c *ops.Builder)
+	type OpsCb func(c spec.Block)
 	type Match func(run rt.Runtime, lines []string) bool
 	test := func(t *testing.T, build, exec OpsCb, match Match) (err error) {
-		relations := ref.NewRelations()
+		relations := rel.NewRelations()
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
 		relations.AddTable("locale", pc.Table)
 
-		var facts struct{ Locations []Locate }
-		if c, ok := cmds.NewBuilder(&facts); !ok {
-			err = errutil.New("no builder")
+		var root struct{ Locations []Locate }
+		c := cmds.NewBuilder(&root, core.Xform{})
+		if c.Cmds().Begin() {
+			build(c)
+			c.End()
+		}
+		if e := c.Build(); e != nil {
+			err = e
 		} else {
-			if c.Cmds().Begin() {
-				build(c)
-				c.End()
-			}
-			if e := c.Build(); e != nil {
-				err = e
-			} else {
-				objs := objects.Build()
+			objs := objects.Build(nil)
+			for _, l := range root.Locations {
+				l := l.(*Location)
+				// in this case we're probably a command too
+				if p, ok := objs.GetObject(l.Parent); !ok {
+					err = errutil.New("unknown", l.Parent)
+					break
+				} else if c, ok := objs.GetObject(l.Child); !ok {
+					err = errutil.New("unknown", l.Child)
+					break
+				} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
+					err = e
+					break
 
-				for _, l := range facts.Locations {
-					l := l.(*Location)
-					// in this case we're probably a command too
-					if p, ok := objs.GetObject(l.Parent); !ok {
-						err = errutil.New("unknown", l.Parent)
-						break
-					} else if c, ok := objs.GetObject(l.Child); !ok {
-						err = errutil.New("unknown", l.Child)
-						break
-					} else if e := pc.SetLocation(p, c, l.Locale); e != nil {
-						err = e
-						break
-					}
 				}
 			}
 		}
 		if err == nil {
 			var root struct{ rt.ExecuteList }
-			if c, ok := cmds.NewBuilder(&root); !ok {
-				err = errutil.New("no builder")
+			c := cmds.NewBuilder(&root, core.Xform{})
+			if c.Cmds().Begin() {
+				exec(c)
+				c.End()
+			}
+			if e := c.Build(); e != nil {
+				err = e
 			} else {
-				if c.Cmds().Begin() {
-					exec(c)
-					c.End()
-				}
-				if e := c.Build(); e != nil {
+				var lines printer.Lines
+				run := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm()
+				if e := root.Execute(run); e != nil {
 					err = e
-				} else {
-					var lines printer.Lines
-					run := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm()
-					if e := root.Execute(run); e != nil {
-						err = e
-					} else if res := lines.Lines(); match(run, res) {
-						t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
-					}
+				} else if res := lines.Lines(); match(run, res) {
+					t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
 				}
+
 			}
 		}
 		return
@@ -126,9 +123,9 @@ func TestContents(t *testing.T) {
 	//
 	t.Run("contains", func(t *testing.T) {
 		assert := testify.New(t)
-		e := test(t, func(c *ops.Builder) {
+		e := test(t, func(c spec.Block) {
 			c.Cmd("Location", "box", locate.Contains, "cake")
-		}, func(c *ops.Builder) {
+		}, func(c spec.Block) {
 			//
 		}, func(run rt.Runtime, lines []string) (okay bool) {
 			if pc, ok := run.GetRelation("locale"); assert.True(ok) {
@@ -141,14 +138,14 @@ func TestContents(t *testing.T) {
 		assert.NoError(e)
 	})
 
-	emptyBox := func(c *ops.Builder) {
+	emptyBox := func(c spec.Block) {
 	}
-	boxContents := func(c *ops.Builder) {
+	boxContents := func(c spec.Block) {
 		c.Cmd("Location", "box", locate.Contains, "cake")
 		c.Cmd("Location", "box", locate.Contains, "apple")
 		c.Cmd("Location", "box", locate.Contains, "pen")
 	}
-	printContent := func(c *ops.Builder) {
+	printContent := func(c spec.Block) {
 		c.Cmd("determine", c.Cmd("print content", "box", c.Param("tersely").Val(true)))
 	}
 	t.Run("empty", func(t *testing.T) {
@@ -166,7 +163,7 @@ func TestContents(t *testing.T) {
 		assert.NoError(e)
 	})
 	// summary tests:
-	printSummary := func(c *ops.Builder) {
+	printSummary := func(c spec.Block) {
 		if c.Cmd("print span").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("determine", c.Cmd("print summary", "box"))
@@ -201,7 +198,7 @@ func TestContents(t *testing.T) {
 	})
 	// print object: simple name, name with summary ( for a container )
 	printObject := func(name string) OpsCb {
-		return func(c *ops.Builder) {
+		return func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
 				c.Cmds(c.Cmd("determine", c.Cmd("print object", name)))
 				c.End()

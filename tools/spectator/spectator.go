@@ -36,7 +36,9 @@ package main
 // 	return
 // }
 
-// func main() {
+func main() {
+}
+
 // 	flag.Parse()
 
 // 	// https://github.com/vektra/mockery

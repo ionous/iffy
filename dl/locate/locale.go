@@ -8,7 +8,7 @@ import (
 )
 
 type Locale struct {
-	*index.Table
+	*index.Table // one to many
 }
 
 func (l *Locale) Empty(p rt.Object) bool {
@@ -16,16 +16,7 @@ func (l *Locale) Empty(p rt.Object) bool {
 	return !hasChild
 }
 
-func (l *Locale) SetLocation(p, c rt.Object, now Containment) (err error) {
-	types := map[Containment]struct {
-		Parent, Child string
-	}{
-		Supports: {Parent: "container", Child: "thing"},
-		Contains: {Parent: "container", Child: "thing"},
-		Wears:    {Parent: "actor", Child: "thing"},
-		Carries:  {Parent: "actor", Child: "thing"},
-		Holds:    {Parent: "room", Child: "thing"},
-	}
+func (l *Locale) SetLocation(p rt.Object, now Containment, c rt.Object) (err error) {
 	if check, ok := types[now]; !ok {
 		err = errutil.New("relation not supported", now)
 	} else if !class.IsCompatible(p.Type(), check.Parent) {
@@ -43,4 +34,14 @@ func (l *Locale) SetLocation(p, c rt.Object, now Containment) (err error) {
 		})
 	}
 	return
+}
+
+var types = map[Containment]struct {
+	Parent, Child string
+}{
+	Supports: {Parent: "container", Child: "thing"},
+	Contains: {Parent: "container", Child: "thing"},
+	Wears:    {Parent: "actor", Child: "thing"},
+	Carries:  {Parent: "actor", Child: "thing"},
+	Has:      {Parent: "room", Child: "thing"},
 }

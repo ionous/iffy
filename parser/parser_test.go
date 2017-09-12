@@ -79,7 +79,7 @@ var ctx = func() (ret MyScope) {
 }()
 
 type Goal interface {
-	Goal() Goal // marker: retuns self
+	Goal() Goal // marker: returns self
 }
 
 type ActionGoal struct {

@@ -6,11 +6,12 @@ import (
 	"github.com/ionous/iffy/event/evtbuilder"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	"github.com/stretchr/testify/assert"
@@ -29,24 +30,18 @@ func TestSomething(t *testing.T) {
 	// FIX: add test to find target
 	// ex. put it as the second object in a structure.
 	type Jump struct {
-		Jumper rt.Object `if:"cls:kind"`
+		Jumper ident.Id `if:"cls:kind"`
 	}
 
 	type Kiss struct {
-		Kisser   rt.Object `if:"cls:kind"`
-		KissWhom rt.Object `if:"cls:kind"`
+		Kisser   ident.Id `if:"cls:kind"`
+		KissWhom ident.Id `if:"cls:kind"`
 	}
 
 	type Unlock struct {
-		Unlocker rt.Object `if:"cls:kind"`
-		Lock     rt.Object `if:"cls:kind"`
-		With     rt.Object `if:"cls:kind"`
-	}
-
-	type Events struct {
-		*Jump
-		*Kiss
-		*Unlock
+		Unlocker ident.Id `if:"cls:kind"`
+		Lock     ident.Id `if:"cls:kind"`
+		With     ident.Id `if:"cls:kind"`
 	}
 
 	classes := make(unique.Types)                 // all types known to iffy
@@ -54,35 +49,32 @@ func TestSomething(t *testing.T) {
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
 
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*rule.Commands)(nil))
 
-	unique.RegisterTypes(
-		unique.PanicTypes(classes),
+	unique.PanicTypes(classes,
 		(*Kind)(nil))
 
-	unique.RegisterBlocks(
-		unique.PanicTypes(events),
-		(*Events)(nil))
+	unique.RegisterTypes(events,
+		(*Jump)(nil))
 
-	objects := ref.NewObjects()
-	unique.RegisterValues(
-		unique.PanicValues(objects),
+	objects := obj.NewObjects()
+	unique.PanicValues(objects,
 		&Kind{"Bogart"},
 		&Kind{"Bob"},
 		&Kind{"Coffin"},
 		&Kind{"Skeleton Key"})
 
 	// default action:
-	DefaultActions := func(c *ops.Builder) {
+	DefaultActions := func(c spec.Block) {
 		if c.Cmd("run rule", "jump").Begin() {
 			if c.Param("decide").Cmds().Begin() {
 				if c.Cmd("print span").Begin() {
 					if c.Cmds().Begin() {
 						// FIX: to print names need to include articles
 						// probably want a simple named object in core.
-						c.Cmd("print text", "jumped!")
+						c.Cmd("say", "jumped!")
 						c.End()
 					}
 					c.End()
@@ -93,7 +85,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	rules, e := rule.Master(cmds, patterns, DefaultActions)
+	rules, e := rule.Master(cmds, core.Xform{}, patterns, DefaultActions)
 	assert.NoError(e)
 
 	// we do this the manual way first, and later with spec
@@ -105,8 +97,8 @@ func TestSomething(t *testing.T) {
 	// object listener:
 	bogart, _ := run.GetObject("bogart")
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "bogart's jumping!")
+		if jump, e := Execute(cmds, func(c spec.Block) {
+			c.Cmd("say", "bogart's jumping!")
 		}); e != nil {
 			t.Fatal(e)
 		} else {
@@ -115,8 +107,8 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "bogart's going to jump!")
+		if jump, e := Execute(cmds, func(c spec.Block) {
+			c.Cmd("say", "bogart's going to jump!")
 		}); e != nil {
 			t.Fatal(e)
 		} else {
@@ -125,8 +117,8 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "bogart's tired of jumping.")
+		if jump, e := Execute(cmds, func(c spec.Block) {
+			c.Cmd("say", "bogart's tired of jumping.")
 		}); e != nil {
 			t.Fatal(e)
 		} else {
@@ -135,10 +127,8 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	jump, e := run.Objects.Emplace(&Jump{
-		Jumper: bogart,
-	})
-	if obj, e := event.TargetOf(jump); assert.NoError(e) {
+	jump := run.Emplace(&Jump{Jumper: bogart.Id()})
+	if obj, e := event.TargetOf(run, jump); assert.NoError(e) {
 		assert.Equal(bogart, obj)
 	}
 
@@ -151,8 +141,8 @@ func TestSomething(t *testing.T) {
 	assert.Equal(sliceOf.String("bogart's going to jump!", "bogart's jumping!", "jumped!", "bogart's tired of jumping."), lines.Lines())
 
 	{
-		if jump, e := cmds.Execute(func(c *ops.Builder) {
-			c.Cmd("print text", "don't do it bogart!")
+		if jump, e := Execute(cmds, func(c spec.Block) {
+			c.Cmd("say", "don't do it bogart!")
 			c.Cmd("set bool", "@", "stop immediate propagation", true)
 			c.Cmd("set bool", "@", "prevent default", true)
 		}); e != nil {
@@ -167,5 +157,19 @@ func TestSomething(t *testing.T) {
 	//
 	assert.NoError(event.Trigger(run, listen.EventMap, jump))
 	assert.Equal(sliceOf.String("don't do it bogart!"), lines.Lines())
+}
 
+func Execute(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
+	var root struct{ Eval rt.ExecuteList }
+	c := cmds.NewBuilder(&root, core.Xform{})
+	if c.Cmds().Begin() {
+		fn(c)
+		c.End()
+	}
+	if e := c.Build(); e != nil {
+		err = e
+	} else {
+		ret = root.Eval
+	}
+	return
 }

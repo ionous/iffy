@@ -17,6 +17,7 @@ type Commands struct {
 	*Sub
 	*Mul
 	*Div
+	*Mod
 	//
 	*AllTrue
 	*AnyTrue
@@ -38,7 +39,8 @@ type Commands struct {
 	*ForEachObj
 	*ForEachText
 	*Get
-	// *GoCall
+	*GetAt
+	*Global
 	*GreaterThan
 	// *Inc
 	*Includes
@@ -57,16 +59,15 @@ type Commands struct {
 	*Num
 	*Numbers
 	*Object
-	// *Objects
+	*Objects
 	// *ObjListContains
 	// *ObjListIsEmpty
-	// *Object
 	*PrintBracket
 	*PrintList
 	*PrintNum
 	*PrintNumWord
 	*PrintSpan
-	*PrintText
+	*Say
 	*Range
 	*RelatedList
 	*RelationEmpty

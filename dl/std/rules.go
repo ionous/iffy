@@ -2,21 +2,22 @@ package std
 
 import (
 	"github.com/ionous/iffy/dl/std/group"
-	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/spec"
 )
 
 // FIX: this has to go into the std library
-func StdRules(c *ops.Builder) {
+func Rules(c spec.Block) {
 	PrintNameRules(c)
 	PrintObjectRules(c)
 	group.GroupRules(c)
+	commence(c)
 }
 
-func PrintNameRules(c *ops.Builder) {
+func PrintNameRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "print name").Begin() {
 		if c.Param("decide").Cmds().Begin() {
-			c.Cmd("print text", c.Cmd("class name", c.Cmd("get", "@", "target")))
+			c.Cmd("say", c.Cmd("class name", c.Cmd("get", "@", "target")))
 			c.End()
 		}
 		c.End()
@@ -26,7 +27,7 @@ func PrintNameRules(c *ops.Builder) {
 		// detect if "unnamed": # is used only for system names, never author names.
 		c.Param("if").Cmd("is not", c.Cmd("includes", c.Cmd("get", c.Cmd("get", "@", "target"), "name"), "#"))
 		if c.Param("decide").Cmds().Begin() {
-			c.Cmd("print text", c.Cmd("get", c.Cmd("get", "@", "target"), "name"))
+			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "name"))
 			c.End()
 		}
 		c.End()
@@ -35,7 +36,7 @@ func PrintNameRules(c *ops.Builder) {
 	if c.Cmd("run rule", "print name").Begin() {
 		c.Param("if").Cmd("is not", c.Cmd("is empty", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name")))
 		if c.Param("decide").Cmds().Begin() {
-			c.Cmd("print text", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name"))
+			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name"))
 			c.End()
 		}
 		c.End()
@@ -43,7 +44,7 @@ func PrintNameRules(c *ops.Builder) {
 	//
 	if c.Cmd("run rule", "print plural name").Begin() {
 		if c.Param("decide").Cmds().Begin() {
-			if c.Cmd("print text").Begin() {
+			if c.Cmd("say").Begin() {
 				if c.Cmd("pluralize").Begin() {
 					if c.Cmd("buffer").Begin() {
 						if c.Cmds().Begin() {
@@ -63,7 +64,7 @@ func PrintNameRules(c *ops.Builder) {
 	if c.Cmd("run rule", "print plural name").Begin() {
 		c.Param("if").Cmd("is not", c.Cmd("is empty", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name")))
 		if c.Param("decide").Cmds().Begin() {
-			c.Cmd("print text", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name"))
+			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name"))
 			c.End()
 		}
 		c.End()
@@ -74,7 +75,7 @@ func PrintNameRules(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("print num word", c.Cmd("get", "@", "group size"))
-					c.Cmd("print text", "other")
+					c.Cmd("say", "other")
 					if c.Cmd("choose", c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)).Begin() {
 						if c.Param("true").Cmds().Begin() {
 							c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
@@ -96,7 +97,7 @@ func PrintNameRules(c *ops.Builder) {
 	}
 }
 
-func PrintObjectRules(c *ops.Builder) {
+func PrintObjectRules(c spec.Block) {
 	// print the name and summary if all else fails
 	if c.Cmd("run rule", "print object").Begin() {
 		if c.Param("decide").Cmds().Begin() {
@@ -115,7 +116,7 @@ func PrintObjectRules(c *ops.Builder) {
 			c.Cmd("get", c.Cmd("get", "@", "target"), "closed"),
 		))
 		if c.Param("decide").Cmds().Begin() {
-			c.Cmd("print text", "closed")
+			c.Cmd("say", "closed")
 			c.End()
 		}
 		c.End()
@@ -125,10 +126,10 @@ func PrintObjectRules(c *ops.Builder) {
 		c.Param("if").Cmd("is similar class", c.Cmd("get", "@", "target"), "container")
 		if c.Param("decide").Cmds().Begin() {
 			if c.Cmd("choose", c.Cmd("get", c.Cmd("get", "@", "target"), "closed")).Begin() {
-				c.Param("true").Cmds(c.Cmd("print text", "closed"))
+				c.Param("true").Cmds(c.Cmd("say", "closed"))
 				if c.Param("false").Cmds().Begin() {
 					if c.Cmd("choose", c.Cmd("relation empty", "locale", c.Cmd("get", "@", "target"))).Begin() {
-						c.Param("true").Cmds(c.Cmd("print text", "open but empty"))
+						c.Param("true").Cmds(c.Cmd("say", "open but empty"))
 						if c.Param("false").Cmds().Begin() {
 							c.Cmd("determine",
 								c.Cmd("print content",
@@ -160,7 +161,7 @@ func PrintObjectRules(c *ops.Builder) {
 				c.Param("tersely").Cmd("get", "@", "tersely")
 				// and handle our fairly magical else
 				if c.Param("else").Cmds().Begin() {
-					c.Cmd("print text", "empty")
+					c.Cmd("say", "empty")
 					c.End()
 				}
 				c.End()

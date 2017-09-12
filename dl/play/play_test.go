@@ -3,9 +3,9 @@ package play
 import (
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/event/trigger"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/rt/printer"
-	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/spec"
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
@@ -23,7 +23,7 @@ func TestPlay(t *testing.T) {
 	assert := testify.New(t)
 
 	type Jump struct {
-		Jumper rt.Object `if:"cls:kind"`
+		Jumper ident.Id `if:"cls:kind"`
 	}
 	type Events struct {
 		*Jump
@@ -31,8 +31,10 @@ func TestPlay(t *testing.T) {
 	var play Play
 	play.AddEvents((*Events)(nil))
 	play.AddScript(definePlay)
-	bogart := &std.Actor{Thing: std.Thing{Kind: std.Kind{Name: "Bogart", CommonProper: std.ProperNamed}}}
-	play.AddObjects(bogart, &std.Player{Name: "player", Pawn: bogart})
+	play.AddObjects(
+		&std.Actor{Thing: std.Thing{Kind: std.Kind{Name: "Bogart", CommonProper: std.ProperNamed}}},
+		&std.Pawn{"pawn", ident.IdOf("bogart")},
+	)
 	// errutil.Panic = true
 
 	//couldnt find $printName
@@ -46,13 +48,13 @@ func TestPlay(t *testing.T) {
 	}
 }
 
-func definePlay(c *ops.Builder) {
+func definePlay(c spec.Block) {
 	if c.Cmd("grammar").Begin() {
 		if c.Cmd("all of").Begin() {
 			if c.Cmds().Begin() {
 				c.Cmd("word", "jump")
 				if c.Cmd("trigger").Begin() {
-					c.Cmd("jump", c.Cmd("get", "player", "pawn"))
+					c.Cmd("jump", c.Cmd("player"))
 					c.End()
 				}
 				c.End()
@@ -67,7 +69,7 @@ func definePlay(c *ops.Builder) {
 				if c.Cmd("print span").Begin() {
 					if c.Cmds().Begin() {
 						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "jumper")))
-						c.Cmd("print text", "jumped!")
+						c.Cmd("say", "jumped!")
 						c.End()
 					}
 					c.End()
@@ -83,7 +85,7 @@ func definePlay(c *ops.Builder) {
 			if c.Cmd("print span").Begin() {
 				if c.Cmds().Begin() {
 					c.Cmd("upper the", c.Cmd("get", c.Cmd("get", "@", "data"), "jumper"))
-					c.Cmd("print text", "is jumping!")
+					c.Cmd("say", "is jumping!")
 					c.End()
 				}
 				c.End()

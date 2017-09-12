@@ -1,8 +1,9 @@
 package ops_test
 
 import (
-	"github.com/ionous/iffy/dl/core" // for interesting evals
-	"github.com/ionous/iffy/ref"
+	"github.com/ionous/iffy/dl/core" // for interesting evals, including literals.
+	"github.com/ionous/iffy/ident"
+	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
@@ -18,55 +19,55 @@ import (
 func TestShadows(t *testing.T) {
 	assert := testify.New(t)
 	classes := make(unique.Types)
-	ops := ops.NewOps(classes)
+	cmds := ops.NewOps(classes)
 
-	unique.RegisterBlocks(unique.PanicTypes(ops),
+	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil))
 
-	unique.RegisterTypes(unique.PanicTypes(ops.ShadowTypes),
+	unique.PanicTypes(cmds.ShadowTypes,
 		(*BaseClass)(nil))
 	//
 	var root struct {
 		Num    rt.NumberEval
 		Object rt.ObjectEval
 	}
-	if c, ok := ops.NewBuilder(&root); assert.True(ok) {
-		// FIX: without the cmd -- it doesnt error.
-		// FIX: and what about using the same param twice?
-		c.Cmd("add", 1, 2)
-		if c.Cmd("BaseClass").Begin() {
-			c.Param("Num").Cmd("add", 1, 2)
-			c.Param("Text").Val("3")
-			c.Param("Nums").Val(sliceOf.Float(1, 2, 3))
-			c.Param("Texts").Val(sliceOf.String("1", "2", "3"))
-			c.Param("State").Val(Maybe) // Note: this turns State into a NumEval
-			c.Param("Labeled").Cmd("is not", false)
-			c.Param("Object").Val("other")
-			c.Param("Objects").Val(sliceOf.String("base", "other"))
-			c.End()
-		}
-		//
-		if e := c.Build(); e != nil {
-			t.Fatal(e)
-		}
+	c := cmds.NewBuilder(&root, core.Xform{})
+	// FIX: without the cmd -- it doesnt error.
+	// FIX: and what about using the same param twice?
+	c.Cmd("add", 1, 2)
+	if c.Cmd("BaseClass").Begin() {
+		c.Param("Num").Cmd("add", 1, 2)
+		c.Param("Text").Val("3")
+		c.Param("Nums").Val(sliceOf.Float(1, 2, 3))
+		c.Param("Texts").Val(sliceOf.String("1", "2", "3"))
+		c.Param("State").Val(Maybe) // Note: this turns State into a NumEval
+		c.Param("Labeled").Cmd("is not", false)
+		c.Param("Object").Val("other")
+		c.Param("Objects").Val(sliceOf.String("base", "other"))
+		c.End()
+	}
+	//
+	if e := c.Build(); e != nil {
+		t.Fatal(e)
 	}
 
-	objects := ref.NewObjects()
+	objects := obj.NewObjects()
 	base, other := &BaseClass{Name: "base"}, &BaseClass{Name: "other"}
-	unique.RegisterValues(unique.PanicValues(objects),
+	unique.PanicValues(objects,
 		base, other,
 	)
 	var lines printer.Lines
 	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
 	// "shadow class tests.BaseClass couldn't create object"
 	if obj, e := root.Object.GetObject(run); assert.NoError(e) {
+		baseId, otherId := ident.IdOf("base"), ident.IdOf("other")
 		vals := map[string]struct{ match, fail interface{} }{
 			"Num":     {3, 5},
 			"Text":    {"3", "5"},
-			"Object":  {other, base},
+			"Object":  {otherId, baseId},
 			"Nums":    {sliceOf.Float(1, 2, 3), sliceOf.Float(3, 2, 1)},
 			"Texts":   {sliceOf.String("1", "2", "3"), sliceOf.String("3")},
-			"Objects": {[]*BaseClass{base, other}, []*BaseClass{base}},
+			"Objects": {[]ident.Id{baseId, otherId}, []ident.Id{baseId}},
 			"State":   {Maybe, Yes},
 			"Labeled": {true, false},
 		}

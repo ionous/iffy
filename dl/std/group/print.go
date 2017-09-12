@@ -24,12 +24,9 @@ func (g Collection) PrintGroup(run rt.Runtime) (err error) {
 			run = rt.Writer(run, &span)
 			defer span.Flush()
 		}
-
-		if printGroup, e := run.Emplace(&PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.Objects}); e != nil {
-			err = e
-		} else if e := run.ExecuteMatching(run, printGroup); e != nil {
-			err = e
-		}
+		printGroup := run.Emplace(&PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.Objects})
+		err = run.ExecuteMatching(run, printGroup)
 	}
+
 	return
 }

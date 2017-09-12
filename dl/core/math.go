@@ -25,6 +25,7 @@ type Add Pair
 type Sub Pair
 type Mul Pair
 type Div Pair
+type Mod Pair
 
 func (cmd *Add) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := Pair(*cmd).Get(run); e != nil {
@@ -60,6 +61,15 @@ func (cmd *Div) GetNumber(run rt.Runtime) (ret float64, err error) {
 		err = errutil.New("Div", "b is too small")
 	} else {
 		ret = a / b
+	}
+	return
+}
+
+func (cmd *Mod) GetNumber(run rt.Runtime) (ret float64, err error) {
+	if a, b, e := Pair(*cmd).Get(run); e != nil {
+		err = errutil.New("Mod", e)
+	} else {
+		ret = math.Mod(a, b)
 	}
 	return
 }

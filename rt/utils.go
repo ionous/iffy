@@ -17,21 +17,6 @@ func (x ExecuteList) Execute(run Runtime) (err error) {
 	return
 }
 
-// Values for SetValues.
-type Values map[string]interface{}
-
-// SetValues to the passed object.
-// FIX? add an optional map parameter to NewObject?
-func SetValues(obj Object, values Values) (err error) {
-	for name, v := range values {
-		if e := obj.SetValue(name, v); e != nil {
-			err = e
-			break
-		}
-	}
-	return
-}
-
 // an object iterator that always fails
 type EmptyObjects struct{}
 

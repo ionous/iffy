@@ -66,9 +66,8 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 		if e := f.Else.Execute(run); e != nil {
 			err = errutil.New("failed each num else", e)
 		}
-	} else if l, e := NewLooper(run, &NumberCounter{}, f.Go); e != nil {
-		err = e
 	} else {
+		l := MakeLooper(run, &NumberCounter{}, f.Go)
 		for it.HasNext() {
 			if v, e := it.GetNext(); e != nil {
 				err = errutil.New("failed each num get", e)
@@ -97,9 +96,8 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 		if e := f.Else.Execute(run); e != nil {
 			err = errutil.New("failed each text else", e)
 		}
-	} else if l, e := NewLooper(run, &TextCounter{}, f.Go); e != nil {
-		err = e
 	} else {
+		l := MakeLooper(run, &TextCounter{}, f.Go)
 		for it.HasNext() {
 			if v, e := it.GetNext(); e != nil {
 				err = errutil.New("failed each text get", e)
@@ -128,9 +126,8 @@ func (f *ForEachObj) Execute(run rt.Runtime) (err error) {
 		if e := f.Else.Execute(run); e != nil {
 			err = errutil.New("failed for each obj else", e)
 		}
-	} else if l, e := NewLooper(run, &ObjCounter{}, f.Go); e != nil {
-		err = e
 	} else {
+		l := MakeLooper(run, &ObjCounter{}, f.Go)
 		for it.HasNext() {
 			if v, e := it.GetNext(); e != nil {
 				err = errutil.New("failed for each obj get", e)

@@ -17,7 +17,7 @@ func TestClass(t *testing.T) {
 		Overriden string
 	}
 
-	// DerivedClass extends BaseClass, and "hides" the property called Overriden.
+	// DerivedClass extends BaseClass, and "hides" the property called Overridden.
 	type DerivedClass struct {
 		BaseClass `if:"parent"`
 		Overriden string

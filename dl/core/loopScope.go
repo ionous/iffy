@@ -12,14 +12,10 @@ type Looper struct {
 	loop rt.ExecuteList
 }
 
-func NewLooper(run rt.Runtime, temp interface{}, loop rt.ExecuteList) (ret *Looper, err error) {
-	if temp, e := run.Emplace(temp); e != nil {
-		err = e
-	} else {
-		run := rt.AtFinder(run, temp)
-		ret = &Looper{run, temp, loop}
-	}
-	return
+func MakeLooper(run rt.Runtime, temp interface{}, loop rt.ExecuteList) Looper {
+	obj := run.Emplace(temp)
+	runat := rt.AtFinder(run, obj)
+	return Looper{runat, obj, loop}
 }
 
 func (l *Looper) RunNext(name string, value interface{}, hasNext bool) (err error) {

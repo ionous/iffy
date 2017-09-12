@@ -17,6 +17,19 @@ func ChoiceToIndex(id ident.Id, cs []string) (ret int, okay bool) {
 	return
 }
 
+// IndexToString, the opposite of StringToIndex.
+func IndexToString(i int, cs []string) (ret string, okay bool) {
+	if i >= 0 && i < len(cs) {
+		ret, okay = cs[i], true
+	}
+	return
+}
+
+func StringToIndex(c string, cs []string) (int, bool) {
+	id := ident.IdOf(c)
+	return ChoiceToIndex(id, cs)
+}
+
 // PropertyPath mimics class.PropertyPath, searching the passed type for a field with the passed id, except: it also tests the possible values of enumerated fields.
 // ex. PropertyPath( TypeOf(Door), "Openable" )
 // matches:
@@ -30,7 +43,6 @@ func ChoiceToIndex(id ident.Id, cs []string) (ret int, okay bool) {
 // 	Openable OpenableState = iota
 // 	NotOpenable
 // )
-//
 func PropertyPath(rtype r.Type, name string) (ret []int, idx int) {
 	pid := ident.IdOf(name)
 	fn := func(f *r.StructField, path []int) (done bool) {

@@ -45,38 +45,37 @@ var testData = &Container{
 // 2. mismatched element types
 func TestOps(t *testing.T) {
 	cmds := NewOps(nil)
-	unique.RegisterTypes(unique.PanicTypes(cmds),
+	unique.PanicTypes(cmds,
 		(*Container)(nil), (*Contents)(nil))
 	t.Run("KeyValue", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
-			c.Param("Value").Val(4)
-			//
-			if e := c.Build(); assert.NoError(e) {
-				assert.EqualValues(4, root.Value)
-			}
+		c := cmds.NewBuilder(&root, DefaultXform{})
+		c.Param("Value").Val(4)
+		//
+		if e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(4, root.Value)
+
 		}
 	})
 	t.Run("AllAreOne", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		if c, ok := cmds.NewBuilder(&root); assert.True(ok) {
-			// the simple way:
-			c.Cmd("contents", "all are one")
-			// // cause why not:
-			if c.Cmd("contents").Begin() {
-				c.Val("dilute, dilute").End()
-			}
-			if c.Param("more").Cmds().Begin() {
-				c.Cmd("container", c.Param("value").Val(5))
-				c.Cmd("container", c.Param("value").Val(7))
-				c.End()
-			}
-			if e := c.Build(); assert.NoError(e) {
-				assert.EqualValues(*testData, root)
-				t.Log(pretty.Sprint(root))
-			}
+		c := cmds.NewBuilder(&root, DefaultXform{})
+		// the simple way:
+		c.Cmd("contents", "all are one")
+		// // cause why not:
+		if c.Cmd("contents").Begin() {
+			c.Val("dilute, dilute").End()
+		}
+		if c.Param("more").Cmds().Begin() {
+			c.Cmd("container", c.Param("value").Val(5))
+			c.Cmd("container", c.Param("value").Val(7))
+			c.End()
+		}
+		if e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(*testData, root)
+			t.Log(pretty.Sprint(root))
 		}
 	})
 }
@@ -86,11 +85,11 @@ type CommandBlock struct {
 	*Contents
 }
 
-// TestOpsBlock ensures blocks of commands register succesfully.
+// TestOpsBlock ensures blocks of commands register successfully.
 func TestOpsBlock(t *testing.T) {
 	assert := assert.New(t)
 	cmds := NewOps(nil)
-	unique.RegisterBlocks(unique.PanicTypes(cmds),
+	unique.PanicBlocks(cmds,
 		(*CommandBlock)(nil))
 	assert.Contains(cmds.Types, ident.IdOf("Container"))
 	assert.Contains(cmds.Types, ident.IdOf("Contents"))
