@@ -31,8 +31,9 @@ func TestApply(t *testing.T) {
 	cmds := ops.NewOps(classes)
 
 	unique.PanicBlocks(cmds,
-		(*std.Commands)(nil), // for Render
-		(*core.Commands)(nil))
+		(*std.Commands)(nil),
+		(*core.Commands)(nil),
+		(*Commands)(nil))
 
 	unique.PanicTypes(cmds,
 		(*TestThe)(nil))
@@ -63,10 +64,10 @@ func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
 }
 
 func partsFn() rt.TextEval {
-	return &std.Render{
+	return &Render{core.Get{
 		Obj:  &core.GetAt{Prop: "status"},
 		Prop: "score",
-	}
+	}}
 }
 
 func twoPartFn() rt.TextEval {
@@ -76,18 +77,18 @@ func twoPartFn() rt.TextEval {
 			// but we need the command array interface to allow one/many/commands more transparently
 			// also, maybe say should implement both get text and execute -- buffer eveerything up in the get text version.
 			&core.Say{
-				&std.Render{
+				&Render{core.Get{
 					Obj:  &core.GetAt{Prop: "status"},
 					Prop: "score",
-				}},
+				}}},
 			&core.Say{
 				&core.Text{"/"},
 			},
 			&core.Say{
-				&std.Render{
+				&Render{core.Get{
 					Obj:  &core.GetAt{Prop: "story"},
 					Prop: "turn",
-				},
+				}},
 			},
 		},
 	}

@@ -9,8 +9,8 @@ import (
 	"testing"
 )
 
-// TestBuild to ensure that commands are transformed into their appropriate command trees when passing through the builder.
-func xTestBuild(t *testing.T) {
+// TestBuild tp ensure we can use templates for eval properties other than text.
+func TestBuild(t *testing.T) {
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
 
@@ -21,8 +21,9 @@ func xTestBuild(t *testing.T) {
 	unique.PanicTypes(cmds,
 		(*TestScore)(nil))
 	unique.PanicBlocks(cmds,
-		(*std.Commands)(nil), // for renderst
-		(*core.Commands)(nil))
+		(*std.Commands)(nil),
+		(*core.Commands)(nil),
+		(*Commands)(nil))
 
 	t.Run("property", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
@@ -44,9 +45,9 @@ func xTestBuild(t *testing.T) {
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
 		} else {
-			testEqual(t, &TestScore{
-				&core.Get{&core.Global{"Story"}, "score"},
-			}, root.NumberEval)
+			testEqual(t, &TestScore{&Render{core.Get{
+				&core.Global{"Story"}, "score"},
+			}}, root.NumberEval)
 		}
 	})
 	//
@@ -58,9 +59,9 @@ func xTestBuild(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			testEqual(t, &TestScore{
-				&TestScore{
-					&core.Get{&core.Global{"Story"}, "score"},
-				}}, root.NumberEval)
+				&TestScore{&Render{core.Get{
+					&core.Global{"Story"}, "score"},
+				}}}, root.NumberEval)
 		}
 	})
 }

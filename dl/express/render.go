@@ -1,7 +1,9 @@
-package std
+package express
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/ref/kindOf"
@@ -10,9 +12,9 @@ import (
 	"strconv"
 )
 
+// Render holds a property eval which can either be expressed as text, or used in its original form. This allows templates to be used for any eval property.
 type Render struct {
-	Obj  rt.ObjectEval
-	Prop string
+	core.Get
 }
 
 func (p *Render) GetText(run rt.Runtime) (ret string, err error) {
@@ -51,7 +53,7 @@ func (p *Render) GetText(run rt.Runtime) (ret string, err error) {
 					err = e
 				} else {
 					var span printer.Span
-					printName := run.Emplace(&PrintName{v})
+					printName := run.Emplace(&std.PrintName{v})
 					run := rt.Writer(run, &span)
 					if e := run.ExecuteMatching(run, printName); e != nil {
 						err = e
