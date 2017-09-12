@@ -41,8 +41,8 @@ func TestStory(t *testing.T) {
 	unique.PanicValues(objects,
 		&std.Story{Name: "story"},
 		&std.Room{Kind: std.Kind{Name: "room"}},
-		&std.Pawn{"pawn", ident.IdOf("player")},
-		&std.Actor{std.Thing{Kind: std.Kind{Name: "player"}}},
+		&std.Pawn{"pawn", ident.IdOf("me")},
+		&std.Actor{std.Thing{Kind: std.Kind{Name: "me"}}},
 	)
 	xform := express.MakeXform(cmds)
 	rules, e := rule.Master(cmds, xform, patterns, std.Rules)
@@ -63,7 +63,7 @@ func TestStory(t *testing.T) {
 		}
 		return ret
 	}
-	if e := pc.SetLocation(Object("room"), locate.Has, Object("player")); e != nil {
+	if e := pc.SetLocation(Object("room"), locate.Has, Object("me")); e != nil {
 		t.Fatal(e)
 	}
 
@@ -91,7 +91,7 @@ func TestStory(t *testing.T) {
 
 	t.Run("print location", func(t *testing.T) {
 		match(t, "room", func(c spec.Block) {
-			c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", "player")))
+			c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", c.Cmd("player"))))
 		})
 	})
 

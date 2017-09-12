@@ -16,7 +16,7 @@ func commence(c spec.Block) {
 		// player location or darkness
 		if c.Param("decide").Cmd("buffer").Begin() {
 			if c.Cmds().Begin() {
-				c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", "player")))
+				c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", c.Cmd("player"))))
 				c.End()
 			}
 			c.End()
