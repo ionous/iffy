@@ -2,7 +2,7 @@ package std_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/core/express"
+	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ident"
@@ -21,14 +21,15 @@ import (
 	"testing"
 )
 
-func xTestStory(t *testing.T) {
+func TestStory(t *testing.T) {
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 
 	unique.PanicBlocks(cmds,
-		(*std.Commands)(nil),
 		(*core.Commands)(nil),
+		(*std.Commands)(nil),
+		(*express.Commands)(nil),
 		(*rule.Commands)(nil),
 	)
 	unique.PanicBlocks(classes,
@@ -68,14 +69,20 @@ func xTestStory(t *testing.T) {
 	}
 
 	match := func(t *testing.T, expected string, fn func(spec.Block)) {
-		var root struct{ rt.Execute }
+		var root struct{ rt.ExecuteList }
 		c := cmds.NewBuilder(&root, xform)
-		if e := c.Build(fn); e != nil {
+		if e := c.Build(func(c spec.Block) {
+			if c.Cmds().Begin() {
+				fn(c)
+				c.End()
+			}
+		}); e != nil {
 			t.Fatal(e)
 		} else {
+			t.Log(pretty.Sprint(root.ExecuteList))
 			var lines printer.Lines
 			run := rt.Writer(run, &lines)
-			if e := root.Execute.Execute(run); e != nil {
+			if e := root.Execute(run); e != nil {
 				t.Fatal(e)
 			} else {
 				l := lines.Lines()
@@ -99,6 +106,12 @@ func xTestStory(t *testing.T) {
 				c.Cmd("determine", c.Cmd("player surroundings"))
 				c.End()
 			}
+		})
+	})
+	t.Run("status print", func(t *testing.T) {
+		match(t, "room", func(c spec.Block) {
+			c.Cmd("set text", "story", "status left", "{go determine playerSurroundings}")
+			c.Cmd("say", "{story.statusLeft}")
 		})
 	})
 

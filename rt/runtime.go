@@ -2,6 +2,7 @@ package rt
 
 import (
 	"io"
+	r "reflect"
 )
 
 // Pluralize turns single words into their plural variants.
@@ -39,4 +40,5 @@ type Runtime interface {
 	Ancestors
 	Patterns
 	Pluralize
+	Pack(pdst, src r.Value) error
 }

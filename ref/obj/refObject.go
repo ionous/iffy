@@ -62,12 +62,10 @@ func (n RefObject) Property(name string) (ret Property, okay bool) {
 
 // GetValue sets the value of the passed pointer to the value of the named property.
 func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
-	if pdst := r.ValueOf(pv); pdst.Kind() != r.Ptr {
-		err = errutil.New(n, prop, "expected pointer outvalue", pdst.Type())
-	} else if p, ok := n.Property(prop); !ok {
+	if p, ok := n.Property(prop); !ok {
 		err = errutil.New(n, prop, "unknown property")
 	} else {
-		dst := pdst.Elem()
+		dst := r.ValueOf(pv)
 		src := r.ValueOf(p.Value())
 		if e := n.pack.Pack(dst, src); e != nil {
 			err = errutil.New(n, prop, "cant unpack", dst.Type(), "from", src.Type(), "because", e)
@@ -84,12 +82,12 @@ func (n RefObject) SetValue(prop string, v interface{}) (err error) {
 	if p, ok := n.Property(prop); !ok {
 		err = errutil.New(n, prop, "unknown property")
 	} else {
-		dst := r.New(p.Type()).Elem() // create a new destination for the value.
+		dst := r.New(p.Type()) // create a new destination for the value.
 		src := r.ValueOf(v)
 		if e := n.pack.Pack(dst, src); e != nil {
 			err = errutil.New(n, prop, "cant pack", dst.Type(), "from", src.Type(), "because", e)
 		} else {
-			err = p.SetValue(dst.Interface())
+			err = p.SetValue(dst.Elem().Interface())
 		}
 	}
 	return

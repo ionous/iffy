@@ -1,9 +1,11 @@
-package core
+package express
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/stream"
+	r "reflect"
 )
 
 // GetAt retrieves a value from the scope object.
@@ -39,10 +41,19 @@ func (p *GetAt) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 }
 
 func (p *GetAt) get(run rt.Runtime, pv interface{}) (err error) {
-	if obj, ok := run.FindObject("@"); !ok {
-		err = errutil.New("couldnt find local object")
-	} else {
-		err = obj.GetValue(p.Prop, pv)
+	var found bool
+	if obj, ok := run.FindObject("@"); ok {
+		if path := class.PropertyPath(obj.Type(), p.Prop); len(path) > 0 {
+			found = true
+			err = obj.GetValue(p.Prop, pv)
+		}
+	}
+	if !found {
+		if obj, ok := run.FindObject(p.Prop); !ok {
+			err = errutil.New("couldnt find an object or property named", p.Prop)
+		} else {
+			err = run.Pack(r.ValueOf(pv), r.ValueOf(obj))
+		}
 	}
 	return
 }

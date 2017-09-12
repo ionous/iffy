@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
+	"strings"
 	// "github.com/kr/pretty"
 	"go/parser"
 	r "reflect"
@@ -53,12 +54,26 @@ func (xf Xform) TransformTemplate(tmpl Template, hint r.Type) (ret interface{}, 
 // one evaluation
 func (xf Xform) convertOne(c spec.Block, token Token) (err error) {
 	// look for and chomp templates starting with {go}
-	if g, ok := token.Go(); !ok {
+	if g, ok := token.CheckFor("go"); !ok {
 		err = parseExpr(c, token.Str)
 	} else {
-		if c.Cmd(g[0]).Begin() {
-			err = parseExprs(c, g[1:])
-			c.End()
+		// FIX: we cant have commands within commands in templates
+		// but thats what a pattern is.
+		if cmd, rest := g[0], g[1:]; !strings.EqualFold(cmd, "determine") {
+			if c.Cmd(cmd).Begin() {
+				err = parseExprs(c, rest)
+				c.End()
+			}
+		} else {
+			if c.Cmd(cmd).Begin() {
+				if c.Cmd(rest[0]).Begin() {
+					if len(rest) > 1 {
+						err = parseExprs(c, rest[1:])
+					}
+					c.End()
+				}
+				c.End()
+			}
 		}
 	}
 	return

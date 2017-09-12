@@ -3,6 +3,7 @@ package express
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/std"
+	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
@@ -13,6 +14,7 @@ import (
 func TestBuild(t *testing.T) {
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
+	patterns := unique.NewStack(cmds.ShadowTypes)
 
 	type TestScore struct {
 		rt.NumberEval
@@ -23,7 +25,10 @@ func TestBuild(t *testing.T) {
 	unique.PanicBlocks(cmds,
 		(*std.Commands)(nil),
 		(*core.Commands)(nil),
+		(*rule.RuntimeCmds)(nil),
 		(*Commands)(nil))
+	unique.PanicBlocks(patterns,
+		(*std.Patterns)(nil))
 
 	t.Run("property", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
@@ -33,7 +38,7 @@ func TestBuild(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			testEqual(t, &TestScore{
-				&core.GetAt{Prop: "val"},
+				&GetAt{Prop: "val"},
 			}, root.NumberEval)
 		}
 	})
@@ -63,5 +68,15 @@ func TestBuild(t *testing.T) {
 					&core.Global{"Story"}, "score"},
 				}}}, root.NumberEval)
 		}
+	})
+	//
+	t.Run("determine", func(t *testing.T) {
+		var root struct{ rt.Execute }
+		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
+		c.Val("{go determine printName Story}")
+		if e := c.Build(); e != nil {
+			t.Fatal(e)
+		}
+		// hard to compare a shadow class
 	})
 }

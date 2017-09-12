@@ -24,7 +24,8 @@ func TestExpr(t *testing.T) {
 	)
 	cmds := ops.NewOps(nil)
 	unique.PanicBlocks(cmds,
-		(*core.Commands)(nil))
+		(*core.Commands)(nil),
+		(*Commands)(nil))
 
 	t.Run("literal", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
@@ -102,7 +103,7 @@ func bigDotFn() rt.NumberEval {
 func littleDotFn() rt.NumberEval {
 	return &core.Get{
 		Obj: &core.Get{
-			Obj:  &core.GetAt{"a"},
+			Obj:  &GetAt{"a"},
 			Prop: "b",
 		},
 		Prop: "c",

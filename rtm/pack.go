@@ -13,7 +13,20 @@ import (
 
 type packFun func(rtm *Rtm, dst, src r.Value) error
 
-func (rtm *Rtm) Pack(dst, src r.Value) (err error) {
+// Pack expects a pointer to an outvalue.
+func (rtm *Rtm) Pack(pdst, src r.Value) (err error) {
+	if pdst.Kind() != r.Ptr {
+		err = errutil.New("expected pointer outvalue", pdst.Type())
+	} else if dst := pdst.Elem(); !dst.CanSet() {
+		err = errutil.New("cant set outvalue", dst.Type())
+	} else {
+		err = rtm.pack(dst, src)
+	}
+	return
+}
+
+// pack expects dst to be a settable value
+func (rtm *Rtm) pack(dst, src r.Value) (err error) {
 	if ds, ss := dst.Kind() == r.Slice, src.Kind() == r.Slice; ds != ss {
 		err = errutil.New("slice mismatch")
 	} else {
@@ -161,7 +174,7 @@ func fromObjEval(rtm *Rtm, dst, src r.Value) (err error) {
 		err = e
 	} else {
 		// recurse since we dont know the dst type.
-		err = rtm.Pack(dst, r.ValueOf(v))
+		err = rtm.pack(dst, r.ValueOf(v))
 	}
 	return
 }
@@ -222,7 +235,7 @@ func toTextEval(rtm *Rtm, dst, src r.Value) (err error) {
 }
 func toObjEval(rtm *Rtm, dst, src r.Value) (err error) {
 	var v ident.Id
-	if e := rtm.Pack(r.ValueOf(&v).Elem(), src); e != nil {
+	if e := rtm.pack(r.ValueOf(&v).Elem(), src); e != nil {
 		err = e
 	} else {
 		dst.Set(r.ValueOf(&core.Object{v.Name}))

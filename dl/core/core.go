@@ -39,7 +39,6 @@ type Commands struct {
 	*ForEachObj
 	*ForEachText
 	*Get
-	*GetAt
 	*Global
 	*GreaterThan
 	// *Inc

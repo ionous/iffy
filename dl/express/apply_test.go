@@ -65,7 +65,7 @@ func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
 
 func partsFn() rt.TextEval {
 	return &Render{core.Get{
-		Obj:  &core.GetAt{Prop: "status"},
+		Obj:  &GetAt{Prop: "status"},
 		Prop: "score",
 	}}
 }
@@ -78,7 +78,7 @@ func twoPartFn() rt.TextEval {
 			// also, maybe say should implement both get text and execute -- buffer eveerything up in the get text version.
 			&core.Say{
 				&Render{core.Get{
-					Obj:  &core.GetAt{Prop: "status"},
+					Obj:  &GetAt{Prop: "status"},
 					Prop: "score",
 				}}},
 			&core.Say{
@@ -86,7 +86,7 @@ func twoPartFn() rt.TextEval {
 			},
 			&core.Say{
 				&Render{core.Get{
-					Obj:  &core.GetAt{Prop: "story"},
+					Obj:  &GetAt{Prop: "story"},
 					Prop: "turn",
 				}},
 			},
