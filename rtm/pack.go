@@ -27,13 +27,13 @@ func (rtm *Rtm) Pack(pdst, src r.Value) (err error) {
 
 // pack expects dst to be a settable value
 func (rtm *Rtm) pack(dst, src r.Value) (err error) {
-	if ds, ss := dst.Kind() == r.Slice, src.Kind() == r.Slice; ds != ss {
-		err = errutil.New("slice mismatch")
+	if sliced, slices := dst.Kind() == r.Slice, src.Kind() == r.Slice; sliced != slices {
+		// one is a slice, and the other is not.
+		err = errutil.New("slice mismatch", dst, src)
 	} else {
 		dt, st := dst.Type(), src.Type()
-		if dt == st {
-			dst.Set(src)
-		} else if ds /*&& ss*/ {
+		if sliced {
+			// both are slices
 			if cfn := getCopyFun(dt.Elem(), st.Elem()); cfn != nil {
 				err = coerce.Slice(dst, src, func(dst, src r.Value) error {
 					return cfn(rtm, dst, src)
@@ -41,7 +41,8 @@ func (rtm *Rtm) pack(dst, src r.Value) (err error) {
 			} else {
 				err = coerce.Value(dst, src)
 			}
-		} else /*if !ds && !ss */ {
+		} else /*if !sliced && !slices */ {
+			// neither are slices.
 			if cfn := getCopyFun(dt, st); cfn != nil {
 				err = cfn(rtm, dst, src)
 			} else {
@@ -53,7 +54,10 @@ func (rtm *Rtm) pack(dst, src r.Value) (err error) {
 }
 
 func getCopyFun(dst, src r.Type) (ret packFun) {
+	//
 	switch {
+	case dst == src:
+		ret = copyDirect
 
 	case kindOf.IdentId(dst):
 		ret = idFromObj
@@ -61,33 +65,40 @@ func getCopyFun(dst, src r.Type) (ret packFun) {
 	case kindOf.IdentId(src):
 		ret = objFromId
 
+		// enums
 	case dst.Kind() == r.Int && src.Kind() == r.String:
 		ret = intFromChoice
 
 	case dst.Kind() == r.String && src.Kind() == r.Int:
 		ret = choiceFromInt
 
-		// asking for an eval, presumably given for a primitive
+		// asking for an eval, presumably given a primitive
+		// we could be targeting an interface variable ( ex. on the stack, or from r.New() )
 	case dst.Kind() == r.Interface:
-		switch {
-		case kindOf.BoolEval(dst):
-			ret = toBoolEval
-		case kindOf.NumberEval(dst):
-			ret = toNumberEval
-		case kindOf.TextEval(dst):
-			ret = toTextEval
-		case kindOf.ObjectEval(dst):
-			ret = toObjEval
-		case kindOf.NumListEval(dst):
-			ret = toNumListEval
-		case kindOf.TextListEval(dst):
-			ret = toTextListEval
-		case kindOf.ObjListEval(dst):
-			ret = toObjListEval
+		if src.Implements(dst) {
+			ret = copyDirect
+		} else {
+			switch {
+			case kindOf.BoolEval(dst):
+				ret = toBoolEval
+			case kindOf.NumberEval(dst):
+				ret = toNumberEval
+			case kindOf.TextEval(dst):
+				ret = toTextEval
+			case kindOf.ObjectEval(dst):
+				ret = toObjEval
+			case kindOf.NumListEval(dst):
+				ret = toNumListEval
+			case kindOf.TextListEval(dst):
+				ret = toTextListEval
+			case kindOf.ObjListEval(dst):
+				ret = toObjListEval
+			}
 		}
 
 		// given an eval, presumably asking for a primitive
-	case src.Kind() == r.Interface:
+		// ( ex. reading a specific struct ptr implementation of an interface )
+	case src.Kind() == r.Ptr:
 		switch {
 		case kindOf.BoolEval(src):
 			ret = fromBoolEval
@@ -108,6 +119,10 @@ func getCopyFun(dst, src r.Type) (ret packFun) {
 	return
 }
 
+func copyDirect(rtm *Rtm, dst, src r.Value) (err error) {
+	dst.Set(src)
+	return
+}
 func intFromChoice(rtm *Rtm, dst, src r.Value) (err error) {
 	if !enum.Pack(dst, src) {
 		err = errutil.New("couldnt pack enum")

@@ -94,7 +94,6 @@ func TestStory(t *testing.T) {
 			}
 		}
 	}
-
 	t.Run("print location", func(t *testing.T) {
 		match(t, "room", func(c spec.Block) {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", c.Cmd("player"))))
@@ -108,11 +107,16 @@ func TestStory(t *testing.T) {
 			}
 		})
 	})
-	t.Run("status print", func(t *testing.T) {
+	t.Run("status left", func(t *testing.T) {
 		match(t, "room", func(c spec.Block) {
 			c.Cmd("set text", "story", "status left", "{go determine playerSurroundings}")
 			c.Cmd("say", "{story.statusLeft}")
 		})
 	})
-
+	t.Run("status right", func(t *testing.T) {
+		match(t, "0/0", func(c spec.Block) {
+			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
+			c.Cmd("say", "{story.statusRight}")
+		})
+	})
 }

@@ -46,11 +46,9 @@ func (p *SetBool) GetObject(run rt.Runtime) (rt.Object, error) {
 
 func (p *SetBool) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
-		err = errutil.New("SetBool.Obj", e)
-	} else if val, e := p.Val.GetBool(run); e != nil {
-		err = errutil.New("SetBool.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
-		err = errutil.New("SetBool.Set", e)
+		err = errutil.New("set bool owner error", e)
+	} else if e := obj.SetValue(p.Prop, p.Val); e != nil {
+		err = errutil.New("set bool property error", e)
 	} else {
 		ret = obj
 	}
@@ -69,11 +67,9 @@ func (p *SetNum) GetObject(run rt.Runtime) (rt.Object, error) {
 
 func (p *SetNum) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
-		err = errutil.New("SetNum.Obj", e)
-	} else if val, e := p.Val.GetNumber(run); e != nil {
-		err = errutil.New("SetNum.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
-		err = errutil.New("SetNum.Set", e)
+		err = errutil.New("set num owner error", e)
+	} else if e := obj.SetValue(p.Prop, p.Val); e != nil {
+		err = errutil.New("set num property error", e)
 	} else {
 		ret = obj
 	}
@@ -92,11 +88,9 @@ func (p *SetText) GetObject(run rt.Runtime) (rt.Object, error) {
 
 func (p *SetText) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
-		err = errutil.New("SetText.Obj", e)
-	} else if val, e := p.Val.GetText(run); e != nil {
-		err = errutil.New("SetText.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
-		err = errutil.New("SetText.Set", e)
+		err = errutil.New("set text owner error", e)
+	} else if e := obj.SetValue(p.Prop, p.Val); e != nil {
+		err = errutil.New("set text property error", e)
 	} else {
 		ret = obj
 	}
@@ -115,11 +109,9 @@ func (p *SetObj) GetObject(run rt.Runtime) (rt.Object, error) {
 
 func (p *SetObj) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
-		err = errutil.New("SetObj.Obj", e)
-	} else if val, e := p.Val.GetObject(run); e != nil {
-		err = errutil.New("SetObj.Val", e)
-	} else if e := obj.SetValue(p.Prop, val); e != nil {
-		err = errutil.New("SetObj.Set", e)
+		err = errutil.New("set obj owner error", e)
+	} else if e := obj.SetValue(p.Prop, p.Val); e != nil {
+		err = errutil.New("set obj property error", e)
 	} else {
 		ret = obj
 	}
@@ -137,9 +129,9 @@ func (p *SetState) GetObject(run rt.Runtime) (rt.Object, error) {
 
 func (p *SetState) exec(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, e := p.Ref.GetObject(run); e != nil {
-		err = errutil.New("SetState.Ref", e)
+		err = errutil.New("set state owner error", e)
 	} else if e := obj.SetValue(p.State, true); e != nil {
-		err = errutil.New("SetState", e)
+		err = errutil.New("set state property error", e)
 	} else {
 		ret = obj
 	}

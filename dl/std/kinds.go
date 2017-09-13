@@ -2,6 +2,7 @@ package std
 
 import (
 	"github.com/ionous/iffy/ident"
+	"github.com/ionous/iffy/rt"
 )
 
 //go:generate stringer -type=SingularPlural
@@ -108,11 +109,11 @@ const (
 type Story struct {
 	Name                string `if:"id"`
 	Author              string
-	Headline            string
+	Headline            rt.TextEval
 	Scored              bool
 	Score, MaximumScore float64
 	TurnCount           float64
 	StoryStatus
-	StatusLeft, StatusRight string
+	StatusLeft, StatusRight rt.TextEval
 	PlayerInput             string
 }

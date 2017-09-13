@@ -68,7 +68,7 @@ func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
 		dst := r.ValueOf(pv)
 		src := r.ValueOf(p.Value())
 		if e := n.pack.Pack(dst, src); e != nil {
-			err = errutil.New(n, prop, "cant unpack", dst.Type(), "from", src.Type(), "because", e)
+			err = errutil.New(n, prop, "cant unpack because", e)
 		}
 	}
 	return

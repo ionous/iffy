@@ -51,37 +51,37 @@ func Object(rtype r.Type) bool {
 
 // BoolEval tests reflect.TypeOf(rt.BoolEval)
 func BoolEval(rtype r.Type) bool {
-	return rtype == boolEval
+	return rtype.Implements(boolEval)
 }
 
 // NumberEval tests reflect.TypeOf(rt.NumberEval)
 func NumberEval(rtype r.Type) bool {
-	return rtype == numEval
+	return rtype.Implements(numEval)
 }
 
 // TextEval tests reflect.TypeOf(rt.TextEval)
 func TextEval(rtype r.Type) bool {
-	return rtype == textEval
+	return rtype.Implements(textEval)
 }
 
 // ObjectEval tests reflect.TypeOf(rt.ObjectEval)
 func ObjectEval(rtype r.Type) bool {
-	return rtype == objEval
+	return rtype.Implements(objEval)
 }
 
 // NumListEval tests reflect.TypeOf(rt.NumListEval)
 func NumListEval(rtype r.Type) bool {
-	return rtype == numListEval
+	return rtype.Implements(numListEval)
 }
 
 // TextListEval tests reflect.TypeOf(rt.TextListEval)
 func TextListEval(rtype r.Type) bool {
-	return rtype == textListEval
+	return rtype.Implements(textListEval)
 }
 
 // ObjListEval tests reflect.TypeOf(rt.ObjListEval)
 func ObjListEval(rtype r.Type) bool {
-	return rtype == objListEval
+	return rtype.Implements(objListEval)
 }
 
 // switches dont work well with .Interface().(type) when dst is nil.
