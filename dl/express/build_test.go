@@ -16,9 +16,7 @@ func TestBuild(t *testing.T) {
 	cmds := ops.NewOps(classes)
 	patterns := unique.NewStack(cmds.ShadowTypes)
 
-	type TestScore struct {
-		rt.NumberEval
-	}
+	type TestScore struct{ rt.NumberEval }
 
 	unique.PanicTypes(cmds,
 		(*TestScore)(nil))

@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rt"
 	r "reflect"
 	"strconv"
 )
@@ -32,7 +33,7 @@ func NewObjects() *ObjBuilder {
 }
 
 // Build returns an ObjectMap
-func (b *ObjBuilder) Build(p Packer) ObjectMap {
+func (b *ObjBuilder) Build(p rt.Runtime) ObjectMap {
 	objs := make(ObjectMap)
 	for id, q := range b.queue {
 		objs[id] = RefObject{id, q.rval, p}

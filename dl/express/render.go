@@ -73,9 +73,7 @@ func (p *Render) get(run rt.Runtime, pv interface{}) (err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
 		err = errutil.New(e, "while rendering", p.Prop)
 	} else {
-		rt.ScopeBlock(run, obj, func() {
-			err = obj.GetValue(p.Prop, pv)
-		})
+		err = obj.GetValue(p.Prop, pv)
 	}
 	return
 }
@@ -101,39 +99,32 @@ func textConvert(run rt.Runtime, obj rt.Object, path []int) (ret string, err err
 		field := obj.Type().FieldByIndex(path)
 		switch ft := field.Type; {
 		default:
-			rt.ScopeBlock(run, obj, func() {
-				err = obj.GetValue(field.Name, &ret)
-			})
+			err = obj.GetValue(field.Name, &ret)
 
 		case kindOf.BoolLike(ft):
 			var v bool
-			rt.ScopeBlock(run, obj, func() {
-				if e := obj.GetValue(field.Name, &v); e != nil {
-					err = e
-				} else {
-					ret = strconv.FormatBool(v)
-				}
-			})
+			if e := obj.GetValue(field.Name, &v); e != nil {
+				err = e
+			} else {
+				ret = strconv.FormatBool(v)
+			}
 
 		case kindOf.NumberLike(ft):
 			var v float64
-			rt.ScopeBlock(run, obj, func() {
-				if e := obj.GetValue(field.Name, &v); e != nil {
-					err = e
-				} else {
-					ret = strconv.FormatFloat(v, 'g', -1, 64)
-				}
-			})
+			if e := obj.GetValue(field.Name, &v); e != nil {
+				err = e
+			} else {
+				ret = strconv.FormatFloat(v, 'g', -1, 64)
+			}
 
 		case kindOf.ObjectLike(ft):
 			var v ident.Id
-			rt.ScopeBlock(run, obj, func() {
-				if e := obj.GetValue(field.Name, &v); e != nil {
-					err = e
-				} else {
-					ret, err = getName(run, v)
-				}
-			})
+			if e := obj.GetValue(field.Name, &v); e != nil {
+				err = e
+			} else {
+				ret, err = getName(run, v)
+			}
+
 		}
 	}
 	return

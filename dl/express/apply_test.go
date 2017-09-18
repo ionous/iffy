@@ -11,9 +11,7 @@ import (
 	"testing"
 )
 
-type TestThe struct {
-	Obj rt.ObjectEval
-}
+type TestThe struct{ rt.ObjectEval }
 
 func (*TestThe) GetText(run rt.Runtime) (ret string, err error) {
 	err = errutil.New("not implemented")

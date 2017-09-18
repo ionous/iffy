@@ -13,16 +13,16 @@ import (
 type RefObject struct {
 	id    ident.Id // id of the object, blank if anonymous.
 	value r.Value  // stores the concrete value. ex. Rock, not *Rock.
-	pack  Packer
+	run   rt.Runtime
 }
 
 // MakeObject wraps the passed value as an anonymous object.
-func MakeObject(id ident.Id, i interface{}, pack Packer) rt.Object {
+func MakeObject(id ident.Id, i interface{}, run rt.Runtime) rt.Object {
 	rval, e := unique.ValuePtr(i)
 	if e != nil {
 		panic(e)
 	}
-	return RefObject{id, rval, pack}
+	return RefObject{id, rval, run}
 }
 
 // Id returns the unique identifier for this Object.
@@ -67,9 +67,11 @@ func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
 	} else {
 		dst := r.ValueOf(pv)
 		src := r.ValueOf(p.Value())
-		if e := n.pack.Pack(dst, src); e != nil {
-			err = errutil.New(n.propN(prop), "cant unpack, because", e)
-		}
+		rt.ScopeBlock(n.run, n, func() {
+			if e := n.run.Pack(dst, src); e != nil {
+				err = errutil.New(n.propN(prop), "cant unpack, because", e)
+			}
+		})
 	}
 	return
 }
@@ -84,11 +86,13 @@ func (n RefObject) SetValue(prop string, v interface{}) (err error) {
 	} else {
 		dst := r.New(p.Type()) // create a new destination for the value.
 		src := r.ValueOf(v)
-		if e := n.pack.Pack(dst, src); e != nil {
-			err = errutil.New(n.propN(prop), "cant pack", dst.Type(), "from", src.Type(), "because", e)
-		} else {
-			err = p.SetValue(dst.Elem().Interface())
-		}
+		rt.ScopeBlock(n.run, n, func() {
+			if e := n.run.Pack(dst, src); e != nil {
+				err = errutil.New(n.propN(prop), "cant run", dst.Type(), "from", src.Type(), "because", e)
+			} else {
+				err = p.SetValue(dst.Elem().Interface())
+			}
+		})
 	}
 	return
 }

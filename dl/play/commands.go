@@ -2,6 +2,7 @@ package play
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/event/trigger"
@@ -24,6 +25,7 @@ type Facts struct {
 
 type Commands struct {
 	Core    core.Commands
+	Express express.Commands
 	Rules   rules.Commands
 	Std     std.Commands
 	Parser  parser.Commands

@@ -2,7 +2,7 @@ package play
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
@@ -17,8 +17,6 @@ import (
 	"io"
 )
 
-var globalPlay Play
-
 type Play struct {
 	callbacks []func(spec.Block)
 	classes   []interface{}
@@ -28,41 +26,30 @@ type Play struct {
 	objects   []interface{}
 }
 
-// Register definitions globally. Used mainly via go init()
-func (r *Play) AddScript(cb func(c spec.Block)) {
-	r.callbacks = append(r.callbacks, cb)
-}
-
-// Register definitions globally. Used mainly via go init()
-// func Register(cb func(c spec.Block)) {
-// 	globalPlay.Register(cb)
-// }
-
 func (r *Play) AddClasses(block interface{}) {
 	r.classes = append(r.classes, block)
 }
-
 func (r *Play) AddCommands(block interface{}) {
 	r.cmds = append(r.cmds, block)
 }
-
-func (r *Play) AddPatterns(block interface{}) {
-	r.patterns = append(r.patterns, block)
-}
-
 func (r *Play) AddEvents(block interface{}) {
 	r.events = append(r.events, block)
 }
-
 func (r *Play) AddObjects(objs ...interface{}) {
 	r.objects = append(r.objects, objs...)
+}
+func (r *Play) AddPatterns(block interface{}) {
+	r.patterns = append(r.patterns, block)
+}
+func (r *Play) AddScript(cb func(c spec.Block)) {
+	r.callbacks = append(r.callbacks, cb)
 }
 
 // Define implements Statement by using all Register(ed) definitions.
 func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
 	var f Facts
 	var root struct{ Definitions }
-	c := cmds.NewBuilder(&root, core.Xform{})
+	c := cmds.NewBuilder(&root, express.MakeXform(cmds))
 	if c.Cmds().Begin() {
 		for _, v := range r.callbacks {
 			v(c)
@@ -86,7 +73,6 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	events := unique.NewStack(patterns)           // all events become default action patterns
 	objects := obj.NewObjects()
 	relations := rel.NewRelations()
-
 	//
 	if e := unique.RegisterBlocks(classes, (*Classes)(nil)); e != nil {
 		err = e
@@ -104,7 +90,7 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 		err = e
 	} else if e := unique.RegisterValues(objects, r.objects...); e != nil {
 		err = e
-	} else if rules, e := rules.Master(cmds, core.Xform{}, patterns, std.Rules); e != nil {
+	} else if rules, e := rules.Master(cmds, express.MakeXform(cmds), patterns, std.Rules); e != nil {
 		err = e
 	} else if facts, e := r.Build(cmds); e != nil {
 		err = e

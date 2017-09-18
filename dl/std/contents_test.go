@@ -93,7 +93,6 @@ func TestContents(t *testing.T) {
 				} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
 					err = e
 					break
-
 				}
 			}
 		}
