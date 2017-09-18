@@ -10,7 +10,7 @@ func Rules(c spec.Block) {
 	PrintNameRules(c)
 	PrintObjectRules(c)
 	group.GroupRules(c)
-	commence(c)
+	commenceRules(c)
 }
 
 func PrintNameRules(c spec.Block) {

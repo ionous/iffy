@@ -57,7 +57,7 @@ package express
 
 // func shortAssignmentFn() rt.Execute {
 // 	return &core.SetNum{
-// 		Obj:  &core.Global{"A"},
+// 		Obj:  &core.Object{"A"},
 // 		Prop: "num",
 // 		Val:  literalFn(),
 // 	}
@@ -65,7 +65,7 @@ package express
 
 // func longAssigmentFn() rt.Execute {
 // 	return &core.SetNum{
-// 		Obj:  &core.Global{"B"},
+// 		Obj:  &core.Object{"B"},
 // 		Prop: "num",
 // 		Val:  chainFn(),
 // 	}

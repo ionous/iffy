@@ -108,8 +108,7 @@ func (r *Table) AddPair(primary, secondary string, onInsert OnInsert) (err error
 func (r *Table) DeletePair(major, minor string) (changed bool) {
 	if pr, ok := r.Primary.FindPair(0, major, minor); ok {
 		if sr, ok := r.Secondary.FindPair(0, minor, major); !ok {
-			err := errutil.New("remove couldnt find reverse pair", minor, major)
-			panic(err)
+			panic(errutil.New("remove couldnt find reverse pair", minor, major))
 		} else {
 			r.Primary.Delete(pr)
 			r.Secondary.Delete(sr)
@@ -132,8 +131,7 @@ func (r *Table) remove(major string, near, far *Index) (changed bool) {
 			if i, ok := far.FindPair(0, minor, major); ok {
 				far.Delete(i)
 			} else {
-				err := errutil.New("remove couldnt find reverse pair", minor, major)
-				panic(err)
+				panic(errutil.New("remove couldnt find reverse pair", minor, major))
 			}
 			if rev {
 				delete(r.Data, Row{minor, major})
@@ -147,8 +145,7 @@ func (r *Table) remove(major string, near, far *Index) (changed bool) {
 			for {
 				// note the minor majors are sorted, so they are ever increasing.
 				if minor := a[n].Minor; !dc.DeletePair(minor, major) {
-					err := errutil.New("remove couldnt find reverse pairs", minor, major)
-					panic(err)
+					panic(errutil.New("remove couldnt find reverse pairs", minor, major))
 				} else if rev {
 					delete(r.Data, Row{minor, major})
 				} else {

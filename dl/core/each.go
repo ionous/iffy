@@ -77,6 +77,7 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 				break
 			}
 		}
+		l.pop()
 	}
 	return
 }
@@ -107,6 +108,7 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 				break
 			}
 		}
+		l.pop()
 	}
 	return
 }
@@ -137,6 +139,7 @@ func (f *ForEachObj) Execute(run rt.Runtime) (err error) {
 				break
 			}
 		}
+		l.pop()
 	}
 	return
 }

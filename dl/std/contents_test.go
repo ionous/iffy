@@ -4,9 +4,9 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/locate"
+	"github.com/ionous/iffy/dl/rules"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/index"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
@@ -35,7 +35,6 @@ func (l Location) Locate() Locate {
 }
 
 func TestContents(t *testing.T) {
-
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
@@ -53,7 +52,7 @@ func TestContents(t *testing.T) {
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 		(*Commands)(nil),
 	)
 	unique.PanicTypes(cmds,
@@ -62,7 +61,7 @@ func TestContents(t *testing.T) {
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, PrintNameRules, PrintObjectRules)
+	rules, e := rules.Master(cmds, core.Xform{}, patterns, PrintNameRules, PrintObjectRules)
 	assert.NoError(e)
 
 	type OpsCb func(c spec.Block)
@@ -115,7 +114,6 @@ func TestContents(t *testing.T) {
 				} else if res := lines.Lines(); match(run, res) {
 					t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
 				}
-
 			}
 		}
 		return

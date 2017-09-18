@@ -16,17 +16,20 @@ func (c Collections) PrintGroups(run rt.Runtime) (err error) {
 }
 
 func (g Collection) PrintGroup(run rt.Runtime) (err error) {
-	if len(g.Objects) > 0 {
-		// a label means we want to treat the group as a block
-		// including all pre and post test into that same block.
-		if len(g.Label) > 0 {
-			span := printer.Spanner{Writer: run}
-			run = rt.Writer(run, &span)
-			defer span.Flush()
-		}
-		printGroup := run.Emplace(&PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.Objects})
-		err = run.ExecuteMatching(run, printGroup)
+	// a label means we want to treat the group as a block
+	// including all pre and post test into that same block.
+	block := len(g.Objects) > 0 && len(g.Label) > 0
+	if !block {
+		err = g.printGroup(run)
+	} else {
+		err = rt.WritersBlock(run, printer.Spanning(run.Writer()), func() error {
+			return g.printGroup(run)
+		})
 	}
-
 	return
+}
+
+func (g Collection) printGroup(run rt.Runtime) error {
+	printGroup := run.Emplace(&PrintGroup{g.Label, g.Innumerable, g.ObjectGrouping, g.Objects})
+	return run.ExecuteMatching(printGroup)
 }

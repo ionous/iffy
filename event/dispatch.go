@@ -21,7 +21,7 @@ func Trigger(run rt.Runtime, events EventMap, data rt.Object) (err error) {
 		//
 		at := els.CollectTargets(target, nil)
 		if len(path) == 0 && len(at) == 0 {
-			err = run.ExecuteMatching(run, data)
+			err = run.ExecuteMatching(data)
 		} else {
 			evt := &EventObject{
 				Id:            id,
@@ -37,7 +37,7 @@ func Trigger(run rt.Runtime, events EventMap, data rt.Object) (err error) {
 			} else if e := ac.DispatchFrame(at, path); e != nil {
 				err = e
 			} else if !evt.PreventDefault {
-				if e := run.ExecuteMatching(run, data); e != nil {
+				if e := run.ExecuteMatching(data); e != nil {
 					err = e
 				} else {
 					evt.Phase = AfterPhase
@@ -45,6 +45,7 @@ func Trigger(run rt.Runtime, events EventMap, data rt.Object) (err error) {
 					err = ac.queue.Flush(run, evt)
 				}
 			}
+			ac.popFrame()
 		}
 	}
 	return

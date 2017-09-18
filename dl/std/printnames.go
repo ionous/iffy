@@ -19,29 +19,15 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 	if groups, ungrouped, e := group.MakeGroups(run, p.Objects); e != nil {
 		err = e
 	} else {
-		sep := printer.AndSeparator(run)
-		run, ungrouped := rt.Writer(run, sep), stream.NewObjectStream(ungrouped)
-		if _, e := printWithArticles(run, ungrouped); e != nil {
-			err = e
-		} else if e := groups.PrintGroups(run); e != nil {
-			err = e
-		}
-		sep.Flush()
+		err = rt.WritersBlock(run, printer.AndSeparator(run.Writer()), func() (err error) {
+			ungrouped := stream.NewObjectStream(ungrouped)
+			if _, e := printWithArticles(run, ungrouped); e != nil {
+				err = e
+			} else if e := groups.PrintGroups(run); e != nil {
+				err = e
+			}
+			return
+		})
 	}
 	return
-}
-
-func printName(run rt.Runtime, x rt.Object) error {
-	printName := run.Emplace(&PrintName{x.Id()})
-	return run.ExecuteMatching(run, printName)
-}
-
-func printPluralName(run rt.Runtime, x rt.Object) error {
-	printName := run.Emplace(&PrintPluralName{x.Id()})
-	return run.ExecuteMatching(run, printName)
-}
-
-func printSeveral(run rt.Runtime, x rt.Object, cnt int) error {
-	printName := run.Emplace(&PrintSeveral{x.Id(), float64(cnt)})
-	return run.ExecuteMatching(run, printName)
 }

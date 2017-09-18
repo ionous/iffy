@@ -2,58 +2,76 @@ package core_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec"
+	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/tests"
+	"testing"
 )
 
-func (assert *CoreSuite) TestAdd() {
-	assert.matchLine("11", func(c spec.Block) {
-		if c.Cmd("print num").Begin() {
+func TestMath(t *testing.T) {
+	classes := make(unique.Types)
+	cmds := ops.NewOps(classes)
+	//
+	unique.PanicBlocks(cmds,
+		(*core.Commands)(nil))
+	unique.PanicBlocks(classes,
+		(*core.Classes)(nil),
+	)
+	//
+	run := rtm.New(classes).Rtm()
+	//
+	match := func(t *testing.T, v float64, fn func(spec.Block)) (err error) {
+		var n tests.Number
+		c := cmds.NewBuilder(&n, core.Xform{})
+		if e := c.Build(fn); e != nil {
+			err = e
+		} else if e := n.Match(run, v); e != nil {
+			err = e
+		}
+		return
+	}
+	t.Run("Add", func(t *testing.T) {
+		if e := match(t, 11, func(c spec.Block) {
 			c.Cmd("add", 1, 10)
-			c.End()
+		}); e != nil {
+			t.Fatal(e)
 		}
 	})
-}
-
-func (assert *CoreSuite) TestSubtract() {
-	assert.matchLine("-9", func(c spec.Block) {
-		if c.Cmd("print num").Begin() {
+	t.Run("Sub", func(t *testing.T) {
+		if e := match(t, -9, func(c spec.Block) {
 			c.Cmd("sub", 1, 10)
-			c.End()
+		}); e != nil {
+			t.Fatal(e)
 		}
 	})
-}
-
-func (assert *CoreSuite) TestMultiply() {
-	assert.matchLine("200", func(c spec.Block) {
-		if c.Cmd("print num").Begin() {
+	t.Run("Mul", func(t *testing.T) {
+		if e := match(t, 200, func(c spec.Block) {
 			c.Cmd("mul", 20, 10)
-			c.End()
+		}); e != nil {
+			t.Fatal(e)
 		}
 	})
-}
-
-// TestDivide tests numbers directly.
-func (assert *CoreSuite) TestDivide() {
-	var root struct{ Eval rt.NumberEval }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	c.Cmd("div", 10, 2)
-	//
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if v, e := root.Eval.GetNumber(run); assert.NoError(e) {
-			assert.EqualValues(5, v)
+	t.Run("Div", func(t *testing.T) {
+		if e := match(t, 2, func(c spec.Block) {
+			c.Cmd("div", 20, 10)
+		}); e != nil {
+			t.Fatal(e)
 		}
-	}
-}
-
-// TestDivideByZero should not panic, but simply error.
-func (assert *CoreSuite) TestDivideByZero() {
-	var root struct{ Eval rt.NumberEval }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	c.Cmd("div", 10, 0)
-	//
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if _, e := root.Eval.GetNumber(run); assert.Error(e) {
+	})
+	t.Run("Div By Zero", func(t *testing.T) {
+		if e := match(t, 200, func(c spec.Block) {
+			c.Cmd("div", 20, 10)
+		}); e == nil {
+			t.Fatal("expected error")
 		}
-	}
+	})
+	t.Run("Mod", func(t *testing.T) {
+		if e := match(t, 1, func(c spec.Block) {
+			c.Cmd("mod", 3, 2)
+		}); e != nil {
+			t.Fatal(e)
+		}
+	})
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 )
 
-// Lines implements io.Writer, treating every Write as a new line.
+// Lines implements io.Writer, buffering every Write as a new line.
 type Lines struct {
 	lines []string
 }

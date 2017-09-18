@@ -98,15 +98,19 @@ func getCopyFun(dst, src r.Type) (ret packFun) {
 
 		// given an eval, presumably asking for a primitive
 		// ( ex. reading a specific struct ptr implementation of an interface )
+		// note: some sources support multiple eval interfaces:
+		// ex. core.Get, rules.Determine, express.Render, express.GetAt.
+		// with templates, not all the best piping exists, so: we have to test dst a bit too.
+		// ex. {go determine pattern} -> which pattern
 	case src.Kind() == r.Ptr:
 		switch {
-		case kindOf.BoolEval(src):
+		case kindOf.BoolEval(src) && kindOf.Bool(dst):
 			ret = fromBoolEval
-		case kindOf.NumberEval(src):
+		case kindOf.NumberEval(src) && kindOf.Number(dst):
 			ret = fromNumberEval
-		case kindOf.TextEval(src):
+		case kindOf.TextEval(src) && kindOf.String(dst):
 			ret = fromTextEval
-		case kindOf.ObjectEval(src):
+		case kindOf.ObjectEval(src) && (kindOf.IdentId(dst) || kindOf.Object(dst)):
 			ret = fromObjEval
 		case kindOf.NumListEval(src):
 			ret = fromNumListEval

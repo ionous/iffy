@@ -94,11 +94,13 @@ func printArticle(run rt.Runtime, article string, obj rt.Object) (err error) {
 // You can only just make out the lamp-post.", or "You can only just make out _ Trevor.", or "You can only just make out the soldiers."
 func articleName(run rt.Runtime, article string, obj rt.Object) (ret string, err error) {
 	// FIX? i think filters would be better -- especically in printWithArticles -- but this matches existing code.
-	var buffer printer.Span
-	if e := printName(rt.Writer(run, &buffer), obj); e != nil {
+	var span printer.Span
+	if e := rt.WritersBlock(run, &span, func() error {
+		return rt.Determine(run, &PrintName{obj.Id()})
+	}); e != nil {
 		err = e
 	} else {
-		name := buffer.String()
+		name := span.String()
 		var proper bool
 		if e := obj.GetValue("proper-named", &proper); e != nil {
 			err = e

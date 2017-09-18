@@ -1,12 +1,13 @@
-package rule
+package rules
 
 import (
+	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 )
 
-func Master(cmds *ops.Ops, xform ops.Transform, pt *unique.Stack, buildPatterns ...func(c spec.Block)) (ret Rules, err error) {
+func Master(cmds *ops.Ops, xform ops.Transform, pt *unique.Stack, buildPatterns ...func(c spec.Block)) (ret pat.Contract, err error) {
 	// Accumulate rules into root.
 	var root struct{ Mandates }
 	c := cmds.NewBuilder(&root, xform)
@@ -19,8 +20,8 @@ func Master(cmds *ops.Ops, xform ops.Transform, pt *unique.Stack, buildPatterns 
 		if e := c.Build(); e != nil {
 			err = e
 		} else {
-			rules := MakeRules()
-			if e := root.Mandate(pt.Types, rules); e != nil {
+			rules := pat.MakeContract(pt.Types)
+			if e := root.Mandate(rules); e != nil {
 				err = e
 			} else {
 				ret = rules

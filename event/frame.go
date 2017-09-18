@@ -8,15 +8,16 @@ type Frame struct {
 	run   rt.Runtime
 	evt   *EventObject
 	queue QueuedActions
+	prev  rt.Object
 }
 
 func NewFrame(run rt.Runtime, evt *EventObject) (ret *Frame, err error) {
-	// create event object
-	{
-		run := rt.AtFinder(run, run.Emplace(evt))
-		ret = &Frame{run: run, evt: evt}
-	}
+	ret = &Frame{run: run, evt: evt, prev: run.SetTop(run.Emplace(evt))}
 	return
+}
+
+func (ac *Frame) popFrame() {
+	ac.run.SetTop(ac.prev)
 }
 
 // Dispatch the event frame to the passed targets.

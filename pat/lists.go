@@ -13,34 +13,49 @@ const (
 	Postfix
 )
 
+// BoolRule holds the distallation of a BoolRule.
 type BoolRule struct {
 	Filters Filters
 	rt.BoolEval
 }
+
+// NumberRule holds the distallation of a NumberRule.
 type NumberRule struct {
 	Filters Filters
 	rt.NumberEval
 }
+
+// TextRule holds the distallation of a TextRule.
 type TextRule struct {
 	Filters Filters
 	rt.TextEval
 }
+
+// ObjectRule holds the distallation of a ObjectRule.
 type ObjectRule struct {
 	Filters Filters
 	rt.ObjectEval
 }
+
+// NumListRule holds the distallation of a NumListRule.
 type NumListRule struct {
 	Filters Filters
 	rt.NumListEval
 }
+
+// TextListRule holds the distallation of a TextListRule.
 type TextListRule struct {
 	Filters Filters
 	rt.TextListEval
 }
+
+// ObjListRule holds the distallation of a ObjListRule.
 type ObjListRule struct {
 	Filters Filters
 	rt.ObjListEval
 }
+
+// ExecuteRule holds the distallation of a RunRule.
 type ExecuteRule struct {
 	Filters Filters
 	rt.Execute

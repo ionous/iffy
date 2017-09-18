@@ -31,8 +31,9 @@ func Parse(run *rtm.Rtm, input string) (err error) {
 		if e := objectify(run, list.Objects(), &p.Noun, &p.SecondNoun); e != nil {
 			err = e
 		} else {
-			run := rt.AtFinder(run, run.Emplace(&p))
-			err = act.Execute(run)
+			rt.ScopeBlock(run, run.Emplace(&p), func() {
+				err = act.Execute(run)
+			})
 		}
 	}
 	return

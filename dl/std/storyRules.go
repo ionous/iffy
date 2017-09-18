@@ -2,7 +2,7 @@ package std
 
 import "github.com/ionous/iffy/spec"
 
-func commence(c spec.Block) {
+func commenceRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "commence").Begin() {
 		if c.Param("decide").Cmds().Begin() {
@@ -12,7 +12,7 @@ func commence(c spec.Block) {
 		}
 		c.End()
 	}
-	if c.Cmd("text rule", "PlayerSurroundings").Begin() {
+	if c.Cmd("text rule", "player surroundings").Begin() {
 		// player location or darkness
 		if c.Param("decide").Cmd("buffer").Begin() {
 			if c.Cmds().Begin() {

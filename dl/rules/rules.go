@@ -1,12 +1,12 @@
-package rule
+package rules
 
 import (
-	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/pat"
 )
 
 // Mandate defines an interface for creating rules.
 type Mandate interface {
-	Mandate(unique.Types, Rules) error
+	Mandate(pat.Contract) error
 }
 
 type MandateCmds struct {
@@ -37,9 +37,9 @@ type Commands struct {
 
 type Mandates []Mandate
 
-func (p Mandates) Mandate(patterns unique.Types, rules Rules) (err error) {
+func (p Mandates) Mandate(rules pat.Contract) (err error) {
 	for _, el := range p {
-		if e := el.Mandate(patterns, rules); e != nil {
+		if e := el.Mandate(rules); e != nil {
 			err = e
 			break
 		}

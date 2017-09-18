@@ -4,10 +4,10 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/locate"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/index"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
@@ -30,7 +30,7 @@ func TestStory(t *testing.T) {
 		(*core.Commands)(nil),
 		(*std.Commands)(nil),
 		(*express.Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 	)
 	unique.PanicBlocks(classes,
 		(*std.Classes)(nil))
@@ -46,7 +46,7 @@ func TestStory(t *testing.T) {
 		&std.Actor{std.Thing{Kind: std.Kind{Name: "me"}}},
 	)
 	xform := express.MakeXform(cmds)
-	rules, e := rule.Master(cmds, xform, patterns, std.Rules)
+	rules, e := rules.Master(cmds, xform, patterns, std.Rules)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -81,8 +81,9 @@ func TestStory(t *testing.T) {
 		} else {
 			t.Log(pretty.Sprint(root.ExecuteList))
 			var lines printer.Lines
-			run := rt.Writer(run, &lines)
-			if e := root.Execute(run); e != nil {
+			if e := rt.WritersBlock(run, &lines, func() error {
+				return root.Execute(run)
+			}); e != nil {
 				t.Fatal(e)
 			} else {
 				l := lines.Lines()

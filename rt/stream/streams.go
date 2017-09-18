@@ -105,7 +105,7 @@ func (it *NameIt) GetNext() (ret rt.Object, err error) {
 		err = rt.StreamExceeded
 	} else {
 		ref := it.list[it.idx]
-		if obj, ok := it.run.FindObject(ref); !ok {
+		if obj, ok := it.run.GetObject(ref); !ok {
 			err = errutil.New("couldnt find object named", ref)
 		} else {
 			ret = obj

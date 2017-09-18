@@ -1,4 +1,4 @@
-package rule
+package rules
 
 import (
 	"github.com/ionous/errutil"
@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+// Rule is the base class for scrips.Types commands.
 type Rule struct {
 	Name string      // Name of pattern
 	If   rt.BoolEval // Filter
@@ -58,71 +59,71 @@ func (p *Rule) Init(pt unique.Types) (ret ident.Id, filters []rt.BoolEval, err e
 	return
 }
 
-func (p *BoolRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *BoolRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		ps.Bools.AddRule(pid, filters, p.Decide)
+		err = ps.AddBoolRule(pid, filters, p.Decide)
 	}
 	return
 }
-func (p *NumberRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *NumberRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		ps.Numbers.AddRule(pid, filters, p.Decide)
+		err = ps.AddNumberRule(pid, filters, p.Decide)
 	}
 	return
 }
-func (p *TextRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *TextRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		ps.Text.AddRule(pid, filters, p.Decide)
+		err = ps.AddTextRule(pid, filters, p.Decide)
 	}
 	return
 }
-func (p *ObjectRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *ObjectRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		ps.Objects.AddRule(pid, filters, p.Decide)
+		err = ps.AddObjectRule(pid, filters, p.Decide)
 	}
 	return
 }
-func (p *NumListRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *NumListRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		ps.NumLists.AddRule(pid, filters, p.Decide)
+		err = ps.AddNumListRule(pid, filters, p.Decide)
 	}
 	return
 }
-func (p *TextListRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *TextListRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		ps.TextLists.AddRule(pid, filters, p.Decide)
+		err = ps.AddTextListRule(pid, filters, p.Decide)
 	}
 	return
 }
-func (p *ObjListRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *ObjListRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		ps.ObjLists.AddRule(pid, filters, p.Decide)
+		err = ps.AddObjListRule(pid, filters, p.Decide)
 	}
 	return
 }
-func (p *RunRule) Mandate(pt unique.Types, ps Rules) (err error) {
-	if pid, filters, e := p.Init(pt); e != nil {
+func (p *RunRule) Mandate(ps pat.Contract) (err error) {
+	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
 		flags := pat.Infix
 		if p.Continue != nil {
 			flags = p.Continue.Flags()
 		}
-		ps.Executes.AddRule(pid, filters, p.Decide, flags)
+		err = ps.AddExecuteRule(pid, filters, p.Decide, flags)
 	}
 	return
 }

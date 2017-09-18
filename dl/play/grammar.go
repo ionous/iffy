@@ -1,8 +1,8 @@
 package play
 
 import (
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/parser"
-	"github.com/ionous/iffy/pat/rule"
 )
 
 type Grammar struct {
@@ -10,7 +10,7 @@ type Grammar struct {
 }
 
 type Mandate struct {
-	rule.Mandate
+	rules.Mandate
 }
 
 func (a *Grammar) Define(f *Facts) (nil error) {

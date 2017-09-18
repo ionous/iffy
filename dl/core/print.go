@@ -38,34 +38,22 @@ type Say struct {
 	Text rt.TextEval
 }
 
-func (p *PrintSpan) Execute(run rt.Runtime) (err error) {
-	span := printer.Spanner{Writer: run}
-	if e := p.Block.Execute(rt.Writer(run, &span)); e != nil {
-		err = e
-	} else {
-		err = span.Flush()
-	}
-	return
+func (p *PrintSpan) Execute(run rt.Runtime) error {
+	return rt.WritersBlock(run, printer.Spanning(run.Writer()), func() error {
+		return p.Block.Execute(run)
+	})
 }
 
-func (p *PrintBracket) Execute(run rt.Runtime) (err error) {
-	bracket := printer.Bracket{Writer: run}
-	if e := p.Block.Execute(rt.Writer(run, &bracket)); e != nil {
-		err = e
-	} else {
-		err = bracket.Flush()
-	}
-	return
+func (p *PrintBracket) Execute(run rt.Runtime) error {
+	return rt.WritersBlock(run, printer.Bracket(run.Writer()), func() error {
+		return p.Block.Execute(run)
+	})
 }
 
-func (p *PrintList) Execute(run rt.Runtime) (err error) {
-	sep := printer.AndSeparator(run)
-	if e := p.Block.Execute(rt.Writer(run, sep)); e != nil {
-		err = e
-	} else {
-		err = sep.Flush()
-	}
-	return
+func (p *PrintList) Execute(run rt.Runtime) error {
+	return rt.WritersBlock(run, printer.AndSeparator(run.Writer()), func() error {
+		return p.Block.Execute(run)
+	})
 }
 
 func (p *PrintNum) Execute(run rt.Runtime) (err error) {

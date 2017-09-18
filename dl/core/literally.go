@@ -11,7 +11,7 @@ type Xform struct{}
 
 // returns src if no error but couldnt convert.
 func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, err error) {
-	if x, ok := literally(val, hint); ok {
+	if x := literally(val, hint); x != nil {
 		ret = x
 	} else {
 		ret = val
@@ -27,39 +27,43 @@ func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, e
 // c.Cmd("get").Begin() { c.Cmd("object", "@") c.Value("text") }
 // c.Cmd("get", "@", "text")
 //
-func literally(v interface{}, dstType r.Type) (ret interface{}, okay bool) {
+func literally(v interface{}, dstType r.Type) (ret interface{}) {
 	switch v := v.(type) {
 	case bool:
-		ret, okay = &Bool{v}, true
+		ret = &Bool{v}
 	case float64:
-		ret, okay = &Num{v}, true
+		ret = &Num{v}
 	case []float64:
-		ret, okay = &Numbers{v}, true
+		ret = &Numbers{v}
 	// -- string for a command.
 	case string:
 		// could be text or object --
 		switch {
 		case kindOf.TextEval(dstType):
-			ret, okay = &Text{v}, true
+			ret = &Text{v}
 		case kindOf.ObjectEval(dstType):
-			ret, okay = &Object{v}, true
+			if v == "@" {
+				ret = &TopObject{}
+			} else {
+				ret = &Object{v}
+			}
 		}
 	case []string:
 		switch {
 		case kindOf.TextListEval(dstType):
-			ret, okay = &Texts{v}, true
+			ret = &Texts{v}
 		case kindOf.ObjListEval(dstType):
-			ret, okay = &Objects{v}, true
+			ret = &Objects{v}
 		}
 	default:
 		{
 			v := r.ValueOf(v)
 			if kindOf.Float(v.Type()) {
 				v := v.Float()
-				ret, okay = &Num{v}, true
+				ret = &Num{v}
 			} else if kindOf.Int(v.Type()) {
 				v := v.Int()
-				ret, okay = &Num{float64(v)}, true
+				ret = &Num{float64(v)}
 			}
 		}
 	}

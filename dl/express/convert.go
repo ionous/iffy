@@ -92,7 +92,7 @@ func SelectorExpr(c spec.Slot, n *ast.SelectorExpr, hint Hint) (err error) {
 
 func makeObject(c spec.Slot, n *ast.Ident) {
 	if name := n.Name; lang.IsCapitalized(name) {
-		c.Cmd("global", name)
+		c.Cmd("object", name)
 	} else {
 		c.Cmd("get at", name)
 	}

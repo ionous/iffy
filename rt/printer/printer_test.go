@@ -10,10 +10,10 @@ func TestBracket(t *testing.T) {
 	assert := testify.New(t)
 	//
 	var buffer Span
-	w := &Bracket{Writer: &buffer}
+	w := Bracket(&buffer)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
-	w.Flush()
+	w.Close()
 	assert.Equal("( hello you )", buffer.String())
 }
 
@@ -32,7 +32,7 @@ func TestCapitalize(t *testing.T) {
 	assert := testify.New(t)
 	//
 	var buffer Span
-	w := &Capitalize{Writer: &buffer}
+	w := Capitalize(&buffer)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
 	assert.Equal("Hello you", buffer.String())
@@ -42,7 +42,7 @@ func TestLowercase(t *testing.T) {
 	assert := testify.New(t)
 	//
 	var buffer Span
-	w := &Lowercase{Writer: &buffer}
+	w := Lowercase(&buffer)
 	io.WriteString(w, "Hello")
 	io.WriteString(w, "Hugh")
 	assert.Equal("hello hugh", buffer.String())
@@ -52,7 +52,7 @@ func TestTitlecase(t *testing.T) {
 	assert := testify.New(t)
 	//
 	var buffer Span
-	w := &TitleCase{Writer: &buffer}
+	w := TitleCase(&buffer)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
 	assert.Equal("Hello You", buffer.String())

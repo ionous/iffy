@@ -92,11 +92,11 @@ func literalFn() rt.NumberEval {
 	return &core.Num{5}
 }
 func noDotFn() rt.ObjectEval {
-	return &core.Global{"A"}
+	return &core.Object{"A"}
 }
 func bigDotFn() rt.NumberEval {
 	return &core.Get{
-		Obj:  &core.Global{"A"},
+		Obj:  &core.Object{"A"},
 		Prop: "num",
 	}
 }
@@ -114,7 +114,7 @@ func binaryFn() rt.NumberEval {
 	return &core.Mul{
 		bigDotFn(),
 		&core.Get{
-			Obj:  &core.Global{"B"},
+			Obj:  &core.Object{"B"},
 			Prop: "num",
 		},
 	}

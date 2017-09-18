@@ -2,8 +2,8 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
@@ -25,7 +25,7 @@ func TestBuild(t *testing.T) {
 	unique.PanicBlocks(cmds,
 		(*std.Commands)(nil),
 		(*core.Commands)(nil),
-		(*rule.RuntimeCmds)(nil),
+		(*rules.RuntimeCmds)(nil),
 		(*Commands)(nil))
 	unique.PanicBlocks(patterns,
 		(*std.Patterns)(nil))
@@ -50,9 +50,9 @@ func TestBuild(t *testing.T) {
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
 		} else {
-			testEqual(t, &TestScore{&Render{core.Get{
-				&core.Global{"Story"}, "score"},
-			}}, root.NumberEval)
+			testEqual(t, &TestScore{&Render{
+				&core.Object{"Story"}, "score"},
+			}, root.NumberEval)
 		}
 	})
 	//
@@ -64,9 +64,9 @@ func TestBuild(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			testEqual(t, &TestScore{
-				&TestScore{&Render{core.Get{
-					&core.Global{"Story"}, "score"},
-				}}}, root.NumberEval)
+				&TestScore{&Render{
+					&core.Object{"Story"}, "score"},
+				}}, root.NumberEval)
 		}
 	})
 	//

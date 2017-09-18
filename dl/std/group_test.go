@@ -2,9 +2,9 @@ package std_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/dl/std/group"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt/printer"
@@ -221,17 +221,16 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(s
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 	)
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, patternSpec...)
+	rules, e := rules.Master(cmds, core.Xform{}, patterns, patternSpec...)
 
 	if assert.NoError(e) {
-		var lines printer.Span
-		run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
-
+		var span printer.Span
+		run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&span).Rtm()
 		prn := &PrintNondescriptObjects{&core.Objects{names}}
 		if e := prn.Execute(run); assert.NoError(e) {
-			if assert.Equal(match, lines.String()) {
+			if assert.Equal(match, span.String()) {
 				t.Log("matched:", match)
 			}
 		}

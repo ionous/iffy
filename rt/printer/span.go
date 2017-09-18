@@ -2,38 +2,40 @@ package printer
 
 import (
 	"bytes"
+	"io"
 	"unicode"
+	"unicode/utf8"
 )
 
-// Span implements io.Writer, treating each new Write as word and adding spaces to separate words as necessary.
+// Span buffers with spacing, treating each new Write as word and adding spaces to separate words as necessary.
 type Span struct {
-	buf bytes.Buffer
+	buf bytes.Buffer // note: we cant aggregate buf or io.WriteString will bypasses implementation of Write() in favor of bytes.Buffer.WriteString()
 }
 
-// String returns the accumulated words as a string.
-func (p *Span) String() string {
-	return p.buf.String()
+func (p *Span) Len() int {
+	return p.buf.Len()
 }
-
-// Bytes returns the accumulated words as an array of bytes.
 func (p *Span) Bytes() []byte {
 	return p.buf.Bytes()
 }
 
-// Write implements io.Writer treading writes as words.
-// ex. Writing "hello", "there,", "world." becomes "hello there. world."
-func (p *Span) Write(s []byte) (ret int, err error) {
-	// printed something before?
-	if len(s) > 0 {
+func (p *Span) String() string {
+	return p.buf.String()
+}
+
+func (p *Span) Write(b []byte) (ret int, err error) {
+	if len(b) > 0 {
+		// printed something before? check for spacing.
 		if p.buf.Len() > 0 {
-			// before writing this new thing, possibly put a space.
-			letter := []rune(string(s))[0]
-			if !unicode.IsSpace(letter) && !unicode.In(letter, unicode.Po, unicode.Pi, unicode.Pf) {
-				n, _ := p.buf.WriteString(" ")
-				ret += n
+			letter, cnt := utf8.DecodeRune(b)
+			if cnt > 0 {
+				if !unicode.IsSpace(letter) && !unicode.In(letter, unicode.Po, unicode.Pi, unicode.Pf) {
+					n, _ := io.WriteString(&p.buf, " ")
+					ret += n
+				}
 			}
 		}
-		n, _ := p.buf.Write(s)
+		n, _ := p.buf.Write(b)
 		ret += n
 	}
 	return

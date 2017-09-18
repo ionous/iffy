@@ -63,12 +63,12 @@ func (n RefObject) Property(name string) (ret Property, okay bool) {
 // GetValue sets the value of the passed pointer to the value of the named property.
 func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
 	if p, ok := n.Property(prop); !ok {
-		err = errutil.New(n, prop, "unknown property")
+		err = errutil.New(n.propN(prop), "unknown property")
 	} else {
 		dst := r.ValueOf(pv)
 		src := r.ValueOf(p.Value())
 		if e := n.pack.Pack(dst, src); e != nil {
-			err = errutil.New(n, prop, "cant unpack because", e)
+			err = errutil.New(n.propN(prop), "cant unpack, because", e)
 		}
 	}
 	return
@@ -77,18 +77,20 @@ func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
 /// SetValue sets the named property to the passed value.
 func (n RefObject) SetValue(prop string, v interface{}) (err error) {
 	if v == nil {
-		panic(errutil.New(n, prop, "is nil"))
+		panic(errutil.New(n.propN(prop), "is nil"))
 	}
 	if p, ok := n.Property(prop); !ok {
-		err = errutil.New(n, prop, "unknown property")
+		err = errutil.New(n.propN(prop), "unknown property")
 	} else {
 		dst := r.New(p.Type()) // create a new destination for the value.
 		src := r.ValueOf(v)
 		if e := n.pack.Pack(dst, src); e != nil {
-			err = errutil.New(n, prop, "cant pack", dst.Type(), "from", src.Type(), "because", e)
+			err = errutil.New(n.propN(prop), "cant pack", dst.Type(), "from", src.Type(), "because", e)
 		} else {
 			err = p.SetValue(dst.Elem().Interface())
 		}
 	}
 	return
 }
+
+func (n RefObject) propN(p string) string { return n.String() + "." + p }

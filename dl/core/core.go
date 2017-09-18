@@ -39,7 +39,6 @@ type Commands struct {
 	*ForEachObj
 	*ForEachText
 	*Get
-	*Global
 	*GreaterThan
 	// *Inc
 	*Includes
@@ -80,5 +79,6 @@ type Commands struct {
 	// *StopNow
 	*Text
 	*Texts
+	*TopObject
 	// *Using
 }

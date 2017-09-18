@@ -10,14 +10,17 @@ type Looper struct {
 	run  rt.Runtime
 	obj  rt.Object
 	loop rt.ExecuteList
+	prev rt.Object
 }
 
 func MakeLooper(run rt.Runtime, temp interface{}, loop rt.ExecuteList) Looper {
 	obj := run.Emplace(temp)
-	runat := rt.AtFinder(run, obj)
-	return Looper{runat, obj, loop}
+	prev := run.SetTop(obj)
+	return Looper{run, obj, loop, prev}
 }
-
+func (l *Looper) pop() {
+	l.run.SetTop(l.prev)
+}
 func (l *Looper) RunNext(name string, value interface{}, hasNext bool) (err error) {
 	var index int
 	if e := l.obj.GetValue("index", &index); e != nil {

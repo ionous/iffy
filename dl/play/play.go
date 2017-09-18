@@ -4,10 +4,10 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/locate"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/event/evtbuilder"
 	"github.com/ionous/iffy/index"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
@@ -104,11 +104,11 @@ func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 		err = e
 	} else if e := unique.RegisterValues(objects, r.objects...); e != nil {
 		err = e
-	} else if rules, e := rule.Master(cmds, core.Xform{}, patterns, std.Rules); e != nil {
+	} else if rules, e := rules.Master(cmds, core.Xform{}, patterns, std.Rules); e != nil {
 		err = e
 	} else if facts, e := r.Build(cmds); e != nil {
 		err = e
-	} else if e := facts.Mandates.Mandate(patterns.Types, rules); e != nil {
+	} else if e := facts.Mandates.Mandate(rules); e != nil {
 		err = e
 	} else {
 		// FIX: create a parser with facts.Grammar

@@ -1,4 +1,4 @@
-package rule
+package rules
 
 import (
 	"github.com/ionous/iffy/pat"

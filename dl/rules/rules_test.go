@@ -1,20 +1,16 @@
-package rule_test
+package rules_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/ident"
-	"github.com/ionous/iffy/pat/rule"
-	"github.com/ionous/iffy/ref/obj"
+	"github.com/ionous/iffy/pat"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
-
-func Int(i int) *core.Num {
-	return &core.Num{float64(i)}
-}
 
 // Factorial computes an integer multiplied by the factorial of the integer below it.
 type Factorial struct {
@@ -23,17 +19,20 @@ type Factorial struct {
 
 func TestFactorial(t *testing.T) {
 	assert := testify.New(t)
+	//
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
+	patterns := unique.NewStack(cmds.ShadowTypes)
+	contract := pat.MakeContract(patterns.Types)
+
 	unique.PanicBlocks(cmds,
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 		(*core.Commands)(nil))
-	patterns := unique.NewStack(classes)
 	unique.PanicTypes(patterns,
 		(*Factorial)(nil))
 	assert.Contains(classes, ident.IdOf("Factorial"), "adding to patterns should add to classes")
 
-	var root struct{ rule.Mandates }
+	var root struct{ rules.Mandates }
 	c := cmds.NewBuilder(&root, core.Xform{})
 	if c.Cmds().Begin() {
 		if c.Cmd("number rule", "factorial").Begin() {
@@ -43,39 +42,34 @@ func TestFactorial(t *testing.T) {
 		}
 		if c.Cmd("number rule", "factorial").Begin() {
 			if c.Param("decide").Cmd("mul", c.Cmd("get", "@", "num")).Begin() {
-				if c.Cmd("determine").Begin() {
-					// alt: register factorial as a shadow class, and trigger a new factorial.
-					// this currently relies on "set num" returning its "this":
-					// therefore "determine" receives the factorial object, and re-runs the pattern.
-					c.Cmd("set num", "@", "num", c.Cmd("sub", c.Cmd("get", "@", "num"), 1))
-					c.End()
-				}
+				c.Cmd("determine", c.Cmd("factorial", c.Cmd("sub", c.Cmd("get", "@", "num"), 1)))
 				c.End()
 			}
 			c.End()
 		}
 		c.End()
 	}
-	rules := rule.MakeRules()
 	//
 	if e := c.Build(); assert.NoError(e) {
 		if els := root.Mandates; assert.Len(els, 2) {
 			// test.Log(pretty.Sprint(els))
-			if e := els.Mandate(patterns.Types, rules); e != nil {
+			if e := els.Mandate(contract); e != nil {
 				t.Fatal(e)
 			}
 		}
 	}
 	//
-	objects := obj.NewObjects()
-	run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
-	peal := run.GetPatterns()
-	if numberPatterns := peal.Numbers; assert.Len(numberPatterns, 1) {
-		if factPattern := numberPatterns[ident.IdOf("factorial")]; assert.Len(factPattern, 2) {
-			//
-			if n, e := run.GetNumMatching(run, run.Emplace(&Factorial{3})); assert.NoError(e) {
-				fac := 3 * (2 * (1 * 1))
-				assert.EqualValues(fac, n)
+
+	// check that what we want made it into the rule book
+	if assert.Len(contract.Numbers, 1) {
+		if ft, ok := contract.Types[ident.IdOf("factorial")]; assert.True(ok) {
+			if factPattern := contract.Numbers[ft]; assert.Len(factPattern, 2) {
+				// run the rule
+				run := rtm.New(classes).Rules(contract).Rtm()
+				if n, e := run.GetNumMatching(run.Emplace(&Factorial{3})); assert.NoError(e) {
+					fac := 3 * (2 * (1 * 1))
+					assert.EqualValues(fac, n)
+				}
 			}
 		}
 	}

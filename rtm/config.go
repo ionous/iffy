@@ -1,15 +1,14 @@
 package rtm
 
 import (
+	"bytes"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/pat"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/printer"
 	"io"
 )
 
@@ -19,7 +18,7 @@ type Config struct {
 	events    event.EventMap
 	grammar   parser.Scanner
 	objects   *obj.ObjBuilder
-	patterns  *pat.Patterns
+	ruleMap   pat.Rulebook
 	rel       rel.RelationBuilder
 	seed      int64
 	writer    io.Writer
@@ -39,33 +38,27 @@ func (c *Config) Events(events event.EventMap) *Config {
 	c.events = events
 	return c
 }
-
 func (c *Config) Grammar(r *parser.AnyOf) *Config {
 	c.grammar = r
 	return c
 }
-
 func (c *Config) Objects(o *obj.ObjBuilder) *Config {
 	c.objects = o
 	return c
 }
-
 func (c *Config) Relations(r rel.RelationBuilder) *Config {
 	c.rel = r
 	return c
 }
-
 func (c *Config) Randomize(seed int64) *Config {
 	c.seed = seed
 	return c
 }
-
-func (c *Config) Rules(p rule.Rules) *Config {
+func (c *Config) Rules(p pat.Contract) *Config {
 	p.Sort()
-	c.patterns = &p.Patterns
+	c.ruleMap = p.Rulebook
 	return c
 }
-
 func (c *Config) Writer(w io.Writer) *Config {
 	c.writer = w
 	return c
@@ -83,7 +76,7 @@ func (c *Config) Rtm() *Rtm {
 	if cw := c.writer; cw != nil {
 		w = cw
 	} else {
-		var cw printer.Lines
+		var cw bytes.Buffer
 		w = &cw
 	}
 	//
@@ -91,15 +84,13 @@ func (c *Config) Rtm() *Rtm {
 		Types:     c.classes,
 		Relations: rel,
 		Ancestors: a,
-		Writer:    w,
+		writer:    w,
 		Scanner:   c.grammar,
 		Events:    c.events,
+		rules:     c.ruleMap,
 	}
 	if c.objects != nil {
 		rtm.Objects = c.objects.Build(rtm)
-	}
-	if c.patterns != nil {
-		rtm.Patterns = *c.patterns
 	}
 	//
 	seed := c.seed

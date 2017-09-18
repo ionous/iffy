@@ -2,8 +2,8 @@ package std_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -24,7 +24,7 @@ func TestArticles(t *testing.T) {
 	unique.PanicBlocks(cmds,
 		(*std.Commands)(nil),
 		(*core.Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 	)
 
 	unique.PanicBlocks(classes,
@@ -40,7 +40,7 @@ func TestArticles(t *testing.T) {
 		&std.Kind{Name: "trevor", CommonProper: std.ProperNamed},
 	)
 
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, std.PrintNameRules)
+	rules, e := rules.Master(cmds, core.Xform{}, patterns, std.PrintNameRules)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -48,18 +48,22 @@ func TestArticles(t *testing.T) {
 
 	match := func(t *testing.T, expected string, fn func(spec.Block)) {
 		var lines printer.Lines
-		var root struct{ rt.Execute }
-		run := rt.Writer(run, &lines)
-		c := cmds.NewBuilder(&root, core.Xform{})
-		if e := c.Build(fn); e != nil {
-			t.Fatal(e)
-		} else if e := root.Execute.Execute(run); e != nil {
-			t.Fatal(e)
-		} else {
-			l := lines.Lines()
-			if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
-				t.Fatal(d)
+		if e := rt.WritersBlock(run, &lines, func() (err error) {
+			var root struct{ rt.Execute }
+			c := cmds.NewBuilder(&root, core.Xform{})
+			if e := c.Build(fn); e != nil {
+				err = e
+			} else if e := root.Execute.Execute(run); e != nil {
+				err = e
+			} else {
+				l := lines.Lines()
+				if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
+					err = e
+				}
 			}
+			return
+		}); e != nil {
+			t.Fatal(e)
 		}
 	}
 	// lower a/n

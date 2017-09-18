@@ -2,10 +2,10 @@ package event_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/event/evtbuilder"
 	"github.com/ionous/iffy/ident"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -51,7 +51,7 @@ func TestSomething(t *testing.T) {
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
-		(*rule.Commands)(nil))
+		(*rules.Commands)(nil))
 
 	unique.PanicTypes(classes,
 		(*Kind)(nil))
@@ -85,7 +85,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, DefaultActions)
+	rules, e := rules.Master(cmds, core.Xform{}, patterns, DefaultActions)
 	assert.NoError(e)
 
 	// we do this the manual way first, and later with spec
@@ -153,7 +153,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	lines = printer.Lines{}
-	run.Writer = &lines
+	run.SetWriter(&lines)
 	//
 	assert.NoError(event.Trigger(run, listen.EventMap, jump))
 	assert.Equal(sliceOf.String("don't do it bogart!"), lines.Lines())

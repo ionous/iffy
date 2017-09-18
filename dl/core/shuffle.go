@@ -17,7 +17,7 @@ type ShuffleCounter struct {
 }
 
 func (l *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, ok := run.FindObject(l.Id); !ok {
+	if obj, ok := run.GetObject(l.Id); !ok {
 		err = errutil.New("couldnt find", l.Id)
 	} else {
 		var curr int

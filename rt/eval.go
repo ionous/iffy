@@ -8,6 +8,7 @@ const StreamEnd errutil.Error = "stream end"
 const StreamExceeded errutil.Error = "stream exceeded"
 
 type Execute interface {
+	// fix: rename to Run() to simplify look of Execute.Execute with embedded
 	Execute(Runtime) error
 }
 type BoolEval interface {

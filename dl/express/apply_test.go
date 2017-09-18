@@ -24,7 +24,6 @@ func TestApply(t *testing.T) {
 	const (
 		partStr    = "{status.score}"
 		twoPartStr = "{status.score}/{story.turn}"
-		// cmdStr     = "{go TestThe example}"
 		// ifElseStr    = "{if x}{status.score}{else}{story.turnCount}{endif}"
 	)
 	classes := make(unique.Types)
@@ -64,10 +63,10 @@ func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
 }
 
 func partsFn() rt.TextEval {
-	return &Render{core.Get{
+	return &Render{
 		Obj:  &GetAt{Prop: "status"},
 		Prop: "score",
-	}}
+	}
 }
 
 func twoPartFn() rt.TextEval {
@@ -77,18 +76,18 @@ func twoPartFn() rt.TextEval {
 			// but we need the command array interface to allow one/many/commands more transparently
 			// also, maybe say should implement both get text and execute -- buffer eveerything up in the get text version.
 			&core.Say{
-				&Render{core.Get{
+				&Render{
 					Obj:  &GetAt{Prop: "status"},
 					Prop: "score",
-				}}},
+				}},
 			&core.Say{
 				&core.Text{"/"},
 			},
 			&core.Say{
-				&Render{core.Get{
+				&Render{
 					Obj:  &GetAt{Prop: "story"},
 					Prop: "turn",
-				}},
+				},
 			},
 		},
 	}
