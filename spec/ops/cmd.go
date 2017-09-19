@@ -42,12 +42,12 @@ func (c *Command) Assign(key string, arg interface{}) (err error) {
 	return
 }
 
-// dst is the field we are setting; src the value specified in the command script.
-func (c *Command) setField(dst r.Value, src interface{}) (err error) {
-	switch src := src.(type) {
+// dst is the field we are setting; v the value specified in the command script.
+func (c *Command) setField(dst r.Value, v interface{}) (err error) {
+	switch v := v.(type) {
 	case *Command:
 		// all commands are interfaces are implemented with pointers
-		targetPtr := src.target.Addr()
+		targetPtr := v.target.Addr()
 		if e := coerce.Value(dst, targetPtr); e != nil {
 			err = errutil.New("couldnt assign command", e)
 		}
@@ -61,7 +61,7 @@ func (c *Command) setField(dst r.Value, src interface{}) (err error) {
 			}
 		} else {
 			slice, elType := dst, dst.Type().Elem()
-			for _, c := range src.els {
+			for _, c := range v.els {
 				// all commands are interfaces are implemented with pointers
 				rvalue := c.target.Addr()
 				if from := rvalue.Type(); !from.AssignableTo(elType) {
@@ -74,24 +74,36 @@ func (c *Command) setField(dst r.Value, src interface{}) (err error) {
 			dst.Set(slice)
 		}
 	default:
-		if v, e := xform(c.xform, src, dst.Type()); e != nil {
-			err = e
-		} else if v == nil {
-			err = errutil.New("transform is empty")
-		} else if e := coerce.Value(dst, r.ValueOf(v)); e != nil {
-			err = errutil.New("couldnt assign value", e)
+		src := r.ValueOf(v)
+		if dst.Kind() != r.Slice || src.Kind() != r.Slice {
+			err = c.setValue(dst, src)
+		} else {
+			err = coerce.Slice(dst, src, func(del, sel r.Value) error {
+				return c.setValue(del, sel)
+			})
 		}
 	}
 	return
 }
 
+func (c *Command) setValue(dst r.Value, src r.Value) (err error) {
+	if v, e := xform(c.xform, src, dst.Type()); e != nil {
+		err = e
+	} else if !v.IsValid() {
+		err = errutil.New("transform is empty")
+	} else if e := coerce.Value(dst, v); e != nil {
+		err = errutil.New("couldnt assign value", e)
+	}
+	return
+}
+
 // helper for managing errror
-func xform(x Transform, v interface{}, hint r.Type) (ret interface{}, err error) {
+func xform(x Transform, src r.Value, hint r.Type) (ret r.Value, err error) {
 	// if the destintation slot in the command is an interface -- ie. another command.
 	if hint.Kind() == r.Interface {
-		ret, err = x.TransformValue(v, hint)
+		ret, err = x.TransformValue(src, hint)
 	} else {
-		ret = v
+		ret = src
 	}
 	return
 }

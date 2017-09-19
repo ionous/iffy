@@ -7,7 +7,7 @@ import (
 
 type ShuffleText struct {
 	Id     string
-	Values []string
+	Values []rt.TextEval
 }
 
 type ShuffleCounter struct {
@@ -48,8 +48,8 @@ func (l *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
 					err = e
 				} else {
 					sel := int(indices[curr])
-					ret = l.Values[sel]
-
+					at := l.Values[sel]
+					ret, err = at.GetText(run)
 				}
 			}
 		}

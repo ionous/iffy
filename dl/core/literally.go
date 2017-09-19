@@ -10,11 +10,11 @@ import (
 type Xform struct{}
 
 // returns src if no error but couldnt convert.
-func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, err error) {
-	if x := literally(val, hint); x != nil {
-		ret = x
+func (ts Xform) TransformValue(src r.Value, hint r.Type) (ret r.Value, err error) {
+	if v := literally(src, hint); v != nil {
+		ret = r.ValueOf(v)
 	} else {
-		ret = val
+		ret = src
 	}
 	return
 }
@@ -27,17 +27,24 @@ func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, e
 // c.Cmd("get").Begin() { c.Cmd("object", "@") c.Value("text") }
 // c.Cmd("get", "@", "text")
 //
-func literally(v interface{}, dstType r.Type) (ret interface{}) {
-	switch v := v.(type) {
-	case bool:
+func literally(src r.Value, dstType r.Type) (ret interface{}) {
+	switch rtype := src.Type(); {
+	case kindOf.Bool(rtype):
+		v := src.Bool()
 		ret = &Bool{v}
-	case float64:
+
+	case kindOf.Int(rtype):
+		v := src.Int()
+		ret = &Num{float64(v)}
+
+	case kindOf.Float(rtype):
+		v := src.Float()
 		ret = &Num{v}
-	case []float64:
-		ret = &Numbers{v}
+
 	// -- string for a command.
-	case string:
+	case rtype.Kind() == r.String:
 		// could be text or object --
+		v := src.String()
 		switch {
 		case kindOf.TextEval(dstType):
 			ret = &Text{v}
@@ -48,23 +55,18 @@ func literally(v interface{}, dstType r.Type) (ret interface{}) {
 				ret = &Object{v}
 			}
 		}
-	case []string:
+
+	case rtype.Kind() == r.Slice && kindOf.Float(rtype.Elem()):
+		v := src.Interface().([]float64)
+		ret = &Numbers{v}
+
+	case rtype.Kind() == r.Slice && kindOf.String(rtype.Elem()):
+		v := src.Interface().([]string)
 		switch {
 		case kindOf.TextListEval(dstType):
 			ret = &Texts{v}
 		case kindOf.ObjListEval(dstType):
 			ret = &Objects{v}
-		}
-	default:
-		{
-			v := r.ValueOf(v)
-			if kindOf.Float(v.Type()) {
-				v := v.Float()
-				ret = &Num{v}
-			} else if kindOf.Int(v.Type()) {
-				v := v.Int()
-				ret = &Num{float64(v)}
-			}
 		}
 	}
 	return

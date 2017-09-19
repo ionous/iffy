@@ -13,7 +13,7 @@ type StoppingCounter struct {
 
 type StoppingText struct {
 	Id     string
-	Values []string
+	Values []rt.TextEval
 }
 
 func (l *StoppingText) GetText(run rt.Runtime) (ret string, err error) {
@@ -27,7 +27,8 @@ func (l *StoppingText) GetText(run rt.Runtime) (ret string, err error) {
 		if e := obj.SetValue("curr", next); e != nil {
 			err = e
 		} else {
-			ret = l.Values[curr]
+			at := l.Values[curr]
+			ret, err = at.GetText(run)
 		}
 	}
 	return
