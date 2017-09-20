@@ -21,6 +21,11 @@ func Lowercase(w io.Writer) io.Writer {
 	return &_Lowercase{Writer: w}
 }
 
+// Slash filters io.Writer, separating writes with a slash.
+func Slash(w io.Writer) io.Writer {
+	return &_Slash{Writer: w}
+}
+
 // Spanning filters io.Writer as per Span, writing the final result to the passed buffer.
 func Spanning(w io.Writer) io.Writer {
 	return &_Spanning{w: w}
@@ -45,6 +50,11 @@ type _Lowercase struct {
 	io.Writer
 }
 
+type _Slash struct {
+	io.Writer
+	cnt int
+}
+
 type _Spanning struct {
 	Span
 	w io.Writer
@@ -56,10 +66,16 @@ type _TitleCase struct {
 
 func (l *_Bracket) Write(p []byte) (ret int, err error) {
 	if l.cnt == 0 {
-		io.WriteString(l.Writer, "(")
+		n, e := io.WriteString(l.Writer, "(")
+		l.cnt += n
+		err = e
 	}
-	l.cnt++
-	return l.Writer.Write(p)
+	if err == nil {
+		ret, err = l.Writer.Write(p)
+		l.cnt += ret
+	}
+	return
+
 }
 
 // Close to terminate the parenthesis.
@@ -82,6 +98,18 @@ func (l *_Capitalize) Write(p []byte) (ret int, err error) {
 
 func (l *_Lowercase) Write(p []byte) (int, error) {
 	return io.WriteString(l.Writer, strings.ToLower((string(p))))
+}
+
+func (l *_Slash) Write(p []byte) (ret int, err error) {
+	if l.cnt == 0 {
+		n, _ := io.WriteString(l.Writer, "/")
+		l.cnt += n
+	}
+	if err == nil {
+		ret, err = l.Writer.Write(p)
+		l.cnt += ret
+	}
+	return
 }
 
 func (l *_Spanning) Close() (err error) {

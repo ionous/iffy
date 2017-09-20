@@ -4,24 +4,24 @@ import (
 	"github.com/ionous/iffy/spec"
 )
 
-type GenerateId interface {
-	GenerateId(string) string
+type NewName interface {
+	NewName(string) string
 }
-type ExpressionParser func(spec.Block, string) error
+type DirectiveParser func(spec.Block, []string) error
 
 type Factory struct {
-	gen       GenerateId
-	parseExpr ExpressionParser
+	gen            NewName
+	parseDirective DirectiveParser
 }
 
-func MakeFactory(gen GenerateId, parseExpr ExpressionParser) Factory {
-	return Factory{gen, parseExpr}
+func MakeFactory(gen NewName, parseDirective DirectiveParser) Factory {
+	return Factory{gen, parseDirective}
 }
 
 // Tokenize turns a string into a template.
 func (f Factory) Tokenize(s string) (ret Template, okay bool) {
-	if ts, cnt := tokenize(s); cnt > 0 {
-		okay, ret = true, Template{ts, f.gen, f.parseExpr}
+	if ts := Tokenize(s); len(ts) > 0 {
+		okay, ret = true, Template{ts, f.gen, f.parseDirective}
 	}
 	return
 }

@@ -2,11 +2,12 @@ package std
 
 import "github.com/ionous/iffy/spec"
 
-func commenceRules(c spec.Block) {
+func storyRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "commence").Begin() {
 		if c.Param("decide").Cmds().Begin() {
-			c.Cmd("set text", "story", "status left", "{go determine playerSurroundings}")
+			c.Cmd("set text", "story", "status left", "{determine playerSurroundings}")
+			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
 			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
 			c.End()
 		}
@@ -23,6 +24,23 @@ func commenceRules(c spec.Block) {
 		}
 		c.End()
 	}
+	if c.Cmd("run rule", "construct status line").Begin() {
+		c.Cmd("say", "{story.statusLeft}")
+		c.Cmd("say", "{story.statusRight}")
+		c.End()
+	}
+
+	if c.Cmd("run rule", "print banner text").Begin() {
+		// FIX: REALLY SHOULD HAVE ELSE IN TEMPLATE
+		if c.Cmd("say").Begin() {
+			c.Param("text").Val("{story.name}")
+			c.Param("else").Val("Welcome")
+			c.End()
+		}
+		c.End()
+	}
+	// *PrintBannerText
+	// *ConstructStatusLine
 }
 
 // func updateScore(c spec.Block) {

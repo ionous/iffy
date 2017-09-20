@@ -1,27 +1,29 @@
-package express
+package template
 
 import (
 	"regexp"
 	"strings"
 )
 
+// Token contains either a run of plain text, or a run of text from inside braces.
+// Unlike a traditional token, a token's text can contain whitespaces.
 type Token struct {
 	Pos   int
 	Str   string
 	Plain bool
 }
 
+// String returns the token's text.
 func (f Token) String() string {
 	return f.Str
 }
 
+// Fields splits the token into whitespace chunks.
 func (f Token) Fields() []string {
 	return strings.Fields(f.Str)
 }
 
-// CheckFor looks at the token to determine if it's command-like
-// Basically, you cant do complex stuff inside of {} and thats okay.
-// If you need to, you establish a new pattern with simple parameters drawn from the object.
+// CheckFor determines if the token starts with the given text.
 func (f Token) CheckFor(name string) (ret []string, okay bool) {
 	if !f.Plain {
 		parts := strings.Fields(f.Str)
@@ -36,21 +38,12 @@ func (f Token) CheckFor(name string) (ret []string, okay bool) {
 
 var x *regexp.Regexp
 
-type Template []Token
-
-// Tokenize
-func Tokenize(s string) (ret Template, okay bool) {
-	if ts, cnt := tokenize(s); cnt > 0 {
-		ret, okay = ts, true
-	}
-	return
-}
-
-func tokenize(s string) (tokens []Token, symbols int) {
+// Tokenize splits the string into tokens.
+func Tokenize(s string) (ret []Token) {
+	var ts []Token
 	if x == nil {
 		x = regexp.MustCompile(`({}|{[^{][^}]*})`)
 	}
-
 	res := x.FindAllStringIndex(s, -1)
 	start := 0
 	//[[0 6] [11 17] [23 30]]
@@ -59,26 +52,28 @@ func tokenize(s string) (tokens []Token, symbols int) {
 		x, y := l[0], l[1]
 		if x > start {
 			plain := s[start:x]
-			tokens = append(tokens, Token{
+			ts = append(ts, Token{
 				Str:   plain,
 				Pos:   start,
 				Plain: true,
 			})
 		}
 		word := s[x+1 : y-1]
-		start, tokens = y, append(tokens, Token{
+		start, ts = y, append(ts, Token{
 			Str: word,
 			Pos: x,
 		})
-		symbols++
 	}
 	if cnt := len(s); cnt > start {
 		plain := s[start:cnt]
-		tokens = append(tokens, Token{
+		ts = append(ts, Token{
 			Str:   plain,
 			Pos:   start,
 			Plain: true,
 		})
+	}
+	if len(ts) > 1 || (len(ts) == 1 && !ts[0].Plain) {
+		ret = ts
 	}
 	return
 }

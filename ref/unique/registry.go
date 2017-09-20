@@ -93,17 +93,3 @@ func RegisterTypes(reg TypeRegistry, ptrs ...interface{}) (err error) {
 	}
 	return
 }
-
-// RegisterValues registers multiple pointer values.
-func RegisterValues(reg ValueRegistry, vals ...interface{}) (err error) {
-	for i, v := range vals {
-		if rval, e := ValuePtr(v); e != nil {
-			err = errutil.New("RegisterValue", i, e)
-			break
-		} else if e := reg.RegisterValue(rval); e != nil {
-			err = errutil.New("RegisterValue", i, e)
-			break
-		}
-	}
-	return
-}

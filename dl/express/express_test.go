@@ -80,7 +80,7 @@ func nparse(t *testing.T, s string) (ret ast.Expr) {
 
 func nconvert(t *testing.T, cmds *ops.Ops, dst interface{}, n ast.Expr) {
 	c := cmds.NewBuilder(dst, core.Xform{})
-	if e := ConvertExpr(c, n); e != nil {
+	if e := astExpr(c, n, false); e != nil {
 		t.Fatal(e, pretty.Sprint(n))
 	} else if e := c.Build(); e != nil {
 		t.Fatal(e, pretty.Sprint(n))

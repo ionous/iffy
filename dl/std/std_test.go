@@ -26,9 +26,9 @@ func TestStd(t *testing.T) {
 	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
-		Thingaverse.objects(sliceOf.String("apple", "pen", "thing#1", "thing#2"))...)
+	var objects obj.Registry
+	objects.RegisterValues(Thingaverse.objects(sliceOf.String(
+		"apple", "pen", "thing#1", "thing#2")))
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
@@ -45,7 +45,8 @@ func TestStd(t *testing.T) {
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".
 		// TODO: add test for: A novel is a kind of thing. Dr Zhivago and Persuasion are novels. Before printing the name of a novel, say "[italic type]". After printing the name of a novel, say "[roman type]".”
-		run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
+		run, e := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
+		assert.NoError(e)
 		//
 		match := func(t *testing.T, what string, op interface{}) {
 			var buf bytes.Buffer

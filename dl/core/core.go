@@ -4,9 +4,6 @@ type Classes struct {
 	*NumberCounter
 	*TextCounter
 	*ObjCounter
-}
-
-type Counters struct {
 	*CycleCounter
 	*ShuffleCounter
 	*StoppingCounter
@@ -51,6 +48,7 @@ type Commands struct {
 	// *IsObj
 	// *IsText
 	// *IsValid
+	*Join
 	*Len
 	*LesserThan
 	*NotEqualTo
@@ -64,6 +62,7 @@ type Commands struct {
 	*PrintList
 	*PrintNum
 	*PrintNumWord
+	*PrintSlash
 	*PrintSpan
 	*Say
 	*Range

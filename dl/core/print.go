@@ -13,8 +13,13 @@ type PrintSpan struct {
 	Block rt.ExecuteList
 }
 
-// PrintSpan sandwiches text inside parenthesis.
+// PrintBracket sandwiches text inside parenthesis.
 type PrintBracket struct {
+	Block rt.ExecuteList
+}
+
+// PrintSlash separates text with a left-leaning slash.
+type PrintSlash struct {
 	Block rt.ExecuteList
 }
 
@@ -78,8 +83,19 @@ func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 	return err
 }
 
-func (p *Say) Execute(run rt.Runtime) error {
-	return Print(run, p.Text)
+func (p *PrintSlash) Execute(run rt.Runtime) error {
+	return rt.WritersBlock(run, printer.Slash(run.Writer()), func() error {
+		return p.Block.Execute(run)
+	})
+}
+
+func (p *Say) Execute(run rt.Runtime) (err error) {
+	if s, e := p.Text.GetText(run); e != nil {
+		err = e
+	} else if len(s) > 0 {
+		_, err = io.WriteString(run, s)
+	}
+	return
 }
 
 func Print(run rt.Runtime, text rt.TextEval) (err error) {

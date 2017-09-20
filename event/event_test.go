@@ -59,12 +59,12 @@ func TestSomething(t *testing.T) {
 	unique.RegisterTypes(events,
 		(*Jump)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
+	var objects obj.Registry
+	objects.RegisterValues(sliceOf.Interface(
 		&Kind{"Bogart"},
 		&Kind{"Bob"},
 		&Kind{"Coffin"},
-		&Kind{"Skeleton Key"})
+		&Kind{"Skeleton Key"}))
 
 	// default action:
 	DefaultActions := func(c spec.Block) {
@@ -91,7 +91,10 @@ func TestSomething(t *testing.T) {
 	// we do this the manual way first, and later with spec
 
 	var lines printer.Lines
-	run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
+	run, e := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	listen := evtbuilder.NewListeners(events.Types)
 	// object listener:

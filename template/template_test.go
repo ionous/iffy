@@ -2,6 +2,7 @@ package template_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
@@ -14,21 +15,6 @@ import (
 )
 
 func TestStates(t *testing.T) {
-	classes := make(unique.Types)
-	cmds := ops.NewOps(classes)
-	gen := unique.NewObjectGenerator()
-
-	unique.PanicBlocks(cmds,
-		(*core.Commands)(nil))
-
-	unique.PanicBlocks(gen,
-		(*core.Counters)(nil))
-
-	ts := template.MakeFactory(gen, func(c spec.Block, in string) error {
-		c.Cmd("get", "@", in)
-		return nil
-	})
-
 	tests := map[string]struct {
 		str    string
 		expect rt.TextEval
@@ -153,6 +139,11 @@ func TestStates(t *testing.T) {
 			}},
 		},
 	}
+	classes := make(unique.Types)
+	cmds := ops.NewOps(classes)
+
+	unique.PanicBlocks(cmds,
+		(*core.Commands)(nil))
 
 	for k, test := range tests {
 		str, expect := test.str, test.expect
@@ -160,7 +151,7 @@ func TestStates(t *testing.T) {
 			continue
 		}
 		t.Run(k, func(t *testing.T) {
-			gen.ResetIds()
+			ts := template.MakeFactory(make(ident.Counters), directives)
 			if tmpl, ok := ts.Tokenize(str); !ok {
 				t.FailNow()
 			} else {
@@ -204,3 +195,11 @@ var z = &core.Get{Obj: &core.TopObject{}, Prop: "z"}
 var a = &core.Join{[]rt.TextEval{&core.Text{Text: " a "}}}
 var b = &core.Join{[]rt.TextEval{&core.Text{Text: " b "}}}
 var c = &core.Join{[]rt.TextEval{&core.Text{Text: " c "}}}
+
+// directives is a mock directive parser
+// our input is always one letter: x,y,z:
+// and we just generate an object property command for the test.
+func directives(c spec.Block, in []string) error {
+	c.Cmd("get", "@", in[0])
+	return nil
+}

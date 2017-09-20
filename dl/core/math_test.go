@@ -20,7 +20,10 @@ func TestMath(t *testing.T) {
 		(*core.Classes)(nil),
 	)
 	//
-	run := rtm.New(classes).Rtm()
+	run, e := rtm.New(classes).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 	//
 	match := func(t *testing.T, v float64, fn func(spec.Block)) (err error) {
 		var n tests.Number

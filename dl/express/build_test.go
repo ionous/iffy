@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-// TestBuild tp ensure we can use templates for eval properties other than text.
+// TestBuild to ensure we can use templates for eval properties other than text.
 func TestBuild(t *testing.T) {
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
@@ -28,22 +28,24 @@ func TestBuild(t *testing.T) {
 	unique.PanicBlocks(patterns,
 		(*std.Patterns)(nil))
 
+	xform := MakeXform(cmds, nil)
+
 	t.Run("property", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
-		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
+		c := cmds.NewBuilder(&root, xform)
 		c.Cmd("test score", "{val}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
 		} else {
 			testEqual(t, &TestScore{
-				&GetAt{Prop: "val"},
+				&GetAt{"val"},
 			}, root.NumberEval)
 		}
 	})
 	//
 	t.Run("global", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
-		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
+		c := cmds.NewBuilder(&root, xform)
 		c.Cmd("test score", "{Story.score}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
@@ -56,7 +58,7 @@ func TestBuild(t *testing.T) {
 	//
 	t.Run("run", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
-		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
+		c := cmds.NewBuilder(&root, xform)
 		c.Cmd("test score", "{go testScore Story.score}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
@@ -70,8 +72,8 @@ func TestBuild(t *testing.T) {
 	//
 	t.Run("determine", func(t *testing.T) {
 		var root struct{ rt.Execute }
-		c := cmds.NewBuilder(&root, Xform{cmds: cmds})
-		c.Val("{go determine printName Story}")
+		c := cmds.NewBuilder(&root, xform)
+		c.Val("{determine printName Story}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
 		}

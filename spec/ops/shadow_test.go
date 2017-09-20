@@ -17,7 +17,6 @@ import (
 )
 
 func TestShadows(t *testing.T) {
-	assert := testify.New(t)
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
 
@@ -51,15 +50,16 @@ func TestShadows(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	objects := obj.NewObjects()
+	var objects obj.Registry
 	base, other := &BaseClass{Name: "base"}, &BaseClass{Name: "other"}
-	unique.PanicValues(objects,
-		base, other,
-	)
+	objects.RegisterValues(sliceOf.Interface(base, other))
+	//
 	var lines printer.Lines
-	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
-	// "shadow class tests.BaseClass couldn't create object"
-	if obj, e := root.Object.GetObject(run); assert.NoError(e) {
+	if run, e := rtm.New(classes).Objects(objects).Writer(&lines).Rtm(); e != nil {
+		t.Fatal(e)
+	} else if obj, e := root.Object.GetObject(run); e != nil {
+		t.Fatal(e)
+	} else {
 		baseId, otherId := ident.IdOf("base"), ident.IdOf("other")
 		vals := map[string]struct{ match, fail interface{} }{
 			"Num":     {3, 5},
@@ -73,7 +73,8 @@ func TestShadows(t *testing.T) {
 		}
 		for name, test := range vals {
 			cp := r.New(r.ValueOf(test.match).Type()).Elem()
-			if e := obj.GetValue(name, cp.Addr().Interface()); !assert.NoError(e) {
+			if e := obj.GetValue(name, cp.Addr().Interface()); e != nil {
+				t.Fatal(e)
 				break
 			} else if !testify.ObjectsAreEqualValues(test.match, cp.Interface()) {
 				t.Fatal("failed to match", name)

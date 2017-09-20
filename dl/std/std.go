@@ -26,6 +26,8 @@ type Patterns struct {
 	*PrintContent
 	*Commence
 	*PlayerSurroundings
+	*PrintBannerText
+	*ConstructStatusLine
 	// *DescribeFirstRoom
 	// *EndTurn
 	// *PrintBanner

@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/std"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
@@ -22,7 +23,6 @@ func TestApply(t *testing.T) {
 	const (
 		partStr    = "{status.score}"
 		twoPartStr = "{status.score}/{story.turn}"
-		// ifElseStr    = "{if x}{status.score}{else}{story.turnCount}{endif}"
 	)
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
@@ -35,69 +35,45 @@ func TestApply(t *testing.T) {
 	unique.PanicTypes(cmds,
 		(*TestThe)(nil))
 
+	xf := MakeXform(cmds, ident.Counters{})
+
 	t.Run("parts", func(t *testing.T) {
 		testEqual(t, partsFn(),
-			templatize(t, partStr, cmds))
+			templatize(t, xf, partStr))
 	})
 	t.Run("two parts", func(t *testing.T) {
 		testEqual(t, twoPartFn(),
-			templatize(t, twoPartStr, cmds))
+			templatize(t, xf, twoPartStr))
 	})
-	// t.Run("cmds", func(t *testing.T) {
-	// testEqual(t, cmdsFn(),
-	// 	templatize(t, cmdStr, cmds))
-	// })
 }
 
-func templatize(t *testing.T, s string, cmds *ops.Ops) (ret rt.TextEval) {
-	xf := Xform{cmds: cmds}
+func templatize(t *testing.T, xform ops.Transform, s string) (ret rt.TextEval) {
 	rtype := r.TypeOf((*rt.TextEval)(nil)).Elem()
-	if r, e := xf.TransformValue(s, rtype); e != nil {
+	if r, e := xform.TransformValue(r.ValueOf(s), rtype); e != nil {
 		t.Fatal(e)
 	} else {
-		ret = r.(rt.TextEval)
+		ret = r.Interface().(rt.TextEval)
 	}
 	return
 }
 
 func partsFn() rt.TextEval {
 	return &Render{
-		Obj:  &GetAt{Prop: "status"},
+		Obj:  &GetAt{"status"},
 		Prop: "score",
 	}
 }
 
 func twoPartFn() rt.TextEval {
-	return &core.Buffer{
-		rt.ExecuteList{
-			// FIX: we should be able to "say" multiple things --
-			// but we need the command array interface to allow one/many/commands more transparently
-			// also, maybe say should implement both get text and execute -- buffer eveerything up in the get text version.
-			&core.Say{
-				&Render{
-					Obj:  &GetAt{Prop: "status"},
-					Prop: "score",
-				}},
-			&core.Say{
-				&core.Text{"/"},
-			},
-			&core.Say{
-				&Render{
-					Obj:  &GetAt{Prop: "story"},
-					Prop: "turn",
-				},
-			},
+	return &core.Join{[]rt.TextEval{
+		&Render{
+			Obj:  &GetAt{"status"},
+			Prop: "score",
 		},
-	}
-}
-
-func cmdsFn() rt.TextEval {
-	return &core.Buffer{[]rt.Execute{
-		&core.Say{
-			Text: &TestThe{
-				&core.Object{Name: "example"},
-			},
+		&core.Text{"/"},
+		&Render{
+			Obj:  &GetAt{"story"},
+			Prop: "turn",
 		},
-	},
-	}
+	}}
 }

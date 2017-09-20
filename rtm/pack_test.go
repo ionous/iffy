@@ -3,7 +3,6 @@ package rtm_test
 import (
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/obj"
-	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rtm"
 	. "github.com/ionous/iffy/tests"
@@ -16,7 +15,7 @@ func TestRegistration(t *testing.T) {
 	assert := testify.New(t)
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
-	run := rtm.New(nil).Objects(newObjects(first, second)).Rtm()
+	run := newRuntime(first, second)
 	if n, ok := run.GetObject("first"); assert.True(ok) {
 		assert.Equal(ident.IdOf("$first"), n.Id())
 	}
@@ -31,7 +30,7 @@ func TestStateAccess(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
 	//
-	run := rtm.New(nil).Objects(newObjects(first, second)).Rtm()
+	run := newRuntime(first, second)
 	test := func(name, prop string, value bool) {
 		if obj, ok := run.GetObject(name); assert.True(ok) {
 			var res bool
@@ -60,7 +59,7 @@ func TestStateSet(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true, Object: ident.IdOf("second")}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe, Object: ident.IdOf("first")}}
 
-	run := rtm.New(nil).Objects(newObjects(first, second)).Rtm()
+	run := newRuntime(first, second)
 	unpackValue := func(obj rt.Object, name string, pv interface{}) {
 		if e := obj.GetValue(name, pv); e != nil {
 			panic(e)
@@ -125,17 +124,21 @@ func TestStateSet(t *testing.T) {
 	toggle("second", "labeled", false)
 }
 
-func newObjects(ptrs ...interface{}) *obj.ObjBuilder {
-	reg := obj.NewObjects()
-	unique.PanicValues(reg, ptrs...)
-	return reg
+func newRuntime(ptrs ...interface{}) rt.Runtime {
+	var objects obj.Registry
+	objects.RegisterValues(ptrs)
+	run, e := rtm.New(nil).Objects(objects).Rtm()
+	if e != nil {
+		panic(e)
+	}
+	return run
 }
 
 // TestPropertyAccess to ensure normal properties are accessible
 func TestPropertyAccess(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true, Object: ident.IdOf("second")}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe, Object: ident.IdOf("first")}}
-	run := rtm.New(nil).Objects(newObjects(first, second)).Rtm()
+	run := newRuntime(first, second)
 
 	// we create some slots for values to be unpacked into
 	var expected = []struct {

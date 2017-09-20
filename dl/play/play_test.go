@@ -21,7 +21,7 @@ import (
 // define the gramar, and the handler in cmds
 // dont worry about defineing the objects/classes as cmds.
 
-func TestPlay(t *testing.T) {
+func xTestPlay(t *testing.T) {
 	assert := testify.New(t)
 
 	type Jump struct {
@@ -47,7 +47,7 @@ func TestPlay(t *testing.T) {
 	} else {
 		// 4. initial position
 		// 3. banner
-		// 2. evaluate status bars
+		// -. evaluate status bars
 		// 1. commence game
 		// 5. "read" input
 		// 6. trigger related command
@@ -55,7 +55,7 @@ func TestPlay(t *testing.T) {
 		// When play begins: say "Welcome to Old Marston Grange, a country house cut off by fog."
 		// ie. verify output order is roughly like inform7
 		// 8. start adding commands -- test them separately, and try a little story which uses the here.
-		if e := statup(run); e != nil {
+		if e := startup(run); e != nil {
 			t.Fatal(e)
 		} else {
 			if e := trigger.Parse(run, "jump"); e != nil {

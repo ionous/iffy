@@ -101,7 +101,7 @@ func getCopyFun(dst, src r.Type) (ret packFun) {
 		// note: some sources support multiple eval interfaces:
 		// ex. core.Get, rules.Determine, express.Render, express.GetAt.
 		// with templates, not all the best piping exists, so: we have to test dst a bit too.
-		// ex. {go determine pattern} -> which pattern
+		// ex. {determine pattern} -> which pattern
 	case src.Kind() == r.Ptr:
 		switch {
 		case kindOf.BoolEval(src) && kindOf.Bool(dst):

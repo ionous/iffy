@@ -33,18 +33,21 @@ func TestArticles(t *testing.T) {
 	unique.PanicBlocks(patterns,
 		(*std.Patterns)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
+	var objects obj.Registry
+	objects.RegisterValues(sliceOf.Interface(
 		&std.Kind{Name: "lamp-post"},
 		&std.Kind{Name: "soldiers", IndefiniteArticle: "some"},
 		&std.Kind{Name: "trevor", CommonProper: std.ProperNamed},
-	)
+	))
 
 	rules, e := rules.Master(cmds, core.Xform{}, patterns, std.PrintNameRules)
 	if e != nil {
 		t.Fatal(e)
 	}
-	run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
+	run, e := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	match := func(t *testing.T, expected string, fn func(spec.Block)) {
 		var lines printer.Lines

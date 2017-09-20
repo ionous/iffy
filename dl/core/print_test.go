@@ -14,7 +14,10 @@ func TestPrint(t *testing.T) {
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
 	unique.PanicBlocks(cmds, (*core.Commands)(nil))
-	run := rtm.New(classes).Rtm()
+	run, e := rtm.New(classes).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 	//
 	t.Run("spacing", func(t *testing.T) {
 		var n tests.Execute

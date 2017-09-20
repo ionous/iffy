@@ -16,8 +16,8 @@ type tprev struct {
 }
 
 type tcontext struct {
-	gen       GenerateId
-	parseExpr ExpressionParser
+	gen            NewName
+	parseDirective DirectiveParser
 }
 
 // Restore a previous state, once this one is exhausted.
@@ -45,25 +45,7 @@ func (ctx tcontext) defaultAdvance(p tstate, c spec.Block, t Token) (ret tstate,
 		default:
 			parts := strings.Fields(t.Str)
 			switch op, rest := parts[0], parts[1:]; op {
-			case "go":
-				if c.Cmd(op).Begin() {
-					err = ctx.parseExprs(c, rest)
-					c.End()
-				}
-				// keep going in the same state:
-				ret = p
-			case "determine":
-				if c.Cmd(op).Begin() {
-					if c.Cmd(rest[0]).Begin() {
-						if len(rest) > 1 {
-							err = ctx.parseExprs(c, rest[1:])
-						}
-						c.End()
-					}
-					c.End()
-				}
-				// keep going in the same state:
-				ret = p
+
 			case "if":
 				if e := ctx.condition(c, rest, true); e != nil {
 					err = errutil.New(op, e, t.Pos)
@@ -80,7 +62,7 @@ func (ctx tcontext) defaultAdvance(p tstate, c spec.Block, t Token) (ret tstate,
 				}
 
 			default:
-				if e := ctx.parseExpr(c, t.Str); e != nil {
+				if e := ctx.parseDirective(c, parts); e != nil {
 					err = e
 				} else {
 					ret = p // keep going in the same state
@@ -92,7 +74,7 @@ func (ctx tcontext) defaultAdvance(p tstate, c spec.Block, t Token) (ret tstate,
 }
 
 func (ctx tcontext) sequence(p tstate, c spec.Block, n string) (ret tstate, err error) {
-	if c.Cmd(n+" text", ctx.gen.GenerateId(n+" counter")).Begin() {
+	if c.Cmd(n+" text", ctx.gen.NewName(n+" counter")).Begin() {
 		ret = sequence{ctx, tprev{p}, 2}
 		c.Cmds().Begin()
 		startJoin(c)
@@ -100,30 +82,18 @@ func (ctx tcontext) sequence(p tstate, c spec.Block, n string) (ret tstate, err 
 	return
 }
 
-// add the passed strings as parsed expressions to the passed c
-// we could probably support keywords using name:something in the string.
-func (ctx tcontext) parseExprs(c spec.Block, strs []string) (err error) {
-	for _, s := range strs {
-		if e := ctx.parseExpr(c, s); e != nil {
-			err = e
-			break
-		}
-	}
-	return
-}
-
 func (ctx tcontext) condition(c spec.Block, rest []string, is bool) (err error) {
 	if len(rest) == 0 {
 		err = errutil.New("expected conditional")
-	} else if len(rest) > 1 {
+	} else /*if len(rest) > 1 {
 		err = errutil.New("currently supports a single condition")
-	} else {
+	} else */{
 		// FIX: without a dst hint, we cant choose anything but text.
 		if c.Cmd("choose text").Begin() {
 			if is {
-				err = ctx.parseExpr(c, rest[0])
+				err = ctx.parseDirective(c, rest)
 			} else if c.Cmd("is not").Begin() {
-				err = ctx.parseExpr(c, rest[0])
+				err = ctx.parseDirective(c, rest)
 				c.End()
 			}
 		}

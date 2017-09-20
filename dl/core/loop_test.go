@@ -15,7 +15,10 @@ func TestLoop(t *testing.T) {
 	cmds := ops.NewOps(classes)
 	unique.PanicBlocks(cmds, (*core.Commands)(nil))
 	unique.PanicBlocks(classes, (*core.Classes)(nil))
-	run := rtm.New(classes).Rtm()
+	run, e := rtm.New(classes).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	// verifies the loop index property.
 	t.Run("index", func(t *testing.T) {

@@ -11,7 +11,7 @@ import (
 // GetAt retrieves a value from the scope object.
 // For GetAt.GetObject, if the value is not found, it tries the value from globals.
 type GetAt struct {
-	Prop string
+	Value string
 }
 
 func (p *GetAt) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -26,7 +26,7 @@ func (p *GetAt) GetNumber(run rt.Runtime) (ret float64, err error) {
 
 func (p *GetAt) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	if e := p.getValue(run, &ret); e != nil {
-		if obj, ok := run.GetObject(p.Prop); !ok {
+		if obj, ok := run.GetObject(p.Value); !ok {
 			err = e
 		} else {
 			ret = obj
@@ -66,10 +66,10 @@ func (p *GetAt) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error)
 }
 
 func (p *GetAt) getValue(run rt.Runtime, pv interface{}) (err error) {
-	if obj, path, e := getAt(run, p.Prop); e != nil {
+	if obj, path, e := getAt(run, p.Value); e != nil {
 		err = e
 	} else if len(path) > 0 {
-		err = obj.GetValue(p.Prop, pv)
+		err = obj.GetValue(p.Value, pv)
 	} else {
 		err = run.Pack(r.ValueOf(pv), r.ValueOf(obj))
 	}
@@ -77,7 +77,7 @@ func (p *GetAt) getValue(run rt.Runtime, pv interface{}) (err error) {
 }
 
 func (p *GetAt) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, path, e := getAt(run, p.Prop); e != nil {
+	if obj, path, e := getAt(run, p.Value); e != nil {
 		err = e
 	} else {
 		ret, err = textConvert(run, obj, path)

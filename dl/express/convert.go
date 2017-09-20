@@ -2,35 +2,73 @@ package express
 
 import (
 	"github.com/ionous/errutil"
-	"strconv"
-	// "github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/lang"
-	// "github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
 	"github.com/kr/pretty"
 	"go/ast"
+	"go/parser"
 	"go/token"
+	"strconv"
 )
+
+// ParseExpression interprets a string as a golang expression, converting it into iffy commands.
+func ParseExpression(c spec.Block, s string) (err error) {
+	if a, e := parser.ParseExpr(s); e != nil {
+		err = e
+	} else {
+		err = astExpr(c, a, true)
+	}
+	return
+}
+
+func ParseDirective(c spec.Block, parts []string) (err error) {
+	// not wild about this being here --
+	// but they are technically expressions and not templates.
+	if len(parts) == 1 {
+		err = ParseExpression(c, parts[0])
+	} else {
+		switch op, rest := parts[0], parts[1:]; op {
+		case "go":
+			op, rest := rest[0], rest[1:]
+			if c.Cmd(op).Begin() {
+				if len(rest) > 0 {
+					err = ParseDirective(c, rest)
+				}
+				c.End()
+			}
+		case "determine":
+			if c.Cmd(op).Begin() {
+				pat, rest := rest[0], rest[1:]
+				if c.Cmd(pat).Begin() {
+					if len(rest) > 0 {
+						err = ParseDirective(c, rest)
+					}
+					c.End()
+				}
+				c.End()
+			}
+		default:
+			err = errutil.New("unknown multi-part expression", parts)
+		}
+	}
+	return
+}
 
 type Hint bool
 
-func ConvertExpr(c spec.Slot, n ast.Expr) (err error) {
-	return convertExpr(c, n, false)
-}
-
-func convertExpr(c spec.Slot, n ast.Expr, hint Hint) (err error) {
+func astExpr(c spec.Slot, n ast.Expr, hint Hint) (err error) {
 	switch n := n.(type) {
 	case *ast.BasicLit:
-		err = BasicLit(c, n)
+		err = astBasicLit(c, n)
 
 	case *ast.BinaryExpr:
-		err = BinaryExpr(c, n)
+		err = astBinaryExpr(c, n)
 
 	case *ast.Ident:
-		makeObject(c, n)
+		err = astIdent(c, n)
 
 	case *ast.SelectorExpr:
-		err = SelectorExpr(c, n, hint)
+		err = astSelectorExpr(c, n, hint)
 
 	default:
 		err = errutil.New("unsupported node", pretty.Sprint(n))
@@ -38,7 +76,7 @@ func convertExpr(c spec.Slot, n ast.Expr, hint Hint) (err error) {
 	return
 }
 
-func BasicLit(c spec.Slot, n *ast.BasicLit) (err error) {
+func astBasicLit(c spec.Slot, n *ast.BasicLit) (err error) {
 	switch t, v := n.Kind, n.Value; t {
 	case token.STRING:
 		c.Val(v)
@@ -56,12 +94,12 @@ func BasicLit(c spec.Slot, n *ast.BasicLit) (err error) {
 	return
 }
 
-func BinaryExpr(c spec.Slot, n *ast.BinaryExpr) (err error) {
+func astBinaryExpr(c spec.Slot, n *ast.BinaryExpr) (err error) {
 	if op, ok := binaryMath[n.Op]; !ok {
 		err = errutil.New("unsupported operation", n.Op)
 	} else if c := c.Cmd(op); c.Begin() {
-		ConvertExpr(c, n.X)
-		ConvertExpr(c, n.Y)
+		astExpr(c, n.X, false)
+		astExpr(c, n.Y, false)
 		c.End()
 	}
 	return
@@ -75,7 +113,7 @@ var binaryMath = map[token.Token]string{
 	token.REM: "mod",
 }
 
-func SelectorExpr(c spec.Slot, n *ast.SelectorExpr, hint Hint) (err error) {
+func astSelectorExpr(c spec.Slot, n *ast.SelectorExpr, hint Hint) (err error) {
 	var cmd string
 	if !hint {
 		cmd = "get"
@@ -83,17 +121,18 @@ func SelectorExpr(c spec.Slot, n *ast.SelectorExpr, hint Hint) (err error) {
 		cmd = "render"
 	}
 	if c := c.Cmd(cmd); c.Begin() {
-		ConvertExpr(c.Param("obj"), n.X)
+		astExpr(c.Param("obj"), n.X, false)
 		c.Param("prop").Val(n.Sel.Name)
 		c.End()
 	}
 	return
 }
 
-func makeObject(c spec.Slot, n *ast.Ident) {
+func astIdent(c spec.Slot, n *ast.Ident) (err error) {
 	if name := n.Name; lang.IsCapitalized(name) {
 		c.Cmd("object", name)
 	} else {
 		c.Cmd("get at", name)
 	}
+	return
 }

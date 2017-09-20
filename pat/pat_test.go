@@ -67,7 +67,7 @@ func ExampleSayMe() {
 	rules.AddTextRule(ident.IdOf("sayMe"), MatchNumber(3), SayIt("Three!"))
 	rules.AddTextRule(ident.IdOf("sayMe"), nil, SayIt("Not between 1 and 3"))
 
-	run := rtm.New(classes).Rules(rules).Rtm()
+	run, _ := rtm.New(classes).Rules(rules).Rtm()
 	for i := 1; i <= 4; i++ {
 		sayMe := run.Emplace(&SayMe{float64(i)})
 
@@ -123,11 +123,10 @@ func TestRawFactorial(t *testing.T) {
 		}
 		return
 	}))
-	// suite?
-	run := rtm.New(classes).Rules(rules).Rtm()
-	//
-	if n, e := run.GetNumMatching(run.Emplace(&Factorial{3})); assert.NoError(e) {
-		fac := 3 * (2 * (1 * 1))
-		assert.EqualValues(fac, n)
+	if run, e := rtm.New(classes).Rules(rules).Rtm(); assert.NoError(e) {
+		if n, e := run.GetNumMatching(run.Emplace(&Factorial{3})); assert.NoError(e) {
+			fac := 3 * (2 * (1 * 1))
+			assert.EqualValues(fac, n)
+		}
 	}
 }

@@ -23,35 +23,35 @@ type Play struct {
 	cmds      []interface{}
 	patterns  []interface{}
 	events    []interface{}
-	objects   []interface{}
+	objects   obj.Registry
 }
 
-func (r *Play) AddClasses(block interface{}) {
-	r.classes = append(r.classes, block)
+func (p *Play) AddClasses(block interface{}) {
+	p.classes = append(p.classes, block)
 }
-func (r *Play) AddCommands(block interface{}) {
-	r.cmds = append(r.cmds, block)
+func (p *Play) AddCommands(block interface{}) {
+	p.cmds = append(p.cmds, block)
 }
-func (r *Play) AddEvents(block interface{}) {
-	r.events = append(r.events, block)
+func (p *Play) AddEvents(block interface{}) {
+	p.events = append(p.events, block)
 }
-func (r *Play) AddObjects(objs ...interface{}) {
-	r.objects = append(r.objects, objs...)
+func (p *Play) AddObjects(objs ...interface{}) {
+	p.objects.RegisterValues(objs)
 }
-func (r *Play) AddPatterns(block interface{}) {
-	r.patterns = append(r.patterns, block)
+func (p *Play) AddPatterns(block interface{}) {
+	p.patterns = append(p.patterns, block)
 }
-func (r *Play) AddScript(cb func(c spec.Block)) {
-	r.callbacks = append(r.callbacks, cb)
+func (p *Play) AddScript(cb func(c spec.Block)) {
+	p.callbacks = append(p.callbacks, cb)
 }
 
 // Define implements Statement by using all Register(ed) definitions.
-func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
+func (p *Play) build(cmds *ops.Ops, xform ops.Transform) (ret Facts, err error) {
 	var f Facts
 	var root struct{ Definitions }
-	c := cmds.NewBuilder(&root, express.MakeXform(cmds))
+	c := cmds.NewBuilder(&root, xform)
 	if c.Cmds().Begin() {
-		for _, v := range r.callbacks {
+		for _, v := range p.callbacks {
 			v(c)
 		}
 		c.End()
@@ -66,65 +66,61 @@ func (r *Play) Build(cmds *ops.Ops) (ret Facts, err error) {
 	return
 }
 
-func (r *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
+func (p *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
 	events := unique.NewStack(patterns)           // all events become default action patterns
-	objects := obj.NewObjects()
 	relations := rel.NewRelations()
 	//
 	if e := unique.RegisterBlocks(classes, (*Classes)(nil)); e != nil {
 		err = e
-	} else if e := unique.RegisterBlocks(classes, r.classes...); e != nil {
+	} else if e := unique.RegisterBlocks(classes, p.classes...); e != nil {
 		err = e
 	} else if e := unique.RegisterBlocks(cmds, (*Commands)(nil)); e != nil {
 		err = e
-	} else if e := unique.RegisterBlocks(cmds, r.cmds...); e != nil {
+	} else if e := unique.RegisterBlocks(cmds, p.cmds...); e != nil {
 		err = e
 	} else if e := unique.RegisterBlocks(patterns, (*Patterns)(nil)); e != nil {
 		err = e
-	} else if e := unique.RegisterBlocks(patterns, r.patterns...); e != nil {
+	} else if e := unique.RegisterBlocks(patterns, p.patterns...); e != nil {
 		err = e
-	} else if e := unique.RegisterBlocks(events, r.events...); e != nil {
-		err = e
-	} else if e := unique.RegisterValues(objects, r.objects...); e != nil {
-		err = e
-	} else if rules, e := rules.Master(cmds, express.MakeXform(cmds), patterns, std.Rules); e != nil {
-		err = e
-	} else if facts, e := r.Build(cmds); e != nil {
-		err = e
-	} else if e := facts.Mandates.Mandate(rules); e != nil {
+	} else if e := unique.RegisterBlocks(events, p.events...); e != nil {
 		err = e
 	} else {
-		// FIX: create a parser with facts.Grammar
-		// noting, that we dont really have a parser yet -- just some teets.
-		listen := evtbuilder.NewListeners(events.Types)
-
-		pc := locate.Locale{index.NewTable(index.OneToMany)}
-		if e := relations.AddTable("locale", pc.Table); e != nil {
+		xform := express.MakeXform(cmds, &p.objects)
+		if rules, e := rules.Master(cmds, xform, patterns, std.Rules); e != nil {
+			err = e
+		} else if facts, e := p.build(cmds, xform); e != nil {
+			err = e
+		} else if e := facts.Mandates.Mandate(rules); e != nil {
 			err = e
 		} else {
-			run := rtm.New(classes).
-				Objects(objects).
+			// FIX: create a parser with facts.Grammar
+			// noting, that we dont really have a parser yet -- just some teets.
+			listen := evtbuilder.NewListeners(events.Types)
+
+			pc := locate.Locale{index.NewTable(index.OneToMany)}
+			if e := relations.AddTable("locale", pc.Table); e != nil {
+				err = e
+			} else if run, e := rtm.New(classes).
+				Objects(p.objects).
 				Rules(rules).
 				Ancestors(ParentChildAncestry{}).
 				Relations(relations).
 				Grammar(&facts.Grammar).
 				Events(listen.EventMap).
 				Writer(w).
-				Rtm()
-
-			if e := addLocations(run.Objects, pc, facts.Locations); e != nil {
+				Rtm(); e != nil {
+				err = e
+			} else if e := addLocations(run.Objects, pc, facts.Locations); e != nil {
+				err = e
+			} else if e := addObjectListeners(run.Objects, listen, facts.ObjectListeners); e != nil {
+				err = e
+			} else if e := addClassListeners(run.Types, listen, facts.ClassListeners); e != nil {
 				err = e
 			} else {
-				if e := addObjectListeners(run.Objects, listen, facts.ObjectListeners); e != nil {
-					err = e
-				} else if e := addClassListeners(run.Types, listen, facts.ClassListeners); e != nil {
-					err = e
-				} else {
-					ret = run
-				}
+				ret = run
 			}
 		}
 	}

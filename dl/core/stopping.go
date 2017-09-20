@@ -3,14 +3,15 @@ package core
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
-	"math"
 )
 
 type StoppingCounter struct {
 	Name string `if:"id"`
-	Curr float64
+	Curr int
 }
 
+// StoppingText options returns its values in-order, once per evaluation, until the options are exhausted, then the last one is kept.
+// As a special case, if there is only one option: it gets returned once, followed by the empty string forever after.
 type StoppingText struct {
 	Id     string
 	Values []rt.TextEval
@@ -23,13 +24,28 @@ func (l *StoppingText) GetText(run rt.Runtime) (ret string, err error) {
 	} else if e := obj.GetValue("curr", &curr); e != nil {
 		err = e
 	} else {
-		next := math.Min(float64(curr)+1, float64(len(l.Values)-1))
-		if e := obj.SetValue("curr", next); e != nil {
-			err = e
-		} else {
-			at := l.Values[curr]
-			ret, err = at.GetText(run)
+		switch cnt := len(l.Values); cnt {
+		case 0:
+		case 1:
+			// only get text if at first:
+			if curr == 0 {
+				ret, err = l.update(run, obj, curr)
+			}
+		default:
+			if curr >= cnt {
+				curr = curr - 1
+			}
+			ret, err = l.update(run, obj, curr)
 		}
+	}
+	return
+}
+func (l *StoppingText) update(run rt.Runtime, obj rt.Object, curr int) (ret string, err error) {
+	if e := obj.SetValue("curr", curr+1); e != nil {
+		err = e
+	} else {
+		at := l.Values[curr]
+		ret, err = at.GetText(run)
 	}
 	return
 }

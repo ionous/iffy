@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-func statup(run rt.Runtime) (err error) {
+func startup(run rt.Runtime) (err error) {
 	if story, ok := run.GetObject("story"); !ok {
 		err = errutil.New("no story found")
 	} else if e := rt.Determine(run, &std.Commence{story}); e != nil {

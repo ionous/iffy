@@ -7,7 +7,7 @@ import (
 
 type CycleCounter struct {
 	Name string `if:"id"`
-	Curr float64
+	Curr int
 }
 
 type CycleText struct {

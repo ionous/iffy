@@ -1,12 +1,13 @@
 package rel
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/index"
-	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	testify "github.com/stretchr/testify/assert"
+	r "reflect"
 	"testing"
 )
 
@@ -27,27 +28,13 @@ func TestOneToMany(t *testing.T) {
 	unique.PanicTypes(classes,
 		(*Gremlin)(nil),
 		(*Rock)(nil))
-
-	objbuilder := obj.NewObjects()
-	unique.PanicValues(objbuilder,
-		&Gremlin{Name: "claire"},
-		&Rock{Name: "loofa"},
-		&Rock{Name: "rocky"},
-		&Rock{Name: "petra"})
-
 	relbuilder := NewRelations()
 	relbuilder.NewRelation("GremlinRocks", index.OneToMany)
 
-	// this test doesnt use runtime, so build manually
-	objects := objbuilder.Build(nil)
 	relations := relbuilder.Build()
 	//
 	Object := func(name string) rt.Object {
-		ret, ok := objects.GetObject(name)
-		if !ok {
-			assert.Fail("couldnt find object", name)
-		}
-		return ret
+		return ObjectMock(ident.IdOf(name))
 	}
 
 	if gr, ok := relations.GetRelation("GremlinRocks"); assert.True(ok) {
@@ -59,7 +46,6 @@ func TestOneToMany(t *testing.T) {
 		assert.Equal(index.OneToMany, gr.GetType())
 
 		claire, loofa, petra := Object("claire"), Object("loofa"), Object("petra")
-		assert.EqualValues(ident.IdOf("$claire"), claire.Id())
 		assert.False(contains(gr.Table.Primary, "$claire"))
 		assert.False(contains(gr.Table.Secondary, "$loofa"))
 		assert.False(contains(gr.Table.Secondary, "$petra"))
@@ -88,4 +74,19 @@ func TestOneToMany(t *testing.T) {
 			}
 		}
 	}
+}
+
+type ObjectMock ident.Id
+
+func (om ObjectMock) Id() ident.Id {
+	return ident.Id(om)
+}
+func (om ObjectMock) Type() r.Type {
+	return r.TypeOf(om)
+}
+func (om ObjectMock) GetValue(prop string, pv interface{}) error {
+	return errutil.New("object mock doesnt support get value")
+}
+func (om ObjectMock) SetValue(prop string, v interface{}) error {
+	return errutil.New("object mock doesnt support set value")
 }

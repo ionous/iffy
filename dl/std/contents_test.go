@@ -46,9 +46,9 @@ func TestContents(t *testing.T) {
 	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
-		Thingaverse.objects(sliceOf.String("box", "cake", "apple", "pen"))...)
+	var objects obj.Registry
+	objects.RegisterValues(Thingaverse.objects(
+		sliceOf.String("box", "cake", "apple", "pen")))
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
@@ -71,8 +71,8 @@ func TestContents(t *testing.T) {
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
 		relations.AddTable("locale", pc.Table)
 
-		var root struct{ Locations []Locate }
-		c := cmds.NewBuilder(&root, core.Xform{})
+		var loc struct{ Locations []Locate }
+		c := cmds.NewBuilder(&loc, core.Xform{})
 		if c.Cmds().Begin() {
 			build(c)
 			c.End()
@@ -80,23 +80,6 @@ func TestContents(t *testing.T) {
 		if e := c.Build(); e != nil {
 			err = e
 		} else {
-			objs := objects.Build(nil)
-			for _, l := range root.Locations {
-				l := l.(*Location)
-				// in this case we're probably a command too
-				if p, ok := objs.GetObject(l.Parent); !ok {
-					err = errutil.New("unknown", l.Parent)
-					break
-				} else if c, ok := objs.GetObject(l.Child); !ok {
-					err = errutil.New("unknown", l.Child)
-					break
-				} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
-					err = e
-					break
-				}
-			}
-		}
-		if err == nil {
 			var root struct{ rt.ExecuteList }
 			c := cmds.NewBuilder(&root, core.Xform{})
 			if c.Cmds().Begin() {
@@ -107,11 +90,29 @@ func TestContents(t *testing.T) {
 				err = e
 			} else {
 				var lines printer.Lines
-				run := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm()
-				if e := root.Execute(run); e != nil {
-					err = e
-				} else if res := lines.Lines(); match(run, res) {
-					t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
+				if run, e := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm(); e != nil {
+					for _, l := range loc.Locations {
+						l := l.(*Location)
+						// in this case we're probably a command too
+						if p, ok := run.GetObject(l.Parent); !ok {
+							err = errutil.New("unknown", l.Parent)
+							break
+						} else if c, ok := run.GetObject(l.Child); !ok {
+							err = errutil.New("unknown", l.Child)
+							break
+						} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
+							err = e
+							break
+						}
+					}
+
+					if err == nil {
+						if e := root.Execute(run); e != nil {
+							err = e
+						} else if res := lines.Lines(); match(run, res) {
+							t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
+						}
+					}
 				}
 			}
 		}

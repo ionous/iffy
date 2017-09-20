@@ -65,13 +65,25 @@ type PlayerSurroundings struct{}
 type Commence struct {
 	Story rt.Object
 }
+
+// PrintBannerText by default says the story:
+//  . title, or "Welcome"
+//  . headline and author, or "An interactive ficition"
+// SLASH this:
+//  . release number,
+//  . date of compilation (that's the serial number: YYMMDD),
+//  . version of iffy
+//  ex. Release 1 / Serial number 050630 / Inform 7 build 2U98 (I6/v6.30 lib 6/10N) SD
+type PrintBannerText struct {
+	Story rt.Object
+}
+type ConstructStatusLine struct {
+	Story rt.Object
+}
 type DescribeFirstRoom struct {
 	Story rt.Object
 }
 type EndTurn struct {
-	Story rt.Object
-}
-type PrintBanner struct {
 	Story rt.Object
 }
 type SetInitialPosition struct {

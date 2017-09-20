@@ -20,7 +20,6 @@ func TestGrouping(t *testing.T) {
 	// note: even without grouping rules, our article printing still gathers unnamed items.
 	t.Run("no grouping", func(t *testing.T) {
 		groupTest(t, "Mildred, an empire apple, a pen, and two other things",
-			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
 			PrintNameRules)
 	})
@@ -214,9 +213,8 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(s
 	unique.PanicTypes(classes,
 		(*ScrabbleTile)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
-		Thingaverse.objects(names)...)
+	var objects obj.Registry
+	objects.RegisterValues(Thingaverse.objects(names))
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
@@ -227,11 +225,13 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(s
 
 	if assert.NoError(e) {
 		var span printer.Span
-		run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&span).Rtm()
-		prn := &PrintNondescriptObjects{&core.Objects{names}}
-		if e := prn.Execute(run); assert.NoError(e) {
-			if assert.Equal(match, span.String()) {
-				t.Log("matched:", match)
+		run, e := rtm.New(classes).Objects(objects).Rules(rules).Writer(&span).Rtm()
+		if assert.NoError(e) {
+			prn := &PrintNondescriptObjects{&core.Objects{names}}
+			if e := prn.Execute(run); assert.NoError(e) {
+				if assert.Equal(match, span.String()) {
+					t.Log("matched:", match)
+				}
 			}
 		}
 	}
