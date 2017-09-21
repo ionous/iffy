@@ -65,8 +65,8 @@ func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
 	if p, ok := n.Property(prop); !ok {
 		err = errutil.New(n.propN(prop), "unknown property")
 	} else {
+		src := p.Value()
 		dst := r.ValueOf(pv)
-		src := r.ValueOf(p.Value())
 		rt.ScopeBlock(n.run, n, func() {
 			if e := n.run.Pack(dst, src); e != nil {
 				err = errutil.New(n.propN(prop), "cant unpack, because", e)
@@ -90,7 +90,7 @@ func (n RefObject) SetValue(prop string, v interface{}) (err error) {
 			if e := n.run.Pack(dst, src); e != nil {
 				err = errutil.New(n.propN(prop), "cant run", dst.Type(), "from", src.Type(), "because", e)
 			} else {
-				err = p.SetValue(dst.Elem().Interface())
+				err = p.SetValue(dst.Elem())
 			}
 		})
 	}

@@ -33,14 +33,13 @@ func (p Field) String() string {
 	return p.field.Name
 }
 
-// Value returns a snapshot of the current value of the property.
-func (p Field) Value() interface{} {
-	return p.value.Interface()
+// Value returns the current value of the property.
+func (p Field) Value() r.Value {
+	return p.value
 }
 
 // SetValue to change the current value of the property.
 // Returns an error if the passed value is not compatible with Type().
-func (p Field) SetValue(v interface{}) (err error) {
-	dst, src := p.value, r.ValueOf(v)
-	return coerce.Value(dst, src)
+func (p Field) SetValue(src r.Value) (err error) {
+	return coerce.Value(p.value, src)
 }

@@ -101,8 +101,8 @@ func (l *_Lowercase) Write(p []byte) (int, error) {
 }
 
 func (l *_Slash) Write(p []byte) (ret int, err error) {
-	if l.cnt == 0 {
-		n, _ := io.WriteString(l.Writer, "/")
+	if l.cnt != 0 {
+		n, _ := io.WriteString(l.Writer, " /")
 		l.cnt += n
 	}
 	if err == nil {

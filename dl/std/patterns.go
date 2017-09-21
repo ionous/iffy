@@ -66,14 +66,13 @@ type Commence struct {
 	Story rt.Object
 }
 
-// PrintBannerText by default says the story:
+// PrintBannerText, by default, says the story's:
 //  . title, or "Welcome"
-//  . headline and author, or "An interactive ficition"
-// SLASH this:
-//  . release number,
-//  . date of compilation (that's the serial number: YYMMDD),
+//  . headline and author, or "An interactive fiction"
+//  . release number, major.minor.patch
+//  . date of compilation. (FIX: not implemented)
 //  . version of iffy
-//  ex. Release 1 / Serial number 050630 / Inform 7 build 2U98 (I6/v6.30 lib 6/10N) SD
+//  ex. Release 1 / 050630 / Iffy 1.0
 type PrintBannerText struct {
 	Story rt.Object
 }

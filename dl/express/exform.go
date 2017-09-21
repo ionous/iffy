@@ -2,8 +2,10 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	// "github.com/ionous/iffy/spec/clog"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/template"
+	// "os"
 	r "reflect"
 )
 
@@ -23,10 +25,12 @@ func (xf exform) TransformValue(v r.Value, hint r.Type) (ret r.Value, err error)
 		ret, err = base.TransformValue(v, hint)
 	} else {
 		target := ops.NewValue(hint)
-		c := xf.cmds.NewFromTarget(target, base)
+		b := xf.cmds.NewFromTarget(target, base)
+		// c := clog.Make(os.Stderr, b)
+		c := b
 		err = t.Convert(c)
 		if err == nil {
-			if e := c.Build(); e != nil {
+			if e := b.Build(); e != nil {
 				err = e
 			} else {
 				ret = target.Field(0)

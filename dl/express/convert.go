@@ -21,6 +21,9 @@ func ParseExpression(c spec.Block, s string) (err error) {
 	return
 }
 
+// ParseDirective handles multi-part expressions:
+// namely "go <return the value of a function>", and
+// and, "directive <return the value of a pattern>".
 func ParseDirective(c spec.Block, parts []string) (err error) {
 	// not wild about this being here --
 	// but they are technically expressions and not templates.

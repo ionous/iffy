@@ -18,10 +18,11 @@ import (
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	"github.com/kr/pretty"
+	"strings"
 	"testing"
 )
 
-func xTestStory(t *testing.T) {
+func TestStory(t *testing.T) {
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
@@ -39,8 +40,9 @@ func xTestStory(t *testing.T) {
 		(*std.Patterns)(nil))
 
 	var objects obj.Registry
+	story := &std.Story{Name: "story"}
 	objects.RegisterValues(sliceOf.Interface(
-		&std.Story{Name: "story"},
+		story,
 		&std.Room{Kind: std.Kind{Name: "room"}},
 		&std.Pawn{"pawn", ident.IdOf("me")},
 		&std.Actor{std.Thing{Kind: std.Kind{Name: "me"}}},
@@ -82,15 +84,15 @@ func xTestStory(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else {
-			t.Log(pretty.Sprint(root.ExecuteList))
+			// t.Log(pretty.Sprint(root.ExecuteList))
 			var lines printer.Lines
 			if e := rt.WritersBlock(run, &lines, func() error {
 				return root.Execute(run)
 			}); e != nil {
 				t.Fatal(e)
 			} else {
-				l := lines.Lines()
-				if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
+				l := strings.Join(lines.Lines(), "\n")
+				if d := pretty.Diff(expected, l); len(d) > 0 {
 					t.Log("expected", expected)
 					t.Log("got", l)
 					t.Fatal(d)
@@ -123,4 +125,31 @@ func xTestStory(t *testing.T) {
 			c.Cmd("say", "{story.statusRight}")
 		})
 	})
+	t.Run("banner defaults", func(t *testing.T) {
+		x := strings.Join(sliceOf.String(
+			"Welcome",
+			"An interactive fiction",
+			"Release 0.0.0 / Iffy 1.0",
+		), "\n")
+		match(t, x, func(c spec.Block) {
+			c.Cmd("determine", c.Cmd("print banner text"))
+		})
+	})
+	t.Run("banner text", func(t *testing.T) {
+		story.Title = "Curses"
+		story.Author = "An other mouse"
+		story.MajorVersion = 1
+		story.MinorVersion = 2
+		story.PatchVersion = 3
+		story.SerialNumber = "YYMMDD"
+		x := strings.Join(sliceOf.String(
+			"Curses",
+			"An interactive fiction by An other mouse",
+			"Release 1.2.3 / YYMMDD / Iffy 1.0",
+		), "\n")
+		match(t, x, func(c spec.Block) {
+			c.Cmd("determine", c.Cmd("print banner text"))
+		})
+	})
+
 }

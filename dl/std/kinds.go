@@ -108,7 +108,12 @@ const (
 
 type Story struct {
 	Name                string `if:"id"`
+	Title               string
 	Author              string
+	MajorVersion        int    // incompatible API changes
+	MinorVersion        int    // added functionality in a backwards-compatible manner
+	PatchVersion        int    // backwards-compatible bug fixes
+	SerialNumber        string // YYMMDD
 	Headline            rt.TextEval
 	Scored              bool
 	Score, MaximumScore float64

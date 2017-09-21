@@ -39,6 +39,9 @@ type PrintNumWord struct {
 }
 
 // Say writes a piece of text.
+// FIX: we should be able to "say" multiple things --
+// but we need the command array interface to allow one/many/commands more transparently
+// also, consider whether say should implement both get text and execute -- buffer eveerything up in the get text version.
 type Say struct {
 	Text rt.TextEval
 }
@@ -83,10 +86,17 @@ func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 	return err
 }
 
-func (p *PrintSlash) Execute(run rt.Runtime) error {
-	return rt.WritersBlock(run, printer.Slash(run.Writer()), func() error {
+func (p *PrintSlash) Execute(run rt.Runtime) (err error) {
+	var span printer.Span
+	slash := printer.Slash(&span)
+	if e := rt.WritersBlock(run, slash, func() error {
 		return p.Block.Execute(run)
-	})
+	}); e != nil {
+		err = e
+	} else {
+		_, err = run.Write(span.Bytes())
+	}
+	return
 }
 
 func (p *Say) Execute(run rt.Runtime) (err error) {

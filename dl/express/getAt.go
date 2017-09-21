@@ -26,11 +26,11 @@ func (p *GetAt) GetNumber(run rt.Runtime) (ret float64, err error) {
 
 func (p *GetAt) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	if e := p.getValue(run, &ret); e != nil {
-		if obj, ok := run.GetObject(p.Value); !ok {
-			err = e
-		} else {
-			ret = obj
-		}
+		err = e
+	} else if obj, ok := run.GetObject(p.Value); !ok {
+		err = e
+	} else {
+		ret = obj
 	}
 	return
 }

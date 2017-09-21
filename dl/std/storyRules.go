@@ -25,22 +25,31 @@ func storyRules(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("run rule", "construct status line").Begin() {
-		c.Cmd("say", "{story.statusLeft}")
-		c.Cmd("say", "{story.statusRight}")
-		c.End()
-	}
-
-	if c.Cmd("run rule", "print banner text").Begin() {
-		// FIX: REALLY SHOULD HAVE ELSE IN TEMPLATE
-		if c.Cmd("say").Begin() {
-			c.Param("text").Val("{story.name}")
-			c.Param("else").Val("Welcome")
+		if c.Param("decide").Cmds().Begin() {
+			c.Cmd("say", "{story.statusLeft}")
+			c.Cmd("say", "{story.statusRight}")
 			c.End()
 		}
 		c.End()
 	}
-	// *PrintBannerText
-	// *ConstructStatusLine
+
+	if c.Cmd("run rule", "print banner text").Begin() {
+		if c.Param("decide").Cmds().Begin() {
+			c.Cmd("say", "{if story.title}{story.title}{else}Welcome{end}")
+			c.Cmd("say", "{if story.headline}{story.headline}{else}An interactive fiction{end}{if story.author} by {story.author}{end}")
+			if c.Cmd("print slash").Begin() {
+				if c.Cmds().Begin() {
+					c.Cmd("say", "Release {story.MajorVersion}.{story.MinorVersion}.{story.PatchVersion}")
+					c.Cmd("say", "{if story.SerialNumber}{story.SerialNumber}{end}")
+					c.Cmd("say", "Iffy 1.0")
+					c.End()
+				}
+				c.End()
+			}
+			c.End()
+		}
+		c.End()
+	}
 }
 
 // func updateScore(c spec.Block) {

@@ -28,21 +28,21 @@ func (ts Xform) TransformValue(src r.Value, hint r.Type) (ret r.Value, err error
 // c.Cmd("get", "@", "text")
 //
 func literally(src r.Value, dstType r.Type) (ret interface{}) {
-	switch rtype := src.Type(); {
-	case kindOf.Bool(rtype):
+	switch srcType := src.Type(); {
+	case kindOf.Bool(srcType):
 		v := src.Bool()
 		ret = &Bool{v}
 
-	case kindOf.Int(rtype):
+	case kindOf.Int(srcType):
 		v := src.Int()
 		ret = &Num{float64(v)}
 
-	case kindOf.Float(rtype):
+	case kindOf.Float(srcType):
 		v := src.Float()
 		ret = &Num{v}
 
 	// -- string for a command.
-	case rtype.Kind() == r.String:
+	case srcType.Kind() == r.String:
 		// could be text or object --
 		v := src.String()
 		switch {
@@ -56,11 +56,11 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 			}
 		}
 
-	case rtype.Kind() == r.Slice && kindOf.Float(rtype.Elem()):
+	case srcType.Kind() == r.Slice && kindOf.Float(srcType.Elem()):
 		v := src.Interface().([]float64)
 		ret = &Numbers{v}
 
-	case rtype.Kind() == r.Slice && kindOf.String(rtype.Elem()):
+	case srcType.Kind() == r.Slice && kindOf.String(srcType.Elem()):
 		v := src.Interface().([]string)
 		switch {
 		case kindOf.TextListEval(dstType):
