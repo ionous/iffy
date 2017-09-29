@@ -13,7 +13,7 @@ func MakeGroups(run rt.Runtime, ol rt.ObjListEval) (groups Collections, ungroupe
 		pending := PendingGroups{make(ObjectGroups), nil}
 		//
 		for os.HasNext() {
-			if tgt, e := os.GetNext(); e != nil {
+			if tgt, e := os.GetObject(); e != nil {
 				err = e
 				break
 			} else {

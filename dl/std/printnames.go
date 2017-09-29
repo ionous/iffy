@@ -20,7 +20,7 @@ func (p *PrintNondescriptObjects) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else {
 		err = rt.WritersBlock(run, printer.AndSeparator(run.Writer()), func() (err error) {
-			ungrouped := stream.NewObjectStream(ungrouped)
+			ungrouped := stream.NewObjectStream(stream.FromList(ungrouped))
 			if _, e := printWithArticles(run, ungrouped); e != nil {
 				err = e
 			} else if e := groups.PrintGroups(run); e != nil {

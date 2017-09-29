@@ -58,20 +58,10 @@ func TestFactorial(t *testing.T) {
 			}
 		}
 	}
-	//
-
-	// check that what we want made it into the rule book
-	if assert.Len(contract.Numbers, 1) {
-		if ft, ok := contract.Types[ident.IdOf("factorial")]; assert.True(ok) {
-			if factPattern := contract.Numbers[ft]; assert.Len(factPattern, 2) {
-				// run the rule
-				if run, e := rtm.New(classes).Rules(contract).Rtm(); assert.NoError(e) {
-					if n, e := run.GetNumMatching(run.Emplace(&Factorial{3})); assert.NoError(e) {
-						fac := 3 * (2 * (1 * 1))
-						assert.EqualValues(fac, n)
-					}
-				}
-			}
+	if run, e := rtm.New(classes).Rules(contract).Rtm(); assert.NoError(e) {
+		if n, e := run.GetNumMatching(run.Emplace(&Factorial{3})); assert.NoError(e) {
+			fac := 3 * (2 * (1 * 1))
+			assert.EqualValues(fac, n)
 		}
 	}
 }

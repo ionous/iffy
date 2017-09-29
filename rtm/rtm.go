@@ -20,7 +20,7 @@ type Rtm struct {
 	Events event.EventMap
 	Randomizer
 	rt.Ancestors
-	rules pat.Rulebook
+	Rules pat.Rulebook
 	Plurals
 	parser.Scanner
 	ObjectScope

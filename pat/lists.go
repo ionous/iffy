@@ -2,6 +2,7 @@ package pat
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 )
 
 type Flags int
@@ -37,29 +38,30 @@ type ObjectRule struct {
 	rt.ObjectEval
 }
 
+// ListRule base for all rules which return streams of data.
+type ListRule struct {
+	Filters Filters
+	Flags
+}
+
 // NumListRule holds the distallation of a NumListRule.
 type NumListRule struct {
-	Filters Filters
+	ListRule
 	rt.NumListEval
 }
-
-// TextListRule holds the distallation of a TextListRule.
 type TextListRule struct {
-	Filters Filters
+	ListRule
 	rt.TextListEval
 }
-
-// ObjListRule holds the distallation of a ObjListRule.
 type ObjListRule struct {
-	Filters Filters
+	ListRule
 	rt.ObjListEval
 }
 
 // ExecuteRule holds the distallation of a RunRule.
 type ExecuteRule struct {
-	Filters Filters
+	ListRule
 	rt.Execute
-	Flags
 }
 
 type BoolRules []BoolRule
@@ -123,76 +125,55 @@ func (ps ObjectRules) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	}
 	return
 }
-
+func (r ListRule) Applies(run rt.Runtime) (ret Flags, err error) {
+	if ok, e := r.Filters.GetBool(run); e != nil {
+		err = e
+	} else if !ok {
+		ret = -1
+	} else {
+		ret = r.Flags
+	}
+	return
+}
 func (ps NumListRules) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
-	for i, cnt := 0, len(ps); i < cnt; i++ {
-		p := ps[cnt-i-1]
-		if matched, e := p.Filters.GetBool(run); e != nil {
-			err = e
-			break
-		} else if matched {
-			ret, err = p.NumListEval.GetNumberStream(run)
-			break
-		}
+	if q, e := splitQuery(run, ps); e != nil {
+		err = e
+	} else {
+		q := adaptNumbers(run, q)
+		ret = stream.NewNumberStream(q.Iterate())
 	}
 	return
 }
 func (ps TextListRules) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
-	for i, cnt := 0, len(ps); i < cnt; i++ {
-		p := ps[cnt-i-1]
-		if matched, e := p.Filters.GetBool(run); e != nil {
-			err = e
-			break
-		} else if matched {
-			ret, err = p.TextListEval.GetTextStream(run)
-			break
-		}
+	if q, e := splitQuery(run, ps); e != nil {
+		err = e
+	} else {
+		q := adaptText(run, q)
+		ret = stream.NewTextStream(q.Iterate())
 	}
 	return
 }
 func (ps ObjListRules) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
-	for i, cnt := 0, len(ps); i < cnt; i++ {
-		p := ps[cnt-i-1]
-		if matched, e := p.Filters.GetBool(run); e != nil {
-			err = e
-			break
-		} else if matched {
-			ret, err = p.ObjListEval.GetObjectStream(run)
-			break
-		}
+	if q, e := splitQuery(run, ps); e != nil {
+		err = e
+	} else {
+		q := adaptObjects(run, q)
+		ret = stream.NewObjectStream(q.Iterate())
 	}
 	return
 }
-
 func (ps ExecuteRules) Execute(run rt.Runtime) (ret bool, err error) {
-	var post rt.ExecuteList // a stack
-	var matches int
-	for i, cnt := 0, len(ps); i < cnt; i++ {
-		p := ps[cnt-i-1]
-		if matched, e := p.Filters.GetBool(run); e != nil {
-			err = e
-			break
-		} else if matched {
-			matches++
-			if p.Flags == Postfix {
-				post = append(post, p.Execute)
-			} else if e := p.Execute.Execute(run); e != nil {
-				err = e
-			} else if p.Flags != Prefix {
-				break // Infix ends once its done.
-			}
-		}
-	}
-	if err == nil {
-		// we want to run the most recently added thing first
-		for i, cnt := 0, len(post); i < cnt; i++ {
-			exec := post[cnt-i-1]
-			if e := exec.Execute(run); e != nil {
+	if q, e := splitQuery(run, ps); e != nil {
+		err = e
+	} else {
+		next := q.Iterate()
+		for item, ok := next(); ok; item, ok = next() {
+			if e := item.(ExecuteRule).Execute.Execute(run); e != nil {
 				err = e
 				break
 			}
+			ret = true // any executed
 		}
-		ret = err == nil && matches > 0
 	}
 	return
 }

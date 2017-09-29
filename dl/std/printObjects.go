@@ -58,7 +58,7 @@ func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error
 	// This is needed for the edge case of a group of items which contains unnamed items.
 	var nonames []rt.Object
 	for ; objs.HasNext(); ret++ {
-		if obj, e := objs.GetNext(); e != nil {
+		if obj, e := objs.GetObject(); e != nil {
 			err = e
 			break
 		} else {
@@ -83,7 +83,7 @@ func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error
 func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error) {
 	var nonames []rt.Object
 	for ; objs.HasNext(); ret++ {
-		if obj, e := objs.GetNext(); e != nil {
+		if obj, e := objs.GetObject(); e != nil {
 			err = e
 			break
 		} else {

@@ -11,12 +11,12 @@ type Mandate interface {
 
 type MandateCmds struct {
 	*BoolRule
+	*ListText
+	*ListNumbers
+	*ListObjects
 	*NumberRule
-	*NumListRule
 	*ObjectRule
-	*ObjListRule
 	*RunRule
-	*TextListRule
 	*TextRule
 }
 

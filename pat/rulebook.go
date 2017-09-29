@@ -9,7 +9,7 @@ import (
 type Rulebook struct {
 	Bools
 	Numbers
-	Text
+	TextPatterns
 	Objects
 	NumLists
 	TextLists
@@ -19,7 +19,7 @@ type Rulebook struct {
 
 type Bools map[r.Type]BoolRules
 type Numbers map[r.Type]NumberRules
-type Text map[r.Type]TextRules
+type TextPatterns map[r.Type]TextRules
 type Objects map[r.Type]ObjectRules
 type NumLists map[r.Type]NumListRules
 type TextLists map[r.Type]TextListRules
@@ -30,7 +30,7 @@ func MakeRulebook() Rulebook {
 	return Rulebook{
 		make(Bools),
 		make(Numbers),
-		make(Text),
+		make(TextPatterns),
 		make(Objects),
 		make(NumLists),
 		make(TextLists),

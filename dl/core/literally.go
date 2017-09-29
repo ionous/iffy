@@ -21,7 +21,7 @@ func (ts Xform) TransformValue(src r.Value, hint r.Type) (ret r.Value, err error
 
 // literally allows users to specify primitive values for some evals.
 //
-// c.Cmd("texts", sliceOf.String("one", "two", "three"))
+// c.Cmd("strings", sliceOf.String("one", "two", "three"))
 // c.Value(sliceOf.String("one", "two", "three"))
 //
 // c.Cmd("get").Begin() { c.Cmd("object", "@") c.Value("text") }
@@ -35,11 +35,19 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 
 	case kindOf.Int(srcType):
 		v := src.Int()
-		ret = &Num{float64(v)}
+		if kindOf.NumListEval(dstType) {
+			ret = &Numbers{[]float64{float64(v)}}
+		} else {
+			ret = &Num{float64(v)}
+		}
 
 	case kindOf.Float(srcType):
 		v := src.Float()
-		ret = &Num{v}
+		if kindOf.NumListEval(dstType) {
+			ret = &Numbers{[]float64{v}}
+		} else {
+			ret = &Num{v}
+		}
 
 	// -- string for a command.
 	case srcType.Kind() == r.String:
@@ -54,6 +62,11 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 			} else {
 				ret = &Object{v}
 			}
+		case kindOf.TextListEval(dstType):
+			ret = &Texts{[]string{v}}
+
+		case kindOf.ObjListEval(dstType):
+			ret = &Objects{[]string{v}}
 		}
 
 	case srcType.Kind() == r.Slice && kindOf.Float(srcType.Elem()):

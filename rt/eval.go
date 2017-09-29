@@ -35,13 +35,13 @@ type ObjListEval interface {
 
 type NumberStream interface {
 	HasNext() bool
-	GetNext() (float64, error)
+	GetNumber() (float64, error)
 }
 type TextStream interface {
 	HasNext() bool
-	GetNext() (string, error)
+	GetText() (string, error)
 }
 type ObjectStream interface {
 	HasNext() bool
-	GetNext() (Object, error)
+	GetObject() (Object, error)
 }

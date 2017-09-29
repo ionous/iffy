@@ -18,7 +18,7 @@ type Config struct {
 	events    event.EventMap
 	grammar   parser.Scanner
 	objects   obj.Registry
-	ruleMap   pat.Rulebook
+	rules     pat.Rulebook
 	rel       rel.RelationBuilder
 	seed      int64
 	writer    io.Writer
@@ -55,8 +55,7 @@ func (c *Config) Randomize(seed int64) *Config {
 	return c
 }
 func (c *Config) Rules(p pat.Contract) *Config {
-	p.Sort()
-	c.ruleMap = p.Rulebook
+	c.rules = p.Rulebook()
 	return c
 }
 func (c *Config) Writer(w io.Writer) *Config {
@@ -87,7 +86,7 @@ func (c *Config) Rtm() (ret *Rtm, err error) {
 		writer:    w,
 		Scanner:   c.grammar,
 		Events:    c.events,
-		rules:     c.ruleMap,
+		Rules:     c.rules,
 	}
 	//
 	seed := c.seed

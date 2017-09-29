@@ -90,7 +90,8 @@ func TestLocation(t *testing.T) {
 
 func TestRules(t *testing.T) {
 	var reg Play
-	mandates := []string{"bool", "number", "text", "object", "num list", "text list", "obj list", "run"}
+	mandates := []string{"bool rule", "number rule", "text rule", "object rule",
+		"list numbers", "list text", "list objects", "run rule"}
 	reg.AddScript(func(c spec.Block) {
 		defineRules(c, mandates)
 	})
@@ -139,7 +140,7 @@ func defineLocation(c spec.Block) {
 func defineRules(c spec.Block, mandates []string) {
 	for _, k := range mandates {
 		if c.Cmd("mandate").Begin() {
-			if c.Cmd(k + " rule").Begin() {
+			if c.Cmd(k).Begin() {
 				c.Param("name").Val(k)
 				c.End()
 			}

@@ -92,7 +92,7 @@ func (f GetNumber) GetNumber(run rt.Runtime) (float64, error) {
 	return f(run)
 }
 
-func TestRawFactorial(t *testing.T) {
+func TestFactorial(t *testing.T) {
 	assert := assert.New(t)
 	//
 	classes := make(unique.Types)

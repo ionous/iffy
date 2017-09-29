@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
+	r "reflect"
 	"sort"
 )
 
@@ -12,118 +13,151 @@ import (
 // FIX? consider rewriting using reflect so that all patterns are stored together and if the interface doesnt match some expectation it errors.
 type Contract struct {
 	Types unique.Types // pattern types
-	Rulebook
+	rules Rulebook
 }
 
 func MakeContract(patternTypes unique.Types) Contract {
 	return Contract{patternTypes, MakeRulebook()}
 }
 
-func (rs Contract) AddBoolRule(id ident.Id, f Filters, k rt.BoolEval) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddBoolRule(id ident.Id, f Filters, k rt.BoolEval) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.Bools[rtype] = append(rs.Bools[rtype], BoolRule{f, k})
+		c.rules.Bools[rtype] = append(c.rules.Bools[rtype], BoolRule{f, k})
 	}
 	return
 }
-func (rs Contract) AddNumberRule(id ident.Id, f Filters, k rt.NumberEval) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddNumberRule(id ident.Id, f Filters, k rt.NumberEval) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.Numbers[rtype] = append(rs.Numbers[rtype], NumberRule{f, k})
+		c.rules.Numbers[rtype] = append(c.rules.Numbers[rtype], NumberRule{f, k})
 	}
 	return
 }
-func (rs Contract) AddTextRule(id ident.Id, f Filters, k rt.TextEval) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddTextRule(id ident.Id, f Filters, k rt.TextEval) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.Text[rtype] = append(rs.Text[rtype], TextRule{f, k})
+		c.rules.TextPatterns[rtype] = append(c.rules.TextPatterns[rtype], TextRule{f, k})
 	}
 	return
 }
-func (rs Contract) AddObjectRule(id ident.Id, f Filters, k rt.ObjectEval) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddObjectRule(id ident.Id, f Filters, k rt.ObjectEval) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.Objects[rtype] = append(rs.Objects[rtype], ObjectRule{f, k})
+		c.rules.Objects[rtype] = append(c.rules.Objects[rtype], ObjectRule{f, k})
 	}
 	return
 }
-func (rs Contract) AddNumListRule(id ident.Id, f Filters, k rt.NumListEval) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddNumListRule(id ident.Id, f Filters, k rt.NumListEval, flags Flags) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.NumLists[rtype] = append(rs.NumLists[rtype], NumListRule{f, k})
+		f := ListRule{f, flags}
+		c.rules.NumLists[rtype] = append(c.rules.NumLists[rtype], NumListRule{f, k})
 	}
 	return
 }
-func (rs Contract) AddTextListRule(id ident.Id, f Filters, k rt.TextListEval) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddTextListRule(id ident.Id, f Filters, k rt.TextListEval, flags Flags) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.TextLists[rtype] = append(rs.TextLists[rtype], TextListRule{f, k})
+		f := ListRule{f, flags}
+		c.rules.TextLists[rtype] = append(c.rules.TextLists[rtype], TextListRule{f, k})
 	}
 	return
 }
-func (rs Contract) AddObjListRule(id ident.Id, f Filters, k rt.ObjListEval) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddObjListRule(id ident.Id, f Filters, k rt.ObjListEval, flags Flags) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.ObjLists[rtype] = append(rs.ObjLists[rtype], ObjListRule{f, k})
+		f := ListRule{f, flags}
+		c.rules.ObjLists[rtype] = append(c.rules.ObjLists[rtype], ObjListRule{f, k})
 	}
 	return
 }
-func (rs Contract) AddExecuteRule(id ident.Id, f Filters, k rt.Execute, flags Flags) (err error) {
-	if rtype, ok := rs.Types[id]; !ok {
+func (c Contract) AddExecuteRule(id ident.Id, f Filters, k rt.Execute, flags Flags) (err error) {
+	if rtype, ok := c.Types[id]; !ok {
 		err = errutil.New("no such pattern", id)
 	} else {
-		rs.Executes[rtype] = append(rs.Executes[rtype], ExecuteRule{f, k, flags})
+		f := ListRule{f, flags}
+		c.rules.Executes[rtype] = append(c.rules.Executes[rtype], ExecuteRule{f, k})
 	}
 	return
 }
 
-// Sort in-place so that lengthier filters are at the front of each list.
-func (rs Contract) Sort() {
-	for _, l := range rs.Bools {
+// Rulebook returns a copy of the rules, sorted based on filter length.
+// Fewer filters are earlier in the list.
+// NOTE: patterns evaluate in reverse order: prefering long filters, declared later.
+func (c Contract) Rulebook() Rulebook {
+	b := MakeRulebook()
+	for k, l := range c.rules.Bools {
+		l := copyRules(l).(BoolRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.Bools[k] = l
 	}
-	for _, l := range rs.Numbers {
+	for k, l := range c.rules.Numbers {
+		l := copyRules(l).(NumberRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.Numbers[k] = l
 	}
-	for _, l := range rs.Text {
+	for k, l := range c.rules.TextPatterns {
+		l := copyRules(l).(TextRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.TextPatterns[k] = l
 	}
-	for _, l := range rs.Objects {
+	for k, l := range c.rules.Objects {
+		l := copyRules(l).(ObjectRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.Objects[k] = l
 	}
-	for _, l := range rs.NumLists {
+	for k, l := range c.rules.NumLists {
+		l := copyRules(l).(NumListRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.NumLists[k] = l
 	}
-	for _, l := range rs.TextLists {
+	for k, l := range c.rules.TextLists {
+		l := copyRules(l).(TextListRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.TextLists[k] = l
 	}
-	for _, l := range rs.ObjLists {
+	for k, l := range c.rules.ObjLists {
+		l := copyRules(l).(ObjListRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.ObjLists[k] = l
 	}
-	for _, l := range rs.Executes {
+	for k, l := range c.rules.Executes {
+		l := copyRules(l).(ExecuteRules)
 		sort.SliceStable(l, func(i, j int) bool {
 			return len(l[i].Filters) < len(l[j].Filters)
 		})
+		b.Executes[k] = l
 	}
+	return b
+}
+
+// where source is BoolRules, etc.rules.
+func copyRules(list interface{}) interface{} {
+	src := r.ValueOf(list)
+	cnt := src.Len()
+	dst := r.MakeSlice(src.Type(), cnt, cnt)
+	r.Copy(dst, src)
+	return dst.Interface()
 }

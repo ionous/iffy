@@ -38,7 +38,7 @@ func TestShadows(t *testing.T) {
 		c.Param("Num").Cmd("add", 1, 2)
 		c.Param("Text").Val("3")
 		c.Param("Nums").Val(sliceOf.Float(1, 2, 3))
-		c.Param("Texts").Val(sliceOf.String("1", "2", "3"))
+		c.Param("Strings").Val(sliceOf.String("1", "2", "3"))
 		c.Param("State").Val(Maybe) // Note: this turns State into a NumEval
 		c.Param("Labeled").Cmd("is not", false)
 		c.Param("Object").Val("other")
@@ -66,7 +66,7 @@ func TestShadows(t *testing.T) {
 			"Text":    {"3", "5"},
 			"Object":  {otherId, baseId},
 			"Nums":    {sliceOf.Float(1, 2, 3), sliceOf.Float(3, 2, 1)},
-			"Texts":   {sliceOf.String("1", "2", "3"), sliceOf.String("3")},
+			"Strings": {sliceOf.String("1", "2", "3"), sliceOf.String("3")},
 			"Objects": {[]ident.Id{baseId, otherId}, []ident.Id{baseId}},
 			"State":   {Maybe, Yes},
 			"Labeled": {true, false},

@@ -31,17 +31,20 @@ type ObjectRule struct {
 	Rule
 	Decide rt.ObjectEval // Obj to return if filter passes
 }
-type NumListRule struct {
+type ListNumbers struct {
 	Rule
-	Decide rt.NumListEval // List to return if filter passes
+	Decide   rt.NumListEval // List to return if filter passes
+	Continue PatternTiming
 }
-type TextListRule struct {
+type ListText struct {
 	Rule
-	Decide rt.TextListEval // List to return if filter passes
+	Decide   rt.TextListEval // List to return if filter passes
+	Continue PatternTiming
 }
-type ObjListRule struct {
+type ListObjects struct {
 	Rule
-	Decide rt.ObjListEval // List to return if filter passes
+	Decide   rt.ObjListEval // List to return if filter passes
+	Continue PatternTiming
 }
 type RunRule struct {
 	Rule
@@ -91,27 +94,27 @@ func (p *ObjectRule) Mandate(ps pat.Contract) (err error) {
 	}
 	return
 }
-func (p *NumListRule) Mandate(ps pat.Contract) (err error) {
+func (p *ListNumbers) Mandate(ps pat.Contract) (err error) {
 	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		err = ps.AddNumListRule(pid, filters, p.Decide)
+		err = ps.AddNumListRule(pid, filters, p.Decide, flag(p.Continue))
 	}
 	return
 }
-func (p *TextListRule) Mandate(ps pat.Contract) (err error) {
+func (p *ListText) Mandate(ps pat.Contract) (err error) {
 	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		err = ps.AddTextListRule(pid, filters, p.Decide)
+		err = ps.AddTextListRule(pid, filters, p.Decide, flag(p.Continue))
 	}
 	return
 }
-func (p *ObjListRule) Mandate(ps pat.Contract) (err error) {
+func (p *ListObjects) Mandate(ps pat.Contract) (err error) {
 	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		err = ps.AddObjListRule(pid, filters, p.Decide)
+		err = ps.AddObjListRule(pid, filters, p.Decide, flag(p.Continue))
 	}
 	return
 }
@@ -119,13 +122,16 @@ func (p *RunRule) Mandate(ps pat.Contract) (err error) {
 	if pid, filters, e := p.Init(ps.Types); e != nil {
 		err = e
 	} else {
-		flags := pat.Infix
-		if p.Continue != nil {
-			flags = p.Continue.Flags()
-		}
-		err = ps.AddExecuteRule(pid, filters, p.Decide, flags)
+		err = ps.AddExecuteRule(pid, filters, p.Decide, flag(p.Continue))
 	}
 	return
+}
+func flag(time PatternTiming) pat.Flags {
+	flags := pat.Infix
+	if time != nil {
+		flags = time.Flags()
+	}
+	return flags
 }
 
 // expandFilters turns a single bool eval into an array by looking at its type.

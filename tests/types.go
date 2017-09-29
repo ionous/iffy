@@ -11,7 +11,7 @@ type BaseClass struct {
 	Text    string
 	Object  ident.Id `if:"cls:BaseClass"`
 	Nums    []float64
-	Texts   []string
+	Strings []string
 	Objects []ident.Id `if:"cls:BaseClass"`
 	State   TriState
 	Labeled bool

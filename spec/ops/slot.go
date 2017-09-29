@@ -58,7 +58,7 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 				err = e
 			} else {
 				for stream.HasNext() {
-					if v, e := stream.GetNext(); e != nil {
+					if v, e := stream.GetNumber(); e != nil {
 						err = e
 						break
 					} else {
@@ -79,7 +79,7 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 				err = e
 			} else {
 				for stream.HasNext() {
-					if v, e := stream.GetNext(); e != nil {
+					if v, e := stream.GetText(); e != nil {
 						err = e
 						break
 					} else {
@@ -100,7 +100,7 @@ func (s *_ShadowSlot) unpack(run rt.Runtime) (ret interface{}, err error) {
 				err = e
 			} else {
 				for stream.HasNext() {
-					if v, e := stream.GetNext(); e != nil {
+					if v, e := stream.GetObject(); e != nil {
 						err = e
 						break
 					} else {

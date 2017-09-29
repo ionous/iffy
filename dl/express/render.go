@@ -44,7 +44,7 @@ func (p *Render) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error
 	if e := p.get(run, &values); e != nil {
 		err = e
 	} else {
-		ret = stream.NewNumberStream(values)
+		ret = stream.NewNumberStream(stream.FromList(values))
 	}
 	return
 }
@@ -54,7 +54,7 @@ func (p *Render) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
 	if e := p.get(run, &values); e != nil {
 		err = e
 	} else {
-		ret = stream.NewTextStream(values)
+		ret = stream.NewTextStream(stream.FromList(values))
 	}
 	return
 }
@@ -64,7 +64,7 @@ func (p *Render) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error
 	if e := p.get(run, &values); e != nil {
 		err = e
 	} else {
-		ret = stream.NewObjectStream(values)
+		ret = stream.NewObjectStream(stream.FromList(values))
 	}
 	return
 }

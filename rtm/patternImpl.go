@@ -7,9 +7,10 @@ import (
 )
 
 func (run *Rtm) GetBoolMatching(data rt.Object) (ret bool, err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-		if ps, ok := run.rules.Bools[rtype]; !ok {
+		if ps, ok := rules.Bools[rtype]; !ok {
 			err = notFound(rtype)
 		} else {
 			ret, err = ps.GetBool(run)
@@ -18,9 +19,10 @@ func (run *Rtm) GetBoolMatching(data rt.Object) (ret bool, err error) {
 	return
 }
 func (run *Rtm) GetNumMatching(data rt.Object) (ret float64, err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-		if ps, ok := run.rules.Numbers[rtype]; !ok {
+		if ps, ok := rules.Numbers[rtype]; !ok {
 			err = notFound(rtype)
 		} else {
 			ret, err = ps.GetNumber(run)
@@ -29,9 +31,10 @@ func (run *Rtm) GetNumMatching(data rt.Object) (ret float64, err error) {
 	return
 }
 func (run *Rtm) GetTextMatching(data rt.Object) (ret string, err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-		if ps, ok := run.rules.Text[rtype]; !ok {
+		if ps, ok := rules.TextPatterns[rtype]; !ok {
 			err = notFound(rtype)
 		} else {
 			ret, err = ps.GetText(run)
@@ -40,9 +43,10 @@ func (run *Rtm) GetTextMatching(data rt.Object) (ret string, err error) {
 	return
 }
 func (run *Rtm) GetObjectMatching(data rt.Object) (ret rt.Object, err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-		if ps, ok := run.rules.Objects[rtype]; !ok {
+		if ps, ok := rules.Objects[rtype]; !ok {
 			err = notFound(rtype)
 		} else {
 			ret, err = ps.GetObject(run)
@@ -51,9 +55,10 @@ func (run *Rtm) GetObjectMatching(data rt.Object) (ret rt.Object, err error) {
 	return
 }
 func (run *Rtm) GetNumStreamMatching(data rt.Object) (ret rt.NumberStream, err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-		if ps, ok := run.rules.NumLists[rtype]; !ok {
+		if ps, ok := rules.NumLists[rtype]; !ok {
 			err = notFound(rtype)
 		} else {
 			ret, err = ps.GetNumberStream(run)
@@ -62,9 +67,10 @@ func (run *Rtm) GetNumStreamMatching(data rt.Object) (ret rt.NumberStream, err e
 	return
 }
 func (run *Rtm) GetTextStreamMatching(data rt.Object) (ret rt.TextStream, err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-		if ps, ok := run.rules.TextLists[rtype]; !ok {
+		if ps, ok := rules.TextLists[rtype]; !ok {
 			err = notFound(rtype)
 		} else {
 			ret, err = ps.GetTextStream(run)
@@ -73,9 +79,10 @@ func (run *Rtm) GetTextStreamMatching(data rt.Object) (ret rt.TextStream, err er
 	return
 }
 func (run *Rtm) GetObjStreamMatching(data rt.Object) (ret rt.ObjectStream, err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-		if ps, ok := run.rules.ObjLists[rtype]; !ok {
+		if ps, ok := rules.ObjLists[rtype]; !ok {
 			err = notFound(rtype)
 		} else {
 			ret, err = ps.GetObjectStream(run)
@@ -84,12 +91,12 @@ func (run *Rtm) GetObjStreamMatching(data rt.Object) (ret rt.ObjectStream, err e
 	return
 }
 func (run *Rtm) ExecuteMatching(data rt.Object) (err error) {
+	rules := run.Rules
 	rt.ScopeBlock(run, data, func() {
 		rtype := data.Type()
-
-		// NOTE: if we need to differentiate between "ran" and "not found",
-		// "didnt run" should probably become an error code.
-		if ps, ok := run.rules.Executes[rtype]; ok {
+		if ps, ok := rules.Executes[rtype]; ok {
+			// NOTE: if we need to differentiate between "ran" and "not found",
+			// "didnt run" should probably become an error code.
 			_, err = ps.Execute(run)
 		}
 	})

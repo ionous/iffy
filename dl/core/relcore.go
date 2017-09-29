@@ -47,7 +47,7 @@ func (a *RelatedList) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err 
 			return
 		})
 		if err == nil {
-			ret = stream.NewObjectStream(list)
+			ret = stream.NewObjectStream(stream.FromList(list))
 		}
 	}
 	return

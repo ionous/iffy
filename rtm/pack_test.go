@@ -150,7 +150,7 @@ func TestPropertyAccess(t *testing.T) {
 		{"Text", new(string)},
 		{"Object", new(rt.Object)},
 		{"Nums", new([]float64)},
-		{"Texts", new([]string)},
+		{"Strings", new([]string)},
 		{"Objects", new([]rt.Object)},
 	}
 	test := func(n rt.Object) (err error) {
