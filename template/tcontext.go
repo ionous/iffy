@@ -2,6 +2,7 @@ package template
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/spec"
 	"strings"
 )
@@ -26,6 +27,33 @@ func (t tprev) pop() (ret tstate, err error) {
 		err = errutil.New("too many ends!")
 	} else {
 		ret = t.prev
+	}
+	return
+}
+
+// convert multiple evaluations.
+// by definition the evaluations separated by plain text.
+// ( if there were no text seperators, it would be one evaluation )
+func (ctx tcontext) convertMulti(c spec.Block, ts []Token) (err error) {
+	// because we are mixing text and evals, we expect the whole thing winds up being text. ( otherwise: what would we do with the intervening text. )
+	// start a new join for the new section
+	if c.Cmd("join").Begin() {
+		if c.Cmds().Begin() {
+			prev := tprev{}
+			var state tstate = base{ctx, prev}
+			for _, token := range ts {
+				if n, e := state.advance(c, token); e != nil {
+					err = e
+					break
+				} else if n == nil {
+					panic("state is nil")
+				} else {
+					state = n
+				}
+			}
+			c.End()
+		}
+		c.End()
 	}
 	return
 }
@@ -60,9 +88,8 @@ func (ctx tcontext) defaultAdvance(p tstate, c spec.Block, t Token) (ret tstate,
 					ret = conditional{ctx, tprev{p}, 1}
 					startJoin(c)
 				}
-
 			default:
-				if e := ctx.parseDirective(c, parts); e != nil {
+				if e := ctx.parseDirective(c, parts, kindOf.TypeTextEval); e != nil {
 					err = e
 				} else {
 					ret = p // keep going in the same state
@@ -91,9 +118,9 @@ func (ctx tcontext) condition(c spec.Block, rest []string, is bool) (err error) 
 		// FIX: without a dst hint, we cant choose anything but text.
 		if c.Cmd("choose text").Begin() {
 			if is {
-				err = ctx.parseDirective(c, rest)
+				err = ctx.parseDirective(c, rest, kindOf.TypeBoolEval)
 			} else if c.Cmd("is not").Begin() {
-				err = ctx.parseDirective(c, rest)
+				err = ctx.parseDirective(c, rest, kindOf.TypeBoolEval)
 				c.End()
 			}
 		}

@@ -9,29 +9,29 @@ func EvalType(rtype r.Type) (ret r.Type) {
 	switch k := rtype.Kind(); {
 	//
 	case k == r.Bool:
-		ret = boolEval
+		ret = TypeBoolEval
 
 	case Number(rtype):
-		ret = numEval
+		ret = TypeNumEval
 
 	case IdentId(rtype):
-		ret = objEval
+		ret = TypeObjEval
 
 	case k == r.String:
-		ret = textEval
+		ret = TypeTextEval
 
 	case k == r.Array || k == r.Slice:
 		elem := rtype.Elem()
 		switch k := elem.Kind(); {
 
 		case Number(elem):
-			ret = numListEval
+			ret = TypeNumListEval
 
 		case IdentId(elem):
-			ret = objListEval
+			ret = TypeObjListEval
 
 		case k == r.String:
-			ret = textListEval
+			ret = TypeTextListEval
 
 		}
 	}

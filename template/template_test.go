@@ -10,6 +10,7 @@ import (
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"
+	r "reflect"
 	"strings"
 	"testing"
 )
@@ -152,28 +153,25 @@ func TestStates(t *testing.T) {
 		}
 		t.Run(k, func(t *testing.T) {
 			ts := template.MakeFactory(make(ident.Counters), directives)
-			if tmpl, ok := ts.Tokenize(str); !ok {
-				t.FailNow()
+			var root struct{ rt.TextEval }
+			c := cmds.NewBuilder(&root, core.Xform{})
+			x := clog.Make(tstlog{t}, c)
+			// x = c
+			if e := ts.Templatize(x, str); e != nil {
+				t.Fatal(e)
+			} else if e := c.Build(); e != nil {
+				t.Fatal(e)
 			} else {
-				var root struct{ rt.TextEval }
-				c := cmds.NewBuilder(&root, core.Xform{})
-				x := clog.Make(tstlog{t}, c)
-				// x = c
-				if e := tmpl.Convert(x); e != nil {
-					t.Fatal(e)
-				} else if e := c.Build(); e != nil {
-					t.Fatal(e)
-				} else {
-					res := root.TextEval
-					d := pretty.Diff(res, expect)
-					if len(d) > 0 {
-						t.Log(d)
-						t.Log("got:", pretty.Sprint(res))
-						t.Log("want:", pretty.Sprint(expect))
-						t.FailNow()
-					}
+				res := root.TextEval
+				d := pretty.Diff(res, expect)
+				if len(d) > 0 {
+					t.Log(d)
+					t.Log("got:", pretty.Sprint(res))
+					t.Log("want:", pretty.Sprint(expect))
+					t.FailNow()
 				}
 			}
+
 		})
 	}
 }
@@ -199,7 +197,7 @@ var c = &core.Join{[]rt.TextEval{&core.Text{Text: " c "}}}
 // directives is a mock directive parser
 // our input is always one letter: x,y,z:
 // and we just generate an object property command for the test.
-func directives(c spec.Block, in []string) error {
+func directives(c spec.Block, in []string, hint r.Type) error {
 	c.Cmd("get", "@", in[0])
 	return nil
 }

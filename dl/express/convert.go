@@ -3,20 +3,22 @@ package express
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/spec"
 	"github.com/kr/pretty"
 	"go/ast"
 	"go/parser"
 	"go/token"
+	r "reflect"
 	"strconv"
 )
 
 // ParseExpression interprets a string as a golang expression, converting it into iffy commands.
-func ParseExpression(c spec.Block, s string) (err error) {
+func ParseExpression(c spec.Block, s string, hint r.Type) (err error) {
 	if a, e := parser.ParseExpr(s); e != nil {
 		err = e
 	} else {
-		err = astExpr(c, a, true)
+		err = astExpr(c, a, hint)
 	}
 	return
 }
@@ -24,18 +26,18 @@ func ParseExpression(c spec.Block, s string) (err error) {
 // ParseDirective handles multi-part expressions:
 // namely "go <return the value of a function>", and
 // and, "directive <return the value of a pattern>".
-func ParseDirective(c spec.Block, parts []string) (err error) {
+func ParseDirective(c spec.Block, parts []string, hint r.Type) (err error) {
 	// not wild about this being here --
 	// but they are technically expressions and not templates.
 	if len(parts) == 1 {
-		err = ParseExpression(c, parts[0])
+		err = ParseExpression(c, parts[0], hint)
 	} else {
 		switch op, rest := parts[0], parts[1:]; op {
 		case "go":
 			op, rest := rest[0], rest[1:]
 			if c.Cmd(op).Begin() {
 				if len(rest) > 0 {
-					err = ParseDirective(c, rest)
+					err = ParseDirective(c, rest, hint)
 				}
 				c.End()
 			}
@@ -44,7 +46,7 @@ func ParseDirective(c spec.Block, parts []string) (err error) {
 				pat, rest := rest[0], rest[1:]
 				if c.Cmd(pat).Begin() {
 					if len(rest) > 0 {
-						err = ParseDirective(c, rest)
+						err = ParseDirective(c, rest, hint)
 					}
 					c.End()
 				}
@@ -57,7 +59,7 @@ func ParseDirective(c spec.Block, parts []string) (err error) {
 	return
 }
 
-type Hint bool
+type Hint r.Type
 
 func astExpr(c spec.Slot, n ast.Expr, hint Hint) (err error) {
 	switch n := n.(type) {
@@ -72,6 +74,9 @@ func astExpr(c spec.Slot, n ast.Expr, hint Hint) (err error) {
 
 	case *ast.SelectorExpr:
 		err = astSelectorExpr(c, n, hint)
+
+	case *ast.ParenExpr:
+		err = astParenExpr(c, n, hint)
 
 	default:
 		err = errutil.New("unsupported node", pretty.Sprint(n))
@@ -98,14 +103,36 @@ func astBasicLit(c spec.Slot, n *ast.BasicLit) (err error) {
 }
 
 func astBinaryExpr(c spec.Slot, n *ast.BinaryExpr) (err error) {
-	if op, ok := binaryMath[n.Op]; !ok {
+	if op, ok := binaryMath[n.Op]; ok {
+		if c := c.Cmd(op); c.Begin() {
+			err = binaryPair(c, n.X, n.Y, kindOf.TypeNumEval)
+			c.End()
+		}
+	} else if op, ok := anyAll[n.Op]; !ok {
 		err = errutil.New("unsupported operation", n.Op)
-	} else if c := c.Cmd(op); c.Begin() {
-		astExpr(c, n.X, false)
-		astExpr(c, n.Y, false)
-		c.End()
+	} else {
+		if c := c.Cmd(op); c.Begin() {
+			if c.Cmds().Begin() {
+				err = binaryPair(c, n.X, n.Y, kindOf.TypeObjEval)
+				c.End()
+			}
+			c.End()
+		}
 	}
 	return
+}
+
+func binaryPair(c spec.Slot, x, y ast.Expr, hint Hint) (err error) {
+	if e := astExpr(c, x, hint); e != nil {
+		err = e
+	} else if e := astExpr(c, y, hint); e != nil {
+		err = e
+	}
+	return
+}
+
+func astParenExpr(c spec.Slot, n *ast.ParenExpr, hint Hint) error {
+	return astExpr(c, n.X, hint)
 }
 
 var binaryMath = map[token.Token]string{
@@ -116,15 +143,20 @@ var binaryMath = map[token.Token]string{
 	token.REM: "mod",
 }
 
+var anyAll = map[token.Token]string{
+	token.LAND: "all true",
+	token.LOR:  "any true",
+}
+
 func astSelectorExpr(c spec.Slot, n *ast.SelectorExpr, hint Hint) (err error) {
 	var cmd string
-	if !hint {
-		cmd = "get"
-	} else {
+	if kindOf.TextEval(hint) {
 		cmd = "render"
+	} else {
+		cmd = "get"
 	}
 	if c := c.Cmd(cmd); c.Begin() {
-		astExpr(c.Param("obj"), n.X, false)
+		astExpr(c.Param("obj"), n.X, kindOf.TypeObjEval)
 		c.Param("prop").Val(n.Sel.Name)
 		c.End()
 	}

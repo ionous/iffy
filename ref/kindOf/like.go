@@ -6,20 +6,20 @@ import (
 
 // BoolLike if rtype is a bool, or an eval which produces a bool.
 func BoolLike(rtype r.Type) bool {
-	return rtype.Kind() == r.Bool || rtype == boolEval
+	return rtype.Kind() == r.Bool || rtype == TypeBoolEval
 }
 
 // StringLike if rtype is a bool, or an eval which produces a bool.
 func StringLike(rtype r.Type) bool {
-	return rtype.Kind() == r.String || rtype == textEval
+	return rtype.Kind() == r.String || rtype == TypeTextEval
 }
 
 // NumberLike if rtype is a bool, or an eval which produces a bool.
 func NumberLike(rtype r.Type) bool {
-	return Number(rtype) || rtype == numEval
+	return Number(rtype) || rtype == TypeNumEval
 }
 
 // ObjectLike if rtype is a bool, or an eval which produces a bool.
 func ObjectLike(rtype r.Type) bool {
-	return rtype == identId || rtype == objEval
+	return rtype == identId || rtype == TypeObjEval
 }
