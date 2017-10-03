@@ -198,7 +198,10 @@ func TestContents(t *testing.T) {
 	printObject := func(name string) OpsCb {
 		return func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
-				c.Cmds(c.Cmd("determine", c.Cmd("print object", name)))
+				if c.Cmds().Begin() {
+					c.Cmd("determine", c.Cmd("print object", name))
+					c.End()
+				}
 				c.End()
 			}
 		}

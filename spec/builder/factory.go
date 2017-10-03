@@ -2,7 +2,6 @@ package builder
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/spec"
 )
 
 type _Factory struct {
@@ -33,39 +32,26 @@ func (b *_Factory) newCmd(src *Memento, name string, args []interface{}) (ret *M
 	if spec, e := b.specs.NewSpec(name); e != nil {
 		err = e
 	} else {
-		if n, e := b.zip(&Memento{
+		ret, err = b.zip(&Memento{
 			chain:   src,
 			factory: b,
 			spec:    spec,
 			pos:     Capture(2),
-		}, args); e != nil {
-			err = e
-		} else {
-			ret = n
-		}
+		}, args)
 	}
 	return
 }
 
-func (b *_Factory) newCmds(src *Memento, cmds []spec.Block) (ret *Memento, err error) {
+func (b *_Factory) newCmds(src *Memento) (ret *Memento, err error) {
 	if specs, e := b.specs.NewSpecs(); e != nil {
 		err = e
 	} else {
-		// normalize into an array of interfaces :(
-		args := make([]interface{}, len(cmds))
-		for i, c := range cmds {
-			args[i] = c
-		}
-		if n, e := b.zip(&Memento{
+		ret, err = b.zip(&Memento{
 			chain:   src,
 			factory: b,
 			specs:   specs,
 			pos:     Capture(2),
-		}, args); e != nil {
-			err = e
-		} else {
-			ret = n
-		}
+		}, nil)
 	}
 	return
 }
@@ -74,16 +60,12 @@ func (b *_Factory) newVal(src *Memento, val interface{}) (ret *Memento, err erro
 	if _, isMemento := val.(*Memento); isMemento {
 		err = errutil.New("New value requested, but the value is not a primitive.")
 	} else {
-		if n, e := b.zip(&Memento{
+		ret, err = b.zip(&Memento{
 			chain:   src,
 			factory: b,
 			val:     val,
 			pos:     Capture(2),
-		}, nil); e != nil {
-			err = e
-		} else {
-			ret = n
-		}
+		}, nil)
 	}
 	return
 }

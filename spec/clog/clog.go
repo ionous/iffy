@@ -52,13 +52,9 @@ func (f clog) Cmd(name string, args ...interface{}) spec.Block {
 	return clog{f.l, b, b}
 }
 
-func (f clog) Cmds(cmds ...spec.Block) spec.Block {
-	if len(cmds) > 0 {
-		f.l.Log("Cmds", len(cmds), " cmd/s")
-	} else {
-		f.l.Log("Cmds")
-	}
-	b := f.p.Cmds(cmds...)
+func (f clog) Cmds() spec.Block {
+	f.l.Log("Cmds")
+	b := f.p.Cmds()
 	return clog{f.l, b, b}
 }
 

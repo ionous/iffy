@@ -252,7 +252,10 @@ func TestArticles(t *testing.T) {
 		match(t, "lamps",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					c.Cmds(c.Cmd("say", c.Cmd("pluralize", "lamp")))
+					if c.Cmds().Begin() {
+						c.Cmd("say", c.Cmd("pluralize", "lamp"))
+						c.End()
+					}
 					c.End()
 				}
 			})

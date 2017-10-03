@@ -23,8 +23,8 @@ func (p Param) Cmd(name string, args ...interface{}) (ret spec.Block) {
 }
 
 // Cmds creates a new array of commands for the parameter mentioned by Memento.Param().
-func (p Param) Cmds(cmds ...spec.Block) (ret spec.Block) {
-	if n, e := p.src.factory.newCmds(p.src, cmds); e != nil {
+func (p Param) Cmds() (ret spec.Block) {
+	if n, e := p.src.factory.newCmds(p.src); e != nil {
 		panic(errutil.New(e, Capture(1)))
 	} else {
 		n.key = p.key

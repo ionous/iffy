@@ -7,7 +7,7 @@ import (
 
 // Memento implements spec.Block. Each chained call targets the surrounding block. For example, in:
 //  if c.Cmd("parent").Begin() {
-//    c.Cmd("some command", params).Cmds(els).Val(value).End()
+//    c.Cmd("some command", params).Cmds().Val(value).End()
 //  }
 // "the command, the array, and the val are all considered members of "parent".
 type Memento struct {
@@ -54,8 +54,8 @@ func (n *Memento) Cmd(name string, args ...interface{}) (ret spec.Block) {
 }
 
 // Cmds specifies a new array of commands. Additional elements can be added to the array using Begin().
-func (n *Memento) Cmds(cmds ...spec.Block) (ret spec.Block) {
-	if n, e := n.factory.newCmds(n, cmds); e != nil {
+func (n *Memento) Cmds() (ret spec.Block) {
+	if n, e := n.factory.newCmds(n); e != nil {
 		panic(errutil.New(e, Capture(1)))
 	} else {
 		ret = n

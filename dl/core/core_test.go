@@ -33,10 +33,14 @@ func TestCore(t *testing.T) {
 		test := func(a, b, res bool) {
 			var n tests.Bool
 			c := cmds.NewBuilder(&n, core.Xform{})
-
-			c.Cmd("all true", c.Cmds(
-				c.Cmd("bool", a),
-				c.Cmd("bool", b)))
+			if c.Cmd("all true").Begin() {
+				if c.Cmds().Begin() {
+					c.Cmd("bool", a)
+					c.Cmd("bool", b)
+					c.End()
+				}
+				c.End()
+			}
 			//
 			if e := c.Build(); e != nil {
 				t.Fatal(e)
@@ -53,9 +57,14 @@ func TestCore(t *testing.T) {
 		test := func(a, b, res bool) {
 			var n tests.Bool
 			c := cmds.NewBuilder(&n, core.Xform{})
-			c.Cmd("any true", c.Cmds(
-				c.Cmd("bool", a),
-				c.Cmd("bool", b)))
+			if c.Cmd("any true").Begin() {
+				if c.Cmds().Begin() {
+					c.Cmd("bool", a)
+					c.Cmd("bool", b)
+					c.End()
+				}
+				c.End()
+			}
 			//
 			if e := c.Build(); e != nil {
 				t.Fatal(e)

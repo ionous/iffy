@@ -103,7 +103,10 @@ func PrintObjectRules(c spec.Block) {
 		if c.Param("decide").Cmds().Begin() {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 			if c.Cmd("print bracket").Begin() {
-				c.Cmds(c.Cmd("determine", c.Cmd("print summary", c.Cmd("get", "@", "target"))))
+				if c.Cmds().Begin() {
+					c.Cmd("determine", c.Cmd("print summary", c.Cmd("get", "@", "target")))
+					c.End()
+				}
 				c.End()
 			}
 			c.End()
@@ -111,10 +114,14 @@ func PrintObjectRules(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("run rule", "print summary").Begin() {
-		c.Param("if").Cmd("all true", c.Cmds(
-			c.Cmd("is class", c.Cmd("get", "@", "target"), "container"),
-			c.Cmd("get", c.Cmd("get", "@", "target"), "closed"),
-		))
+		if c.Param("if").Cmd("all true").Begin() {
+			if c.Cmds().Begin() {
+				c.Cmd("is class", c.Cmd("get", "@", "target"), "container")
+				c.Cmd("get", c.Cmd("get", "@", "target"), "closed")
+				c.End()
+			}
+			c.End()
+		}
 		if c.Param("decide").Cmds().Begin() {
 			c.Cmd("say", "closed")
 			c.End()
@@ -126,10 +133,16 @@ func PrintObjectRules(c spec.Block) {
 		c.Param("if").Cmd("is class", c.Cmd("get", "@", "target"), "container")
 		if c.Param("decide").Cmds().Begin() {
 			if c.Cmd("choose", c.Cmd("get", c.Cmd("get", "@", "target"), "closed")).Begin() {
-				c.Param("true").Cmds(c.Cmd("say", "closed"))
+				if c.Param("true").Cmds().Begin() {
+					c.Cmd("say", "closed")
+					c.End()
+				}
 				if c.Param("false").Cmds().Begin() {
 					if c.Cmd("choose", c.Cmd("relation empty", "locale", c.Cmd("get", "@", "target"))).Begin() {
-						c.Param("true").Cmds(c.Cmd("say", "open but empty"))
+						if c.Param("true").Cmds().Begin() {
+							c.Cmd("say", "open but empty")
+							c.End()
+						}
 						if c.Param("false").Cmds().Begin() {
 							c.Cmd("determine",
 								c.Cmd("print content",

@@ -96,9 +96,14 @@ func GroupRules(c spec.Block) {
 										// if they are not innumerable, they are numerable.
 										// if they are numerable, then they got a number... in front of some brackets.
 										if c.Param("false").Cmds().Begin() {
-											c.Cmd("print bracket", c.Cmds(
-												c.Cmd("print objects", c.Cmd("get", "@", "objects"),
-													c.Param("articles").Cmd("get", "@", "with articles"))))
+											if c.Cmd("print bracket").Begin() {
+												if c.Cmds().Begin() {
+													c.Cmd("print objects", c.Cmd("get", "@", "objects"),
+														c.Param("articles").Cmd("get", "@", "with articles"))
+													c.End()
+												}
+												c.End()
+											}
 											c.End()
 										}
 										if c.Param("true").Cmds().Begin() {

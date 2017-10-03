@@ -20,9 +20,8 @@ type Slot interface {
 	// Cmd starts a new command
 	Cmd(name string, args ...interface{}) Block
 	// Cmds starts a new array of commands.
-	// It takes initial members of that block.
 	// The block must eventually be terminated with End().
-	Cmds(cmds ...Block) Block
+	Cmds() Block
 	// Val specifies a single literal value: whether one primitive value or one array of primitive values. It returns the current block
 	Val(val interface{}) Block
 }
