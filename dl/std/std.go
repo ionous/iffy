@@ -16,18 +16,29 @@ type Classes struct {
 }
 
 type Patterns struct {
-	*group.GroupTogether
-	*group.PrintGroup
-	*PrintName
-	*PrintPluralName
-	*PrintSeveral
-	*PrintObject
-	*PrintSummary
-	*PrintContent
 	*Commence
+	*CommonObjects
+	*ConstructStatusLine
+	*DescribeObject
+	*group.GroupTogether
+	*IsNotableEnclosure
+	*IsNotableScenery
+	*IsUnremarkable
+	*NotableObjects
 	*PlayerSurroundings
 	*PrintBannerText
-	*ConstructStatusLine
+	*PrintContent
+	*PrintLocation
+	*PrintName
+	*PrintObject
+	*group.PrintGroup
+	*PrintPluralName
+	*PrintSeveral
+	*PrintSummary
+	*VisibleParents
+	*Children
+	*Parents
+
 	// *DescribeFirstRoom
 	// *EndTurn
 	// *PrintBanner
@@ -38,15 +49,16 @@ type Patterns struct {
 
 type Commands struct {
 	// Runtime
+	*DescribeLocation
+	*locate.LocationOf
+	*LowerAn
+	*LowerThe
+	*Pluralize
 	*PrintNondescriptObjects
 	*PrintObjects
-	*UpperThe
-	*LowerThe
 	*UpperAn
-	*LowerAn
-	*Pluralize
+	*UpperThe
 	// Pluralizer
 	*PluralRule
 	*Player
-	*locate.LocationOf
 }

@@ -19,8 +19,9 @@ func startup(run rt.Runtime) (err error) {
 		} else if e := story.GetValue("status right", &right); e != nil {
 			err = e
 		} else {
-			io.WriteString(run, left)
-			io.WriteString(run, right)
+			w := run.Writer()
+			io.WriteString(w, left)
+			io.WriteString(w, right)
 		}
 	}
 	return

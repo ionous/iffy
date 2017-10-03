@@ -36,7 +36,6 @@ type Ancestors interface {
 }
 
 type Output interface {
-	io.Writer
 	Writer() io.Writer
 	SetWriter(io.Writer) (prev io.Writer)
 }

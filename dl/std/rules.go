@@ -112,7 +112,7 @@ func PrintObjectRules(c spec.Block) {
 	}
 	if c.Cmd("run rule", "print summary").Begin() {
 		c.Param("if").Cmd("all true", c.Cmds(
-			c.Cmd("is similar class", c.Cmd("get", "@", "target"), "container"),
+			c.Cmd("is class", c.Cmd("get", "@", "target"), "container"),
 			c.Cmd("get", c.Cmd("get", "@", "target"), "closed"),
 		))
 		if c.Param("decide").Cmds().Begin() {
@@ -123,7 +123,7 @@ func PrintObjectRules(c spec.Block) {
 	}
 	// is it better to have multiple patterns, or just one?
 	if c.Cmd("run rule", "print summary").Begin() {
-		c.Param("if").Cmd("is similar class", c.Cmd("get", "@", "target"), "container")
+		c.Param("if").Cmd("is class", c.Cmd("get", "@", "target"), "container")
 		if c.Param("decide").Cmds().Begin() {
 			if c.Cmd("choose", c.Cmd("get", c.Cmd("get", "@", "target"), "closed")).Begin() {
 				c.Param("true").Cmds(c.Cmd("say", "closed"))

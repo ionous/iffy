@@ -14,7 +14,6 @@ import (
 )
 
 // Order computes an integer multiplied by the factorial of the integer below it.
-
 func TestOrder(t *testing.T) {
 	assert := testify.New(t)
 	//

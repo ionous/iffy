@@ -67,10 +67,13 @@ func (p *PrintList) Execute(run rt.Runtime) error {
 func (p *PrintNum) Execute(run rt.Runtime) (err error) {
 	if n, e := p.Num.GetNumber(run); e != nil {
 		err = e
-	} else if s := strconv.FormatFloat(n, 'g', -1, 64); len(s) > 0 {
-		_, err = io.WriteString(run, s)
 	} else {
-		_, err = io.WriteString(run, "<num>")
+		w := run.Writer()
+		if s := strconv.FormatFloat(n, 'g', -1, 64); len(s) > 0 {
+			_, err = io.WriteString(w, s)
+		} else {
+			_, err = io.WriteString(w, "<num>")
+		}
 	}
 	return err
 }
@@ -78,10 +81,13 @@ func (p *PrintNum) Execute(run rt.Runtime) (err error) {
 func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 	if n, e := p.Num.GetNumber(run); e != nil {
 		err = e
-	} else if s := num2words.Convert(int(n)); len(s) > 0 {
-		_, err = io.WriteString(run, s)
 	} else {
-		_, err = io.WriteString(run, "<num>")
+		w := run.Writer()
+		if s := num2words.Convert(int(n)); len(s) > 0 {
+			_, err = io.WriteString(w, s)
+		} else {
+			_, err = io.WriteString(w, "<num>")
+		}
 	}
 	return err
 }
@@ -94,7 +100,8 @@ func (p *PrintSlash) Execute(run rt.Runtime) (err error) {
 	}); e != nil {
 		err = e
 	} else {
-		_, err = run.Write(span.Bytes())
+		w := run.Writer()
+		_, err = w.Write(span.Bytes())
 	}
 	return
 }
@@ -103,7 +110,8 @@ func (p *Say) Execute(run rt.Runtime) (err error) {
 	if s, e := p.Text.GetText(run); e != nil {
 		err = e
 	} else if len(s) > 0 {
-		_, err = io.WriteString(run, s)
+		w := run.Writer()
+		_, err = io.WriteString(w, s)
 	}
 	return
 }
@@ -112,7 +120,8 @@ func Print(run rt.Runtime, text rt.TextEval) (err error) {
 	if s, e := text.GetText(run); e != nil {
 		err = e
 	} else {
-		_, err = io.WriteString(run, s)
+		w := run.Writer()
+		_, err = io.WriteString(w, s)
 	}
 	return err
 }

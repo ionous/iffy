@@ -11,9 +11,9 @@ import (
 )
 
 type RefObject struct {
-	id    ident.Id // id of the object, blank if anonymous.
-	value r.Value  // stores the concrete value. ex. Rock, not *Rock.
-	run   rt.Runtime
+	id    ident.Id   // id of the object, blank if anonymous.
+	value r.Value    // stores the concrete value. ex. Rock, not *Rock.
+	run   rt.Runtime // necessary for translating ids to objects.
 }
 
 // MakeObject wraps the passed value as an anonymous object.

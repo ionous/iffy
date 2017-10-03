@@ -20,7 +20,6 @@ type Commands struct {
 	*AnyTrue
 	*Bool
 	*Buffer
-	*SetState
 	*Choose
 	*ChooseNum
 	*ChooseObj
@@ -28,10 +27,12 @@ type Commands struct {
 	*ClassName
 	*CompareNum
 	*CompareText
+	*Comprise
 	*CycleText
 	*DoNothing
 	*EqualTo
 	// *Error
+	*Filter
 	*ForEachNum
 	*ForEachObj
 	*ForEachText
@@ -41,8 +42,8 @@ type Commands struct {
 	*Includes
 	// *Is/State -> use Get
 	*IsEmpty
-	*IsSameClass
-	*IsSimilarClass
+	*IsExactClass
+	*IsClass
 	*IsNot
 	// *IsNum
 	// *IsObj
@@ -51,6 +52,7 @@ type Commands struct {
 	*Join
 	*Len
 	*LesserThan
+	*ListUp
 	*NotEqualTo
 	*Num
 	*Numbers
@@ -68,10 +70,12 @@ type Commands struct {
 	*Range
 	*RelatedList
 	*RelationEmpty
+	*Reverse
 	*SetBool
 	*SetNum
 	*SetText
 	*SetObj
+	*SetState
 	*ShuffleText
 	*StoppingText
 	// *State

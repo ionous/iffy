@@ -25,14 +25,15 @@ func (op *PrintObjects) Execute(run rt.Runtime) (err error) {
 	} else if header, e := optional.Text(run, op.Header); e != nil {
 		err = e
 	} else {
+		w := run.Writer()
 		if len(header) > 0 {
-			io.WriteString(run, header)
+			io.WriteString(w, header)
 		}
 		// control and separator so print could run by line as well.
 		if tersely {
 			err = op.print(run, articles, objs)
 		} else {
-			err = rt.WritersBlock(run, printer.AndSeparator(run.Writer()), func() error {
+			err = rt.WritersBlock(run, printer.AndSeparator(w), func() error {
 				return op.print(run, articles, objs)
 			})
 		}

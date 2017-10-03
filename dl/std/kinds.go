@@ -45,7 +45,7 @@ type Room struct {
 type Thing struct {
 	Kind        `if:"parent"`
 	Description string
-	Brief       string // known as "initial appearance"
+	Brief       string // also known as "initial appearance"
 
 	// this is part of the room display:
 	// unmarked for listing not marked for listing,

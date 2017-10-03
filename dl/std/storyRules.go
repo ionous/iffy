@@ -8,7 +8,6 @@ func storyRules(c spec.Block) {
 		if c.Param("decide").Cmds().Begin() {
 			c.Cmd("set text", "story", "status left", "{determine playerSurroundings}")
 			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
-			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
 			c.End()
 		}
 		c.End()
@@ -32,7 +31,6 @@ func storyRules(c spec.Block) {
 		}
 		c.End()
 	}
-
 	if c.Cmd("run rule", "print banner text").Begin() {
 		if c.Param("decide").Cmds().Begin() {
 			c.Cmd("say", "{if story.title}{story.title}{else}Welcome{end}")
@@ -46,6 +44,13 @@ func storyRules(c spec.Block) {
 				}
 				c.End()
 			}
+			c.End()
+		}
+		c.End()
+	}
+	if c.Cmd("run rule", "describe first room").Begin() {
+		if c.Param("decide").Cmds().Begin() {
+
 			c.End()
 		}
 		c.End()

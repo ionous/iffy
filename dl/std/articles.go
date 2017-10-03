@@ -85,8 +85,11 @@ func (a *LowerAn) Execute(run rt.Runtime) error {
 func printArticle(run rt.Runtime, article string, obj rt.Object) (err error) {
 	if text, e := articleName(run, article, obj); e != nil {
 		err = e
-	} else if _, e := io.WriteString(run, text); e != nil {
-		err = e
+	} else {
+		w := run.Writer()
+		if _, e := io.WriteString(w, text); e != nil {
+			err = e
+		}
 	}
 	return
 }

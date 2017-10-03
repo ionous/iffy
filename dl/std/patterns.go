@@ -5,6 +5,76 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+type Commence struct {
+	Story rt.Object
+}
+
+// CommonObjects should act as a source for those objects which a player "can also see" in a given location.
+// see also: DescribeLocation.
+type CommonObjects struct {
+	Location rt.Object
+}
+
+// ConstructStatusLine should set the values of the story's left and right status text.
+type ConstructStatusLine struct {
+	Story rt.Object
+}
+
+type DescribeFirstRoom struct {
+	Story rt.Object
+}
+
+// DescribeObject should print a brief description about the targeted object.
+// see also: DescribeLocation.
+type DescribeObject struct {
+	Object rt.Object
+}
+
+type EndTurn struct {
+	Story rt.Object
+}
+
+// IsCeiling should return true if the targeted object stops visibility.
+type IsCeiling struct {
+	Object rt.Object
+}
+
+// IsNotableEnclosure should return true if the targeted object is important enough to merit a description when it acts as a parent of the player.
+// see also: DescribeLocation.
+type IsNotableEnclosure struct {
+	Object rt.Object
+}
+
+// IsNotableScenery should return true if the targeted object is important enough to merit a description when defined as scenery in a location.
+// see also: DescribeLocation.
+type IsNotableScenery struct {
+	Object rt.Object
+}
+
+// IsUnremarkable should return true to avoid being treated as a notable object.
+// see also: DescribeLocation.
+type IsUnremarkable struct {
+	Object rt.Object
+}
+
+// NotableObjects should return a list of objects in the targeted location which merit a brief description.
+// see also: DescribeObject, DescribeLocation, UnremarkableObjects
+type NotableObjects struct {
+	Location rt.Object
+}
+
+// PrintCommonObjects should print a simple sentence regarding the associated objects.
+type PrintCommonObjects struct {
+	Objects []rt.Object
+}
+
+// PrintLocation should print the complete position of the player.
+// For instance: "The lab (in the box) (on the desk)".
+// see also: PlayerSurroundings.
+type PrintLocation struct {
+	Location rt.Object
+}
+
 // PrintName defines a pattern to say the target's name.
 // The standard rules print the "printed name" property of the target,
 // or the object name ( if the target lacks a "printed name" ),
@@ -13,6 +83,15 @@ import (
 // Analogous to Inform's "Printing the name of something."
 // http://inform7.com/learn/man/WI_18_10.html
 type PrintName struct {
+	Target ident.Id `if:"cls:kind"`
+}
+
+// PrintObject defines a pattern to say simple information about an object.
+// Inform's "Printing the locale description" uses I6 functions ( "list the contents of" and "say [a list of including contents]" ) which are not themselves activities, though -- apparently -- it sometimes breaks back out into activities: via "details of something".
+// There's currently no strong rule for what is a command and what is a pattern.
+// http://inform7.com/learn/man/WI_18_25.html
+// http://inform7.com/learn/man/WI_18_26.html
+type PrintObject struct {
 	Target ident.Id `if:"cls:kind"`
 }
 
@@ -35,15 +114,6 @@ type PrintSeveral struct {
 	GroupSize float64
 }
 
-// PrintObject defines a pattern to say simple information about an object.
-// Inform's "Printing the locale description" uses I6 functions ( "list the contents of" and "say [a list of including contents]" ) which are not themselves activities, though -- apparently -- it sometimes breaks back out into activities: via "details of something".
-// There's currently no strong rule for what is a command and what is a pattern.
-// http://inform7.com/learn/man/WI_18_25.html
-// http://inform7.com/learn/man/WI_18_26.html
-type PrintObject struct {
-	Target ident.Id `if:"cls:kind"`
-}
-
 // PrintSummary defines a pattern to say extra information for certain items ( such as containers. )
 // ( open, closed, worn, being worn, providing light )
 // ( providing light and open but empty )
@@ -60,11 +130,8 @@ type PrintContent struct {
 	Articles, Tersely bool
 }
 
+// PlayerSurroundings should return the name of the player's current location ( as text. )
 type PlayerSurroundings struct{}
-
-type Commence struct {
-	Story rt.Object
-}
 
 // PrintBannerText, by default, says the story's:
 //  . title, or "Welcome"
@@ -76,15 +143,6 @@ type Commence struct {
 type PrintBannerText struct {
 	Story rt.Object
 }
-type ConstructStatusLine struct {
-	Story rt.Object
-}
-type DescribeFirstRoom struct {
-	Story rt.Object
-}
-type EndTurn struct {
-	Story rt.Object
-}
 type SetInitialPosition struct {
 	Story rt.Object
 }
@@ -93,4 +151,15 @@ type StartTurn struct {
 }
 type UpdateScore struct {
 	Story rt.Object
+}
+
+// NotableObjects should return a list of objects in the targeted location which merit a casaul mention.
+// see also: DescribeObject, DescribeLocation, NotableObjects.
+type UnremarkableObjects struct {
+	Location rt.Object
+}
+
+// VisibleParents should return a list of all parents of the targeted object, stopping if one of the parents acts as a "ceiling". Examples of ceilings include: rooms and closed boxes.
+type VisibleParents struct {
+	Object rt.Object
 }

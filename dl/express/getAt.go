@@ -8,8 +8,7 @@ import (
 	r "reflect"
 )
 
-// GetAt retrieves a value from the scope object.
-// For GetAt.GetObject, if the value is not found, it tries the value from globals.
+// GetAt retrieves a value from the current top object; if the value isnt't found, it looks for an object of that name in the global scope.
 type GetAt struct {
 	Value string
 }

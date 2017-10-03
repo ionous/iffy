@@ -22,7 +22,7 @@ import (
 	"testing"
 )
 
-func TestStory(t *testing.T) {
+func xTestStory(t *testing.T) {
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
