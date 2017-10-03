@@ -62,25 +62,15 @@ func TestExpr(t *testing.T) {
 			},
 		},
 		"logic": {
-			"A.a && (B.b || C.c)", &core.AllTrue{
-				[]rt.BoolEval{
-					&core.Get{
-						Obj:  &core.Object{Name: "A"},
-						Prop: "a",
-					}, &core.AnyTrue{
-						[]rt.BoolEval{
-							&core.Get{
-								Obj:  &core.Object{Name: "B"},
-								Prop: "b",
-							},
-							&core.Get{
-								Obj:  &core.Object{Name: "C"},
-								Prop: "c",
-							},
-						},
+			"a && (b || !c)", &core.AllTrue{[]rt.BoolEval{
+				&GetAt{"a"},
+				&core.AnyTrue{[]rt.BoolEval{
+					&GetAt{"b"},
+					&core.IsNot{
+						&GetAt{"c"},
 					},
-				},
-			},
+				}},
+			}},
 		},
 	}
 	cmds := ops.NewOps(nil)

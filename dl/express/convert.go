@@ -78,6 +78,9 @@ func astExpr(c spec.Slot, n ast.Expr, hint Hint) (err error) {
 	case *ast.ParenExpr:
 		err = astParenExpr(c, n, hint)
 
+	case *ast.UnaryExpr:
+		err = astUnaryExpr(c, n, hint)
+
 	default:
 		err = errutil.New("unsupported node", pretty.Sprint(n))
 	}
@@ -133,6 +136,19 @@ func binaryPair(c spec.Slot, x, y ast.Expr, hint Hint) (err error) {
 
 func astParenExpr(c spec.Slot, n *ast.ParenExpr, hint Hint) error {
 	return astExpr(c, n.X, hint)
+}
+
+func astUnaryExpr(c spec.Slot, n *ast.UnaryExpr, hint Hint) (err error) {
+	switch n.Op {
+	case token.NOT:
+		if c := c.Cmd("is not"); c.Begin() {
+			err = astExpr(c, n.X, hint)
+			c.End()
+		}
+	default:
+		err = errutil.New("unsupported unary expression", n.Op)
+	}
+	return
 }
 
 var binaryMath = map[token.Token]string{
