@@ -69,7 +69,7 @@ func TestSomething(t *testing.T) {
 	// default action:
 	DefaultActions := func(c spec.Block) {
 		if c.Cmd("run rule", "jump").Begin() {
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				if c.Cmd("print span").Begin() {
 					// FIX: to print names need to include articles
 					// probably want a simple named object in core.
@@ -162,7 +162,7 @@ func TestSomething(t *testing.T) {
 func Execute(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
 	var root struct{ Eval rt.ExecuteList }
 	c := cmds.NewBuilder(&root, core.Xform{})
-	if e := c.Build(c); e != nil {
+	if e := c.Build(fn); e != nil {
 		err = e
 	} else {
 		ret = root.Eval

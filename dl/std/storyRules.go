@@ -5,7 +5,7 @@ import "github.com/ionous/iffy/spec"
 func storyRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "commence").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("set text", "story", "status left", "{determine playerSurroundings}")
 			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
 			c.End()
@@ -21,7 +21,7 @@ func storyRules(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("run rule", "construct status line").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("say", "{story.statusLeft}")
 			c.Cmd("say", "{story.statusRight}")
 			c.End()
@@ -29,7 +29,7 @@ func storyRules(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("run rule", "print banner text").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("say", "{if story.title}{story.title}{else}Welcome{end}")
 			c.Cmd("say", "{if story.headline}{story.headline}{else}An interactive fiction{end}{if story.author} by {story.author}{end}")
 			if c.Cmd("print slash").Begin() {
@@ -43,7 +43,7 @@ func storyRules(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("run rule", "describe first room").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 
 			c.End()
 		}
@@ -54,7 +54,7 @@ func storyRules(c spec.Block) {
 // func updateScore(c spec.Block) {
 // 	// print the class name if all else fails
 // 	if c.Cmd("run rule", "update score").Begin() {
-// 		if c.Param("decide").Cmds().Begin() {
+// 		if c.Param("decide").Begin() {
 // 			if c.Cmd("choose").Begin() {
 // 				if c.Cmd("if", c.Cmd("get", c.Cmd("get", "@", "story"), "scored")).Begin() {
 

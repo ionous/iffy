@@ -139,12 +139,12 @@ func defineRules(c spec.Block, mandates []string) {
 
 func defineEventHandler(c spec.Block) {
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
-		if c.Param("go").Cmds().Begin() {
+		if c.Param("go").Begin() {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 			c.Cmd("say", "jumping!")
 			c.End()
 		}
-		if c.Param("options").Cmds().Begin() {
+		if c.Param("options").Begin() {
 			c.Cmd("capture")
 			c.Cmd("target only")
 			c.End()
@@ -153,7 +153,7 @@ func defineEventHandler(c spec.Block) {
 	}
 	if c.Cmd("mandate").Begin() {
 		if c.Cmd("run rule", "jump").Begin() {
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				if c.Cmd("print span").Begin() {
 					c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 					c.Cmd("say", "jumped!")

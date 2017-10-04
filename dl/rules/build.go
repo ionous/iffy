@@ -11,7 +11,7 @@ func Master(cmds *ops.Ops, xform ops.Transform, pt *unique.Stack, buildPatterns 
 	// Accumulate rules into root.
 	var root struct{ Mandates }
 	c := cmds.NewBuilder(&root, xform)
-	if c.Param("mandates").Cmds().Begin() {
+	if c.Param("mandates").Begin() {
 		for _, b := range buildPatterns {
 			b(c)
 		}

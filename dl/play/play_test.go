@@ -82,7 +82,7 @@ func definePlay(c spec.Block) {
 	}
 	if c.Cmd("mandate").Begin() {
 		if c.Cmd("run rule", "jump").Begin() {
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				if c.Cmd("print span").Begin() {
 					c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "jumper")))
 					c.Cmd("say", "jumped!")
@@ -99,7 +99,7 @@ func definePlay(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
-		if c.Param("go").Cmds().Begin() {
+		if c.Param("go").Begin() {
 			if c.Cmd("print span").Begin() {
 				c.Cmd("upper the", c.Cmd("get", c.Cmd("get", "@", "data"), "jumper"))
 				c.Cmd("say", "is jumping!")

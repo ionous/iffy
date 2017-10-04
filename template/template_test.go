@@ -6,7 +6,6 @@ import (
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
-	"github.com/ionous/iffy/spec/clog"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"
@@ -155,9 +154,7 @@ func TestStates(t *testing.T) {
 			ts := template.MakeFactory(make(ident.Counters), directives)
 			var root struct{ rt.TextEval }
 			c := cmds.NewBuilder(&root, core.Xform{})
-			x := clog.Make(tstlog{t}, c)
-			// x = c
-			if e := ts.Templatize(x, str); e != nil {
+			if e := ts.Templatize(c, str); e != nil {
 				t.Fatal(e)
 			} else if e := c.Build(); e != nil {
 				t.Fatal(e)

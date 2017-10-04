@@ -67,7 +67,7 @@ func TestOps(t *testing.T) {
 		if c.Cmd("contents").Begin() {
 			c.Val("dilute, dilute").End()
 		}
-		if c.Param("more").Cmds().Begin() {
+		if c.Param("more").Begin() {
 			c.Cmd("container", c.Param("value").Val(5))
 			c.Cmd("container", c.Param("value").Val(7))
 			c.End()

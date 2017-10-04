@@ -11,7 +11,7 @@ func ExampleLogging() {
 	b, _ := cmd.NewBuilder()
 	c := clog.Make(os.Stdout, b)
 	if c.Cmd("unit").Begin() {
-		if c.Param("trials").Cmds().Begin() {
+		if c.Param("trials").Begin() {
 			c.Cmd("match output", sliceOf.String("a", "b", "c", "d"))
 			if c.Cmd("match output", sliceOf.String("a", "b", "c", "d")).Begin() {
 				if c.Cmd("for each", sliceOf.Float(1, 2, 3, 4)).Begin() {
@@ -29,7 +29,6 @@ func ExampleLogging() {
 	// Cmd unit
 	//  {
 	//   Param trials
-	//   Cmds
 	//   {
 	//    Cmd match output [a b c d]
 	//    Cmd match output [a b c d]

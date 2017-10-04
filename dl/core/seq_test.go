@@ -31,7 +31,7 @@ func TestSequences(t *testing.T) {
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", len(expect))
-			if c.Param("go").Cmds().Begin() {
+			if c.Param("go").Begin() {
 				c.Cmd("say", c.Cmd("cycle text",
 					gen.NewName("cycle counter"),
 					sliceOf.String("a", "b", "c"),
@@ -54,7 +54,7 @@ func TestSequences(t *testing.T) {
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", 9)
-			if c.Param("go").Cmds().Begin() {
+			if c.Param("go").Begin() {
 				c.Cmd("say", c.Cmd("shuffle text",
 					gen.NewName("shuffle counter"),
 					sliceOf.String("a", "b", "c"),
@@ -103,7 +103,7 @@ func TestSequences(t *testing.T) {
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", len(expect))
-			if c.Param("go").Cmds().Begin() {
+			if c.Param("go").Begin() {
 				c.Cmd("say", c.Cmd("stopping text",
 					gen.NewName("stopping counter"),
 					sliceOf.String("a", "b", "c"),
@@ -129,7 +129,7 @@ func TestSequences(t *testing.T) {
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", 5)
-			if c.Param("go").Cmds().Begin() {
+			if c.Param("go").Begin() {
 				c.Cmd("say", c.Cmd("stopping text",
 					gen.NewName("stopping counter"),
 					sliceOf.String("a"),

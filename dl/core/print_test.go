@@ -56,7 +56,7 @@ func TestPrint(t *testing.T) {
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("hello", "there", "world"))
-			if c.Param("go").Cmds().Begin() {
+			if c.Param("go").Begin() {
 				c.Cmd("say", c.Cmd("get", "@", "text"))
 				c.End()
 			}
@@ -77,7 +77,7 @@ func TestPrint(t *testing.T) {
 		if c.Cmd("print span").Begin() {
 			if c.Cmd("for each text").Begin() {
 				c.Param("in").Val(sliceOf.String("hello", "there", "world"))
-				if c.Param("go").Cmds().Begin() {
+				if c.Param("go").Begin() {
 					c.Cmd("say", c.Cmd("get", "@", "text")).End()
 				}
 				c.End()

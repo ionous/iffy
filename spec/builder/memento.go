@@ -11,21 +11,26 @@ import (
 //  }
 // "the command, the array, and the val are all considered members of "parent".
 type Memento struct {
-	factory *_Factory   // for chaining
-	chain   *Memento    // for detecting bad chaining
-	pos     Location    // source of the memento
-	key     string      // the target of this memento in its parent
-	spec    spec.Spec   // cmd data
-	specs   spec.Specs  // array data
-	val     interface{} // primitive data
-	kids    Mementos    // child data, either array elements or command parameters
+	factory  *_Factory   // for chaining
+	chain    *Memento    // for detecting bad chaining
+	pos      Location    // source of the memento
+	key      string      // the target of this memento in its parent
+	spec     spec.Spec   // cmd data
+	specs    spec.Specs  // array data
+	val      interface{} // primitive data
+	kids     Mementos    // child data, either array elements or command parameters
+	cmdBlock bool
 }
 
-// Begin starts a new parameter block. Usually used as:
-//  if c.Cmd("name").Begin() {
-//    c.End()
-//  }
+// Begin starts a new block
 func (n *Memento) Begin() (okay bool) {
+	if !n.cmdBlock {
+		if next, e := n.factory.newCmds(n); e != nil {
+			panic(errutil.New(e, Capture(1)))
+		} else {
+			n = next
+		}
+	}
 	if e := n.factory.newBlock(); e != nil {
 		panic(errutil.New(e, Capture(1)))
 	} else {
@@ -48,17 +53,8 @@ func (n *Memento) Cmd(name string, args ...interface{}) (ret spec.Block) {
 	if next, e := n.factory.newCmd(n, name, args); e != nil {
 		panic(errutil.New(e, Capture(1)))
 	} else {
+		next.cmdBlock = true
 		ret = next
-	}
-	return
-}
-
-// Cmds specifies a new array of commands. Additional elements can be added to the array using Begin().
-func (n *Memento) Cmds() (ret spec.Block) {
-	if n, e := n.factory.newCmds(n); e != nil {
-		panic(errutil.New(e, Capture(1)))
-	} else {
-		ret = n
 	}
 	return
 }

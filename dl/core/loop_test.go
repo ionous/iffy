@@ -26,7 +26,7 @@ func TestLoop(t *testing.T) {
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
-			if c.Param("go").Cmds().Begin() {
+			if c.Param("go").Begin() {
 				if c.Cmd("print num").Begin() {
 					c.Cmd("get", "@", "index").End()
 				}
@@ -47,7 +47,7 @@ func TestLoop(t *testing.T) {
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
-			if c.Param("go").Cmds().Begin() {
+			if c.Param("go").Begin() {
 				if c.Cmd("say").Begin() {
 					if c.Cmd("choose text").Begin() {
 						c.Param("if").Cmd("get", "@", "last")

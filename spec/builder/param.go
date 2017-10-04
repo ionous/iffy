@@ -17,18 +17,21 @@ func (p Param) Cmd(name string, args ...interface{}) (ret spec.Block) {
 		panic(errutil.New(e, Capture(1)))
 	} else {
 		n.key = p.key
+		n.cmdBlock = true
 		ret = n
 	}
 	return
 }
 
 // Cmds creates a new array of commands for the parameter mentioned by Memento.Param().
-func (p Param) Cmds() (ret spec.Block) {
+func (p Param) Begin() (okay bool) {
 	if n, e := p.src.factory.newCmds(p.src); e != nil {
+		panic(errutil.New(e, Capture(1)))
+	} else if e := n.factory.newBlock(); e != nil {
 		panic(errutil.New(e, Capture(1)))
 	} else {
 		n.key = p.key
-		ret = n
+		okay = true
 	}
 	return
 }

@@ -40,7 +40,7 @@ func printLocationRules(c spec.Block) {
 		c.End()
 	}
 	// if c.Cmd("run rule", "describe object").Begin() {
-	// 	if c.Param("decide").Cmds().Begin() {
+	// 	if c.Param("decide").Begin() {
 	// 		if c.Cmd("choose").Begin() {
 	// 			c.Param("if").Cmd("{object.brief}")
 	// 			c.Param("true").Cmd("say", "{object.brief}")

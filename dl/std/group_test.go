@@ -34,7 +34,7 @@ func TestGrouping(t *testing.T) {
 	several := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
 			c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				c.Cmd("set bool", "@", "with articles", true)
 				c.End()
 			}
@@ -47,7 +47,7 @@ func TestGrouping(t *testing.T) {
 				c.End()
 			}
 			//
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				c.Cmd("say", "a few things")
 				c.End()
 			}
@@ -72,7 +72,7 @@ func TestGrouping(t *testing.T) {
 	replacement := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
 			c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				c.Cmd("set text", "@", "label", "some things")
 				c.Cmd("set bool", "@", "innumerable", true)
 				c.Cmd("set bool", "@", "without objects", true)
@@ -101,7 +101,7 @@ func TestGrouping(t *testing.T) {
 		fancy := func(c spec.Block) {
 			if c.Cmd("run rule", "group together").Begin() {
 				c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "scrabble tile")
-				if c.Param("decide").Cmds().Begin() {
+				if c.Param("decide").Begin() {
 					c.Cmd("set text", "@", "label", "the tiles")
 					c.Cmd("set bool", "@", "innumerable", true)
 					c.Cmd("set bool", "@", "without articles", true)
@@ -112,7 +112,7 @@ func TestGrouping(t *testing.T) {
 			if c.Cmd("run rule", "print group").Begin() {
 				c.Param("if").Cmd("compare text", c.Cmd("get", "@", "label"), c.Cmd("equal to"), "the tiles")
 				c.Param("continue").Cmd("continue before")
-				if c.Param("decide").Cmds().Begin() {
+				if c.Param("decide").Begin() {
 					c.Cmd("say", "from a Scrabble set")
 					c.End()
 				}
@@ -140,7 +140,7 @@ func TestGrouping(t *testing.T) {
 			PrintNameRules, group.GroupRules, func(c spec.Block) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "scrabble tile")
-					if c.Param("decide").Cmds().Begin() {
+					if c.Param("decide").Begin() {
 						c.Cmd("set text", "@", "label", "scrabble tiles")
 						c.Cmd("set bool", "@", "without articles", true)
 						c.End()
@@ -156,7 +156,7 @@ func TestGrouping(t *testing.T) {
 			PrintNameRules, group.GroupRules, func(c spec.Block) {
 				if c.Cmd("run rule", "group together").Begin() {
 					c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "scrabble tile")
-					if c.Param("decide").Cmds().Begin() {
+					if c.Param("decide").Begin() {
 						c.Cmd("set text", "@", "label", "scrabble tiles")
 						c.Cmd("set bool", "@", "with articles", true)
 						c.End()
@@ -168,7 +168,7 @@ func TestGrouping(t *testing.T) {
 	unnamedThings := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
 			c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				c.Cmd("set text", "@", "label", "things")
 				c.Cmd("set bool", "@", "with articles", true)
 				c.End()

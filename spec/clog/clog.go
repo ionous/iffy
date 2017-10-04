@@ -32,7 +32,7 @@ func (f clog) Begin() bool {
 func (f clog) Param(field string) spec.Slot {
 	f.l.Log("Param", field)
 	p := f.c.Param(field)
-	return clog{l: f.l, p: p}
+	return clog{f.l, f.c, p}
 }
 func (f clog) End() {
 	f.l.Dedent()
@@ -49,12 +49,6 @@ func (f clog) Cmd(name string, args ...interface{}) spec.Block {
 	}
 	f.l.Log("Cmd "+name, args...)
 	b := f.p.Cmd(name, args...)
-	return clog{f.l, b, b}
-}
-
-func (f clog) Cmds() spec.Block {
-	f.l.Log("Cmds")
-	b := f.p.Cmds()
 	return clog{f.l, b, b}
 }
 
