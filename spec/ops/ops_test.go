@@ -47,7 +47,7 @@ func TestOps(t *testing.T) {
 	cmds := NewOps(nil)
 	unique.PanicTypes(cmds,
 		(*Container)(nil), (*Contents)(nil))
-	t.Run("KeyValue", func(t *testing.T) {
+	t.Run("kv", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
 		c := cmds.NewBuilder(&root, DefaultXform{})
@@ -55,10 +55,9 @@ func TestOps(t *testing.T) {
 		//
 		if e := c.Build(); assert.NoError(e) {
 			assert.EqualValues(4, root.Value)
-
 		}
 	})
-	t.Run("AllAreOne", func(t *testing.T) {
+	t.Run("defines", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
 		c := cmds.NewBuilder(&root, DefaultXform{})
@@ -75,6 +74,22 @@ func TestOps(t *testing.T) {
 		}
 		if e := c.Build(); assert.NoError(e) {
 			assert.EqualValues(*testData, root)
+			t.Log(pretty.Sprint(root))
+		}
+	})
+	t.Run("auto", func(t *testing.T) {
+		var root struct{ List []SomeInterface }
+		assert := assert.New(t)
+		c := cmds.NewBuilder(&root, DefaultXform{})
+		//
+		c.Cmd("contents", c.Val("a"))
+		c.Cmd("contents", c.Val("b"))
+		//
+		expect := []SomeInterface{
+			&Contents{"a"}, &Contents{"b"},
+		}
+		if e := c.Build(); assert.NoError(e) {
+			assert.EqualValues(expect, root.List)
 			t.Log(pretty.Sprint(root))
 		}
 	})

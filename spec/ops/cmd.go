@@ -17,16 +17,29 @@ func (c *Command) Target() r.Value {
 }
 
 func (c *Command) Position(arg interface{}) (err error) {
-	if cnt := c.target.NumField(); c.index >= cnt {
-		err = errutil.New("too many arguments", c.target, "expected", cnt)
+	idx, tgt := c.index, c.target
+	if cnt := tgt.NumField(); idx+1 > cnt {
+		err = errutil.New("too many arguments", tgt, "expected", cnt)
+	} else if dst := tgt.Field(idx); !dst.IsValid() {
+		err = errutil.New("couldnt get field", tgt, idx)
 	} else {
-		field := c.target.Field(c.index)
-		if !field.IsValid() {
-			err = errutil.New("couldnt get field", c.target, c.index)
-		} else if e := c.setField(field, arg); e != nil {
-			err = errutil.New("couldnt get field", c.target, c.index, e)
-		} else {
-			c.index++
+		var auto bool
+		if dst.Kind() == r.Slice && idx+1 == cnt {
+			if src, ok := arg.(*Command); ok {
+				auto = true
+				if slice, e := appendValue(dst, src.target); e != nil {
+					err = e
+				} else {
+					dst.Set(slice)
+				}
+			}
+		}
+		if !auto {
+			if e := c.setField(dst, arg); e != nil {
+				err = errutil.New("couldnt set field", tgt, idx, e)
+			} else {
+				c.index = idx + 1
+			}
 		}
 	}
 	return
@@ -51,7 +64,6 @@ func (c *Command) setField(dst r.Value, v interface{}) (err error) {
 		if e := coerce.Value(dst, targetPtr); e != nil {
 			err = errutil.New("couldnt assign command", e)
 		}
-
 	case *Commands:
 		if kind, isArray := arrayKind(dst.Type()); !isArray || kind != r.Interface {
 			if !isArray {
@@ -60,15 +72,13 @@ func (c *Command) setField(dst r.Value, v interface{}) (err error) {
 				err = errutil.New("trying to set commands to", kind)
 			}
 		} else {
-			slice, elType := dst, dst.Type().Elem()
+			slice := dst
 			for _, c := range v.els {
-				// all commands are interfaces are implemented with pointers
-				rvalue := c.target.Addr()
-				if from := rvalue.Type(); !from.AssignableTo(elType) {
-					err = errutil.Fmt("incompatible element type. from: %v to: %v", from, elType)
+				if next, e := appendValue(slice, c.target); e != nil {
+					err = e
 					break
 				} else {
-					slice = r.Append(slice, rvalue)
+					slice = next
 				}
 			}
 			dst.Set(slice)
@@ -82,6 +92,17 @@ func (c *Command) setField(dst r.Value, v interface{}) (err error) {
 				return c.setValue(del, sel)
 			})
 		}
+	}
+	return
+}
+
+func appendValue(slice r.Value, target Target) (ret r.Value, err error) {
+	rvalue := target.Addr() // all commands are implemented with pointers
+	elType := slice.Type().Elem()
+	if from := rvalue.Type(); !from.AssignableTo(elType) {
+		err = errutil.Fmt("incompatible element type. from: %v to: %v", from, elType)
+	} else {
+		ret = r.Append(slice, rvalue)
 	}
 	return
 }
