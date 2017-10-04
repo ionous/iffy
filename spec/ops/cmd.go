@@ -23,22 +23,34 @@ func (c *Command) Position(arg interface{}) (err error) {
 	} else if dst := tgt.Field(idx); !dst.IsValid() {
 		err = errutil.New("couldnt get field", tgt, idx)
 	} else {
-		var auto bool
-		if dst.Kind() == r.Slice && idx+1 == cnt {
-			if src, ok := arg.(*Command); ok {
-				auto = true
-				if slice, e := appendValue(dst, src.target); e != nil {
+		// check for the last value is an array:
+		var autoel bool
+		src := r.ValueOf(arg)
+		if idx+1 == cnt && dst.Kind() == r.Slice && src.Kind() != r.Slice {
+			if cmd, ok := arg.(*Command); ok {
+				src, autoel = cmd.target.Addr(), true
+			} else {
+				box := r.New(dst.Type().Elem()).Elem()
+				if e := c.setValue(box, src); e != nil {
+					err = e
+				} else {
+					src, autoel = box, true
+				}
+			}
+		}
+		if err == nil {
+			if autoel {
+				if slice, e := appendValue(dst, src); e != nil {
 					err = e
 				} else {
 					dst.Set(slice)
 				}
-			}
-		}
-		if !auto {
-			if e := c.setField(dst, arg); e != nil {
-				err = errutil.New("couldnt set field", tgt, idx, e)
 			} else {
-				c.index = idx + 1
+				if e := c.setField(dst, arg); e != nil {
+					err = errutil.New("couldnt set field", tgt, idx, e)
+				} else {
+					c.index = idx + 1
+				}
 			}
 		}
 	}
@@ -74,7 +86,7 @@ func (c *Command) setField(dst r.Value, v interface{}) (err error) {
 		} else {
 			slice := dst
 			for _, c := range v.els {
-				if next, e := appendValue(slice, c.target); e != nil {
+				if next, e := appendValue(slice, c.target.Addr()); e != nil {
 					err = e
 					break
 				} else {
@@ -96,13 +108,13 @@ func (c *Command) setField(dst r.Value, v interface{}) (err error) {
 	return
 }
 
-func appendValue(slice r.Value, target Target) (ret r.Value, err error) {
-	rvalue := target.Addr() // all commands are implemented with pointers
+// seems to be duplication here between Commands the struct, which has append, and this.
+func appendValue(slice r.Value, src r.Value) (ret r.Value, err error) {
 	elType := slice.Type().Elem()
-	if from := rvalue.Type(); !from.AssignableTo(elType) {
-		err = errutil.Fmt("incompatible element type. from: %v to: %v", from, elType)
+	if srcType := src.Type(); !srcType.AssignableTo(elType) {
+		err = errutil.Fmt("incompatible element from %v to %v", srcType, elType)
 	} else {
-		ret = r.Append(slice, rvalue)
+		ret = r.Append(slice, src)
 	}
 	return
 }
@@ -118,7 +130,7 @@ func (c *Command) setValue(dst r.Value, src r.Value) (err error) {
 	return
 }
 
-// helper for managing errror
+// helper for managing error
 func xform(x Transform, src r.Value, hint r.Type) (ret r.Value, err error) {
 	// if the destintation slot in the command is an interface -- ie. another command.
 	if hint.Kind() == r.Interface {

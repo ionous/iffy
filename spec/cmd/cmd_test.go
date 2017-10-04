@@ -11,12 +11,9 @@ import (
 func TestMismatchedEnds(t *testing.T) {
 	assert := assert.New(t)
 	if c, ok := cmd.NewBuilder(); assert.True(ok) {
-		if c.Cmds().Begin() {
-			if c.Cmd("unit").Begin() {
-				// c.End() --> missing an end
-			} // unit
-			c.End()
-		} // array block
+		if c.Cmd("unit").Begin() {
+			// c.End() --> missing an end
+		} // unit
 		if root, e := c.Build(); !assert.Error(e) {
 			cmd.Print(root)
 		}
