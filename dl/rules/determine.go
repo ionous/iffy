@@ -11,10 +11,8 @@ type Determine struct{ Obj rt.ObjectEval }
 func (p *Determine) GetBool(run rt.Runtime) (ret bool, err error) {
 	if data, e := p.Obj.GetObject(run); e != nil {
 		err = errutil.New("couldnt determine bool, because", e)
-		panic(err)
 	} else if r, e := run.GetBoolMatching(data); e != nil {
 		err = errutil.New("couldnt determine bool, because", e)
-		panic(err)
 	} else {
 		ret = r
 	}
