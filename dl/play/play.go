@@ -50,13 +50,7 @@ func (p *Play) build(cmds *ops.Ops, xform ops.Transform) (ret Facts, err error) 
 	var f Facts
 	var root struct{ Definitions }
 	c := cmds.NewBuilder(&root, xform)
-	if c.Cmds().Begin() {
-		for _, v := range p.callbacks {
-			v(c)
-		}
-		c.End()
-	}
-	if e := c.Build(); e != nil {
+	if e := c.Build(p.callbacks...); e != nil {
 		err = e
 	} else if e := root.Define(&f); e != nil {
 		err = e

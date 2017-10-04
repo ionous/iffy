@@ -115,10 +115,7 @@ func astBinaryExpr(c spec.Slot, n *ast.BinaryExpr) (err error) {
 		err = errutil.New("unsupported operation", n.Op)
 	} else {
 		if c := c.Cmd(op); c.Begin() {
-			if c.Cmds().Begin() {
-				err = binaryPair(c, n.X, n.Y, kindOf.TypeObjEval)
-				c.End()
-			}
+			err = binaryPair(c, n.X, n.Y, kindOf.TypeObjEval)
 			c.End()
 		}
 	}

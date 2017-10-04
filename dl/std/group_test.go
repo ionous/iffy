@@ -42,11 +42,8 @@ func TestGrouping(t *testing.T) {
 		}
 		if c.Cmd("run rule", "print several").Begin() {
 			if c.Param("if").Cmd("all true").Begin() {
-				if c.Cmds().Begin() {
-					c.Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
-					c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)
-					c.End()
-				}
+				c.Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
+				c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)
 				c.End()
 			}
 			//

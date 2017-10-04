@@ -34,21 +34,18 @@ func TestOrder(t *testing.T) {
 
 	var root struct{ rules.Mandates }
 	c := cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmds().Begin() {
-		if c.Cmd("list text", "order").Begin() {
-			c.Param("decide").Val("a")
-			c.End()
-		}
-		if c.Cmd("list text", "order").Begin() {
-			c.Param("decide").Val("b")
-			c.Param("continue").Cmd("continue after")
-			c.End()
-		}
-		if c.Cmd("list text", "order").Begin() {
-			c.Param("decide").Val("c")
-			c.Param("continue").Cmd("continue before")
-			c.End()
-		}
+	if c.Cmd("list text", "order").Begin() {
+		c.Param("decide").Val("a")
+		c.End()
+	}
+	if c.Cmd("list text", "order").Begin() {
+		c.Param("decide").Val("b")
+		c.Param("continue").Cmd("continue after")
+		c.End()
+	}
+	if c.Cmd("list text", "order").Begin() {
+		c.Param("decide").Val("c")
+		c.Param("continue").Cmd("continue before")
 		c.End()
 	}
 	//

@@ -142,7 +142,6 @@ func nparse(t *testing.T, s string) (ret ast.Expr) {
 }
 
 func nconvert(t *testing.T, cmds *ops.Ops, dst interface{}, n ast.Expr) {
-
 	c := cmds.NewBuilder(dst, core.Xform{})
 	if e := astExpr(c, n, r.TypeOf(dst)); e != nil {
 		t.Fatal(e, pretty.Sprint(n))

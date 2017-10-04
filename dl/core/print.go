@@ -43,7 +43,7 @@ type PrintNumWord struct {
 // but we need the command array interface to allow one/many/commands more transparently
 // also, consider whether say should implement both get text and execute -- buffer eveerything up in the get text version.
 type Say struct {
-	Text rt.TextEval
+	Text []rt.TextEval
 }
 
 func (p *PrintSpan) Execute(run rt.Runtime) error {
@@ -107,11 +107,17 @@ func (p *PrintSlash) Execute(run rt.Runtime) (err error) {
 }
 
 func (p *Say) Execute(run rt.Runtime) (err error) {
-	if s, e := p.Text.GetText(run); e != nil {
-		err = e
-	} else if len(s) > 0 {
-		w := run.Writer()
-		_, err = io.WriteString(w, s)
+	for _, t := range p.Text {
+		if s, e := t.GetText(run); e != nil {
+			err = e
+			break
+		} else if len(s) > 0 {
+			w := run.Writer()
+			if _, e := io.WriteString(w, s); e != nil {
+				err = e
+				break
+			}
+		}
 	}
 	return
 }

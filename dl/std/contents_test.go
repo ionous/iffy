@@ -73,20 +73,12 @@ func TestContents(t *testing.T) {
 
 		var loc struct{ Locations []Locate }
 		c := cmds.NewBuilder(&loc, core.Xform{})
-		if c.Cmds().Begin() {
-			build(c)
-			c.End()
-		}
-		if e := c.Build(); e != nil {
+		if e := c.Build(build); e != nil {
 			err = e
 		} else {
 			var root struct{ rt.ExecuteList }
 			c := cmds.NewBuilder(&root, core.Xform{})
-			if c.Cmds().Begin() {
-				exec(c)
-				c.End()
-			}
-			if e := c.Build(); e != nil {
+			if e := c.Build(exec); e != nil {
 				err = e
 			} else {
 				var lines printer.Lines
@@ -163,10 +155,7 @@ func TestContents(t *testing.T) {
 	// summary tests:
 	printSummary := func(c spec.Block) {
 		if c.Cmd("print span").Begin() {
-			if c.Cmds().Begin() {
-				c.Cmd("determine", c.Cmd("print summary", "box"))
-				c.End()
-			}
+			c.Cmd("determine", c.Cmd("print summary", "box"))
 			c.End()
 		}
 	}
@@ -198,10 +187,7 @@ func TestContents(t *testing.T) {
 	printObject := func(name string) OpsCb {
 		return func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
-				if c.Cmds().Begin() {
-					c.Cmd("determine", c.Cmd("print object", name))
-					c.End()
-				}
+				c.Cmd("determine", c.Cmd("print object", name))
 				c.End()
 			}
 		}

@@ -76,12 +76,7 @@ func xTestStory(t *testing.T) {
 	match := func(t *testing.T, expected string, fn func(spec.Block)) {
 		var root struct{ rt.ExecuteList }
 		c := cmds.NewBuilder(&root, xform)
-		if e := c.Build(func(c spec.Block) {
-			if c.Cmds().Begin() {
-				fn(c)
-				c.End()
-			}
-		}); e != nil {
+		if e := c.Build(fn); e != nil {
 			t.Fatal(e)
 		} else {
 			// t.Log(pretty.Sprint(root.ExecuteList))

@@ -36,11 +36,8 @@ func (q sequence) advance(c spec.Block, t Token) (ret tstate, err error) {
 // end the ambient join, without changing state:
 func endJoin(c spec.Block) {
 	c.End()
-	c.End()
 }
 
-func startJoin(c spec.Block) {
-	if c.Cmd("join").Begin() {
-		c.Cmds().Begin()
-	}
+func startJoin(c spec.Block) bool {
+	return c.Cmd("join").Begin()
 }

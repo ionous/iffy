@@ -47,10 +47,7 @@ func PrintNameRules(c spec.Block) {
 			if c.Cmd("say").Begin() {
 				if c.Cmd("pluralize").Begin() {
 					if c.Cmd("buffer").Begin() {
-						if c.Cmds().Begin() {
-							c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-							c.End()
-						}
+						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 						c.End()
 					}
 					c.End()
@@ -73,18 +70,15 @@ func PrintNameRules(c spec.Block) {
 	if c.Cmd("run rule", "print several").Begin() {
 		if c.Param("decide").Cmds().Begin() {
 			if c.Cmd("print span").Begin() {
-				if c.Cmds().Begin() {
-					c.Cmd("print num word", c.Cmd("get", "@", "group size"))
-					c.Cmd("say", "other")
-					if c.Cmd("choose", c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)).Begin() {
-						if c.Param("true").Cmds().Begin() {
-							c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
-							c.End()
-						}
-						if c.Param("false").Cmds().Begin() {
-							c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-							c.End()
-						}
+				c.Cmd("print num word", c.Cmd("get", "@", "group size"))
+				c.Cmd("say", "other")
+				if c.Cmd("choose", c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)).Begin() {
+					if c.Param("true").Cmds().Begin() {
+						c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
+						c.End()
+					}
+					if c.Param("false").Cmds().Begin() {
+						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 						c.End()
 					}
 					c.End()
@@ -103,10 +97,7 @@ func PrintObjectRules(c spec.Block) {
 		if c.Param("decide").Cmds().Begin() {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 			if c.Cmd("print bracket").Begin() {
-				if c.Cmds().Begin() {
-					c.Cmd("determine", c.Cmd("print summary", c.Cmd("get", "@", "target")))
-					c.End()
-				}
+				c.Cmd("determine", c.Cmd("print summary", c.Cmd("get", "@", "target")))
 				c.End()
 			}
 			c.End()
@@ -115,11 +106,8 @@ func PrintObjectRules(c spec.Block) {
 	}
 	if c.Cmd("run rule", "print summary").Begin() {
 		if c.Param("if").Cmd("all true").Begin() {
-			if c.Cmds().Begin() {
-				c.Cmd("is class", c.Cmd("get", "@", "target"), "container")
-				c.Cmd("get", c.Cmd("get", "@", "target"), "closed")
-				c.End()
-			}
+			c.Cmd("is class", c.Cmd("get", "@", "target"), "container")
+			c.Cmd("get", c.Cmd("get", "@", "target"), "closed")
 			c.End()
 		}
 		if c.Param("decide").Cmds().Begin() {

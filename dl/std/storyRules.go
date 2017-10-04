@@ -15,10 +15,7 @@ func storyRules(c spec.Block) {
 	if c.Cmd("text rule", "player surroundings").Begin() {
 		// player location or darkness
 		if c.Param("decide").Cmd("buffer").Begin() {
-			if c.Cmds().Begin() {
-				c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", c.Cmd("player"))))
-				c.End()
-			}
+			c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", c.Cmd("player"))))
 			c.End()
 		}
 		c.End()
@@ -36,12 +33,9 @@ func storyRules(c spec.Block) {
 			c.Cmd("say", "{if story.title}{story.title}{else}Welcome{end}")
 			c.Cmd("say", "{if story.headline}{story.headline}{else}An interactive fiction{end}{if story.author} by {story.author}{end}")
 			if c.Cmd("print slash").Begin() {
-				if c.Cmds().Begin() {
-					c.Cmd("say", "Release {story.MajorVersion}.{story.MinorVersion}.{story.PatchVersion}")
-					c.Cmd("say", "{if story.SerialNumber}{story.SerialNumber}{end}")
-					c.Cmd("say", "Iffy 1.0")
-					c.End()
-				}
+				c.Cmd("say", "Release {story.MajorVersion}.{story.MinorVersion}.{story.PatchVersion}")
+				c.Cmd("say", "{if story.SerialNumber}{story.SerialNumber}{end}")
+				c.Cmd("say", "Iffy 1.0")
 				c.End()
 			}
 			c.End()

@@ -26,18 +26,17 @@ type Commands struct {
 	*ChooseText
 	*ClassName
 	*CompareNum
+	*CompareObj
 	*CompareText
 	*Comprise
 	*CycleText
 	*DoNothing
-	*EqualTo
 	// *Error
 	*Filter
 	*ForEachNum
 	*ForEachObj
 	*ForEachText
 	*Get
-	*GreaterThan
 	// *Inc
 	*Includes
 	// *Is/State -> use Get
@@ -51,9 +50,7 @@ type Commands struct {
 	// *IsValid
 	*Join
 	*Len
-	*LesserThan
 	*ListUp
-	*NotEqualTo
 	*Num
 	*Numbers
 	*Object
@@ -84,4 +81,8 @@ type Commands struct {
 	*Texts
 	*TopObject
 	// *Using
+	// CompareTo:
+	*EqualTo
+	*GreaterThan
+	*LesserThan
 }

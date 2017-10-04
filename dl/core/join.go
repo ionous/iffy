@@ -5,8 +5,8 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// Join is really a hack for the fact that Say takes only one string.
-// Say only takes one string because the spec generator doesnt transparently handle arrays. FIX: it.
+// Join combines multiple text into a buffer.
+// It's similar to Say, except that say prints rather than returns text.
 type Join struct {
 	Text []rt.TextEval
 }

@@ -43,13 +43,7 @@ func (r *Play) Define(f *Facts) (err error) {
 
 	var root struct{ Definitions }
 	c := cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmds().Begin() {
-		for _, v := range r.callbacks {
-			v(c)
-		}
-		c.End()
-	}
-	if e := c.Build(); e != nil {
+	if e := c.Build(r.callbacks...); e != nil {
 		err = e
 	} else {
 		err = root.Define(f)
@@ -115,18 +109,12 @@ func TestEvents(t *testing.T) {
 func defineGrammar(c spec.Block) {
 	if c.Cmd("grammar").Begin() {
 		if c.Cmd("all of").Begin() {
-			if c.Cmds().Begin() {
-				if c.Cmd("any of").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("word", "l")
-						c.Cmd("word", "look")
-						c.End()
-					}
-					c.End()
-				}
-				c.Cmd("action", "look")
+			if c.Cmd("any of").Begin() {
+				c.Cmd("word", "l")
+				c.Cmd("word", "look")
 				c.End()
 			}
+			c.Cmd("action", "look")
 			c.End()
 		}
 		c.End()
@@ -167,11 +155,8 @@ func defineEventHandler(c spec.Block) {
 		if c.Cmd("run rule", "jump").Begin() {
 			if c.Param("decide").Cmds().Begin() {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-						c.Cmd("say", "jumped!")
-						c.End()
-					}
+					c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
+					c.Cmd("say", "jumped!")
 					c.End()
 				}
 				c.End()

@@ -67,61 +67,55 @@ func GroupRules(c spec.Block) {
 	if c.Cmd("run rule", "print group").Begin() {
 		if c.Param("decide").Cmds().Begin() {
 			if c.Cmd("print span").Begin() {
-				if c.Cmds().Begin() {
-					if c.Cmd("choose", c.Cmd("is empty", c.Cmd("get", "@", "label"))).Begin() {
-						// no label: then the group is an inline list of things ( and no brackets. )
-						if c.Param("true").Cmds().Begin() {
-							if c.Cmd("print objects", c.Cmd("get", "@", "objects")).Begin() {
-								c.Param("articles").Cmd("get", "@", "with articles")
-								c.End() // print objects
-							}
-							c.End() // true, no label
+				if c.Cmd("choose", c.Cmd("is empty", c.Cmd("get", "@", "label"))).Begin() {
+					// no label: then the group is an inline list of things ( and no brackets. )
+					if c.Param("true").Cmds().Begin() {
+						if c.Cmd("print objects", c.Cmd("get", "@", "objects")).Begin() {
+							c.Param("articles").Cmd("get", "@", "with articles")
+							c.End() // print objects
 						}
-						// the label is not empty: then the group is a block of things.
-						if c.Param("false").Cmds().Begin() {
-							// before the label, possibly write the number of objects:
-							if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
-								if c.Param("false").Cmds().Begin() {
-									c.Cmd("print num word", c.Cmd("len", c.Cmd("get", "@", "objects")))
-									c.End()
-								}
+						c.End() // true, no label
+					}
+					// the label is not empty: then the group is a block of things.
+					if c.Param("false").Cmds().Begin() {
+						// before the label, possibly write the number of objects:
+						if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
+							if c.Param("false").Cmds().Begin() {
+								c.Cmd("print num word", c.Cmd("len", c.Cmd("get", "@", "objects")))
 								c.End()
 							}
-							// now the label:
-							c.Cmd("say", c.Cmd("get", "@", "label"))
-							// after the label, possibly write the objects:
-							if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
-								if c.Param("false").Cmds().Begin() {
-									if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
-										// if they are not innumerable, they are numerable.
-										// if they are numerable, then they got a number... in front of some brackets.
-										if c.Param("false").Cmds().Begin() {
-											if c.Cmd("print bracket").Begin() {
-												if c.Cmds().Begin() {
-													c.Cmd("print objects", c.Cmd("get", "@", "objects"),
-														c.Param("articles").Cmd("get", "@", "with articles"))
-													c.End()
-												}
-												c.End()
-											}
-											c.End()
-										}
-										if c.Param("true").Cmds().Begin() {
+							c.End()
+						}
+						// now the label:
+						c.Cmd("say", c.Cmd("get", "@", "label"))
+						// after the label, possibly write the objects:
+						if c.Cmd("choose", c.Cmd("get", "@", "without objects")).Begin() {
+							if c.Param("false").Cmds().Begin() {
+								if c.Cmd("choose", c.Cmd("get", "@", "innumerable")).Begin() {
+									// if they are not innumerable, they are numerable.
+									// if they are numerable, then they got a number... in front of some brackets.
+									if c.Param("false").Cmds().Begin() {
+										if c.Cmd("print bracket").Begin() {
 											c.Cmd("print objects", c.Cmd("get", "@", "objects"),
 												c.Param("articles").Cmd("get", "@", "with articles"))
 											c.End()
 										}
 										c.End()
 									}
-									c.End() // false, not without objects
+									if c.Param("true").Cmds().Begin() {
+										c.Cmd("print objects", c.Cmd("get", "@", "objects"),
+											c.Param("articles").Cmd("get", "@", "with articles"))
+										c.End()
+									}
+									c.End()
 								}
-								c.End() // choose objects
+								c.End() // false, not without objects
 							}
-							c.End() // false, has label
+							c.End() // choose objects
 						}
-						c.End() // end of choose
+						c.End() // false, has label
 					}
-					c.End() // end of line statements
+					c.End() // end of choose
 				}
 				c.End() // end of print
 			}

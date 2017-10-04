@@ -71,12 +71,9 @@ func xTestPlay(t *testing.T) {
 func definePlay(c spec.Block) {
 	if c.Cmd("grammar").Begin() {
 		if c.Cmd("all of").Begin() {
-			if c.Cmds().Begin() {
-				c.Cmd("word", "jump")
-				if c.Cmd("trigger").Begin() {
-					c.Cmd("jump", c.Cmd("player"))
-					c.End()
-				}
+			c.Cmd("word", "jump")
+			if c.Cmd("trigger").Begin() {
+				c.Cmd("jump", c.Cmd("player"))
 				c.End()
 			}
 			c.End()
@@ -87,11 +84,8 @@ func definePlay(c spec.Block) {
 		if c.Cmd("run rule", "jump").Begin() {
 			if c.Param("decide").Cmds().Begin() {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "jumper")))
-						c.Cmd("say", "jumped!")
-						c.End()
-					}
+					c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "jumper")))
+					c.Cmd("say", "jumped!")
 					c.End()
 				}
 				c.End()
@@ -107,11 +101,8 @@ func definePlay(c spec.Block) {
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
 		if c.Param("go").Cmds().Begin() {
 			if c.Cmd("print span").Begin() {
-				if c.Cmds().Begin() {
-					c.Cmd("upper the", c.Cmd("get", c.Cmd("get", "@", "data"), "jumper"))
-					c.Cmd("say", "is jumping!")
-					c.End()
-				}
+				c.Cmd("upper the", c.Cmd("get", c.Cmd("get", "@", "data"), "jumper"))
+				c.Cmd("say", "is jumping!")
 				c.End()
 			}
 			c.End()

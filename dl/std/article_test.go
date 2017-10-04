@@ -74,12 +74,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out a lamp-post.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower a/n", "lamp post"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "lamp post"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -89,12 +86,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out Trevor.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower a/n", "trevor"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "trevor"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -104,12 +98,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out some soldiers.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower a/n", "soldiers"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "soldiers"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -120,11 +111,8 @@ func TestArticles(t *testing.T) {
 		match(t, "A lamp-post can be made out in the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper a/n", "lamp post"))
-						c.Cmd("say", "can be made out in the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper a/n", "lamp post"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 			})
@@ -134,11 +122,8 @@ func TestArticles(t *testing.T) {
 		match(t, "Trevor can be made out in the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper a/n", "trevor"))
-						c.Cmd("say", "can be made out in the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper a/n", "trevor"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 			})
@@ -148,11 +133,8 @@ func TestArticles(t *testing.T) {
 		match(t, "Some soldiers can be made out in the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper a/n", "soldiers"))
-						c.Cmd("say", "can be made out in the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper a/n", "soldiers"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 			})
@@ -163,12 +145,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out the lamp-post.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower the", "lamp post"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "lamp post"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -178,12 +157,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out Trevor.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower the", "trevor"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "trevor"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -193,12 +169,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out the soldiers.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower the", "soldiers"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "soldiers"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -209,11 +182,8 @@ func TestArticles(t *testing.T) {
 		match(t, "The lamp-post may be a trick of the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper the", "lamp post"))
-						c.Cmd("say", "may be a trick of the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper the", "lamp post"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 			})
@@ -223,11 +193,8 @@ func TestArticles(t *testing.T) {
 		match(t, "Trevor may be a trick of the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper the", "trevor"))
-						c.Cmd("say", "may be a trick of the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper the", "trevor"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 			})
@@ -237,11 +204,8 @@ func TestArticles(t *testing.T) {
 		match(t, "The soldiers may be a trick of the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper the", "soldiers"))
-						c.Cmd("say", "may be a trick of the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper the", "soldiers"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 			})
@@ -252,10 +216,7 @@ func TestArticles(t *testing.T) {
 		match(t, "lamps",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("pluralize", "lamp"))
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("pluralize", "lamp"))
 					c.End()
 				}
 			})

@@ -34,17 +34,14 @@ func TestFactorial(t *testing.T) {
 
 	var root struct{ rules.Mandates }
 	c := cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmds().Begin() {
-		if c.Cmd("number rule", "factorial").Begin() {
-			c.Param("if").Cmd("compare num", c.Cmd("get", "@", "num"), c.Cmd("equal to"), 0)
-			c.Param("decide").Val(1)
-			c.End()
-		}
-		if c.Cmd("number rule", "factorial").Begin() {
-			if c.Param("decide").Cmd("mul", c.Cmd("get", "@", "num")).Begin() {
-				c.Cmd("determine", c.Cmd("factorial", c.Cmd("sub", c.Cmd("get", "@", "num"), 1)))
-				c.End()
-			}
+	if c.Cmd("number rule", "factorial").Begin() {
+		c.Param("if").Cmd("compare num", c.Cmd("get", "@", "num"), c.Cmd("equal to"), 0)
+		c.Param("decide").Val(1)
+		c.End()
+	}
+	if c.Cmd("number rule", "factorial").Begin() {
+		if c.Param("decide").Cmd("mul", c.Cmd("get", "@", "num")).Begin() {
+			c.Cmd("determine", c.Cmd("factorial", c.Cmd("sub", c.Cmd("get", "@", "num"), 1)))
 			c.End()
 		}
 		c.End()

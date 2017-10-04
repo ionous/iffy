@@ -37,23 +37,20 @@ func (t tprev) pop() (ret tstate, err error) {
 func (ctx tcontext) convertMulti(c spec.Block, ts []Token) (err error) {
 	// because we are mixing text and evals, we expect the whole thing winds up being text. ( otherwise: what would we do with the intervening text. )
 	// start a new join for the new section
-	if c.Cmd("join").Begin() {
-		if c.Cmds().Begin() {
-			prev := tprev{}
-			var state tstate = base{ctx, prev}
-			for _, token := range ts {
-				if n, e := state.advance(c, token); e != nil {
-					err = e
-					break
-				} else if n == nil {
-					panic("state is nil")
-				} else {
-					state = n
-				}
+	if startJoin(c) {
+		prev := tprev{}
+		var state tstate = base{ctx, prev}
+		for _, token := range ts {
+			if n, e := state.advance(c, token); e != nil {
+				err = e
+				break
+			} else if n == nil {
+				panic("state is nil")
+			} else {
+				state = n
 			}
-			c.End()
 		}
-		c.End()
+		endJoin(c)
 	}
 	return
 }
@@ -102,8 +99,7 @@ func (ctx tcontext) defaultAdvance(p tstate, c spec.Block, t Token) (ret tstate,
 
 func (ctx tcontext) sequence(p tstate, c spec.Block, n string) (ret tstate, err error) {
 	if c.Cmd(n+" text", ctx.gen.NewName(n+" counter")).Begin() {
-		ret = sequence{ctx, tprev{p}, 2}
-		c.Cmds().Begin()
+		ret = sequence{ctx, tprev{p}, 1}
 		startJoin(c)
 	}
 	return

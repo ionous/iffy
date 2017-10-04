@@ -23,12 +23,9 @@ func TestPrint(t *testing.T) {
 		var n tests.Execute
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("print span").Begin() {
-			if c.Cmds().Begin() {
-				c.Cmd("say", "hello")
-				c.Cmd("say", "there,")
-				c.Cmd("say", "world.")
-				c.End()
-			}
+			c.Cmd("say", "hello")
+			c.Cmd("say", "there,")
+			c.Cmd("say", "world.")
 			c.End()
 		}
 		//
@@ -42,11 +39,8 @@ func TestPrint(t *testing.T) {
 		var n tests.Execute
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("print span").Begin() {
-			if c.Cmds().Begin() {
-				c.Cmd("print num", 213)
-				c.Cmd("print num word", 213)
-				c.End()
-			}
+			c.Cmd("print num", 213)
+			c.Cmd("print num word", 213)
 			c.End()
 		}
 		if e := c.Build(); e != nil {
@@ -81,13 +75,10 @@ func TestPrint(t *testing.T) {
 		var n tests.Execute
 		c := cmds.NewBuilder(&n, core.Xform{})
 		if c.Cmd("print span").Begin() {
-			if c.Cmds().Begin() {
-				if c.Cmd("for each text").Begin() {
-					c.Param("in").Val(sliceOf.String("hello", "there", "world"))
-					if c.Param("go").Cmds().Begin() {
-						c.Cmd("say", c.Cmd("get", "@", "text")).End()
-					}
-					c.End()
+			if c.Cmd("for each text").Begin() {
+				c.Param("in").Val(sliceOf.String("hello", "there", "world"))
+				if c.Param("go").Cmds().Begin() {
+					c.Cmd("say", c.Cmd("get", "@", "text")).End()
 				}
 				c.End()
 			}
