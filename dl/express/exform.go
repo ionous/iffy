@@ -12,6 +12,7 @@ type exform struct {
 	facs template.Factory
 }
 
+//
 func MakeXform(cmds *ops.Ops, gen template.NewName) ops.Transform {
 	facs := template.MakeFactory(gen, ParseDirective)
 	return exform{cmds, facs}

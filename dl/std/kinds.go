@@ -91,7 +91,9 @@ type Container struct {
 	// CarryingCapacity float64
 }
 
-// Pawn represents the current viewpoint
+// Pawn represents the current viewpoint.
+// There is usually just one instance:
+// it is also named "pawn".
 type Pawn struct {
 	Name  string   `if:"id"`
 	Actor ident.Id `if:"cls:Actor"`

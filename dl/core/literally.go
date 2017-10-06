@@ -5,11 +5,13 @@ import (
 	r "reflect"
 )
 
-// move to a different package? a sub-package?
-// check the imports i guess.
+// Xform transforms values specified by a script author into values usable by the runtime.
+// For instance, a string into a request for an object; an int into a number eval.
+// See also express.MakeXform which can create templates from author specified strings.
+// FIX: this uses core, but should it be a part of core?
 type Xform struct{}
 
-// returns src if no error but couldnt convert.
+// TransformValue returns src if no error but couldnt convert.
 func (ts Xform) TransformValue(src r.Value, hint r.Type) (ret r.Value, err error) {
 	if v := literally(src, hint); v != nil {
 		ret = r.ValueOf(v)
