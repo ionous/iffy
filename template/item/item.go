@@ -40,7 +40,6 @@ const (
 	LeftBracket  // left directive delimiter
 	Filter       // pipe symbol, aka filter.
 	RightBracket // right directive delimiter
-	Space        // run of spaces separating arguments
 	Text         // plain text -- ie. all things not between delims
 )
 

@@ -35,6 +35,12 @@ func (l *Window) InputTextAt(ofs item.Pos) string {
 	return l.input[l.currPos+ofs:]
 }
 
+// ignore skips over the pending input before this point.
+func (l *Lexer) Ignore(ofs item.Pos) {
+	l.currPos += ofs
+	l.startPos = l.currPos
+}
+
 // returns the next rune in the input, or the constant 'eof'
 // it increments the internal line count for newline characters
 func (l *Window) NextRune() (ret rune, width item.Pos) {

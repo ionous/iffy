@@ -11,20 +11,6 @@ type state interface {
 }
 
 type lexEnd struct{}
-type lexDirective struct{}
-type lexPrelude struct{}
-type lexTrailingSpace struct{}
-type lexReference struct{ dot bool }
-type lexTrailingFilter struct{}
-type lexFunctionHeader struct{}
-type lexParameter struct{}
-type lexParameterBody struct{}
-type lexExpression struct{}
-type lexFilter struct{}
-type lexLeftBracket struct{}
-type lexRightBracket struct{}
-type lexText struct{}
-type lexComment struct{}
 
 func (lexEnd) Lex(l *Lexer) (ret state) {
 	if l.nestingDepth > 0 {
@@ -38,6 +24,8 @@ func (lexEnd) Lex(l *Lexer) (ret state) {
 
 // scan the elements inside directive brackets ( aka brackets ).
 // We expect to see a keyword, reference, function, expression, or end-bracket.
+type lexDirective struct{}
+
 func (lexDirective) Lex(l *Lexer) (ret state) {
 	if l.seedIdentifier() > 0 {
 		ret = lexPrelude{}
@@ -52,6 +40,8 @@ func (lexDirective) Lex(l *Lexer) (ret state) {
 // an identifier, here, means the same as go:
 // a sequence of one or more letters and digits; the first of which must be a letter.
 // https://golang.org/ref/spec#Identifiers
+type lexPrelude struct{}
+
 func (lexPrelude) Lex(l *Lexer) (ret state) {
 	// an identifier all on its own can only be a keyword or reference.
 	// technically, keywords never have numbers, but this is a helpful simplification.
@@ -64,20 +54,26 @@ func (lexPrelude) Lex(l *Lexer) (ret state) {
 		}
 	} else {
 		switch r, w := l.NextRune(); {
-		case isLetter(r) || isDigit(r): // letters and digits tell us nothing new
+		// more letters and digits tell us nothing new
+		case isLetter(r) || isDigit(r):
 			ret = lexPrelude{}
 
-		case isDot(r) || isEndOfInput(r) || isEndOfLine(r): // a dot means we are a reference
+		// a dot or filter means our identifier must have been a reference
+		// defer to its parser. its parser also handles endings pretty well
+		// so defer to it for that as well.
+		case isDot(r) || (isFilter(r) && !isFilter(l.PeekRune())) || isEndOfInput(r) || isEndOfLine(r):
 			l.PrevRune(w)
 			ret = lexReference{}
 
-		case isSeparator(r): // a function:
+		// separators mean functions:
+		case isSeparator(r):
 			l.currPos -= w // don't send the separator as part of the function name
 			l.emit(item.Function)
-			l.ignore(w) // skip over the separator
+			l.Ignore(w) // skip over the separator
 			ret = lexParameter{}
 
-		default: // any other random symbol
+		// any other random symbol means our identifier must be part of an expression.
+		default:
 			ret = lexExpression{}
 		}
 	}
@@ -85,6 +81,8 @@ func (lexPrelude) Lex(l *Lexer) (ret state) {
 }
 
 // after a keyword, we expect to see nothing but net.
+type lexTrailingSpace struct{}
+
 func (lexTrailingSpace) Lex(l *Lexer) (ret state) {
 	if l.rightBracketWidth() > 0 {
 		ret = lexRightBracket{}
@@ -107,6 +105,8 @@ func (lexTrailingSpace) Lex(l *Lexer) (ret state) {
 // we may add more letters, digits, and dots to it, or we may emit the reference and move on.
 // filters can follow references.
 // FIX? text/template allows new lines after identifiers
+type lexReference struct{ dot bool }
+
 func (x lexReference) Lex(l *Lexer) (ret state) {
 	r, w := l.NextRune()
 	if isLetter(r) || isDigit(r) {
@@ -126,6 +126,8 @@ func (x lexReference) Lex(l *Lexer) (ret state) {
 }
 
 // filters may follow references, functions, and expressions.
+type lexTrailingFilter struct{}
+
 func (lexTrailingFilter) Lex(l *Lexer) (ret state) {
 	if l.rightBracketWidth() > 0 {
 		ret = lexRightBracket{}
@@ -141,7 +143,7 @@ func (lexTrailingFilter) Lex(l *Lexer) (ret state) {
 		case isSpace(r):
 			ret = lexTrailingFilter{}
 		default:
-			ret = l.emitError("unknown character", r)
+			ret = l.emitError("ambiguous expression")
 		}
 	}
 	return
@@ -149,6 +151,8 @@ func (lexTrailingFilter) Lex(l *Lexer) (ret state) {
 
 // scan a filter already seeded with an identifier,
 // expecting to eventually see a function.
+type lexFunctionHeader struct{}
+
 func (lexFunctionHeader) Lex(l *Lexer) (ret state) {
 	r, w := l.NextRune()
 	if isLetter(r) || isDigit(r) {
@@ -157,7 +161,7 @@ func (lexFunctionHeader) Lex(l *Lexer) (ret state) {
 	} else if isSeparator(r) {
 		l.currPos -= w        // don't send the separator as part of the function name
 		l.emit(item.Function) //
-		l.ignore(w)           // skip over the separator
+		l.Ignore(w)           // skip over the separator
 		ret = lexParameter{}  // on to the body
 	} else {
 		ret = l.emitError("invalid function name")
@@ -165,40 +169,50 @@ func (lexFunctionHeader) Lex(l *Lexer) (ret state) {
 	return
 }
 
-// we expect to see a spaces leading a parameter,
-// followed by a filter, or ending bracket.
-func (lexParameter) Lex(l *Lexer) (ret state) {
-	if l.seedIdentifier() > 0 {
-		ret = lexParameterBody{}
-	} else {
-		ret = lexTrailingFilter{}
-	}
-	return
-}
-
 // at the start of a new parameter, we might see:
+// some spaces,
+// a letter to start an identifier,
 // a right bracket: the end of the current function;
 // a left bracket: a sub-directive;
 // a reference: "object.something";
 // or a filter;
-// expressions are disallowed.
-func (lexParameterBody) Lex(l *Lexer) (ret state) {
-	if r, w := l.NextRune(); isLetter(r) || isDigit(r) {
-		// letters and digits tell us nothing new
-		ret = lexParameterBody{}
+// direct function calls and expressions are disallowed.
+type lexParameter struct{ lettered bool }
+
+func (p lexParameter) Lex(l *Lexer) (ret state) {
+	// fix? its kind of annoying that we duplicate reference parsing
+	// it might make more sense to have an identifier parser
+	// and give it some flags for what kind of identifiers are permissible.
+	// *or* reduce the logic in the lexer and increase the smarts of the parser.
+	// note: we dont even really handle the dotting right here. :\
+	if r, w := l.NextRune(); isLetter(r) {
+		p.lettered = true
+		ret = p // one or more letters is a valid identifier
+	} else if p.lettered && (isDigit(r) || isDot(r)) {
+		ret = p // a number is cool, so long as we have a letter
+	} else if !p.lettered && isSpace(r) {
+		l.PrevRune(w)
+		l.Ignore(w)
+		ret = p // a space is cool, so long as we are searching for the first letter.
 	} else {
 		// everything else terminates the parameter:
 		l.PrevRune(w)
-		l.emit(item.Reference)
-
+		// if we had at least one letter, then we have an identifier.
+		if p.lettered {
+			l.emit(item.Reference)
+		}
 		switch {
 		case leftBracket.IsPrefix(l.InputText()):
+			// a sub-expression is starting
 			ret = lexLeftBracket{}
 		case isFilter(r):
+			// a filter is starting
 			ret = lexFilter{}
 		case isSpace(r):
+			// an identifier and a space, that's a new parameter.
 			ret = lexParameter{}
-		default: // example: right bracket, right trim, filter, bad expression
+		default:
+			// anything else? example: right bracket, right trim, filter, bad expression
 			ret = lexTrailingFilter{}
 		}
 	}
@@ -207,6 +221,8 @@ func (lexParameterBody) Lex(l *Lexer) (ret state) {
 
 // starting from somewhere inside an expression directive, search for the end of the expression, and emit it.
 // moves to either lexFilter or lexRightBracket
+type lexExpression struct{}
+
 func (lexExpression) Lex(l *Lexer) (ret state) {
 	if l.rightBracketWidth() > 0 {
 		l.emitTrimmed(item.Expression)
@@ -237,6 +253,8 @@ func (lexExpression) Lex(l *Lexer) (ret state) {
 
 // at a filter bracket, eats it, emits it;
 // expects to see a function header next.
+type lexFilter struct{}
+
 func (lexFilter) Lex(l *Lexer) (ret state) {
 	l.NextRune() // filter is always one character
 	l.emit(item.Filter)
@@ -252,6 +270,8 @@ func (lexFilter) Lex(l *Lexer) (ret state) {
 // ex. "{~"
 // expects to see a comment or directive next
 // any preceding trimmed spaces will have been eaten in lexText; we just need to eat the marker.
+type lexLeftBracket struct{}
+
 func (lexLeftBracket) Lex(l *Lexer) (ret state) {
 	// move forward across the bracket
 	l.currPos += leftBracket.Width()
@@ -266,11 +286,11 @@ func (lexLeftBracket) Lex(l *Lexer) (ret state) {
 		// test for a comment; move to a comment.
 		if leftComment.IsPrefix(l.InputTextAt(afterMarker)) {
 			// comments dont emit
-			l.ignore(afterMarker)
+			l.Ignore(afterMarker)
 			ret = lexComment{}
 		} else {
 			l.emit(item.LeftBracket)
-			l.ignore(afterMarker)
+			l.Ignore(afterMarker)
 			l.nestingDepth++
 			ret = lexDirective{}
 		}
@@ -282,19 +302,21 @@ func (lexLeftBracket) Lex(l *Lexer) (ret state) {
 // // ex. "~}  "
 // if this was the outer most bracketed directive, expects a text block to follow;
 // if this was a sub-directive, some parameters may follow.
+type lexRightBracket struct{}
+
 func (lexRightBracket) Lex(l *Lexer) (ret state) {
 	trimAfter := rightTrim.IsPrefix(l.InputText())
 	if l.nestingDepth > 1 && trimAfter {
 		ret = l.emitError("meaningless right trim in sub-directive")
 	} else {
 		if trimAfter {
-			l.ignore(rightTrim.Width())
+			l.Ignore(rightTrim.Width())
 		}
 		l.currPos += rightBracket.Width()
 		l.emit(item.RightBracket)
 		if trimAfter {
 			spaces := leftTrimLength(l.InputText())
-			l.ignore(spaces)
+			l.Ignore(spaces)
 		}
 		//
 		l.nestingDepth--
@@ -309,6 +331,8 @@ func (lexRightBracket) Lex(l *Lexer) (ret state) {
 
 // at the start of a text block; emit text as a single item.
 // expects that a directive or the end of the input follows.
+type lexText struct{}
+
 func (lexText) Lex(l *Lexer) (ret state) {
 	// scan forward for a left bracket
 	if w := leftBracket.Scan(l.InputText()); !w.Valid() {
@@ -334,7 +358,7 @@ func (lexText) Lex(l *Lexer) (ret state) {
 			l.emit(item.Text)
 		}
 		// ignore the whitespace.
-		l.ignore(trimLength)
+		l.Ignore(trimLength)
 		ret = lexLeftBracket{}
 	}
 	return
@@ -345,6 +369,8 @@ func (lexText) Lex(l *Lexer) (ret state) {
 // to end a comment means to leave its directive,
 // expects that a text block follows.
 // errors if the comment doesn't end.
+type lexComment struct{}
+
 func (lexComment) Lex(l *Lexer) (ret state) {
 	l.currPos += leftComment.Width()
 	if end := rightComment.Scan(l.InputText()); !end.Valid() {

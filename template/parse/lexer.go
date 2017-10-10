@@ -23,6 +23,10 @@ func ScanText(in Window) *Lexer {
 	return &Lexer{in, lexText{}, nil}
 }
 
+func (l *Lexer) State() string {
+	return fmt.Sprintf("%T", l.state)
+}
+
 // Next returns a single parsed token.
 // It returns false if the lexer can't generate any tokens.
 func (l *Lexer) Next() (ret item.Data, okay bool) {
@@ -47,12 +51,6 @@ func (l *Lexer) Drain(iter int) (ret []item.Data) {
 	return l.items
 }
 
-// ignore skips over the pending input before this point.
-func (l *Lexer) ignore(ofs item.Pos) {
-	l.currPos += ofs
-	l.startPos = l.currPos
-}
-
 // helper to skip left-side whitespace and read any initial letters.
 // returns the number of letters read ( if any )
 func (l *Lexer) seedIdentifier() (ret item.Pos) {
@@ -60,7 +58,7 @@ func (l *Lexer) seedIdentifier() (ret item.Pos) {
 	text := l.InputText()
 	n := strings.TrimLeftFunc(text, isSpace)
 	trimLength := item.Width(text) - item.Width(n)
-	l.ignore(trimLength)
+	l.Ignore(trimLength)
 	for {
 		if r, w := l.NextRune(); !isLetter(r) {
 			l.PrevRune(w)
@@ -109,7 +107,7 @@ func (l *Lexer) emitTrimmed(t item.Type) {
 	if len(l.ItemText()) > 0 {
 		l.emit(t)
 	}
-	l.ignore(trimLength) // skip the whitespace
+	l.Ignore(trimLength) // skip the whitespace
 }
 
 // emitError returns an error token and terminates the scan by passing
