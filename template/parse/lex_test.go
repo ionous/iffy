@@ -31,8 +31,6 @@ var (
 	tRef   = mkItem(item.Reference, "abc")
 )
 
-//{ run: a { bob && judy } c }
-
 var lexTests = []lexTest{
 	{"empty", "", []item.Data{tEnd}},
 	{"spaces", " \t\n", []item.Data{mkItem(item.Text, " \t\n"), tEnd}},
