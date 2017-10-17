@@ -38,13 +38,13 @@ func isQuote(r rune) bool {
 	return r == '\'' || r == '"'
 }
 
-// for consistancy with isEndBracket
+// for consistancy with isCloseBracket
 func isOpenBracket(r rune) bool {
 	return r == '{'
 }
 
 // the rune messes up sublime go switch bracket matching.
-func isEndBracket(r rune) bool {
+func isCloseBracket(r rune) bool {
 	return r == '}'
 }
 

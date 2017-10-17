@@ -1,14 +1,26 @@
 package chart
 
 type blockParser struct {
-	blocks []Block
-	text   []rune
-	spaces []rune
+	blocks       []Block
+	text         []rune
+	spaces       []rune
+	newDirective func() subBlockParser
+}
+
+type subBlockParser interface {
+	NewRune(rune) State
+	GetBlock() (Block, error)
+}
+
+// GetBlocks doesnt return an error directly.
+func (p *blockParser) GetBlocks() []Block {
+	return p.blocks
 }
 
 func (p *blockParser) NewRune(r rune) (ret State) {
 	switch {
 	case r == eof:
+		p.flushText(false)
 		break // done.
 
 	case isOpenBracket(r):
@@ -29,11 +41,11 @@ func (p *blockParser) afterBracket(r rune) (ret State) {
 	// write any pending text
 	trim := isTrim(r)
 	p.flushText(trim)
-	// read the directive
-	dir := directiveParser{canTrim: true}
-	next := makeChain(spaces, makeChain(&dir, Statement(func(r rune) State {
-		if d, e := dir.GetDirective(); e != nil {
-			p.addBlock(&ErrorBlock{e})
+	dir := p.newDirective()
+	next := makeChain(spaces, makeChain(dir, Statement(func(r rune) State {
+		if d, e := dir.GetBlock(); e != nil {
+			err := ErrorBlock{e}
+			p.addBlock(err)
 		} else if d != nil {
 			p.addBlock(d)
 		}
@@ -59,7 +71,8 @@ func (p *blockParser) flushText(trim bool) {
 		text = append(text, spaces...)
 	}
 	if len(text) > 0 {
-		p.addBlock(&TextBlock{string(text)})
+		block := TextBlock{string(text)}
+		p.addBlock(block)
 	}
 }
 

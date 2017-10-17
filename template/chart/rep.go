@@ -43,9 +43,9 @@ type FunctionSpec struct {
 	Args []Spec
 }
 
-func (*Directive) blockNode()  {}
-func (*ErrorBlock) blockNode() {}
-func (*TextBlock) blockNode()  {}
+func (Directive) blockNode()  {}
+func (ErrorBlock) blockNode() {}
+func (TextBlock) blockNode()  {}
 
 func (*Directive) specNode()     {}
 func (*TextSpec) specNode()      {}

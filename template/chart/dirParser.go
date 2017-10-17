@@ -8,7 +8,7 @@ type directiveParser struct {
 	canTrim bool
 }
 
-func (p directiveParser) GetDirective() (ret *Directive, err error) {
+func (p directiveParser) GetBlock() (ret *Directive, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else if p.spec != nil {

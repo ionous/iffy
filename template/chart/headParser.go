@@ -43,7 +43,7 @@ func (p *headParser) setSpec(s Spec) {
 func (p *headParser) parseDirective(r rune) State {
 	var dir directiveParser // we skip 'r' because dir wants *after* the bracket.
 	return parseChain(r, &dir, Statement(func(r rune) State {
-		if spec, e := dir.GetDirective(); e != nil {
+		if spec, e := dir.GetBlock(); e != nil {
 			p.err = e
 		} else {
 			p.spec = spec

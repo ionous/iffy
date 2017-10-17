@@ -43,7 +43,7 @@ func (p *tailParser) NewRune(r rune) (ret State) {
 			return
 		}))
 
-	case isEndBracket(r):
+	case isCloseBracket(r):
 		p.fini = r
 		ret = terminal // done, eat the bracket.
 
@@ -52,7 +52,7 @@ func (p *tailParser) NewRune(r rune) (ret State) {
 		ret = Statement(func(r rune) (ret State) {
 			if !p.canTrim {
 				p.err = errutil.New("unexpected trim")
-			} else if !isEndBracket(r) {
+			} else if !isCloseBracket(r) {
 				p.err = errutil.Fmt("unknown character following right trim %q", r)
 			} else {
 				p.fini = trim

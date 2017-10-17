@@ -46,7 +46,6 @@ func TestTail(t *testing.T) {
 			assert.NoError(test("ab||}", "ab||", '}')) &&
 			// no terminal  errors
 			assert.Error(test("ab", "", 0))
-	// FIX: test can trim false
 	canTrim = false
 	_ = x && assert.Error(test("ab~}", "ab", '~'))
 }
