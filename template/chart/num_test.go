@@ -9,7 +9,7 @@ import (
 type endpointError int
 
 func (e endpointError) Error() string {
-	return errutil.New("error at", int(e)).Error()
+	return errutil.New("ended at", int(e)).Error()
 }
 
 // parse the string, if the state machine ends before the string is empty

@@ -30,19 +30,35 @@ func (p tailParser) GetTail() (ret string, fini rune, err error) {
 // which -- for trim -- is not the control rune returned from trim char.
 func (p *tailParser) NewRune(r rune) (ret State) {
 	switch {
-	case isEndBracket(r):
-		bracket := r
-		p.fini = bracket // done.
-
-	case p.canTrim && isTrim(r):
-		trim := r
-		ret = Statement(func(r rune) State {
-			if isEndBracket(r) {
-				p.fini = trim // done.
+	// skip quoted text ( so that quoted brackets and trim dont trigger directive endings )
+	case isQuote(r):
+		var quote quoteParser
+		ret = parseChain(r, &quote, Statement(func(r rune) (ret State) {
+			if q, e := quote.GetString(); e != nil {
+				p.err = e
 			} else {
-				p.err = errutil.Fmt("unknown character following right trim %q", r) // done.
+				p.addRunes([]rune(q)...)
+				ret = p.NewRune(r) // quote returns the char after the quote.
 			}
-			return nil // we are a state exit action.
+			return
+		}))
+
+	case isEndBracket(r):
+		p.fini = r
+		ret = terminal // done, eat the bracket.
+
+	case isTrim(r):
+		trim := r
+		ret = Statement(func(r rune) (ret State) {
+			if !p.canTrim {
+				p.err = errutil.New("unexpected trim")
+			} else if !isEndBracket(r) {
+				p.err = errutil.Fmt("unknown character following right trim %q", r)
+			} else {
+				p.fini = trim
+				ret = terminal // done, eat the bracket.
+			}
+			return
 		})
 
 	case isSpace(r):
@@ -52,17 +68,18 @@ func (p *tailParser) NewRune(r rune) (ret State) {
 	case isFilter(r):
 		filter := r
 		ret = Statement(func(r rune) (ret State) {
-			if !isFilter(r) {
-				p.fini = filter // done.
-			} else {
-				p.addRunes(r, r)
+			if r == filter {
+				p.addRunes(filter, filter)
 				ret = p // loop...
+			} else {
+				p.fini = filter
+				ret = terminal // done, eat the filter
 			}
-			return ret
+			return
 		})
 
 	case r == eof:
-		p.err = errutil.New("unclosed directive") // done.
+		p.err = errutil.New("unclosed directive")
 
 	default:
 		p.addRunes(r)

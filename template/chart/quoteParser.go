@@ -19,7 +19,7 @@ func (p quoteParser) GetString() (ret string, err error) {
 	return
 }
 
-// assumes r is the leading quote mark
+// assumes r is the leading quote mark, finish just after the matching quote mark.
 func (p *quoteParser) NewRune(r rune) (ret State) {
 	if isQuote(r) {
 		p.runes = append(p.runes, r)
@@ -35,8 +35,7 @@ func (p *quoteParser) scanQuote(q rune) (ret State) {
 		switch {
 		case r == q:
 			p.runes = append(p.runes, r)
-			ret = Statement(func(rune) State { return nil })
-			break // done at next
+			ret = terminal // done, eat the trailing quote.
 
 		case r == escape:
 			ret = Statement(func(r rune) (ret State) {
