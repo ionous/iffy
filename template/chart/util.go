@@ -53,5 +53,5 @@ func isFilter(r rune) bool {
 }
 
 func isTrim(r rune) bool {
-	return isTrim(r)
+	return r == '~'
 }
