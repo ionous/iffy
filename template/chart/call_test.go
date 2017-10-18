@@ -28,7 +28,7 @@ func TestCall(t *testing.T) {
 	x = x && assert.NoError(test("a  b		c", TestArg("a"), TestArg("b"), TestArg("c")))
 }
 
-// stands in for head arg
+// stands in for prelude arg
 type TestArg string
 
 // implements arg:

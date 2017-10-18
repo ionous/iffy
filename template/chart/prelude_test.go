@@ -7,18 +7,18 @@ import (
 	"testing"
 )
 
-func TestHead(t *testing.T) {
+func TestPrelude(t *testing.T) {
 	var mockBlockFactory blockFactory = func() subBlockParser {
 		return mockBlockParser{}
 	}
-	test := func(str string, head Argument) (err error) {
-		p := newHeadParser(mockBlockFactory, mockArgFactory)
+	test := func(str string, prelude Argument) (err error) {
+		p := newPreludeParser(mockBlockFactory, mockArgFactory)
 
 		if end := parse(p, str); end > 0 {
 			err = errutil.New(str, endpointError(end))
 		} else if res, e := p.GetArg(); e != nil {
 			err = errutil.New(str, e)
-		} else if diff := pretty.Diff(head, res); len(diff) > 0 {
+		} else if diff := pretty.Diff(prelude, res); len(diff) > 0 {
 			err = errutil.New(str, "mismatched results", diff)
 		} else {
 			t.Log(str, res)

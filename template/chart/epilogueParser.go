@@ -4,8 +4,8 @@ import (
 	"github.com/ionous/errutil"
 )
 
-// tailParser reads the optional "expression" following a directive's header.
-type tailParser struct {
+// epilogueParser reads the optional "expression" following a directive's prelude.
+type epilogueParser struct {
 	spaces  []rune
 	runes   []rune
 	err     error
@@ -13,10 +13,14 @@ type tailParser struct {
 	canTrim bool
 }
 
-// GetTail returns the expression text and the control rune, or an error.
-// The control rune indicates *how* the tail was ended:
+func newEpilogueParser(canTrim bool) *epilogueParser {
+	return &epilogueParser{canTrim: canTrim}
+}
+
+// GetResult returns the expression text and the control rune, or an error.
+// The control rune indicates *how* the epilogue was ended:
 // an ending bracket, a trim character, or a filter.
-func (p tailParser) GetTail() (ret string, fini rune, err error) {
+func (p epilogueParser) GetResult() (ret string, fini rune, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else {
@@ -25,10 +29,10 @@ func (p tailParser) GetTail() (ret string, fini rune, err error) {
 	return
 }
 
-// NewRune is the first character after a directive's header
+// NewRune is the first character after a directive's prelude
 // The last unhandled rune in a well-formed directive is the terminating rune,
 // which -- for trim -- is not the control rune returned from trim char.
-func (p *tailParser) NewRune(r rune) (ret State) {
+func (p *epilogueParser) NewRune(r rune) (ret State) {
 	switch {
 	// skip quoted text ( so that quoted brackets and trim dont trigger directive endings )
 	case isQuote(r):
@@ -89,7 +93,7 @@ func (p *tailParser) NewRune(r rune) (ret State) {
 }
 
 // add the passed runes to the expression text, flushing any accumulated whitespace if needed.
-func (p *tailParser) addRunes(runes ...rune) {
+func (p *epilogueParser) addRunes(runes ...rune) {
 	if len(p.spaces) > 0 {
 		runes = append(runes, p.spaces...)
 		p.spaces = nil

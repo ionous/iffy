@@ -6,20 +6,20 @@ import (
 	"testing"
 )
 
-func TestTail(t *testing.T) {
+func TestEpilogue(t *testing.T) {
 	canTrim, cnt := true, 0
 	test := func(str, m string, r rune) (err error) {
-		p := tailParser{canTrim: canTrim}
-		cnt++
-		if end := parse(&p, str); end > 0 {
+		p := newEpilogueParser(canTrim)
+		if end := parse(p, str); end > 0 {
 			err = errutil.New("test", cnt, str, endpointError(end))
-		} else if v, x, e := p.GetTail(); e != nil {
+		} else if v, x, e := p.GetResult(); e != nil {
 			err = errutil.New("test", cnt, str, e)
 		} else if v != m {
 			err = errutil.New("test", cnt, str, "unexpected value", v)
 		} else if x != r {
 			err = errutil.New("test", cnt, str, "unexpected terminal", x)
 		}
+		cnt++
 		return
 	}
 	assert := testify.New(t)

@@ -31,17 +31,16 @@ func (p directiveParser) GetBlock() (ret Block, err error) {
 }
 
 // NewRune starts just after the opening of a directive or its trim.
-// FIX: need to support implicit directives ( which dont allow trailing trim )
 func (p *directiveParser) NewRune(r rune) State {
-	prelude := newHeadParser(subDirectiveFactory, headFactory)
+	prelude := newPreludeParser(subDirectiveFactory, preludeFactory)
 	//
 	return parseChain(r, prelude, Statement(func(r rune) (ret State) {
 		if arg, e := prelude.GetArg(); e != nil {
 			p.err = e
 		} else if arg != nil {
-			tail := tailParser{canTrim: p.canTrim} // expression
-			ret = parseChain(r, &tail, Statement(func(r rune) (ret State) {
-				if exp, ctrl, e := tail.GetTail(); e != nil {
+			epilouge := newEpilogueParser(p.canTrim) // expression
+			ret = parseChain(r, epilouge, Statement(func(r rune) (ret State) {
+				if exp, ctrl, e := epilouge.GetResult(); e != nil {
 					p.err = e
 				} else {
 					p.arg = arg
@@ -63,7 +62,7 @@ func (p *directiveParser) NewRune(r rune) State {
 // if the rune is a filter character, we add a new function
 func (p *directiveParser) filter(r rune) (ret State) {
 	if isFilter(r) {
-		filter := newFilterParser(headFactory)
+		filter := newFilterParser(preludeFactory)
 		ret = makeChain(filter, Statement(func(r rune) (ret State) {
 			if f, e := filter.GetFunction(); e != nil {
 				p.err = e

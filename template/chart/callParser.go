@@ -12,10 +12,10 @@ func newCallParser(f argFactory) *callParser {
 }
 
 // creates new argParser;
-// the primary implementation is headFactory.
+// the primary implementation is preludeFactory.
 type argFactory func() argParser
 
-// the primary implementation is headParser.
+// the primary implementation is preludeParser.
 type argParser interface {
 	NewRune(rune) State
 	GetArg() (Argument, error)

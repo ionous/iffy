@@ -6,25 +6,25 @@ import (
 
 type Functions map[string]bool
 
-// head parser reads the "prelude" of a directive
-type headParser struct {
-	head     Argument
+// prelude parser reads the "prelude" of a directive
+type preludeParser struct {
+	prelude  Argument
 	err      error
-	newArg   argFactory   // for arguments of head functions
+	newArg   argFactory   // for arguments of prelude functions
 	newBlock blockFactory // for sub directives
 }
 
-func newHeadParser(blocks blockFactory, args argFactory) *headParser {
-	return &headParser{newBlock: blocks, newArg: args}
+func newPreludeParser(blocks blockFactory, args argFactory) *preludeParser {
+	return &preludeParser{newBlock: blocks, newArg: args}
 }
 
 //
-var headFactory argFactory = func() argParser {
-	return &headParser{newBlock: subDirectiveFactory}
+var preludeFactory argFactory = func() argParser {
+	return &preludeParser{newBlock: subDirectiveFactory}
 }
 
 // attempt to build a quote, number, function, reference, or sub-block.
-func (p *headParser) NewRune(r rune) (ret State) {
+func (p *preludeParser) NewRune(r rune) (ret State) {
 	switch {
 	case isQuote(r):
 		ret = p.parseQuote(r)
@@ -38,20 +38,20 @@ func (p *headParser) NewRune(r rune) (ret State) {
 	return
 }
 
-func (p headParser) GetArg() (Argument, error) {
-	return p.head, p.err
+func (p preludeParser) GetArg() (Argument, error) {
+	return p.prelude, p.err
 }
 
-func (p *headParser) setArg(s Argument) {
-	if p.head != nil {
+func (p *preludeParser) setArg(s Argument) {
+	if p.prelude != nil {
 		panic("arg already set")
 	} else {
-		p.head = s
+		p.prelude = s
 	}
 }
 
 // the passed rune is a bracket
-func (p *headParser) parseDirective(r rune) State {
+func (p *preludeParser) parseDirective(r rune) State {
 	dir := p.newBlock()
 	return makeChain(dir, Statement(func(r rune) State {
 		if block, e := dir.GetBlock(); e != nil {
@@ -59,14 +59,14 @@ func (p *headParser) parseDirective(r rune) State {
 		} else if arg, ok := block.(Argument); !ok {
 			p.err = errutil.Fmt("unknown block %T", block)
 		} else {
-			p.head = arg
+			p.prelude = arg
 		}
 		return nil // state exit action
 	}))
 }
 
 // the passed rune starts some quoted text
-func (p *headParser) parseQuote(r rune) State {
+func (p *preludeParser) parseQuote(r rune) State {
 	var quote quoteParser
 	return parseChain(r, &quote, Statement(func(r rune) State {
 		// hey look: its a state-transition action using a transient.
@@ -81,7 +81,7 @@ func (p *headParser) parseQuote(r rune) State {
 }
 
 // the passed rune starts a reference or a function
-func (p *headParser) parseIdent(r rune) State {
+func (p *preludeParser) parseIdent(r rune) State {
 	var name identParser
 	return parseChain(r, &name, Statement(func(r rune) (ret State) {
 		if name, e := name.GetName(); e != nil {
@@ -114,7 +114,7 @@ func (p *headParser) parseIdent(r rune) State {
 }
 
 // the passed rune starts a number
-func (p *headParser) parseNumber(r rune) State {
+func (p *preludeParser) parseNumber(r rune) State {
 	var num numParser
 	return parseChain(r, &num, Statement(func(r rune) State {
 		if v, e := num.GetValue(); e != nil {
