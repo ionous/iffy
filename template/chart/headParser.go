@@ -1,14 +1,21 @@
 package chart
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/sliceOf"
 )
 
 type Functions map[string]bool
 
 type headParser struct {
-	spec Spec
-	err  error
+	spec     Spec
+	err      error
+	newBlock blockFactory
+}
+
+//
+var headFactory specFactory = func() specParser {
+	return &headParser{newBlock: subDirectiveFactory}
 }
 
 // attempt to build one of:
@@ -41,10 +48,12 @@ func (p *headParser) setSpec(s Spec) {
 
 // the passed rune is a bracket
 func (p *headParser) parseDirective(r rune) State {
-	var dir directiveParser // we skip 'r' because dir wants *after* the bracket.
-	return parseChain(r, &dir, Statement(func(r rune) State {
-		if spec, e := dir.GetBlock(); e != nil {
+	dir := p.newBlock()
+	return makeChain(dir, Statement(func(r rune) State {
+		if block, e := dir.GetBlock(); e != nil {
 			p.err = e
+		} else if spec, ok := block.(Spec); !ok {
+			p.err = errutil.Fmt("unknown block %T", block)
 		} else {
 			p.spec = spec
 		}
@@ -74,9 +83,9 @@ func (p *headParser) parseIdent(r rune) State {
 		if name, e := name.GetName(); e != nil {
 			p.err = e
 		} else if isSeparator(r) {
-			var args argParser
+			args := argParser{newSpecParser: headFactory}
 			ret = makeChain(&args, Statement(func(r rune) State {
-				if args, e := args.GetArgs(); e != nil {
+				if args, e := args.GetSpecs(); e != nil {
 					p.err = e
 				} else {
 					spec := &FunctionSpec{name, args}

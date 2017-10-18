@@ -8,7 +8,20 @@ type directiveParser struct {
 	canTrim bool
 }
 
-func (p directiveParser) GetBlock() (ret *Directive, err error) {
+//
+var topDirectiveFactory blockFactory = func() subBlockParser {
+	dir := directiveParser{canTrim: true}
+	return &dir
+}
+
+//
+var subDirectiveFactory blockFactory = func() subBlockParser {
+	dir := directiveParser{}
+	return &dir
+}
+
+// GetBlock
+func (p directiveParser) GetBlock() (ret Block, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else if p.spec != nil {
@@ -20,7 +33,7 @@ func (p directiveParser) GetBlock() (ret *Directive, err error) {
 // NewRune starts just after the opening of a directive or its trim.
 // FIX: need to support implicit directives ( which dont allow trailing trim )
 func (p *directiveParser) NewRune(r rune) State {
-	var head headParser // subject
+	head := headParser{newBlock: subDirectiveFactory}
 	return parseChain(r, &head, Statement(func(r rune) (ret State) {
 		if spec, e := head.GetSpec(); e != nil {
 			p.err = e
@@ -55,6 +68,7 @@ func (p *directiveParser) filter(r rune) (ret State) {
 				p.err = e
 			} else {
 				p.filters = append(p.filters, *f)
+				// ************* does this make sense!????
 				ret = p.filter(r)
 			}
 			return

@@ -1,12 +1,16 @@
 package chart
 
 type blockParser struct {
-	blocks       []Block
-	text         []rune
-	spaces       []rune
-	newDirective func() subBlockParser
+	blocks   []Block
+	text     []rune
+	spaces   []rune
+	newBlock blockFactory
 }
 
+// creates new subBlockParser
+type blockFactory func() subBlockParser
+
+// the primary implementation is directiveParser
 type subBlockParser interface {
 	NewRune(rune) State
 	GetBlock() (Block, error)
@@ -41,7 +45,7 @@ func (p *blockParser) afterBracket(r rune) (ret State) {
 	// write any pending text
 	trim := isTrim(r)
 	p.flushText(trim)
-	dir := p.newDirective()
+	dir := p.newBlock()
 	next := makeChain(spaces, makeChain(dir, Statement(func(r rune) State {
 		if d, e := dir.GetBlock(); e != nil {
 			err := ErrorBlock{e}
