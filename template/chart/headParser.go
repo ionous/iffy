@@ -2,24 +2,28 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/sliceOf"
 )
 
 type Functions map[string]bool
 
+// head parser reads the "prelude" of a directive
 type headParser struct {
-	spec     Spec
+	head     Argument
 	err      error
-	newBlock blockFactory
+	newArg   argFactory   // for arguments of head functions
+	newBlock blockFactory // for sub directives
+}
+
+func newHeadParser(blocks blockFactory, args argFactory) *headParser {
+	return &headParser{newBlock: blocks, newArg: args}
 }
 
 //
-var headFactory specFactory = func() specParser {
+var headFactory argFactory = func() argParser {
 	return &headParser{newBlock: subDirectiveFactory}
 }
 
-// attempt to build one of:
-// text, number, function, reference, or sub-directive.
+// attempt to build a quote, number, function, reference, or sub-block.
 func (p *headParser) NewRune(r rune) (ret State) {
 	switch {
 	case isQuote(r):
@@ -34,15 +38,15 @@ func (p *headParser) NewRune(r rune) (ret State) {
 	return
 }
 
-func (p headParser) GetSpec() (Spec, error) {
-	return p.spec, p.err
+func (p headParser) GetArg() (Argument, error) {
+	return p.head, p.err
 }
 
-func (p *headParser) setSpec(s Spec) {
-	if p.spec != nil {
-		panic("spec already set")
+func (p *headParser) setArg(s Argument) {
+	if p.head != nil {
+		panic("arg already set")
 	} else {
-		p.spec = s
+		p.head = s
 	}
 }
 
@@ -52,10 +56,10 @@ func (p *headParser) parseDirective(r rune) State {
 	return makeChain(dir, Statement(func(r rune) State {
 		if block, e := dir.GetBlock(); e != nil {
 			p.err = e
-		} else if spec, ok := block.(Spec); !ok {
+		} else if arg, ok := block.(Argument); !ok {
 			p.err = errutil.Fmt("unknown block %T", block)
 		} else {
-			p.spec = spec
+			p.head = arg
 		}
 		return nil // state exit action
 	}))
@@ -69,8 +73,8 @@ func (p *headParser) parseQuote(r rune) State {
 		if v, e := quote.GetString(); e != nil {
 			p.err = e
 		} else {
-			spec := &TextSpec{v}
-			p.setSpec(spec)
+			arg := &QuotedArg{v}
+			p.setArg(arg)
 		}
 		return nil // state exit action
 	}))
@@ -83,24 +87,24 @@ func (p *headParser) parseIdent(r rune) State {
 		if name, e := name.GetName(); e != nil {
 			p.err = e
 		} else if isSeparator(r) {
-			args := newArgParser(headFactory)
+			args := newCallParser(p.newArg)
 			ret = makeChain(args, Statement(func(r rune) State {
-				if args, e := args.GetSpecs(); e != nil {
+				if args, e := args.GetArgs(); e != nil {
 					p.err = e
 				} else {
-					spec := &FunctionSpec{name, args}
-					p.setSpec(spec)
+					arg := &FunctionArg{name, args}
+					p.setArg(arg)
 				}
 				return nil // state exit action
 			}))
 		} else if r == '.' {
-			fields := fieldParser{fields: sliceOf.String()}
-			ret = makeChain(&fields, Statement(func(r rune) State {
+			fields := newFieldParser(name)
+			ret = makeChain(fields, Statement(func(r rune) State {
 				if fields, e := fields.GetFields(); e != nil {
 					p.err = e
 				} else {
-					spec := &ReferenceSpec{fields}
-					p.setSpec(spec)
+					arg := &ReferenceArg{fields}
+					p.setArg(arg)
 				}
 				return nil // state exit action
 			}))
@@ -116,8 +120,8 @@ func (p *headParser) parseNumber(r rune) State {
 		if v, e := num.GetValue(); e != nil {
 			p.err = e
 		} else {
-			spec := &NumberSpec{v}
-			p.setSpec(spec)
+			arg := &NumberArg{v}
+			p.setArg(arg)
 		}
 		return nil // state exit action
 	}))

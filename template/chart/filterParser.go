@@ -2,22 +2,22 @@ package chart
 
 // starts first past the bar, it reads a single function and its parameters.
 type filterParser struct {
-	name          string
-	args          []Spec
-	err           error
-	newSpecParser specFactory
+	name         string
+	args         []Argument
+	err          error
+	newArgParser argFactory
 }
 
-func newFilterParser(f specFactory) *filterParser {
-	return &filterParser{newSpecParser: f}
+func newFilterParser(f argFactory) *filterParser {
+	return &filterParser{newArgParser: f}
 }
 
 // GetFunction returns
-func (p *filterParser) GetFunction() (ret *FunctionSpec, err error) {
+func (p *filterParser) GetFunction() (ret *FunctionArg, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else {
-		ret = &FunctionSpec{p.name, p.args}
+		ret = &FunctionArg{p.name, p.args}
 	}
 	return
 }
@@ -32,10 +32,10 @@ func (p *filterParser) NewRune(r rune) State {
 		} else {
 			// if that character was a separator: start parsing args
 			if isSeparator(r) {
-				args := newArgParser(p.newSpecParser)
+				args := newCallParser(p.newArgParser)
 				// use makeChain to skip the separator itself
 				ret = makeChain(args, Statement(func(r rune) State {
-					if args, e := args.GetSpecs(); e != nil {
+					if args, e := args.GetArgs(); e != nil {
 						p.err = e
 					} else {
 						p.name = n

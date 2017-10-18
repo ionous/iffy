@@ -1,9 +1,9 @@
 package chart
 
 type directiveParser struct {
-	spec    Spec
+	arg     Argument
 	exp     string
-	filters []FunctionSpec
+	filters []FunctionArg
 	err     error
 	canTrim bool
 }
@@ -24,8 +24,8 @@ var subDirectiveFactory blockFactory = func() subBlockParser {
 func (p directiveParser) GetBlock() (ret Block, err error) {
 	if e := p.err; e != nil {
 		err = e
-	} else if p.spec != nil {
-		ret = &Directive{p.spec, p.exp, p.filters}
+	} else if p.arg != nil {
+		ret = &Directive{p.arg, p.exp, p.filters}
 	}
 	return
 }
@@ -33,17 +33,18 @@ func (p directiveParser) GetBlock() (ret Block, err error) {
 // NewRune starts just after the opening of a directive or its trim.
 // FIX: need to support implicit directives ( which dont allow trailing trim )
 func (p *directiveParser) NewRune(r rune) State {
-	head := headParser{newBlock: subDirectiveFactory}
-	return parseChain(r, &head, Statement(func(r rune) (ret State) {
-		if spec, e := head.GetSpec(); e != nil {
+	prelude := newHeadParser(subDirectiveFactory, headFactory)
+	//
+	return parseChain(r, prelude, Statement(func(r rune) (ret State) {
+		if arg, e := prelude.GetArg(); e != nil {
 			p.err = e
-		} else if spec != nil {
+		} else if arg != nil {
 			tail := tailParser{canTrim: p.canTrim} // expression
 			ret = parseChain(r, &tail, Statement(func(r rune) (ret State) {
 				if exp, ctrl, e := tail.GetTail(); e != nil {
 					p.err = e
 				} else {
-					p.spec = spec
+					p.arg = arg
 					p.exp = exp
 					switch {
 					case isTrim(ctrl):

@@ -7,14 +7,13 @@ import (
 	"testing"
 )
 
-func TestBlocks(t *testing.T) {
+func TestDirectives(t *testing.T) {
 	var mock mockBlockParser
-	var mockFactory blockFactory = func() subBlockParser {
+	var mockBlockFactory blockFactory = func() subBlockParser {
 		return mock
 	}
-
 	test := func(str string, match ...Block) (err error) {
-		p := blockParser{newBlock: mockFactory}
+		p := blockParser{newBlock: mockBlockFactory}
 		if end := parse(&p, str); end > 0 {
 			err = errutil.New(str, endpointError(end))
 		} else {
@@ -28,7 +27,7 @@ func TestBlocks(t *testing.T) {
 		return
 	}
 	assert := testify.New(t)
-	dir := testBlock{}
+	dir := TestDirective{}
 	x := assert.NoError(test(""))
 	x = x && assert.NoError(test("abc", TextBlock{"abc"}))
 	x = x && assert.NoError(test("{}", dir))
@@ -46,10 +45,10 @@ func TestBlocks(t *testing.T) {
 }
 
 // test block stands in for a directive
-type testBlock struct{}
+type TestDirective struct{}
 
-// implements block:
-func (testBlock) blockNode() {}
+func (TestDirective) blockNode() {}
+func (TestDirective) argNode()   {}
 
 // generates test blocks or an error
 type mockBlockParser struct{ err error }
@@ -63,5 +62,5 @@ func (m mockBlockParser) NewRune(r rune) (ret State) {
 	return
 }
 func (m mockBlockParser) GetBlock() (Block, error) {
-	return testBlock{}, m.err
+	return TestDirective{}, m.err
 }

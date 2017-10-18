@@ -8,9 +8,9 @@ import (
 )
 
 func TestFilters(t *testing.T) {
-	test := func(str string, name string, args ...Spec) (err error) {
-		match := &FunctionSpec{name, args}
-		p := newFilterParser(mockSpecFactory)
+	test := func(str string, name string, args ...Argument) (err error) {
+		match := &FunctionArg{name, args}
+		p := newFilterParser(mockArgFactory)
 		if end := parse(p, str); end > 0 {
 			err = errutil.New(str, endpointError(end))
 		} else if res, e := p.GetFunction(); e != nil {
@@ -23,12 +23,22 @@ func TestFilters(t *testing.T) {
 		return
 	}
 	assert := testify.New(t)
-	args := []Spec{testSpec("a"), testSpec("b"), testSpec("c")}
+	args := []Argument{TestArg("a"), TestArg("b"), TestArg("c")}
 	//
-	x := assert.Error(test("", ""))
+	x := true
+	x = x && assert.Error(test("", ""))
 	x = x && assert.NoError(test("go: a b c", "go", args...))
 	x = x && assert.NoError(test("going! a b c", "going", args...))
 	x = x && assert.NoError(test("gone? a b c", "gone", args...))
 	x = x && assert.NoError(test("went!", "went"))
-	x = x && assert.Error(test("go$ a b c", ""))
+	x = x && fails(t, test("! a b c", ""))
+	x = x && fails(t, test("go$ a b c", ""))
+}
+
+func fails(t *testing.T, e error) (okay bool) {
+	if testify.Error(t, e) {
+		t.Log("ok", e)
+		okay = true
+	}
+	return
 }

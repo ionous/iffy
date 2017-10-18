@@ -10,6 +10,11 @@ type fieldParser struct {
 	pending bool
 }
 
+// create a field parser seeded with the passed strings.
+func newFieldParser(fields ...string) *fieldParser {
+	return &fieldParser{fields: fields}
+}
+
 func (p fieldParser) GetFields() (ret []string, err error) {
 	if e := p.err; e != nil {
 		err = e
