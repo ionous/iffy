@@ -62,8 +62,8 @@ func (p *directiveParser) NewRune(r rune) State {
 // if the rune is a filter character, we add a new function
 func (p *directiveParser) filter(r rune) (ret State) {
 	if isFilter(r) {
-		var filter filterParser // we skip the rune r.
-		ret = makeChain(&filter, Statement(func(r rune) (ret State) {
+		filter := newFilterParser(headFactory)
+		ret = makeChain(filter, Statement(func(r rune) (ret State) {
 			if f, e := filter.GetFunction(); e != nil {
 				p.err = e
 			} else {

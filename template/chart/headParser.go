@@ -83,8 +83,8 @@ func (p *headParser) parseIdent(r rune) State {
 		if name, e := name.GetName(); e != nil {
 			p.err = e
 		} else if isSeparator(r) {
-			args := argParser{newSpecParser: headFactory}
-			ret = makeChain(&args, Statement(func(r rune) State {
+			args := newArgParser(headFactory)
+			ret = makeChain(args, Statement(func(r rune) State {
 				if args, e := args.GetSpecs(); e != nil {
 					p.err = e
 				} else {

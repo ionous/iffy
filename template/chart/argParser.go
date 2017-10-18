@@ -7,6 +7,10 @@ type argParser struct {
 	newSpecParser specFactory
 }
 
+func newArgParser(f specFactory) *argParser {
+	return &argParser{newSpecParser: f}
+}
+
 // creates new specParser;
 // the primary implementation is headFactory.
 type specFactory func() specParser
@@ -29,17 +33,20 @@ func (p *argParser) NewRune(r rune) State {
 }
 
 // r is the start of an arg
-func (p *argParser) readArg(r rune) State {
-	head := p.newSpecParser()
-	return parseChain(r, head, Statement(func(r rune) (ret State) {
-		if arg, e := head.GetSpec(); e != nil {
-			p.err = e
-		} else if arg != nil {
-			p.args = append(p.args, arg)
-			if isSpace(r) {
-				ret = p // loop...
+func (p *argParser) readArg(r rune) (ret State) {
+	if r != eof {
+		specParser := p.newSpecParser()
+		ret = parseChain(r, specParser, Statement(func(r rune) (ret State) {
+			if arg, e := specParser.GetSpec(); e != nil {
+				p.err = e
+			} else if arg != nil {
+				p.args = append(p.args, arg)
+				if isSpace(r) {
+					ret = p // loop...
+				}
 			}
-		}
-		return
-	}))
+			return
+		}))
+	}
+	return
 }

@@ -8,14 +8,11 @@ import (
 )
 
 func TestArgs(t *testing.T) {
-	var mockSpecFactory specFactory = func() specParser {
-		return &mockSpecParser{}
-	}
 	test := func(str string, match ...Spec) (err error) {
-		p := argParser{newSpecParser: mockSpecFactory}
-		if end := parse(&p, str); end > 0 {
+		args := newArgParser(mockSpecFactory)
+		if end := parse(args, str); end > 0 {
 			err = endpointError(end)
-		} else if res, e := p.GetSpecs(); e != nil {
+		} else if res, e := args.GetSpecs(); e != nil {
 			err = e
 		} else if diff := pretty.Diff(match, res); len(diff) > 0 {
 			err = errutil.New(str, "mismatched results", pretty.Sprint(diff))
@@ -25,7 +22,7 @@ func TestArgs(t *testing.T) {
 		return
 	}
 	assert := testify.New(t)
-	x := assert.Error(test(""))
+	x := assert.NoError(test("")) // arguments are optional.
 	x = x && assert.NoError(test("a", testSpec("a")))
 	x = x && assert.NoError(test("a b c", testSpec("a"), testSpec("b"), testSpec("c")))
 	x = x && assert.NoError(test("a  b		c", testSpec("a"), testSpec("b"), testSpec("c")))
@@ -47,4 +44,8 @@ func (m mockSpecParser) GetSpec() (ret Spec, err error) {
 		ret = testSpec(n)
 	}
 	return
+}
+
+var mockSpecFactory specFactory = func() specParser {
+	return &mockSpecParser{}
 }
