@@ -23,16 +23,17 @@ func TestCall(t *testing.T) {
 	}
 	assert := testify.New(t)
 	x := assert.NoError(test("")) // arguments are optional.
-	x = x && assert.NoError(test("a", TestArg("a")))
-	x = x && assert.NoError(test("a b c", TestArg("a"), TestArg("b"), TestArg("c")))
-	x = x && assert.NoError(test("a  b		c", TestArg("a"), TestArg("b"), TestArg("c")))
+	x = x && assert.NoError(test("a", MockArg("a")))
+	x = x && assert.NoError(test("a b c", MockArg("a"), MockArg("b"), MockArg("c")))
+	x = x && assert.NoError(test("a  b		c", MockArg("a"), MockArg("b"), MockArg("c")))
+	x = x && assert.NoError(test("a b c  ", MockArg("a"), MockArg("b"), MockArg("c")))
 }
 
 // stands in for prelude arg
-type TestArg string
+type MockArg string
 
 // implements arg:
-func (TestArg) argNode() {}
+func (MockArg) argNode() {}
 
 // generates test blocks
 type mockArgParser struct{ identParser }
@@ -41,11 +42,11 @@ func (m mockArgParser) GetArg() (ret Argument, err error) {
 	if n, e := m.GetName(); e != nil {
 		err = e
 	} else {
-		ret = TestArg(n)
+		ret = MockArg(n)
 	}
 	return
 }
 
-var mockArgFactory argFactory = func() argParser {
+func mockArgFactory() argParser {
 	return &mockArgParser{}
 }

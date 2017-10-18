@@ -12,7 +12,7 @@ func newCallParser(f argFactory) *callParser {
 }
 
 // creates new argParser;
-// the primary implementation is preludeFactory.
+// the primary implementation is newDefaultPrelude.
 type argFactory func() argParser
 
 // the primary implementation is preludeParser.

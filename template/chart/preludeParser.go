@@ -6,7 +6,7 @@ import (
 
 type Functions map[string]bool
 
-// prelude parser reads the "prelude" of a directive
+// prelude parser reads the header of a directive or an argument in a function call
 type preludeParser struct {
 	prelude  Argument
 	err      error
@@ -14,13 +14,13 @@ type preludeParser struct {
 	newBlock blockFactory // for sub directives
 }
 
-func newPreludeParser(blocks blockFactory, args argFactory) *preludeParser {
+func newCustomPrelude(blocks blockFactory, args argFactory) *preludeParser {
 	return &preludeParser{newBlock: blocks, newArg: args}
 }
 
 //
-var preludeFactory argFactory = func() argParser {
-	return &preludeParser{newBlock: subDirectiveFactory}
+func newDefaultPrelude() argParser {
+	return &preludeParser{newBlock: newSubParser, newArg: newDefaultPrelude}
 }
 
 // attempt to build a quote, number, function, reference, or sub-block.
@@ -73,7 +73,7 @@ func (p *preludeParser) parseQuote(r rune) State {
 		if v, e := quote.GetString(); e != nil {
 			p.err = e
 		} else {
-			arg := &QuotedArg{v}
+			arg := &Quote{v}
 			p.setArg(arg)
 		}
 		return nil // state exit action
@@ -92,7 +92,7 @@ func (p *preludeParser) parseIdent(r rune) State {
 				if args, e := args.GetArgs(); e != nil {
 					p.err = e
 				} else {
-					arg := &FunctionArg{name, args}
+					arg := &Function{name, args}
 					p.setArg(arg)
 				}
 				return nil // state exit action
@@ -103,11 +103,15 @@ func (p *preludeParser) parseIdent(r rune) State {
 				if fields, e := fields.GetFields(); e != nil {
 					p.err = e
 				} else {
-					arg := &ReferenceArg{fields}
+					arg := &Reference{fields}
 					p.setArg(arg)
 				}
 				return nil // state exit action
 			}))
+		} else {
+			arg := &Reference{[]string{name}}
+			p.setArg(arg)
+			// done.
 		}
 		return
 	}))
@@ -120,7 +124,7 @@ func (p *preludeParser) parseNumber(r rune) State {
 		if v, e := num.GetValue(); e != nil {
 			p.err = e
 		} else {
-			arg := &NumberArg{v}
+			arg := &Number{v}
 			p.setArg(arg)
 		}
 		return nil // state exit action

@@ -18,10 +18,11 @@ func TestQuotes(t *testing.T) {
 		return err, str
 	}
 	assert := testify.New(t)
-	_ = assert.NoError(test("'singles'")) &&
-		assert.NoError(test(`"doubles"`)) &&
-		assert.NoError(test("'escape\"'")) &&
-		assert.NoError(test(`"\\"`)) &&
-		assert.NoError(test(string([]rune{'"', '\\', 'a', '"'}))) &&
-		assert.Error(test(string([]rune{'"', '\\', 'g', '"'})))
+	x := true
+	x = x && assert.NoError(test("'singles'"))
+	x = x && assert.NoError(test(`"doubles"`))
+	x = x && assert.NoError(test("'escape\"'"))
+	x = x && assert.NoError(test(`"\\"`))
+	x = x && assert.NoError(test(string([]rune{'"', '\\', 'a', '"'})))
+	x = x && assert.Error(test(string([]rune{'"', '\\', 'g', '"'})))
 }

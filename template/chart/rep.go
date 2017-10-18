@@ -1,5 +1,10 @@
 package chart
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Argument interface {
 	argNode() // internal marker
 }
@@ -24,21 +29,21 @@ type TextBlock struct{ Text string }
 type Directive struct {
 	Subject    Argument
 	Expression string
-	Filters    []FunctionArg
+	Filters    []Function
 }
 
-// QuotedArg in a directive or function parameter.
-type QuotedArg struct{ Value string }
+// Quote in a directive or function parameter.
+type Quote struct{ Value string }
 
-// NumberArg in a directive or function parameter.
-type NumberArg struct{ Value float64 }
+// Number in a directive or function parameter.
+type Number struct{ Value float64 }
 
-// ReferenceArg in a directive or function parameter.
-type ReferenceArg struct{ Fields []string }
+// Reference in a directive or function parameter.
+type Reference struct{ Fields []string }
 
-// FunctionArg can act as a directive prelude.
+// Function can act as a directive prelude.
 // Expressions cannot appear in function args unless embedded in sub-directives.
-type FunctionArg struct {
+type Function struct {
 	Name string
 	Args []Argument
 }
@@ -47,11 +52,44 @@ func (Directive) blockNode()  {}
 func (ErrorBlock) blockNode() {}
 func (TextBlock) blockNode()  {}
 
-func (*Directive) argNode()    {}
-func (*QuotedArg) argNode()    {}
-func (*NumberArg) argNode()    {}
-func (*FunctionArg) argNode()  {}
-func (*ReferenceArg) argNode() {}
+func (*Directive) argNode() {}
+func (*Quote) argNode()     {}
+func (*Number) argNode()    {}
+func (*Function) argNode()  {}
+func (*Reference) argNode() {}
 
-// { A | B x {y} | C }
-// { `"adam!"` | capitalize! | prepend: "Hello " }
+func (d *Directive) String() string {
+	var fs []string
+	for _, n := range d.Filters {
+		fs = append(fs, n.String())
+	}
+	x := d.Expression
+	if len(x) > 0 {
+		x = fmt.Sprintf("[%s]", x)
+	}
+	p := strings.Join(fs, " ")
+	if len(p) > 0 {
+		p = fmt.Sprintf("(%s)", p)
+	}
+	return fmt.Sprint("{", d.Subject, x, p, "}")
+}
+func (q *Quote) String() string {
+	return fmt.Sprint("quote:", q.Value)
+}
+func (n *Number) String() string {
+	return fmt.Sprintf("num:'%g'", n.Value)
+}
+func (f *Function) String() string {
+	var fs []string
+	for _, n := range f.Args {
+		fs = append(fs, fmt.Sprint(n))
+	}
+	p := strings.Join(fs, ",")
+	if len(p) > 0 {
+		p = fmt.Sprintf("(%s)", p)
+	}
+	return fmt.Sprint("call:", f.Name, p)
+}
+func (r *Reference) String() string {
+	return fmt.Sprintf("ref:%d'%v'", len(r.Fields), strings.Join(r.Fields, "."))
+}

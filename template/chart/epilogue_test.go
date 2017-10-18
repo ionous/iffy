@@ -23,29 +23,29 @@ func TestEpilogue(t *testing.T) {
 		return
 	}
 	assert := testify.New(t)
-	x :=
-		// empty endings
-		assert.NoError(test("|", "", '|')) &&
-			assert.NoError(test("}", "", '}')) &&
-			assert.NoError(test("~}", "", '~')) &&
-			// once more with some content
-			assert.NoError(test("ab|", "ab", '|')) &&
-			assert.NoError(test("ab}", "ab", '}')) &&
-			assert.NoError(test("ab~}", "ab", '~')) &&
-			// once more with internal traiing spaces
-			assert.NoError(test("ab |", "ab", '|')) &&
-			assert.NoError(test("ab }", "ab", '}')) &&
-			assert.NoError(test("ab ~}", "ab", '~')) &&
-			// trim alone is an error
-			assert.Error(test("ab~ }", "", 0)) &&
-			// trim and brackets in a quote should be fine.
-			assert.NoError(test("'~'}", "'~'", '}')) &&
-			assert.NoError(test("'}'}", "'}'", '}')) &&
-			assert.NoError(test("'~}'}", "'~}'", '}')) &&
-			// doubled filter chars are doubled filter chars
-			assert.NoError(test("ab||}", "ab||", '}')) &&
-			// no terminal  errors
-			assert.Error(test("ab", "", 0))
+	x := true
+	// empty endings
+	x = x && assert.NoError(test("|", "", '|'))
+	x = x && assert.NoError(test("}", "", '}'))
+	x = x && assert.NoError(test("~}", "", '~'))
+	// once more with some content
+	x = x && assert.NoError(test("ab|", "ab", '|'))
+	x = x && assert.NoError(test("ab}", "ab", '}'))
+	x = x && assert.NoError(test("ab~}", "ab", '~'))
+	// once more with internal traiing spaces
+	x = x && assert.NoError(test("ab |", "ab", '|'))
+	x = x && assert.NoError(test("ab }", "ab", '}'))
+	x = x && assert.NoError(test("ab ~}", "ab", '~'))
+	// trim alone is an error
+	x = x && assert.Error(test("ab~ }", "", 0))
+	// trim and brackets in a quote should be fine.
+	x = x && assert.NoError(test("'~'}", "'~'", '}'))
+	x = x && assert.NoError(test("'}'}", "'}'", '}'))
+	x = x && assert.NoError(test("'~}'}", "'~}'", '}'))
+	// doubled filter chars are doubled filter chars
+	x = x && assert.NoError(test("ab||}", "ab||", '}'))
+	// no terminal  errors
+	x = x && assert.Error(test("ab", "", 0))
 	canTrim = false
-	_ = x && assert.Error(test("ab~}", "ab", '~'))
+	x = x && assert.Error(test("ab~}", "ab", '~'))
 }

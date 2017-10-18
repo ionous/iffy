@@ -9,7 +9,7 @@ import (
 
 func TestFilters(t *testing.T) {
 	test := func(str string, name string, args ...Argument) (err error) {
-		match := &FunctionArg{name, args}
+		match := newFunction(name, args...)
 		p := newFilterParser(mockArgFactory)
 		if end := parse(p, str); end > 0 {
 			err = errutil.New(str, endpointError(end))
@@ -23,7 +23,7 @@ func TestFilters(t *testing.T) {
 		return
 	}
 	assert := testify.New(t)
-	args := []Argument{TestArg("a"), TestArg("b"), TestArg("c")}
+	args := []Argument{MockArg("a"), MockArg("b"), MockArg("c")}
 	//
 	x := true
 	x = x && assert.Error(test("", ""))

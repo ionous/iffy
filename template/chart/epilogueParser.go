@@ -95,7 +95,7 @@ func (p *epilogueParser) NewRune(r rune) (ret State) {
 // add the passed runes to the expression text, flushing any accumulated whitespace if needed.
 func (p *epilogueParser) addRunes(runes ...rune) {
 	if len(p.spaces) > 0 {
-		runes = append(runes, p.spaces...)
+		p.runes = append(p.runes, p.spaces...)
 		p.spaces = nil
 	}
 	p.runes = append(p.runes, runes...)
