@@ -19,7 +19,7 @@ func (p quoteParser) GetString() (ret string, err error) {
 	return
 }
 
-// assumes r is the leading quote mark, finish just after the matching quote mark.
+// NewRune starts with the leading quote mark; it finishes just after the matching quote mark.
 func (p *quoteParser) NewRune(r rune) (ret State) {
 	if isQuote(r) {
 		p.runes = append(p.runes, r)

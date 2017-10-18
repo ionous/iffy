@@ -5,31 +5,27 @@ import (
 	"strings"
 )
 
+// Argument of a function or the subject of a directive.
 type Argument interface {
 	argNode() // internal marker
 }
 
-// Block represents some text or a directive.
+// Block of text, a directive, or error.
 type Block interface {
 	blockNode()
 }
 
-// Template contains text and directives.
-type Template struct {
-	Blocks []Block
-}
-
-// Error acts a block in a template.
+// ErrorBlock appears in a template when a directive fails to parse.
 type ErrorBlock struct{ error }
 
-// TextBlock in a template.
+// TextBlock contains the uninterpreted parts of a template.
 type TextBlock struct{ Text string }
 
-// Directive can be used as a function argument.
+// Directive contain instructions which templates turn into code.
 type Directive struct {
-	Subject    Argument
-	Expression string
-	Filters    []Function
+	Subject    Argument   // The initial value computed by the directive.
+	Expression string     // Unparsed text after the main subject; used for modifying the value of the subject via golang expressions.
+	Filters    []Function // Chains of function calls. The result of the subject, modified by the expression text, gets passed as the last parameter of the first function. Its result is passed sa the last parameter of the next function, and so on till the end.
 }
 
 // Quote in a directive or function parameter.
@@ -41,8 +37,8 @@ type Number struct{ Value float64 }
 // Reference in a directive or function parameter.
 type Reference struct{ Fields []string }
 
-// Function can act as a directive prelude.
-// Expressions cannot appear in function args unless embedded in sub-directives.
+// Function call in a directive or filter chain.
+// Functions cannot be used as parameters of other functions unless embedded in sub-directives.
 type Function struct {
 	Name string
 	Args []Argument

@@ -1,7 +1,5 @@
 package chart
 
-type Pos int
-
 type State interface {
 	NewRune(rune) State
 }

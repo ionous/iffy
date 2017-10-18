@@ -1,5 +1,6 @@
 package chart
 
+// read alternative blocks of text and directives.
 type blockParser struct {
 	blocks   []Block
 	text     []rune
@@ -21,6 +22,7 @@ func (p *blockParser) GetBlocks() []Block {
 	return p.blocks
 }
 
+// NewRune starts with the first unexamined character.
 func (p *blockParser) NewRune(r rune) (ret State) {
 	switch {
 	case r == eof:

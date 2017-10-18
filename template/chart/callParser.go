@@ -1,6 +1,6 @@
 package chart
 
-//  x: arg arg arg
+// read the arguments specified by a function call.
 type callParser struct {
 	args         []Argument
 	err          error
@@ -26,7 +26,7 @@ func (p callParser) GetArgs() ([]Argument, error) {
 	return p.args, p.err
 }
 
-// first character past a function separator;
+// NewRune starts with the first character past a function separator;
 // each arg is read by a arg parser created by argFactory;
 // args are separated by spaces
 func (p *callParser) NewRune(r rune) State {

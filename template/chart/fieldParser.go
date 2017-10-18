@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 )
 
+// field parser reads identifiers separated by dots.
 type fieldParser struct {
 	err     error
 	fields  []string
@@ -28,7 +29,7 @@ func (p fieldParser) GetFields() (ret []string, err error) {
 	return
 }
 
-// NewRune where r is the first letter of the field
+// NewRune starts on the first letter of a new field.
 func (p *fieldParser) NewRune(r rune) State {
 	var id identParser
 	return parseChain(r, &id, Statement(func(r rune) (ret State) {
@@ -38,7 +39,7 @@ func (p *fieldParser) NewRune(r rune) State {
 			p.fields = append(p.fields, n)
 			if r == '.' {
 				p.pending = true
-				ret = p // loop... more idents.
+				ret = p // loop...
 			} else {
 				p.pending = false
 			}

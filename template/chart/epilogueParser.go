@@ -18,8 +18,8 @@ func newEpilogueParser(canTrim bool) *epilogueParser {
 }
 
 // GetResult returns the expression text and the control rune, or an error.
-// The control rune indicates *how* the epilogue was ended:
-// an ending bracket, a trim character, or a filter.
+// The control rune indicates the kind of epilogue:
+// a closing bracket, a trimmed bracket, or a filter.
 func (p epilogueParser) GetResult() (ret string, fini rune, err error) {
 	if e := p.err; e != nil {
 		err = e
@@ -29,12 +29,12 @@ func (p epilogueParser) GetResult() (ret string, fini rune, err error) {
 	return
 }
 
-// NewRune is the first character after a directive's prelude
-// The last unhandled rune in a well-formed directive is the terminating rune,
-// which -- for trim -- is not the control rune returned from trim char.
+// NewRune starts on the first character after a directive's prelude;
+// the last unhandled rune in a well-formed directive is the terminating rune.
+// Note, for trim the terminating rune is not the same as the resulting control rune.
 func (p *epilogueParser) NewRune(r rune) (ret State) {
 	switch {
-	// skip quoted text ( so that quoted brackets and trim dont trigger directive endings )
+	// skip quoted text ( so that brackets and trim in quotes dont end the epilogue )
 	case isQuote(r):
 		var quote quoteParser
 		ret = parseChain(r, &quote, Statement(func(r rune) (ret State) {
