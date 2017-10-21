@@ -1,41 +1,18 @@
 package chart
 
 import (
-	"github.com/ionous/errutil"
 	"math"
 	"testing"
 )
 
-type endpointError int
-
-func (e endpointError) Error() string {
-	return errutil.New("ended at", int(e)).Error()
-}
-
-// parse the string, if the state machine ends before the string is empty
-// return the one-index point of failure; 0 therefore is "ok".
-func parse(try State, str string) (ret int) {
-	for i, r := range str {
-		if next := try.NewRune(r); next != nil {
-			try = next
-		} else {
-			ret = i + 1
-			break
-		}
-	}
-	if ret == 0 {
-		try.NewRune(eof)
-	}
-	return
-}
-
 func TestNum(t *testing.T) {
+	var NaN = math.NaN()
 	// returns point of failure
 	run := func(str string) (val float64, err error) {
 		var num numParser
-		if end := parse(&num, str); end > 0 {
-			val = math.NaN()
-			err = endpointError(end)
+		if e := parse(&num, str); e != nil {
+			val = NaN
+			err = e
 		} else if v, e := num.GetValue(); e != nil {
 			err = e
 		} else {
@@ -48,46 +25,73 @@ func TestNum(t *testing.T) {
 		endpoint int // 0 means okay, -1 incomplete, >0 the one-index of the failure point.
 		value    float64
 	}{
-		{"0.", -1, math.NaN()},
-		{".0", 1, math.NaN()},
+		// bad decimals
+		{"0.", -1, NaN},
+		{".0", 1, NaN},
+		// floats
 		{"0.0", 0, 0},
+		{"0.25", 0, 0.25},
 		{"72.40", 0, 72.4},
 		{"072.40", 0, 72.4},
 		{"2.71828", 0, 2.71828},
+		// exponents:
 		{"1.e+0", 0, 1},
 		{"6.67428e-11", 0, 6.67428e-11},
 		{"0e6", 0, 0},
 		{"1E6", 0, 1e6},
-		{".25", 1, math.NaN()},
-		{"0.25", 0, 0.25},
-		{"0.12345E+5", 0, 0.12345E+5},
-		{"0.12345E+", -1, math.NaN()},
-		{"0.12345E", -1, math.NaN()},
+		// bad exponents
+		{"0.12345E+5", 0, 12345},
+		{"0.12345E+", -1, NaN},
+		{"0.12345E", -1, NaN},
+		{"1E6e5", -1, NaN},
+		// ints
 		{"42", 0, 42},
 		{"0600", 0, 600},
+		// hex
 		{"0xFACADE", 0, 0xfacade},
-		{"uncle", 1, math.NaN()},
-		{"0uncle", 2, math.NaN()},
+		{"0Xbadf00d", 0, 0xbadf00d},
+		// bad hex:
+		{"0x", -1, NaN},
+		{"0xg", 3, NaN},
+		{"xbadf00d", 1, NaN},
+		// other chars:
+		{"uncle", 1, NaN},
+		{"0uncle", 2, NaN},
+		// leading
 		{"-5", 0, -5},
+		{"+5", 0, 5},
+		{"-5.1", 0, -5.1},
+		{"+5.1", 0, 5.1},
+		// bad leads
+		{"-0x5", 3, NaN},
+		{"+0x5", 3, NaN},
 	}
 	// out of range:
 	// {"170141183460469231731687303715884105727", 0, 1.7014118346046923e+38},
 	for i, test := range tests {
+		t.Logf("test%2d: '%s'", i, test.input)
 		if v, e := run(test.input); e == nil {
+			t.Log("output:", v)
 			// no error returned, then our values should match
 			if v != test.value {
-				t.Fatalf("test %d mismatched value '%s'; expected: %g, got: %g", i,
-					test.input, test.value, v)
+				t.Fatalf("wanted:", test.value)
 				break
 			}
 		} else {
 			// error returned, check the expected error
-			if test.endpoint > 0 && e != endpointError(test.endpoint) {
-				t.Fatalf("test %d mismatched endpoint '%s' at %s", i, test.input, e)
-			} else if c, ok := e.(endpointError); ok {
-				t.Fatalf("test %d expected value error '%s' %d at %s", i, test.input, c, e)
+			if test.endpoint == 0 {
+				t.Fatal("expected success", e)
+				break
+			} else if test.endpoint > 0 {
+				if c, ok := e.(endpointError); !ok {
+					t.Fatal("unexpected error", e)
+					break
+				} else if c.end != test.endpoint {
+					t.Fatalf("mismatched endpoint at %s", e)
+					break
+				}
 			}
+			t.Log("ok", e)
 		}
-		break
 	}
 }
