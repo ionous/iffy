@@ -1,14 +1,19 @@
 package chart
 
-type runes struct {
+// Runes gathers runes for the parsing of string-like data.
+type Runes struct {
 	list []rune
 }
 
-func (rs runes) String() string {
+func (rs Runes) Len() int {
+	return len(rs.list)
+}
+
+func (rs Runes) String() string {
 	return string(rs.list)
 }
 
-func (rs *runes) Accept(r rune, s State) State {
+func (rs *Runes) Accept(r rune, s State) State {
 	rs.list = append(rs.list, r)
 	return s
 }

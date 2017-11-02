@@ -4,38 +4,18 @@ import (
 	"github.com/ionous/errutil"
 )
 
-// field parser reads identifiers separated by dots.
-type fieldParser struct {
+// FieldParser reads identifiers separated by dots.
+type FieldParser struct {
 	err     error
 	fields  []string
 	pending bool
 }
 
-// create a field parser seeded with the passed strings.
-func newFieldParser(fields ...string) *fieldParser {
-	return &fieldParser{fields: fields}
-}
-
-func (p fieldParser) GetFields() (ret []string, err error) {
-	if e := p.err; e != nil {
-		err = e
-	} else if p.pending {
-		err = errutil.New("incomplete fields")
-	} else if len(p.fields) == 0 {
-		err = errutil.New("empty fields")
-	} else {
-		ret = p.fields
-	}
-	return
-}
-
 // NewRune starts on the first letter of a new field.
-func (p *fieldParser) NewRune(r rune) State {
-	var id identParser
+func (p *FieldParser) NewRune(r rune) State {
+	var id IdentParser
 	return parseChain(r, &id, Statement(func(r rune) (ret State) {
-		if n, e := id.GetName(); e != nil {
-			p.err = e
-		} else {
+		if n := id.GetName(); len(n) > 0 {
 			p.fields = append(p.fields, n)
 			if r == '.' {
 				p.pending = true
@@ -46,4 +26,16 @@ func (p *fieldParser) NewRune(r rune) State {
 		}
 		return
 	}))
+}
+
+// GetFields returns an array of parsed identifiers.
+func (p FieldParser) GetFields() (ret []string, err error) {
+	if e := p.err; e != nil {
+		err = e
+	} else if p.pending {
+		err = errutil.New("incomplete fields")
+	} else {
+		ret = p.fields
+	}
+	return
 }

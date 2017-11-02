@@ -8,9 +8,10 @@ import (
 
 func TestQuotes(t *testing.T) {
 	test := func(str string) (err error, ret interface{}) {
-		var p quoteParser
-		parse(&p, str)
-		if n, e := p.GetString(); e != nil {
+		var p QuoteParser
+		if e := parse(&p, str); e != nil {
+			err = e
+		} else if n, e := p.GetString(); e != nil {
 			err = e
 		} else if n != str {
 			err = errutil.New("mismatched strings", str, n)

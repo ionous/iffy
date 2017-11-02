@@ -9,14 +9,8 @@ import (
 //  * Tokens are replaced by Functions; operands are zero-arity functions ( presumably functions which return the value of the operand. )
 //  * We use one yard for each sub-expression rather than making parentheses a token or function in the stream symbols.
 type Shunt struct {
-	w     Writer
+	out   Expression
 	yards Yards
-}
-
-func (s *Shunt) Reset(w Writer) {
-	s.w = w
-	s.yards.list = nil
-	return
 }
 
 // Yards contains a stack of shunting yards: one for each pending sub/expression.
@@ -53,12 +47,21 @@ type Yard struct {
 }
 
 // Flush returns the shunt's postfix ordered output, clearing the shunt.
-func (s *Shunt) Flush() (err error) {
+func (s *Shunt) Flush() (ret Expression, err error) {
 	if cnt := s.yards.Len(); cnt > 1 {
 		err = errutil.New(cnt-1, "unclosed sub expressions")
 	} else if cnt > 0 {
-		err = s.EndSubExpression()
+		if e := s.EndSubExpression(); e != nil {
+			err = e
+		} else {
+			ret, s.out = s.out, nil
+		}
 	}
+	return
+}
+
+func (s *Shunt) AddExpression(prev []Function) (err error) {
+	s.out = append(s.out, prev...)
 	return
 }
 
@@ -66,7 +69,7 @@ func (s *Shunt) Flush() (err error) {
 // Zero-arity functions are moved directly to the output, otherwise they are shunted to a yard such that higher precedence functions will pop out of the yard first, leaving
 func (s *Shunt) AddFunction(next Function) (err error) {
 	if next.Arity() == 0 {
-		_, err = s.w.Write([]Function{next})
+		s.out = append(s.out, next)
 	} else {
 		if s.yards.Len() == 0 {
 			s.yards.NewYard()
@@ -92,12 +95,8 @@ func (s *Shunt) AddFunction(next Function) (err error) {
 						topp := top.Precedence()
 						//
 						if newp < topp || (newp == topp /*&& !next.IsRightAssoc()*/) {
-							if _, e := s.w.Write([]Function{top}); e != nil {
-								err = e
-								break
-							} else {
-								yard.stack = yard.stack[:cnt-1] // pop
-							}
+							s.out = append(s.out, top)
+							yard.stack = yard.stack[:cnt-1] // pop
 						}
 					}
 				}
@@ -120,7 +119,7 @@ func (s *Shunt) EndSubExpression() (err error) {
 		err = errutil.New("too many ends")
 	} else {
 		yard := s.yards.Pop()
-		_, err = s.w.Write(reverse(yard.stack))
+		s.out = append(s.out, reverse(yard.stack)...)
 	}
 	return
 }

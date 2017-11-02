@@ -17,3 +17,35 @@ func makeChain(first, last State) State {
 		return
 	})
 }
+
+func parallel(rs ...State) State {
+	return SelfStatement(func(self SelfStatement, r rune) (ret State) {
+		var cnt int
+		for _, s := range rs {
+			if next := s.NewRune(r); next != nil {
+				rs[cnt] = next
+				cnt++
+			}
+		}
+		if cnt > 0 {
+			rs = rs[:cnt]
+			ret = self
+		}
+		return
+	})
+}
+
+func ruin(try State, rs Runes) State {
+	for _, r := range rs.list {
+		try = try.NewRune(r)
+	}
+	return try
+}
+
+func stateEnter(next State, action Action) State {
+	return makeChain(action, next)
+}
+
+func stateExit(action Action) State {
+	return action
+}

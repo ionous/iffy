@@ -47,8 +47,6 @@ var minus = mockop{'-', 2, 4}
 
 func build(sym string) (ret Expression, err error) {
 	var t Test
-	var b Buffer
-	t.Reset(&b)
 	for _, r := range sym {
 		if f, e := t.AddRune(r); e != nil {
 			err = e
@@ -61,10 +59,10 @@ func build(sym string) (ret Expression, err error) {
 		}
 	}
 	if err == nil {
-		if e := t.Flush(); e != nil {
+		if exp, e := t.Flush(); e != nil {
 			err = e
 		} else {
-			ret = b.Expression()
+			ret = exp
 		}
 	}
 	return

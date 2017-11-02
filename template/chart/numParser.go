@@ -15,8 +15,8 @@ const (
 	Float64
 )
 
-type numParser struct {
-	runes  runes
+type NumParser struct {
+	runes  Runes
 	mode   FloatMode
 	negate negate
 }
@@ -30,7 +30,7 @@ func (n negate) mul(f float64) float64 {
 	return f
 }
 
-func (p numParser) GetValue() (ret float64, err error) {
+func (p NumParser) GetValue() (ret float64, err error) {
 	s := p.runes.String()
 	switch p.mode {
 	case Int10:
@@ -59,7 +59,7 @@ func (p numParser) GetValue() (ret float64, err error) {
 
 // initial state of digit parsing.
 // note: iffy doesn't support leading with just a "."
-func (p *numParser) NewRune(r rune) (ret State) {
+func (p *NumParser) NewRune(r rune) (ret State) {
 	switch {
 	// in golang, leading +/- are unary operators;
 	// in iffy, they are considered optional parts decimal numbers.
@@ -109,7 +109,7 @@ func (p *numParser) NewRune(r rune) (ret State) {
 
 // a string of numbers, possibly followed by a decimal or exponent separator.
 // note: golang numbers can end in a pure ".", iffy chooses not to allow that.
-func (p *numParser) leadingDigit(r rune) (ret State) {
+func (p *NumParser) leadingDigit(r rune) (ret State) {
 	switch {
 	case isNumber(r):
 		ret = p.runes.Accept(r, Statement(p.leadingDigit))
@@ -132,7 +132,7 @@ func (p *numParser) leadingDigit(r rune) (ret State) {
 
 // https://golang.org/ref/spec#exponent
 // exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals
-func (p *numParser) tryExponent(r rune) (ret State) {
+func (p *NumParser) tryExponent(r rune) (ret State) {
 	switch {
 	case r == 'e' || r == 'E':
 		p.mode = Pending
@@ -157,7 +157,7 @@ func (p *numParser) tryExponent(r rune) (ret State) {
 }
 
 // a chain of decimal digits 0-9
-func (p *numParser) decimals(r rune) (ret State) {
+func (p *NumParser) decimals(r rune) (ret State) {
 	if isNumber(r) {
 		ret = p.runes.Accept(r, Statement(p.decimals))
 	}
@@ -165,7 +165,7 @@ func (p *numParser) decimals(r rune) (ret State) {
 }
 
 // a chain of hex digits 0-9, a-f
-func (p *numParser) hexDigits(r rune) (ret State) {
+func (p *NumParser) hexDigits(r rune) (ret State) {
 	if isHex(r) {
 		ret = p.runes.Accept(r, Statement(p.hexDigits))
 	}

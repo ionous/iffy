@@ -7,38 +7,46 @@ import (
 )
 
 func TestFields(t *testing.T) {
-	test := func(str string) (ret []string, err error) {
-		var p fieldParser
-		if end := parse(&p, str); end > 0 {
-			err = endpointError(end)
-		} else if n, e := p.GetFields(); e != nil {
-			err = e
-		} else {
-			ret = n
-		}
-		return
+	fieldFails(t, "a.")
+	fieldFails(t, ".b")
+	fieldSucceeds(t, "")
+	fieldSucceeds(t, "a")
+	fieldSucceeds(t, "a.b")
+	fieldSucceeds(t, "a.b1.c2")
+}
+
+func testField(t *testing.T, str string) (ret []string, err error) {
+	t.Log("parsing", str)
+	var p FieldParser
+	if e := parse(&p, str); e != nil {
+		err = e
+	} else if n, e := p.GetFields(); e != nil {
+		err = e
+	} else {
+		ret = n
 	}
-	fails := func(str string) {
-		if v, e := test(str); e != nil {
-			t.Log("ok", e)
-		} else {
-			t.Fatal("expected error", v)
+	return
+}
+
+func fieldFails(t *testing.T, str string) {
+	if v, e := testField(t, str); e != nil {
+		t.Log("ok", e)
+	} else {
+		t.Fatal("expected error", v)
+	}
+}
+
+func fieldSucceeds(t *testing.T, str string) {
+	if res, e := testField(t, str); e != nil {
+		t.Fatal(e, "for:", str)
+	} else {
+		var match []string
+		if len(str) > 0 {
+			match = strings.Split(str, ".")
+		}
+		diff := pretty.Diff(res, match)
+		if len(diff) > 0 {
+			t.Fatal("unexpected value", res)
 		}
 	}
-	succeeds := func(str string) {
-		if fields, e := test(str); e != nil {
-			t.Fatal(e, "for:", str)
-		} else {
-			diff := pretty.Diff(fields, strings.Split(str, "."))
-			if len(diff) > 0 {
-				t.Fatal("unexpected value", diff)
-			}
-		}
-	}
-	fails("")
-	fails("a.")
-	fails(".b")
-	succeeds("a")
-	succeeds("a.b")
-	succeeds("a.b1.c2")
 }

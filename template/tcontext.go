@@ -55,7 +55,7 @@ func (ctx tcontext) convertMulti(c spec.Block, ts []Token) (err error) {
 	return
 }
 
-func (ctx tcontext) defaultAdvance(p tstate, c spec.Block, t Token) (ret tstate, err error) {
+func (ctx tcontext) defaultAdvance(p tstat7e, c spec.Block, t Token) (ret tstate, err error) {
 	if plain(c, t) {
 		// keep going in the same state:
 		ret = p

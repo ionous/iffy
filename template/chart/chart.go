@@ -5,12 +5,13 @@ import (
 )
 
 // func Parse(str string) (ret []Block, err error) {
-// 	p := newBlocks(newTopBlockParser)
-// 	if e := parse(p, str); e != nil {
-// 		err = e
-// 	} else {
-// 		ret = p.GetBlocks()
-// 	}
+// 	// p := MakeBlockParser(MockFactory{})
+// 	panic("need a real sink")
+// 	// if e := parse(&p, str); e != nil {
+// 	// 	err = e
+// 	// } else {
+// 	// 	ret = p.GetBlocks()
+// 	// }
 // 	return
 // }
 
@@ -25,8 +26,6 @@ func (e endpointError) Error() string {
 		e.str, e.last, e.str[e.end-1], e.end)
 }
 
-// parse the string, if the state machine ends before the string is empty
-// return the one-index point of failure; 0 therefore is "ok".
 func parse(try State, str string) (err error) {
 	if end, last := innerParse(try, str); end > 0 {
 		err = endpointError{str, end, last}
@@ -34,6 +33,8 @@ func parse(try State, str string) (err error) {
 	return
 }
 
+// if the state machine ends before the string is empty
+// return the one-index point of failure; 0 therefore is "ok".
 func innerParse(try State, str string) (ret int, last State) {
 	for i, r := range str {
 		if next := try.NewRune(r); next != nil {

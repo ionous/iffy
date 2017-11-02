@@ -1,17 +1,18 @@
 package chart
 
 import (
+	"github.com/ionous/errutil"
 	"testing"
 )
 
 func TestIdent(t *testing.T) {
 	// returns point of failure
 	test := func(str string) (ret string, err error) {
-		var p identParser
-		if end := parse(&p, str); end > 0 {
-			err = endpointError(end)
-		} else if v, e := p.GetName(); e != nil {
+		var p IdentParser
+		if e := parse(&p, str); e != nil {
 			err = e
+		} else if v := p.GetName(); len(v) == 0 {
+			err = errutil.New("couldnt parse ident")
 		} else {
 			ret = v
 		}

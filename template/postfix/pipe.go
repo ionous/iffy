@@ -6,41 +6,27 @@ package postfix
 // where greeting is "hello" would become "Hello World!"
 type Pipe struct {
 	Shunt
-	w    Writer
-	buf  Buffer
 	prev Expression
-}
-
-func (p *Pipe) Reset(w Writer) {
-	p.w = w
-	p.prev = nil
-	p.buf.Reset()
-	p.Shunt.Reset(&p.buf)
-	return
 }
 
 // AddPipe delineates a link in a chain of functions.
 func (p *Pipe) AddPipe() (err error) {
-	if _, e := p.buf.Write(p.prev); e != nil {
-		err = e
-	} else if e := p.Shunt.Flush(); e != nil {
+	if exp, e := p.Flush(); e != nil {
 		err = e
 	} else {
-		p.prev = p.buf.Expression()
-		p.buf.Reset()
+		p.prev = exp
 	}
 	return
 }
 
 // Flush returns the pipe's postfix ordered output, clearing the pipe.
-func (p *Pipe) Flush() (err error) {
-	if _, e := p.buf.Write(p.prev); e != nil {
+func (p *Pipe) Flush() (ret Expression, err error) {
+	if e := p.Shunt.AddExpression(p.prev); e != nil {
 		err = e
-	} else if e := p.Shunt.Flush(); e != nil {
+	} else if exp, e := p.Shunt.Flush(); e != nil {
 		err = e
 	} else {
-		p.w.Write(p.buf.Expression())
-		p.buf.Reset()
+		ret = exp
 		p.prev = nil
 	}
 	return

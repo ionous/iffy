@@ -1,42 +1,32 @@
 package chart
 
-import (
-	"github.com/ionous/errutil"
-)
-
-type identParser struct {
-	err   error
-	runes []rune
+type IdentParser struct {
+	runes Runes
 }
 
-func (p identParser) GetName() (ret string, err error) {
-	if e := p.err; e != nil {
-		err = e
-	} else if s := string(p.runes); len(s) == 0 {
-		err = errutil.New("empty identifier")
-	} else {
-		ret = s
-	}
-	return
+func (p *IdentParser) Reset() string {
+	r := p.runes.String()
+	p.runes = Runes{}
+	return r
+}
+
+func (p *IdentParser) GetName() string {
+	return p.runes.String()
 }
 
 // first character of the identifier
-func (p *identParser) NewRune(r rune) (ret State) {
+func (p *IdentParser) NewRune(r rune) (ret State) {
 	if isLetter(r) {
-		p.runes = append(p.runes, r)
-		ret = Statement(p.body)
-	} else {
-		p.err = errutil.New("identifier too short")
+		ret = p.runes.Accept(r, Statement(p.body)) // loop...
 	}
 	return
 }
 
 // subsequent characters can be letters or numbers
 // noting that fields are separated by dots "."
-func (p *identParser) body(r rune) (ret State) {
+func (p *IdentParser) body(r rune) (ret State) {
 	if isLetter(r) || isNumber(r) {
-		p.runes = append(p.runes, r)
-		ret = Statement(p.body) // loop ...
+		ret = p.runes.Accept(r, Statement(p.body)) // loop...
 	}
 	return
 }

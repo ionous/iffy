@@ -4,53 +4,50 @@ import (
 	"github.com/ionous/errutil"
 )
 
-type quoteParser struct {
-	runes []rune
+type QuoteParser struct {
+	runes Runes
 	err   error
 }
 
-// GetString returns the text including its surrounding quote markers.
-func (p quoteParser) GetString() (ret string, err error) {
-	if p.err != nil {
-		err = p.err
-	} else {
-		ret = string(p.runes)
+// NewRune starts with the leading quote mark; it finishes just after the matching quote mark.
+func (p *QuoteParser) NewRune(r rune) (ret State) {
+	if isQuote(r) {
+		ret = p.runes.Accept(r, p.scanQuote(r))
 	}
 	return
 }
 
-// NewRune starts with the leading quote mark; it finishes just after the matching quote mark.
-func (p *quoteParser) NewRune(r rune) (ret State) {
-	if isQuote(r) {
-		p.runes = append(p.runes, r)
-		ret = p.scanQuote(r)
+// GetString returns the text including its surrounding quote markers.
+func (p QuoteParser) GetString() (ret string, err error) {
+	if p.err != nil {
+		err = p.err
+	} else {
+		ret = p.runes.String()
 	}
 	return
 }
 
 // scans until the matching quote marker is found
-func (p *quoteParser) scanQuote(q rune) (ret State) {
+func (p *QuoteParser) scanQuote(q rune) (ret State) {
 	const escape = '\\'
 	return SelfStatement(func(self SelfStatement, r rune) (ret State) {
 		switch {
 		case r == q:
-			p.runes = append(p.runes, r)
-			ret = terminal // done, eat the trailing quote.
+			ret = p.runes.Accept(r, terminal) // done, eat the trailing quote.
 
 		case r == escape:
 			ret = Statement(func(r rune) (ret State) {
 				if ok := escapes[r]; !ok {
 					p.err = errutil.Fmt("unknown escape sequence %q", r)
 				} else {
-					p.runes = append(p.runes, escape, r)
-					ret = self // loop...
+					p.runes.list = append(p.runes.list, escape, r)
+					ret = self // loop
 				}
 				return
 			})
 
-		case r != p.runes[0]:
-			p.runes = append(p.runes, r)
-			ret = self // loop...
+		case r != p.runes.list[0]:
+			ret = p.runes.Accept(r, self) // loop...
 		}
 		return
 	})

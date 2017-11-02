@@ -8,9 +8,9 @@ import (
 func TestSpaces(t *testing.T) {
 	count := func(x int, str string) {
 		// the fail point is one-indexed,
-		n := parse(spaces, str) - 1
-		if n != x {
-			t.Fatal(str, "len:", n)
+		n, _ := innerParse(spaces, str)
+		if n-1 != x {
+			t.Fatal(str, "len:", n-1)
 		}
 	}
 	count(0, "a")

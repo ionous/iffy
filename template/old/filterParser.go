@@ -1,4 +1,4 @@
-package chart
+package old
 
 import (
 	"github.com/ionous/errutil"
@@ -9,28 +9,28 @@ type filterParser struct {
 	name         string
 	args         []Argument
 	err          error
-	newArgParser argFactory
+	newArgParser ArgFactory
 }
 
-func newFilterParser(f argFactory) *filterParser {
+func newFilterParser(f ArgFactory) *filterParser {
 	return &filterParser{newArgParser: f}
 }
 
-// GetFunction returns one function and its arguments.
-func (p *filterParser) GetFunction() (ret *Function, err error) {
+// GetFunc returns one function and its arguments.
+func (p *filterParser) GetFunc() (ret *Func, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else if len(p.name) == 0 {
 		err = errutil.New("missing function call after filter")
 	} else {
-		ret = &Function{p.name, p.args}
+		ret = &Func{p.name, p.args}
 	}
 	return
 }
 
 // NewRune starts with the first character past the bar
 func (p *filterParser) NewRune(r rune) State {
-	var id identParser
+	var id IdentParser
 	return parseChain(r, spaces, makeChain(&id, Statement(func(r rune) (ret State) {
 		// read an identifier, which ends with any unknown character.
 		if n, e := id.GetName(); e != nil {
@@ -40,7 +40,7 @@ func (p *filterParser) NewRune(r rune) State {
 			if isSeparator(r) {
 				args := newCallParser(p.newArgParser)
 				// use makeChain to skip the separator itself
-				ret = makeChain(args, Statement(func(r rune) State {
+				ret = makeChain(spaces, makeChain(args, Statement(func(r rune) State {
 					if args, e := args.GetArgs(); e != nil {
 						p.err = e
 					} else {
@@ -48,7 +48,7 @@ func (p *filterParser) NewRune(r rune) State {
 						p.args = args
 					}
 					return nil // state exit action
-				}))
+				})))
 			}
 		}
 		return

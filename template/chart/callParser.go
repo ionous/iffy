@@ -1,53 +1,42 @@
 package chart
 
-// read the arguments specified by a function call.
-type callParser struct {
-	args         []Argument
-	err          error
-	newArgParser argFactory
+import (
+	"github.com/ionous/iffy/template/postfix"
+)
+
+// CallParser reads a single function call and its arguments.
+type CallParser struct {
+	argFactory ExpressionStateFactory
+	out        postfix.Expression
+	err        error
 }
 
-func newCallParser(f argFactory) *callParser {
-	return &callParser{newArgParser: f}
+func MakeCallParser(f ExpressionStateFactory) CallParser {
+	return CallParser{argFactory: f}
 }
 
-// creates new argParser;
-// the primary implementation is newDefaultPrelude.
-type argFactory func() argParser
-
-// the primary implementation is preludeParser.
-type argParser interface {
-	NewRune(rune) State
-	GetArg() (Argument, error)
+func (p CallParser) GetExpression() (postfix.Expression, error) {
+	return p.out, p.err
 }
 
-// GetArgs returns the arguments for the called function.
-func (p callParser) GetArgs() ([]Argument, error) {
-	return p.args, p.err
-}
-
-// NewRune starts with the first character past a function separator;
-// each arg is read by a arg parser created by argFactory;
-// args are separated by spaces
-func (p *callParser) NewRune(r rune) State {
-	return parseChain(r, spaces, Statement(p.readArg))
-}
-
-// r is the start of an arg
-func (p *callParser) readArg(r rune) (ret State) {
-	if r != eof {
-		argParser := p.newArgParser()
-		ret = parseChain(r, argParser, Statement(func(r rune) (ret State) {
-			if arg, e := argParser.GetArg(); e != nil {
-				p.err = e
-			} else if arg != nil {
-				p.args = append(p.args, arg)
-				if isSpace(r) {
-					ret = p // loop...
+// NewRune starts with the first character past the bar
+func (p *CallParser) NewRune(r rune) State {
+	var id IdentParser
+	return parseChain(r, spaces, makeChain(&id, Statement(func(r rune) (ret State) {
+		// read an identifier, which ends with any unknown character.
+		if n := id.GetName(); len(n) > 0 && isSeparator(r) {
+			args := MakeArgParser(p.argFactory)
+			// use makeChain to skip the separator itself
+			ret = makeChain(spaces, makeChain(&args, stateExit(func() {
+				if args, arity, e := args.GetArgs(); e != nil {
+					p.err = e
+				} else {
+					cmd := Command{n, arity}
+					p.out = append(p.out, args...)
+					p.out = append(p.out, cmd)
 				}
-			}
-			return
-		}))
-	}
-	return
+			})))
+		}
+		return
+	})))
 }

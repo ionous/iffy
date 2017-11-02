@@ -4,7 +4,7 @@ import (
 	"unicode"
 )
 
-var eof rune = -1
+const eof = rune(-1)
 
 // isLetter reports whether r is a golang letter.
 // https://golang.org/ref/spec#letter
@@ -46,6 +46,16 @@ func isOpenBracket(r rune) bool {
 // the rune messes up sublime go switch bracket matching.
 func isCloseBracket(r rune) bool {
 	return r == '}'
+}
+
+// for consistancy with isCloseBracket
+func isOpenParen(r rune) bool {
+	return r == '('
+}
+
+// the rune messes up sublime go paren matching.
+func isCloseParen(r rune) bool {
+	return r == ')'
 }
 
 func isFilter(r rune) bool {
