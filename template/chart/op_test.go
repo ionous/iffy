@@ -35,7 +35,7 @@ func TestOps(t *testing.T) {
 	for _, n := range m {
 		str := n.str
 		t.Log("test:", str)
-		p := opParser{}
+		p := OperatorParser{}
 		parse(&p, str)
 		if r, ok := p.GetOperator(); ok == n.errors {
 			t.Fatalf("unexpected result %v for '%s'", ok, str)

@@ -60,7 +60,7 @@ func (p *BlockParser) NewRune(r rune) (ret State) {
 		p.spaces = append(p.spaces, r)
 		ret = p // loop...
 
-	default:
+	case r != eof:
 		p.text = append(p.text, p.spaces...)
 		p.text = append(p.text, r)
 		p.spaces = nil

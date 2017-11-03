@@ -23,12 +23,12 @@ var list = []Match{
 	{LOR, "or"},
 }
 
-type opParser struct {
+type OperatorParser struct {
 	next []rune
 	ofs  int
 }
 
-func (p opParser) GetOperator() (ret Operator, okay bool) {
+func (p OperatorParser) GetOperator() (ret Operator, okay bool) {
 	if len(p.next) > 0 {
 		ret, okay = list[p.ofs].Op, true
 	}
@@ -36,7 +36,7 @@ func (p opParser) GetOperator() (ret Operator, okay bool) {
 }
 
 // unless we find an exact match, we are done with the state.
-func (p *opParser) NewRune(r rune) (ret State) {
+func (p *OperatorParser) NewRune(r rune) (ret State) {
 	next := string(append(p.next, r))
 	i := sort.Search(len(list)-p.ofs, func(i int) bool {
 		return list[i].Text >= next

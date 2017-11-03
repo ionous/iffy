@@ -6,28 +6,42 @@ import (
 )
 
 func TestShunt(t *testing.T) {
-	test := func(in string, want string) {
-		t.Log("in:", in)
-		if p, e := build(in); e != nil {
-			t.Fatal("error building expression", e)
+	succeed(t, "x+y", "xy+")
+	succeed(t, "a+b*c-d", "abc*+d-")
+	succeed(t, "x+y*w", "xyw*+")
+	succeed(t, "(x+y)*w", "xy+w*")
+	succeed(t, "Fa", "aF")
+	succeed(t, "Frx|Gst", "strxFG")
+	succeed(t, "Fa|Gb|Hc", "cbaFGH")
+	succeed(t, "Fr((x+y)*w)|Gst", "strxy+w*FG")
+	succeed(t, "(x+y)", "xy+")
+	fail(t, "(x+y))")  // too many ends
+	fail(t, "((x+y)")  // unclosed ends
+	fail(t, "((x+y))") // empty statement
+}
+
+func fail(t *testing.T, in string) {
+	t.Log("in:", in)
+	if p, e := build(in); e != nil {
+		t.Log("okay", e)
+	} else {
+		t.Fatal("unexpected success", p)
+	}
+}
+
+func succeed(t *testing.T, in string, want string) {
+	t.Log("in:", in)
+	if p, e := build(in); e != nil {
+		t.Fatal("error building expression", e)
+	} else {
+		res := p.String()
+		if res != want {
+			t.Log("expected:", want)
+			t.Fatal("got:", len(p), res)
 		} else {
-			res := p.String()
-			if res != want {
-				t.Log("expected:", want)
-				t.Fatal("got:", res)
-			} else {
-				t.Log("ok:", res)
-			}
+			t.Log("ok:", res)
 		}
 	}
-	test("x+y", "xy+")
-	test("a+b*c-d", "abc*+d-")
-	test("x+y*w", "xyw*+")
-	test("(x+y)*w", "xy+w*")
-	test("Fa", "aF")
-	test("Frx|Gst", "strxFG")
-	test("Fa|Gb|Hc", "cbaFGH")
-	test("Fr((x+y)*w)|Gst", "strxy+w*FG")
 }
 
 type mockop struct {
@@ -52,10 +66,8 @@ func build(sym string) (ret Expression, err error) {
 			err = e
 			break
 		} else if f != nil {
-			if e := t.AddFunction(f); e != nil {
-				err = e
-				break
-			}
+
+			t.AddFunction(f)
 		}
 	}
 	if err == nil {
@@ -83,18 +95,13 @@ func (t *Test) AddRune(r rune) (ret Function, err error) {
 	case '*':
 		ret = times
 	case '(':
-		if e := t.BeginSubExpression(); e != nil {
-			err = e
-		}
+		t.BeginSubExpression()
 	case ')':
-		if e := t.EndSubExpression(); e != nil {
-			err = e
-		}
+		t.EndSubExpression()
 	default:
 		if !unicode.IsLetter(r) {
 			panic("unknown symbol" + string(r))
-		}
-		if unicode.IsUpper(r) {
+		} else if unicode.IsUpper(r) {
 			// note: the arity isnt correct here; this is for mockup only.
 			ret = mockop{char: r, arity: 3}
 		} else {

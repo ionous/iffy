@@ -9,13 +9,19 @@ import (
 //  * Tokens are replaced by Functions; operands are zero-arity functions ( presumably functions which return the value of the operand. )
 //  * We use one yard for each sub-expression rather than making parentheses a token or function in the stream symbols.
 type Shunt struct {
-	out   Expression
-	yards Yards
+	out       Expression
+	yards     Yards
+	lastError error
 }
 
 // Yards contains a stack of shunting yards: one for each pending sub/expression.
 type Yards struct {
 	list []Yard
+}
+
+// Yard containing functions suspended in their transition from infix to postfix.
+type Yard struct {
+	stack []Function
 }
 
 // Len returns count of pending sub/expressions.
@@ -41,39 +47,45 @@ func (ys *Yards) Pop() (ret Yard) {
 	return
 }
 
-// Yard containing functions suspended in their transition from infix to postfix.
-type Yard struct {
-	stack []Function
-}
-
 // Flush returns the shunt's postfix ordered output, clearing the shunt.
 func (s *Shunt) Flush() (ret Expression, err error) {
-	if cnt := s.yards.Len(); cnt > 1 {
+	if s.lastError != nil {
+		err = errutil.New("too many ends")
+	} else if cnt := s.yards.Len(); cnt > 1 {
 		err = errutil.New(cnt-1, "unclosed sub expressions")
-	} else if cnt > 0 {
-		if e := s.EndSubExpression(); e != nil {
-			err = e
-		} else {
-			ret, s.out = s.out, nil
+	} else {
+		if cnt > 0 {
+			yard := s.yards.Pop()
+			s.out = append(s.out, reverse(yard.stack)...)
 		}
+		ret, s.out = s.out, nil
 	}
 	return
 }
 
-func (s *Shunt) AddExpression(prev []Function) (err error) {
-	s.out = append(s.out, prev...)
-	return
+func (s *Shunt) AddExpression(prev []Function) {
+	if s.lastError != nil {
+		// do nothing
+	} else {
+		s.out = append(s.out, prev...)
+	}
+}
+
+func (s *Shunt) init() {
+	if s.yards.Len() == 0 {
+		s.yards.NewYard()
+	}
 }
 
 // AddFunction appends the next (infix) operation to the pending postfix expression.
 // Zero-arity functions are moved directly to the output, otherwise they are shunted to a yard such that higher precedence functions will pop out of the yard first, leaving
-func (s *Shunt) AddFunction(next Function) (err error) {
-	if next.Arity() == 0 {
+func (s *Shunt) AddFunction(next Function) {
+	if s.lastError != nil {
+		// do nothing
+	} else if next.Arity() == 0 {
 		s.out = append(s.out, next)
 	} else {
-		if s.yards.Len() == 0 {
-			s.yards.NewYard()
-		}
+		s.init()
 		yard := s.yards.Top()
 		if cnt := len(yard.stack); cnt == 0 {
 			yard.stack = append(yard.stack, next)
@@ -104,24 +116,29 @@ func (s *Shunt) AddFunction(next Function) (err error) {
 			}
 		}
 	}
-	return
 }
 
 // BeginSubExpression delineates an opening parenthesis in a stream of functions.
-func (s *Shunt) BeginSubExpression() (err error) {
-	s.yards.NewYard()
-	return
+func (s *Shunt) BeginSubExpression() {
+	if s.lastError != nil {
+		// do nothing
+	} else {
+		s.init()
+		s.yards.NewYard()
+	}
 }
 
 // EndSubExpression indicates a closing parenthesis in a stream of functions.
-func (s *Shunt) EndSubExpression() (err error) {
-	if s.yards.Len() == 0 {
-		err = errutil.New("too many ends")
+func (s *Shunt) EndSubExpression() {
+	if s.lastError != nil {
+		// do nothing
+	} else if s.yards.Len() == 0 {
+		s.lastError = errutil.New("unexpected end of sub-expression")
+	} else if yard := s.yards.Pop(); len(yard.stack) == 0 {
+		s.lastError = errutil.New("empty sub-expression")
 	} else {
-		yard := s.yards.Pop()
 		s.out = append(s.out, reverse(yard.stack)...)
 	}
-	return
 }
 
 // in-place reversal of the passed functions.

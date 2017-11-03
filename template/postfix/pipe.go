@@ -21,9 +21,8 @@ func (p *Pipe) AddPipe() (err error) {
 
 // Flush returns the pipe's postfix ordered output, clearing the pipe.
 func (p *Pipe) Flush() (ret Expression, err error) {
-	if e := p.Shunt.AddExpression(p.prev); e != nil {
-		err = e
-	} else if exp, e := p.Shunt.Flush(); e != nil {
+	p.Shunt.AddExpression(p.prev)
+	if exp, e := p.Shunt.Flush(); e != nil {
 		err = e
 	} else {
 		ret = exp
