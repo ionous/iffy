@@ -12,6 +12,8 @@ type ArgParser struct {
 	factory ExpressionStateFactory
 }
 
+// MakeArgParser using a factory so that tests can mock out recursion;
+// Normally, arguments can be any operand -- or any directive.
 func MakeArgParser(f ExpressionStateFactory) ArgParser {
 	return ArgParser{factory: f}
 }

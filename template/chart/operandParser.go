@@ -4,7 +4,7 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// OperandState reads a single operand.
+// OperandState reads a single number, reference, or quote.
 type OperandState interface {
 	State
 	GetOperand() (postfix.Function, error)

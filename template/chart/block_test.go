@@ -10,7 +10,7 @@ import (
 func TestBlocks(t *testing.T) {
 	test := func(str string, match ...Block) (err error) {
 		t.Log("test:", str)
-		p := MakeBlockParser(MockFactory{})
+		p := MakeBlockParser(EmptyFactory{})
 		if e := parse(&p, str); e != nil {
 			err = e
 		} else if res, e := p.GetBlocks(); e != nil {
@@ -37,4 +37,8 @@ func TestBlocks(t *testing.T) {
 	x = x && assert.NoError(test("{}{}", dir, dir))
 	// long
 	x = x && assert.NoError(test("abc{}d{}efg{}z", abc, dir, newText("d"), dir, newText("efg"), dir, newText("z")))
+}
+
+func newText(t string) *TextBlock {
+	return &TextBlock{t}
 }
