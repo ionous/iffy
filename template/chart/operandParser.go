@@ -1,7 +1,6 @@
 package chart
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/template/postfix"
 )
 
@@ -25,18 +24,18 @@ func (p *OperandParser) NewRune(r rune) (ret State) {
 	case isNumber(r) || r == '+' || r == '-':
 		op = &NumParser{}
 	default:
-		op = &InvalidOperand{}
+		op = &EmptyOperand{r}
 	}
 	p.OperandState = op
 	return op.NewRune(r)
 }
 
-type InvalidOperand struct{}
+type EmptyOperand struct{ r rune }
 
-func (p *InvalidOperand) NewRune(r rune) State { return nil }
+func (p *EmptyOperand) NewRune(r rune) State { return nil }
 
-func (p *InvalidOperand) GetOperand() (postfix.Function, error) {
-	return nil, errutil.New("invalid operand")
+func (p *EmptyOperand) GetOperand() (postfix.Function, error) {
+	return nil, nil
 }
 
 func (p QuoteParser) GetOperand() (ret postfix.Function, err error) {

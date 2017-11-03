@@ -29,6 +29,7 @@ func TestOperand(t *testing.T) {
 	x = x && assert.NoError(test("'hello'", Quote("'hello'")))
 	x = x && assert.NoError(test("1.2", Number(1.2)))
 	x = x && assert.NoError(test("object", Reference(sliceOf.String("object"))))
+	x = x && assert.NoError(test("a", Reference(sliceOf.String("a"))))
 	x = x && assert.NoError(test("object.property", Reference(sliceOf.String("object", "property"))))
 	x = x && fails(t, test("#", nil))
 }

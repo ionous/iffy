@@ -6,6 +6,8 @@ import (
 )
 
 func TestShunt(t *testing.T) {
+	succeed(t, "", "")
+	succeed(t, "x", "x")
 	succeed(t, "x+y", "xy+")
 	succeed(t, "a+b*c-d", "abc*+d-")
 	succeed(t, "x+y*w", "xyw*+")
@@ -15,9 +17,11 @@ func TestShunt(t *testing.T) {
 	succeed(t, "Fa|Gb|Hc", "cbaFGH")
 	succeed(t, "Fr((x+y)*w)|Gst", "strxy+w*FG")
 	succeed(t, "(x+y)", "xy+")
-	fail(t, "(x+y))")  // too many ends
-	fail(t, "((x+y)")  // unclosed ends
-	fail(t, "((x+y))") // empty statement
+	succeed(t, "(x+y)*(z)", "xy+z*")
+	fail(t, "(x+y))") // too many ends
+	fail(t, "((x+y)") // unclosed ends
+	// we dont have a good way to reliably detect empty statements
+	// fail(t, "((x+y))") // empty statement
 }
 
 func fail(t *testing.T, in string) {

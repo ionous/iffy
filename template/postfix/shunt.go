@@ -50,7 +50,7 @@ func (ys *Yards) Pop() (ret Yard) {
 // Flush returns the shunt's postfix ordered output, clearing the shunt.
 func (s *Shunt) Flush() (ret Expression, err error) {
 	if s.lastError != nil {
-		err = errutil.New("too many ends")
+		err = s.lastError
 	} else if cnt := s.yards.Len(); cnt > 1 {
 		err = errutil.New(cnt-1, "unclosed sub expressions")
 	} else {
@@ -132,11 +132,9 @@ func (s *Shunt) BeginSubExpression() {
 func (s *Shunt) EndSubExpression() {
 	if s.lastError != nil {
 		// do nothing
-	} else if s.yards.Len() == 0 {
+	} else if s.yards.Len() == 1 {
 		s.lastError = errutil.New("unexpected end of sub-expression")
-	} else if yard := s.yards.Pop(); len(yard.stack) == 0 {
-		s.lastError = errutil.New("empty sub-expression")
-	} else {
+	} else if yard := s.yards.Pop(); len(yard.stack) > 0 {
 		s.out = append(s.out, reverse(yard.stack)...)
 	}
 }
