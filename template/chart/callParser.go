@@ -6,13 +6,14 @@ import (
 
 // CallParser reads a single function call and its arguments.
 type CallParser struct {
+	arity      int
 	argFactory ExpressionStateFactory
 	out        postfix.Expression
 	err        error
 }
 
-func MakeCallParser(f ExpressionStateFactory) CallParser {
-	return CallParser{argFactory: f}
+func MakeCallParser(a int, f ExpressionStateFactory) CallParser {
+	return CallParser{arity: a, argFactory: f}
 }
 
 func (p CallParser) GetExpression() (postfix.Expression, error) {
@@ -22,17 +23,19 @@ func (p CallParser) GetExpression() (postfix.Expression, error) {
 // NewRune starts with the first character past the bar
 func (p *CallParser) NewRune(r rune) State {
 	var id IdentParser
-	return parseChain(r, spaces, makeChain(&id, Statement(func(r rune) (ret State) {
+	return ParseChain(r, spaces, MakeChain(&id, Statement(func(r rune) (ret State) {
 		// read an identifier, which ends with any unknown character.
 		if n := id.GetName(); len(n) > 0 && isSeparator(r) {
-			args := MakeArgParser(p.argFactory)
-			// use makeChain to skip the separator itself
-			ret = makeChain(spaces, makeChain(&args, stateExit(func() {
-				if args, arity, e := args.GetArgs(); e != nil {
+			args := ArgParser{factory: p.argFactory}
+			// use MakeChain to skip the separator itself
+			ret = MakeChain(spaces, MakeChain(&args, StateExit(func() {
+				if args, arity, e := args.GetArguments(); e != nil {
 					p.err = e
 				} else {
-					cmd := Command{n, arity}
-					p.out = append(p.out, args...)
+					cmd := Command{n, arity + p.arity}
+					if len(args) > 0 {
+						p.out = append(p.out, args...)
+					}
 					p.out = append(p.out, cmd)
 				}
 			})))

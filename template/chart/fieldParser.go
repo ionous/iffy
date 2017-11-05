@@ -14,7 +14,7 @@ type FieldParser struct {
 // NewRune starts on the first letter of a new field.
 func (p *FieldParser) NewRune(r rune) State {
 	var id IdentParser
-	return parseChain(r, &id, Statement(func(r rune) (ret State) {
+	return ParseChain(r, &id, Statement(func(r rune) (ret State) {
 		if n := id.GetName(); len(n) > 0 {
 			p.fields = append(p.fields, n)
 			if r == '.' {

@@ -11,7 +11,7 @@ type Pipe struct {
 
 // AddPipe delineates a link in a chain of functions.
 func (p *Pipe) AddPipe() (err error) {
-	if exp, e := p.Flush(); e != nil {
+	if exp, e := p.GetExpression(); e != nil {
 		err = e
 	} else {
 		p.prev = exp
@@ -19,10 +19,10 @@ func (p *Pipe) AddPipe() (err error) {
 	return
 }
 
-// Flush returns the pipe's postfix ordered output, clearing the pipe.
-func (p *Pipe) Flush() (ret Expression, err error) {
-	p.Shunt.AddExpression(p.prev)
-	if exp, e := p.Shunt.Flush(); e != nil {
+// GetExpression returns the pipe's postfix ordered output, clearing the pipe.
+func (p *Pipe) GetExpression() (ret Expression, err error) {
+	p.Shunt.addExpression(p.prev)
+	if exp, e := p.Shunt.GetExpression(); e != nil {
 		err = e
 	} else {
 		ret = exp

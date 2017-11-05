@@ -13,6 +13,8 @@ func TestShunt(t *testing.T) {
 	succeed(t, "x+y*w", "xyw*+")
 	succeed(t, "(x+y)*w", "xy+w*")
 	succeed(t, "Fa", "aF")
+	succeed(t, "a|F", "aF")
+	succeed(t, "b|F|Ha", "abFH")
 	succeed(t, "Frx|Gst", "strxFG")
 	succeed(t, "Fa|Gb|Hc", "cbaFGH")
 	succeed(t, "Fr((x+y)*w)|Gst", "strxy+w*FG")
@@ -70,12 +72,11 @@ func build(sym string) (ret Expression, err error) {
 			err = e
 			break
 		} else if f != nil {
-
 			t.AddFunction(f)
 		}
 	}
 	if err == nil {
-		if exp, e := t.Flush(); e != nil {
+		if exp, e := t.GetExpression(); e != nil {
 			err = e
 		} else {
 			ret = exp

@@ -11,18 +11,6 @@ type EmptyFactory struct{}
 // creates directives
 type EmptyParser struct{}
 
-// creates parsers which match, in order, the passed strings.
-type MatchFactory struct {
-	matches []string
-}
-
-// creates directives
-type MatchParser struct {
-	match string
-	err   error
-	res   postfix.Expression
-}
-
 // AnyFactory creates parsers which match any series of lowercase letters
 type AnyFactory struct{}
 
@@ -33,27 +21,6 @@ type AnyParser struct{ runes Runes }
 func (EmptyFactory) NewExpressionState() ExpressionState           { return EmptyParser{} }
 func (EmptyParser) NewRune(rune) State                             { return nil }
 func (EmptyParser) GetExpression() (x postfix.Expression, e error) { return }
-
-// NewExpressionState
-func (f *MatchFactory) NewExpressionState() ExpressionState {
-	var next string
-	if cnt := len(f.matches); cnt > 0 {
-		next, f.matches = f.matches[0], f.matches[1:]
-	}
-	return &MatchParser{match: next}
-}
-
-func (p MatchParser) GetExpression() (postfix.Expression, error) {
-	return p.res, p.err
-}
-
-func (p *MatchParser) NewRune(r rune) (ret State) {
-	if string(r) == p.match {
-		p.res = append(p.res, Quote(p.match))
-		ret = Statement(func(rune) State { return nil })
-	}
-	return
-}
 
 // NewExpressionState
 func (f *AnyFactory) NewExpressionState() ExpressionState {

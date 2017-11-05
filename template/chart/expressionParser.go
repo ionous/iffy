@@ -5,27 +5,27 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// ExpParser reads either a call or a sequence.
-type ExpParser struct {
+// ExpressionParser reads either a call or a sequence.
+type ExpressionParser struct {
 	argFactory ExpressionStateFactory
 	out        postfix.Expression
 	err        error
 }
 
-func MakeExpParser(f ExpressionStateFactory) ExpParser {
-	return ExpParser{argFactory: f}
+func MakeExpressionParser(f ExpressionStateFactory) ExpressionParser {
+	return ExpressionParser{argFactory: f}
 }
 
-func (p ExpParser) GetExpression() (postfix.Expression, error) {
+func (p ExpressionParser) GetExpression() (postfix.Expression, error) {
 	return p.out, p.err
 }
 
 // NewRune starts with the first character past the bar
-func (p *ExpParser) NewRune(r rune) State {
-	call := MakeCallParser(p.argFactory)
+func (p *ExpressionParser) NewRune(r rune) State {
+	call := MakeCallParser(0, p.argFactory)
 	seq := SequenceParser{}
-	par := parallel(
-		makeChain(&call, Statement(func(r rune) (ret State) {
+	par := MakeParallel(
+		MakeChain(&call, Statement(func(r rune) (ret State) {
 			if x, e := call.GetExpression(); e != nil {
 				p.err = errutil.Append(p.err, e)
 			} else if len(x) > 0 {
@@ -33,7 +33,7 @@ func (p *ExpParser) NewRune(r rune) State {
 			}
 			return
 		})),
-		makeChain(&seq, Statement(func(r rune) (ret State) {
+		MakeChain(&seq, Statement(func(r rune) (ret State) {
 			if x, e := seq.GetExpression(); e != nil {
 				p.err = errutil.Append(p.err, e)
 			} else if len(x) > 0 {

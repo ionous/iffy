@@ -48,10 +48,10 @@ func (p *BlockParser) NewRune(r rune) (ret State) {
 			p.flushText(trim)
 			if trim {
 				// eat the trim character, and any content space
-				ret = makeChain(spaces, Statement(p.afterOpen))
+				ret = MakeChain(spaces, Statement(p.afterOpen))
 			} else {
 				// not trim, pass non-space content along
-				ret = parseChain(r, spaces, Statement(p.afterOpen))
+				ret = ParseChain(r, spaces, Statement(p.afterOpen))
 			}
 			return
 		})
@@ -72,7 +72,7 @@ func (p *BlockParser) NewRune(r rune) (ret State) {
 // rune at the start of a directive's content.
 func (p *BlockParser) afterOpen(r rune) State {
 	var keyParser IdentParser
-	return parseChain(r, &keyParser, Statement(func(r rune) (ret State) {
+	return ParseChain(r, &keyParser, Statement(func(r rune) (ret State) {
 		// parse what comes next as an expression
 		//keyParser.runes.Reset()
 		nextp := p.factory.NewExpressionState()
@@ -87,7 +87,7 @@ func (p *BlockParser) afterOpen(r rune) State {
 		} else {
 			key = "" // ignore the word.
 		}
-		return parseChain(r, nextp, Statement(func(r rune) (ret State) {
+		return ParseChain(r, nextp, Statement(func(r rune) (ret State) {
 			if exp, e := nextp.GetExpression(); e != nil {
 				p.err = e
 			} else {
@@ -101,13 +101,13 @@ func (p *BlockParser) afterOpen(r rune) State {
 
 // rune after the content of a directive: spaces, trim, closing bracket, etc.
 func (p *BlockParser) afterContent(r rune) State {
-	return parseChain(r, spaces, Statement(func(r rune) (ret State) {
+	return ParseChain(r, spaces, Statement(func(r rune) (ret State) {
 		switch {
 		case isCloseBracket(r):
 			ret = p // loop...
 
 		case isTrim(r):
-			ret = makeChain(Statement(func(r rune) (ret State) {
+			ret = MakeChain(Statement(func(r rune) (ret State) {
 				if !isCloseBracket(r) {
 					p.err = errutil.Fmt("unknown character following right trim %q", r)
 				} else {

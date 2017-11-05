@@ -18,7 +18,7 @@ func TestExp(t *testing.T) {
 }
 
 func testExp(t *testing.T, str string, want string) (err error) {
-	p := MakeExpParser(&AnyFactory{})
+	p := MakeExpressionParser(&AnyFactory{})
 	t.Logf("parsing: '%s'", str)
 	if e := parse(&p, str); e != nil {
 		t.Log("couldnt parse", e)

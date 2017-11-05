@@ -2,36 +2,35 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/template/postfix"
-	"github.com/kr/pretty"
 	testify "github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
 func TestArg(t *testing.T) {
-	test := func(str string, match ...string) (err error) {
-		p := MakeArgParser(&MatchFactory{match})
+	test := func(str string, want string) (err error) {
+		p := MakeArgParser(&AnyFactory{})
 		t.Logf("parsing: '%s'", str)
 		if e := parse(&p, str); e != nil {
 			err = e
-		} else if res, e := p.GetExpression(); e != nil {
+		} else if res, arity, e := p.GetArguments(); e != nil {
 			err = e
+		} else if a := strings.Count(want, "["); arity != a {
+			err = errutil.New("mismatched arity", arity, a)
 		} else {
-			var want postfix.Expression
-			for _, str := range match {
-				want = append(want, Quote(str))
-			}
-			if diff := pretty.Diff(res, want); len(diff) > 0 {
-				err = errutil.New("mismatched results", diff)
+			got := res.String()
+			t.Log("got:", got)
+			if got != want {
+				err = errutil.New("wanted:", want)
 			}
 		}
 		return
 	}
 	assert := testify.New(t)
 	x := true
-	x = x && assert.NoError(test("")) // arguments are optional.
-	x = x && assert.NoError(test("a", "a"))
-	x = x && assert.NoError(test("a b c", "a", "b", "c"))
-	x = x && assert.NoError(test("a  b		c", "a", "b", "c"))
-	x = x && assert.NoError(test("a b c  ", "a", "b", "c"))
+	x = x && assert.NoError(test("", "")) // arguments are optional.
+	x = x && assert.NoError(test("a", "[a]"))
+	x = x && assert.NoError(test("a b c", "[a][b][c]"))
+	x = x && assert.NoError(test("a  b		c", "[a][b][c]"))
+	x = x && assert.NoError(test("a b c  ", "[a][b][c]"))
 }

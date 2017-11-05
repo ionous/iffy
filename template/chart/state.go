@@ -19,11 +19,16 @@ type SelfStatement func(SelfStatement, rune) State
 func (s SelfStatement) NewRune(r rune) State { return s(s, r) }
 
 // Action are states which always return nil.
-// see also: stateEnter and stateExit.
+// see also: StateExit.
 type Action func()
 
 // NewRune implements State by calling the action and returning nil.
 func (s Action) NewRune(r rune) State {
 	s()
 	return nil
+}
+
+// StateExit marks a terminating state for readability's sake.
+func StateExit(action Action) State {
+	return action
 }

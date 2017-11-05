@@ -58,7 +58,7 @@ func isCloseParen(r rune) bool {
 	return r == ')'
 }
 
-func isFilter(r rune) bool {
+func isPipe(r rune) bool {
 	return r == '|'
 }
 

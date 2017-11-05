@@ -30,11 +30,20 @@ func (p *OperandParser) NewRune(r rune) (ret State) {
 	return op.NewRune(r)
 }
 
+func (p *OperandParser) GetExpression() (ret postfix.Expression, err error) {
+	if op, e := p.OperandState.GetOperand(); e != nil {
+		err = e
+	} else if op != nil {
+		ret = postfix.Expression{op}
+	}
+	return
+}
+
 type EmptyOperand struct{ r rune }
 
 func (p *EmptyOperand) NewRune(r rune) State { return nil }
 
-func (p *EmptyOperand) GetOperand() (postfix.Function, error) {
+func (p EmptyOperand) GetOperand() (postfix.Function, error) {
 	return nil, nil
 }
 
