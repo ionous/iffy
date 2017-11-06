@@ -20,7 +20,7 @@ var list = []Match{
 	{GTR, ">"},
 	{GEQ, ">="},
 	{LAND, "and"},
-	{LOR, "or"},
+	{LOR, "or"}, // if this was || we'd have to make special provisions in the expression parser to handle the difference between a pipe (|) and an or (||)
 }
 
 type OperatorParser struct {
