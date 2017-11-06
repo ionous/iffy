@@ -5,22 +5,27 @@ import (
 	"unicode"
 )
 
-// creates parsers which match empty test
+// EmptyFactory creates parsers which match empty test.
 type EmptyFactory struct{}
 
-// creates directives
+// EmptyParser reads empty text.
 type EmptyParser struct{}
 
-// AnyFactory creates parsers which match any series of lowercase letters
+// AnyFactory creates parsers which match any series of lowercase letters.
 type AnyFactory struct{}
 
-// creates directives
+// AnyParser reads letters.
 type AnyParser struct{ runes Runes }
 
 // NewExpressionState
 func (EmptyFactory) NewExpressionState() ExpressionState           { return EmptyParser{} }
-func (EmptyParser) NewRune(rune) State                             { return nil }
 func (EmptyParser) GetExpression() (x postfix.Expression, e error) { return }
+func (p EmptyParser) NewRune(r rune) (ret State) {
+	if isSpace(r) {
+		ret = p
+	}
+	return
+}
 
 // NewExpressionState
 func (f *AnyFactory) NewExpressionState() ExpressionState {

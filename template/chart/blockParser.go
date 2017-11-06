@@ -29,12 +29,12 @@ func MakeBlockParser(f ExpressionStateFactory) (ret BlockParser) {
 }
 
 // GetBlocks or error
-func (p *BlockParser) GetBlocks() (ret []Block, err error) {
+func (p *BlockParser) GetBlocks() (ret Blocks, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else {
 		p.flushText(false)
-		ret = p.blocks.Blocks()
+		ret = Blocks{p.blocks.Blocks()}
 	}
 	return
 }
