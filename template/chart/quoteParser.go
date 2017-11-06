@@ -12,7 +12,7 @@ type QuoteParser struct {
 // NewRune starts with the leading quote mark; it finishes just after the matching quote mark.
 func (p *QuoteParser) NewRune(r rune) (ret State) {
 	if isQuote(r) {
-		ret = p.runes.Accept(r, p.scanQuote(r))
+		ret = p.scanQuote(r)
 	}
 	return
 }
@@ -33,20 +33,21 @@ func (p *QuoteParser) scanQuote(q rune) (ret State) {
 	return SelfStatement(func(self SelfStatement, r rune) (ret State) {
 		switch {
 		case r == q:
-			ret = p.runes.Accept(r, terminal) // done, eat the trailing quote.
+			// for the very next rune returns nil ( unhandled )
+			// this rune, the ending quote: it eats.
+			ret = Statement(func(rune) State { return nil })
 
 		case r == escape:
 			ret = Statement(func(r rune) (ret State) {
-				if ok := escapes[r]; !ok {
+				if x, ok := escapes[r]; !ok {
 					p.err = errutil.Fmt("unknown escape sequence %q", r)
 				} else {
-					p.runes.list = append(p.runes.list, escape, r)
-					ret = self // loop
+					ret = p.runes.Accept(x, self)
 				}
 				return
 			})
 
-		case r != p.runes.list[0]:
+		case r != eof:
 			ret = p.runes.Accept(r, self) // loop...
 		}
 		return
@@ -54,15 +55,15 @@ func (p *QuoteParser) scanQuote(q rune) (ret State) {
 	return
 }
 
-var escapes = map[rune]bool{
-	'a':  true, // '\a',
-	'b':  true, // '\b',
-	'f':  true, // '\f',
-	'n':  true, // '\n',
-	'r':  true, // '\r',
-	't':  true, // '\t',
-	'v':  true, // '\v',
-	'\\': true, //'\\',
-	'\'': true, //'\'',
-	'"':  true, // '"',
+var escapes = map[rune]rune{
+	'a':  '\a',
+	'b':  '\b',
+	'f':  '\f',
+	'n':  '\n',
+	'r':  '\r',
+	't':  '\t',
+	'v':  '\v',
+	'\\': '\\',
+	'\'': '\'',
+	'"':  '"',
 }

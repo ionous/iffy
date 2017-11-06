@@ -7,6 +7,3 @@ var spaces SelfStatement = func(self SelfStatement, r rune) (ret State) {
 	}
 	return
 }
-
-// for the very next rune, returns nil ( unhandled )
-var terminal = Statement(func(rune) State { return nil })

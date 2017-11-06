@@ -4,16 +4,15 @@ import (
 	"fmt"
 )
 
-// func Parse(str string) (ret []Block, err error) {
-// 	// p := MakeBlockParser(MockFactory{})
-// 	panic("need a real sink")
-// 	// if e := parse(&p, str); e != nil {
-// 	// 	err = e
-// 	// } else {
-// 	// 	ret = p.GetBlocks()
-// 	// }
-// 	return
-// }
+func Parse(str string) (ret []Block, err error) {
+	var p BlockParser
+	if e := parse(&p, str); e != nil {
+		err = e
+	} else {
+		ret, err = p.GetBlocks()
+	}
+	return
+}
 
 type endpointError struct {
 	str  string
@@ -22,12 +21,14 @@ type endpointError struct {
 }
 
 func (e endpointError) Error() string {
-	return fmt.Sprintf("parsing of %s ended in %T at %q(%d)",
+	return fmt.Sprintf("parsing of `%s` ended in %T at %q(%d)",
 		e.str, e.last, e.str[e.end-1], e.end)
 }
 
 func parse(try State, str string) (err error) {
-	if end, last := innerParse(try, str); end > 0 {
+	if end, last := innerParse(try, str); end == 0 {
+		last.NewRune(eof) // FIX: this is odd, i know.
+	} else {
 		err = endpointError{str, end, last}
 	}
 	return
@@ -41,12 +42,9 @@ func innerParse(try State, str string) (ret int, last State) {
 			try = next
 		} else {
 			ret = i + 1
-			last = try
 			break
 		}
 	}
-	if ret == 0 {
-		try.NewRune(eof)
-	}
+	last = try
 	return
 }

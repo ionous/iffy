@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestExp(t *testing.T) {
+func TestExpression(t *testing.T) {
 	assert := testify.New(t)
 	x := true
 	x = x && assert.NoError(testExp(t, "fun!", "FUN/0"))

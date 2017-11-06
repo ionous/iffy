@@ -81,22 +81,24 @@ func (p *BlockParser) afterOpen(r rune) State {
 		}),
 		Statement(func(r rune) (ret State) {
 			expp := p.newExpressionParser()
+			var continueExp State = expp
 			// read the key
 			var key string
 			var err error
 			if n := runes.String(); len(n) > 0 {
 				if isSpace(r) || isCloseBracket(r) || isTrim(r) {
 					key = n
+				} else if end, last := innerParse(expp, n); end == 0 {
+					continueExp = last
 				} else {
-					// ex. a number, an operator, etc.
-					err = parse(expp, n)
+					err = errutil.New("unknown expression")
 				}
 			}
 			//
 			if err != nil {
 				p.err = err
 			} else {
-				ret = ParseChain(r, expp, Statement(func(r rune) (ret State) {
+				ret = ParseChain(r, continueExp, Statement(func(r rune) (ret State) {
 					if exp, e := expp.GetExpression(); e != nil {
 						p.err = e
 					} else {
@@ -114,7 +116,7 @@ func (p *BlockParser) newExpressionParser() (ret ExpressionState) {
 	if p.factory != nil {
 		ret = p.factory.NewExpressionState()
 	} else {
-		ret = new(ExpressionParser)
+		ret = new(PipeParser)
 	}
 	return
 }
