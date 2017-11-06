@@ -25,8 +25,12 @@ func testQ(t *testing.T, str, want string) (err error, ret interface{}) {
 		err = e
 	} else if got, e := p.GetString(); e != nil {
 		err = e
-	} else if want != ignoreResult && got != want {
-		err = errutil.Fmt("want(%s:%d) != got(%s:%d)", want, len(want), got, len(got))
+	} else if want != ignoreResult {
+		if got != want {
+			err = errutil.Fmt("want(%s:%d) != got(%s:%d)", want, len(want), got, len(got))
+		} else {
+			t.Log("ok", got)
+		}
 	}
 	return err, str
 }

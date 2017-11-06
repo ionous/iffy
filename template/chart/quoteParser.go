@@ -33,9 +33,8 @@ func (p *QuoteParser) scanQuote(q rune) (ret State) {
 	return SelfStatement(func(self SelfStatement, r rune) (ret State) {
 		switch {
 		case r == q:
-			// for the very next rune returns nil ( unhandled )
-			// this rune, the ending quote: it eats.
-			ret = Statement(func(rune) State { return nil })
+			// eats the ending quote
+			ret = Terminal
 
 		case r == escape:
 			ret = Statement(func(r rune) (ret State) {

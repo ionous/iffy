@@ -34,6 +34,7 @@ func (p *PipeParser) next(r rune, exp ExpressionState) State {
 		if res, e := exp.GetExpression(); e != nil {
 			p.err = e
 		} else if res != nil {
+			// add each element of the expression:
 			for _, x := range res {
 				p.out.AddFunction(x)
 			}

@@ -28,12 +28,9 @@ func (blocks Blocks) Blocks() []Block {
 
 // String of the blocks accumulated thus far.
 func (blocks Blocks) String() string {
-	type stringer interface {
-		String() string
-	}
 	var buf bytes.Buffer
-	for _, s := range blocks.list {
-		buf.WriteString(s.(stringer).String())
+	for _, b := range blocks.list {
+		buf.WriteString(fmt.Sprint(b))
 	}
 	return buf.String()
 }

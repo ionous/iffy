@@ -30,7 +30,7 @@ func (p *ArgParser) NewRune(r rune) State {
 	if f := p.factory; f != nil {
 		sub = p.factory.NewExpressionState()
 	} else {
-		sub = new(OperandParser)
+		sub = new(SubdirParser)
 	}
 	return ParseChain(r, sub, Statement(func(r rune) (ret State) {
 		if exp, e := sub.GetExpression(); e != nil {

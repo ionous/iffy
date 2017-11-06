@@ -21,7 +21,7 @@ func (p *Pipe) AddPipe() (err error) {
 
 // GetExpression returns the pipe's postfix ordered output, clearing the pipe.
 func (p *Pipe) GetExpression() (ret Expression, err error) {
-	p.Shunt.addExpression(p.prev)
+	p.Shunt.AddExpression(p.prev)
 	if exp, e := p.Shunt.GetExpression(); e != nil {
 		err = e
 	} else {

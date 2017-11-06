@@ -45,3 +45,6 @@ func MakeParallel(rs ...State) State {
 		return
 	})
 }
+
+// for the very next rune returns nil ( unhandled )
+var Terminal = Statement(func(rune) State { return nil })

@@ -18,7 +18,7 @@ func TestChart(t *testing.T) {
 		"{PLAYER/0}"))
 	x = x && assert.NoError(testChart(t,
 		`hello {player!} to the {"world"|cap?}.`,
-		"hello {PLAYER/0} to the {`world`CAP/1}."))
+		"hello {PLAYER/0} to the {`world` CAP/1}."))
 }
 
 func testChart(t *testing.T, str, want string) (err error) {

@@ -51,7 +51,7 @@ func (n Number) String() string {
 	return fmt.Sprintf("%g", float64(n))
 }
 func (r Reference) String() string {
-	return fmt.Sprintf("[%v]", strings.Join([]string(r), "."))
+	return strings.Join([]string(r), ".")
 }
 func (c Command) String() string {
 	return fmt.Sprintf("%s/%d", strings.ToUpper(c.CommandName), c.CommandArity)

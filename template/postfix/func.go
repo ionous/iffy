@@ -1,8 +1,8 @@
 package postfix
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 )
 
 // Function element of an Expression.
@@ -21,9 +21,9 @@ type Function interface {
 type Expression []Function
 
 func (x Expression) String() string {
-	var b bytes.Buffer
-	for _, x := range x {
-		b.WriteString(fmt.Sprint(x))
+	s := make([]string, len(x))
+	for i, f := range x {
+		s[i] = fmt.Sprint(f)
 	}
-	return b.String()
+	return strings.Join(s, " ")
 }
