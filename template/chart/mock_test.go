@@ -11,15 +11,18 @@ type EmptyFactory struct{}
 // EmptyParser reads empty text.
 type EmptyParser struct{}
 
-// AnyFactory creates parsers which match any series of lowercase letters.
+// AnyFactory creates parsers which match any series of lowercase letters
 type AnyFactory struct{}
 
 // AnyParser reads letters.
 type AnyParser struct{ runes Runes }
 
-// NewExpressionState
-func (EmptyFactory) NewExpressionState() ExpressionState           { return EmptyParser{} }
-func (EmptyParser) GetExpression() (x postfix.Expression, e error) { return }
+func (EmptyFactory) NewExpressionState() ExpressionState {
+	return EmptyParser{}
+}
+func (EmptyParser) GetExpression() (ret postfix.Expression, err error) {
+	return
+}
 func (p EmptyParser) NewRune(r rune) (ret State) {
 	if isSpace(r) {
 		ret = p
@@ -27,7 +30,6 @@ func (p EmptyParser) NewRune(r rune) (ret State) {
 	return
 }
 
-// NewExpressionState
 func (f *AnyFactory) NewExpressionState() ExpressionState {
 	return &AnyParser{}
 }

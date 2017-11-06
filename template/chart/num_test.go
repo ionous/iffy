@@ -9,11 +9,11 @@ func TestNum(t *testing.T) {
 	var NaN = math.NaN()
 	// returns point of failure
 	run := func(str string) (val float64, err error) {
-		var num NumParser
-		if e := parse(&num, str); e != nil {
+		var p NumParser
+		if e := parse(&p, str); e != nil {
 			val = NaN
 			err = e
-		} else if v, e := num.GetValue(); e != nil {
+		} else if v, e := p.GetValue(); e != nil {
 			err = e
 		} else {
 			val = v

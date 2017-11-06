@@ -62,7 +62,7 @@ func (b TextBlock) String() string {
 
 func (b Directive) String() (ret string) {
 	if len(b.Key) > 0 {
-		ret = fmt.Sprintf("{%s %s}", b.Key, b.Expression)
+		ret = fmt.Sprintf("{%s:%s}", b.Key, b.Expression)
 	} else {
 		ret = fmt.Sprintf("{%s}", b.Expression)
 	}

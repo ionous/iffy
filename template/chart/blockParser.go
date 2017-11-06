@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// BlockParser reads alternating blocks of text and directives.
+// Block(r reads alternating blocks of text and directives.
 type BlockParser struct {
 	blocks  Blocks
 	err     error
@@ -29,12 +29,12 @@ func MakeBlockParser(f ExpressionStateFactory) (ret BlockParser) {
 }
 
 // GetBlocks or error
-func (p *BlockParser) GetBlocks() (ret Blocks, err error) {
+func (p *BlockParser) GetBlocks() (ret []Block, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else {
 		p.flushText(false)
-		ret = Blocks{p.blocks.Blocks()}
+		ret = p.blocks.Blocks()
 	}
 	return
 }
@@ -71,32 +71,52 @@ func (p *BlockParser) NewRune(r rune) (ret State) {
 
 // rune at the start of a directive's content.
 func (p *BlockParser) afterOpen(r rune) State {
-	var keyParser IdentParser
-	return ParseChain(r, &keyParser, Statement(func(r rune) (ret State) {
-		// parse what comes next as an expression
-		//keyParser.runes.Reset()
-		nextp := p.factory.NewExpressionState()
-
-		// if b standsalone as a word then its a key-expression
-		key := keyParser.GetName()
-		if isWord := len(key) > 0 && (isSpace(r) || isCloseBracket(r) || isTrim(r)); isWord {
+	var runes Runes
+	return ParseChain(r,
+		SelfStatement(func(self SelfStatement, r rune) (ret State) {
+			if isLetter(r) {
+				ret = runes.Accept(r, self)
+			}
+			return
+		}),
+		Statement(func(r rune) (ret State) {
+			expp := p.newExpressionParser()
+			// read the key
+			var key string
+			var err error
+			if n := runes.String(); len(n) > 0 {
+				if isSpace(r) || isCloseBracket(r) || isTrim(r) {
+					key = n
+				} else {
+					// ex. a number, an operator, etc.
+					err = parse(expp, n)
+				}
+			}
 			//
-			//
-			//
-			// keyParser.runes.Reset() // eat the word.
-		} else {
-			key = "" // ignore the word.
-		}
-		return ParseChain(r, nextp, Statement(func(r rune) (ret State) {
-			if exp, e := nextp.GetExpression(); e != nil {
-				p.err = e
+			if err != nil {
+				p.err = err
 			} else {
-				p.blocks.AddBlock(&Directive{key, exp})
-				ret = p.afterContent(r)
+				ret = ParseChain(r, expp, Statement(func(r rune) (ret State) {
+					if exp, e := expp.GetExpression(); e != nil {
+						p.err = e
+					} else {
+						p.blocks.AddBlock(&Directive{key, exp})
+						ret = p.afterContent(r)
+					}
+					return
+				}))
 			}
 			return
 		}))
-	}))
+}
+
+func (p *BlockParser) newExpressionParser() (ret ExpressionState) {
+	if p.factory != nil {
+		ret = p.factory.NewExpressionState()
+	} else {
+		ret = new(ExpressionParser)
+	}
+	return
 }
 
 // rune after the content of a directive: spaces, trim, closing bracket, etc.
