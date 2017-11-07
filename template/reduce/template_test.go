@@ -1,20 +1,25 @@
-package template_test
+package reduce_test
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
-	"github.com/ionous/iffy/template"
+	"github.com/ionous/iffy/template/chart"
+	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/reduce"
 	"github.com/kr/pretty"
 	r "reflect"
 	"strings"
 	"testing"
 )
 
-func TestStates(t *testing.T) {
+// test the structure of keywords
+// ( as opposed to the results of expressions )
+func TestMeta(t *testing.T) {
 	tests := map[string]struct {
 		str    string
 		expect rt.TextEval
@@ -151,24 +156,29 @@ func TestStates(t *testing.T) {
 			continue
 		}
 		t.Run(k, func(t *testing.T) {
-			ts := template.MakeFactory(make(ident.Counters), directives)
-			var root struct{ rt.TextEval }
-			c := cmds.NewBuilder(&root, core.Xform{})
-			if e := ts.Templatize(c, str); e != nil {
-				t.Fatal(e)
-			} else if e := c.Build(); e != nil {
+			t.Log("testing", str)
+			if dirs, e := chart.Parse(str); e != nil {
 				t.Fatal(e)
 			} else {
-				res := root.TextEval
-				d := pretty.Diff(res, expect)
-				if len(d) > 0 {
-					t.Log(d)
-					t.Log("got:", pretty.Sprint(res))
-					t.Log("want:", pretty.Sprint(expect))
-					t.FailNow()
+				t.Log(chart.Format(dirs))
+				f := factory{make(ident.Counters)}
+				var root struct{ rt.TextEval }
+				c := cmds.NewBuilder(&root, core.Xform{})
+				if e := reduce.Directives(&f, c, dirs); e != nil {
+					t.Fatal(e)
+				} else if e := c.Build(); e != nil {
+					t.Fatal(e)
+				} else {
+					res := root.TextEval
+					d := pretty.Diff(res, expect)
+					if len(d) > 0 {
+						t.Log(d)
+						t.Log("got:", pretty.Sprint(res))
+						t.Log("want:", pretty.Sprint(expect))
+						t.FailNow()
+					}
 				}
 			}
-
 		})
 	}
 }
@@ -191,10 +201,30 @@ var a = &core.Join{[]rt.TextEval{&core.Text{Text: " a "}}}
 var b = &core.Join{[]rt.TextEval{&core.Text{Text: " b "}}}
 var c = &core.Join{[]rt.TextEval{&core.Text{Text: " c "}}}
 
-// directives is a mock directive parser
+// mockExpression is a mock directive parser
+
+type factory struct {
+	gen ident.Counters
+}
+
+func (f *factory) CreateName(group string) (string, error) {
+	return f.gen.NewName(group), nil
+}
+
 // our input is always one letter: x,y,z:
-// and we just generate an object property command for the test.
-func directives(c spec.Block, in []string, hint r.Type) error {
-	c.Cmd("get", "@", in[0])
-	return nil
+// and we generate an object property command for the test.
+func (f *factory) CreateExpression(c spec.Block, x postfix.Expression, hint r.Type) (err error) {
+	if len(x) != 1 {
+		err = errutil.New("test expected 1 element")
+	} else {
+		switch fn := x[0].(type) {
+		case chart.Reference:
+			c.Cmd("get", "@", fn.String())
+		case chart.Quote:
+			c.Cmd("text", string(fn))
+		default:
+			err = errutil.Fmt("test encounted unknown type %T", fn)
+		}
+	}
+	return
 }
