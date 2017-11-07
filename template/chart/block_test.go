@@ -61,7 +61,7 @@ func testBlock(t *testing.T, str string, want string) (err error) {
 	} else if res, e := p.GetDirectives(); e != nil {
 		err = e
 	} else if want != ignoreResult {
-		got := String(res)
+		got := Format(res)
 		if got == want {
 			t.Log("ok:", got)
 		} else {

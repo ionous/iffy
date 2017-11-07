@@ -29,7 +29,7 @@ func testChart(t *testing.T, str, want string) (err error) {
 	t.Log("test:", str)
 	if ds, e := Parse(str); e != nil {
 		err = e
-	} else if got := String(ds); want == ignoreResult {
+	} else if got := Format(ds); want == ignoreResult {
 		t.Log("got", got)
 	} else if got != want {
 		err = errutil.Fmt("want(%d): %s; != got(%d): %s.", len(want), want, len(got), got)

@@ -33,8 +33,8 @@ func (d Directive) isQuote() (ret Quote, okay bool) {
 	return
 }
 
-// String of a slice of directives.
-func String(ds []Directive) string {
+// Format a string from slice of directives.
+func Format(ds []Directive) string {
 	var buf bytes.Buffer
 	for _, d := range ds {
 		buf.WriteString(fmt.Sprint(d))
