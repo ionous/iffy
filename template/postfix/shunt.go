@@ -127,7 +127,7 @@ func (s *Shunt) BeginSubExpression() {
 func (s *Shunt) EndSubExpression() {
 	if s.lastError != nil {
 		// do nothing
-	} else if s.yards.Len() == 1 {
+	} else if s.yards.Len() < 2 {
 		s.lastError = errutil.New("unexpected end of sub-expression")
 	} else if yard := s.yards.Pop(); len(yard.stack) > 0 {
 		s.out = append(s.out, reverse(yard.stack)...)
