@@ -6,62 +6,38 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// Block of text, a directive, or error.
-type Block interface {
-	blockNode()
-}
-
-// Blocks gathers blocks for the parsing of template data.
-type Blocks struct {
-	list []Block
-}
-
-// Len of the blocks accumulated thus far.
-func (blocks Blocks) Len() int {
-	return len(blocks.list)
-}
-
-// Blocks returns the underlying slice of accumulated blocks.
-func (blocks Blocks) Blocks() []Block {
-	return blocks.list
-}
-
-// String of the blocks accumulated thus far.
-func (blocks Blocks) String() string {
-	var buf bytes.Buffer
-	for _, b := range blocks.list {
-		buf.WriteString(fmt.Sprint(b))
-	}
-	return buf.String()
-}
-
-// AddBlock to the output.
-func (blocks *Blocks) AddBlock(b Block) {
-	blocks.list = append(blocks.list, b)
-}
-
-// TextBlock contains the uninterpreted parts of a template.
-type TextBlock struct{ Text string }
-
-// Directive contains the parsed content inside a directive.
+// Directive containing the parsed content of a template.
 // Both or either of the key and the expression can be empty.
 type Directive struct {
 	Key string
 	postfix.Expression
 }
 
-func (*TextBlock) blockNode() {}
-func (*Directive) blockNode() {}
-
-func (b TextBlock) String() string {
-	return b.Text
-}
-
-func (b Directive) String() (ret string) {
-	if len(b.Key) > 0 {
-		ret = fmt.Sprintf("{%s:%s}", b.Key, b.Expression)
+// String of a directive in the format:
+// {key:expression} or {expression}
+func (d Directive) String() (ret string) {
+	if len(d.Key) > 0 {
+		ret = fmt.Sprintf("{%s:%s}", d.Key, d.Expression)
+	} else if q, ok := d.isQuote(); ok {
+		ret = string(q)
 	} else {
-		ret = fmt.Sprintf("{%s}", b.Expression)
+		ret = fmt.Sprintf("{%s}", d.Expression)
 	}
 	return
+}
+
+func (d Directive) isQuote() (ret Quote, okay bool) {
+	if cnt := len(d.Expression); cnt == 1 {
+		ret, okay = d.Expression[0].(Quote)
+	}
+	return
+}
+
+// String of a slice of directives.
+func String(ds []Directive) string {
+	var buf bytes.Buffer
+	for _, d := range ds {
+		buf.WriteString(fmt.Sprint(d))
+	}
+	return buf.String()
 }

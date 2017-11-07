@@ -58,10 +58,10 @@ func testBlock(t *testing.T, str string, want string) (err error) {
 	p := MakeBlockParser(EmptyFactory{})
 	if e := parse(&p, str); e != nil {
 		err = e
-	} else if res, e := p.GetBlocks(); e != nil {
+	} else if res, e := p.GetDirectives(); e != nil {
 		err = e
 	} else if want != ignoreResult {
-		got := Blocks{res}.String()
+		got := String(res)
 		if got == want {
 			t.Log("ok:", got)
 		} else {
@@ -69,7 +69,4 @@ func testBlock(t *testing.T, str string, want string) (err error) {
 		}
 	}
 	return
-}
-func newText(t string) *TextBlock {
-	return &TextBlock{t}
 }

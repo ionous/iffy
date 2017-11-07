@@ -5,9 +5,9 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// Block(r reads alternating blocks of text and directives.
+// BlockParser reads alternating text and directives.
 type BlockParser struct {
-	blocks  Blocks
+	out     []Directive
 	err     error
 	text    []rune
 	spaces  []rune
@@ -28,13 +28,13 @@ func MakeBlockParser(f ExpressionStateFactory) (ret BlockParser) {
 	return
 }
 
-// GetBlocks or error
-func (p *BlockParser) GetBlocks() (ret []Block, err error) {
+// GetDirectives or error
+func (p *BlockParser) GetDirectives() (ret []Directive, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else {
 		p.flushText(false)
-		ret = p.blocks.Blocks()
+		ret = p.out
 	}
 	return
 }
@@ -71,45 +71,36 @@ func (p *BlockParser) NewRune(r rune) (ret State) {
 
 // rune at the start of a directive's content.
 func (p *BlockParser) afterOpen(r rune) State {
-	var runes Runes
-	return ParseChain(r,
-		SelfStatement(func(self SelfStatement, r rune) (ret State) {
-			if isLetter(r) {
-				ret = runes.Accept(r, self)
+	keyp := KeyParser{exp: p.newExpressionParser()}
+	expp := p.newExpressionParser()
+	//
+	var dir Directive
+	var err error
+	para := MakeParallel(
+		MakeChain(expp, StateExit(func() {
+			if x, e := expp.GetExpression(); e != nil {
+				err = errutil.Append(err, e)
+			} else if len(x) > 0 {
+				dir = Directive{Expression: x} // last match wins
 			}
-			return
-		}),
-		Statement(func(r rune) (ret State) {
-			expp := p.newExpressionParser()
-			var continueExp State = expp
-			// read the key
-			var key string
-			var err error
-			if n := runes.String(); len(n) > 0 {
-				if isSpace(r) || isCloseBracket(r) || isTrim(r) {
-					key = n
-				} else if end, last := innerParse(expp, n); end == 0 {
-					continueExp = last
-				} else {
-					err = errutil.New("unknown expression")
-				}
-			}
-			//
-			if err != nil {
-				p.err = err
+		})),
+		MakeChain(&keyp, StateExit(func() {
+			if d, e := keyp.GetDirective(); e != nil {
+				err = errutil.Append(err, e)
 			} else {
-				ret = ParseChain(r, continueExp, Statement(func(r rune) (ret State) {
-					if exp, e := expp.GetExpression(); e != nil {
-						p.err = e
-					} else {
-						p.blocks.AddBlock(&Directive{key, exp})
-						ret = p.afterContent(r)
-					}
-					return
-				}))
+				dir = d // last match wins; key wins equal matches
 			}
-			return
-		}))
+		})),
+	)
+	return ParseChain(r, para, Statement(func(r rune) (ret State) {
+		if err != nil {
+			p.err = err
+		} else {
+			p.out = append(p.out, dir)
+			ret = p.afterContent(r)
+		}
+		return
+	}))
 }
 
 func (p *BlockParser) newExpressionParser() (ret ExpressionState) {
@@ -154,6 +145,7 @@ func (p *BlockParser) flushText(trim bool) {
 		text = append(text, spaces...)
 	}
 	if len(text) > 0 {
-		p.blocks.AddBlock(&TextBlock{string(text)})
+		q := Quote(text)
+		p.out = append(p.out, Directive{Expression: []postfix.Function{q}})
 	}
 }

@@ -4,12 +4,14 @@ import (
 	"fmt"
 )
 
-func Parse(str string) (ret []Block, err error) {
+// Parse the passed string into blocks.
+// This is package chart's primary method.
+func Parse(str string) (ret []Directive, err error) {
 	var p BlockParser
 	if e := parse(&p, str); e != nil {
 		err = e
 	} else {
-		ret, err = p.GetBlocks()
+		ret, err = p.GetDirectives()
 	}
 	return
 }

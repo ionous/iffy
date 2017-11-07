@@ -7,7 +7,7 @@ import (
 
 func TestPipe(t *testing.T) {
 	assert, x := testify.New(t), true
-	// x = x && assert.NoError(testPipe(t, "", "")) // arguments are optional.
+	x = x && assert.NoError(testPipe(t, "", "")) // arguments are optional.
 	x = x && assert.NoError(testPipe(t, "world", "world"))
 	x = x && assert.NoError(testPipe(t, "up! up", "up UP/1"))
 	x = x && assert.NoError(testPipe(t, "up! up|bup! bup", "bup up UP/1 BUP/2"))
