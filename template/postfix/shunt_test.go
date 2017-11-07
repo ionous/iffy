@@ -12,6 +12,7 @@ func TestShunt(t *testing.T) {
 	succeed(t, "a+b*c-d", "a b c * + d -")
 	succeed(t, "x+y*w", "x y w * +")
 	succeed(t, "(x+y)*w", "x y + w *")
+	succeed(t, "(x+y)*(w+z)", "x y + w z + *")
 	succeed(t, "Fa", "a F")
 	succeed(t, "a|F", "a F")
 	succeed(t, "b|F|Ha", "a b F H")
