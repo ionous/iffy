@@ -5,6 +5,8 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
+// SubdirParser reads a single operand or bracketed pipeline.
+// "a" -or- "{a!|...}"
 type SubdirParser struct {
 	exp postfix.Expression
 	err error
@@ -33,6 +35,6 @@ func (p *SubdirParser) NewRune(r rune) (ret State) {
 	return
 }
 
-func (p *SubdirParser) GetExpression() (postfix.Expression, error) {
+func (p SubdirParser) GetExpression() (postfix.Expression, error) {
 	return p.exp, p.err
 }

@@ -25,12 +25,11 @@ func testChart(t *testing.T, str, want string) (err error) {
 	t.Log("test:", str)
 	if res, e := Parse(str); e != nil {
 		err = e
-	} else {
-		got := Blocks{res}.String()
-		if got != want {
-			err = errutil.New(want, "mismatched results", got)
+	} else if want != ignoreResult {
+		if got := (Blocks{res}).String(); got != want {
+			err = errutil.Fmt("want(%d): %s; != got(%d): %s.", len(want), want, len(got), got)
 		} else {
-			t.Log("ok:", res)
+			t.Log("ok", got)
 		}
 	}
 	return

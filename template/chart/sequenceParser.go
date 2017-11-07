@@ -28,12 +28,12 @@ func (p *SequenceParser) GetExpression() (ret postfix.Expression, err error) {
 // at the start of every operand we might have some opening paren, a bracket,
 // or just some operand.
 func (p *SequenceParser) operand(r rune) (ret State) {
-	var a SubdirParser
 	switch {
 	case isOpenParen(r):
 		p.out.BeginSubExpression()
 		ret = MakeChain(spaces, Statement(p.operand))
 	default:
+		var a SubdirParser
 		ret = ParseChain(r, &a, Statement(func(r rune) (ret State) {
 			if exp, e := a.GetExpression(); e != nil {
 				p.err = e
