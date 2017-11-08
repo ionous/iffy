@@ -71,7 +71,7 @@ func (p *Render) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error
 }
 
 // get the object property
-func (p *Render) get(run rt.Runtime, pv interface{}) (err error) {
+func (p *Render) getValue(run rt.Runtime, pv interface{}) (err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
 		err = errutil.New(e, "while rendering", p.Prop)
 	} else {

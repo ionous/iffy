@@ -57,10 +57,9 @@ type mockop struct {
 	pred  int // https://golang.org/ref/spec#Operator_precedence
 }
 
-func (m mockop) Name() string    { return string(m.char) }
 func (m mockop) Arity() int      { return m.arity }
 func (m mockop) Precedence() int { return m.pred }
-func (m mockop) String() string  { return m.Name() }
+func (m mockop) String() string  { return string(m.char) }
 
 var times = mockop{'*', 2, 5}
 var plus = mockop{'+', 2, 4}

@@ -7,9 +7,6 @@ import (
 
 // Function element of an Expression.
 type Function interface {
-	// Name of the function.
-	// Should be a constant string for each function instance.
-	Name() string
 	// Arity the number of required function arguments;
 	// Should be a constant number for each function instance.
 	Arity() int

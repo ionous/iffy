@@ -28,19 +28,18 @@ type Command struct {
 	CommandArity int
 }
 
-func (Quote) Name() string    { return "$txt" }
 func (Quote) Arity() int      { return 0 }
 func (Quote) Precedence() int { return 0 }
+func (q Quote) Value() string { return string(q) }
 
-func (Number) Name() string    { return "$num" }
-func (Number) Arity() int      { return 0 }
-func (Number) Precedence() int { return 0 }
+func (Number) Arity() int       { return 0 }
+func (Number) Precedence() int  { return 0 }
+func (n Number) Value() float64 { return float64(n) }
 
-func (Reference) Name() string    { return "$ref" }
-func (Reference) Arity() int      { return 0 }
-func (Reference) Precedence() int { return 0 }
+func (Reference) Arity() int        { return 0 }
+func (Reference) Precedence() int   { return 0 }
+func (r Reference) Value() []string { return []string(r) }
 
-func (c Command) Name() string    { return c.CommandName }
 func (c Command) Arity() int      { return c.CommandArity }
 func (c Command) Precedence() int { return 8 }
 

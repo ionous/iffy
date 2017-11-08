@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/rt/stream"
 )
 
-// Get retrieves a value from an object.
+// Get a property value from an object by name.
 // FIX: test all forms of Get/Set
 type Get struct {
 	Obj  rt.ObjectEval

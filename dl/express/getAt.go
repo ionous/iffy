@@ -8,9 +8,11 @@ import (
 	r "reflect"
 )
 
-// GetAt retrieves a value from the current top object; if the value isnt't found, it looks for an object of that name in the global scope.
+// GetAt a named property in the current top object;
+// or, if the property isn't found, look for an object of that name instead.
+// Acts similar to variable name resolution in other languages.
 type GetAt struct {
-	Value string
+	Name string
 }
 
 func (p *GetAt) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -26,7 +28,7 @@ func (p *GetAt) GetNumber(run rt.Runtime) (ret float64, err error) {
 func (p *GetAt) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	if e := p.getValue(run, &ret); e != nil {
 		err = e
-	} else if obj, ok := run.GetObject(p.Value); !ok {
+	} else if obj, ok := run.GetObject(p.Name); !ok {
 		err = e
 	} else {
 		ret = obj
@@ -65,10 +67,10 @@ func (p *GetAt) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error)
 }
 
 func (p *GetAt) getValue(run rt.Runtime, pv interface{}) (err error) {
-	if obj, path, e := getAt(run, p.Value); e != nil {
+	if obj, path, e := getAt(run, p.Name); e != nil {
 		err = e
 	} else if len(path) > 0 {
-		err = obj.GetValue(p.Value, pv)
+		err = obj.GetValue(p.Name, pv)
 	} else {
 		err = run.Pack(r.ValueOf(pv), r.ValueOf(obj))
 	}
@@ -76,7 +78,7 @@ func (p *GetAt) getValue(run rt.Runtime, pv interface{}) (err error) {
 }
 
 func (p *GetAt) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, path, e := getAt(run, p.Value); e != nil {
+	if obj, path, e := getAt(run, p.Name); e != nil {
 		err = e
 	} else {
 		ret, err = textConvert(run, obj, path)

@@ -7,17 +7,37 @@ import (
 
 type CompareType int
 
+// CompareTo generates comparision flags.
+// FIX: im not sure this is really needed anymore.
 type CompareTo interface {
 	Compare() CompareType
 }
 
 type EqualTo struct{}
+type NotEqualTo struct{}
 type GreaterThan struct{}
 type LesserThan struct{}
+type GreaterThanOrEqualTo struct{}
+type LesserThanOrEqualTo struct{}
 
-func (EqualTo) Compare() CompareType     { return Compare_EqualTo }
-func (GreaterThan) Compare() CompareType { return Compare_GreaterThan }
-func (LesserThan) Compare() CompareType  { return Compare_LesserThan }
+func (EqualTo) Compare() CompareType {
+	return Compare_EqualTo
+}
+func (NotEqualTo) Compare() CompareType {
+	return 0
+}
+func (GreaterThan) Compare() CompareType {
+	return Compare_GreaterThan
+}
+func (LesserThan) Compare() CompareType {
+	return Compare_LesserThan
+}
+func (GreaterThanOrEqualTo) Compare() CompareType {
+	return Compare_LesserThan | Compare_EqualTo
+}
+func (LesserThanOrEqualTo) Compare() CompareType {
+	return Compare_GreaterThan | Compare_EqualTo
+}
 
 //go:generate stringer -type=CompareType
 const (

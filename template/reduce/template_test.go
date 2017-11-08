@@ -194,12 +194,12 @@ func (t tstlog) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-var x = &core.Get{Obj: &core.TopObject{}, Prop: "x"}
-var y = &core.Get{Obj: &core.TopObject{}, Prop: "y"}
-var z = &core.Get{Obj: &core.TopObject{}, Prop: "z"}
-var a = &core.Join{[]rt.TextEval{&core.Text{Text: " a "}}}
-var b = &core.Join{[]rt.TextEval{&core.Text{Text: " b "}}}
-var c = &core.Join{[]rt.TextEval{&core.Text{Text: " c "}}}
+var x = &core.Get{&core.TopObject{}, "x"}
+var y = &core.Get{&core.TopObject{}, "y"}
+var z = &core.Get{&core.TopObject{}, "z"}
+var a = &core.Join{[]rt.TextEval{&core.Text{" a "}}}
+var b = &core.Join{[]rt.TextEval{&core.Text{" b "}}}
+var c = &core.Join{[]rt.TextEval{&core.Text{" c "}}}
 
 // mockExpression is a mock directive parser
 

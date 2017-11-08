@@ -39,8 +39,8 @@ func TestArgExpression(t *testing.T) {
 	x = x && assert.NoError(testArgx(t, "a {1+2}", "a 1 2 ADD"))
 	x = x && assert.NoError(testArgx(t, "{(5+6)*(7+8)}", "5 6 ADD 7 8 ADD MUL"))
 	x = x && assert.NoError(testArgx(t,
-		"{{5|Super!}+{'hello'|p! 6|end: 7}}",
-		"5 SUPER/1 7 6 `hello` P/2 END/2 ADD",
+		"{{5|first!}+{'hello'|second! 6|third: 7}}",
+		"5 FIRST/1 7 6 `hello` SECOND/2 THIRD/2 ADD",
 	))
 }
 
