@@ -1,4 +1,4 @@
-package reduce_test
+package text_test
 
 import (
 	"github.com/ionous/errutil"

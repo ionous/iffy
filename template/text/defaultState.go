@@ -1,4 +1,4 @@
-package reduce
+package text
 
 import (
 	"github.com/ionous/iffy/spec"
