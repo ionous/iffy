@@ -9,51 +9,48 @@ import (
 
 type ConditionState struct {
 	*Engine
-	PrevState
 	Depth
 }
 
-func (n ConditionState) next(d template.Directive) (ret DirectiveState, err error) {
+func (q ConditionState) next(d template.Directive) (ret DirectiveState, err error) {
 	switch key := d.Key; key {
 	case "end":
-		if prev, e := n.pop(); e != nil {
-			err = e
-		} else {
-			n.rollup(n.Engine)
-			ret = prev
-		}
+		ret, err = q.rollup(q.Engine)
 	case "else", "otherwise":
-		n.end() // endJoin(c)
-		if res, e := n.newBranch(d.Expression, false); e != nil {
+		q.cmds.end() // endJoin(c)
+		if res, e := q.newBranch(d.Expression, false); e != nil {
 			err = errutil.New(key, e)
 		} else {
 			ret = res
 		}
 	case "unless":
-		n.end() // endJoin(c)
-		if res, e := n.newBranch(d.Expression, true); e != nil {
+		q.cmds.end() // endJoin(c)
+		if res, e := q.newBranch(d.Expression, true); e != nil {
 			err = errutil.New(key, e)
 		} else {
 			ret = res
 		}
 	default:
-		ret, err = n.advance(n, d)
+		ret, err = q.advance(q, d)
 	}
 	return
 }
 
-func (n ConditionState) newBranch(x postfix.Expression, invert bool) (ret DirectiveState, err error) {
+func (q ConditionState) newBranch(x postfix.Expression, invert bool) (ret DirectiveState, err error) {
 	if len(x) == 0 {
-		if e := n.span(); e != nil {
+		if next, e := q.newEnd(q); e != nil {
 			err = e
 		} else {
-			ret = EndState{n.Engine, PrevState{n}, n.Depth}
+			next.Depth = q.Depth
+			ret = next
 		}
-	} else if cnd, e := n.newCondition(n, x, invert); e != nil {
-		err = e
 	} else {
-		cnd.Depth += n.Depth
-		ret = cnd
+		if next, e := q.newCondition(q, x, invert); e != nil {
+			err = e
+		} else {
+			next.Depth = 1 + q.Depth
+			ret = next
+		}
 	}
 	return
 }

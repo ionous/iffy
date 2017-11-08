@@ -11,32 +11,8 @@ import (
 
 type Engine struct {
 	Commander
-	stack []*ops.Command
-}
-
-func (eng *Engine) end() {
-	eng.stack = eng.stack[:len(eng.stack)-1]
-}
-
-func (eng *Engine) begin(cmd *ops.Command) (err error) {
-	if e := eng.position(cmd); e != nil {
-		err = e
-	} else {
-		eng.stack = append(eng.stack, cmd)
-	}
-	return
-}
-
-func (eng *Engine) position(cmd *ops.Command) (err error) {
-	if cnt := len(eng.stack); cnt == 0 {
-		err = errutil.New("stack underflow")
-	} else {
-		top := eng.stack[cnt-1]
-		if e := top.Position(cmd); e != nil {
-			err = e
-		}
-	}
-	return
+	cmds Commands
+	prev PrevStates
 }
 
 // StartJoin of one or more strings.
@@ -45,19 +21,19 @@ func (eng *Engine) span() (err error) {
 	if cmd, e := eng.CreateCommand("join"); e != nil {
 		err = e
 	} else {
-		err = eng.begin(cmd)
+		err = eng.cmds.begin(cmd)
 	}
 	return
 }
 
 // because we are mixing text and evals, we expect the whole thing winds up being text. ( otherwise: what would we do with the intervening text. )
 func (eng *Engine) convert(dirs []template.Directive) (ret *ops.Command, err error) {
-	if len(eng.stack) != 0 {
+	if len(eng.cmds.list) != 0 {
 		err = errutil.New("engine reused")
 	} else if cmd, e := eng.CreateCommand("join"); e != nil {
 		err = e
 	} else {
-		eng.stack = []*ops.Command{cmd}
+		eng.cmds.list = []*ops.Command{cmd}
 		var state DirectiveState = DefaultState{Engine: eng}
 		for _, d := range dirs {
 			if n, e := state.next(d); e != nil {
@@ -67,16 +43,18 @@ func (eng *Engine) convert(dirs []template.Directive) (ret *ops.Command, err err
 				state = n
 			}
 		}
-		if cnt := len(eng.stack); cnt != 1 {
-			err = errutil.New("stack error", eng.stack[1].Target().Type().String())
-		} else {
-			ret = eng.stack[0]
+		if err == nil {
+			if cnt := len(eng.cmds.list); cnt != 1 {
+				err = errutil.New("cmds error")
+			} else {
+				ret = eng.cmds.list[0]
+			}
 		}
 	}
 	return
 }
 
-func (eng *Engine) advance(p DirectiveState, d template.Directive) (ret DirectiveState, err error) {
+func (eng *Engine) advance(q DirectiveState, d template.Directive) (ret DirectiveState, err error) {
 	switch key, xs := d.Key, d.Expression; key {
 	case "once":
 		key = "stopping"
@@ -84,7 +62,7 @@ func (eng *Engine) advance(p DirectiveState, d template.Directive) (ret Directiv
 	case "cycle", "shuffle":
 		if xs != nil {
 			err = errutil.New(key, "expected empty expression", xs)
-		} else if seq, e := eng.newSequence(p, key); e != nil {
+		} else if seq, e := eng.newSequence(q, key); e != nil {
 			err = errutil.New(key, e)
 		} else {
 			ret = seq
@@ -92,7 +70,7 @@ func (eng *Engine) advance(p DirectiveState, d template.Directive) (ret Directiv
 	case "if", "unless":
 		if len(xs) == 0 {
 			err = errutil.New("expected conditional")
-		} else if cnd, e := eng.newCondition(p, xs, key != "if"); e != nil {
+		} else if cnd, e := eng.newCondition(q, xs, key != "if"); e != nil {
 			err = errutil.New(key, e)
 		} else {
 			ret = cnd
@@ -100,35 +78,45 @@ func (eng *Engine) advance(p DirectiveState, d template.Directive) (ret Directiv
 	case "":
 		if cmd, e := eng.CreateExpression(xs, kindOf.TypeTextEval); e != nil {
 			err = e
-		} else if e := eng.position(cmd); e != nil {
+		} else if e := eng.cmds.position(cmd); e != nil {
 			err = e
 		} else {
-			ret = p // keep going in the same state
+			ret = q // keep going in the same state
 		}
 	default:
 		err = errutil.New("unknown key", key)
 	}
 	return
 }
-
-func (eng *Engine) newSequence(p DirectiveState, n string) (ret SequenceState, err error) {
-	if counter, e := eng.CreateName(n + " counter"); e != nil {
-		err = e
-	} else if count, e := eng.CreateCommand(n + " text"); e != nil {
-		err = e
-	} else if e := count.Position(counter); e != nil {
-		err = e
-	} else if e := eng.begin(count); e != nil {
-		err = e
-	} else if e := eng.span(); e != nil {
+func (eng *Engine) newEnd(q DirectiveState) (ret EndState, err error) {
+	if e := eng.span(); e != nil {
 		err = e
 	} else {
-		ret = SequenceState{eng, PrevState{p}, 1}
+		eng.prev.push(q)
+		ret = EndState{eng, 1}
 	}
 	return
 }
 
-func (eng *Engine) newCondition(p DirectiveState, xs postfix.Expression, invert bool) (ret ConditionState, err error) {
+func (eng *Engine) newSequence(q DirectiveState, group string) (ret SequenceState, err error) {
+	if counter, e := eng.CreateName(group + " counter"); e != nil {
+		err = e
+	} else if count, e := eng.CreateCommand(group + " text"); e != nil {
+		err = e
+	} else if e := count.Position(counter); e != nil {
+		err = e
+	} else if e := eng.cmds.begin(count); e != nil {
+		err = e
+	} else if e := eng.span(); e != nil {
+		err = e
+	} else {
+		eng.prev.push(q)
+		ret = SequenceState{eng, 1}
+	}
+	return
+}
+
+func (eng *Engine) newCondition(q DirectiveState, xs postfix.Expression, invert bool) (ret ConditionState, err error) {
 	if cmd, e := eng.CreateCommand("choose text"); e != nil {
 		err = e
 	} else if test, e := eng.CreateExpression(xs, kindOf.TypeBoolEval); e != nil {
@@ -137,12 +125,13 @@ func (eng *Engine) newCondition(p DirectiveState, xs postfix.Expression, invert 
 		err = e
 	} else if e := cmd.Position(test); e != nil {
 		err = e
-	} else if e := eng.begin(cmd); e != nil {
+	} else if e := eng.cmds.begin(cmd); e != nil {
 		err = e
 	} else if e := eng.span(); e != nil {
 		err = e
 	} else {
-		ret = ConditionState{eng, PrevState{p}, 1}
+		eng.prev.push(q)
+		ret = ConditionState{eng, 1}
 	}
 	return
 }

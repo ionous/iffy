@@ -133,6 +133,23 @@ func TestMeta(t *testing.T) {
 					},
 				},
 			}}},
+		{"cycle-if",
+			"{cycle} {if x} a {else} b {end} {or} b {or} c {end}",
+			&core.Join{[]rt.TextEval{
+				&core.CycleText{
+					Id: "$cycleCounter#1",
+					Values: []rt.TextEval{
+						&core.Join{[]rt.TextEval{
+							&core.ChooseText{
+								If:    x,
+								True:  a,
+								False: b,
+							},
+						}},
+						b, c,
+					},
+				},
+			}}},
 	}
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)

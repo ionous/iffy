@@ -6,7 +6,6 @@ import (
 
 type DefaultState struct {
 	*Engine
-	PrevState
 }
 
 func (b DefaultState) next(d template.Directive) (ret DirectiveState, err error) {
