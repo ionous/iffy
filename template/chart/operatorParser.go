@@ -38,10 +38,10 @@ func (p OperatorParser) GetOperator() (ret Operator, okay bool) {
 // unless we find an exact match, we are done with the state.
 func (p *OperatorParser) NewRune(r rune) (ret State) {
 	next := string(append(p.next, r))
-	i := sort.Search(len(list)-p.ofs, func(i int) bool {
-		return list[i].Text >= next
+	i := p.ofs + sort.Search(len(list)-p.ofs, func(i int) bool {
+		return list[i+p.ofs].Text >= next
 	})
-	if i >= 0 && i < len(list) {
+	if i >= p.ofs && i < len(list) {
 		el := list[i].Text
 		if cnt := len(next); cnt <= len(el) && el[:cnt] == next {
 			p.ofs = i

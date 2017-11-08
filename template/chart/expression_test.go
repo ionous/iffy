@@ -14,6 +14,9 @@ func TestExpression(t *testing.T) {
 	x = x && assert.NoError(testExp(t, "quest?", "QUEST/0"))
 	x = x && assert.NoError(testExp(t, "x+y", "x y ADD"))
 	x = x && assert.NoError(testExp(t, "(5+6)*(7+8)", "5 6 ADD 7 8 ADD MUL"))
+	x = x && assert.NoError(testExp(t, "5*(6-4)", "5 6 4 SUB MUL"))
+	x = x && assert.NoError(testExp(t, "x and y", "x y LAND"))
+	x = x && assert.NoError(testExp(t, "a and (b or {isNot: c})", "a b c ISNOT/1 LOR LAND"))
 	x = x && assert.Error(testExp(t, "!", ignoreResult))
 	x = x && assert.Error(testExp(t, "fun!!", ignoreResult))
 }

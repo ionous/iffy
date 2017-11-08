@@ -4,8 +4,7 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// Sequence parser reads a series of operand and optional operator, operand phrases.
-// step 2 : sub-directives.
+// Sequence parser reads a series of operand and operator phrases.
 type SequenceParser struct {
 	err error
 	out postfix.Shunt
