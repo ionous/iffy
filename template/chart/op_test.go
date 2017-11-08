@@ -1,13 +1,14 @@
 package chart
 
 import (
+	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"
 	"sort"
 	"testing"
 )
 
 func TestOpListIsSorted(t *testing.T) {
-	test := make([]Match, len(list))
+	test := make([]_Match, len(list))
 	copy(test, list)
 	sort.Slice(test, func(i, j int) bool {
 		return test[i].Text < test[j].Text
@@ -21,15 +22,15 @@ func TestOpListIsSorted(t *testing.T) {
 func TestOps(t *testing.T) {
 	type Test struct {
 		str    string
-		op     Operator
+		op     template.Operator
 		errors bool
 	}
 	m := []Test{
-		{str: "andy", op: LAND},
-		{str: ">>>>", op: GTR},
-		{str: "*", op: MUL},
-		// {str: "(", op: LPAREN},
-		{str: "<=", op: LEQ},
+		{str: "andy", op: template.LAND},
+		{str: ">>>>", op: template.GTR},
+		{str: "*", op: template.MUL},
+		// {str: "(", op: template.LPAREN},
+		{str: "<=", op: template.LEQ},
 		{str: "#", errors: true},
 	}
 	for _, n := range m {

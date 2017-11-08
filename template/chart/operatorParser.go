@@ -1,41 +1,25 @@
 package chart
 
-import "sort"
+import (
+	"github.com/ionous/iffy/template"
+	"sort"
+)
 
-type Match struct {
-	Op   Operator
-	Text string
-}
-
-var list = []Match{
-	{REM, "%"},
-	{MUL, "*"},
-	{ADD, "+"},
-	{SUB, "-"},
-	{QUO, "/"},
-	{LSS, "<"},
-	{LEQ, "<="},
-	{NEQ, "<>"},
-	{EQL, "="},
-	{GTR, ">"},
-	{GEQ, ">="},
-	{LAND, "and"},
-	{LOR, "or"}, // if this was || we'd have to make special provisions in the expression parser to handle the difference between a pipe (|) and an or (||)
-}
-
+// OperatorParser reads a binary operator.
 type OperatorParser struct {
 	next []rune
 	ofs  int
 }
 
-func (p OperatorParser) GetOperator() (ret Operator, okay bool) {
+// GetOperator representing the result of parsing.
+func (p OperatorParser) GetOperator() (ret template.Operator, okay bool) {
 	if len(p.next) > 0 {
 		ret, okay = list[p.ofs].Op, true
 	}
 	return
 }
 
-// unless we find an exact match, we are done with the state.
+// NewRune starts on the first character of the operator; unless we find an exact match, we are done with the state.
 func (p *OperatorParser) NewRune(r rune) (ret State) {
 	next := string(append(p.next, r))
 	i := p.ofs + sort.Search(len(list)-p.ofs, func(i int) bool {
@@ -50,4 +34,25 @@ func (p *OperatorParser) NewRune(r rune) (ret State) {
 		}
 	}
 	return
+}
+
+type _Match struct {
+	Op   template.Operator
+	Text string
+}
+
+var list = []_Match{
+	{template.REM, "%"},
+	{template.MUL, "*"},
+	{template.ADD, "+"},
+	{template.SUB, "-"},
+	{template.QUO, "/"},
+	{template.LSS, "<"},
+	{template.LEQ, "<="},
+	{template.NEQ, "<>"},
+	{template.EQL, "="},
+	{template.GTR, ">"},
+	{template.GEQ, ">="},
+	{template.LAND, "and"},
+	{template.LOR, "or"}, // if this was || we'd have to make special provisions in the expression parser to handle the difference between a pipe (|) and an or (||)
 }

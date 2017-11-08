@@ -2,12 +2,13 @@ package chart
 
 import (
 	"fmt"
+	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 )
 
 // Parse the passed string into blocks.
 // This is package chart's primary method.
-func Parse(str string) (ret []Directive, err error) {
+func Parse(str string) (ret []template.Directive, err error) {
 	var p BlockParser
 	if e := parse(&p, str); e != nil {
 		err = e

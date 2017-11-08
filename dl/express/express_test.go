@@ -72,20 +72,22 @@ func TestExpr(t *testing.T) {
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*Commands)(nil))
-	fac := ops.NewFactory(cmds, core.Xform{})
-
+	fac := ops.NewFactory(cmds, ops.TransformFunction{core.Transform})
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			if xs, e := chart.ParseExpression(test.str); e != nil {
 				t.Fatal(e)
-			} else if got, e := Convert(fac, xs); e != nil {
+			} else if res, e := Convert(fac, xs); e != nil {
 				t.Fatal(e)
-			} else if want := test.want; !testify.ObjectsAreEqualValues(want, got) {
-				// got != want
-				t.Log(pretty.Diff(got, want))
-				t.Log("got:", pretty.Sprint(got))
-				t.Log("want:", pretty.Sprint(want))
-				t.FailNow()
+			} else {
+				got := res.Target().Interface()
+				if want := test.want; !testify.ObjectsAreEqualValues(want, got) {
+					// got != want
+					t.Log(pretty.Diff(got, want))
+					t.Log("got:", pretty.Sprint(got))
+					t.Log("want:", pretty.Sprint(want))
+					t.FailNow()
+				}
 			}
 		})
 	}

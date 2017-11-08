@@ -33,9 +33,6 @@ func (ops *Ops) NewBuilder(root interface{}, x Transform) *Builder {
 }
 
 func (ops *Ops) NewFromTarget(tgt Target, x Transform) *Builder {
-	if x == nil {
-		x = DefaultXform{}
-	}
 	c := &Command{xform: x, target: tgt}
 	return &Builder{
 		builder.NewBuilder(&Factory{ops, x}, c),

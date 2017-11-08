@@ -6,26 +6,26 @@ import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
-	"github.com/ionous/iffy/template/chart"
+	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// Convert converts a postfix expression into iffy commands.
-func Convert(ops *ops.Factory, expression postfix.Expression) (ret interface{}, err error) {
-	c := converter{ops: ops}
-	if e := c.convert(expression); e != nil {
+// Express converts a postfix expression into iffy commands.
+func Convert(cmds *ops.Factory, xs postfix.Expression) (ret *ops.Command, err error) {
+	c := converter{cmds: cmds}
+	if e := c.convert(xs); e != nil {
 	} else if len(c.stack) == 0 {
 		err = errutil.New("empty output")
 	} else if len(c.stack) > 1 {
 		err = errutil.New("unparsed output")
 	} else {
-		ret = c.stack[0]
+		ret = c.stack[0].(*ops.Command)
 	}
 	return
 }
 
 type converter struct {
-	ops   *ops.Factory
+	cmds  *ops.Factory
 	stack []interface{}
 }
 
@@ -40,7 +40,7 @@ func (c *converter) convert(xs postfix.Expression) (err error) {
 }
 
 // add a new command pointer to the output stack.
-func (c *converter) push(cmd interface{}) {
+func (c *converter) push(cmd *ops.Command) {
 	c.stack = append(c.stack, cmd)
 }
 
@@ -57,7 +57,7 @@ func (c *converter) pop(cnt int) (ret []interface{}, err error) {
 func (c *converter) binary(i interface{}) (err error) {
 	if args, e := c.pop(2); e != nil {
 		err = e
-	} else if cmd, e := c.ops.CmdFromPointer(i); e != nil {
+	} else if cmd, e := c.cmds.EmplaceCommand(i); e != nil {
 		err = e
 	} else {
 		err = c.pushCommand(cmd, args...)
@@ -71,7 +71,7 @@ func (c *converter) binary(i interface{}) (err error) {
 func (c *converter) compare(cmp core.CompareTo) (err error) {
 	if args, e := c.pop(2); e != nil {
 		err = e
-	} else if cmd, e := c.ops.CmdFromPointer(&core.CompareText{}); e != nil {
+	} else if cmd, e := c.cmds.EmplaceCommand(&core.CompareText{}); e != nil {
 		err = e
 	} else {
 		// as an alternative to this custom code, we could name arguments for every command.
@@ -87,7 +87,7 @@ func (c *converter) pushCommand(cmd *ops.Command, args ...interface{}) (err erro
 	if e := assign(cmd, args); e != nil {
 		err = e
 	} else {
-		c.push(cmd.Target().Interface())
+		c.push(cmd)
 	}
 	return
 }
@@ -106,15 +106,21 @@ func assign(cmd *ops.Command, args []interface{}) (err error) {
 // convert the passed function into iffy commands.
 func (c *converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
-	case chart.Quote:
-		op := &core.Text{fn.Value()}
-		c.push(op)
+	case template.Quote:
+		if cmd, e := c.cmds.EmplaceCommand(&core.Text{fn.Value()}); e != nil {
+			err = e
+		} else {
+			c.push(cmd)
+		}
 
-	case chart.Number:
-		op := &core.Num{fn.Value()}
-		c.push(op)
+	case template.Number:
+		if cmd, e := c.cmds.EmplaceCommand(&core.Num{fn.Value()}); e != nil {
+			err = e
+		} else {
+			c.push(cmd)
+		}
 
-	case chart.Reference:
+	case template.Reference:
 		if fields := fn.Value(); len(fields) == 0 {
 			err = errutil.New("empty reference")
 		} else {
@@ -128,11 +134,15 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 			for _, field := range fields[1:] {
 				op = &Render{op, field}
 			}
-			c.push(op)
+			if cmd, e := c.cmds.EmplaceCommand(op); e != nil {
+				err = e
+			} else {
+				c.push(cmd)
+			}
 		}
 
-	case chart.Command:
-		if cmd, e := c.ops.CmdFromName(fn.CommandName); e != nil {
+	case template.Command:
+		if cmd, e := c.cmds.CreateCommand(fn.CommandName); e != nil {
 			err = e
 		} else if args, e := c.pop(fn.CommandArity); e != nil {
 			err = e
@@ -140,33 +150,33 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 			err = c.pushCommand(cmd, args...)
 		}
 
-	case chart.Operator:
+	case template.Operator:
 		switch fn {
-		case chart.MUL:
+		case template.MUL:
 			err = c.binary(&core.Mul{})
-		case chart.QUO:
+		case template.QUO:
 			err = c.binary(&core.Div{})
-		case chart.REM:
+		case template.REM:
 			err = c.binary(&core.Mod{})
-		case chart.ADD:
+		case template.ADD:
 			err = c.binary(&core.Add{})
-		case chart.SUB:
+		case template.SUB:
 			err = c.binary(&core.Sub{})
-		case chart.EQL:
+		case template.EQL:
 			err = c.compare(&core.EqualTo{})
-		case chart.NEQ:
+		case template.NEQ:
 			err = c.compare(&core.NotEqualTo{})
-		case chart.LSS:
+		case template.LSS:
 			err = c.compare(&core.LesserThan{})
-		case chart.LEQ:
+		case template.LEQ:
 			err = c.compare(&core.LesserThanOrEqualTo{})
-		case chart.GTR:
+		case template.GTR:
 			err = c.compare(&core.GreaterThan{})
-		case chart.GEQ:
+		case template.GEQ:
 			err = c.compare(&core.GreaterThanOrEqualTo{})
-		case chart.LAND:
+		case template.LAND:
 			err = c.binary(&core.AllTrue{})
-		case chart.LOR:
+		case template.LOR:
 			err = c.binary(&core.AnyTrue{})
 		default:
 			err = errutil.Fmt("unknown operator %s", fn)

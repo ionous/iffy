@@ -50,7 +50,7 @@ func TestOps(t *testing.T) {
 	t.Run("kv", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		c := cmds.NewBuilder(&root, DefaultXform{})
+		c := cmds.NewBuilder(&root, nil)
 		c.Param("Value").Val(4)
 		//
 		if e := c.Build(); assert.NoError(e) {
@@ -60,7 +60,7 @@ func TestOps(t *testing.T) {
 	t.Run("defines", func(t *testing.T) {
 		var root Container
 		assert := assert.New(t)
-		c := cmds.NewBuilder(&root, DefaultXform{})
+		c := cmds.NewBuilder(&root, nil)
 		// the simple way:
 		c.Cmd("contents", "all are one")
 		// // cause why not:
@@ -80,7 +80,7 @@ func TestOps(t *testing.T) {
 	t.Run("auto", func(t *testing.T) {
 		var root struct{ List []SomeInterface }
 		assert := assert.New(t)
-		c := cmds.NewBuilder(&root, DefaultXform{})
+		c := cmds.NewBuilder(&root, nil)
 		//
 		c.Cmd("contents", c.Val("a"))
 		c.Cmd("contents", c.Val("b"))

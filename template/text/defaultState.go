@@ -1,15 +1,14 @@
 package text
 
 import (
-	"github.com/ionous/iffy/spec"
-	"github.com/ionous/iffy/template/chart"
+	"github.com/ionous/iffy/template"
 )
 
 type DefaultState struct {
-	Engine
+	*Engine
 	PrevState
 }
 
-func (b DefaultState) next(c spec.Block, d chart.Directive) (ret DirectiveState, err error) {
-	return b.advance(b, c, d)
+func (b DefaultState) next(d template.Directive) (ret DirectiveState, err error) {
+	return b.advance(b, d)
 }

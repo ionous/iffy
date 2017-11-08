@@ -5,14 +5,11 @@ import (
 	r "reflect"
 )
 
-// Xform transforms values specified by a script author into values usable by the runtime.
+// Transform converts values specified by a scriptinto values usable by the runtime.
 // For instance, a string into a request for an object; an int into a number eval.
-// See also express.MakeXform which can create templates from author specified strings.
+// See also express.NewTransform which can create templates from author specified strings.
 // FIX: this uses core, but should it be a part of core?
-type Xform struct{}
-
-// TransformValue returns src if no error but couldnt convert.
-func (ts Xform) TransformValue(src r.Value, hint r.Type) (ret r.Value, err error) {
+func Transform(src r.Value, hint r.Type) (ret r.Value, err error) {
 	if v := literally(src, hint); v != nil {
 		ret = r.ValueOf(v)
 	} else {

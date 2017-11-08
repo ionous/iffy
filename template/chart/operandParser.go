@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 )
 
@@ -51,7 +52,7 @@ func (p QuoteParser) GetOperand() (ret postfix.Function, err error) {
 	if r, e := p.GetString(); e != nil {
 		err = e
 	} else {
-		ret = Quote(r)
+		ret = template.Quote(r)
 	}
 	return
 }
@@ -60,7 +61,7 @@ func (p FieldParser) GetOperand() (ret postfix.Function, err error) {
 	if r, e := p.GetFields(); e != nil {
 		err = e
 	} else {
-		ret = Reference(r)
+		ret = template.Reference(r)
 	}
 	return
 }
@@ -69,7 +70,7 @@ func (p NumParser) GetOperand() (ret postfix.Function, err error) {
 	if n, e := p.GetValue(); e != nil {
 		err = e
 	} else {
-		ret = Number(n)
+		ret = template.Number(n)
 	}
 	return
 }

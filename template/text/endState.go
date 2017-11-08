@@ -1,36 +1,35 @@
 package text
 
 import (
-	"github.com/ionous/iffy/spec"
-	"github.com/ionous/iffy/template/chart"
+	"github.com/ionous/iffy/template"
 )
 
 type EndState struct {
-	Engine
+	*Engine
 	PrevState
 	Depth
 }
 
-func (q EndState) next(c spec.Block, d chart.Directive) (ret DirectiveState, err error) {
+func (q EndState) next(d template.Directive) (ret DirectiveState, err error) {
 	switch key := d.Key; key {
 	case "end":
 		if prev, e := q.pop(); e != nil {
 			err = e
 		} else {
 			ret = prev
-			q.rollup(c)
+			q.rollup(q.Engine)
 		}
 	default:
-		ret, err = q.advance(q, c, d)
+		ret, err = q.advance(q, d)
 	}
 	return
 }
 
 type Depth int
 
-func (d Depth) rollup(c spec.Block) {
-	endJoin(c)
+func (d Depth) rollup(eng *Engine) {
+	eng.end() // end span
 	for i := 0; i < int(d); i++ {
-		c.End()
+		eng.end()
 	}
 }

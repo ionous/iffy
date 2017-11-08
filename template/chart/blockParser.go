@@ -2,12 +2,13 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 )
 
 // BlockParser reads alternating text and directives.
 type BlockParser struct {
-	out     []Directive
+	out     []template.Directive
 	err     error
 	text    []rune
 	spaces  []rune
@@ -29,7 +30,7 @@ func MakeBlockParser(f ExpressionStateFactory) (ret BlockParser) {
 }
 
 // GetDirectives or error
-func (p *BlockParser) GetDirectives() (ret []Directive, err error) {
+func (p *BlockParser) GetDirectives() (ret []template.Directive, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else {
@@ -74,14 +75,14 @@ func (p *BlockParser) afterOpen(r rune) State {
 	keyp := KeyParser{exp: p.newExpressionParser()}
 	expp := p.newExpressionParser()
 	//
-	var dir Directive
+	var dir template.Directive
 	var err error
 	para := MakeParallel(
 		MakeChain(expp, StateExit(func() {
 			if x, e := expp.GetExpression(); e != nil {
 				err = errutil.Append(err, e)
 			} else if len(x) > 0 {
-				dir = Directive{Expression: x} // last match wins
+				dir = template.Directive{Expression: x} // last match wins
 			}
 		})),
 		MakeChain(&keyp, StateExit(func() {
@@ -145,7 +146,7 @@ func (p *BlockParser) flushText(trim bool) {
 		text = append(text, spaces...)
 	}
 	if len(text) > 0 {
-		q := Quote(text)
-		p.out = append(p.out, Directive{Expression: []postfix.Function{q}})
+		q := template.Quote(text)
+		p.out = append(p.out, template.Directive{Expression: []postfix.Function{q}})
 	}
 }

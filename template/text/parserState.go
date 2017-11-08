@@ -2,13 +2,12 @@ package text
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/spec"
-	"github.com/ionous/iffy/template/chart"
+	"github.com/ionous/iffy/template"
 )
 
 // DirectiveState tracks the structure of the template keywords: if blocks, else blocks, etc.
 type DirectiveState interface {
-	next(spec.Block, chart.Directive) (DirectiveState, error)
+	next(template.Directive) (DirectiveState, error)
 	pop() (DirectiveState, error)
 }
 

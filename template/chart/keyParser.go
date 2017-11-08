@@ -1,5 +1,9 @@
 package chart
 
+import (
+	"github.com/ionous/iffy/template"
+)
+
 // KeyParser reads a key and its optional following expression.
 type KeyParser struct {
 	err   error
@@ -17,7 +21,7 @@ func (p *KeyParser) NewRune(r rune) (ret State) {
 	return
 }
 
-func (p *KeyParser) GetDirective() (ret Directive, err error) {
+func (p *KeyParser) GetDirective() (ret template.Directive, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else if exp, e := p.exp.GetExpression(); e != nil {

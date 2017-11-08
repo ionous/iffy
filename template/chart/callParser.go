@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 )
 
@@ -41,7 +42,7 @@ func (p *CallParser) NewRune(r rune) State {
 					if len(prev) > 0 {
 						p.out = append(p.out, prev...)
 					}
-					cmd := Command{n, arity + p.arity}
+					cmd := template.Command{n, arity + p.arity}
 					p.out = append(p.out, cmd)
 				}
 			})))

@@ -131,10 +131,10 @@ func (c *Command) setValue(dst r.Value, src r.Value) (err error) {
 }
 
 // helper for managing error
-func xform(x Transform, src r.Value, hint r.Type) (ret r.Value, err error) {
+func xform(xform Transform, src r.Value, hint r.Type) (ret r.Value, err error) {
 	// if the destintation slot in the command is an interface -- ie. another command.
-	if hint.Kind() == r.Interface {
-		ret, err = x.TransformValue(src, hint)
+	if xform != nil && hint.Kind() == r.Interface {
+		ret, err = xform.TransformValue(src, hint)
 	} else {
 		ret = src
 	}

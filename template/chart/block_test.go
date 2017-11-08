@@ -2,6 +2,7 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/template"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -61,7 +62,7 @@ func testBlock(t *testing.T, str string, want string) (err error) {
 	} else if res, e := p.GetDirectives(); e != nil {
 		err = e
 	} else if want != ignoreResult {
-		got := Format(res)
+		got := template.Format(res)
 		if got == want {
 			t.Log("ok:", got)
 		} else {

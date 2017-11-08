@@ -82,7 +82,7 @@ func (p *Play) Play(w io.Writer) (ret *rtm.Rtm, err error) {
 	} else if e := unique.RegisterBlocks(events, p.events...); e != nil {
 		err = e
 	} else {
-		xform := express.MakeXform(cmds, &p.objects)
+		xform := express.NewTransform(cmds, &p.objects)
 		if rules, e := rules.Master(cmds, xform, patterns, std.Rules); e != nil {
 			err = e
 		} else if facts, e := p.build(cmds, xform); e != nil {

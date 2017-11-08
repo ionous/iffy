@@ -30,7 +30,7 @@ func TestShadows(t *testing.T) {
 		Num    rt.NumberEval
 		Object rt.ObjectEval
 	}
-	c := cmds.NewBuilder(&root, core.Xform{})
+	c := cmds.NewBuilder(&root, ops.TransformFunction{core.Transform})
 	// FIX: without the cmd -- it doesnt error.
 	// FIX: and what about using the same param twice?
 	c.Cmd("add", 1, 2)

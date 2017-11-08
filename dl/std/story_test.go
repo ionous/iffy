@@ -47,7 +47,7 @@ func xTestStory(t *testing.T) {
 		&std.Pawn{"pawn", ident.IdOf("me")},
 		&std.Actor{std.Thing{Kind: std.Kind{Name: "me"}}},
 	))
-	xform := express.MakeXform(cmds, nil)
+	xform := express.NewTransform(cmds, nil)
 	rules, e := rules.Master(cmds, xform, patterns, std.Rules)
 	if e != nil {
 		t.Fatal(e)

@@ -28,7 +28,7 @@ package express
 // 	unique.PanicBlocks(patterns,
 // 		(*std.Patterns)(nil))
 
-// 	xform := MakeXform(cmds, nil)
+// 	xform := NewTransform(cmds, nil)
 
 // 	t.Run("property", func(t *testing.T) {
 // 		var root struct{ rt.NumberEval }

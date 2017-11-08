@@ -1,4 +1,4 @@
-package chart
+package template
 
 // Operator represents built-in binary functions.
 type Operator int
