@@ -2,6 +2,7 @@ package chart
 
 import (
 	"fmt"
+	"github.com/ionous/iffy/template/postfix"
 )
 
 // Parse the passed string into blocks.
@@ -12,6 +13,16 @@ func Parse(str string) (ret []Directive, err error) {
 		err = e
 	} else {
 		ret, err = p.GetDirectives()
+	}
+	return
+}
+
+func ParseExpression(str string) (ret postfix.Expression, err error) {
+	var p SequenceParser
+	if e := parse(&p, str); e != nil {
+		err = e
+	} else {
+		ret, err = p.GetExpression()
 	}
 	return
 }

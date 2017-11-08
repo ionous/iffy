@@ -3,17 +3,35 @@ package express
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/template/chart"
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// ParseExpression converts a postfix expression into iffy commands.
-func ParseExpression(ops *ops.Factory, expression postfix.Expression) (err error) {
-	p := parser{ops: ops}
-	for _, fn := range expression {
-		if e := p.addFunction(fn); e != nil {
+// Convert converts a postfix expression into iffy commands.
+func Convert(ops *ops.Factory, expression postfix.Expression) (ret interface{}, err error) {
+	c := converter{ops: ops}
+	if e := c.convert(expression); e != nil {
+	} else if len(c.stack) == 0 {
+		err = errutil.New("empty output")
+	} else if len(c.stack) > 1 {
+		err = errutil.New("unparsed output")
+	} else {
+		ret = c.stack[0]
+	}
+	return
+}
+
+type converter struct {
+	ops   *ops.Factory
+	stack []interface{}
+}
+
+func (c *converter) convert(xs postfix.Expression) (err error) {
+	for _, fn := range xs {
+		if e := c.addFunction(fn); e != nil {
 			err = e
 			break
 		}
@@ -21,33 +39,28 @@ func ParseExpression(ops *ops.Factory, expression postfix.Expression) (err error
 	return
 }
 
-type parser struct {
-	ops   *ops.Factory
-	stack []interface{}
-}
-
 // add a new command pointer to the output stack.
-func (p *parser) push(cmd interface{}) {
-	p.stack = append(p.stack, cmd)
+func (c *converter) push(cmd interface{}) {
+	c.stack = append(c.stack, cmd)
 }
 
-// extract cnt commands from the parser stack.
-func (p *parser) pop(cnt int) (ret []interface{}, err error) {
-	if end := len(p.stack) - cnt; end < 0 {
+// extract cnt commands from the converter stack.
+func (c *converter) pop(cnt int) (ret []interface{}, err error) {
+	if end := len(c.stack) - cnt; end < 0 {
 		err = errutil.New("stack underflow")
 	} else {
-		ret, p.stack = p.stack[end:], p.stack[:end]
+		ret, c.stack = c.stack[end:], c.stack[:end]
 	}
 	return
 }
 
-func (p *parser) binary(i interface{}) (err error) {
-	if args, e := p.pop(2); e != nil {
+func (c *converter) binary(i interface{}) (err error) {
+	if args, e := c.pop(2); e != nil {
 		err = e
-	} else if cmd, e := p.ops.CmdFromPointer(i); e != nil {
+	} else if cmd, e := c.ops.CmdFromPointer(i); e != nil {
 		err = e
 	} else {
-		err = p.pushCommand(cmd, args...)
+		err = c.pushCommand(cmd, args...)
 	}
 	return
 }
@@ -55,26 +68,26 @@ func (p *parser) binary(i interface{}) (err error) {
 // adds a comparision statement to the output.
 // FIX FIX we have to know the type: num,text,obj of the properties in question
 // need more information on properties.
-func (p *parser) compare(cmp core.CompareTo) (err error) {
-	if args, e := p.pop(2); e != nil {
+func (c *converter) compare(cmp core.CompareTo) (err error) {
+	if args, e := c.pop(2); e != nil {
 		err = e
-	} else if cmd, e := p.ops.CmdFromPointer(&core.CompareText{}); e != nil {
+	} else if cmd, e := c.ops.CmdFromPointer(&core.CompareText{}); e != nil {
 		err = e
 	} else {
 		// as an alternative to this custom code, we could name arguments for every command.
 		// ex. MUL: {cmd:Mul, args: "A", "B" }, CompareText[ A, B ]
 		// wed still have to have an initalizer or something for "cmp".
-		err = p.pushCommand(cmd, args[0], cmp, args[1])
+		err = c.pushCommand(cmd, args[0], cmp, args[1])
 	}
 	return
 }
 
 // add the passed args to the passed command in order; then push the command.
-func (p *parser) pushCommand(cmd *ops.Command, args ...interface{}) (err error) {
+func (c *converter) pushCommand(cmd *ops.Command, args ...interface{}) (err error) {
 	if e := assign(cmd, args); e != nil {
 		err = e
 	} else {
-		p.push(cmd.Target().Interface())
+		c.push(cmd.Target().Interface())
 	}
 	return
 }
@@ -91,65 +104,70 @@ func assign(cmd *ops.Command, args []interface{}) (err error) {
 }
 
 // convert the passed function into iffy commands.
-func (p *parser) addFunction(fn postfix.Function) (err error) {
+func (c *converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
 	case chart.Quote:
 		op := &core.Text{fn.Value()}
-		p.push(op)
+		c.push(op)
 
 	case chart.Number:
 		op := &core.Num{fn.Value()}
-		p.push(op)
+		c.push(op)
 
 	case chart.Reference:
 		if fields := fn.Value(); len(fields) == 0 {
 			err = errutil.New("empty reference")
 		} else {
 			// obj.a.b.c => Get{c Get{b Get{a GetAt{obj}}}}
-			var op rt.ObjectEval = &GetAt{fields[0]}
+			var op rt.ObjectEval
+			if name := fields[0]; lang.IsCapitalized(name) {
+				op = &core.Object{name}
+			} else {
+				op = &GetAt{name}
+			}
 			for _, field := range fields[1:] {
 				op = &Render{op, field}
 			}
-			p.push(op)
+			c.push(op)
 		}
 
 	case chart.Command:
-		if cmd, e := p.ops.CmdFromName(fn.CommandName); e != nil {
+		if cmd, e := c.ops.CmdFromName(fn.CommandName); e != nil {
 			err = e
-		} else if args, e := p.pop(fn.CommandArity); e != nil {
+		} else if args, e := c.pop(fn.CommandArity); e != nil {
 			err = e
 		} else {
-			err = p.pushCommand(cmd, args...)
+			err = c.pushCommand(cmd, args...)
 		}
 
 	case chart.Operator:
 		switch fn {
 		case chart.MUL:
-			err = p.binary(&core.Mul{})
+			err = c.binary(&core.Mul{})
 		case chart.QUO:
-			err = p.binary(&core.Div{})
+			err = c.binary(&core.Div{})
 		case chart.REM:
-			err = p.binary(&core.Mod{})
+			err = c.binary(&core.Mod{})
 		case chart.ADD:
-			err = p.binary(&core.Add{})
+			err = c.binary(&core.Add{})
 		case chart.SUB:
-			err = p.binary(&core.Sub{})
+			err = c.binary(&core.Sub{})
 		case chart.EQL:
-			err = p.compare(&core.EqualTo{})
+			err = c.compare(&core.EqualTo{})
 		case chart.NEQ:
-			err = p.compare(&core.NotEqualTo{})
+			err = c.compare(&core.NotEqualTo{})
 		case chart.LSS:
-			err = p.compare(&core.LesserThan{})
+			err = c.compare(&core.LesserThan{})
 		case chart.LEQ:
-			err = p.compare(&core.LesserThanOrEqualTo{})
+			err = c.compare(&core.LesserThanOrEqualTo{})
 		case chart.GTR:
-			err = p.compare(&core.GreaterThan{})
+			err = c.compare(&core.GreaterThan{})
 		case chart.GEQ:
-			err = p.compare(&core.GreaterThanOrEqualTo{})
+			err = c.compare(&core.GreaterThanOrEqualTo{})
 		case chart.LAND:
-			err = p.binary(&core.AllTrue{})
+			err = c.binary(&core.AllTrue{})
 		case chart.LOR:
-			err = p.binary(&core.AnyTrue{})
+			err = c.binary(&core.AnyTrue{})
 		default:
 			err = errutil.Fmt("unknown operator %s", fn)
 		}
