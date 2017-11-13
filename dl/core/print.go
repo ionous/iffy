@@ -46,10 +46,19 @@ type Say struct {
 	Text []rt.TextEval
 }
 
+func (p *PrintSpan) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
+}
+
 func (p *PrintSpan) Execute(run rt.Runtime) error {
 	return rt.WritersBlock(run, printer.Spanning(run.Writer()), func() error {
 		return p.Block.Execute(run)
 	})
+}
+func (p *PrintBracket) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
 }
 
 func (p *PrintBracket) Execute(run rt.Runtime) error {
@@ -58,10 +67,20 @@ func (p *PrintBracket) Execute(run rt.Runtime) error {
 	})
 }
 
+func (p *PrintList) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
+}
+
 func (p *PrintList) Execute(run rt.Runtime) error {
 	return rt.WritersBlock(run, printer.AndSeparator(run.Writer()), func() error {
 		return p.Block.Execute(run)
 	})
+}
+
+func (p *PrintNum) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
 }
 
 func (p *PrintNum) Execute(run rt.Runtime) (err error) {
@@ -77,6 +96,10 @@ func (p *PrintNum) Execute(run rt.Runtime) (err error) {
 	}
 	return err
 }
+func (p *PrintNumWord) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
+}
 
 func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 	if n, e := p.Num.GetNumber(run); e != nil {
@@ -90,6 +113,10 @@ func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 		}
 	}
 	return err
+}
+func (p *PrintSlash) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
 }
 
 func (p *PrintSlash) Execute(run rt.Runtime) (err error) {

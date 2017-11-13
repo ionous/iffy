@@ -5,13 +5,13 @@ import (
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
-	"github.com/ionous/iffy/template/chart"
+	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestExpr(t *testing.T) {
+func TestExpress(t *testing.T) {
 	// A.num
 	bigDot := &Render{&core.Object{"A"}, "num"}
 	// A.num * B.num
@@ -75,9 +75,9 @@ func TestExpr(t *testing.T) {
 	fac := ops.NewFactory(cmds, ops.TransformFunction{core.Transform})
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			if xs, e := chart.ParseExpression(test.str); e != nil {
+			if xs, e := template.ParseExpression(test.str); e != nil {
 				t.Fatal(e)
-			} else if res, e := Convert(fac, xs); e != nil {
+			} else if res, e := Convert(fac, xs, nil); e != nil {
 				t.Fatal(e)
 			} else {
 				got := res.Target().Interface()

@@ -15,10 +15,6 @@ import (
 
 // TestXform to verify the use of the command string converter.
 func TestXform(t *testing.T) {
-	const (
-		partStr    = "{status.score}"
-		twoPartStr = "{status.score}/{story.turn}"
-	)
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
 
@@ -28,13 +24,32 @@ func TestXform(t *testing.T) {
 		(*Commands)(nil))
 
 	xf := NewTransform(cmds, ident.Counters{})
-	t.Run("parts", func(t *testing.T) {
-		testEqual(t, partsFn(),
-			templatize(t, xf, partStr))
+	t.Run("ref", func(t *testing.T) {
+		ref := "{status.score}"
+		testEqual(t, partsRes(),
+			templatize(t, xf, ref))
 	})
-	t.Run("two parts", func(t *testing.T) {
-		testEqual(t, twoPartFn(),
-			templatize(t, xf, twoPartStr))
+	t.Run("parts", func(t *testing.T) {
+		parts := "{status.score}/{story.turn}"
+		testEqual(t, twoPartRes(),
+			templatize(t, xf, parts))
+	})
+	// FIX: how to say 5+5 -- printNum? why not render? is it b/c only one section?
+	t.Run("ifs", func(t *testing.T) {
+		ifs := "{if x}a{else}b{end}"
+		testEqual(t, ifsRes(),
+			templatize(t, xf, ifs))
+	})
+	t.Run("shuffle", func(t *testing.T) {
+		shuffle := "{cycle}a{or}b{or}c{end}"
+		testEqual(t, shuffleRes(),
+			templatize(t, xf, shuffle))
+	})
+	t.Run("num", func(t *testing.T) {
+		// FIX: its ugly that references can be rendered into anything.... but numbers cant.
+		num := "{13|printNum!}"
+		testEqual(t, numRes(),
+			templatize(t, xf, num))
 	})
 }
 
@@ -47,24 +62,43 @@ func testEqual(t *testing.T, expect, res interface{}) {
 	}
 }
 
-func templatize(t *testing.T, xform ops.Transform, s string) (ret rt.TextEval) {
+func templatize(t *testing.T, xform ops.Transform, s string) (ret interface{}) {
 	rtype := r.TypeOf((*rt.TextEval)(nil)).Elem()
 	if r, e := xform.TransformValue(r.ValueOf(s), rtype); e != nil {
 		t.Fatal(e)
 	} else {
-		ret = r.Interface().(rt.TextEval)
+		ret = r.Interface()
 	}
 	return
 }
 
-func partsFn() rt.TextEval {
+func numRes() rt.TextEval {
+	return &core.PrintNum{&core.Num{13}}
+}
+func shuffleRes() rt.TextEval {
+	return &core.CycleText{
+		Id: "$cycleCounter#1",
+		Values: []rt.TextEval{
+			&core.Text{"a"},
+			&core.Text{"b"},
+			&core.Text{"c"},
+		},
+	}
+}
+func ifsRes() rt.TextEval {
+	return &core.ChooseText{
+		If:    &GetAt{Name: "x"},
+		True:  &core.Text{"a"},
+		False: &core.Text{"b"},
+	}
+}
+func partsRes() rt.TextEval {
 	return &Render{
 		Obj:  &GetAt{"status"},
 		Prop: "score",
 	}
 }
-
-func twoPartFn() rt.TextEval {
+func twoPartRes() rt.TextEval {
 	return &core.Join{[]rt.TextEval{
 		&Render{
 			Obj:  &GetAt{"status"},

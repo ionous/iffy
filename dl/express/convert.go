@@ -3,23 +3,28 @@ package express
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 // Express converts a postfix expression into iffy commands.
-func Convert(cmds *ops.Factory, xs postfix.Expression) (ret *ops.Command, err error) {
-	c := converter{cmds: cmds}
+func Convert(cmds *ops.Factory, xs template.Expression, gen ident.Counters) (ret *ops.Command, err error) {
+	c := converter{cmds: cmds, gen: gen}
 	if e := c.convert(xs); e != nil {
+		err = e
 	} else if len(c.stack) == 0 {
 		err = errutil.New("empty output")
 	} else if len(c.stack) > 1 {
 		err = errutil.New("unparsed output")
+	} else if c := c.stack[0].(*ops.Command); c == nil {
+		err = errutil.New("convert returned nil")
 	} else {
-		ret = c.stack[0].(*ops.Command)
+		ret = c
 	}
 	return
 }
@@ -27,9 +32,10 @@ func Convert(cmds *ops.Factory, xs postfix.Expression) (ret *ops.Command, err er
 type converter struct {
 	cmds  *ops.Factory
 	stack []interface{}
+	gen   ident.Counters
 }
 
-func (c *converter) convert(xs postfix.Expression) (err error) {
+func (c *converter) convert(xs template.Expression) (err error) {
 	for _, fn := range xs {
 		if e := c.addFunction(fn); e != nil {
 			err = e
@@ -103,24 +109,58 @@ func assign(cmd *ops.Command, args []interface{}) (err error) {
 	return
 }
 
+func (c *converter) create(name string, args int) (err error) {
+	if cmd, e := c.cmds.CreateCommand(name); e != nil {
+		err = e
+	} else if args, e := c.pop(args); e != nil {
+		err = e
+	} else {
+		err = c.pushCommand(cmd, args...)
+	}
+	return
+}
+
+// name is "shuffle", etc.
+// c.Cmd("say", c.Cmd("shuffle text",
+// 		gen.NewName("shuffle counter"),
+// 		sliceOf.String("a", "b", "c"),
+// 	))
+func (c *converter) sequence(name string, args int) (err error) {
+	text := name + " text"
+	counter := name + " counter"
+	if cmd, e := c.cmds.CreateCommand(text); e != nil {
+		err = e
+	} else {
+		name := c.gen.NewName(counter)
+		if e := cmd.Position(name); e != nil {
+			err = e
+		} else if args, e := c.pop(args); e != nil {
+			err = e
+		} else {
+			err = c.pushCommand(cmd, args...)
+		}
+	}
+	return
+}
+
 // convert the passed function into iffy commands.
 func (c *converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
-	case template.Quote:
+	case types.Quote:
 		if cmd, e := c.cmds.EmplaceCommand(&core.Text{fn.Value()}); e != nil {
 			err = e
 		} else {
 			c.push(cmd)
 		}
 
-	case template.Number:
+	case types.Number:
 		if cmd, e := c.cmds.EmplaceCommand(&core.Num{fn.Value()}); e != nil {
 			err = e
 		} else {
 			c.push(cmd)
 		}
 
-	case template.Reference:
+	case types.Reference:
 		if fields := fn.Value(); len(fields) == 0 {
 			err = errutil.New("empty reference")
 		} else {
@@ -141,42 +181,65 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 			}
 		}
 
-	case template.Command:
-		if cmd, e := c.cmds.CreateCommand(fn.CommandName); e != nil {
-			err = e
-		} else if args, e := c.pop(fn.CommandArity); e != nil {
-			err = e
-		} else {
-			err = c.pushCommand(cmd, args...)
+	case types.Command:
+		err = c.create(fn.CommandName, fn.CommandArity)
+
+	case types.Builtin:
+		switch k := fn.Type; k {
+		case types.Span:
+			err = c.create("join", fn.ParameterCount)
+		case types.Stopping:
+			err = c.sequence("stopping", fn.ParameterCount)
+		case types.Shuffle:
+			err = c.sequence("shuffle", fn.ParameterCount)
+		case types.Cycle:
+			err = c.sequence("cycle", fn.ParameterCount)
+		case types.IfStatement:
+			// choose by hint?
+			err = c.create("choose text", fn.ParameterCount)
+		case types.UnlessStatement:
+			if args, e := c.pop(fn.ParameterCount); e != nil {
+			} else if cmd, e := c.cmds.CreateCommand("is not"); e != nil {
+				err = e
+			} else if e := cmd.Position(args[0]); e != nil {
+				err = e
+			} else {
+				args[0] = cmd
+				if cmd, e := c.cmds.CreateCommand("choose text"); e != nil {
+					err = e
+				} else {
+					err = c.pushCommand(cmd, args...)
+				}
+			}
 		}
 
-	case template.Operator:
+	case types.Operator:
 		switch fn {
-		case template.MUL:
+		case types.MUL:
 			err = c.binary(&core.Mul{})
-		case template.QUO:
+		case types.QUO:
 			err = c.binary(&core.Div{})
-		case template.REM:
+		case types.REM:
 			err = c.binary(&core.Mod{})
-		case template.ADD:
+		case types.ADD:
 			err = c.binary(&core.Add{})
-		case template.SUB:
+		case types.SUB:
 			err = c.binary(&core.Sub{})
-		case template.EQL:
+		case types.EQL:
 			err = c.compare(&core.EqualTo{})
-		case template.NEQ:
+		case types.NEQ:
 			err = c.compare(&core.NotEqualTo{})
-		case template.LSS:
+		case types.LSS:
 			err = c.compare(&core.LesserThan{})
-		case template.LEQ:
+		case types.LEQ:
 			err = c.compare(&core.LesserThanOrEqualTo{})
-		case template.GTR:
+		case types.GTR:
 			err = c.compare(&core.GreaterThan{})
-		case template.GEQ:
+		case types.GEQ:
 			err = c.compare(&core.GreaterThanOrEqualTo{})
-		case template.LAND:
+		case types.LAND:
 			err = c.binary(&core.AllTrue{})
-		case template.LOR:
+		case types.LOR:
 			err = c.binary(&core.AnyTrue{})
 		default:
 			err = errutil.Fmt("unknown operator %s", fn)
