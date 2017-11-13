@@ -2,24 +2,28 @@ package chart
 
 import (
 	"fmt"
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// Parse the passed string into blocks.
+// Parse the passed template string into an expression.
 // This is package chart's primary method.
-func Parse(str string) (ret []template.Directive, err error) {
-	var p BlockParser
-	if e := parse(&p, str); e != nil {
-		err = e
+func Parse(template string) (ret postfix.Expression, err error) {
+	p := MakeTemplateParser()
+	if e := parse(&p, template); e != nil {
+		if p.err != nil {
+			err = p.err
+		} else {
+			err = e
+		}
 	} else {
-		ret, err = p.GetDirectives()
+		ret, err = p.GetExpression()
 	}
 	return
 }
 
+// ParseExpression reads a series of simple operand and operator phrases.
 func ParseExpression(str string) (ret postfix.Expression, err error) {
-	var p SequenceParser
+	var p SeriesParser
 	if e := parse(&p, str); e != nil {
 		err = e
 	} else {

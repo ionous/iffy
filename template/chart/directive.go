@@ -1,8 +1,10 @@
-package template
+package chart
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 )
 
@@ -11,6 +13,23 @@ import (
 type Directive struct {
 	Key string
 	postfix.Expression
+}
+
+func UnknownDirective(v Directive) error {
+	return errutil.Fmt("unknown key '%s'", v.Key)
+}
+
+func UnexpectedExpression(v Directive) (err error) {
+	if len(v.Expression) > 0 {
+		err = errutil.Fmt("unexpected expression following key '%s'", v.Key)
+	}
+	return
+}
+func ExpectedExpression(v Directive) (err error) {
+	if len(v.Expression) == 0 {
+		err = errutil.Fmt("expected expression following key '%s'", v.Key)
+	}
+	return
 }
 
 // String of a directive in the format:
@@ -26,9 +45,9 @@ func (d Directive) String() (ret string) {
 	return
 }
 
-func (d Directive) isQuote() (ret Quote, okay bool) {
+func (d Directive) isQuote() (ret template.Quote, okay bool) {
 	if cnt := len(d.Expression); cnt == 1 {
-		ret, okay = d.Expression[0].(Quote)
+		ret, okay = d.Expression[0].(template.Quote)
 	}
 	return
 }

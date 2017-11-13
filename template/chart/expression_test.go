@@ -1,7 +1,6 @@
 package chart
 
 import (
-	"github.com/ionous/errutil"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -36,7 +35,7 @@ func testRes(t *testing.T, p ExpressionState, str, want string) (err error) {
 		err = e
 	} else if want != ignoreResult {
 		if got := res.String(); got != want {
-			err = errutil.Fmt("want(%d): %s; != got(%d): %s.", len(want), want, len(got), got)
+			err = mismatched(want, got)
 		} else {
 			t.Log("ok", got)
 		}

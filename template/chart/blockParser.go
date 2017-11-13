@@ -8,145 +8,131 @@ import (
 
 // BlockParser reads alternating text and directives.
 type BlockParser struct {
-	out     []template.Directive
+	out     []Directive
 	err     error
-	text    []rune
-	spaces  []rune
-	factory ExpressionStateFactory
+	factory ExpressionStateFactory // for testing.
 }
 
-type ExpressionStateFactory interface {
-	NewExpressionState() ExpressionState
-}
-type ExpressionState interface {
-	State
-	GetExpression() (postfix.Expression, error)
+// LeftParser reads text, ending just after the opening of a directive.
+// It deals with leading trim: "...{~".
+type LeftParser struct {
+	text, spaces []rune
+	out          string
 }
 
-// MakeBlockParser returns a new parser that generates directives via the passed factory.
-func MakeBlockParser(f ExpressionStateFactory) (ret BlockParser) {
-	ret.factory = f
-	return
+// RightParser reads the content of a directive, ending just after its end.
+// It deals with trailing trim: : "~}...".
+type RightParser struct {
+	out     Directive
+	err     error
+	factory ExpressionStateFactory // for testing.
 }
 
 // GetDirectives or error
-func (p *BlockParser) GetDirectives() (ret []template.Directive, err error) {
-	if e := p.err; e != nil {
-		err = e
-	} else {
-		p.flushText(false)
-		ret = p.out
-	}
-	return
+func (p *BlockParser) GetDirectives() ([]Directive, error) {
+	return p.out, p.err
+}
+func (p *LeftParser) GetText() string {
+	return p.out
+}
+func (p *RightParser) GetDirective() (Directive, error) {
+	return p.out, p.err
 }
 
 // NewRune starts with the first character of a string.
-func (p *BlockParser) NewRune(r rune) (ret State) {
+func (p *BlockParser) NewRune(r rune) State {
+	var left LeftParser
+	return ParseChain(r, &left, Statement(func(r rune) State {
+		if text := left.GetText(); len(text) > 0 {
+			d := Directive{Expression: quote(text)}
+			p.append(d)
+		}
+		return ParseChain(r, spaces, Statement(func(r rune) (ret State) {
+			if r != eof {
+				right := RightParser{factory: p.factory}
+				ret = ParseChain(r, &right, Statement(func(r rune) (ret State) {
+					if v, e := right.GetDirective(); e != nil {
+						p.err = e
+					} else {
+						p.append(v)
+						ret = p.NewRune(r) // loop, back to left half.
+					}
+					return
+				}))
+			}
+			return
+		}))
+	}))
+}
+
+func (p *BlockParser) append(d Directive) {
+	p.out = append(p.out, d)
+}
+
+func quote(t string) (ret postfix.Expression) {
+	if len(t) > 0 {
+		ret = []postfix.Function{template.Quote(t)}
+	}
+	return
+}
+
+// NewRune starts with the first character of a string, ends just after the opening bracket of a directive.
+func (p *LeftParser) NewRune(r rune) (ret State) {
 	switch {
 	case isOpenBracket(r):
 		ret = Statement(func(r rune) (ret State) {
-			trim := isTrim(r) // write any pending text
-			p.flushText(trim)
-			if trim {
-				// eat the trim character, and any content space
-				ret = MakeChain(spaces, Statement(p.afterOpen))
+			if !isTrim(r) {
+				p.acceptSpaces()
 			} else {
-				// not trim, pass non-space content along
-				ret = ParseChain(r, spaces, Statement(p.afterOpen))
+				ret = Terminal //end after eating this trim char
 			}
+			p.out = string(p.text)
 			return
 		})
-
+	case r == eof:
+		p.acceptSpaces()
+		p.out = string(p.text)
 	case isSpace(r):
 		p.spaces = append(p.spaces, r)
 		ret = p // loop...
-
-	case r != eof:
-		p.text = append(p.text, p.spaces...)
+	default:
+		p.acceptSpaces()
 		p.text = append(p.text, r)
-		p.spaces = nil
 		ret = p // loop...
 	}
 	return
 }
 
-// rune at the start of a directive's content.
-func (p *BlockParser) afterOpen(r rune) State {
-	keyp := KeyParser{exp: p.newExpressionParser()}
-	expp := p.newExpressionParser()
-	//
-	var dir template.Directive
-	var err error
-	para := MakeParallel(
-		MakeChain(expp, StateExit(func() {
-			if x, e := expp.GetExpression(); e != nil {
-				err = errutil.Append(err, e)
-			} else if len(x) > 0 {
-				dir = template.Directive{Expression: x} // last match wins
-			}
-		})),
-		MakeChain(&keyp, StateExit(func() {
-			if d, e := keyp.GetDirective(); e != nil {
-				err = errutil.Append(err, e)
-			} else {
-				dir = d // last match wins; key wins equal matches
-			}
-		})),
-	)
-	return ParseChain(r, para, Statement(func(r rune) (ret State) {
-		if err != nil {
-			p.err = err
+func (p *LeftParser) acceptSpaces() {
+	p.text, p.spaces = append(p.text, p.spaces...), nil
+}
+
+// NewRune starts on the first rune of directive content, after the opening bracket, trim, and leading whitespace.
+func (p *RightParser) NewRune(r rune) State {
+	dir := DirectiveParser{factory: p.factory}
+	return ParseChain(r, &dir, Statement(func(r rune) (ret State) {
+		if v, e := dir.GetDirective(); e != nil {
+			p.err = e
 		} else {
-			p.out = append(p.out, dir)
-			ret = p.afterContent(r)
+			switch {
+			case isCloseBracket(r):
+				p.out, ret = v, Terminal // eat the trim bracket
+
+			case isTrim(r):
+				ret = Statement(func(r rune) (ret State) {
+					if !isCloseBracket(r) {
+						p.err = errutil.Fmt("unknown character following right trim %q", r)
+					} else {
+						p.out = v
+						ret = spaces // done, eat the subsequent spaces.
+					}
+					return
+				})
+			default:
+				p.err = errutil.Fmt("unclosed directive %q", r)
+			}
+			return
 		}
 		return
 	}))
-}
-
-func (p *BlockParser) newExpressionParser() (ret ExpressionState) {
-	if p.factory != nil {
-		ret = p.factory.NewExpressionState()
-	} else {
-		ret = new(PipeParser)
-	}
-	return
-}
-
-// rune after the content of a directive: spaces, trim, closing bracket, etc.
-func (p *BlockParser) afterContent(r rune) State {
-	return ParseChain(r, spaces, Statement(func(r rune) (ret State) {
-		switch {
-		case isCloseBracket(r):
-			ret = p // loop...
-
-		case isTrim(r):
-			ret = MakeChain(Statement(func(r rune) (ret State) {
-				if !isCloseBracket(r) {
-					p.err = errutil.Fmt("unknown character following right trim %q", r)
-				} else {
-					ret = spaces // done, eat the closing bracket and subsequent spaces.
-				}
-				return
-			}), p) // after trimming, loop ...
-
-		default:
-			p.err = errutil.Fmt("unclosed directive %q", r)
-		}
-		return
-	}))
-}
-
-// write any queued text as a block
-// if trim is true, we skip trailing spaces, otherwise we write those too.
-func (p *BlockParser) flushText(trim bool) {
-	text, spaces := p.text, p.spaces
-	p.text, p.spaces = nil, nil
-	if !trim {
-		text = append(text, spaces...)
-	}
-	if len(text) > 0 {
-		q := template.Quote(text)
-		p.out = append(p.out, template.Directive{Expression: []postfix.Function{q}})
-	}
 }

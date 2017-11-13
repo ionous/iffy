@@ -23,7 +23,7 @@ func (p ExpressionParser) GetExpression() (postfix.Expression, error) {
 // NewRune starts with the first character past the bar
 func (p *ExpressionParser) NewRune(r rune) State {
 	call := MakeCallParser(0, p.argFactory)
-	seqp := SequenceParser{}
+	seqp := SeriesParser{}
 	para := MakeParallel(
 		MakeChain(&call, StateExit(func() {
 			if x, e := call.GetExpression(); e != nil {

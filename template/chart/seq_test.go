@@ -19,6 +19,6 @@ func TestSeq(t *testing.T) {
 }
 
 func testSeq(t *testing.T, str, want string) error {
-	var p SequenceParser
+	var p SeriesParser
 	return testRes(t, &p, str, want)
 }

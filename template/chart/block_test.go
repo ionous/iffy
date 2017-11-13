@@ -2,7 +2,6 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/template"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -56,18 +55,22 @@ func TestKeyTrim(t *testing.T) {
 
 func testBlock(t *testing.T, str string, want string) (err error) {
 	t.Log("test:", str)
-	p := MakeBlockParser(EmptyFactory{})
+	p := BlockParser{factory: EmptyFactory{}}
 	if e := parse(&p, str); e != nil {
 		err = e
 	} else if res, e := p.GetDirectives(); e != nil {
 		err = e
 	} else if want != ignoreResult {
-		got := template.Format(res)
+		got := Format(res)
 		if got == want {
 			t.Log("ok:", got)
 		} else {
-			err = errutil.New(want, "mismatched result:", got)
+			err = mismatched(want, got)
 		}
 	}
 	return
+}
+
+func mismatched(want, got string) error {
+	return errutil.Fmt("want(%d): %s; != got(%d): %s.", len(want), want, len(got), got)
 }

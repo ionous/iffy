@@ -4,18 +4,18 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
-// Sequence parser reads a series of operand and operator phrases.
-type SequenceParser struct {
+// SeriesParser reads a sequence of operand and operator phrases.
+type SeriesParser struct {
 	err error
 	out postfix.Shunt
 }
 
 // NewRune starts on the first character of an operand or opening sub-phrase.
-func (p *SequenceParser) NewRune(r rune) State {
+func (p *SeriesParser) NewRune(r rune) State {
 	return p.operand(r)
 }
 
-func (p *SequenceParser) GetExpression() (ret postfix.Expression, err error) {
+func (p *SeriesParser) GetExpression() (ret postfix.Expression, err error) {
 	if e := p.err; e != nil {
 		err = e
 	} else {
@@ -26,7 +26,7 @@ func (p *SequenceParser) GetExpression() (ret postfix.Expression, err error) {
 
 // at the start of every operand we might have some opening paren, a bracket,
 // or just some operand.
-func (p *SequenceParser) operand(r rune) (ret State) {
+func (p *SeriesParser) operand(r rune) (ret State) {
 	switch {
 	case isOpenParen(r):
 		p.out.BeginSubExpression()
@@ -49,7 +49,7 @@ func (p *SequenceParser) operand(r rune) (ret State) {
 // after every argument can come operators or close parens or the end
 // start on the first character of the operator.
 // a pipe floats upward.
-func (p *SequenceParser) operator(r rune) (ret State) {
+func (p *SeriesParser) operator(r rune) (ret State) {
 	var b OperatorParser
 	return ParseChain(r, &b, Statement(func(r rune) (ret State) {
 		switch {
@@ -70,7 +70,7 @@ func (p *SequenceParser) operator(r rune) (ret State) {
 }
 
 // looks for the end of sub-expressions before handling the next state.
-func (p *SequenceParser) closing(r rune, next State) (ret State) {
+func (p *SeriesParser) closing(r rune, next State) (ret State) {
 	switch {
 	case isCloseParen(r):
 		p.out.EndSubExpression()
