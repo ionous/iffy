@@ -1,6 +1,7 @@
-package chart
+package template
 
 import (
+	"github.com/ionous/errutil"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -108,3 +109,9 @@ func testChart(t *testing.T, str, want string) (err error) {
 	}
 	return
 }
+
+func mismatched(want, got string) error {
+	return errutil.Fmt("want(%d): %s; != got(%d): %s.", len(want), want, len(got), got)
+}
+
+const ignoreResult = "~~IGNORE~~"

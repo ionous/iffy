@@ -9,10 +9,10 @@ func TestIdent(t *testing.T) {
 	// returns point of failure
 	test := func(str string) (ret string, err error) {
 		var p IdentParser
-		if e := parse(&p, str); e != nil {
+		if e := Parse(&p, str); e != nil {
 			err = e
 		} else if v := p.GetName(); len(v) == 0 {
-			err = errutil.New("couldnt parse ident")
+			err = errutil.New("couldnt Parse ident")
 		} else {
 			ret = v
 		}

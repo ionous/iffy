@@ -18,7 +18,7 @@ func TestFields(t *testing.T) {
 func testField(t *testing.T, str string) (ret []string, err error) {
 	t.Log("parsing", str)
 	var p FieldParser
-	if e := parse(&p, str); e != nil {
+	if e := Parse(&p, str); e != nil {
 		err = e
 	} else if n, e := p.GetFields(); e != nil {
 		err = e

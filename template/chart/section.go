@@ -1,8 +1,8 @@
 package chart
 
 import (
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 // Section joins a bunch of separate postfix expressions into a single operation.
@@ -24,14 +24,14 @@ func (x *Section) Append(xs postfix.Expression) {
 }
 
 // Reduce returns the summation of the current span.
-func (x Section) Reduce(kind template.BuiltinType) (ret postfix.Expression) {
-	if cnt := len(x.list); cnt == 1 && kind == template.Span {
+func (x Section) Reduce(kind types.BuiltinType) (ret postfix.Expression) {
+	if cnt := len(x.list); cnt == 1 && kind == types.Span {
 		ret = x.list[0]
 	} else /*if cnt > 0*/ {
 		for _, v := range x.list {
 			ret = append(ret, v...)
 		}
-		ret = append(ret, template.Builtin{kind, len(x.list)})
+		ret = append(ret, types.Builtin{kind, len(x.list)})
 	}
 	return
 }

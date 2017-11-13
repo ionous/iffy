@@ -1,8 +1,8 @@
 package chart
 
 import (
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 	"unicode"
 )
 
@@ -37,7 +37,7 @@ func (f *AnyFactory) NewExpressionState() ExpressionState {
 
 func (p AnyParser) GetExpression() (ret postfix.Expression, err error) {
 	if s := p.runes.String(); len(s) > 0 {
-		arg := template.Reference([]string{s})
+		arg := types.Reference([]string{s})
 		ret = append(ret, arg)
 	}
 	return

@@ -1,8 +1,8 @@
 package chart
 
 import (
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 // CallParser reads a single function call and its arguments.
@@ -42,7 +42,7 @@ func (p *CallParser) NewRune(r rune) State {
 					if len(prev) > 0 {
 						p.out = append(p.out, prev...)
 					}
-					cmd := template.Command{n, arity + p.arity}
+					cmd := types.Command{n, arity + p.arity}
 					p.out = append(p.out, cmd)
 				}
 			})))

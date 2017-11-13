@@ -2,8 +2,8 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 type TemplateParser struct {
@@ -25,7 +25,7 @@ func MakeSubParser(d Delegate, xs postfix.Expression) TemplateParser {
 type Delegate func(*TemplateParser, Directive) (State, error)
 
 func (p *TemplateParser) GetExpression() (ret postfix.Expression, err error) {
-	return p.reduce(template.Span)
+	return p.reduce(types.Span)
 }
 
 // words { directive } words { directive }
@@ -63,7 +63,7 @@ func (p *TemplateParser) NewRune(r rune) State {
 
 // reduce returns the output of the template as a command of the passed type:
 // a span of elements, an if statement with branches, a sequence with cycling text, etc.
-func (p *TemplateParser) reduce(kind template.BuiltinType) (ret postfix.Expression, err error) {
+func (p *TemplateParser) reduce(kind types.BuiltinType) (ret postfix.Expression, err error) {
 	if p.err != nil {
 		err = p.err
 	} else {
@@ -76,7 +76,7 @@ func (p *TemplateParser) reduce(kind template.BuiltinType) (ret postfix.Expressi
 // forceSpan is true if SPAN/0 is written for empty sections.
 func (p *TemplateParser) endSection(forceSpan bool) {
 	if forceSpan || len(p.pending.list) > 0 {
-		p.out.Append(p.pending.Reduce(template.Span))
+		p.out.Append(p.pending.Reduce(types.Span))
 	}
 	p.pending = Section{}
 }
@@ -107,7 +107,7 @@ func baseParser(p *TemplateParser, v Directive) (ret State, err error) {
 			t := MakeSubParser(conditionParser, v.Expression)
 			ret = MakeChain(&t, Statement(func(r rune) (ret State) {
 				// 	if len(t.pending.list) > 0 {
-				// 		t.out.Append(t.pending.Reduce(template.Span))
+				// 		t.out.Append(t.pending.Reduce(types.Span))
 				// 	}
 				// 	p.pending.Append(t.out.Reduce(k))
 				// 	ret = p.NewRune(r)
@@ -187,11 +187,11 @@ func branchParser(p *TemplateParser, v Directive) (ret State, err error) {
 		} else {
 			p.endSection(true)
 			// we expect to see "end" next (plus/or minus subexpressions)
-			// which is the end of our branch; the template.IfStatement handler
+			// which is the end of our branch; the types.IfStatement handler
 			// which is our parent, will get the next crack at the rune stream.
 			t := MakeSubParser(endingParser, nil)
 			ret = MakeChain(&t, StateExit(func() {
-				if res, e := t.reduce(template.Span); e != nil {
+				if res, e := t.reduce(types.Span); e != nil {
 					p.err = e
 				} else {
 					p.pending.Append(res)
@@ -219,19 +219,19 @@ func branchParser(p *TemplateParser, v Directive) (ret State, err error) {
 	return
 }
 
-func builtin(key string) template.BuiltinType {
-	which := map[string]template.BuiltinType{
-		"once":    template.Stopping,
-		"cycle":   template.Cycle,
-		"shuffle": template.Shuffle,
+func builtin(key string) types.BuiltinType {
+	which := map[string]types.BuiltinType{
+		"once":    types.Stopping,
+		"cycle":   types.Cycle,
+		"shuffle": types.Shuffle,
 		//
-		"if":          template.IfStatement,
-		"elseIf":      template.IfStatement,
-		"otherwiseIf": template.IfStatement,
+		"if":          types.IfStatement,
+		"elseIf":      types.IfStatement,
+		"otherwiseIf": types.IfStatement,
 		//
-		"unless":          template.UnlessStatement,
-		"elseUnless":      template.UnlessStatement,
-		"otherwiseUnless": template.UnlessStatement,
+		"unless":          types.UnlessStatement,
+		"elseUnless":      types.UnlessStatement,
+		"otherwiseUnless": types.UnlessStatement,
 	}
 	return which[key]
 }

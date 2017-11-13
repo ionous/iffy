@@ -1,7 +1,7 @@
 package chart
 
 import (
-	"github.com/ionous/iffy/template"
+	"github.com/ionous/iffy/template/types"
 	"sort"
 )
 
@@ -12,7 +12,7 @@ type OperatorParser struct {
 }
 
 // GetOperator representing the result of parsing.
-func (p OperatorParser) GetOperator() (ret template.Operator, okay bool) {
+func (p OperatorParser) GetOperator() (ret types.Operator, okay bool) {
 	if len(p.next) > 0 {
 		ret, okay = list[p.ofs].Op, true
 	}
@@ -37,22 +37,22 @@ func (p *OperatorParser) NewRune(r rune) (ret State) {
 }
 
 type _Match struct {
-	Op   template.Operator
+	Op   types.Operator
 	Text string
 }
 
 var list = []_Match{
-	{template.REM, "%"},
-	{template.MUL, "*"},
-	{template.ADD, "+"},
-	{template.SUB, "-"},
-	{template.QUO, "/"},
-	{template.LSS, "<"},
-	{template.LEQ, "<="},
-	{template.NEQ, "<>"},
-	{template.EQL, "="},
-	{template.GTR, ">"},
-	{template.GEQ, ">="},
-	{template.LAND, "and"},
-	{template.LOR, "or"}, // if this was || we'd have to make special provisions in the expression parser to handle the difference between a pipe (|) and an or (||)
+	{types.REM, "%"},
+	{types.MUL, "*"},
+	{types.ADD, "+"},
+	{types.SUB, "-"},
+	{types.QUO, "/"},
+	{types.LSS, "<"},
+	{types.LEQ, "<="},
+	{types.NEQ, "<>"},
+	{types.EQL, "="},
+	{types.GTR, ">"},
+	{types.GEQ, ">="},
+	{types.LAND, "and"},
+	{types.LOR, "or"}, // if this was || we'd have to make special provisions in the expression parser to handle the difference between a pipe (|) and an or (||)
 }

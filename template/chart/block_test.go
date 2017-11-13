@@ -56,7 +56,7 @@ func TestKeyTrim(t *testing.T) {
 func testBlock(t *testing.T, str string, want string) (err error) {
 	t.Log("test:", str)
 	p := BlockParser{factory: EmptyFactory{}}
-	if e := parse(&p, str); e != nil {
+	if e := Parse(&p, str); e != nil {
 		err = e
 	} else if res, e := p.GetDirectives(); e != nil {
 		err = e

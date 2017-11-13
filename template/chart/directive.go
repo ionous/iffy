@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
-// Directive containing the parsed content of a template.
+// Directive containing the parsed content of a types.
 // Both or either of the key and the expression can be empty.
 type Directive struct {
 	Key string
@@ -45,9 +45,9 @@ func (d Directive) String() (ret string) {
 	return
 }
 
-func (d Directive) isQuote() (ret template.Quote, okay bool) {
+func (d Directive) isQuote() (ret types.Quote, okay bool) {
 	if cnt := len(d.Expression); cnt == 1 {
-		ret, okay = d.Expression[0].(template.Quote)
+		ret, okay = d.Expression[0].(types.Quote)
 	}
 	return
 }

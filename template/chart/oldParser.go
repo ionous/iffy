@@ -2,8 +2,8 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 // OldParser was the simplified BlockParser before it was split into left and right.
@@ -102,7 +102,7 @@ func (p *OldParser) flushText(trim bool) {
 		text = append(text, spaces...)
 	}
 	if len(text) > 0 {
-		q := template.Quote(text)
+		q := types.Quote(text)
 		p.out = append(p.out, Directive{Expression: []postfix.Function{q}})
 	}
 }

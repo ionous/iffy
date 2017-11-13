@@ -27,8 +27,8 @@ func testExp(t *testing.T, str, want string) error {
 
 func testRes(t *testing.T, p ExpressionState, str, want string) (err error) {
 	t.Logf("parsing: '%s'", str)
-	if e := parse(p, str); e != nil {
-		t.Log("couldnt parse", e)
+	if e := Parse(p, str); e != nil {
+		t.Log("couldnt Parse", e)
 		err = e
 	} else if res, e := p.GetExpression(); e != nil {
 		t.Log("invalid expression", e)

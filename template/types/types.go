@@ -1,8 +1,7 @@
-package template
+package types
 
 import (
 	"fmt"
-	// "github.com/ionous/iffy/template/postfix"
 	"strings"
 )
 

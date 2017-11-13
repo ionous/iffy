@@ -10,7 +10,7 @@ func TestNum(t *testing.T) {
 	// returns point of failure
 	run := func(str string) (val float64, err error) {
 		var p NumParser
-		if e := parse(&p, str); e != nil {
+		if e := Parse(&p, str); e != nil {
 			val = NaN
 			err = e
 		} else if v, e := p.GetValue(); e != nil {

@@ -2,8 +2,8 @@ package chart
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 // BlockParser reads alternating text and directives.
@@ -71,7 +71,7 @@ func (p *BlockParser) append(d Directive) {
 
 func quote(t string) (ret postfix.Expression) {
 	if len(t) > 0 {
-		ret = []postfix.Function{template.Quote(t)}
+		ret = []postfix.Function{types.Quote(t)}
 	}
 	return
 }

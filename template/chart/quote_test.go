@@ -20,7 +20,7 @@ func TestQuotes(t *testing.T) {
 func testQ(t *testing.T, str, want string) (err error, ret interface{}) {
 	t.Log("test:", str)
 	var p QuoteParser
-	if e := parse(&p, str); e != nil {
+	if e := Parse(&p, str); e != nil {
 		err = e
 	} else if got, e := p.GetString(); e != nil {
 		err = e

@@ -1,8 +1,8 @@
 package chart
 
 import (
-	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 // OperandState reads a single number, reference, or quote.
@@ -52,7 +52,7 @@ func (p QuoteParser) GetOperand() (ret postfix.Function, err error) {
 	if r, e := p.GetString(); e != nil {
 		err = e
 	} else {
-		ret = template.Quote(r)
+		ret = types.Quote(r)
 	}
 	return
 }
@@ -61,7 +61,7 @@ func (p FieldParser) GetOperand() (ret postfix.Function, err error) {
 	if r, e := p.GetFields(); e != nil {
 		err = e
 	} else {
-		ret = template.Reference(r)
+		ret = types.Reference(r)
 	}
 	return
 }
@@ -70,7 +70,7 @@ func (p NumParser) GetOperand() (ret postfix.Function, err error) {
 	if n, e := p.GetValue(); e != nil {
 		err = e
 	} else {
-		ret = template.Number(n)
+		ret = types.Number(n)
 	}
 	return
 }

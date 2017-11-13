@@ -1,7 +1,7 @@
 package chart
 
 import (
-	"github.com/ionous/iffy/template"
+	"github.com/ionous/iffy/template/types"
 	"github.com/kr/pretty"
 	"sort"
 	"testing"
@@ -22,22 +22,22 @@ func TestOpListIsSorted(t *testing.T) {
 func TestOps(t *testing.T) {
 	type Test struct {
 		str    string
-		op     template.Operator
+		op     types.Operator
 		errors bool
 	}
 	m := []Test{
-		{str: "andy", op: template.LAND},
-		{str: ">>>>", op: template.GTR},
-		{str: "*", op: template.MUL},
-		// {str: "(", op: template.LPAREN},
-		{str: "<=", op: template.LEQ},
+		{str: "andy", op: types.LAND},
+		{str: ">>>>", op: types.GTR},
+		{str: "*", op: types.MUL},
+		// {str: "(", op: types.LPAREN},
+		{str: "<=", op: types.LEQ},
 		{str: "#", errors: true},
 	}
 	for _, n := range m {
 		str := n.str
 		t.Log("test:", str)
 		p := OperatorParser{}
-		parse(&p, str)
+		Parse(&p, str)
 		if r, ok := p.GetOperator(); ok == n.errors {
 			t.Fatalf("unexpected result %v for '%s'", ok, str)
 		} else if !ok {
