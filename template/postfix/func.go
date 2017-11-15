@@ -1,7 +1,6 @@
 package postfix
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -20,7 +19,15 @@ type Expression []Function
 func (x Expression) String() string {
 	s := make([]string, len(x))
 	for i, f := range x {
-		s[i] = fmt.Sprint(f)
+		if str, ok := f.(stringer); !ok {
+			s[i] = "???"
+		} else {
+			s[i] = str.String()
+		}
 	}
 	return strings.Join(s, " ")
+}
+
+type stringer interface {
+	String() string
 }

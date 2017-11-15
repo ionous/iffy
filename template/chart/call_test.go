@@ -26,7 +26,7 @@ func TestCallSubSubdir(t *testing.T) {
 	var f ExpressionStateFactory
 	x = x && assert.NoError(testCall(t, f,
 		"call: {{5|first!}+{'hello'|second! 6|third: 7}}",
-		"5 FIRST/1 7 6 `hello` SECOND/2 THIRD/2 ADD CALL/1",
+		"5 FIRST/1 7 6 \"hello\" SECOND/2 THIRD/2 ADD CALL/1",
 	))
 }
 

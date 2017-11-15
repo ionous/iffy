@@ -1,7 +1,7 @@
 package chart
 
 import (
-	"fmt"
+	"github.com/ionous/errutil"
 )
 
 // Parse is the main function of chart.
@@ -21,8 +21,8 @@ type endpointError struct {
 }
 
 func (e endpointError) Error() string {
-	return fmt.Sprintf("parsing `%s` ended in %T at %q(%d)",
-		e.str, e.last, e.str[e.end-1], e.end)
+	return errutil.Fmt("parsing `%s` ended in %T at %q(%d)",
+		e.str, e.last, e.str[e.end-1], e.end).Error()
 }
 
 // if the state machine ends before the string is empty

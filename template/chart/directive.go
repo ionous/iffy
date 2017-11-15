@@ -2,7 +2,6 @@ package chart
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/template/postfix"
 	"github.com/ionous/iffy/template/types"
@@ -36,11 +35,11 @@ func ExpectedExpression(v Directive) (err error) {
 // {key:expression} or {expression}
 func (d Directive) String() (ret string) {
 	if len(d.Key) > 0 {
-		ret = fmt.Sprintf("{%s:%s}", d.Key, d.Expression)
+		ret = "{" + d.Key + ":" + d.Expression.String() + "}"
 	} else if q, ok := d.isQuote(); ok {
 		ret = string(q)
 	} else {
-		ret = fmt.Sprintf("{%s}", d.Expression)
+		ret = "{" + d.Expression.String() + "}"
 	}
 	return
 }
@@ -56,7 +55,7 @@ func (d Directive) isQuote() (ret types.Quote, okay bool) {
 func Format(ds []Directive) string {
 	var buf bytes.Buffer
 	for _, d := range ds {
-		buf.WriteString(fmt.Sprint(d))
+		buf.WriteString(d.String())
 	}
 	return buf.String()
 }

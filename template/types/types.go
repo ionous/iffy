@@ -1,7 +1,7 @@
 package types
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -10,11 +10,14 @@ type Argument interface {
 	arg()
 }
 
-// Quote text as a function.
+// Quote text as a postfix function.
 type Quote string
 
-// Number as a function.
+// Number as a postfix function.
 type Number float64
+
+// Boolean as a postfix function.
+type Boolean bool
 
 // Reference refers to an object property by name.
 // note: there are potentially two ways of representing references:
@@ -53,34 +56,45 @@ const (
 
 func (Quote) Arity() int      { return 0 }
 func (Quote) Precedence() int { return 0 }
-func (q Quote) Value() string { return string(q) }
+func (k Quote) Value() string { return string(k) }
 
 func (Number) Arity() int       { return 0 }
 func (Number) Precedence() int  { return 0 }
-func (n Number) Value() float64 { return float64(n) }
+func (k Number) Value() float64 { return float64(k) }
+
+func (Boolean) Arity() int      { return 0 }
+func (Boolean) Precedence() int { return 0 }
+func (k Boolean) Value() bool   { return bool(k) }
 
 func (Reference) Arity() int        { return 0 }
 func (Reference) Precedence() int   { return 0 }
 func (r Reference) Value() []string { return []string(r) }
 
-func (c Command) Arity() int      { return c.CommandArity }
-func (c Command) Precedence() int { return 8 }
+func (k Command) Arity() int      { return k.CommandArity }
+func (k Command) Precedence() int { return 8 }
 
-func (b Builtin) Arity() int      { return b.ParameterCount }
-func (b Builtin) Precedence() int { return 8 }
+func (k Builtin) Arity() int      { return k.ParameterCount }
+func (k Builtin) Precedence() int { return 8 }
 
-func (q Quote) String() string {
-	return fmt.Sprintf("`%s`", string(q))
+func (k Quote) String() string {
+	return strconv.Quote(string(k))
 }
-func (n Number) String() string {
-	return fmt.Sprintf("%g", float64(n))
+func (k Number) String() string {
+	return strconv.FormatFloat(float64(k), 'g', -1, 64)
 }
-func (r Reference) String() string {
-	return strings.Join([]string(r), ".")
+func (k Boolean) String() string {
+	return strconv.FormatBool(bool(k))
 }
-func (c Command) String() string {
-	return fmt.Sprintf("%s/%d", strings.ToUpper(c.CommandName), c.CommandArity)
+func (k Reference) String() string {
+	return strings.Join([]string(k), ".")
 }
-func (b Builtin) String() string {
-	return fmt.Sprintf("%s/%d", b.Type.String(), b.ParameterCount)
+func (k Command) String() string {
+	w := strings.ToUpper(k.CommandName)
+	a := strconv.Itoa(k.CommandArity)
+	return w + "/" + a
+}
+func (k Builtin) String() string {
+	w := k.Type.String()
+	a := strconv.Itoa(k.ParameterCount)
+	return w + "/" + a
 }

@@ -60,8 +60,22 @@ func (p QuoteParser) GetOperand() (ret postfix.Function, err error) {
 func (p FieldParser) GetOperand() (ret postfix.Function, err error) {
 	if r, e := p.GetFields(); e != nil {
 		err = e
+	} else if b, ok := boolean(r); ok {
+		ret = b
 	} else {
 		ret = types.Reference(r)
+	}
+	return
+}
+
+func boolean(r []string) (ret postfix.Function, okay bool) {
+	if len(r) == 1 {
+		switch r[0] {
+		case "true":
+			ret, okay = types.Boolean(true), true
+		case "false":
+			ret, okay = types.Boolean(false), true
+		}
 	}
 	return
 }
