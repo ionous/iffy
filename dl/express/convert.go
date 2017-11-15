@@ -3,7 +3,6 @@ package express
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
@@ -14,7 +13,7 @@ import (
 )
 
 // Express converts a postfix expression into iffy commands.
-func Convert(cmds *ops.Factory, xs template.Expression, gen ident.Counters) (ret *ops.Command, err error) {
+func Convert(cmds *ops.Factory, xs template.Expression, gen names) (ret *ops.Command, err error) {
 	c := converter{cmds: cmds, gen: gen}
 	if e := c.convert(xs); e != nil {
 		err = e
@@ -41,7 +40,7 @@ func Convert(cmds *ops.Factory, xs template.Expression, gen ident.Counters) (ret
 type converter struct {
 	cmds  *ops.Factory
 	stack []interface{}
-	gen   ident.Counters
+	gen   names
 }
 
 func (c *converter) convert(xs template.Expression) (err error) {

@@ -27,7 +27,7 @@ func TestMath(t *testing.T) {
 	//
 	match := func(t *testing.T, v float64, fn func(spec.Block)) (err error) {
 		var n tests.Number
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if e := c.Build(fn); e != nil {
 			err = e
 		} else if e := n.Match(run, v); e != nil {

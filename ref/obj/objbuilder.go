@@ -29,7 +29,7 @@ func (b *Registry) addName(cls string) string {
 	return b.counters.NewName(cls)
 }
 
-// NewName given the passed class, generate a unique name, which will generate a new blank object at Build().
+// CreateName given the passed class, generate a unique name, which will generate a new blank object at Build().
 func (b *Registry) NewName(cls string) string {
 	name := b.addName(cls)
 	b.uniqueIds = append(b.uniqueIds, uniqueId{cls, name})

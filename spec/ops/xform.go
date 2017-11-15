@@ -9,11 +9,9 @@ type Transform interface {
 	TransformValue(v r.Value, hint r.Type) (r.Value, error)
 }
 
-// TransformFunction implements the Transform interface for free functions.
-type TransformFunction struct {
-	Transform func(v r.Value, hint r.Type) (r.Value, error)
-}
+// Transform  implements the TransformValue interface for free functions.
+type Transformer func(v r.Value, hint r.Type) (r.Value, error)
 
-func (tf TransformFunction) TransformValue(v r.Value, hint r.Type) (r.Value, error) {
-	return tf.Transform(v, hint)
+func (tf Transformer) TransformValue(v r.Value, hint r.Type) (r.Value, error) {
+	return tf(v, hint)
 }

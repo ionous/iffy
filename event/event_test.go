@@ -82,7 +82,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	rules, e := rules.Master(cmds, core.Xform{}, patterns, DefaultActions)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, DefaultActions)
 	assert.NoError(e)
 
 	// we do this the manual way first, and later with spec
@@ -161,7 +161,7 @@ func TestSomething(t *testing.T) {
 
 func Execute(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
 	var root struct{ Eval rt.ExecuteList }
-	c := cmds.NewBuilder(&root, core.Xform{})
+	c := cmds.NewBuilder(&root, ops.Transformer(ops.Transformer(core.Transform)))
 	if e := c.Build(fn); e != nil {
 		err = e
 	} else {

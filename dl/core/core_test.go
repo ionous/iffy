@@ -20,7 +20,7 @@ func TestCore(t *testing.T) {
 	//
 	t.Run("text shortcut", func(t *testing.T) {
 		var n tests.Text
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		c.Val("some text")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
@@ -32,7 +32,7 @@ func TestCore(t *testing.T) {
 	t.Run("all true", func(t *testing.T) {
 		test := func(a, b, res bool) {
 			var n tests.Bool
-			c := cmds.NewBuilder(&n, core.Xform{})
+			c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 			if c.Cmd("all true").Begin() {
 				c.Cmd("bool", a)
 				c.Cmd("bool", b)
@@ -53,7 +53,7 @@ func TestCore(t *testing.T) {
 	t.Run("any true", func(t *testing.T) {
 		test := func(a, b, res bool) {
 			var n tests.Bool
-			c := cmds.NewBuilder(&n, core.Xform{})
+			c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 			if c.Cmd("any true").Begin() {
 				c.Cmd("bool", a)
 				c.Cmd("bool", b)
@@ -73,7 +73,7 @@ func TestCore(t *testing.T) {
 	t.Run("compare numbers", func(t *testing.T) {
 		test := func(a float64, op string, b float64, res bool) {
 			var n tests.Bool
-			c := cmds.NewBuilder(&n, core.Xform{})
+			c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 			if c.Cmd("compare num").Begin() {
 				c.Val(a).Cmd(op).Val(b)
 				c.End()
@@ -99,7 +99,7 @@ func TestCore(t *testing.T) {
 	t.Run("compare text", func(t *testing.T) {
 		test := func(a string, op string, b string, res bool) {
 			var n tests.Bool
-			c := cmds.NewBuilder(&n, core.Xform{})
+			c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 			if c.Cmd("compare text").Begin() {
 				c.Val(a).Cmd(op).Val(b)
 				c.End()

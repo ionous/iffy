@@ -33,7 +33,7 @@ func TestOrder(t *testing.T) {
 	assert.Contains(classes, ident.IdOf("Order"), "adding to patterns should add to classes")
 
 	var root struct{ rules.Mandates }
-	c := cmds.NewBuilder(&root, core.Xform{})
+	c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
 	if c.Cmd("list text", "order").Begin() {
 		c.Param("decide").Val("a")
 		c.End()

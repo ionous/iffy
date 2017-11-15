@@ -33,7 +33,7 @@ func TestFactorial(t *testing.T) {
 	assert.Contains(classes, ident.IdOf("Factorial"), "adding to patterns should add to classes")
 
 	var root struct{ rules.Mandates }
-	c := cmds.NewBuilder(&root, core.Xform{})
+	c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
 	if c.Cmd("number rule", "factorial").Begin() {
 		c.Param("if").Cmd("compare num", c.Cmd("get", "@", "num"), c.Cmd("equal to"), 0)
 		c.Param("decide").Val(1)

@@ -2,7 +2,6 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/template"
 	r "reflect"
@@ -11,13 +10,17 @@ import (
 
 type exform struct {
 	cmds *ops.Ops
-	gen  ident.Counters
+	gen  names
+}
+
+type names interface {
+	NewName(cls string) string
 }
 
 // NewTransform returns a transform which can convert command text into actions.
 // For example, in c.Cmd("set text", "status", "{score}/{turnCount}") --
 // the "{}" would be converted into a tree of iffy commands.
-func NewTransform(cmds *ops.Ops, gen ident.Counters) *exform {
+func NewTransform(cmds *ops.Ops, gen names) *exform {
 	return &exform{cmds, gen}
 }
 

@@ -21,7 +21,7 @@ func TestPrint(t *testing.T) {
 	//
 	t.Run("spacing", func(t *testing.T) {
 		var n tests.Execute
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("print span").Begin() {
 			c.Cmd("say", "hello")
 			c.Cmd("say", "there,")
@@ -37,7 +37,7 @@ func TestPrint(t *testing.T) {
 	})
 	t.Run("numbers", func(t *testing.T) {
 		var n tests.Execute
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("print span").Begin() {
 			c.Cmd("print num", 213)
 			c.Cmd("print num word", 213)
@@ -53,7 +53,7 @@ func TestPrint(t *testing.T) {
 	// In sashimi, the default printer made every print a new line, we should do the same. This test complements TestSingleLines.
 	t.Run("multi", func(t *testing.T) {
 		var n tests.Execute
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("hello", "there", "world"))
 			if c.Param("go").Begin() {
@@ -73,7 +73,7 @@ func TestPrint(t *testing.T) {
 	// It complements TestMultiLines
 	t.Run("single", func(t *testing.T) {
 		var n tests.Execute
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("print span").Begin() {
 			if c.Cmd("for each text").Begin() {
 				c.Param("in").Val(sliceOf.String("hello", "there", "world"))

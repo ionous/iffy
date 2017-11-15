@@ -72,7 +72,7 @@ func TestExpress(t *testing.T) {
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*Commands)(nil))
-	fac := ops.NewFactory(cmds, ops.TransformFunction{core.Transform})
+	fac := ops.NewFactory(cmds, ops.Transformer(core.Transform))
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			if xs, e := template.ParseExpression(test.str); e != nil {

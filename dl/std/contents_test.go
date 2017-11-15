@@ -61,7 +61,7 @@ func TestContents(t *testing.T) {
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-	rules, e := rules.Master(cmds, core.Xform{}, patterns, PrintNameRules, PrintObjectRules)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, PrintNameRules, PrintObjectRules)
 	assert.NoError(e)
 
 	type OpsCb func(c spec.Block)
@@ -72,12 +72,12 @@ func TestContents(t *testing.T) {
 		relations.AddTable("locale", pc.Table)
 
 		var loc struct{ Locations []Locate }
-		c := cmds.NewBuilder(&loc, core.Xform{})
+		c := cmds.NewBuilder(&loc, ops.Transformer(core.Transform))
 		if e := c.Build(build); e != nil {
 			err = e
 		} else {
 			var root struct{ rt.ExecuteList }
-			c := cmds.NewBuilder(&root, core.Xform{})
+			c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
 			if e := c.Build(exec); e != nil {
 				err = e
 			} else {

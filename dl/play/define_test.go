@@ -42,7 +42,7 @@ func (r *Play) Define(f *Facts) (err error) {
 	)
 
 	var root struct{ Definitions }
-	c := cmds.NewBuilder(&root, core.Xform{})
+	c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
 	if e := c.Build(r.callbacks...); e != nil {
 		err = e
 	} else {

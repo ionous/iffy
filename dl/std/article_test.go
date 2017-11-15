@@ -40,7 +40,7 @@ func TestArticles(t *testing.T) {
 		&std.Kind{Name: "trevor", CommonProper: std.ProperNamed},
 	))
 
-	rules, e := rules.Master(cmds, core.Xform{}, patterns, std.PrintNameRules)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, std.PrintNameRules)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -53,7 +53,7 @@ func TestArticles(t *testing.T) {
 		var lines printer.Lines
 		if e := rt.WritersBlock(run, &lines, func() (err error) {
 			var root struct{ rt.Execute }
-			c := cmds.NewBuilder(&root, core.Xform{})
+			c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
 			if e := c.Build(fn); e != nil {
 				err = e
 			} else if e := root.Execute.Execute(run); e != nil {

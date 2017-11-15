@@ -40,7 +40,7 @@ func TestStd(t *testing.T) {
 		assert := testify.New(t)
 
 		//
-		rules, e := rules.Master(cmds, core.Xform{}, patterns, PrintNameRules)
+		rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, PrintNameRules)
 		assert.NoError(e)
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".

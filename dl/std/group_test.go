@@ -222,7 +222,7 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(s
 		(*Commands)(nil),
 		(*rules.Commands)(nil),
 	)
-	rules, e := rules.Master(cmds, core.Xform{}, patterns, patternSpec...)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, patternSpec...)
 
 	if assert.NoError(e) {
 		var span printer.Span

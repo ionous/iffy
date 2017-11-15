@@ -28,7 +28,7 @@ func TestSequences(t *testing.T) {
 		//
 		var n tests.Execute
 		var gen obj.Registry
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", len(expect))
 			if c.Param("go").Begin() {
@@ -51,7 +51,7 @@ func TestSequences(t *testing.T) {
 	t.Run("shuffle text", func(t *testing.T) {
 		var n tests.Execute
 		var gen obj.Registry
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", 9)
 			if c.Param("go").Begin() {
@@ -100,7 +100,7 @@ func TestSequences(t *testing.T) {
 		//
 		var n tests.Execute
 		var gen obj.Registry
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", len(expect))
 			if c.Param("go").Begin() {
@@ -126,7 +126,7 @@ func TestSequences(t *testing.T) {
 		//
 		var n tests.Execute
 		var gen obj.Registry
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("for each num").Begin() {
 			c.Param("in").Cmd("range", 5)
 			if c.Param("go").Begin() {

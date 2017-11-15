@@ -23,7 +23,7 @@ func TestLoop(t *testing.T) {
 	// verifies the loop index property.
 	t.Run("index", func(t *testing.T) {
 		var n tests.Execute
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
 			if c.Param("go").Begin() {
@@ -44,7 +44,7 @@ func TestLoop(t *testing.T) {
 	// verifies loop first and last properties.
 	t.Run("endings", func(t *testing.T) {
 		var n tests.Execute
-		c := cmds.NewBuilder(&n, core.Xform{})
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 		if c.Cmd("for each text").Begin() {
 			c.Param("in").Val(sliceOf.String("one", "two", "three"))
 			if c.Param("go").Begin() {
