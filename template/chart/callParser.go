@@ -26,6 +26,8 @@ func (p *CallParser) NewRune(r rune) State {
 	var id IdentParser
 	return ParseChain(r, spaces, MakeChain(&id, Statement(func(r rune) (ret State) {
 		// read a function: an identifer which ends with a separator.
+		// We dont fail if we dont end with a separator --
+		// the assumption is that it might be an id
 		if n := id.GetName(); len(n) > 0 && isSeparator(r) {
 			args := ArgParser{factory: p.argFactory}
 			// use MakeChain to skip the separator itself

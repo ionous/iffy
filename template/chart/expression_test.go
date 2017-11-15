@@ -21,7 +21,7 @@ func TestExpression(t *testing.T) {
 }
 
 func testExp(t *testing.T, str, want string) error {
-	p := MakeExpressionParser(&AnyFactory{})
+	p := ExpressionParser{argFactory: &AnyFactory{}}
 	return testRes(t, &p, str, want)
 }
 

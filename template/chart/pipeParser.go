@@ -1,6 +1,7 @@
 package chart
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/template/postfix"
 )
 
@@ -8,32 +9,38 @@ import (
 // Expression | Function | ...
 type PipeParser struct {
 	err error
-	exp postfix.Expression
+	xs  postfix.Expression
 }
 
 // NewRune starts on the first character of an operand or opening sub-phrase.
 func (p *PipeParser) NewRune(r rune) State {
-	return p.next(r, &ExpressionParser{})
+	var expParser ExpressionParser
+	return ParseChain(r, &expParser, p.after(0, &expParser))
 }
 
 func (p PipeParser) GetExpression() (postfix.Expression, error) {
-	return p.exp, p.err
+	return p.xs, p.err
 }
 
-func (p *PipeParser) next(r rune, exp ExpressionState) State {
-	return ParseChain(r, exp, Statement(func(r rune) (ret State) {
-		if exp, e := exp.GetExpression(); e != nil {
+// after generates a state which reads the results of the passed expression parser.
+func (p *PipeParser) after(n int, expParser ExpressionState) State {
+	return Statement(func(r rune) (ret State) {
+		if xs, e := expParser.GetExpression(); e != nil {
 			p.err = e
-		} else if len(exp) > 0 {
+		} else if cnt := len(xs); n > 0 && cnt == n {
+			p.err = errutil.New("pipe should be followed by a call")
+		} else {
 			switch {
 			case isPipe(r):
 				ret = Statement(func(r rune) State {
-					return p.next(r, &CallParser{arity: 1, out: exp})
+					// pass the existing expression into the call parser.
+					call := CallParser{arity: 1, out: xs}
+					return ParseChain(r, &call, p.after(cnt, &call))
 				})
 			default:
-				p.exp = exp
+				p.xs = xs
 			}
 		}
 		return
-	}))
+	})
 }

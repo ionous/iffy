@@ -7,6 +7,7 @@ import (
 )
 
 // BlockParser reads alternating text and directives.
+// It is used for tests of Left and RightParser.
 type BlockParser struct {
 	out     []Directive
 	err     error
@@ -20,8 +21,7 @@ type LeftParser struct {
 	out          string
 }
 
-// RightParser reads the content of a directive, ending just after its end.
-// It deals with trailing trim: : "~}...".
+// RightParser reads the content of a directive, ending just after the closing brace and any trimed whitespace. "~}...".
 type RightParser struct {
 	out     Directive
 	err     error
@@ -129,7 +129,7 @@ func (p *RightParser) NewRune(r rune) State {
 					return
 				})
 			default:
-				p.err = errutil.Fmt("unclosed directive %q", r)
+				p.err = errutil.Fmt("unexpected end of directive after '%s:%s'", v.Key, v.Expression.String())
 			}
 			return
 		}

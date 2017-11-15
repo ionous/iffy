@@ -21,7 +21,7 @@ type endpointError struct {
 }
 
 func (e endpointError) Error() string {
-	return fmt.Sprintf("parsing of `%s` ended in %T at %q(%d)",
+	return fmt.Sprintf("parsing `%s` ended in %T at %q(%d)",
 		e.str, e.last, e.str[e.end-1], e.end)
 }
 

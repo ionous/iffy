@@ -19,6 +19,9 @@ func TestPipe(t *testing.T) {
 	x = x && assert.NoError(testPipe(t, "world|hello! there", "there world HELLO/2"))
 	x = x && assert.NoError(testPipe(t, "world|capitalize!|hello: there", "there world CAPITALIZE/1 HELLO/2"))
 	x = x && assert.NoError(testPipe(t, "(5+6)*(7+8)", "5 6 ADD 7 8 ADD MUL"))
+	//
+	x = x && assert.Error(testPipe(t, "world|", ignoreResult))
+	x = x && assert.Error(testPipe(t, "world|nofun", ignoreResult))
 }
 
 func testPipe(t *testing.T, str, want string) error {

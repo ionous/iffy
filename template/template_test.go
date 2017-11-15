@@ -6,6 +6,14 @@ import (
 	"testing"
 )
 
+func TestFailures(t *testing.T) {
+	assert, x := testify.New(t), true
+	x = x && assert.Error(testChart(t, "{go testScore Story.score}",
+		ignoreResult))
+	x = x && assert.Error(testChart(t, "{Story.score|testScore}",
+		ignoreResult))
+}
+
 func TestChart(t *testing.T) {
 	t.Run("directives", func(t *testing.T) {
 		assert, x := testify.New(t), true
@@ -100,12 +108,10 @@ func testChart(t *testing.T, str, want string) (err error) {
 	t.Log("test:", str)
 	if ds, e := Parse(str); e != nil {
 		err = e
-	} else if got := ds.String(); want == ignoreResult {
+	} else if got := ds.String(); want == ignoreResult || got == want {
 		t.Log("got", got)
-	} else if got != want {
-		err = mismatched(want, got)
 	} else {
-		t.Log("ok", got)
+		err = mismatched(want, got)
 	}
 	return
 }

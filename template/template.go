@@ -1,6 +1,7 @@
 package template
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/template/chart"
 	"github.com/ionous/iffy/template/postfix"
 )
@@ -13,8 +14,7 @@ func Parse(template string) (ret Expression, err error) {
 	e := chart.Parse(&p, template)
 	xs, ex := p.GetExpression()
 	if ex != nil {
-
-		err = ex // prefer the expression error if there is one.
+		err = errutil.New(ex, e)
 	} else if e != nil {
 		err = e
 	} else {
