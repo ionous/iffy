@@ -12,9 +12,9 @@ type Pair struct {
 
 func (cmd Pair) Get(run rt.Runtime) (reta, retb float64, err error) {
 	if a, e := cmd.A.GetNumber(run); e != nil {
-		err = errutil.New("a", e)
+		err = errutil.New("couldnt get first operand, because", e)
 	} else if b, e := cmd.B.GetNumber(run); e != nil {
-		err = errutil.New("b", e)
+		err = errutil.New("couldnt get second operand, because", e)
 	} else {
 		reta, retb = a, b
 	}
@@ -58,7 +58,7 @@ func (cmd *Div) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := Pair(*cmd).Get(run); e != nil {
 		err = errutil.New("Div", e)
 	} else if math.Abs(b) <= 1e-5 {
-		err = errutil.New("Div", "b is too small")
+		err = errutil.New("Div second operand is too small")
 	} else {
 		ret = a / b
 	}

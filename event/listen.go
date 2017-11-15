@@ -38,7 +38,7 @@ func (els EventListeners) CollectAncestors(run rt.Runtime, obj rt.Object) (ret [
 	} else {
 		var tgt []Target
 		for at.HasNext() {
-			if obj, e := at.GetNext(); e != nil {
+			if obj, e := at.GetObject(); e != nil {
 				err = e
 				break
 			} else {

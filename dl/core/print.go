@@ -13,8 +13,13 @@ type PrintSpan struct {
 	Block rt.ExecuteList
 }
 
-// PrintSpan sandwiches text inside parenthesis.
+// PrintBracket sandwiches text inside parenthesis.
 type PrintBracket struct {
+	Block rt.ExecuteList
+}
+
+// PrintSlash separates text with a left-leaning slash.
+type PrintSlash struct {
 	Block rt.ExecuteList
 }
 
@@ -34,71 +39,122 @@ type PrintNumWord struct {
 }
 
 // Say writes a piece of text.
+// FIX: we should be able to "say" multiple things --
+// but we need the command array interface to allow one/many/commands more transparently
+// also, consider whether say should implement both get text and execute -- buffer eveerything up in the get text version.
 type Say struct {
-	Text rt.TextEval
+	Text []rt.TextEval
 }
 
-func (p *PrintSpan) Execute(run rt.Runtime) (err error) {
-	span := printer.Spanner{Writer: run}
-	if e := p.Block.Execute(rt.Writer(run, &span)); e != nil {
-		err = e
-	} else {
-		err = span.Flush()
-	}
-	return
+func (p *PrintSpan) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
 }
 
-func (p *PrintBracket) Execute(run rt.Runtime) (err error) {
-	bracket := printer.Bracket{Writer: run}
-	if e := p.Block.Execute(rt.Writer(run, &bracket)); e != nil {
-		err = e
-	} else {
-		err = bracket.Flush()
-	}
-	return
+func (p *PrintSpan) Execute(run rt.Runtime) error {
+	return rt.WritersBlock(run, printer.Spanning(run.Writer()), func() error {
+		return p.Block.Execute(run)
+	})
+}
+func (p *PrintBracket) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
 }
 
-func (p *PrintList) Execute(run rt.Runtime) (err error) {
-	sep := printer.AndSeparator(run)
-	if e := p.Block.Execute(rt.Writer(run, sep)); e != nil {
-		err = e
-	} else {
-		err = sep.Flush()
-	}
-	return
+func (p *PrintBracket) Execute(run rt.Runtime) error {
+	return rt.WritersBlock(run, printer.Bracket(run.Writer()), func() error {
+		return p.Block.Execute(run)
+	})
+}
+
+func (p *PrintList) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
+}
+
+func (p *PrintList) Execute(run rt.Runtime) error {
+	return rt.WritersBlock(run, printer.AndSeparator(run.Writer()), func() error {
+		return p.Block.Execute(run)
+	})
+}
+
+func (p *PrintNum) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
 }
 
 func (p *PrintNum) Execute(run rt.Runtime) (err error) {
 	if n, e := p.Num.GetNumber(run); e != nil {
 		err = e
-	} else if s := strconv.FormatFloat(n, 'g', -1, 64); len(s) > 0 {
-		_, err = io.WriteString(run, s)
 	} else {
-		_, err = io.WriteString(run, "<num>")
+		w := run.Writer()
+		if s := strconv.FormatFloat(n, 'g', -1, 64); len(s) > 0 {
+			_, err = io.WriteString(w, s)
+		} else {
+			_, err = io.WriteString(w, "<num>")
+		}
 	}
 	return err
+}
+func (p *PrintNumWord) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
 }
 
 func (p *PrintNumWord) Execute(run rt.Runtime) (err error) {
 	if n, e := p.Num.GetNumber(run); e != nil {
 		err = e
-	} else if s := num2words.Convert(int(n)); len(s) > 0 {
-		_, err = io.WriteString(run, s)
 	} else {
-		_, err = io.WriteString(run, "<num>")
+		w := run.Writer()
+		if s := num2words.Convert(int(n)); len(s) > 0 {
+			_, err = io.WriteString(w, s)
+		} else {
+			_, err = io.WriteString(w, "<num>")
+		}
 	}
 	return err
 }
+func (p *PrintSlash) GetText(run rt.Runtime) (string, error) {
+	b := Buffer{rt.ExecuteList{p}}
+	return b.GetText(run)
+}
 
-func (p *Say) Execute(run rt.Runtime) error {
-	return Print(run, p.Text)
+func (p *PrintSlash) Execute(run rt.Runtime) (err error) {
+	var span printer.Span
+	slash := printer.Slash(&span)
+	if e := rt.WritersBlock(run, slash, func() error {
+		return p.Block.Execute(run)
+	}); e != nil {
+		err = e
+	} else {
+		w := run.Writer()
+		_, err = w.Write(span.Bytes())
+	}
+	return
+}
+
+func (p *Say) Execute(run rt.Runtime) (err error) {
+	for _, t := range p.Text {
+		if s, e := t.GetText(run); e != nil {
+			err = e
+			break
+		} else if len(s) > 0 {
+			w := run.Writer()
+			if _, e := io.WriteString(w, s); e != nil {
+				err = e
+				break
+			}
+		}
+	}
+	return
 }
 
 func Print(run rt.Runtime, text rt.TextEval) (err error) {
 	if s, e := text.GetText(run); e != nil {
 		err = e
 	} else {
-		_, err = io.WriteString(run, s)
+		w := run.Writer()
+		_, err = io.WriteString(w, s)
 	}
 	return err
 }

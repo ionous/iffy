@@ -1,9 +1,5 @@
 package rt
 
-import (
-	"github.com/ionous/errutil"
-)
-
 // ExecuteList runs a block of statements.
 type ExecuteList []Execute
 
@@ -17,13 +13,13 @@ func (x ExecuteList) Execute(run Runtime) (err error) {
 	return
 }
 
-// an object iterator that always fails
-type EmptyObjects struct{}
-
-func (EmptyObjects) HasNext() bool {
-	return false
-}
-
-func (EmptyObjects) GetNext() (Object, error) {
-	return nil, errutil.New("empty objects never has objects")
+func (x ExecuteList) ReverseExecute(run Runtime) (err error) {
+	for i, cnt := 0, len(x); i < cnt; i++ {
+		exec := x[cnt-i-1]
+		if e := exec.Execute(run); e != nil {
+			err = e
+			break
+		}
+	}
+	return
 }

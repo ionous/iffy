@@ -4,15 +4,14 @@ import (
 	r "reflect"
 )
 
+// Transform should return value if there was no error, but it couldnt convert.
 type Transform interface {
-	// TransformValue should return value if there was no error, but it couldnt convert.
-	TransformValue(v interface{}, hint r.Type) (interface{}, error)
+	TransformValue(v r.Value, hint r.Type) (r.Value, error)
 }
 
-// DefaultXform acts as no transform.
-type DefaultXform struct{}
+// Transform  implements the TransformValue interface for free functions.
+type Transformer func(v r.Value, hint r.Type) (r.Value, error)
 
-// TransformValue here returns v, and never error.
-func (DefaultXform) TransformValue(v interface{}, hint r.Type) (interface{}, error) {
-	return v, nil
+func (tf Transformer) TransformValue(v r.Value, hint r.Type) (r.Value, error) {
+	return tf(v, hint)
 }

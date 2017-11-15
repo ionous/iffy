@@ -4,9 +4,9 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/locate"
+	"github.com/ionous/iffy/dl/rules"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/index"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
@@ -35,7 +35,6 @@ func (l Location) Locate() Locate {
 }
 
 func TestContents(t *testing.T) {
-
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
@@ -47,13 +46,13 @@ func TestContents(t *testing.T) {
 	unique.PanicBlocks(patterns,
 		(*Patterns)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
-		Thingaverse.objects(sliceOf.String("box", "cake", "apple", "pen"))...)
+	var objects obj.Registry
+	objects.RegisterValues(Thingaverse.objects(
+		sliceOf.String("box", "cake", "apple", "pen")))
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 		(*Commands)(nil),
 	)
 	unique.PanicTypes(cmds,
@@ -62,7 +61,7 @@ func TestContents(t *testing.T) {
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, PrintNameRules, PrintObjectRules)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, PrintNameRules, PrintObjectRules)
 	assert.NoError(e)
 
 	type OpsCb func(c spec.Block)
@@ -72,50 +71,41 @@ func TestContents(t *testing.T) {
 		pc := locate.Locale{index.NewTable(index.OneToMany)}
 		relations.AddTable("locale", pc.Table)
 
-		var root struct{ Locations []Locate }
-		c := cmds.NewBuilder(&root, core.Xform{})
-		if c.Cmds().Begin() {
-			build(c)
-			c.End()
-		}
-		if e := c.Build(); e != nil {
+		var loc struct{ Locations []Locate }
+		c := cmds.NewBuilder(&loc, ops.Transformer(core.Transform))
+		if e := c.Build(build); e != nil {
 			err = e
 		} else {
-			objs := objects.Build(nil)
-			for _, l := range root.Locations {
-				l := l.(*Location)
-				// in this case we're probably a command too
-				if p, ok := objs.GetObject(l.Parent); !ok {
-					err = errutil.New("unknown", l.Parent)
-					break
-				} else if c, ok := objs.GetObject(l.Child); !ok {
-					err = errutil.New("unknown", l.Child)
-					break
-				} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
-					err = e
-					break
-
-				}
-			}
-		}
-		if err == nil {
 			var root struct{ rt.ExecuteList }
-			c := cmds.NewBuilder(&root, core.Xform{})
-			if c.Cmds().Begin() {
-				exec(c)
-				c.End()
-			}
-			if e := c.Build(); e != nil {
+			c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
+			if e := c.Build(exec); e != nil {
 				err = e
 			} else {
 				var lines printer.Lines
-				run := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm()
-				if e := root.Execute(run); e != nil {
-					err = e
-				} else if res := lines.Lines(); match(run, res) {
-					t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
-				}
+				if run, e := rtm.New(classes).Objects(objects).Rules(rules).Relations(relations).Writer(&lines).Rtm(); e != nil {
+					for _, l := range loc.Locations {
+						l := l.(*Location)
+						// in this case we're probably a command too
+						if p, ok := run.GetObject(l.Parent); !ok {
+							err = errutil.New("unknown", l.Parent)
+							break
+						} else if c, ok := run.GetObject(l.Child); !ok {
+							err = errutil.New("unknown", l.Child)
+							break
+						} else if e := pc.SetLocation(p, l.Locale, c); e != nil {
+							err = e
+							break
+						}
+					}
 
+					if err == nil {
+						if e := root.Execute(run); e != nil {
+							err = e
+						} else if res := lines.Lines(); match(run, res) {
+							t.Logf("%s success: '%s'", t.Name(), strings.Join(res, ";"))
+						}
+					}
+				}
 			}
 		}
 		return
@@ -165,10 +155,7 @@ func TestContents(t *testing.T) {
 	// summary tests:
 	printSummary := func(c spec.Block) {
 		if c.Cmd("print span").Begin() {
-			if c.Cmds().Begin() {
-				c.Cmd("determine", c.Cmd("print summary", "box"))
-				c.End()
-			}
+			c.Cmd("determine", c.Cmd("print summary", "box"))
 			c.End()
 		}
 	}
@@ -200,7 +187,7 @@ func TestContents(t *testing.T) {
 	printObject := func(name string) OpsCb {
 		return func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
-				c.Cmds(c.Cmd("determine", c.Cmd("print object", name)))
+				c.Cmd("determine", c.Cmd("print object", name))
 				c.End()
 			}
 		}

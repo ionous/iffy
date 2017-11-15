@@ -4,22 +4,26 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+// Choose to execute one of two blocks based on a boolean test.
 type Choose struct {
 	If    rt.BoolEval
 	True  rt.ExecuteList
 	False rt.ExecuteList
 }
 
+// Choose one of two number evaluations based on a boolean test.
 type ChooseNum struct {
 	If          rt.BoolEval
 	True, False rt.NumberEval
 }
 
+// Choose one of two text evaluations based on a boolean test.
 type ChooseText struct {
 	If          rt.BoolEval
 	True, False rt.TextEval
 }
 
+// Choose one of two object evaluations based on a boolean test.
 type ChooseObj struct {
 	If          rt.BoolEval
 	True, False rt.ObjectEval

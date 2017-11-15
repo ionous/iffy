@@ -2,10 +2,10 @@ package event_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/event/evtbuilder"
 	"github.com/ionous/iffy/ident"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -51,7 +51,7 @@ func TestSomething(t *testing.T) {
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
-		(*rule.Commands)(nil))
+		(*rules.Commands)(nil))
 
 	unique.PanicTypes(classes,
 		(*Kind)(nil))
@@ -59,24 +59,21 @@ func TestSomething(t *testing.T) {
 	unique.RegisterTypes(events,
 		(*Jump)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
+	var objects obj.Registry
+	objects.RegisterValues(sliceOf.Interface(
 		&Kind{"Bogart"},
 		&Kind{"Bob"},
 		&Kind{"Coffin"},
-		&Kind{"Skeleton Key"})
+		&Kind{"Skeleton Key"}))
 
 	// default action:
 	DefaultActions := func(c spec.Block) {
 		if c.Cmd("run rule", "jump").Begin() {
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						// FIX: to print names need to include articles
-						// probably want a simple named object in core.
-						c.Cmd("say", "jumped!")
-						c.End()
-					}
+					// FIX: to print names need to include articles
+					// probably want a simple named object in core.
+					c.Cmd("say", "jumped!")
 					c.End()
 				}
 				c.End()
@@ -85,13 +82,16 @@ func TestSomething(t *testing.T) {
 		}
 	}
 
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, DefaultActions)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, DefaultActions)
 	assert.NoError(e)
 
 	// we do this the manual way first, and later with spec
 
 	var lines printer.Lines
-	run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
+	run, e := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	listen := evtbuilder.NewListeners(events.Types)
 	// object listener:
@@ -153,7 +153,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	lines = printer.Lines{}
-	run.Writer = &lines
+	run.SetWriter(&lines)
 	//
 	assert.NoError(event.Trigger(run, listen.EventMap, jump))
 	assert.Equal(sliceOf.String("don't do it bogart!"), lines.Lines())
@@ -161,12 +161,8 @@ func TestSomething(t *testing.T) {
 
 func Execute(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
 	var root struct{ Eval rt.ExecuteList }
-	c := cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmds().Begin() {
-		fn(c)
-		c.End()
-	}
-	if e := c.Build(); e != nil {
+	c := cmds.NewBuilder(&root, ops.Transformer(ops.Transformer(core.Transform)))
+	if e := c.Build(fn); e != nil {
 		err = e
 	} else {
 		ret = root.Eval

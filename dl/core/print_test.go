@@ -2,149 +2,92 @@ package core_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/ref/unique"
+	"github.com/ionous/iffy/rtm"
+	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/tests"
 	"github.com/ionous/sliceOf"
+	"testing"
 )
 
-// TestPrintSpacing verifies that print span adds spaces between words as needed.
-func (assert *CoreSuite) TestPrintSpacing() {
-	var root struct{ Eval rt.Execute }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmd("print span").Begin() {
-		if c.Cmds().Begin() {
+func TestPrint(t *testing.T) {
+	classes := make(unique.Types)
+	cmds := ops.NewOps(classes)
+	unique.PanicBlocks(cmds, (*core.Commands)(nil))
+	run, e := rtm.New(classes).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
+	//
+	t.Run("spacing", func(t *testing.T) {
+		var n tests.Execute
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
+		if c.Cmd("print span").Begin() {
 			c.Cmd("say", "hello")
 			c.Cmd("say", "there,")
 			c.Cmd("say", "world.")
 			c.End()
 		}
-		c.End()
-	}
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if e := root.Eval.Execute(run); assert.NoError(e) {
-			lines := assert.Lines()
-			assert.Equal(sliceOf.String("hello there, world."), lines, "Note the space after the comma, and the lack of space after the period.")
+		//
+		if e := c.Build(); e != nil {
+			t.Fatal(e)
+		} else if e := n.MatchLine(run, "hello there, world."); e != nil {
+			t.Fatal(e)
 		}
-	}
-
-}
-
-func (assert *CoreSuite) TestPrintNum() {
-	var root struct{ Eval rt.Execute }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmd("print span").Begin() {
-		if c.Cmds().Begin() {
+	})
+	t.Run("numbers", func(t *testing.T) {
+		var n tests.Execute
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
+		if c.Cmd("print span").Begin() {
 			c.Cmd("print num", 213)
 			c.Cmd("print num word", 213)
 			c.End()
 		}
-		c.End()
-	}
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if e := root.Eval.Execute(run); assert.NoError(e) {
-			lines := assert.Lines()
-			assert.Equal(sliceOf.String("213 two hundred thirteen"), lines)
+		if e := c.Build(); e != nil {
+			t.Fatal(e)
+		} else if e := n.MatchLine(run, "213 two hundred thirteen"); e != nil {
+			t.Fatal(e)
 		}
-	}
-}
+	})
 
-// TestMultiLines verifies that iffy printing works similar to sashimi printing.
-// In sashimi, the default printer made every print a new line, we should do the same. This test complements TestSingleLines.
-func (assert *CoreSuite) TestMultiLines() {
-	var root struct{ Eval rt.Execute }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmd("for each text").Begin() {
-		c.Param("in").Val(sliceOf.String("hello", "there", "world"))
-		if c.Param("go").Cmds().Begin() {
-			c.Cmd("say", c.Cmd("get", "@", "text"))
+	// In sashimi, the default printer made every print a new line, we should do the same. This test complements TestSingleLines.
+	t.Run("multi", func(t *testing.T) {
+		var n tests.Execute
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
+		if c.Cmd("for each text").Begin() {
+			c.Param("in").Val(sliceOf.String("hello", "there", "world"))
+			if c.Param("go").Begin() {
+				c.Cmd("say", c.Cmd("get", "@", "text"))
+				c.End()
+			}
 			c.End()
 		}
-		c.End()
-	}
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if e := root.Eval.Execute(run); assert.NoError(e) {
-			lines := assert.Lines()
-			assert.Equal(sliceOf.String("hello", "there", "world"), lines)
+		if e := c.Build(); e != nil {
+			t.Fatal(e)
+		} else if e := n.MatchLines(run, sliceOf.String("hello", "there", "world")); e != nil {
+			t.Fatal(e)
 		}
-	}
-}
+	})
 
-// TestSingleLine verifies the ability of print to join text.
-// It complements TestMultiLines
-func (assert *CoreSuite) TestSingleLines() {
-	var root struct{ Eval rt.Execute }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmd("print span").Begin() {
-		if c.Cmds().Begin() {
+	// TestSingleLine verifies the ability of print to join text.
+	// It complements TestMultiLines
+	t.Run("single", func(t *testing.T) {
+		var n tests.Execute
+		c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
+		if c.Cmd("print span").Begin() {
 			if c.Cmd("for each text").Begin() {
 				c.Param("in").Val(sliceOf.String("hello", "there", "world"))
-				if c.Param("go").Cmds().Begin() {
+				if c.Param("go").Begin() {
 					c.Cmd("say", c.Cmd("get", "@", "text")).End()
 				}
 				c.End()
 			}
 			c.End()
 		}
-		c.End()
-	}
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if e := root.Eval.Execute(run); assert.NoError(e) {
-			lines := assert.Lines()
-			assert.Equal("hello there world", lines[0])
+		if e := c.Build(); e != nil {
+			t.Fatal(e)
+		} else if e := n.MatchLine(run, "hello there world"); e != nil {
+			t.Fatal(e)
 		}
-	}
-}
-
-// TestLineIndex verifies the loop index property.
-func (assert *CoreSuite) TestLineIndex() {
-	var root struct{ Eval rt.Execute }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmd("for each text").Begin() {
-		c.Param("in").Val(sliceOf.String("one", "two", "three"))
-		if c.Param("go").Cmds().Begin() {
-			if c.Cmd("print num").Begin() {
-				c.Cmd("get", "@", "index").End()
-			}
-			c.End()
-		}
-		c.End()
-	}
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if e := root.Eval.Execute(run); assert.NoError(e) {
-			lines := assert.Lines()
-			assert.Equal(sliceOf.String("1", "2", "3"), lines)
-		}
-	}
-}
-
-// TestLineEndings verifies loop first and last properties.
-func (assert *CoreSuite) TestLineEndings() {
-	var root struct{ Eval rt.Execute }
-	c := assert.cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmd("for each text").Begin() {
-		c.Param("in").Val(sliceOf.String("one", "two", "three"))
-		if c.Param("go").Cmds().Begin() {
-			if c.Cmd("say").Begin() {
-				if c.Cmd("choose text").Begin() {
-					c.Param("if").Cmd("get", "@", "last")
-					c.Param("true").Val("last")
-					if c.Param("false").Cmd("choose text").Begin() {
-						c.Param("if").Cmd("get", "@", "first")
-						c.Param("true").Val("first")
-						c.Param("false").Cmd("get", "@", "text")
-						c.End()
-					}
-					c.End()
-				}
-				c.End()
-			}
-			c.End()
-		}
-		c.End()
-	}
-	if run, e := assert.newRuntime(c); assert.NoError(e) {
-		if e := root.Eval.Execute(run); assert.NoError(e) {
-			lines := assert.Lines()
-			assert.Equal(sliceOf.String("first", "two", "last"), lines)
-		}
-	}
+	})
 }

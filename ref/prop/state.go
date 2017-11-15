@@ -23,18 +23,18 @@ func (x State) Type() r.Type {
 }
 
 // Value returns true if the parent object is in the state represented by this property; false otherwise.
-func (x State) Value() interface{} {
+func (x State) Value() r.Value {
 	c, idx := x.value.Int(), x.choice
 	match := c == int64(idx)
-	return match
+	return r.ValueOf(match)
 }
 
 // SetValue implements rt.Property, enabling or disabling the state represented by this property; v must be a boolean value.
-func (x State) SetValue(v interface{}) (err error) {
-	if b, ok := v.(bool); !ok {
+func (x State) SetValue(v r.Value) (err error) {
+	if v.Kind() != r.Bool {
 		err = errutil.New("expected a true/false value")
 	} else {
-		err = x.EnableState(b)
+		err = x.EnableState(v.Bool())
 	}
 	return
 }

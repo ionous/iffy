@@ -16,30 +16,37 @@ type Rtm struct {
 	unique.Types
 	Objects obj.ObjectMap
 	rel.Relations
-	io.Writer
+	writer io.Writer
 	Events event.EventMap
 	Randomizer
 	rt.Ancestors
-	pat.Patterns
+	Rules pat.Rulebook
 	Plurals
 	parser.Scanner
+	ObjectScope
 }
 
-// GetPatterns mainly for testing.
-func (rtm *Rtm) GetPatterns() *pat.Patterns {
-	return &rtm.Patterns
-}
-
-// FindObject implements rt.ObjectFinder.
-func (rtm *Rtm) FindObject(name string) (rt.Object, bool) {
-	return rtm.Objects.GetObject(name)
-}
-
-// GetValue from the map
 func (rtm *Rtm) GetObject(name string) (rt.Object, bool) {
 	return rtm.Objects.GetObject(name)
 }
 
 func (rtm *Rtm) Emplace(i interface{}) rt.Object {
 	return obj.MakeObject(ident.None(), i, rtm)
+}
+
+func (rtm *Rtm) Writer() io.Writer {
+	return rtm.writer
+}
+
+func (rtm *Rtm) Write(b []byte) (int, error) {
+	return rtm.writer.Write(b)
+}
+
+func (rtm *Rtm) SetWriter(w io.Writer) io.Writer {
+	if w == nil {
+		panic("push writer requires a valid object")
+	}
+	prev := rtm.writer
+	rtm.writer = w
+	return prev
 }

@@ -2,8 +2,8 @@ package std_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -24,7 +24,7 @@ func TestArticles(t *testing.T) {
 	unique.PanicBlocks(cmds,
 		(*std.Commands)(nil),
 		(*core.Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 	)
 
 	unique.PanicBlocks(classes,
@@ -33,33 +33,40 @@ func TestArticles(t *testing.T) {
 	unique.PanicBlocks(patterns,
 		(*std.Patterns)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
+	var objects obj.Registry
+	objects.RegisterValues(sliceOf.Interface(
 		&std.Kind{Name: "lamp-post"},
 		&std.Kind{Name: "soldiers", IndefiniteArticle: "some"},
 		&std.Kind{Name: "trevor", CommonProper: std.ProperNamed},
-	)
+	))
 
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, std.PrintNameRules)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, std.PrintNameRules)
 	if e != nil {
 		t.Fatal(e)
 	}
-	run := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
+	run, e := rtm.New(classes).Objects(objects).Rules(rules).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	match := func(t *testing.T, expected string, fn func(spec.Block)) {
 		var lines printer.Lines
-		var root struct{ rt.Execute }
-		run := rt.Writer(run, &lines)
-		c := cmds.NewBuilder(&root, core.Xform{})
-		if e := c.Build(fn); e != nil {
-			t.Fatal(e)
-		} else if e := root.Execute.Execute(run); e != nil {
-			t.Fatal(e)
-		} else {
-			l := lines.Lines()
-			if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
-				t.Fatal(d)
+		if e := rt.WritersBlock(run, &lines, func() (err error) {
+			var root struct{ rt.Execute }
+			c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
+			if e := c.Build(fn); e != nil {
+				err = e
+			} else if e := root.Execute.Execute(run); e != nil {
+				err = e
+			} else {
+				l := lines.Lines()
+				if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
+					err = e
+				}
 			}
+			return
+		}); e != nil {
+			t.Fatal(e)
 		}
 	}
 	// lower a/n
@@ -67,12 +74,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out a lamp-post.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower a/n", "lamp post"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "lamp post"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -82,12 +86,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out Trevor.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower a/n", "trevor"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "trevor"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -97,12 +98,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out some soldiers.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower a/n", "soldiers"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower a/n", "soldiers"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -113,11 +111,8 @@ func TestArticles(t *testing.T) {
 		match(t, "A lamp-post can be made out in the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper a/n", "lamp post"))
-						c.Cmd("say", "can be made out in the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper a/n", "lamp post"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 			})
@@ -127,11 +122,8 @@ func TestArticles(t *testing.T) {
 		match(t, "Trevor can be made out in the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper a/n", "trevor"))
-						c.Cmd("say", "can be made out in the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper a/n", "trevor"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 			})
@@ -141,11 +133,8 @@ func TestArticles(t *testing.T) {
 		match(t, "Some soldiers can be made out in the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper a/n", "soldiers"))
-						c.Cmd("say", "can be made out in the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper a/n", "soldiers"))
+					c.Cmd("say", "can be made out in the mist.")
 					c.End()
 				}
 			})
@@ -156,12 +145,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out the lamp-post.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower the", "lamp post"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "lamp post"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -171,12 +157,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out Trevor.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower the", "trevor"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "trevor"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -186,12 +169,9 @@ func TestArticles(t *testing.T) {
 		match(t, "You can only just make out the soldiers.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", "You can only just make out")
-						c.Cmd("say", c.Cmd("lower the", "soldiers"))
-						c.Cmd("say", ".")
-						c.End()
-					}
+					c.Cmd("say", "You can only just make out")
+					c.Cmd("say", c.Cmd("lower the", "soldiers"))
+					c.Cmd("say", ".")
 					c.End()
 				}
 			})
@@ -202,11 +182,8 @@ func TestArticles(t *testing.T) {
 		match(t, "The lamp-post may be a trick of the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper the", "lamp post"))
-						c.Cmd("say", "may be a trick of the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper the", "lamp post"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 			})
@@ -216,11 +193,8 @@ func TestArticles(t *testing.T) {
 		match(t, "Trevor may be a trick of the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper the", "trevor"))
-						c.Cmd("say", "may be a trick of the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper the", "trevor"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 			})
@@ -230,11 +204,8 @@ func TestArticles(t *testing.T) {
 		match(t, "The soldiers may be a trick of the mist.",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("say", c.Cmd("upper the", "soldiers"))
-						c.Cmd("say", "may be a trick of the mist.")
-						c.End()
-					}
+					c.Cmd("say", c.Cmd("upper the", "soldiers"))
+					c.Cmd("say", "may be a trick of the mist.")
 					c.End()
 				}
 			})
@@ -245,7 +216,7 @@ func TestArticles(t *testing.T) {
 		match(t, "lamps",
 			func(c spec.Block) {
 				if c.Cmd("print span").Begin() {
-					c.Cmds(c.Cmd("say", c.Cmd("pluralize", "lamp")))
+					c.Cmd("say", c.Cmd("pluralize", "lamp"))
 					c.End()
 				}
 			})

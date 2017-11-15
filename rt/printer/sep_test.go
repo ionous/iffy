@@ -30,7 +30,7 @@ func TestPrintSep(t *testing.T) {
 	}
 }
 
-func write(sep func(w io.Writer) *Sep, names ...string) (ret string, err error) {
+func write(sep func(w io.Writer) io.WriteCloser, names ...string) (ret string, err error) {
 	var buffer Span
 	w := sep(&buffer)
 	for _, n := range names {
@@ -41,7 +41,7 @@ func write(sep func(w io.Writer) *Sep, names ...string) (ret string, err error) 
 	}
 	if err == nil {
 		// normally PopWriter would call close, but we arent using the runtime here.
-		if e := w.Flush(); e != nil {
+		if e := w.Close(); e != nil {
 			err = e
 		} else {
 			ret = buffer.String()

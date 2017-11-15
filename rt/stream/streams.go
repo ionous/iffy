@@ -1,116 +1,34 @@
 package stream
 
 import (
+	"github.com/ahmetb/go-linq"
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
 )
 
-type Len interface {
-	Len() int
+func NewNumberStream(next linq.Iterator) rt.NumberStream {
+	v, ok := next()
+	return &iterator{v, ok, next}
 }
-
-func NewNumberStream(list []float64) rt.NumberStream {
-	return &NumberIt{list: list}
+func NewTextStream(next linq.Iterator) rt.TextStream {
+	v, ok := next()
+	return &iterator{v, ok, next}
 }
-
-type NumberIt struct {
-	list []float64
-	idx  int
+func NewObjectStream(next linq.Iterator) rt.ObjectStream {
+	v, ok := next()
+	return &iterator{v, ok, next}
 }
-
-func (it *NumberIt) HasNext() bool {
-	return it.idx < len(it.list)
-}
-
-func (it *NumberIt) GetNext() (ret float64, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ret = it.list[it.idx]
-		it.idx++
-	}
-	return
-}
-
-func NewTextStream(list []string) rt.TextStream {
-	return &TextIt{list: list}
-}
-
-type TextIt struct {
-	list []string
-	idx  int
-}
-
-func (it *TextIt) HasNext() bool {
-	return it.idx < len(it.list)
-}
-
-func (it *TextIt) GetNext() (ret string, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ret = it.list[it.idx]
-		it.idx++
-	}
-	return
-}
-
-func NewObjectStream(list []rt.Object) rt.ObjectStream {
-	return &ObjectIt{list: list}
-}
-
-type ObjectIt struct {
-	list []rt.Object
-	idx  int // FIX? can we just slice elements from list, and always use index 0?
-}
-
-func (it *ObjectIt) Len() int {
-	return len(it.list)
-}
-
-func (it *ObjectIt) HasNext() bool {
-	return it.idx < len(it.list)
-}
-
-func (it *ObjectIt) GetNext() (ret rt.Object, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ret = it.list[it.idx]
-		it.idx++
-	}
-	return
-}
-
 func NewNameStream(run rt.Runtime, list []string) rt.ObjectStream {
-	return &NameIt{run: run, list: list}
-}
-
-type NameIt struct {
-	run  rt.Runtime
-	list []string
-	idx  int
-}
-
-func (it *NameIt) Len() int {
-	return len(it.list)
-}
-
-func (it *NameIt) HasNext() bool {
-	return it.idx < len(it.list)
-}
-
-func (it *NameIt) GetNext() (ret rt.Object, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ref := it.list[it.idx]
-		if obj, ok := it.run.FindObject(ref); !ok {
-			err = errutil.New("couldnt find object named", ref)
-		} else {
-			ret = obj
-			it.idx++
+	names := linq.From(list).Iterate()
+	return NewObjectStream(func() (ret interface{}, okay bool) {
+		if n, ok := names(); ok {
+			ref := n.(string)
+			if obj, ok := run.GetObject(ref); !ok {
+				ret, okay = Error(errutil.New("couldnt find object named", ref))
+			} else {
+				ret, okay = Value(obj)
+			}
 		}
-	}
-	return
+		return
+	})
 }

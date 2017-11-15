@@ -2,9 +2,9 @@ package std_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/rules"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/dl/std/group"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt/printer"
@@ -20,7 +20,6 @@ func TestGrouping(t *testing.T) {
 	// note: even without grouping rules, our article printing still gathers unnamed items.
 	t.Run("no grouping", func(t *testing.T) {
 		groupTest(t, "Mildred, an empire apple, a pen, and two other things",
-			//
 			sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2"),
 			PrintNameRules)
 	})
@@ -34,20 +33,21 @@ func TestGrouping(t *testing.T) {
 	//
 	several := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
-			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
-			if c.Param("decide").Cmds().Begin() {
+			c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
+			if c.Param("decide").Begin() {
 				c.Cmd("set bool", "@", "with articles", true)
 				c.End()
 			}
 			c.End()
 		}
 		if c.Cmd("run rule", "print several").Begin() {
-			c.Param("if").Cmd("all true", c.Cmds(
-				c.Cmd("is same class", c.Cmd("get", "@", "target"), "thing"),
-				c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)),
-			)
+			if c.Param("if").Cmd("all true").Begin() {
+				c.Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
+				c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)
+				c.End()
+			}
 			//
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				c.Cmd("say", "a few things")
 				c.End()
 			}
@@ -71,8 +71,8 @@ func TestGrouping(t *testing.T) {
 	// Rule for grouping together utensils: say "the usual utensils".
 	replacement := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
-			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
-			if c.Param("decide").Cmds().Begin() {
+			c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
+			if c.Param("decide").Begin() {
 				c.Cmd("set text", "@", "label", "some things")
 				c.Cmd("set bool", "@", "innumerable", true)
 				c.Cmd("set bool", "@", "without objects", true)
@@ -100,8 +100,8 @@ func TestGrouping(t *testing.T) {
 	t.Run("fancy", func(t *testing.T) {
 		fancy := func(c spec.Block) {
 			if c.Cmd("run rule", "group together").Begin() {
-				c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
-				if c.Param("decide").Cmds().Begin() {
+				c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "scrabble tile")
+				if c.Param("decide").Begin() {
 					c.Cmd("set text", "@", "label", "the tiles")
 					c.Cmd("set bool", "@", "innumerable", true)
 					c.Cmd("set bool", "@", "without articles", true)
@@ -112,7 +112,7 @@ func TestGrouping(t *testing.T) {
 			if c.Cmd("run rule", "print group").Begin() {
 				c.Param("if").Cmd("compare text", c.Cmd("get", "@", "label"), c.Cmd("equal to"), "the tiles")
 				c.Param("continue").Cmd("continue before")
-				if c.Param("decide").Cmds().Begin() {
+				if c.Param("decide").Begin() {
 					c.Cmd("say", "from a Scrabble set")
 					c.End()
 				}
@@ -139,8 +139,8 @@ func TestGrouping(t *testing.T) {
 			//
 			PrintNameRules, group.GroupRules, func(c spec.Block) {
 				if c.Cmd("run rule", "group together").Begin() {
-					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
-					if c.Param("decide").Cmds().Begin() {
+					c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "scrabble tile")
+					if c.Param("decide").Begin() {
 						c.Cmd("set text", "@", "label", "scrabble tiles")
 						c.Cmd("set bool", "@", "without articles", true)
 						c.End()
@@ -155,8 +155,8 @@ func TestGrouping(t *testing.T) {
 			sliceOf.String("mildred", "x", "w", "f", "y", "z"),
 			PrintNameRules, group.GroupRules, func(c spec.Block) {
 				if c.Cmd("run rule", "group together").Begin() {
-					c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "scrabble tile")
-					if c.Param("decide").Cmds().Begin() {
+					c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "scrabble tile")
+					if c.Param("decide").Begin() {
 						c.Cmd("set text", "@", "label", "scrabble tiles")
 						c.Cmd("set bool", "@", "with articles", true)
 						c.End()
@@ -167,8 +167,8 @@ func TestGrouping(t *testing.T) {
 	})
 	unnamedThings := func(c spec.Block) {
 		if c.Cmd("run rule", "group together").Begin() {
-			c.Param("if").Cmd("is same class", c.Cmd("get", "@", "target"), "thing")
-			if c.Param("decide").Cmds().Begin() {
+			c.Param("if").Cmd("is exact class", c.Cmd("get", "@", "target"), "thing")
+			if c.Param("decide").Begin() {
 				c.Cmd("set text", "@", "label", "things")
 				c.Cmd("set bool", "@", "with articles", true)
 				c.End()
@@ -214,25 +214,25 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(s
 	unique.PanicTypes(classes,
 		(*ScrabbleTile)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
-		Thingaverse.objects(names)...)
+	var objects obj.Registry
+	objects.RegisterValues(Thingaverse.objects(names))
 
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 	)
-	rules, e := rule.Master(cmds, core.Xform{}, patterns, patternSpec...)
+	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, patternSpec...)
 
 	if assert.NoError(e) {
-		var lines printer.Span
-		run := rtm.New(classes).Objects(objects).Rules(rules).Writer(&lines).Rtm()
-
-		prn := &PrintNondescriptObjects{&core.Objects{names}}
-		if e := prn.Execute(run); assert.NoError(e) {
-			if assert.Equal(match, lines.String()) {
-				t.Log("matched:", match)
+		var span printer.Span
+		run, e := rtm.New(classes).Objects(objects).Rules(rules).Writer(&span).Rtm()
+		if assert.NoError(e) {
+			prn := &PrintNondescriptObjects{&core.Objects{names}}
+			if e := prn.Execute(run); assert.NoError(e) {
+				if assert.Equal(match, span.String()) {
+					t.Log("matched:", match)
+				}
 			}
 		}
 	}

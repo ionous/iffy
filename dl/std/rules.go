@@ -10,13 +10,13 @@ func Rules(c spec.Block) {
 	PrintNameRules(c)
 	PrintObjectRules(c)
 	group.GroupRules(c)
-	commence(c)
+	storyRules(c)
 }
 
 func PrintNameRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "print name").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("say", c.Cmd("class name", c.Cmd("get", "@", "target")))
 			c.End()
 		}
@@ -26,7 +26,7 @@ func PrintNameRules(c spec.Block) {
 	if c.Cmd("run rule", "print name").Begin() {
 		// detect if "unnamed": # is used only for system names, never author names.
 		c.Param("if").Cmd("is not", c.Cmd("includes", c.Cmd("get", c.Cmd("get", "@", "target"), "name"), "#"))
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "name"))
 			c.End()
 		}
@@ -35,7 +35,7 @@ func PrintNameRules(c spec.Block) {
 	// perfer the printed name above all else
 	if c.Cmd("run rule", "print name").Begin() {
 		c.Param("if").Cmd("is not", c.Cmd("is empty", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name")))
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name"))
 			c.End()
 		}
@@ -43,14 +43,11 @@ func PrintNameRules(c spec.Block) {
 	}
 	//
 	if c.Cmd("run rule", "print plural name").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			if c.Cmd("say").Begin() {
 				if c.Cmd("pluralize").Begin() {
 					if c.Cmd("buffer").Begin() {
-						if c.Cmds().Begin() {
-							c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-							c.End()
-						}
+						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 						c.End()
 					}
 					c.End()
@@ -63,7 +60,7 @@ func PrintNameRules(c spec.Block) {
 	}
 	if c.Cmd("run rule", "print plural name").Begin() {
 		c.Param("if").Cmd("is not", c.Cmd("is empty", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name")))
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name"))
 			c.End()
 		}
@@ -71,20 +68,17 @@ func PrintNameRules(c spec.Block) {
 	}
 	//
 	if c.Cmd("run rule", "print several").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			if c.Cmd("print span").Begin() {
-				if c.Cmds().Begin() {
-					c.Cmd("print num word", c.Cmd("get", "@", "group size"))
-					c.Cmd("say", "other")
-					if c.Cmd("choose", c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)).Begin() {
-						if c.Param("true").Cmds().Begin() {
-							c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
-							c.End()
-						}
-						if c.Param("false").Cmds().Begin() {
-							c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-							c.End()
-						}
+				c.Cmd("print num word", c.Cmd("get", "@", "group size"))
+				c.Cmd("say", "other")
+				if c.Cmd("choose", c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)).Begin() {
+					if c.Param("true").Begin() {
+						c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
+						c.End()
+					}
+					if c.Param("false").Begin() {
+						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 						c.End()
 					}
 					c.End()
@@ -100,10 +94,10 @@ func PrintNameRules(c spec.Block) {
 func PrintObjectRules(c spec.Block) {
 	// print the name and summary if all else fails
 	if c.Cmd("run rule", "print object").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 			if c.Cmd("print bracket").Begin() {
-				c.Cmds(c.Cmd("determine", c.Cmd("print summary", c.Cmd("get", "@", "target"))))
+				c.Cmd("determine", c.Cmd("print summary", c.Cmd("get", "@", "target")))
 				c.End()
 			}
 			c.End()
@@ -111,11 +105,12 @@ func PrintObjectRules(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("run rule", "print summary").Begin() {
-		c.Param("if").Cmd("all true", c.Cmds(
-			c.Cmd("is similar class", c.Cmd("get", "@", "target"), "container"),
-			c.Cmd("get", c.Cmd("get", "@", "target"), "closed"),
-		))
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("if").Cmd("all true").Begin() {
+			c.Cmd("is class", c.Cmd("get", "@", "target"), "container")
+			c.Cmd("get", c.Cmd("get", "@", "target"), "closed")
+			c.End()
+		}
+		if c.Param("decide").Begin() {
 			c.Cmd("say", "closed")
 			c.End()
 		}
@@ -123,14 +118,20 @@ func PrintObjectRules(c spec.Block) {
 	}
 	// is it better to have multiple patterns, or just one?
 	if c.Cmd("run rule", "print summary").Begin() {
-		c.Param("if").Cmd("is similar class", c.Cmd("get", "@", "target"), "container")
-		if c.Param("decide").Cmds().Begin() {
+		c.Param("if").Cmd("is class", c.Cmd("get", "@", "target"), "container")
+		if c.Param("decide").Begin() {
 			if c.Cmd("choose", c.Cmd("get", c.Cmd("get", "@", "target"), "closed")).Begin() {
-				c.Param("true").Cmds(c.Cmd("say", "closed"))
-				if c.Param("false").Cmds().Begin() {
+				if c.Param("true").Begin() {
+					c.Cmd("say", "closed")
+					c.End()
+				}
+				if c.Param("false").Begin() {
 					if c.Cmd("choose", c.Cmd("relation empty", "locale", c.Cmd("get", "@", "target"))).Begin() {
-						c.Param("true").Cmds(c.Cmd("say", "open but empty"))
-						if c.Param("false").Cmds().Begin() {
+						if c.Param("true").Begin() {
+							c.Cmd("say", "open but empty")
+							c.End()
+						}
+						if c.Param("false").Begin() {
 							c.Cmd("determine",
 								c.Cmd("print content",
 									c.Cmd("get", "@", "target"),
@@ -152,7 +153,7 @@ func PrintObjectRules(c spec.Block) {
 	// keeping the pattern itself bare of parens, etc.
 	// that way the caller has some control over how its printed.
 	if c.Cmd("run rule", "print content").Begin() {
-		if c.Param("decide").Cmds().Begin() {
+		if c.Param("decide").Begin() {
 			if c.Cmd("print objects").Begin() {
 				c.Param("objects").Cmd("related list", "locale", c.Cmd("get", "@", "target"))
 				// transfer our print content settings to print objects
@@ -160,7 +161,7 @@ func PrintObjectRules(c spec.Block) {
 				c.Param("articles").Cmd("get", "@", "articles")
 				c.Param("tersely").Cmd("get", "@", "tersely")
 				// and handle our fairly magical else
-				if c.Param("else").Cmds().Begin() {
+				if c.Param("else").Begin() {
 					c.Cmd("say", "empty")
 					c.End()
 				}

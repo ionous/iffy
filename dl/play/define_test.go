@@ -15,7 +15,7 @@ import (
 // 	if obj, ok := objs.GetObject(v.Obj); !ok {
 // 		t.Fatal("couldnt find", v.Obj)
 // 		break
-// 	} else if e := obj.SetValue(v.Prop, v.Val); e != nil {
+// 	} else if e := obj.SetValue(,v.Prop, v.Val); e != nil {
 // 		t.Fatal(e)
 // 		break
 // 	}
@@ -42,14 +42,8 @@ func (r *Play) Define(f *Facts) (err error) {
 	)
 
 	var root struct{ Definitions }
-	c := cmds.NewBuilder(&root, core.Xform{})
-	if c.Cmds().Begin() {
-		for _, v := range r.callbacks {
-			v(c)
-		}
-		c.End()
-	}
-	if e := c.Build(); e != nil {
+	c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
+	if e := c.Build(r.callbacks...); e != nil {
 		err = e
 	} else {
 		err = root.Define(f)
@@ -90,7 +84,8 @@ func TestLocation(t *testing.T) {
 
 func TestRules(t *testing.T) {
 	var reg Play
-	mandates := []string{"bool", "number", "text", "object", "num list", "text list", "obj list", "run"}
+	mandates := []string{"bool rule", "number rule", "text rule", "object rule",
+		"list numbers", "list text", "list objects", "run rule"}
 	reg.AddScript(func(c spec.Block) {
 		defineRules(c, mandates)
 	})
@@ -114,18 +109,12 @@ func TestEvents(t *testing.T) {
 func defineGrammar(c spec.Block) {
 	if c.Cmd("grammar").Begin() {
 		if c.Cmd("all of").Begin() {
-			if c.Cmds().Begin() {
-				if c.Cmd("any of").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("word", "l")
-						c.Cmd("word", "look")
-						c.End()
-					}
-					c.End()
-				}
-				c.Cmd("action", "look")
+			if c.Cmd("any of").Begin() {
+				c.Cmd("word", "l")
+				c.Cmd("word", "look")
 				c.End()
 			}
+			c.Cmd("action", "look")
 			c.End()
 		}
 		c.End()
@@ -139,7 +128,7 @@ func defineLocation(c spec.Block) {
 func defineRules(c spec.Block, mandates []string) {
 	for _, k := range mandates {
 		if c.Cmd("mandate").Begin() {
-			if c.Cmd(k + " rule").Begin() {
+			if c.Cmd(k).Begin() {
 				c.Param("name").Val(k)
 				c.End()
 			}
@@ -150,12 +139,12 @@ func defineRules(c spec.Block, mandates []string) {
 
 func defineEventHandler(c spec.Block) {
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
-		if c.Param("go").Cmds().Begin() {
+		if c.Param("go").Begin() {
 			c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
 			c.Cmd("say", "jumping!")
 			c.End()
 		}
-		if c.Param("options").Cmds().Begin() {
+		if c.Param("options").Begin() {
 			c.Cmd("capture")
 			c.Cmd("target only")
 			c.End()
@@ -164,13 +153,10 @@ func defineEventHandler(c spec.Block) {
 	}
 	if c.Cmd("mandate").Begin() {
 		if c.Cmd("run rule", "jump").Begin() {
-			if c.Param("decide").Cmds().Begin() {
+			if c.Param("decide").Begin() {
 				if c.Cmd("print span").Begin() {
-					if c.Cmds().Begin() {
-						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-						c.Cmd("say", "jumped!")
-						c.End()
-					}
+					c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
+					c.Cmd("say", "jumped!")
 					c.End()
 				}
 				c.End()

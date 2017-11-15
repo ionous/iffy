@@ -17,13 +17,16 @@ type Specs interface {
 
 // Slot helps users write to blocks.
 type Slot interface {
-	// Cmd starts a new command
+	// Begin starts a new block.
+	// If chained from a Cmd, this starts a block of command parameters,
+	// Otherwise, it starts an block of commands.
+	Begin() bool
+	// Cmd starts a new command block.
+	// It returns the *current+* block.
+	// To gain access to the newly created block, chain this call with a call to Begin().
 	Cmd(name string, args ...interface{}) Block
-	// Cmds starts a new array of commands.
-	// It takes initial members of that block.
-	// The block must eventually be terminated with End().
-	Cmds(cmds ...Block) Block
-	// Val specifies a single literal value: whether one primitive value or one array of primitive values. It returns the current block
+	// Val specifies a single literal value: whether one primitive value or one array of primitive values.
+	// It returns the current block.
 	Val(val interface{}) Block
 }
 
@@ -31,11 +34,6 @@ type Slot interface {
 type Block interface {
 	// Slot writes to the next slot in the current block
 	Slot
-	// Begin starts a new parameter block. Usually used as:
-	//  if c.Cmd("name").Begin() {
-	//    c.End()
-	//  }
-	Begin() bool
 	// Param targets a specific field in the current block.
 	Param(field string) Slot
 	// End terminates a block.

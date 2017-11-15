@@ -1,15 +1,14 @@
 package rtm
 
 import (
+	"bytes"
 	"github.com/ionous/iffy/event"
 	"github.com/ionous/iffy/parser"
 	"github.com/ionous/iffy/pat"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/printer"
 	"io"
 )
 
@@ -18,8 +17,8 @@ type Config struct {
 	ancestors rt.Ancestors
 	events    event.EventMap
 	grammar   parser.Scanner
-	objects   *obj.ObjBuilder
-	patterns  *pat.Patterns
+	objects   obj.Registry
+	rules     pat.Rulebook
 	rel       rel.RelationBuilder
 	seed      int64
 	writer    io.Writer
@@ -39,39 +38,32 @@ func (c *Config) Events(events event.EventMap) *Config {
 	c.events = events
 	return c
 }
-
 func (c *Config) Grammar(r *parser.AnyOf) *Config {
 	c.grammar = r
 	return c
 }
-
-func (c *Config) Objects(o *obj.ObjBuilder) *Config {
+func (c *Config) Objects(o obj.Registry) *Config {
 	c.objects = o
 	return c
 }
-
 func (c *Config) Relations(r rel.RelationBuilder) *Config {
 	c.rel = r
 	return c
 }
-
 func (c *Config) Randomize(seed int64) *Config {
 	c.seed = seed
 	return c
 }
-
-func (c *Config) Rules(p rule.Rules) *Config {
-	p.Sort()
-	c.patterns = &p.Patterns
+func (c *Config) Rules(p pat.Contract) *Config {
+	c.rules = p.Rulebook()
 	return c
 }
-
 func (c *Config) Writer(w io.Writer) *Config {
 	c.writer = w
 	return c
 }
 
-func (c *Config) Rtm() *Rtm {
+func (c *Config) Rtm() (ret *Rtm, err error) {
 	a := c.ancestors
 	if a == nil {
 		a = NoAncestors{}
@@ -83,7 +75,7 @@ func (c *Config) Rtm() *Rtm {
 	if cw := c.writer; cw != nil {
 		w = cw
 	} else {
-		var cw printer.Lines
+		var cw bytes.Buffer
 		w = &cw
 	}
 	//
@@ -91,15 +83,10 @@ func (c *Config) Rtm() *Rtm {
 		Types:     c.classes,
 		Relations: rel,
 		Ancestors: a,
-		Writer:    w,
+		writer:    w,
 		Scanner:   c.grammar,
 		Events:    c.events,
-	}
-	if c.objects != nil {
-		rtm.Objects = c.objects.Build(rtm)
-	}
-	if c.patterns != nil {
-		rtm.Patterns = *c.patterns
+		Rules:     c.rules,
 	}
 	//
 	seed := c.seed
@@ -107,6 +94,11 @@ func (c *Config) Rtm() *Rtm {
 		seed = 1
 	}
 	rtm.Randomizer.Reset(seed) // FIX: time?
-
-	return rtm
+	//
+	if om, e := c.objects.CreateObjects(rtm, c.classes); e != nil {
+		err = e
+	} else {
+		rtm.Objects = om
+	}
+	return rtm, err
 }

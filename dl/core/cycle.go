@@ -7,17 +7,17 @@ import (
 
 type CycleCounter struct {
 	Name string `if:"id"`
-	Curr float64
+	Curr int
 }
 
 type CycleText struct {
 	Id     string
-	Values []string
+	Values []rt.TextEval
 }
 
 func (l *CycleText) GetText(run rt.Runtime) (ret string, err error) {
 	var curr int
-	if obj, ok := run.FindObject(l.Id); !ok {
+	if obj, ok := run.GetObject(l.Id); !ok {
 		err = errutil.New("couldnt find", l.Id)
 	} else if e := obj.GetValue("curr", &curr); e != nil {
 		err = e
@@ -26,7 +26,8 @@ func (l *CycleText) GetText(run rt.Runtime) (ret string, err error) {
 		if e := obj.SetValue("curr", next); e != nil {
 			err = e
 		} else {
-			ret = l.Values[curr]
+			at := l.Values[curr]
+			ret, err = at.GetText(run)
 		}
 	}
 	return

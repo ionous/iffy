@@ -25,44 +25,41 @@ func (op *PrintObjects) Execute(run rt.Runtime) (err error) {
 	} else if header, e := optional.Text(run, op.Header); e != nil {
 		err = e
 	} else {
+		w := run.Writer()
 		if len(header) > 0 {
-			io.WriteString(run, header)
+			io.WriteString(w, header)
 		}
 		// control and separator so print could run by line as well.
-		if !tersely {
-			sep := printer.AndSeparator(run)
-			run = rt.Writer(run, sep)
-			defer sep.Flush()
-		}
-		//
-		var cnt int
-		if articles {
-			cnt, err = printWithArticles(run, objs)
+		if tersely {
+			err = op.print(run, articles, objs)
 		} else {
-			cnt, err = printWithoutArticles(run, objs)
-		}
-		if err == nil && cnt == 0 {
-			err = op.Else.Execute(run)
+			err = rt.WritersBlock(run, printer.AndSeparator(w), func() error {
+				return op.print(run, articles, objs)
+			})
 		}
 	}
 	return
 }
 
-// NoNames collects objects without names to print them in ordinal style.
-// This is needed for the edge case of a group of items which contains unnamed items.
-type NoNames []rt.Object
-
-func (n NoNames) Print(run rt.Runtime) (err error) {
-	if cnt := len(n); cnt > 0 {
-		err = printSeveral(run, n[0], cnt)
+func (op *PrintObjects) print(run rt.Runtime, articles bool, objs rt.ObjectStream) (err error) {
+	var cnt int
+	if articles {
+		cnt, err = printWithArticles(run, objs)
+	} else {
+		cnt, err = printWithoutArticles(run, objs)
+	}
+	if err == nil && cnt == 0 {
+		err = op.Else.Execute(run)
 	}
 	return
 }
 
 func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error) {
-	var nonames NoNames
+	// NoNames collects objects without names to print them in ordinal style.
+	// This is needed for the edge case of a group of items which contains unnamed items.
+	var nonames []rt.Object
 	for ; objs.HasNext(); ret++ {
-		if obj, e := objs.GetNext(); e != nil {
+		if obj, e := objs.GetObject(); e != nil {
 			err = e
 			break
 		} else {
@@ -79,15 +76,15 @@ func printWithArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error
 		}
 	}
 	if err == nil {
-		err = nonames.Print(run)
+		err = printSeveral(run, nonames)
 	}
 	return
 }
 
 func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err error) {
-	var nonames NoNames
+	var nonames []rt.Object
 	for ; objs.HasNext(); ret++ {
-		if obj, e := objs.GetNext(); e != nil {
+		if obj, e := objs.GetObject(); e != nil {
 			err = e
 			break
 		} else {
@@ -97,14 +94,23 @@ func printWithoutArticles(run rt.Runtime, objs rt.ObjectStream) (ret int, err er
 				break
 			} else if unnamed := strings.Contains(name, "#"); unnamed {
 				nonames = append(nonames, obj)
-			} else if e := printName(run, obj); e != nil {
+			} else if e := rt.Determine(run, &PrintName{obj.Id()}); e != nil {
 				err = e
 				break
 			}
 		}
 	}
 	if err == nil {
-		err = nonames.Print(run)
+		err = printSeveral(run, nonames)
+	}
+	return
+}
+
+// printSeveral objects without names in an ordinal style.
+// This is needed for the edge case of a group of items which contains unnamed items.
+func printSeveral(run rt.Runtime, objs []rt.Object) (err error) {
+	if cnt := len(objs); cnt > 0 {
+		err = rt.Determine(run, &PrintSeveral{objs[0].Id(), float64(cnt)})
 	}
 	return
 }

@@ -13,7 +13,9 @@ type Buffer struct {
 
 func (b *Buffer) GetText(run rt.Runtime) (ret string, err error) {
 	var buf bytes.Buffer
-	if e := b.Buffer.Execute(rt.Writer(run, &buf)); e != nil {
+	if e := rt.WritersBlock(run, &buf, func() error {
+		return b.Buffer.Execute(run)
+	}); e != nil {
 		err = e
 	} else {
 		ret = buf.String()

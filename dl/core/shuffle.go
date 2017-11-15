@@ -7,30 +7,30 @@ import (
 
 type ShuffleText struct {
 	Id     string
-	Values []string
+	Values []rt.TextEval
 }
 
 type ShuffleCounter struct {
 	Name    string `if:"id"`
-	Curr    float64
-	Indices []float64
+	Curr    int
+	Indices []int
 }
 
 func (l *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, ok := run.FindObject(l.Id); !ok {
+	if obj, ok := run.GetObject(l.Id); !ok {
 		err = errutil.New("couldnt find", l.Id)
 	} else {
 		var curr int
-		var indices []float64
+		var indices []int
 		if e := obj.GetValue("curr", &curr); e != nil {
 			err = e
 		} else if e := obj.GetValue("indices", &indices); e != nil {
 			err = e
 		} else if cnt := len(l.Values); cnt > 0 {
 			if len(indices) == 0 {
-				indices = make([]float64, cnt)
+				indices = make([]int, cnt)
 				for i := 0; i < cnt; i++ {
-					indices[i] = float64(i)
+					indices[i] = i
 				}
 				if e := obj.SetValue("indices", indices); e != nil {
 					err = e
@@ -47,9 +47,9 @@ func (l *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
 				if e := obj.SetValue("curr", curr+1); e != nil {
 					err = e
 				} else {
-					sel := int(indices[curr])
-					ret = l.Values[sel]
-
+					sel := indices[curr]
+					at := l.Values[sel]
+					ret, err = at.GetText(run)
 				}
 			}
 		}

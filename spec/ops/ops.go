@@ -17,6 +17,10 @@ type Builder struct {
 }
 
 func NewOps(classes unique.TypeRegistry) *Ops {
+	// FIX: this uses the class registry slightly backwards
+	// it knows to stack it rather than being given the types it should use
+	// moreover it exposes types as an aggregate -- which shouldnt be needed;
+	// isnt done by other similar things -- ex. ObjectGenerator.
 	return &Ops{
 		make(unique.Types),
 		unique.NewStack(classes),
@@ -29,9 +33,6 @@ func (ops *Ops) NewBuilder(root interface{}, x Transform) *Builder {
 }
 
 func (ops *Ops) NewFromTarget(tgt Target, x Transform) *Builder {
-	if x == nil {
-		x = DefaultXform{}
-	}
 	c := &Command{xform: x, target: tgt}
 	return &Builder{
 		builder.NewBuilder(&Factory{ops, x}, c),

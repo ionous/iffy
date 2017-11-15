@@ -8,6 +8,7 @@ const StreamEnd errutil.Error = "stream end"
 const StreamExceeded errutil.Error = "stream exceeded"
 
 type Execute interface {
+	// fix: rename to Run() to simplify look of Execute.Execute with embedded
 	Execute(Runtime) error
 }
 type BoolEval interface {
@@ -34,13 +35,13 @@ type ObjListEval interface {
 
 type NumberStream interface {
 	HasNext() bool
-	GetNext() (float64, error)
+	GetNumber() (float64, error)
 }
 type TextStream interface {
 	HasNext() bool
-	GetNext() (string, error)
+	GetText() (string, error)
 }
 type ObjectStream interface {
 	HasNext() bool
-	GetNext() (Object, error)
+	GetObject() (Object, error)
 }

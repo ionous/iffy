@@ -45,7 +45,7 @@ type Room struct {
 type Thing struct {
 	Kind        `if:"parent"`
 	Description string
-	Brief       string // known as "initial appearance"
+	Brief       string // also known as "initial appearance"
 
 	// this is part of the room display:
 	// unmarked for listing not marked for listing,
@@ -91,7 +91,9 @@ type Container struct {
 	// CarryingCapacity float64
 }
 
-// Pawn represents the current viewpoint
+// Pawn represents the current viewpoint.
+// There is usually just one instance:
+// it is also named "pawn".
 type Pawn struct {
 	Name  string   `if:"id"`
 	Actor ident.Id `if:"cls:Actor"`
@@ -108,7 +110,12 @@ const (
 
 type Story struct {
 	Name                string `if:"id"`
+	Title               string
 	Author              string
+	MajorVersion        int    // incompatible API changes
+	MinorVersion        int    // added functionality in a backwards-compatible manner
+	PatchVersion        int    // backwards-compatible bug fixes
+	SerialNumber        string // YYMMDD
 	Headline            rt.TextEval
 	Scored              bool
 	Score, MaximumScore float64

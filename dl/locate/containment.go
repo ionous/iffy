@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/index"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 )
 
 //go:generate stringer -type=Containment
@@ -45,29 +46,19 @@ func GetAncestors(run rt.Runtime, child rt.Object) (ret rt.ObjectStream, err err
 		if next, e := nextParent(run, table, child); e != nil {
 			err = e
 		} else {
-			ret = &ParentStream{run, table, next}
+			ret = stream.NewObjectStream(func() (ret interface{}, okay bool) {
+				if next != nil {
+					if n, e := nextParent(run, table, next); e != nil {
+						ret, okay = stream.Error(e)
+						next = nil
+					} else {
+						ret, okay = stream.Value(next)
+						next = n
+					}
+				}
+				return
+			})
 		}
-	}
-	return
-}
-
-type ParentStream struct {
-	run        rt.Runtime
-	table      *index.Table
-	nextParent rt.Object
-}
-
-func (ps *ParentStream) HasNext() bool {
-	return ps.nextParent != nil
-}
-
-func (ps *ParentStream) GetNext() (ret rt.Object, err error) {
-	if ps.nextParent == nil {
-		err = rt.StreamExceeded
-	} else if n, e := nextParent(ps.run, ps.table, ps.nextParent); e != nil {
-		err = e
-	} else {
-		ret, ps.nextParent = ps.nextParent, n
 	}
 	return
 }

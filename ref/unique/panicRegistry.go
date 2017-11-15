@@ -13,10 +13,3 @@ func PanicTypes(reg TypeRegistry, ptrs ...interface{}) {
 		panic(e)
 	}
 }
-
-// PanicValues wraps RegisterValues to panic on error.
-func PanicValues(reg ValueRegistry, vals ...interface{}) {
-	if e := RegisterValues(reg, vals...); e != nil {
-		panic(e)
-	}
-}

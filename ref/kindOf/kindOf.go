@@ -51,49 +51,49 @@ func Object(rtype r.Type) bool {
 
 // BoolEval tests reflect.TypeOf(rt.BoolEval)
 func BoolEval(rtype r.Type) bool {
-	return rtype.Implements(boolEval)
+	return rtype.Implements(TypeBoolEval)
 }
 
 // NumberEval tests reflect.TypeOf(rt.NumberEval)
 func NumberEval(rtype r.Type) bool {
-	return rtype.Implements(numEval)
+	return rtype.Implements(TypeNumEval)
 }
 
 // TextEval tests reflect.TypeOf(rt.TextEval)
 func TextEval(rtype r.Type) bool {
-	return rtype.Implements(textEval)
+	return rtype.Implements(TypeTextEval)
 }
 
 // ObjectEval tests reflect.TypeOf(rt.ObjectEval)
 func ObjectEval(rtype r.Type) bool {
-	return rtype.Implements(objEval)
+	return rtype.Implements(TypeObjEval)
 }
 
 // NumListEval tests reflect.TypeOf(rt.NumListEval)
 func NumListEval(rtype r.Type) bool {
-	return rtype.Implements(numListEval)
+	return rtype.Implements(TypeNumListEval)
 }
 
 // TextListEval tests reflect.TypeOf(rt.TextListEval)
 func TextListEval(rtype r.Type) bool {
-	return rtype.Implements(textListEval)
+	return rtype.Implements(TypeTextListEval)
 }
 
 // ObjListEval tests reflect.TypeOf(rt.ObjListEval)
 func ObjListEval(rtype r.Type) bool {
-	return rtype.Implements(objListEval)
+	return rtype.Implements(TypeObjListEval)
 }
 
 // switches dont work well with .Interface().(type) when dst is nil.
 var object = r.TypeOf((*rt.Object)(nil)).Elem()
 var identId = r.TypeOf((*ident.Id)(nil)).Elem()
-var boolEval = r.TypeOf((*rt.BoolEval)(nil)).Elem()
-var numEval = r.TypeOf((*rt.NumberEval)(nil)).Elem()
-var textEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
-var objEval = r.TypeOf((*rt.ObjectEval)(nil)).Elem()
-var numListEval = r.TypeOf((*rt.NumListEval)(nil)).Elem()
-var textListEval = r.TypeOf((*rt.TextListEval)(nil)).Elem()
-var objListEval = r.TypeOf((*rt.ObjListEval)(nil)).Elem()
+var TypeBoolEval = r.TypeOf((*rt.BoolEval)(nil)).Elem()
+var TypeNumEval = r.TypeOf((*rt.NumberEval)(nil)).Elem()
+var TypeTextEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
+var TypeObjEval = r.TypeOf((*rt.ObjectEval)(nil)).Elem()
+var TypeNumListEval = r.TypeOf((*rt.NumListEval)(nil)).Elem()
+var TypeTextListEval = r.TypeOf((*rt.TextListEval)(nil)).Elem()
+var TypeObjListEval = r.TypeOf((*rt.ObjListEval)(nil)).Elem()
 
 // Bool
 // Number

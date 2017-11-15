@@ -62,15 +62,13 @@ func (t *Text) String() string {
 	return t.Text
 }
 
-// Global asks for an object without considering scope.
-type Global struct {
-	Name string
-}
+// TopObject asks for the top most object in scope. It fails if no scope has been established.
+type TopObject struct{}
 
 // GetObject searches through the scope for an object matching Name
-func (op *Global) GetObject(run rt.Runtime) (ret rt.Object, err error) {
-	if obj, ok := run.GetObject(op.Name); !ok {
-		err = errutil.New("Global.GetObject, couldnt find", op.Name)
+func (TopObject) GetObject(run rt.Runtime) (ret rt.Object, err error) {
+	if obj, ok := run.TopObject(); !ok {
+		err = errutil.New("no top object")
 	} else {
 		ret = obj
 	}
@@ -84,8 +82,8 @@ type Object struct {
 
 // GetObject searches through the scope for an object matching Name
 func (op *Object) GetObject(run rt.Runtime) (ret rt.Object, err error) {
-	if obj, ok := run.FindObject(op.Name); !ok {
-		err = errutil.New("Object.GetObject, couldnt find", op.Name)
+	if obj, ok := run.GetObject(op.Name); !ok {
+		err = errutil.New("couldnt find object", op.Name)
 	} else {
 		ret = obj
 	}
@@ -98,7 +96,7 @@ type Numbers struct {
 }
 
 func (l *Numbers) GetNumberStream(rt.Runtime) (rt.NumberStream, error) {
-	return stream.NewNumberStream(l.Values), nil
+	return stream.NewNumberStream(stream.FromList(l.Values)), nil
 }
 
 // Texts specifies multiple strings.
@@ -107,7 +105,7 @@ type Texts struct {
 }
 
 func (l *Texts) GetTextStream(rt.Runtime) (rt.TextStream, error) {
-	return stream.NewTextStream(l.Values), nil
+	return stream.NewTextStream(stream.FromList(l.Values)), nil
 }
 
 // Objects specifies multiple object names.

@@ -15,8 +15,7 @@ func NewFactory(cmds *Ops, xform Transform) *Factory {
 	return &Factory{cmds, xform}
 }
 
-// NewSpec implements spec.SpecFactory.
-func (fac *Factory) NewSpec(name string) (ret spec.Spec, err error) {
+func (fac *Factory) CreateCommand(name string) (ret *Command, err error) {
 	if rtype, ok := fac.cmds.FindType(name); ok {
 		ret = &Command{
 			xform:  fac.xform,
@@ -31,6 +30,17 @@ func (fac *Factory) NewSpec(name string) (ret spec.Spec, err error) {
 		err = errutil.New("unknown command", name)
 	}
 	return
+}
+
+func (fac *Factory) EmplaceCommand(ptr interface{}) (*Command, error) {
+	cmd := &Command{xform: fac.xform, target: InPlace(ptr)}
+	return cmd, nil
+}
+
+// NewSpec implements spec.SpecFactory.
+func (fac *Factory) NewSpec(name string) (spec.Spec, error) {
+	cmd, err := fac.CreateCommand(name)
+	return cmd, err
 }
 
 // NewSpecs implements spec.SpecFactory.

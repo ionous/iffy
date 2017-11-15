@@ -5,62 +5,80 @@ import (
 	r "reflect"
 )
 
-// move to a different package? a sub-package?
-// check the imports i guess.
-type Xform struct{}
-
-// returns src if no error but couldnt convert.
-func (ts Xform) TransformValue(val interface{}, hint r.Type) (ret interface{}, err error) {
-	if x, ok := literally(val, hint); ok {
-		ret = x
+// Transform converts values specified by a scriptinto values usable by the runtime.
+// For instance, a string into a request for an object; an int into a number eval.
+// See also express.NewTransform which can create templates from author specified strings.
+// FIX: this uses core, but should it be a part of core?
+func Transform(src r.Value, hint r.Type) (ret r.Value, err error) {
+	if v := literally(src, hint); v != nil {
+		ret = r.ValueOf(v)
 	} else {
-		ret = val
+		ret = src
 	}
 	return
 }
 
 // literally allows users to specify primitive values for some evals.
 //
-// c.Cmd("texts", sliceOf.String("one", "two", "three"))
+// c.Cmd("strings", sliceOf.String("one", "two", "three"))
 // c.Value(sliceOf.String("one", "two", "three"))
 //
 // c.Cmd("get").Begin() { c.Cmd("object", "@") c.Value("text") }
 // c.Cmd("get", "@", "text")
 //
-func literally(v interface{}, dstType r.Type) (ret interface{}, okay bool) {
-	switch v := v.(type) {
-	case bool:
-		ret, okay = &Bool{v}, true
-	case float64:
-		ret, okay = &Num{v}, true
-	case []float64:
-		ret, okay = &Numbers{v}, true
+func literally(src r.Value, dstType r.Type) (ret interface{}) {
+	switch srcType := src.Type(); {
+	case kindOf.Bool(srcType):
+		v := src.Bool()
+		ret = &Bool{v}
+
+	case kindOf.Int(srcType):
+		v := src.Int()
+		if kindOf.NumListEval(dstType) {
+			ret = &Numbers{[]float64{float64(v)}}
+		} else {
+			ret = &Num{float64(v)}
+		}
+
+	case kindOf.Float(srcType):
+		v := src.Float()
+		if kindOf.NumListEval(dstType) {
+			ret = &Numbers{[]float64{v}}
+		} else {
+			ret = &Num{v}
+		}
+
 	// -- string for a command.
-	case string:
+	case srcType.Kind() == r.String:
 		// could be text or object --
+		v := src.String()
 		switch {
 		case kindOf.TextEval(dstType):
-			ret, okay = &Text{v}, true
+			ret = &Text{v}
 		case kindOf.ObjectEval(dstType):
-			ret, okay = &Object{v}, true
+			if v == "@" {
+				ret = &TopObject{}
+			} else {
+				ret = &Object{v}
+			}
+		case kindOf.TextListEval(dstType):
+			ret = &Texts{[]string{v}}
+
+		case kindOf.ObjListEval(dstType):
+			ret = &Objects{[]string{v}}
 		}
-	case []string:
+
+	case srcType.Kind() == r.Slice && kindOf.Float(srcType.Elem()):
+		v := src.Interface().([]float64)
+		ret = &Numbers{v}
+
+	case srcType.Kind() == r.Slice && kindOf.String(srcType.Elem()):
+		v := src.Interface().([]string)
 		switch {
 		case kindOf.TextListEval(dstType):
-			ret, okay = &Texts{v}, true
+			ret = &Texts{v}
 		case kindOf.ObjListEval(dstType):
-			ret, okay = &Objects{v}, true
-		}
-	default:
-		{
-			v := r.ValueOf(v)
-			if kindOf.Float(v.Type()) {
-				v := v.Float()
-				ret, okay = &Num{v}, true
-			} else if kindOf.Int(v.Type()) {
-				v := v.Int()
-				ret, okay = &Num{float64(v)}, true
-			}
+			ret = &Objects{v}
 		}
 	}
 	return

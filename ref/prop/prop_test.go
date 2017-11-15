@@ -28,16 +28,29 @@ func TestProp(t *testing.T) {
 	//
 	assert := assert.New(t)
 	// test that we can see expected values via the interface
-	assert.Equal("foo", str.Value())
-	assert.Equal(5, num.Value())
+	assert.Equal("foo", str.Get())
+	assert.Equal(5, num.Get())
 	// test that we can coerce via the value interface
 	// -- TestCoerce runs the full gamut of coercion tests.
-	num.SetValue(3.2)
-	assert.Equal(3, num.Value())
+	num.Set(3.2)
+	assert.Equal(3, num.Get())
 	// test that changing one state changes them all
-	assert.Equal(true, yes.Value())
-	assert.Equal(false, no.Value())
-	no.SetValue(true)
-	assert.Equal(false, yes.Value())
-	assert.Equal(true, no.Value())
+	assert.Equal(true, yes.Get())
+	assert.Equal(false, no.Get())
+	no.Set(true)
+	assert.Equal(false, yes.Get())
+	assert.Equal(true, no.Get())
+}
+
+func (f Field) Set(i interface{}) {
+	f.SetValue(r.ValueOf(i))
+}
+func (f Field) Get() interface{} {
+	return f.Value().Interface()
+}
+func (s State) Set(i interface{}) {
+	s.SetValue(r.ValueOf(i))
+}
+func (s State) Get() interface{} {
+	return s.Value().Interface()
 }

@@ -12,7 +12,7 @@ type Property interface {
 	// Type of the slot ( related to, but not always the same type as the value. )
 	Type() r.Type
 	// Value of the property.
-	Value() interface{}
+	Value() r.Value
 	// SetValue to change the property.
-	SetValue(interface{}) error
+	SetValue(r.Value) error
 }

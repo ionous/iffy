@@ -16,9 +16,11 @@ type packFun func(rtm *Rtm, dst, src r.Value) error
 // Pack expects a pointer to an outvalue.
 func (rtm *Rtm) Pack(pdst, src r.Value) (err error) {
 	if pdst.Kind() != r.Ptr {
-		err = errutil.New("expected pointer outvalue", pdst.Type())
+		err = errutil.New("expected pointer dst", pdst.Type())
 	} else if dst := pdst.Elem(); !dst.CanSet() {
-		err = errutil.New("cant set outvalue", dst.Type())
+		err = errutil.New("cant set dst", dst.Type())
+	} else if src.Kind() == r.Invalid {
+		err = errutil.New("cant read src", src)
 	} else {
 		err = rtm.pack(dst, src)
 	}
@@ -31,7 +33,8 @@ func (rtm *Rtm) pack(dst, src r.Value) (err error) {
 		// one is a slice, and the other is not.
 		err = errutil.New("slice mismatch", dst, src)
 	} else {
-		dt, st := dst.Type(), src.Type()
+		dt := dst.Type()
+		st := src.Type()
 		if sliced {
 			// both are slices
 			if cfn := getCopyFun(dt.Elem(), st.Elem()); cfn != nil {
@@ -54,10 +57,13 @@ func (rtm *Rtm) pack(dst, src r.Value) (err error) {
 }
 
 func getCopyFun(dst, src r.Type) (ret packFun) {
-	//
 	switch {
 	case dst == src:
 		ret = copyDirect
+
+		//to bool from string
+	case dst.Kind() == r.Bool && src.Kind() == r.String:
+		ret = boolFromString
 
 	case kindOf.IdentId(dst):
 		ret = idFromObj
@@ -96,24 +102,38 @@ func getCopyFun(dst, src r.Type) (ret packFun) {
 			}
 		}
 
-		// given an eval, presumably asking for a primitive
-		// ( ex. reading a specific struct ptr implementation of an interface )
-	case src.Kind() == r.Ptr:
+		// given an eval, dst is presumably a primitive
+		// NOTE: some sources support multiple eval interfaces:
+		// ex. core.Get, rules.Determine, express.Render, express.GetAt.
+		// so: we have to test dst a bit too.
+		// ex. {determine pattern} -> which pattern
+		//
+		// FIX: in some cases, after we assign a pointer --
+		// the kind becomes "interface" when we evaluate it as a src later
+		// this probably has something to do with the way were copying
+		// itd be nice if src could only be tested against ptr --
+		// because thats whats really stored there.
+
+	case src.Kind() == r.Ptr || src.Kind() == r.Interface:
 		switch {
-		case kindOf.BoolEval(src):
-			ret = fromBoolEval
-		case kindOf.NumberEval(src):
-			ret = fromNumberEval
-		case kindOf.TextEval(src):
-			ret = fromTextEval
-		case kindOf.ObjectEval(src):
-			ret = fromObjEval
+		case kindOf.Bool(dst):
+			if kindOf.BoolEval(src) {
+				ret = boolFromEval
+			} else {
+				ret = boolFromPointer
+			}
+		case kindOf.NumberEval(src) && kindOf.Number(dst):
+			ret = numberFromEval
+		case kindOf.TextEval(src) && kindOf.String(dst):
+			ret = textFromEval
+		case kindOf.ObjectEval(src) && (kindOf.IdentId(dst) || kindOf.Object(dst)):
+			ret = objFromEval
 		case kindOf.NumListEval(src):
-			ret = fromNumListEval
+			ret = numbersFromEval
 		case kindOf.TextListEval(src):
-			ret = fromTextListEval
+			ret = textsFromEval
 		case kindOf.ObjListEval(src):
-			ret = fromObjListEval
+			ret = objectsFromEval
 		}
 	}
 	return
@@ -156,7 +176,19 @@ func idFromObj(rtm *Rtm, dst, src r.Value) (err error) {
 	dst.Set(r.ValueOf(id))
 	return
 }
-func fromBoolEval(rtm *Rtm, dst, src r.Value) (err error) {
+
+func boolFromString(rtm *Rtm, dst, src r.Value) (err error) {
+	str := src.String()
+	dst.SetBool(len(str) != 0)
+	return
+}
+
+// supports true/false from the existance of an eval in a slot.
+func boolFromPointer(rtm *Rtm, dst, src r.Value) (err error) {
+	dst.SetBool(!src.IsNil())
+	return
+}
+func boolFromEval(rtm *Rtm, dst, src r.Value) (err error) {
 	eval := src.Interface().(rt.BoolEval)
 	if v, e := eval.GetBool(rtm); e != nil {
 		err = e
@@ -165,7 +197,7 @@ func fromBoolEval(rtm *Rtm, dst, src r.Value) (err error) {
 	}
 	return
 }
-func fromNumberEval(rtm *Rtm, dst, src r.Value) (err error) {
+func numberFromEval(rtm *Rtm, dst, src r.Value) (err error) {
 	eval := src.Interface().(rt.NumberEval)
 	if v, e := eval.GetNumber(rtm); e != nil {
 		err = e
@@ -174,7 +206,7 @@ func fromNumberEval(rtm *Rtm, dst, src r.Value) (err error) {
 	}
 	return
 }
-func fromTextEval(rtm *Rtm, dst, src r.Value) (err error) {
+func textFromEval(rtm *Rtm, dst, src r.Value) (err error) {
 	eval := src.Interface().(rt.TextEval)
 	if v, e := eval.GetText(rtm); e != nil {
 		err = e
@@ -183,7 +215,7 @@ func fromTextEval(rtm *Rtm, dst, src r.Value) (err error) {
 	}
 	return
 }
-func fromObjEval(rtm *Rtm, dst, src r.Value) (err error) {
+func objFromEval(rtm *Rtm, dst, src r.Value) (err error) {
 	eval := src.Interface().(rt.ObjectEval)
 	if v, e := eval.GetObject(rtm); e != nil {
 		err = e
@@ -193,7 +225,7 @@ func fromObjEval(rtm *Rtm, dst, src r.Value) (err error) {
 	}
 	return
 }
-func fromNumListEval(rtm *Rtm, dst, src r.Value) (err error) {
+func numbersFromEval(rtm *Rtm, dst, src r.Value) (err error) {
 	eval := src.Interface().(rt.NumListEval)
 	if v, e := eval.GetNumberStream(rtm); e != nil {
 		err = e
@@ -202,7 +234,7 @@ func fromNumListEval(rtm *Rtm, dst, src r.Value) (err error) {
 	}
 	return
 }
-func fromTextListEval(rtm *Rtm, dst, src r.Value) (err error) {
+func textsFromEval(rtm *Rtm, dst, src r.Value) (err error) {
 	eval := src.Interface().(rt.TextListEval)
 	if v, e := eval.GetTextStream(rtm); e != nil {
 		err = e
@@ -211,7 +243,7 @@ func fromTextListEval(rtm *Rtm, dst, src r.Value) (err error) {
 	}
 	return
 }
-func fromObjListEval(rtm *Rtm, dst, src r.Value) (err error) {
+func objectsFromEval(rtm *Rtm, dst, src r.Value) (err error) {
 	eval := src.Interface().(rt.ObjListEval)
 	if v, e := eval.GetObjectStream(rtm); e != nil {
 		err = e

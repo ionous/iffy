@@ -2,10 +2,11 @@ package play
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/express"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/event/trigger"
 	"github.com/ionous/iffy/parser"
-	"github.com/ionous/iffy/pat/rule"
 )
 
 type Statement interface {
@@ -19,12 +20,13 @@ type Facts struct {
 	ObjectListeners []ListenTo
 	ClassListeners  []ListenFor
 	Locations       []Location
-	Mandates        rule.Mandates
+	Mandates        rules.Mandates
 }
 
 type Commands struct {
 	Core    core.Commands
-	Rules   rule.Commands
+	Express express.Commands
+	Rules   rules.Commands
 	Std     std.Commands
 	Parser  parser.Commands
 	Trigger trigger.Commands

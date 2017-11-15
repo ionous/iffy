@@ -6,52 +6,87 @@ import (
 	"strings"
 )
 
-// Bracket filters io.Writer, parenthesizing a stream of writes. Flush adds the closing paren.
-type Bracket struct {
-	io.Writer
-	cnt int
+// Bracket filters io.Writer, parenthesizing a stream of writes. Close adds the closing paren.
+func Bracket(w io.Writer) io.WriteCloser {
+	return &_Bracket{Writer: w}
 }
 
 // Capitalize filters io.Writer, capitalizing the first string.
-type Capitalize struct {
+func Capitalize(w io.Writer) io.Writer {
+	return &_Capitalize{Writer: w}
+}
+
+// Lowercase filters io.Writer, lowering every string.
+func Lowercase(w io.Writer) io.Writer {
+	return &_Lowercase{Writer: w}
+}
+
+// Slash filters io.Writer, separating writes with a slash.
+func Slash(w io.Writer) io.Writer {
+	return &_Slash{Writer: w}
+}
+
+// Spanning filters io.Writer as per Span, writing the final result to the passed buffer.
+func Spanning(w io.Writer) io.Writer {
+	return &_Spanning{w: w}
+}
+
+// TitleCase filters io.Writer, capitalizing every write.
+func TitleCase(w io.Writer) io.Writer {
+	return &_TitleCase{Writer: w}
+}
+
+type _Bracket struct {
 	io.Writer
 	cnt int
 }
 
-// Lowercase filters io.Writer, lowering every string.
-type Lowercase struct {
+type _Capitalize struct {
+	io.Writer
+	cnt int
+}
+
+type _Lowercase struct {
 	io.Writer
 }
 
-// Spanner filters io.Writer, accumulating writes via Span. Flush writes the Span to the writer as a single unit.
-type Spanner struct {
-	Writer io.Writer
+type _Slash struct {
+	io.Writer
+	cnt int
+}
+
+type _Spanning struct {
 	Span
+	w io.Writer
 }
 
-// TitleCase filters io.Writer, capitalizing every write.
-type TitleCase struct {
+type _TitleCase struct {
 	io.Writer
 }
 
-func (l *Bracket) Write(p []byte) (ret int, err error) {
+func (l *_Bracket) Write(p []byte) (ret int, err error) {
 	if l.cnt == 0 {
-		io.WriteString(l.Writer, "(")
+		n, e := io.WriteString(l.Writer, "(")
+		l.cnt += n
+		err = e
 	}
-	l.cnt++
-	return l.Writer.Write(p)
+	if err == nil {
+		ret, err = l.Writer.Write(p)
+		l.cnt += ret
+	}
+	return
+
 }
 
-// Flush to terminate the parenthesis.
-func (l *Bracket) Flush() (err error) {
+// Close to terminate the parenthesis.
+func (l *_Bracket) Close() (err error) {
 	if l.cnt > 0 {
-		_, e := io.WriteString(l.Writer, ")")
-		err = e
+		_, err = io.WriteString(l.Writer, ")")
 	}
 	return
 }
 
-func (l *Capitalize) Write(p []byte) (ret int, err error) {
+func (l *_Capitalize) Write(p []byte) (ret int, err error) {
 	if l.cnt == 0 {
 		ret, err = io.WriteString(l.Writer, lang.Capitalize((string(p))))
 	} else {
@@ -61,22 +96,29 @@ func (l *Capitalize) Write(p []byte) (ret int, err error) {
 	return
 }
 
-func (l *Lowercase) Write(p []byte) (int, error) {
+func (l *_Lowercase) Write(p []byte) (int, error) {
 	return io.WriteString(l.Writer, strings.ToLower((string(p))))
 }
 
-// Flush to terminate write the accumulated text.
-func (l *Spanner) Flush() (err error) {
-	if b := l.Bytes(); len(b) > 0 {
-		if _, e := l.Writer.Write(b); e != nil {
-			err = e
-		} else {
-			l.Span = Span{}
-		}
+func (l *_Slash) Write(p []byte) (ret int, err error) {
+	if l.cnt != 0 {
+		n, _ := io.WriteString(l.Writer, " /")
+		l.cnt += n
+	}
+	if err == nil {
+		ret, err = l.Writer.Write(p)
+		l.cnt += ret
 	}
 	return
 }
 
-func (l *TitleCase) Write(p []byte) (int, error) {
+func (l *_Spanning) Close() (err error) {
+	if l.Len() > 0 {
+		_, err = l.w.Write(l.Bytes())
+	}
+	return
+}
+
+func (l *_TitleCase) Write(p []byte) (int, error) {
 	return io.WriteString(l.Writer, lang.Capitalize(string(p)))
 }

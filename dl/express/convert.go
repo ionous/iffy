@@ -2,98 +2,258 @@ package express
 
 import (
 	"github.com/ionous/errutil"
-	"strconv"
-	// "github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/lang"
-	// "github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/spec"
-	"github.com/kr/pretty"
-	"go/ast"
-	"go/token"
+	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/template"
+	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
+	r "reflect"
 )
 
-type Hint bool
-
-func ConvertExpr(c spec.Slot, n ast.Expr) (err error) {
-	return convertExpr(c, n, false)
-}
-
-func convertExpr(c spec.Slot, n ast.Expr, hint Hint) (err error) {
-	switch n := n.(type) {
-	case *ast.BasicLit:
-		err = BasicLit(c, n)
-
-	case *ast.BinaryExpr:
-		err = BinaryExpr(c, n)
-
-	case *ast.Ident:
-		makeObject(c, n)
-
-	case *ast.SelectorExpr:
-		err = SelectorExpr(c, n, hint)
-
-	default:
-		err = errutil.New("unsupported node", pretty.Sprint(n))
-	}
-	return
-}
-
-func BasicLit(c spec.Slot, n *ast.BasicLit) (err error) {
-	switch t, v := n.Kind, n.Value; t {
-	case token.STRING:
-		c.Val(v)
-	case token.FLOAT, token.INT:
-		// "literally" doesnt translate text to numbers, so we have to do it manually:
-		if v, e := strconv.ParseFloat(v, 64); e != nil {
+// Express converts a postfix expression into iffy commands.
+func Convert(cmds *ops.Factory, xs template.Expression, gen names) (ret *ops.Command, err error) {
+	c := converter{cmds: cmds, gen: gen}
+	if e := c.convert(xs); e != nil {
+		err = e
+	} else if len(c.stack) == 0 {
+		err = errutil.New("empty output")
+	} else if len(c.stack) > 1 {
+		err = errutil.New("unparsed output")
+	} else if cmd := c.stack[0].(*ops.Command); cmd == nil {
+		err = errutil.New("convert returned nil")
+	} else if tgt := cmd.Target(); tgt.Type() == r.TypeOf((*ops.ShadowClass)(nil)) {
+		if det, e := c.cmds.CreateCommand("determine"); e != nil {
+			err = e
+		} else if e := det.Position(cmd); e != nil {
 			err = e
 		} else {
-			c.Cmd("num", v)
+			ret = det
+		}
+	} else {
+		ret = cmd
+	}
+	return
+}
+
+type converter struct {
+	cmds  *ops.Factory
+	stack []interface{}
+	gen   names
+}
+
+func (c *converter) convert(xs template.Expression) (err error) {
+	for _, fn := range xs {
+		if e := c.addFunction(fn); e != nil {
+			err = e
+			break
+		}
+	}
+	return
+}
+
+// add a new command pointer to the output stack.
+func (c *converter) push(cmd *ops.Command) {
+	c.stack = append(c.stack, cmd)
+}
+
+// extract cnt commands from the converter stack.
+func (c *converter) pop(cnt int) (ret []interface{}, err error) {
+	if end := len(c.stack) - cnt; end < 0 {
+		err = errutil.New("stack underflow")
+	} else {
+		ret, c.stack = c.stack[end:], c.stack[:end]
+	}
+	return
+}
+
+func (c *converter) binary(i interface{}) (err error) {
+	if args, e := c.pop(2); e != nil {
+		err = e
+	} else if cmd, e := c.cmds.EmplaceCommand(i); e != nil {
+		err = e
+	} else {
+		err = c.pushCommand(cmd, args...)
+	}
+	return
+}
+
+// adds a comparision statement to the output.
+// FIX FIX we have to know the type: num,text,obj of the properties in question
+// need more information on properties.
+func (c *converter) compare(cmp core.CompareTo) (err error) {
+	if args, e := c.pop(2); e != nil {
+		err = e
+	} else if cmd, e := c.cmds.EmplaceCommand(&core.CompareText{}); e != nil {
+		err = e
+	} else {
+		// as an alternative to this custom code, we could name arguments for every command.
+		// ex. MUL: {cmd:Mul, args: "A", "B" }, CompareText[ A, B ]
+		// wed still have to have an initalizer or something for "cmp".
+		err = c.pushCommand(cmd, args[0], cmp, args[1])
+	}
+	return
+}
+
+// add the passed args to the passed command in order; then push the command.
+func (c *converter) pushCommand(cmd *ops.Command, args ...interface{}) (err error) {
+	if e := assign(cmd, args); e != nil {
+		err = e
+	} else {
+		c.push(cmd)
+	}
+	return
+}
+
+// add the passed args to the passed command in order.
+func assign(cmd *ops.Command, args []interface{}) (err error) {
+	for _, arg := range args {
+		if e := cmd.Position(arg); e != nil {
+			err = errutil.Fmt("couldnt assign %s to %s, because %s", arg, cmd, e)
+			break
+		}
+	}
+	return
+}
+
+func (c *converter) create(name string, args int) (err error) {
+	if cmd, e := c.cmds.CreateCommand(name); e != nil {
+		err = e
+	} else if args, e := c.pop(args); e != nil {
+		err = e
+	} else {
+		err = c.pushCommand(cmd, args...)
+	}
+	return
+}
+
+// name is "shuffle", etc.
+// c.Cmd("say", c.Cmd("shuffle text",
+// 		gen.NewName("shuffle counter"),
+// 		sliceOf.String("a", "b", "c"),
+// 	))
+func (c *converter) sequence(name string, args int) (err error) {
+	text := name + " text"
+	counter := name + " counter"
+	if cmd, e := c.cmds.CreateCommand(text); e != nil {
+		err = e
+	} else {
+		name := c.gen.NewName(counter)
+		if e := cmd.Position(name); e != nil {
+			err = e
+		} else if args, e := c.pop(args); e != nil {
+			err = e
+		} else {
+			err = c.pushCommand(cmd, args...)
+		}
+	}
+	return
+}
+
+// convert the passed function into iffy commands.
+func (c *converter) addFunction(fn postfix.Function) (err error) {
+	switch fn := fn.(type) {
+	case types.Quote:
+		if cmd, e := c.cmds.EmplaceCommand(&core.Text{fn.Value()}); e != nil {
+			err = e
+		} else {
+			c.push(cmd)
+		}
+
+	case types.Number:
+		if cmd, e := c.cmds.EmplaceCommand(&core.Num{fn.Value()}); e != nil {
+			err = e
+		} else {
+			c.push(cmd)
+		}
+
+	case types.Reference:
+		if fields := fn.Value(); len(fields) == 0 {
+			err = errutil.New("empty reference")
+		} else {
+			// obj.a.b.c => Get{c Get{b Get{a GetAt{obj}}}}
+			var op rt.ObjectEval
+			if name := fields[0]; lang.IsCapitalized(name) {
+				op = &core.Object{name}
+			} else {
+				op = &GetAt{name}
+			}
+			for _, field := range fields[1:] {
+				op = &Render{op, field}
+			}
+			if cmd, e := c.cmds.EmplaceCommand(op); e != nil {
+				err = e
+			} else {
+				c.push(cmd)
+			}
+		}
+
+	case types.Command:
+		err = c.create(fn.CommandName, fn.CommandArity)
+
+	case types.Builtin:
+		switch k := fn.Type; k {
+		case types.Span:
+			err = c.create("join", fn.ParameterCount)
+		case types.Stopping:
+			err = c.sequence("stopping", fn.ParameterCount)
+		case types.Shuffle:
+			err = c.sequence("shuffle", fn.ParameterCount)
+		case types.Cycle:
+			err = c.sequence("cycle", fn.ParameterCount)
+		case types.IfStatement:
+			// choose by hint?
+			err = c.create("choose text", fn.ParameterCount)
+		case types.UnlessStatement:
+			if args, e := c.pop(fn.ParameterCount); e != nil {
+			} else if cmd, e := c.cmds.CreateCommand("is not"); e != nil {
+				err = e
+			} else if e := cmd.Position(args[0]); e != nil {
+				err = e
+			} else {
+				args[0] = cmd
+				if cmd, e := c.cmds.CreateCommand("choose text"); e != nil {
+					err = e
+				} else {
+					err = c.pushCommand(cmd, args...)
+				}
+			}
+		}
+
+	case types.Operator:
+		switch fn {
+		case types.MUL:
+			err = c.binary(&core.Mul{})
+		case types.QUO:
+			err = c.binary(&core.Div{})
+		case types.REM:
+			err = c.binary(&core.Mod{})
+		case types.ADD:
+			err = c.binary(&core.Add{})
+		case types.SUB:
+			err = c.binary(&core.Sub{})
+		case types.EQL:
+			err = c.compare(&core.EqualTo{})
+		case types.NEQ:
+			err = c.compare(&core.NotEqualTo{})
+		case types.LSS:
+			err = c.compare(&core.LesserThan{})
+		case types.LEQ:
+			err = c.compare(&core.LesserThanOrEqualTo{})
+		case types.GTR:
+			err = c.compare(&core.GreaterThan{})
+		case types.GEQ:
+			err = c.compare(&core.GreaterThanOrEqualTo{})
+		case types.LAND:
+			err = c.binary(&core.AllTrue{})
+		case types.LOR:
+			err = c.binary(&core.AnyTrue{})
+		default:
+			err = errutil.Fmt("unknown operator %s", fn)
 		}
 	default:
-		//token.IMAG, token.CHAR,
-		err = errutil.New("unsupported literal token", t)
+		err = errutil.Fmt("unknown function %T", fn)
 	}
 	return
-}
-
-func BinaryExpr(c spec.Slot, n *ast.BinaryExpr) (err error) {
-	if op, ok := binaryMath[n.Op]; !ok {
-		err = errutil.New("unsupported operation", n.Op)
-	} else if c := c.Cmd(op); c.Begin() {
-		ConvertExpr(c, n.X)
-		ConvertExpr(c, n.Y)
-		c.End()
-	}
-	return
-}
-
-var binaryMath = map[token.Token]string{
-	token.ADD: "add",
-	token.SUB: "sub",
-	token.MUL: "mul",
-	token.QUO: "div",
-	token.REM: "mod",
-}
-
-func SelectorExpr(c spec.Slot, n *ast.SelectorExpr, hint Hint) (err error) {
-	var cmd string
-	if !hint {
-		cmd = "get"
-	} else {
-		cmd = "render"
-	}
-	if c := c.Cmd(cmd); c.Begin() {
-		ConvertExpr(c.Param("obj"), n.X)
-		c.Param("prop").Val(n.Sel.Name)
-		c.End()
-	}
-	return
-}
-
-func makeObject(c spec.Slot, n *ast.Ident) {
-	if name := n.Name; lang.IsCapitalized(name) {
-		c.Cmd("global", name)
-	} else {
-		c.Cmd("get at", name)
-	}
 }

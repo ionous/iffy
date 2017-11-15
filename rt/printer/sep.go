@@ -13,14 +13,14 @@ type Sep struct {
 }
 
 // AndSeparator creates a phrase: a, b, c, and d.
-// Note: spacing between words is left to printer.Span.
-func AndSeparator(w io.Writer) *Sep {
+// Note: spacing between words is left to printer.Spacing.
+func AndSeparator(w io.Writer) io.WriteCloser {
 	return &Sep{Writer: w, last: "and"}
 }
 
 // OrSeparator creates a phrase: a, b, c, or d.
-// Note: spacing between words is left to printer.Span.
-func OrSeparator(w io.Writer) *Sep {
+// Note: spacing between words is left to printer.Spacing.
+func OrSeparator(w io.Writer) io.WriteCloser {
 	return &Sep{Writer: w, last: "or"}
 }
 
@@ -36,8 +36,8 @@ func (l *Sep) Write(p []byte) (ret int, err error) {
 	return
 }
 
-// Flush writes all pending lines with appropriate separators.
-func (l *Sep) Flush() error {
+// Close writes all pending lines with appropriate separators.
+func (l *Sep) Close() error {
 	var fini string
 	if l.cnt > 1 {
 		fini = ", " + l.last

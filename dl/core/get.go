@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/rt/stream"
 )
 
-// Get retrieves a value from an object.
+// Get a property value from an object by name.
 // FIX: test all forms of Get/Set
 type Get struct {
 	Obj  rt.ObjectEval
@@ -46,7 +46,7 @@ func (p *Get) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
 	if e := p.get(run, &values); e != nil {
 		err = e
 	} else {
-		ret = stream.NewNumberStream(values)
+		ret = stream.NewNumberStream(stream.FromList(values))
 	}
 	return
 }
@@ -56,7 +56,7 @@ func (p *Get) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
 	if e := p.get(run, &values); e != nil {
 		err = e
 	} else {
-		ret = stream.NewTextStream(values)
+		ret = stream.NewTextStream(stream.FromList(values))
 	}
 	return
 }
@@ -66,7 +66,7 @@ func (p *Get) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error) {
 	if e := p.get(run, &values); e != nil {
 		err = e
 	} else {
-		ret = stream.NewObjectStream(values)
+		ret = stream.NewObjectStream(stream.FromList(values))
 	}
 	return
 }

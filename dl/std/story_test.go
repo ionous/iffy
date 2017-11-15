@@ -4,10 +4,10 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/locate"
+	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/index"
-	"github.com/ionous/iffy/pat/rule"
 	"github.com/ionous/iffy/ref/obj"
 	"github.com/ionous/iffy/ref/rel"
 	"github.com/ionous/iffy/ref/unique"
@@ -18,10 +18,11 @@ import (
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/sliceOf"
 	"github.com/kr/pretty"
+	"strings"
 	"testing"
 )
 
-func TestStory(t *testing.T) {
+func xTestStory(t *testing.T) {
 	classes := make(unique.Types)                 // all types known to iffy
 	cmds := ops.NewOps(classes)                   // all shadow types become classes
 	patterns := unique.NewStack(cmds.ShadowTypes) // all patterns are shadow types
@@ -30,7 +31,7 @@ func TestStory(t *testing.T) {
 		(*core.Commands)(nil),
 		(*std.Commands)(nil),
 		(*express.Commands)(nil),
-		(*rule.Commands)(nil),
+		(*rules.Commands)(nil),
 	)
 	unique.PanicBlocks(classes,
 		(*std.Classes)(nil))
@@ -38,15 +39,16 @@ func TestStory(t *testing.T) {
 	unique.PanicBlocks(patterns,
 		(*std.Patterns)(nil))
 
-	objects := obj.NewObjects()
-	unique.PanicValues(objects,
-		&std.Story{Name: "story"},
+	var objects obj.Registry
+	story := &std.Story{Name: "story"}
+	objects.RegisterValues(sliceOf.Interface(
+		story,
 		&std.Room{Kind: std.Kind{Name: "room"}},
 		&std.Pawn{"pawn", ident.IdOf("me")},
 		&std.Actor{std.Thing{Kind: std.Kind{Name: "me"}}},
-	)
-	xform := express.MakeXform(cmds)
-	rules, e := rule.Master(cmds, xform, patterns, std.Rules)
+	))
+	xform := express.NewTransform(cmds, nil)
+	rules, e := rules.Master(cmds, xform, patterns, std.Rules)
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -55,7 +57,10 @@ func TestStory(t *testing.T) {
 	pc := locate.Locale{index.NewTable(index.OneToMany)}
 	relations.AddTable("locale", pc.Table)
 
-	run := rtm.New(classes).Objects(objects).Relations(relations).Rules(rules).Rtm()
+	run, e := rtm.New(classes).Objects(objects).Relations(relations).Rules(rules).Rtm()
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	Object := func(name string) rt.Object {
 		ret, ok := run.GetObject(name)
@@ -71,22 +76,18 @@ func TestStory(t *testing.T) {
 	match := func(t *testing.T, expected string, fn func(spec.Block)) {
 		var root struct{ rt.ExecuteList }
 		c := cmds.NewBuilder(&root, xform)
-		if e := c.Build(func(c spec.Block) {
-			if c.Cmds().Begin() {
-				fn(c)
-				c.End()
-			}
-		}); e != nil {
+		if e := c.Build(fn); e != nil {
 			t.Fatal(e)
 		} else {
-			t.Log(pretty.Sprint(root.ExecuteList))
+			// t.Log(pretty.Sprint(root.ExecuteList))
 			var lines printer.Lines
-			run := rt.Writer(run, &lines)
-			if e := root.Execute(run); e != nil {
+			if e := rt.WritersBlock(run, &lines, func() error {
+				return root.Execute(run)
+			}); e != nil {
 				t.Fatal(e)
 			} else {
-				l := lines.Lines()
-				if d := pretty.Diff(sliceOf.String(expected), l); len(d) > 0 {
+				l := strings.Join(lines.Lines(), "\n")
+				if d := pretty.Diff(expected, l); len(d) > 0 {
 					t.Log("expected", expected)
 					t.Log("got", l)
 					t.Fatal(d)
@@ -109,7 +110,7 @@ func TestStory(t *testing.T) {
 	})
 	t.Run("status left", func(t *testing.T) {
 		match(t, "room", func(c spec.Block) {
-			c.Cmd("set text", "story", "status left", "{go determine playerSurroundings}")
+			c.Cmd("set text", "story", "status left", "{determine playerSurroundings}")
 			c.Cmd("say", "{story.statusLeft}")
 		})
 	})
@@ -119,4 +120,31 @@ func TestStory(t *testing.T) {
 			c.Cmd("say", "{story.statusRight}")
 		})
 	})
+	t.Run("banner defaults", func(t *testing.T) {
+		x := strings.Join(sliceOf.String(
+			"Welcome",
+			"An interactive fiction",
+			"Release 0.0.0 / Iffy 1.0",
+		), "\n")
+		match(t, x, func(c spec.Block) {
+			c.Cmd("determine", c.Cmd("print banner text"))
+		})
+	})
+	t.Run("banner text", func(t *testing.T) {
+		story.Title = "Curses"
+		story.Author = "An other mouse"
+		story.MajorVersion = 1
+		story.MinorVersion = 2
+		story.PatchVersion = 3
+		story.SerialNumber = "YYMMDD"
+		x := strings.Join(sliceOf.String(
+			"Curses",
+			"An interactive fiction by An other mouse",
+			"Release 1.2.3 / YYMMDD / Iffy 1.0",
+		), "\n")
+		match(t, x, func(c spec.Block) {
+			c.Cmd("determine", c.Cmd("print banner text"))
+		})
+	})
+
 }

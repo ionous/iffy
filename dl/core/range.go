@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 )
 
 // Range generates a series of float values.
@@ -22,27 +23,13 @@ func (l *Range) GetNumberStream(rt.Runtime) (rt.NumberStream, error) {
 		end = start
 		start = 0
 	}
-	return &RangeIt{
-		idx:  start,
-		end:  end,
-		step: step,
-	}, nil
-}
-
-type RangeIt struct {
-	idx, end, step int
-}
-
-func (it *RangeIt) HasNext() bool {
-	return it.idx < it.end
-}
-
-func (it *RangeIt) GetNext() (ret float64, err error) {
-	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else {
-		ret = float64(it.idx)
-		it.idx += it.step
-	}
-	return
+	var idx int
+	return stream.NewNumberStream(func() (ret interface{}, okay bool) {
+		if idx < end {
+			v := float64(idx)
+			idx += step
+			ret, okay = stream.Value(v)
+		}
+		return
+	}), nil
 }

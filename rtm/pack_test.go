@@ -1,10 +1,10 @@
-package rtm
+package rtm_test
 
 import (
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/obj"
-	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rtm"
 	. "github.com/ionous/iffy/tests"
 	testify "github.com/stretchr/testify/assert"
 	"testing"
@@ -15,11 +15,11 @@ func TestRegistration(t *testing.T) {
 	assert := testify.New(t)
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
-	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
-	if n, ok := rtm.GetObject("first"); assert.True(ok) {
+	run := newRuntime(first, second)
+	if n, ok := run.GetObject("first"); assert.True(ok) {
 		assert.Equal(ident.IdOf("$first"), n.Id())
 	}
-	if d, ok := rtm.GetObject("second"); assert.True(ok) {
+	if d, ok := run.GetObject("second"); assert.True(ok) {
 		assert.Equal(ident.IdOf("$second"), d.Id())
 	}
 }
@@ -30,9 +30,9 @@ func TestStateAccess(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe}}
 	//
-	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
+	run := newRuntime(first, second)
 	test := func(name, prop string, value bool) {
-		if obj, ok := rtm.GetObject(name); assert.True(ok) {
+		if obj, ok := run.GetObject(name); assert.True(ok) {
 			var res bool
 			if e := obj.GetValue(prop, &res); assert.NoError(e) {
 				if !assert.Equal(value, res) {
@@ -59,7 +59,7 @@ func TestStateSet(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true, Object: ident.IdOf("second")}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe, Object: ident.IdOf("first")}}
 
-	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
+	run := newRuntime(first, second)
 	unpackValue := func(obj rt.Object, name string, pv interface{}) {
 		if e := obj.GetValue(name, pv); e != nil {
 			panic(e)
@@ -71,7 +71,7 @@ func TestStateSet(t *testing.T) {
 		}
 	}
 
-	if n, ok := rtm.GetObject("first"); assert.True(ok) {
+	if n, ok := run.GetObject("first"); assert.True(ok) {
 		var res bool
 		// start with yes, it should be true
 		unpackValue(n, "yes", &res)
@@ -110,7 +110,7 @@ func TestStateSet(t *testing.T) {
 	}
 	// check, change, and check the labeled bool.
 	toggle := func(name, prop string, goal bool) {
-		if n, ok := rtm.GetObject(name); assert.True(ok) {
+		if n, ok := run.GetObject(name); assert.True(ok) {
 			var res bool
 			unpackValue(n, prop, &res)
 			if assert.NotEqual(goal, res, "initial value") {
@@ -124,17 +124,21 @@ func TestStateSet(t *testing.T) {
 	toggle("second", "labeled", false)
 }
 
-func newObjects(ptrs ...interface{}) *obj.ObjBuilder {
-	reg := obj.NewObjects()
-	unique.PanicValues(reg, ptrs...)
-	return reg
+func newRuntime(ptrs ...interface{}) rt.Runtime {
+	var objects obj.Registry
+	objects.RegisterValues(ptrs)
+	run, e := rtm.New(nil).Objects(objects).Rtm()
+	if e != nil {
+		panic(e)
+	}
+	return run
 }
 
 // TestPropertyAccess to ensure normal properties are accessible
 func TestPropertyAccess(t *testing.T) {
 	first := &BaseClass{Name: "first", State: Yes, Labeled: true, Object: ident.IdOf("second")}
 	second := &DerivedClass{BaseClass{Name: "second", State: Maybe, Object: ident.IdOf("first")}}
-	rtm := New(nil).Objects(newObjects(first, second)).Rtm()
+	run := newRuntime(first, second)
 
 	// we create some slots for values to be unpacked into
 	var expected = []struct {
@@ -146,7 +150,7 @@ func TestPropertyAccess(t *testing.T) {
 		{"Text", new(string)},
 		{"Object", new(rt.Object)},
 		{"Nums", new([]float64)},
-		{"Texts", new([]string)},
+		{"Strings", new([]string)},
 		{"Objects", new([]rt.Object)},
 	}
 	test := func(n rt.Object) (err error) {
@@ -160,8 +164,8 @@ func TestPropertyAccess(t *testing.T) {
 	}
 	//
 	assert := testify.New(t)
-	if n, ok := rtm.GetObject("first"); assert.True(ok) {
-		if d, ok := rtm.GetObject("second"); assert.True(ok) {
+	if n, ok := run.GetObject("first"); assert.True(ok) {
+		if d, ok := run.GetObject("second"); assert.True(ok) {
 			// from n get d:
 			if e := test(n); assert.NoError(e) {
 				other := (*expected[3].pv.(*rt.Object))

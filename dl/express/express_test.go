@@ -5,124 +5,90 @@ import (
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
+	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"
 	testify "github.com/stretchr/testify/assert"
-	"go/ast"
-	"go/parser"
 	"testing"
 )
 
-func TestExpr(t *testing.T) {
-	const (
-		literalStr   = "5"
-		noDotStr     = "A"
-		bigDotStr    = "A.num"
-		littleDotStr = "a.b.c"
-		binaryStr    = "A.num * B.num"
-		chainStr     = "5 + A.num * B.num"
-		// paren      = "(A.num) * (B.num + 5)"
-	)
+func TestExpress(t *testing.T) {
+	// A.num
+	bigDot := &Render{&core.Object{"A"}, "num"}
+	// A.num * B.num
+	binary := &core.Mul{
+		bigDot,
+		&Render{&core.Object{"B"}, "num"},
+	}
+	//
+	tests := []struct {
+		name string
+		str  string
+		want interface{}
+	}{
+		{"literal", "5", &core.Num{5}},
+		{"no dot", "A", &core.Object{"A"}},
+		{"little dot", "a.b.c",
+			&Render{
+				Obj: &Render{
+					Obj:  &GetAt{"a"},
+					Prop: "b",
+				},
+				Prop: "c",
+			},
+		},
+		{"big dot", "A.num", bigDot},
+		{"binary", "A.num * B.num", binary},
+		{"chain", "5 + A.num * B.num",
+			&core.Add{
+				&core.Num{5},
+				binary,
+			},
+		},
+		{"math", "(5+6)*(1+2)",
+			&core.Mul{
+				&core.Add{
+					&core.Num{5},
+					&core.Num{6},
+				},
+				&core.Add{
+					&core.Num{1},
+					&core.Num{2},
+				},
+			},
+		},
+		{"logic",
+			"a and (b or {isNot: c})", &core.AllTrue{[]rt.BoolEval{
+				&GetAt{"a"},
+				&core.AnyTrue{[]rt.BoolEval{
+					&GetAt{"b"},
+					&core.IsNot{
+						&GetAt{"c"},
+					},
+				}},
+			}},
+		},
+	}
 	cmds := ops.NewOps(nil)
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*Commands)(nil))
-
-	t.Run("literal", func(t *testing.T) {
-		var root struct{ rt.NumberEval }
-		nconvert(t, cmds, &root, nparse(t, literalStr))
-		testEqual(t, literalFn(), root.NumberEval)
-	})
-	t.Run("no dot", func(t *testing.T) {
-		var root struct{ rt.ObjectEval }
-		nconvert(t, cmds, &root, nparse(t, noDotStr))
-		testEqual(t, noDotFn(), root.ObjectEval)
-	})
-	t.Run("big dot", func(t *testing.T) {
-		var root struct{ rt.ObjectEval }
-		nconvert(t, cmds, &root, nparse(t, bigDotStr))
-		testEqual(t, bigDotFn(), root.ObjectEval)
-	})
-	t.Run("little dot", func(t *testing.T) {
-		var root struct{ rt.ObjectEval }
-		nconvert(t, cmds, &root, nparse(t, littleDotStr))
-		testEqual(t, littleDotFn(), root.ObjectEval)
-	})
-	t.Run("binary", func(t *testing.T) {
-		var root struct{ rt.NumberEval }
-		nconvert(t, cmds, &root, nparse(t, binaryStr))
-		testEqual(t, binaryFn(), root.NumberEval)
-	})
-	t.Run("chain", func(t *testing.T) {
-		var root struct{ rt.NumberEval }
-		nconvert(t, cmds, &root, nparse(t, chainStr))
-		testEqual(t, chainFn(), root.NumberEval)
-	})
-}
-
-func testEqual(t *testing.T, expect, res interface{}) {
-	if !testify.ObjectsAreEqualValues(expect, res) {
-		// res != expect
-		t.Log(pretty.Diff(res, expect))
-		t.Log("got:", pretty.Sprint(res))
-		t.Log("want:", pretty.Sprint(expect))
-		t.FailNow()
-	}
-}
-
-func nparse(t *testing.T, s string) (ret ast.Expr) {
-	if a, e := parser.ParseExpr(s); e != nil {
-		t.Fatal(e)
-	} else {
-		ret = a
-	}
-	return
-}
-
-func nconvert(t *testing.T, cmds *ops.Ops, dst interface{}, n ast.Expr) {
-	c := cmds.NewBuilder(dst, core.Xform{})
-	if e := ConvertExpr(c, n); e != nil {
-		t.Fatal(e, pretty.Sprint(n))
-	} else if e := c.Build(); e != nil {
-		t.Fatal(e, pretty.Sprint(n))
-	}
-	return
-}
-
-func literalFn() rt.NumberEval {
-	return &core.Num{5}
-}
-func noDotFn() rt.ObjectEval {
-	return &core.Global{"A"}
-}
-func bigDotFn() rt.NumberEval {
-	return &core.Get{
-		Obj:  &core.Global{"A"},
-		Prop: "num",
-	}
-}
-func littleDotFn() rt.NumberEval {
-	return &core.Get{
-		Obj: &core.Get{
-			Obj:  &GetAt{"a"},
-			Prop: "b",
-		},
-		Prop: "c",
-	}
-}
-
-func binaryFn() rt.NumberEval {
-	return &core.Mul{
-		bigDotFn(),
-		&core.Get{
-			Obj:  &core.Global{"B"},
-			Prop: "num",
-		},
-	}
-}
-
-func chainFn() rt.NumberEval {
-	return &core.Add{
-		literalFn(),
-		binaryFn(),
+	fac := ops.NewFactory(cmds, ops.Transformer(core.Transform))
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if xs, e := template.ParseExpression(test.str); e != nil {
+				t.Fatal(e)
+			} else if res, e := Convert(fac, xs, nil); e != nil {
+				t.Fatal(e)
+			} else {
+				got := res.Target().Interface()
+				if want := test.want; !testify.ObjectsAreEqualValues(want, got) {
+					// got != want
+					t.Log(pretty.Diff(got, want))
+					t.Log("got:", pretty.Sprint(got))
+					t.Log("want:", pretty.Sprint(want))
+					t.FailNow()
+				}
+			}
+		})
 	}
 }

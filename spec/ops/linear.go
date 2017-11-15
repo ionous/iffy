@@ -11,8 +11,9 @@ func NewTarget(rtype r.Type) Linear {
 	return inplace(rval)
 }
 
-func InPlace(root interface{}) Linear {
-	target := r.ValueOf(root).Elem()
+//
+func InPlace(ptr interface{}) Linear {
+	target := r.ValueOf(ptr).Elem()
 	return inplace(target)
 }
 

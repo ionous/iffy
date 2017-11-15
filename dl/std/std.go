@@ -15,17 +15,31 @@ type Classes struct {
 	*Story
 }
 
+// FIX? maybe the expected return of the pattern can be specified here via struct tags.
 type Patterns struct {
+	*Commence
+	*CommonObjects
+	*ConstructStatusLine
+	*DescribeObject
 	*group.GroupTogether
-	*group.PrintGroup
+	*IsNotableEnclosure
+	*IsNotableScenery
+	*IsUnremarkable
+	*NotableObjects
+	*PlayerSurroundings
+	*PrintBannerText
+	*PrintContent
+	*PrintLocation
 	*PrintName
+	*PrintObject
+	*group.PrintGroup
 	*PrintPluralName
 	*PrintSeveral
-	*PrintObject
 	*PrintSummary
-	*PrintContent
-	*Commence
-	*PlayerSurroundings
+	*VisibleParents
+	*Children
+	*Parents
+
 	// *DescribeFirstRoom
 	// *EndTurn
 	// *PrintBanner
@@ -36,15 +50,16 @@ type Patterns struct {
 
 type Commands struct {
 	// Runtime
+	*DescribeLocation
+	*locate.LocationOf
+	*LowerAn
+	*LowerThe
+	*Pluralize
 	*PrintNondescriptObjects
 	*PrintObjects
-	*UpperThe
-	*LowerThe
 	*UpperAn
-	*LowerAn
-	*Pluralize
+	*UpperThe
 	// Pluralizer
 	*PluralRule
 	*Player
-	*locate.LocationOf
 }

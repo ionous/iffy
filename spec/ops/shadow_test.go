@@ -17,7 +17,6 @@ import (
 )
 
 func TestShadows(t *testing.T) {
-	assert := testify.New(t)
 	classes := make(unique.Types)
 	cmds := ops.NewOps(classes)
 
@@ -31,7 +30,7 @@ func TestShadows(t *testing.T) {
 		Num    rt.NumberEval
 		Object rt.ObjectEval
 	}
-	c := cmds.NewBuilder(&root, core.Xform{})
+	c := cmds.NewBuilder(&root, ops.Transformer(ops.Transformer(core.Transform)))
 	// FIX: without the cmd -- it doesnt error.
 	// FIX: and what about using the same param twice?
 	c.Cmd("add", 1, 2)
@@ -39,7 +38,7 @@ func TestShadows(t *testing.T) {
 		c.Param("Num").Cmd("add", 1, 2)
 		c.Param("Text").Val("3")
 		c.Param("Nums").Val(sliceOf.Float(1, 2, 3))
-		c.Param("Texts").Val(sliceOf.String("1", "2", "3"))
+		c.Param("Strings").Val(sliceOf.String("1", "2", "3"))
 		c.Param("State").Val(Maybe) // Note: this turns State into a NumEval
 		c.Param("Labeled").Cmd("is not", false)
 		c.Param("Object").Val("other")
@@ -51,29 +50,31 @@ func TestShadows(t *testing.T) {
 		t.Fatal(e)
 	}
 
-	objects := obj.NewObjects()
+	var objects obj.Registry
 	base, other := &BaseClass{Name: "base"}, &BaseClass{Name: "other"}
-	unique.PanicValues(objects,
-		base, other,
-	)
+	objects.RegisterValues(sliceOf.Interface(base, other))
+	//
 	var lines printer.Lines
-	run := rtm.New(classes).Objects(objects).Writer(&lines).Rtm()
-	// "shadow class tests.BaseClass couldn't create object"
-	if obj, e := root.Object.GetObject(run); assert.NoError(e) {
+	if run, e := rtm.New(classes).Objects(objects).Writer(&lines).Rtm(); e != nil {
+		t.Fatal(e)
+	} else if obj, e := root.Object.GetObject(run); e != nil {
+		t.Fatal(e)
+	} else {
 		baseId, otherId := ident.IdOf("base"), ident.IdOf("other")
 		vals := map[string]struct{ match, fail interface{} }{
 			"Num":     {3, 5},
 			"Text":    {"3", "5"},
 			"Object":  {otherId, baseId},
 			"Nums":    {sliceOf.Float(1, 2, 3), sliceOf.Float(3, 2, 1)},
-			"Texts":   {sliceOf.String("1", "2", "3"), sliceOf.String("3")},
+			"Strings": {sliceOf.String("1", "2", "3"), sliceOf.String("3")},
 			"Objects": {[]ident.Id{baseId, otherId}, []ident.Id{baseId}},
 			"State":   {Maybe, Yes},
 			"Labeled": {true, false},
 		}
 		for name, test := range vals {
 			cp := r.New(r.ValueOf(test.match).Type()).Elem()
-			if e := obj.GetValue(name, cp.Addr().Interface()); !assert.NoError(e) {
+			if e := obj.GetValue(name, cp.Addr().Interface()); e != nil {
+				t.Fatal(e)
 				break
 			} else if !testify.ObjectsAreEqualValues(test.match, cp.Interface()) {
 				t.Fatal("failed to match", name)

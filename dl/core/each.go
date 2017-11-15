@@ -15,12 +15,14 @@ type Len struct {
 }
 
 func (op *Len) GetNumber(run rt.Runtime) (ret float64, err error) {
+	// FIX? the downside of returning an iterator rather than a stream source is that we cant easily
+	// ask the length of the source -- we have to count the elements via iteration.
 	if os, e := op.List.GetObjectStream(run); e != nil {
 		err = e
-	} else if l, ok := os.(stream.Len); !ok {
+	} else if l, ok := os.(stream.Count); !ok {
 		err = errutil.Fmt("unknown list type %T", os)
 	} else {
-		ret = float64(l.Len())
+		ret = float64(l.Count())
 	}
 	return
 }
@@ -69,7 +71,7 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 	} else {
 		l := MakeLooper(run, &NumberCounter{}, f.Go)
 		for it.HasNext() {
-			if v, e := it.GetNext(); e != nil {
+			if v, e := it.GetNumber(); e != nil {
 				err = errutil.New("failed each num get", e)
 				break
 			} else if e := l.RunNext("Num", v, it.HasNext()); e != nil {
@@ -77,6 +79,7 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 				break
 			}
 		}
+		l.pop()
 	}
 	return
 }
@@ -99,7 +102,7 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	} else {
 		l := MakeLooper(run, &TextCounter{}, f.Go)
 		for it.HasNext() {
-			if v, e := it.GetNext(); e != nil {
+			if v, e := it.GetText(); e != nil {
 				err = errutil.New("failed each text get", e)
 				break
 			} else if e := l.RunNext("Text", v, it.HasNext()); e != nil {
@@ -107,6 +110,7 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 				break
 			}
 		}
+		l.pop()
 	}
 	return
 }
@@ -129,7 +133,7 @@ func (f *ForEachObj) Execute(run rt.Runtime) (err error) {
 	} else {
 		l := MakeLooper(run, &ObjCounter{}, f.Go)
 		for it.HasNext() {
-			if v, e := it.GetNext(); e != nil {
+			if v, e := it.GetObject(); e != nil {
 				err = errutil.New("failed for each obj get", e)
 				break
 			} else if e := l.RunNext("Obj", v, it.HasNext()); e != nil {
@@ -137,6 +141,7 @@ func (f *ForEachObj) Execute(run rt.Runtime) (err error) {
 				break
 			}
 		}
+		l.pop()
 	}
 	return
 }

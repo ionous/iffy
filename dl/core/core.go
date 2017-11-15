@@ -4,9 +4,6 @@ type Classes struct {
 	*NumberCounter
 	*TextCounter
 	*ObjCounter
-}
-
-type Counters struct {
 	*CycleCounter
 	*ShuffleCounter
 	*StoppingCounter
@@ -23,38 +20,37 @@ type Commands struct {
 	*AnyTrue
 	*Bool
 	*Buffer
-	*SetState
 	*Choose
 	*ChooseNum
 	*ChooseObj
 	*ChooseText
 	*ClassName
 	*CompareNum
+	*CompareObj
 	*CompareText
+	*Comprise
 	*CycleText
 	*DoNothing
-	*EqualTo
 	// *Error
+	*Filter
 	*ForEachNum
 	*ForEachObj
 	*ForEachText
 	*Get
-	*Global
-	*GreaterThan
 	// *Inc
 	*Includes
 	// *Is/State -> use Get
 	*IsEmpty
-	*IsSameClass
-	*IsSimilarClass
+	*IsExactClass
+	*IsClass
 	*IsNot
 	// *IsNum
 	// *IsObj
 	// *IsText
 	// *IsValid
+	*Join
 	*Len
-	*LesserThan
-	*NotEqualTo
+	*ListUp
 	*Num
 	*Numbers
 	*Object
@@ -65,20 +61,28 @@ type Commands struct {
 	*PrintList
 	*PrintNum
 	*PrintNumWord
+	*PrintSlash
 	*PrintSpan
 	*Say
 	*Range
 	*RelatedList
 	*RelationEmpty
+	*Reverse
 	*SetBool
 	*SetNum
 	*SetText
 	*SetObj
+	*SetState
 	*ShuffleText
 	*StoppingText
 	// *State
 	// *StopNow
 	*Text
 	*Texts
+	*TopObject
 	// *Using
+	// CompareTo:
+	*EqualTo
+	*GreaterThan
+	*LesserThan
 }
