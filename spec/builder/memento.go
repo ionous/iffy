@@ -3,6 +3,7 @@ package builder
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/spec"
+	"strings"
 )
 
 // Memento implements spec.Block. Each chained call targets the surrounding block. For example, in:
@@ -50,7 +51,10 @@ func (n *Memento) End() {
 // Cmd adds a new command of name with the passed set of positional args. Args can contain Mementos and literals. Returns a memento which can be passed to arrays or commands, or chained.
 // To add data to the new command, pass them via args or follow this call with a call to Begin().
 func (n *Memento) Cmd(name string, args ...interface{}) (ret spec.Block) {
-	if next, e := n.factory.newCmd(n, name, args); e != nil {
+	// HACK: because .Val("{cmd}") just looks so odd.
+	if strings.Contains(name, "{") && len(args) == 0 {
+		ret = n.Val(name)
+	} else if next, e := n.factory.newCmd(n, name, args); e != nil {
 		panic(errutil.New(e, Capture(1)))
 	} else {
 		next.cmdBlock = true

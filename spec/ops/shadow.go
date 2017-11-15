@@ -9,13 +9,12 @@ import (
 	r "reflect"
 )
 
-// ShadowClass provides a factory for constructing pod-like types.
-// Each field in the target is assigned an eval capable of filling that field.
-// ShadowClass then implements GetObject to which evalutes the fields and constructs the object.
+// ShadowClass provides a target which can construct a pod-like type.
+// Each shadow instance can be assigned evals capable of filling the pod's corresponding fields; GetObject constructs the pod-type based on the assigned evals.
 type ShadowClass struct {
-	rtype  r.Type
-	fields []FieldIndex
-	slots  map[string]_ShadowSlot
+	rtype  r.Type                 // the pod-type this instance constructs
+	fields []FieldIndex           // direct access to all of the pod's fields; could be pooled/shared.
+	slots  map[string]_ShadowSlot // evals used to construct a pod.
 }
 
 func Shadow(rtype r.Type) *ShadowClass {
@@ -24,15 +23,15 @@ func Shadow(rtype r.Type) *ShadowClass {
 	return &ShadowClass{rtype, fields, make(map[string]_ShadowSlot)}
 }
 
-// GetObject for a shadow type generates an object from the slots specified.
-// It is a constructor.
+// GetObject constructs a pod-like object by evaluating the shadow's previously assigned evals.
+// Each call generates a brand new object by reevaluating the shadow.
 func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	obj := run.Emplace(r.New(c.rtype).Interface())
 	// walk all the fields we recorded and pass them to the new object
 	for k, slot := range c.slots {
-		// Unpack evaluates an interface to get its resulting go value.
+		// evaluate and retrieve the resulting value
 		if v, e := slot.unpack(run); e != nil {
-			err = errutil.New("shadow class", c.rtype, "couldn't unpack", k, e)
+			err = errutil.New("shadow class", c.rtype, "couldn't evaluate", k, e)
 			break
 		} else if e := obj.SetValue(k, v); e != nil {
 			err = errutil.New("shadow class", c.rtype, "couldn't set value", k, e)
@@ -45,29 +44,26 @@ func (c *ShadowClass) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	return
 }
 
-// Addr: all command interfaces are (normally) implemented as pointers.
+// Addr return the r.Value of ourself.
+// All command interfaces are (normally) implemented as pointers.
 // Spec carries around the target element, and has to take its address to make it into a pointer so that it matches the implementation.
 // When using constructors, spec uses *ShadowClass as its target.
-// We need to return the Value just of ourself.
 func (c *ShadowClass) Addr() r.Value {
 	return r.ValueOf(c)
 }
 
-// Type returns the type of the class for field walking.
-// Compatible with reflect.Value
+// Type, as per reflect.Value, returns the underlying pod-type for walking its fields.
 func (c *ShadowClass) Type() r.Type {
 	return c.rtype
 }
 
+// NumField, as per reflect.Value, returns the number of fields in the pod (and its parents).
 func (c *ShadowClass) NumField() int {
 	return len(c.fields)
 }
 
-// Field returns the value of the requested field.
-// Compatible with reflect.Value
-// The spec will provide some type-safety on assignment to this value.
-// FIX? one thing this cant handle is setting a state via an enumerated value.
-// ex. TriState ( yes, no, maybe ) cmd.Param("yes").Value("true")
+// Field, as per reflect.Value, returns a slot corresponding to the indicated field.
+// see also: FieldByIndex.
 func (c *ShadowClass) Field(n int) (ret r.Value) {
 	if n < len(c.fields) {
 		ret = c.FieldByIndex(c.fields[n])
@@ -75,25 +71,40 @@ func (c *ShadowClass) Field(n int) (ret r.Value) {
 	return
 }
 
+// FieldByName, as per reflect.Value, returns a slot corresponding to the named field in the shadow's pod type. see also: FieldByIndex.
 func (c *ShadowClass) FieldByName(n string) (ret r.Value) {
 	k := ident.IdOf(n)
 	unique.WalkProperties(c.rtype, func(f *r.StructField, idx []int) (done bool) {
 		if k == ident.IdOf(f.Name) {
-			ret, done = c.FieldByIndex(idx), true
+			ret = c.getField(f, true)
+			done = true
 		}
 		return
 	})
 	return
 }
 
-func (c *ShadowClass) FieldByIndex(n []int) (ret r.Value) {
+// FieldByIndex, as per reflect.Value, returns the slot of the indicated field.
+// The slot allows the caller to poke in an eval which will be used to fill out the value of a pod during GetObject.
+// As a side-effect it caches the slot; this as opposed to creating all fields in Shadow.
+// FIX? one thing this cant handle is setting a state via an enumerated value.
+// ex. TriState ( yes, no, maybe ) cmd.Param("yes").Value("true")
+func (c *ShadowClass) FieldByIndex(n []int) r.Value {
 	field := c.rtype.FieldByIndex(n)
+	return c.getField(&field, true)
+}
+
+func (c *ShadowClass) getField(field *r.StructField, cache bool) (ret r.Value) {
 	// determine what kind of eval can produce the passed type.
 	if rtype := kindOf.EvalType(field.Type); rtype != nil {
-		// create an empty eval for the user to poke into
-		rvalue := r.New(rtype).Elem()
-		c.slots[field.Name] = _ShadowSlot{rtype, rvalue}
-		ret = rvalue
+		if x, ok := c.slots[field.Name]; ok {
+			ret = x.rvalue
+		} else if cache {
+			// create an empty eval for the user to poke into
+			rvalue := r.New(rtype).Elem()
+			c.slots[field.Name] = _ShadowSlot{rtype, rvalue}
+			ret = rvalue
+		}
 	}
 	return
 }

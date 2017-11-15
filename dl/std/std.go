@@ -15,6 +15,7 @@ type Classes struct {
 	*Story
 }
 
+// FIX? maybe the expected return of the pattern can be specified here via struct tags.
 type Patterns struct {
 	*Commence
 	*CommonObjects

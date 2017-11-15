@@ -1,6 +1,7 @@
 package ops
 
 import (
+	"fmt"
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ref/coerce"
 	r "reflect"
@@ -12,6 +13,9 @@ type Command struct {
 	index  int
 }
 
+func (c *Command) String() string {
+	return fmt.Sprintf("%s(%T)", c.target.Type(), c.target)
+}
 func (c *Command) Target() r.Value {
 	return c.target.Addr()
 }
@@ -19,9 +23,9 @@ func (c *Command) Target() r.Value {
 func (c *Command) Position(arg interface{}) (err error) {
 	idx, tgt := c.index, c.target
 	if cnt := tgt.NumField(); idx+1 > cnt {
-		err = errutil.New("too many arguments", tgt, "expected", cnt)
+		err = errutil.New("too many arguments", c, "expected", cnt)
 	} else if dst := tgt.Field(idx); !dst.IsValid() {
-		err = errutil.New("couldnt get field", tgt, idx)
+		err = errutil.Fmt("field %d in %s is invalid", idx, c)
 	} else {
 		// check for the last value is an array:
 		var autoel bool
@@ -47,7 +51,7 @@ func (c *Command) Position(arg interface{}) (err error) {
 				}
 			} else {
 				if e := c.setField(dst, arg); e != nil {
-					err = errutil.New("couldnt set field", tgt, idx, e)
+					err = errutil.Fmt("couldnt set field %d in %s using %v, because %s", idx, c, arg, e)
 				} else {
 					c.index = idx + 1
 				}

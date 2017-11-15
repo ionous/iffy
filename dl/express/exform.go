@@ -26,7 +26,7 @@ func (xf *exform) TransformValue(v r.Value, hint r.Type) (ret r.Value, err error
 	if xs, e := tryTokenize(v); e != nil {
 		err = e
 	} else if cnt := len(xs); cnt == 0 {
-		// no directives? transform the value via core.
+		// no directives? transform the value via core ( for literals )
 		ret, err = core.Transform(v, hint)
 	} else {
 		cmds := ops.NewFactory(xf.cmds, nil)

@@ -26,12 +26,10 @@ type Rtm struct {
 	ObjectScope
 }
 
-//
 func (rtm *Rtm) GetObject(name string) (rt.Object, bool) {
 	return rtm.Objects.GetObject(name)
 }
 
-//
 func (rtm *Rtm) Emplace(i interface{}) rt.Object {
 	return obj.MakeObject(ident.None(), i, rtm)
 }
@@ -44,7 +42,6 @@ func (rtm *Rtm) Write(b []byte) (int, error) {
 	return rtm.writer.Write(b)
 }
 
-//
 func (rtm *Rtm) SetWriter(w io.Writer) io.Writer {
 	if w == nil {
 		panic("push writer requires a valid object")

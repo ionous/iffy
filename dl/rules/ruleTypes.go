@@ -9,7 +9,7 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// Rule is the base class for scrips.Types commands.
+// Rule is the base class for implementing patterns.
 type Rule struct {
 	Name string      // Name of pattern
 	If   rt.BoolEval // Filter

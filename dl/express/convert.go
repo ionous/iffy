@@ -10,6 +10,7 @@ import (
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
 	"github.com/ionous/iffy/template/types"
+	r "reflect"
 )
 
 // Express converts a postfix expression into iffy commands.
@@ -21,10 +22,18 @@ func Convert(cmds *ops.Factory, xs template.Expression, gen ident.Counters) (ret
 		err = errutil.New("empty output")
 	} else if len(c.stack) > 1 {
 		err = errutil.New("unparsed output")
-	} else if c := c.stack[0].(*ops.Command); c == nil {
+	} else if cmd := c.stack[0].(*ops.Command); cmd == nil {
 		err = errutil.New("convert returned nil")
+	} else if tgt := cmd.Target(); tgt.Type() == r.TypeOf((*ops.ShadowClass)(nil)) {
+		if det, e := c.cmds.CreateCommand("determine"); e != nil {
+			err = e
+		} else if e := det.Position(cmd); e != nil {
+			err = e
+		} else {
+			ret = det
+		}
 	} else {
-		ret = c
+		ret = cmd
 	}
 	return
 }
@@ -102,7 +111,7 @@ func (c *converter) pushCommand(cmd *ops.Command, args ...interface{}) (err erro
 func assign(cmd *ops.Command, args []interface{}) (err error) {
 	for _, arg := range args {
 		if e := cmd.Position(arg); e != nil {
-			err = e
+			err = errutil.Fmt("couldnt assign %s to %s, because %s", arg, cmd, e)
 			break
 		}
 	}
