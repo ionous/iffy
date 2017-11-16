@@ -21,18 +21,19 @@ func (p *ExpressionParser) NewRune(r rune) State {
 	call := MakeCallParser(0, p.argFactory)
 	series := SeriesParser{}
 	para := MakeParallel(
-		MakeChain(&call, StateExit(func() {
-			if x, e := call.GetExpression(); e != nil {
-				p.err = errutil.Append(p.err, e)
-			} else if len(x) > 0 {
-				p.out = x // longest match wins
-			}
-		})),
 		MakeChain(&series, StateExit(func() {
 			if x, e := series.GetExpression(); e != nil {
 				p.err = errutil.Append(p.err, e)
 			} else if len(x) > 0 {
-				p.out = x // longest match wins
+				p.out, p.err = x, nil // longest match wins; noting that operators can read too far ahead
+				// particularly an issue with ! which provisionally matches !=
+			}
+		})),
+		MakeChain(&call, StateExit(func() {
+			if x, e := call.GetExpression(); e != nil {
+				p.err = errutil.Append(p.err, e)
+			} else if len(x) > 0 {
+				p.out, p.err = x, nil // for equal matches, call wins.
 			}
 		})),
 	)

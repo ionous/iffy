@@ -199,7 +199,7 @@ func branchParser(p *TemplateParser, v Directive) (ret State, err error) {
 				return
 			}))
 		}
-	case "elseIf", "otherwiseIf", "elseUnless", "otherwiseUnless":
+	case "elsif", "otherwiseIf":
 		if e := ExpectedExpression(v); e != nil {
 			err = e
 		} else {
@@ -226,12 +226,9 @@ func builtin(key string) types.BuiltinType {
 		"shuffle": types.Shuffle,
 		//
 		"if":          types.IfStatement,
-		"elseIf":      types.IfStatement,
+		"elsif":       types.IfStatement,
 		"otherwiseIf": types.IfStatement,
-		//
-		"unless":          types.UnlessStatement,
-		"elseUnless":      types.UnlessStatement,
-		"otherwiseUnless": types.UnlessStatement,
+		"unless":      types.UnlessStatement,
 	}
 	return which[key]
 }

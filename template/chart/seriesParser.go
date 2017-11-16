@@ -2,6 +2,7 @@ package chart
 
 import (
 	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 // SeriesParser reads a sequence of operand and operator phrases.
@@ -58,7 +59,9 @@ func (p *SeriesParser) operator(r rune) (ret State) {
 			ret = MakeChain(spaces, Statement(p.operator))
 		default:
 			ret = ParseChain(r, &b, Statement(func(r rune) (ret State) {
-				if op, ok := b.GetOperator(); ok {
+				if op, e := b.GetOperator(); e != nil {
+					p.err = e
+				} else if op != types.Operator(-1) {
 					p.out.AddFunction(op)
 					ret = ParseChain(r, spaces, Statement(p.operand))
 				}

@@ -29,16 +29,21 @@ func TestOps(t *testing.T) {
 		{str: "andy", op: types.LAND},
 		{str: ">>>>", op: types.GTR},
 		{str: "*", op: types.MUL},
-		// {str: "(", op: types.LPAREN},
 		{str: "<=", op: types.LEQ},
-		{str: "#", errors: true},
+		// this is not an operator error, it simply doesnt parse anything.
+		{str: "#", op: types.Operator(-1)},
+		// this provisionally matches, which has to generate an error because it consumes runes
+		// without actually turning into a result.
+		{str: "!!", errors: true},
 	}
 	for _, n := range m {
 		str := n.str
 		t.Log("test:", str)
 		p := OperatorParser{}
-		Parse(&p, str)
-		if r, ok := p.GetOperator(); ok == n.errors {
+		_ = Parse(&p, str) // this returns an error, lets ignore it.
+		r, e := p.GetOperator()
+		ok := e == nil
+		if ok == n.errors {
 			t.Fatalf("unexpected result %v for '%s'", ok, str)
 		} else if !ok {
 			t.Log("ok expected mismatch")
