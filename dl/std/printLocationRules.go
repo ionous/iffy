@@ -40,12 +40,12 @@ func printLocationRules(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("run rule", "describe object").Begin() {
-		c.Cmd("determine", c.Cmd("print name", "object"))
+		c.Cmd("say", "{printName: object|buffer:}")
 		c.End()
 	}
 	if c.Cmd("run rule", "describe object").Begin() {
 		c.Param("if").Cmd("object.brief")
-		c.Cmd("determine", c.Cmd("say", "object.brief"))
+		c.Cmd("say", "{object.brief}")
 		c.End()
 	}
 	if c.Cmd("list objects", "visible parents").Begin() {

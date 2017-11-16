@@ -6,12 +6,12 @@ import "fmt"
 
 const (
 	_CompareType_name_0 = "Compare_EqualToCompare_GreaterThan"
-	_CompareType_name_1 = "Compare_LesserThan"
+	_CompareType_name_1 = "Compare_LessThan"
 )
 
 var (
 	_CompareType_index_0 = [...]uint8{0, 15, 34}
-	_CompareType_index_1 = [...]uint8{0, 18}
+	_CompareType_index_1 = [...]uint8{0, 16}
 )
 
 func (i CompareType) String() string {

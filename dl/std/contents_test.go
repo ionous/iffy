@@ -3,6 +3,7 @@ package std_test
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/locate"
 	"github.com/ionous/iffy/dl/rules"
 	. "github.com/ionous/iffy/dl/std"
@@ -61,7 +62,8 @@ func TestContents(t *testing.T) {
 
 	// fix? if runtime was a set of slots, we could add a slot specifically for locale.
 	assert := testify.New(t)
-	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, PrintNameRules, PrintObjectRules)
+	xform := express.NewTransform(cmds, nil)
+	rules, e := rules.Master(cmds, xform, patterns, PrintNameRules, PrintObjectRules)
 	assert.NoError(e)
 
 	type OpsCb func(c spec.Block)
@@ -72,12 +74,12 @@ func TestContents(t *testing.T) {
 		relations.AddTable("locale", pc.Table)
 
 		var loc struct{ Locations []Locate }
-		c := cmds.NewBuilder(&loc, ops.Transformer(core.Transform))
+		c := cmds.NewBuilder(&loc, xform)
 		if e := c.Build(build); e != nil {
 			err = e
 		} else {
 			var root struct{ rt.ExecuteList }
-			c := cmds.NewBuilder(&root, ops.Transformer(core.Transform))
+			c := cmds.NewBuilder(&root, xform)
 			if e := c.Build(exec); e != nil {
 				err = e
 			} else {
@@ -155,7 +157,7 @@ func TestContents(t *testing.T) {
 	// summary tests:
 	printSummary := func(c spec.Block) {
 		if c.Cmd("print span").Begin() {
-			c.Cmd("determine", c.Cmd("print summary", "box"))
+			c.Cmd("{printSummary: box}")
 			c.End()
 		}
 	}
@@ -187,7 +189,7 @@ func TestContents(t *testing.T) {
 	printObject := func(name string) OpsCb {
 		return func(c spec.Block) {
 			if c.Cmd("print span").Begin() {
-				c.Cmd("determine", c.Cmd("print object", name))
+				c.Cmd("{printObject:" + name + "}")
 				c.End()
 			}
 		}

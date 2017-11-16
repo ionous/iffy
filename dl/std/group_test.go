@@ -2,6 +2,7 @@ package std_test
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/rules"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/dl/std/group"
@@ -222,7 +223,8 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(s
 		(*Commands)(nil),
 		(*rules.Commands)(nil),
 	)
-	rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, patternSpec...)
+	xform := express.NewTransform(cmds, nil)
+	rules, e := rules.Master(cmds, xform, patterns, patternSpec...)
 
 	if assert.NoError(e) {
 		var span printer.Span

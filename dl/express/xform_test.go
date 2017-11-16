@@ -2,7 +2,6 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
@@ -19,7 +18,6 @@ func TestXform(t *testing.T) {
 	cmds := ops.NewOps(classes)
 
 	unique.PanicBlocks(cmds,
-		(*std.Commands)(nil),
 		(*core.Commands)(nil),
 		(*Commands)(nil))
 

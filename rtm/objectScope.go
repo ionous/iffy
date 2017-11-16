@@ -19,8 +19,7 @@ func (os ObjectScope) TopObject() (ret rt.Object, okay bool) {
 }
 
 // SetTop changes the current top object to the passed object.
-func (os *ObjectScope) SetTop(top rt.Object) rt.Object {
-	prev := os.topObject
-	os.topObject = top
-	return prev
+func (os *ObjectScope) SetTop(top rt.Object) (ret rt.Object) {
+	ret, os.topObject = os.topObject, top
+	return
 }

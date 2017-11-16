@@ -44,6 +44,20 @@ func TestExpress(t *testing.T) {
 				binary,
 			},
 		},
+		{"text cmp", "'a' < 'b'",
+			&core.CompareText{
+				&core.Text{"a"},
+				&core.LessThan{},
+				&core.Text{"b"},
+			},
+		},
+		{"num cmp", "7 >= 8",
+			&core.CompareNum{
+				&core.Num{7},
+				&core.GreaterOrEqual{},
+				&core.Num{8},
+			},
+		},
 		{"math", "(5+6)*(1+2)",
 			&core.Mul{
 				&core.Add{

@@ -84,5 +84,5 @@ type Commands struct {
 	// CompareTo:
 	*EqualTo
 	*GreaterThan
-	*LesserThan
+	*LessThan
 }

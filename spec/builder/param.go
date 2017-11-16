@@ -3,6 +3,7 @@ package builder
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/spec"
+	"strings"
 )
 
 // Param targets a key-value spec argument. It implements spec.Slot.
@@ -13,7 +14,10 @@ type Param struct {
 
 // Cmd creates a new command of the passed name for the parameter mentioned by Memento.Param(). Args can contain Mementos and literals.
 func (p Param) Cmd(name string, args ...interface{}) (ret spec.Block) {
-	if n, e := p.src.factory.newCmd(p.src, name, args); e != nil {
+	// HACK: because .Val("{cmd}") just looks so odd.
+	if strings.Contains(name, "{") && len(args) == 0 {
+		ret = p.Val(name)
+	} else if n, e := p.src.factory.newCmd(p.src, name, args); e != nil {
 		panic(errutil.New(e, Capture(1)))
 	} else {
 		n.key = p.key

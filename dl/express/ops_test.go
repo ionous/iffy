@@ -1,15 +1,15 @@
-package express_test
+package express
 
 import (
+	"bytes"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
-	"github.com/kr/pretty"
-	testify "github.com/stretchr/testify/assert"
+	"io"
+	r "reflect"
 	"testing"
 )
 
@@ -26,28 +26,36 @@ func TestOps(t *testing.T) {
 	patterns := unique.NewStack(cmds.ShadowTypes)
 
 	// a sample command.
-	type TestScore struct{ rt.NumberEval }
+	type TestScore struct {
+		rt.NumberEval
+	}
+	type Pluralize struct {
+		rt.TextEval
+	}
 	// a sample, empty, pattern.
-	type TestPattern struct {
+	type TestPrint struct {
 		Story ident.Id `if:"cls:kind"`
 	}
 
 	unique.PanicTypes(cmds,
-		(*TestScore)(nil))
+		(*TestScore)(nil),
+		(*Pluralize)(nil),
+	)
 	unique.PanicBlocks(cmds,
 		(*core.Commands)(nil),
 		(*rules.RuntimeCmds)(nil), // determine.
-		(*express.Commands)(nil))
-	unique.PanicTypes(patterns,
-		(*TestPattern)(nil))
+		(*Commands)(nil))
 
-	xform := express.NewTransform(cmds, nil)
+	unique.PanicTypes(patterns,
+		(*TestPrint)(nil))
+
+	xform := NewTransform(cmds, nil)
 
 	t.Run("property", func(t *testing.T) {
 		var root struct{ rt.NumberEval }
 		c := cmds.NewBuilder(&root, xform)
 		//
-		// HOW DOES THIS EVEN WORK!?!
+		// TODO: document how this works.
 		//
 		c.Cmd("test score", "{5 + 5}")
 		if e := c.Build(); e != nil {
@@ -70,10 +78,9 @@ func TestOps(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			//
-			//  IF THE OTHER BIT WORKS, WHY DO WE NEED RENDER?
-			//  AT THE VERY LEAST WHY NOT GetAt
+			// FIX: since the numeval works above, why do we need render? why not just GetAt?
 			//
-			testEqual(t, &TestScore{&express.Render{
+			testEqual(t, &TestScore{&Render{
 				&core.Object{"Story"}, "score"},
 			}, root.NumberEval)
 		}
@@ -86,7 +93,7 @@ func TestOps(t *testing.T) {
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
 		} else {
-			testEqual(t, &TestScore{&express.Render{
+			testEqual(t, &TestScore{&Render{
 				&core.Object{"Story"}, "score"},
 			}, root.NumberEval)
 		}
@@ -98,37 +105,89 @@ func TestOps(t *testing.T) {
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
 		} else {
-			testEqual(t, &TestScore{&express.Render{
+			testEqual(t, &TestScore{&Render{
 				&core.Object{"Story"}, "score"},
 			}, root.NumberEval)
 		}
 	})
-	// TESTPATTERN/1
 	t.Run("determine", func(t *testing.T) {
 		var root struct{ rt.TextEval }
 		c := cmds.NewBuilder(&root, xform)
-		c.Cmd("{testPattern! story}")
+		c.Cmd("{testPrint! story}")
 		if e := c.Build(); e != nil {
 			t.Fatal(e)
 		} else {
-			testStrings(t, root.TextEval, `&rules.Determine{Obj:MakeTestPattern{Story:&express.GetAt{Name:"story"}}}`)
+			testStrings(t, root.TextEval,
+				`Determine{&TestPrint{GetAt{"story"}}}`)
+		}
+	})
+	t.Run("dpipe", func(t *testing.T) {
+		var root struct{ rt.TextEval }
+		c := cmds.NewBuilder(&root, xform)
+		c.Cmd("{testPrint: story|buffer:|pluralize:}")
+		if e := c.Build(); e != nil {
+			t.Fatal(e)
+		} else {
+			testStrings(t, root.TextEval,
+				`Pluralize{Buffer{Determine{&TestPrint{GetAt{"story"}}}}}`)
 		}
 	})
 }
 
-func testEqual(t *testing.T, expect, res interface{}) {
-	t.Log("got:", pretty.Sprint(res))
-	if !testify.ObjectsAreEqualValues(expect, res) {
-		t.Log(pretty.Diff(res, expect))
-		t.Log("want:", pretty.Sprint(expect))
-		t.FailNow()
-	}
-}
-
 func testStrings(t *testing.T, res interface{}, want string) {
-	got := pretty.Sprintf("%#v", res)
-	t.Log("got:", got)
+	// got := pretty.Sprintf("%#v", res)
+	got := dump(res)
+	t.Log("got :", got)
 	if got != want {
 		t.Fatalf("want: %s", want)
 	}
+}
+
+// a very hacky string representation of an iffy call tree
+// kr/pretty doesnt handle shadow class well.
+// you have to add a custom formatter as a *class* member :\
+// causing new dependencies on fmt,io,pretty,and more.
+func dump(i interface{}) string {
+	var b bytes.Buffer
+	dummy(&b, r.ValueOf(i).Elem())
+	return b.String()
+}
+
+func dummy(w io.Writer, v ops.Target) {
+	vt := v.Type()
+	io.WriteString(w, vt.Name())
+	io.WriteString(w, "{")
+	for i := 0; i < v.NumField(); i++ {
+		if i > 0 {
+			io.WriteString(w, ",")
+		}
+		if fv := v.Field(i); fv.IsValid() {
+			field := vt.Field(i)
+			switch fv.Kind() {
+			case r.Slice:
+				if field.Type.Elem().Kind() == r.Interface {
+					for j := 0; j < fv.Len(); j++ {
+						dummy(w, fv.Index(j).Elem().Elem())
+					}
+				} else {
+					io.WriteString(w, "[]")
+
+				}
+			case r.Interface:
+				if el := fv.Elem(); el.Type() == r.TypeOf((*ops.ShadowClass)(nil)) {
+					shade := el.Interface().(*ops.ShadowClass)
+					io.WriteString(w, "&")
+					dummy(w, shade)
+				} else {
+					dummy(w, el.Elem())
+				}
+
+			case r.String:
+				io.WriteString(w, "\""+fv.String()+"\"")
+			default:
+				io.WriteString(w, fv.Kind().String())
+			}
+		}
+	}
+	io.WriteString(w, "}")
 }

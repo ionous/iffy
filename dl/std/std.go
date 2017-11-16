@@ -39,8 +39,7 @@ type Patterns struct {
 	*VisibleParents
 	*Children
 	*Parents
-
-	// *DescribeFirstRoom
+	*DescribeFirstRoom
 	// *EndTurn
 	// *PrintBanner
 	// *SetInitialPosition

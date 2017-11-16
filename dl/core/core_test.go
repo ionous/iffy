@@ -88,9 +88,9 @@ func TestCore(t *testing.T) {
 		test(1, "greater than", 10, false)
 		test(8, "greater than", 8, false)
 		//
-		test(10, "lesser than", 1, false)
-		test(1, "lesser than", 10, true)
-		test(8, "lesser than", 8, false)
+		test(10, "less than", 1, false)
+		test(1, "less than", 10, true)
+		test(8, "less than", 8, false)
 		//
 		test(10, "equal to", 1, false)
 		test(1, "equal to", 10, false)
@@ -113,8 +113,8 @@ func TestCore(t *testing.T) {
 		test("Z", "greater than", "A", true)
 		test("A", "greater than", "Z", false)
 		//
-		test("marzip", "lesser than", "marzipan", true)
-		test("marzipan", "lesser than", "marzip", false)
+		test("marzip", "less than", "marzipan", true)
+		test("marzipan", "less than", "marzip", false)
 		//
 		test("bobby", "equal to", "bobby", true)
 		test("bobby", "equal to", "phillipa", false)

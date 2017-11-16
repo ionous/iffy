@@ -89,16 +89,20 @@ func (p *GetAt) GetText(run rt.Runtime) (ret string, err error) {
 // getAt looks at the top object for a property of the passed name,
 // or failing that, an object of the passed name.
 func getAt(run rt.Runtime, name string) (ret rt.Object, at []int, err error) {
-	var found bool
-	if obj, ok := run.TopObject(); ok {
-		if path := class.PropertyPath(obj.Type(), name); len(path) > 0 {
-			ret, at = obj, path
-			found = true
+	top, topOk := run.TopObject()
+	if topOk {
+		if path := class.PropertyPath(top.Type(), name); len(path) > 0 {
+			ret, at = top, path
 		}
 	}
-	if !found {
+	if ret == nil {
 		if obj, ok := run.GetObject(name); !ok {
-			err = errutil.New("couldnt find an object or property named", name)
+			if !topOk {
+				err = errutil.New("couldnt find an object named", name)
+			} else {
+				err = errutil.Fmt("couldnt find a property or object named '%s' in context %v.", name, top)
+			}
+
 		} else {
 			ret = obj
 		}

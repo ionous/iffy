@@ -69,7 +69,7 @@ func (n RefObject) GetValue(prop string, pv interface{}) (err error) {
 		dst := r.ValueOf(pv)
 		rt.ScopeBlock(n.run, n, func() {
 			if e := n.run.Pack(dst, src); e != nil {
-				err = errutil.New(n.propN(prop), "cant unpack, because", e)
+				err = errutil.Fmt("cant unpack %v, because %v", n.propN(prop), e)
 			}
 		})
 	}

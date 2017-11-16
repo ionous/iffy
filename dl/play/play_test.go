@@ -21,7 +21,7 @@ import (
 // define the gramar, and the handler in cmds
 // dont worry about defineing the objects/classes as cmds.
 
-func xTestPlay(t *testing.T) {
+func TestPlay(t *testing.T) {
 	assert := testify.New(t)
 
 	type Jump struct {
@@ -83,11 +83,7 @@ func definePlay(c spec.Block) {
 	if c.Cmd("mandate").Begin() {
 		if c.Cmd("run rule", "jump").Begin() {
 			if c.Param("decide").Begin() {
-				if c.Cmd("print span").Begin() {
-					c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "jumper")))
-					c.Cmd("say", "jumped!")
-					c.End()
-				}
+				c.Cmd("say", "{printName: jumper|buffer:} jumped!")
 				c.End()
 			}
 			c.End()
@@ -99,12 +95,9 @@ func definePlay(c spec.Block) {
 		c.End()
 	}
 	if c.Cmd("listen to", "bogart", "jump").Begin() {
+		// FIX: the reference to evt is not my favorite.
 		if c.Param("go").Begin() {
-			if c.Cmd("print span").Begin() {
-				c.Cmd("upper the", c.Cmd("get", c.Cmd("get", "@", "data"), "jumper"))
-				c.Cmd("say", "is jumping!")
-				c.End()
-			}
+			c.Cmd("say", "{upperThe: evt.jumper} is jumping!")
 			c.End()
 		}
 		c.End()

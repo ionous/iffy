@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/template"
@@ -21,16 +22,8 @@ func Convert(cmds *ops.Factory, xs template.Expression, gen names) (ret *ops.Com
 		err = errutil.New("empty output")
 	} else if len(c.stack) > 1 {
 		err = errutil.New("unparsed output")
-	} else if cmd := c.stack[0].(*ops.Command); cmd == nil {
+	} else if cmd := c.stack[0]; cmd == nil {
 		err = errutil.New("convert returned nil")
-	} else if tgt := cmd.Target(); tgt.Type() == r.TypeOf((*ops.ShadowClass)(nil)) {
-		if det, e := c.cmds.CreateCommand("determine"); e != nil {
-			err = e
-		} else if e := det.Position(cmd); e != nil {
-			err = e
-		} else {
-			ret = det
-		}
 	} else {
 		ret = cmd
 	}
@@ -39,7 +32,7 @@ func Convert(cmds *ops.Factory, xs template.Expression, gen names) (ret *ops.Com
 
 type converter struct {
 	cmds  *ops.Factory
-	stack []interface{}
+	stack []*ops.Command
 	gen   names
 }
 
@@ -59,7 +52,7 @@ func (c *converter) push(cmd *ops.Command) {
 }
 
 // extract cnt commands from the converter stack.
-func (c *converter) pop(cnt int) (ret []interface{}, err error) {
+func (c *converter) pop(cnt int) (ret []*ops.Command, err error) {
 	if end := len(c.stack) - cnt; end < 0 {
 		err = errutil.New("stack underflow")
 	} else {
@@ -85,20 +78,49 @@ func (c *converter) binary(i interface{}) (err error) {
 func (c *converter) compare(cmp core.CompareTo) (err error) {
 	if args, e := c.pop(2); e != nil {
 		err = e
-	} else if cmd, e := c.cmds.EmplaceCommand(&core.CompareText{}); e != nil {
+	} else if cmp, e := c.cmds.EmplaceCommand(cmp); e != nil {
 		err = e
 	} else {
-		// as an alternative to this custom code, we could name arguments for every command.
-		// ex. MUL: {cmd:Mul, args: "A", "B" }, CompareText[ A, B ]
-		// wed still have to have an initalizer or something for "cmp".
-		err = c.pushCommand(cmd, args[0], cmp, args[1])
+		a, b := args[0], args[1]
+		if cmd := compare(a.Target(), b.Target()); cmd == nil {
+			err = errutil.Fmt("cant compare %T to %T", a, b)
+		} else if cmd, e := c.cmds.EmplaceCommand(cmd); e != nil {
+			err = e
+		} else {
+			// as an alternative to this custom code, we could name arguments for every command.
+			// ex. MUL: {cmd:Mul, args: "A", "B" }, CompareText[ A, B ]
+			// wed still have to have an initalizer or something for "cmp".
+			err = c.pushCommand(cmd, a, cmp, b)
+
+		}
+	}
+	return
+}
+
+func compare(a, b r.Value) (ret interface{}) {
+	try := []struct {
+		Test func(rtype r.Type) bool
+		Res  func() interface{}
+	}{
+		{kindOf.NumberEval, func() interface{} { return &core.CompareNum{} }},
+		{kindOf.ObjectEval, func() interface{} { return &core.CompareObj{} }},
+		{kindOf.TextEval, func() interface{} { return &core.CompareText{} }},
+	}
+	at, bt := a.Type(), b.Type()
+	for _, x := range try {
+		if x.Test(at) && x.Test(bt) {
+			ret = x.Res()
+			break
+		}
 	}
 	return
 }
 
 // add the passed args to the passed command in order; then push the command.
-func (c *converter) pushCommand(cmd *ops.Command, args ...interface{}) (err error) {
+func (c *converter) pushCommand(cmd *ops.Command, args ...*ops.Command) (err error) {
 	if e := assign(cmd, args); e != nil {
+		err = e
+	} else if cmd, e := c.determine(cmd); e != nil {
 		err = e
 	} else {
 		c.push(cmd)
@@ -106,8 +128,23 @@ func (c *converter) pushCommand(cmd *ops.Command, args ...interface{}) (err erro
 	return
 }
 
+// FIX? itd probably be better to know which commands are real and which are shadow/patterns;
+// and just create as neede.
+func (c *converter) determine(cmd *ops.Command) (ret *ops.Command, err error) {
+	if tgt := cmd.Target(); tgt.Type() != r.TypeOf((*ops.ShadowClass)(nil)) {
+		ret = cmd
+	} else if det, e := c.cmds.CreateCommand("determine"); e != nil {
+		err = e
+	} else if e := det.Position(cmd); e != nil {
+		err = e
+	} else {
+		ret = det
+	}
+	return
+}
+
 // add the passed args to the passed command in order.
-func assign(cmd *ops.Command, args []interface{}) (err error) {
+func assign(cmd *ops.Command, args []*ops.Command) (err error) {
 	for _, arg := range args {
 		if e := cmd.Position(arg); e != nil {
 			err = errutil.Fmt("couldnt assign %s to %s, because %s", arg, cmd, e)
@@ -238,13 +275,13 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 		case types.NEQ:
 			err = c.compare(&core.NotEqualTo{})
 		case types.LSS:
-			err = c.compare(&core.LesserThan{})
+			err = c.compare(&core.LessThan{})
 		case types.LEQ:
-			err = c.compare(&core.LesserThanOrEqualTo{})
+			err = c.compare(&core.LessOrEqual{})
 		case types.GTR:
 			err = c.compare(&core.GreaterThan{})
 		case types.GEQ:
-			err = c.compare(&core.GreaterThanOrEqualTo{})
+			err = c.compare(&core.GreaterOrEqual{})
 		case types.LAND:
 			err = c.binary(&core.AllTrue{})
 		case types.LOR:

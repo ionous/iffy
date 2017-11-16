@@ -97,7 +97,7 @@ func TestSomething(t *testing.T) {
 	// object listener:
 	bogart, _ := run.GetObject("bogart")
 	{
-		if jump, e := Execute(cmds, func(c spec.Block) {
+		if jump, e := testExec(cmds, func(c spec.Block) {
 			c.Cmd("say", "bogart's jumping!")
 		}); e != nil {
 			t.Fatal(e)
@@ -107,7 +107,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	{
-		if jump, e := Execute(cmds, func(c spec.Block) {
+		if jump, e := testExec(cmds, func(c spec.Block) {
 			c.Cmd("say", "bogart's going to jump!")
 		}); e != nil {
 			t.Fatal(e)
@@ -117,7 +117,7 @@ func TestSomething(t *testing.T) {
 		}
 	}
 	{
-		if jump, e := Execute(cmds, func(c spec.Block) {
+		if jump, e := testExec(cmds, func(c spec.Block) {
 			c.Cmd("say", "bogart's tired of jumping.")
 		}); e != nil {
 			t.Fatal(e)
@@ -141,7 +141,7 @@ func TestSomething(t *testing.T) {
 	assert.Equal(sliceOf.String("bogart's going to jump!", "bogart's jumping!", "jumped!", "bogart's tired of jumping."), lines.Lines())
 
 	{
-		if jump, e := Execute(cmds, func(c spec.Block) {
+		if jump, e := testExec(cmds, func(c spec.Block) {
 			c.Cmd("say", "don't do it bogart!")
 			c.Cmd("set bool", "@", "stop immediate propagation", true)
 			c.Cmd("set bool", "@", "prevent default", true)
@@ -159,7 +159,7 @@ func TestSomething(t *testing.T) {
 	assert.Equal(sliceOf.String("don't do it bogart!"), lines.Lines())
 }
 
-func Execute(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
+func testExec(cmds *ops.Ops, fn func(c spec.Block)) (ret rt.Execute, err error) {
 	var root struct{ Eval rt.ExecuteList }
 	c := cmds.NewBuilder(&root, ops.Transformer(ops.Transformer(core.Transform)))
 	if e := c.Build(fn); e != nil {

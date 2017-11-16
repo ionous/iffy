@@ -90,7 +90,6 @@ func (p *Determine) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err er
 	}
 	return
 }
-
 func (p *Determine) Execute(run rt.Runtime) (err error) {
 	if data, e := p.Obj.GetObject(run); e != nil {
 		err = errutil.New("couldnt determine exec, because", e)

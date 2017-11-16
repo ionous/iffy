@@ -25,7 +25,7 @@ func Trigger(run rt.Runtime, events EventMap, data rt.Object) (err error) {
 		} else {
 			evt := &EventObject{
 				Id:            id,
-				Data:          data,
+				Evt:           data,
 				Bubbles:       true,
 				Cancelable:    true,
 				CurrentTarget: target,

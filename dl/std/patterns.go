@@ -2,77 +2,76 @@ package std
 
 import (
 	"github.com/ionous/iffy/ident"
-	"github.com/ionous/iffy/rt"
 )
 
 type Commence struct {
-	Story rt.Object
+	Story ident.Id `if:"cls:story"`
 }
 
 // CommonObjects should act as a source for those objects which a player "can also see" in a given location.
 // see also: DescribeLocation.
 type CommonObjects struct {
-	Location rt.Object
+	Location ident.Id `if:"cls:room"`
 }
 
 // ConstructStatusLine should set the values of the story's left and right status text.
 type ConstructStatusLine struct {
-	Story rt.Object
+	Story ident.Id `if:"cls:story"`
 }
 
 type DescribeFirstRoom struct {
-	Story rt.Object
+	Story ident.Id `if:"cls:story"`
 }
 
 // DescribeObject should print a brief description about the targeted object.
 // see also: DescribeLocation.
 type DescribeObject struct {
-	Object rt.Object
+	Object ident.Id `if:"cls:kind"`
 }
 
 type EndTurn struct {
-	Story rt.Object
+	Story ident.Id `if:"cls:story"`
 }
 
 // IsCeiling should return true if the targeted object stops visibility.
 type IsCeiling struct {
-	Object rt.Object
+	Object ident.Id `if:"cls:kind"`
 }
 
 // IsNotableEnclosure should return true if the targeted object is important enough to merit a description when it acts as a parent of the player.
 // see also: DescribeLocation.
 type IsNotableEnclosure struct {
-	Object rt.Object
+	Object ident.Id `if:"cls:kind"`
 }
 
 // IsNotableScenery should return true if the targeted object is important enough to merit a description when defined as scenery in a location.
 // see also: DescribeLocation.
 type IsNotableScenery struct {
-	Object rt.Object
+	Object ident.Id `if:"cls:kind"`
 }
 
 // IsUnremarkable should return true to avoid being treated as a notable object.
 // see also: DescribeLocation.
 type IsUnremarkable struct {
-	Object rt.Object
+	Object ident.Id `if:"cls:kind"`
 }
 
 // NotableObjects should return a list of objects in the targeted location which merit a brief description.
 // see also: DescribeObject, DescribeLocation, UnremarkableObjects
 type NotableObjects struct {
-	Location rt.Object
+	Location ident.Id `if:"cls:kind"`
 }
 
 // PrintCommonObjects should print a simple sentence regarding the associated objects.
 type PrintCommonObjects struct {
-	Objects []rt.Object
+	Objects []ident.Id
 }
 
 // PrintLocation should print the complete position of the player.
 // For instance: "The lab (in the box) (on the desk)".
 // see also: PlayerSurroundings.
 type PrintLocation struct {
-	Location rt.Object
+	Location ident.Id `if:"cls:kind"`
 }
 
 // PrintName defines a pattern to say the target's name.
@@ -141,25 +140,25 @@ type PlayerSurroundings struct{}
 //  . version of iffy
 //  ex. Release 1 / 050630 / Iffy 1.0
 type PrintBannerText struct {
-	Story rt.Object
+	Story ident.Id
 }
 type SetInitialPosition struct {
-	Story rt.Object
+	Story ident.Id
 }
 type StartTurn struct {
-	Story rt.Object
+	Story ident.Id
 }
 type UpdateScore struct {
-	Story rt.Object
+	Story ident.Id
 }
 
 // NotableObjects should return a list of objects in the targeted location which merit a casaul mention.
 // see also: DescribeObject, DescribeLocation, NotableObjects.
 type UnremarkableObjects struct {
-	Location rt.Object
+	Location ident.Id
 }
 
 // VisibleParents should return a list of all parents of the targeted object, stopping if one of the parents acts as a "ceiling". Examples of ceilings include: rooms and closed boxes.
 type VisibleParents struct {
-	Object rt.Object
+	Object ident.Id
 }

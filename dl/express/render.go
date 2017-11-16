@@ -2,12 +2,10 @@ package express
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/class"
 	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/printer"
 	"github.com/ionous/iffy/rt/stream"
 	"strconv"
 )
@@ -73,7 +71,7 @@ func (p *Render) GetObjectStream(run rt.Runtime) (ret rt.ObjectStream, err error
 // get the object property
 func (p *Render) getValue(run rt.Runtime, pv interface{}) (err error) {
 	if obj, e := p.Obj.GetObject(run); e != nil {
-		err = errutil.New(e, "while rendering", p.Prop)
+		err = errutil.New(p.Prop, "failed rendering because,", e)
 	} else {
 		err = obj.GetValue(p.Prop, pv)
 	}
@@ -82,7 +80,7 @@ func (p *Render) getValue(run rt.Runtime, pv interface{}) (err error) {
 
 func getText(run rt.Runtime, obj rt.ObjectEval, prop string) (ret string, err error) {
 	if obj, e := obj.GetObject(run); e != nil {
-		err = errutil.New(e, "while rendering", prop)
+		err = errutil.New(prop, "failed rendering because,", e)
 	} else {
 		cls := obj.Type()
 		if path := class.PropertyPath(cls, prop); len(path) == 0 {
@@ -132,15 +130,17 @@ func textConvert(run rt.Runtime, obj rt.Object, path []int) (ret string, err err
 	return
 }
 
-// getName returns the printed name of an object.
+// this would be nice -- but express shouldnt depend on std.
+// XXX - getName returns the printed name of an object.
 func getName(run rt.Runtime, id ident.Id) (ret string, err error) {
-	var span printer.Span
-	if e := rt.WritersBlock(run, &span, func() error {
-		return rt.Determine(run, &std.PrintName{id})
-	}); e != nil {
-		err = e
-	} else {
-		ret = span.String()
-	}
+	ret = id.String()
+	// 	var span printer.Span
+	// 	if e := rt.WritersBlock(run, &span, func() error {
+	// 		return rt.Determine(run, &std.PrintName{id})
+	// 	}); e != nil {
+	// 		err = e
+	// 	} else {
+	// 		ret = span.String()
+	// 	}
 	return
 }

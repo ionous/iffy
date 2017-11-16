@@ -6,18 +6,15 @@ func storyRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "commence").Begin() {
 		if c.Param("decide").Begin() {
-			c.Cmd("set text", "story", "status left", "{determine playerSurroundings}")
-			c.Cmd("set text", "story", "status right", "{score}/{turnCount}")
+			c.Cmd("set text", "story", "status left", "{playerSurroundings!}")
+			c.Cmd("set text", "story", "status right", "{printNum: score}/{printNum: turnCount}")
 			c.End()
 		}
 		c.End()
 	}
 	if c.Cmd("text rule", "player surroundings").Begin() {
-		// player location or darkness
-		if c.Param("decide").Cmd("buffer").Begin() {
-			c.Cmd("determine", c.Cmd("print name", c.Cmd("location of", c.Cmd("player"))))
-			c.End()
-		}
+		// FIX: player location or darkness
+		c.Param("decide").Cmd("{player:|locationOf:|printName:|buffer:}")
 		c.End()
 	}
 	if c.Cmd("run rule", "construct status line").Begin() {

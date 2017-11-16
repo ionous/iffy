@@ -17,7 +17,7 @@ func PrintNameRules(c spec.Block) {
 	// print the class name if all else fails
 	if c.Cmd("run rule", "print name").Begin() {
 		if c.Param("decide").Begin() {
-			c.Cmd("say", c.Cmd("class name", c.Cmd("get", "@", "target")))
+			c.Cmd("say", "{className: target}")
 			c.End()
 		}
 		c.End()
@@ -25,18 +25,18 @@ func PrintNameRules(c spec.Block) {
 	// prefer the object name, so long as it was specified by the user.
 	if c.Cmd("run rule", "print name").Begin() {
 		// detect if "unnamed": # is used only for system names, never author names.
-		c.Param("if").Cmd("is not", c.Cmd("includes", c.Cmd("get", c.Cmd("get", "@", "target"), "name"), "#"))
+		c.Param("if").Cmd("isNot", "{includes: target.name '#'}")
 		if c.Param("decide").Begin() {
-			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "name"))
+			c.Cmd("say", "{target.name}")
 			c.End()
 		}
 		c.End()
 	}
 	// perfer the printed name above all else
 	if c.Cmd("run rule", "print name").Begin() {
-		c.Param("if").Cmd("is not", c.Cmd("is empty", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name")))
+		c.Param("if").Cmd("{target.printedName}")
 		if c.Param("decide").Begin() {
-			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "printed name"))
+			c.Cmd("say", "{target.printedName}")
 			c.End()
 		}
 		c.End()
@@ -44,24 +44,15 @@ func PrintNameRules(c spec.Block) {
 	//
 	if c.Cmd("run rule", "print plural name").Begin() {
 		if c.Param("decide").Begin() {
-			if c.Cmd("say").Begin() {
-				if c.Cmd("pluralize").Begin() {
-					if c.Cmd("buffer").Begin() {
-						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-						c.End()
-					}
-					c.End()
-				}
-				c.End()
-			}
+			c.Cmd("say", "{printName: target|buffer:|pluralize:}")
 			c.End()
 		}
 		c.End()
 	}
 	if c.Cmd("run rule", "print plural name").Begin() {
-		c.Param("if").Cmd("is not", c.Cmd("is empty", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name")))
+		c.Param("if").Cmd("{target.printedPluralName}")
 		if c.Param("decide").Begin() {
-			c.Cmd("say", c.Cmd("get", c.Cmd("get", "@", "target"), "printed plural name"))
+			c.Cmd("say", "{target.printedPluralName}")
 			c.End()
 		}
 		c.End()
@@ -69,22 +60,7 @@ func PrintNameRules(c spec.Block) {
 	//
 	if c.Cmd("run rule", "print several").Begin() {
 		if c.Param("decide").Begin() {
-			if c.Cmd("print span").Begin() {
-				c.Cmd("print num word", c.Cmd("get", "@", "group size"))
-				c.Cmd("say", "other")
-				if c.Cmd("choose", c.Cmd("compare num", c.Cmd("get", "@", "group size"), c.Cmd("greater than"), 1)).Begin() {
-					if c.Param("true").Begin() {
-						c.Cmd("determine", c.Cmd("print plural name", c.Cmd("get", "@", "target")))
-						c.End()
-					}
-					if c.Param("false").Begin() {
-						c.Cmd("determine", c.Cmd("print name", c.Cmd("get", "@", "target")))
-						c.End()
-					}
-					c.End()
-				}
-				c.End()
-			}
+			c.Cmd("say", "{printNumWord: groupSize} other {if groupSize > 1}{ printPluralName: target|buffer:}{else}{printName: target|buffer:}{end}")
 			c.End()
 		}
 		c.End()
@@ -116,7 +92,6 @@ func PrintObjectRules(c spec.Block) {
 		}
 		c.End()
 	}
-	// is it better to have multiple patterns, or just one?
 	if c.Cmd("run rule", "print summary").Begin() {
 		c.Param("if").Cmd("is class", c.Cmd("get", "@", "target"), "container")
 		if c.Param("decide").Begin() {
@@ -150,6 +125,17 @@ func PrintObjectRules(c spec.Block) {
 		}
 		c.End()
 	}
+	// FIX FIX FIX FIX -- no support in Convert for commands which have primitive parameters.
+	// if c.Cmd("run rule", "print summary").Begin() {
+	// 	c.Param("if").Cmd("is class", c.Cmd("get", "@", "target"), "container")
+	// 	if c.Param("decide").Begin() {
+	// 		c.Cmd("say", `{~ if target.closed ~} closed
+	// 		 {~ elsif relationEmpty:"local" target ~} open but empty
+	// 		 {~ else ~} {printContent: target "in which is" true}`)
+	// 		c.End()
+	// 	}
+	// 	c.End()
+	// }
 	// keeping the pattern itself bare of parens, etc.
 	// that way the caller has some control over how its printed.
 	if c.Cmd("run rule", "print content").Begin() {

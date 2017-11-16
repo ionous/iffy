@@ -3,13 +3,14 @@ package std
 import (
 	"bytes"
 	"github.com/ahmetb/go-linq"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/rt"
 )
 
 // DescribeLocation prints details about the targeted location, including "paragraphs” for notable objects in the location, and a sentence for otherwise unremarkable objects.
 // It is a command, for now, and not a pattern due to the complexity of the code required to avoid describing the same object more than once.
 type DescribeLocation struct {
-	Location rt.Object
+	Location ident.Id
 }
 
 func (op *DescribeLocation) Execute(run rt.Runtime) (err error) {
@@ -45,7 +46,7 @@ func (op *DescribeLocation) mentionNotables(run rt.Runtime) (mentioned, unmentio
 				// objects may not have anything to say, in which case they become "unmentioned"
 				var buf bytes.Buffer
 				if e := rt.WritersBlock(run, &buf, func() (err error) {
-					return rt.Determine(run, &DescribeObject{obj})
+					return rt.Determine(run, &DescribeObject{obj.Id()})
 				}); e != nil {
 					err = e
 					break

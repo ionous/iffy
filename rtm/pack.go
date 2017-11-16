@@ -106,7 +106,7 @@ func getCopyFun(dst, src r.Type) (ret packFun) {
 		// NOTE: some sources support multiple eval interfaces:
 		// ex. core.Get, rules.Determine, express.Render, express.GetAt.
 		// so: we have to test dst a bit too.
-		// ex. {determine pattern} -> which pattern
+		// ex. {pattern!} -> which pattern
 		//
 		// FIX: in some cases, after we assign a pointer --
 		// the kind becomes "interface" when we evaluate it as a src later
@@ -189,39 +189,56 @@ func boolFromPointer(rtm *Rtm, dst, src r.Value) (err error) {
 	return
 }
 func boolFromEval(rtm *Rtm, dst, src r.Value) (err error) {
-	eval := src.Interface().(rt.BoolEval)
-	if v, e := eval.GetBool(rtm); e != nil {
-		err = e
+	if i := src.Interface(); i == nil {
+		err = coerce.Value(dst, r.ValueOf(false))
 	} else {
-		err = coerce.Value(dst, r.ValueOf(v))
+		eval := i.(rt.BoolEval)
+		if v, e := eval.GetBool(rtm); e != nil {
+			err = e
+		} else {
+			err = coerce.Value(dst, r.ValueOf(v))
+		}
 	}
 	return
 }
 func numberFromEval(rtm *Rtm, dst, src r.Value) (err error) {
-	eval := src.Interface().(rt.NumberEval)
-	if v, e := eval.GetNumber(rtm); e != nil {
-		err = e
+	if i := src.Interface(); i == nil {
+		err = coerce.Value(dst, r.ValueOf(0))
 	} else {
-		err = coerce.Value(dst, r.ValueOf(v))
+		eval := i.(rt.NumberEval)
+		if v, e := eval.GetNumber(rtm); e != nil {
+			err = e
+		} else {
+			err = coerce.Value(dst, r.ValueOf(v))
+		}
 	}
 	return
 }
 func textFromEval(rtm *Rtm, dst, src r.Value) (err error) {
-	eval := src.Interface().(rt.TextEval)
-	if v, e := eval.GetText(rtm); e != nil {
-		err = e
+	if i := src.Interface(); i == nil {
+		err = coerce.Value(dst, r.ValueOf(""))
 	} else {
-		err = coerce.Value(dst, r.ValueOf(v))
+		eval := i.(rt.TextEval)
+		if v, e := eval.GetText(rtm); e != nil {
+			err = e
+		} else {
+			err = coerce.Value(dst, r.ValueOf(v))
+		}
 	}
 	return
 }
 func objFromEval(rtm *Rtm, dst, src r.Value) (err error) {
-	eval := src.Interface().(rt.ObjectEval)
-	if v, e := eval.GetObject(rtm); e != nil {
-		err = e
-	} else {
+	if i := src.Interface(); i == nil {
 		// recurse since we dont know the dst type.
-		err = rtm.pack(dst, r.ValueOf(v))
+		err = rtm.pack(dst, r.ValueOf(""))
+	} else {
+		eval := i.(rt.ObjectEval)
+		if v, e := eval.GetObject(rtm); e != nil {
+			err = e
+		} else {
+			// recurse since we dont know the dst type.
+			err = rtm.pack(dst, r.ValueOf(v))
+		}
 	}
 	return
 }

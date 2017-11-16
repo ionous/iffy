@@ -78,7 +78,7 @@ func (c *Command) setField(dst r.Value, v interface{}) (err error) {
 		// all commands are interfaces are implemented with pointers
 		targetPtr := v.target.Addr()
 		if e := coerce.Value(dst, targetPtr); e != nil {
-			err = errutil.New("couldnt assign command", e)
+			err = errutil.New("couldnt assign command, because", e)
 		}
 	case *Commands:
 		if kind, isArray := arrayKind(dst.Type()); !isArray || kind != r.Interface {
@@ -129,7 +129,7 @@ func (c *Command) setValue(dst r.Value, src r.Value) (err error) {
 	} else if !v.IsValid() {
 		err = errutil.New("transform is empty")
 	} else if e := coerce.Value(dst, v); e != nil {
-		err = errutil.New("couldnt assign value", e)
+		err = errutil.New("couldnt assign value, because", e)
 	}
 	return
 }

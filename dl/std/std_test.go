@@ -3,6 +3,7 @@ package std_test
 import (
 	"bytes"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/express"
 	"github.com/ionous/iffy/dl/rules"
 	. "github.com/ionous/iffy/dl/std"
 	"github.com/ionous/iffy/ref/obj"
@@ -38,9 +39,9 @@ func TestStd(t *testing.T) {
 
 	t.Run("Names", func(t *testing.T) {
 		assert := testify.New(t)
-
 		//
-		rules, e := rules.Master(cmds, ops.Transformer(core.Transform), patterns, PrintNameRules)
+		xform := express.NewTransform(cmds, nil)
+		rules, e := rules.Master(cmds, xform, patterns, PrintNameRules)
 		assert.NoError(e)
 
 		// TODO: add test for: Rule for printing the name of the pen while taking inventory: say "useful pen".

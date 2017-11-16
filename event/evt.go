@@ -6,8 +6,8 @@ import (
 )
 
 type EventObject struct {
-	Id   ident.Id  // name of event
-	Data rt.Object // data for the event
+	Id  ident.Id  // name of event
+	Evt rt.Object // data for the event
 
 	Bubbles    bool // r/o does this bubble
 	Cancelable bool // r/o can this event be canceled

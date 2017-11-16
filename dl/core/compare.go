@@ -16,9 +16,9 @@ type CompareTo interface {
 type EqualTo struct{}
 type NotEqualTo struct{}
 type GreaterThan struct{}
-type LesserThan struct{}
-type GreaterThanOrEqualTo struct{}
-type LesserThanOrEqualTo struct{}
+type LessThan struct{}
+type GreaterOrEqual struct{}
+type LessOrEqual struct{}
 
 func (EqualTo) Compare() CompareType {
 	return Compare_EqualTo
@@ -29,13 +29,13 @@ func (NotEqualTo) Compare() CompareType {
 func (GreaterThan) Compare() CompareType {
 	return Compare_GreaterThan
 }
-func (LesserThan) Compare() CompareType {
-	return Compare_LesserThan
+func (LessThan) Compare() CompareType {
+	return Compare_LessThan
 }
-func (GreaterThanOrEqualTo) Compare() CompareType {
-	return Compare_LesserThan | Compare_EqualTo
+func (GreaterOrEqual) Compare() CompareType {
+	return Compare_LessThan | Compare_EqualTo
 }
-func (LesserThanOrEqualTo) Compare() CompareType {
+func (LessOrEqual) Compare() CompareType {
 	return Compare_GreaterThan | Compare_EqualTo
 }
 
@@ -43,7 +43,7 @@ func (LesserThanOrEqualTo) Compare() CompareType {
 const (
 	Compare_EqualTo CompareType = 1 << iota
 	Compare_GreaterThan
-	Compare_LesserThan
+	Compare_LessThan
 )
 
 type CompareNum struct {
@@ -75,7 +75,7 @@ func (comp *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
 		case d == 0:
 			ret = (cmp & Compare_EqualTo) != 0
 		case d < 0:
-			ret = (cmp & Compare_LesserThan) != 0
+			ret = (cmp & Compare_LessThan) != 0
 		case d > 0:
 			ret = (cmp & Compare_GreaterThan) != 0
 		}
@@ -92,13 +92,13 @@ func (comp *CompareText) GetBool(run rt.Runtime) (ret bool, err error) {
 		switch cmp := comp.Is.Compare(); cmp {
 		case Compare_EqualTo:
 			ret = src == tgt
-		case Compare_LesserThan:
+		case Compare_LessThan:
 			ret = src < tgt
 		case Compare_GreaterThan:
 			ret = src > tgt
 		case Compare_GreaterThan | Compare_EqualTo:
 			ret = src >= tgt
-		case Compare_LesserThan | Compare_EqualTo:
+		case Compare_LessThan | Compare_EqualTo:
 			ret = src <= tgt
 		default:
 			err = errutil.New("CompareText.Is", cmp, "unknown operand")
@@ -116,13 +116,13 @@ func (comp *CompareObj) GetBool(run rt.Runtime) (ret bool, err error) {
 		switch cmp := comp.Is.Compare(); cmp {
 		case Compare_EqualTo:
 			ret = src == tgt
-		case Compare_LesserThan:
+		case Compare_LessThan:
 			ret = src.Id().String() < tgt.Id().String()
 		case Compare_GreaterThan:
 			ret = src.Id().String() > tgt.Id().String()
 		case Compare_GreaterThan | Compare_EqualTo:
 			ret = src.Id().String() >= tgt.Id().String()
-		case Compare_LesserThan | Compare_EqualTo:
+		case Compare_LessThan | Compare_EqualTo:
 			ret = src.Id().String() <= tgt.Id().String()
 		default:
 			err = errutil.New("CompareText.Is", cmp, "unknown operand")
