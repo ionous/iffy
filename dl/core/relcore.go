@@ -6,11 +6,13 @@ import (
 	"github.com/ionous/iffy/rt/stream"
 )
 
+// RelationEmpty returns true if the requested object has no related objects.
 type RelationEmpty struct {
 	Relation string
 	Object   rt.ObjectEval
 }
 
+// RelatedList returns a stream of objects related to the requested object.
 type RelatedList struct {
 	Relation string
 	Object   rt.ObjectEval

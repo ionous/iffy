@@ -1,11 +1,12 @@
 package std
 
 import (
+	"io"
+
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/printer"
-	"io"
 )
 
 // UpperThe is equivalent to Inform7's [The]
@@ -96,7 +97,7 @@ func printArticle(run rt.Runtime, article string, obj rt.Object) (err error) {
 
 // You can only just make out the lamp-post.", or "You can only just make out _ Trevor.", or "You can only just make out the soldiers."
 func articleName(run rt.Runtime, article string, obj rt.Object) (ret string, err error) {
-	// FIX? i think filters would be better -- especically in printWithArticles -- but this matches existing code.
+	// FIX? i think filters would be better -- especially in printWithArticles -- but this matches existing code.
 	var span printer.Span
 	if e := rt.WritersBlock(run, &span, func() error {
 		return rt.Determine(run, &PrintName{obj.Id()})

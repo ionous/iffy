@@ -10,6 +10,7 @@ import (
 // really a pattern thing:
 const Undecided errutil.Error = "undecided"
 
+// Filter returns a list of objects which pass the evaluation
 type Filter struct {
 	List   rt.ObjListEval
 	Accept rt.BoolEval

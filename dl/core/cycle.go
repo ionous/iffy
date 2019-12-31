@@ -10,6 +10,7 @@ type CycleCounter struct {
 	Curr int
 }
 
+// CycleText when called multiple times returns each of its inputs in turn
 type CycleText struct {
 	Id     string
 	Values []rt.TextEval

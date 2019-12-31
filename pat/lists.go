@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/rt/stream"
 )
 
+// Flags controlling how individual list rules ( which each respond with multiple results ) work together.
 type Flags int
 
 //go:generate stringer -type=Flags
@@ -14,51 +15,63 @@ const (
 	Postfix
 )
 
-// BoolRule holds the distallation of a BoolRule.
+// BoolRule responds with a true/false result when its filters are satisfied.
+// It works in conjunction with BoolRules.
 type BoolRule struct {
 	Filters Filters
 	rt.BoolEval
 }
 
-// NumberRule holds the distallation of a NumberRule.
+// NumberRule responds with a single number when its filters are satisfied.
+// It works in conjunction with NumberRules.
 type NumberRule struct {
 	Filters Filters
 	rt.NumberEval
 }
 
-// TextRule holds the distallation of a TextRule.
+// TextRule responds with a bit of text when its filters are satisfied.
+// It works in conjunction with TextRules.
 type TextRule struct {
 	Filters Filters
 	rt.TextEval
 }
 
-// ObjectRule holds the distallation of a ObjectRule.
+// ObjectRule responds with an object when its filters are satisfied.
+// It works in conjunction with ObjectRules.
 type ObjectRule struct {
 	Filters Filters
 	rt.ObjectEval
 }
 
-// ListRule base for all rules which return streams of data.
+// ListRule for any rule which can respond with multiple results.
 type ListRule struct {
 	Filters Filters
 	Flags
 }
 
-// NumListRule holds the distallation of a NumListRule.
+// NumListRule responds with a stream of numbers when its filters are satisfied.
+// It works in conjunction with NumListRules.
 type NumListRule struct {
 	ListRule
 	rt.NumListEval
 }
+
+// TextListRule responds with a stream of text when its filters are satisfied.
+// It works in conjunction with TextListRules.
 type TextListRule struct {
 	ListRule
 	rt.TextListEval
 }
+
+// ObjListRule responds with a stream of objects when its filters are satisfied.
+// It works in conjunction with ObjListRules.
 type ObjListRule struct {
 	ListRule
 	rt.ObjListEval
 }
 
-// ExecuteRule holds the distallation of a RunRule.
+// ExecuteListRule triggers a series of statements when its filters are satisfied.
+// It works in conjunction with ExecuteRules.
 type ExecuteRule struct {
 	ListRule
 	rt.Execute
