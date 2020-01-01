@@ -1,6 +1,6 @@
 package reader
 
-import "github.com/ionous/ephemera"
+import "github.com/ionous/iffy/ephemera"
 
 type NameList struct {
 	Named []ephemera.Named

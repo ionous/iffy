@@ -21,7 +21,7 @@ func (jq *GenQueue) Prep(which string, keys ...string) {
 func (jq *GenQueue) Write(which string, args ...interface{}) (ret Queued) {
 	keys := jq.keys[which]
 	if len(keys) != len(args) {
-		log.Fatal("mismatched keys")
+		log.Fatal("mismatched keys for ", which)
 	} else {
 		type Row map[string]interface{}
 		type Rows []Row

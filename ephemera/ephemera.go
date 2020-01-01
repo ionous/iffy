@@ -79,12 +79,12 @@ func (r *Recorder) Primitive(primType string, kind, prop Named) {
 
 // Relation defines a connection between a primary and secondary kind.
 func (r *Recorder) Relation(relation, primary, cardinality, secondary Named) {
-	r.q.Write("Kind", relation, primary, cardinality, secondary)
+	r.q.Write("Relation", relation, primary, cardinality, secondary)
 }
 
 // Relative connects two specific nouns using a relativizer.
 func (r *Recorder) Relative(relativizer, primary, secondary Named) {
-	r.q.Write("Kind", relativizer, primary, secondary)
+	r.q.Write("Relative", relativizer, primary, secondary)
 }
 
 // Trait records a member of an aspect and its order ( rank. )

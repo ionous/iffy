@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/ionous/ephemera"
-	"github.com/ionous/ephemera/debug"
-	"github.com/ionous/ephemera/reader"
+	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/ephemera/debug"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/kr/pretty"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -118,6 +118,17 @@ const (
 	NAMED_TRAIT       = "trait"
 )
 
+func parseAttrs(r *Parser, item reader.Map) {
+	defer r.on(NAMED_TRAIT, func(trait ephemera.Named) {
+		for _, noun := range r.nouns.Named {
+			r.Value(trait, noun, true)
+		}
+	})()
+	for _, it := range item.SliceOf("$ATTRIBUTE") {
+		r.catStr(reader.Cast(it), NAMED_TRAIT)
+	}
+}
+
 var fns = map[string]Parse{
 	// story is a bunch of paragraphs
 	"story": func(r *Parser, item reader.Map) {
@@ -130,6 +141,7 @@ var fns = map[string]Parse{
 	},
 
 	"story_statement": func(r *Parser, item reader.Map) {
+		r.nouns.Swap(nil)
 		r.parse(item)
 	},
 
@@ -152,19 +164,16 @@ var fns = map[string]Parse{
 
 	// "{relation} {+noun} {are_being} {+noun}."
 	// ex. On the beach are shells.
-	// FIX: plural supposition
 	"relative_to_noun": func(r *Parser, item reader.Map) {
 		relation := r.namedStr(item, NAMED_RELATIVIZER, "$RELATION")
 		//
-		var nouns, moreNouns []ephemera.Named
-		defer r.on(NAMED_NOUN, func(noun ephemera.Named) {
-			nouns = append(nouns, noun)
-		})()
+		r.parseSlice(item.SliceOf("$NOUN"))
+		leadingNouns := r.nouns.Swap(nil)
 		r.parseSlice(item.SliceOf("$NOUN1"))
-		moreNouns, nouns = nouns, nil       // transfer into "moreNouns"
-		r.parseSlice(item.SliceOf("$NOUN")) // parse into "nouns"
-		for _, a := range nouns {
-			for _, b := range moreNouns {
+		trailingNouns := r.nouns.Swap(leadingNouns)
+		//
+		for _, a := range leadingNouns {
+			for _, b := range trailingNouns {
 				r.Relative(relation, a, b)
 			}
 		}
@@ -214,7 +223,6 @@ var fns = map[string]Parse{
 	//"{plural_kinds} {are_being} {certainty} {attribute}.");
 	// horses are usually fast.
 	"certainties": func(r *Parser, item reader.Map) {
-		// fix: if the parameters were standard could we xform parameter to category?
 		certainty := r.namedStr(item, NAMED_CERTAINTY, "$CERTAINTY")
 		trait := r.namedStr(item, NAMED_TRAIT, "$ATTRIBUTE")
 		kind := r.namedStr(item, NAMED_KIND, "$PLURAL_KINDS")
@@ -254,13 +262,12 @@ var fns = map[string]Parse{
 	"noun_relation": func(r *Parser, item reader.Map) {
 		relation := r.namedStr(item, NAMED_RELATIVIZER, "$RELATION")
 		//
-		var nouns []ephemera.Named
-		defer r.on(NAMED_NOUN, func(noun ephemera.Named) {
-			nouns = append(nouns, noun)
-		})()
+		leadingNouns := r.nouns.Swap(nil)
 		r.parseSlice(item.SliceOf("$NOUN"))
-		for _, n := range nouns {
-			for _, d := range r.nouns.Named {
+		trailingNouns := r.nouns.Swap(leadingNouns)
+		//
+		for _, n := range leadingNouns {
+			for _, d := range trailingNouns {
 				r.Relative(n, d, relation)
 			}
 		}
@@ -286,41 +293,43 @@ var fns = map[string]Parse{
 		id := r.lastId
 		det := r.getStr(item, "$DETERMINER")
 		noun := r.namedStr(item, NAMED_NOUN, "$COMMON_NAME")
+		r.nouns.Add(noun)
+		// set common nounType to true ( implicitly defined by "noun" )
+		nounType := r.Named(NAMED_TRAIT, "common", id)
+		r.Value(nounType, noun, true)
+		//
 		if det[0] != '$' {
 			article := r.Named(NAMED_FIELD, "indefinite article", id)
 			r.Value(article, noun, det)
-		}
-		r.nouns.Add(noun)
-		once := "common_noun"
-		if r.once(once) {
-			indefinite := r.Named(NAMED_FIELD, "indefinite article", once)
-			things := r.Named(NAMED_KIND, "things", once)
-			r.Primitive(PRIM_TEXT, things, indefinite)
+			once := "common_noun"
+			if r.once(once) {
+				indefinite := r.Named(NAMED_FIELD, "indefinite article", once)
+				things := r.Named(NAMED_KIND, "things", once)
+				r.Primitive(PRIM_TEXT, things, indefinite)
+			}
 		}
 	},
 
 	// run: "{proper_name}"
-	// FIX
 	// common / proper setting
 	"proper_noun": func(r *Parser, item reader.Map) {
+		id := r.lastId
 		noun := r.namedStr(item, NAMED_NOUN, "$PROPER_NAME")
 		r.nouns.Add(noun)
+		// set proper nounType to true ( implicitly defined by "noun" )
+		nounType := r.Named(NAMED_TRAIT, "proper", id)
+		r.Value(nounType, noun, true)
 	},
 
 	// run: "{are_an} {*attribute} {kind} {?noun_relation}"
 	// ex. "(the box) is a closed container on the beach"
-	// FIX: plural supposition
 	"kind_of_noun": func(r *Parser, item reader.Map) {
 		//
 		kind := r.namedStr(item, NAMED_KIND, "$KIND")
-		//
-		r.parseSlice(item.SliceOf("$ATTRIBUTE"))
-		defer r.on(NAMED_TRAIT, func(trait ephemera.Named) {
-			for _, noun := range r.nouns.Named {
-				r.Noun(noun, kind)
-				r.Value(trait, noun, true)
-			}
-		})()
+		for _, noun := range r.nouns.Named {
+			r.Noun(noun, kind)
+		}
+		parseAttrs(r, item)
 		// noun relation takes care of itself --
 		// relating the new nouns to the existing nouns.
 		r.parse(item.MapOf("$NOUN_RELATION"))
@@ -328,24 +337,13 @@ var fns = map[string]Parse{
 
 	// run: "{are_being} {+attribute}"
 	// ex. "(the box) is closed"
-	// FIX: plural supposition
-	"noun_attrs": func(r *Parser, item reader.Map) {
-		// FIX: todo
-	},
+	"noun_attrs": parseAttrs,
 
 	// run: "{are_either} {+attribute}."
-	// FIX: plural supposition
-	"attribute_phrase": func(r *Parser, item reader.Map) {
-	},
+	"attribute_phrase": parseAttrs,
 
 	// run: "{The [summary] is:: %lines}"
 	"summary": func(r *Parser, item reader.Map) {
-		// fix. from Inform: "either the "description" of the most recently discussed room,
-		// or the "initial appearance" of the most recently discussed thing."
-		//
-		// one option would be a "names group" when there's more than one
-		// and you let the compiler sort it out.
-		// currently -- you dont even really have a warnings come out of here....
 		once := "summary"
 		id := r.lastId
 		if r.once(once) {
@@ -353,7 +351,6 @@ var fns = map[string]Parse{
 			appear := r.Named(NAMED_FIELD, "appearance", once)
 			r.Primitive(PRIM_EXPR, things, appear)
 		}
-		// FIX: because we arent passing the container in, we can't for id.
 		prop := r.Named(NAMED_FIELD, "appearance", id)
 		noun := r.nouns.Last()
 		val := r.namedStr(item, PRIM_EXPR, "$LINES")
