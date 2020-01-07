@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"strings"
+
+	"github.com/ionous/errutil"
 )
 
 type DbQueue struct {
@@ -18,15 +20,41 @@ func NewDBQueue(db *sql.DB) *DbQueue {
 	}
 }
 
-func (q *DbQueue) Prep(which string, keys ...string) {
+const AutoKey = "ROWID"
+
+func (q *DbQueue) Create(which string, cols []Col) (err error) {
+	desc := make([]string, len(cols))
+	for i, c := range cols {
+		desc[i] = c.ColumnName + "  " + c.TypeName
+	}
+	create := "drop table if exists " + which + "; create table " + which + "(" + strings.Join(desc, ", ") + ");"
+	if _, e := q.db.Exec(create); e != nil {
+		err = errutil.New(e, "for", create)
+	}
+	return
+}
+
+func (q *DbQueue) Prep(which string, cols ...Col) {
 	if _, ok := q.statements[which]; ok {
-		log.Fatal(which, "already exists")
+		log.Fatalln("prep", which, "already exists")
+	} else if e := q.Create(which, cols); e != nil {
+		log.Fatalln("prep", e)
 	} else {
+		//
 		//"insert into foo(id, name) values(?, ?)"
-		cols := "(" + strings.Join(keys, ", ") + ")"
-		vals := "(" + strings.Repeat("?, ", len(keys)) + ")"
-		if stmt, e := q.db.Prepare("INSERT into " + which + cols + " values" + vals); e != nil {
-			log.Fatal(e)
+		vals := "?"
+		if kcnt := len(cols) - 1; kcnt > 0 {
+			vals += strings.Repeat(",?", kcnt)
+		}
+		keys := make([]string, len(cols))
+		for i, c := range cols {
+			keys[i] = c.ColumnName
+		}
+		query := "INSERT into " + which +
+			"(" + strings.Join(keys, ", ") + ")" +
+			" values " + "(" + vals + ");"
+		if stmt, e := q.db.Prepare(query); e != nil {
+			log.Fatalln("prep insert", query, e)
 		} else {
 			q.statements[which] = stmt
 		}
@@ -36,46 +64,13 @@ func (q *DbQueue) Prep(which string, keys ...string) {
 
 func (q *DbQueue) Write(which string, args ...interface{}) (ret Queued) {
 	if stmt, ok := q.statements[which]; !ok {
-		log.Fatal(which, " doesn't exist")
+		log.Fatalln(which, "doesn't exist")
 	} else if res, e := stmt.Exec(args...); e != nil {
-		log.Fatal(e)
+		log.Fatalln("write", e)
 	} else if id, e := res.LastInsertId(); e != nil {
-		log.Fatal(e)
+		log.Fatalln("last id", e)
 	} else {
 		ret = Queued{id}
 	}
 	return
 }
-
-// for returning string primary keys
-//dbConn.QueryRow("INSERT INTO product (title) VALUES ($1) RETURNING product_id", p.Title).Scan(&p)
-
-// _, err = db.Exec("insert into foo(id, name) values(1, 'foo'), (2, 'bar'), (3, 'baz')")
-// stmt, err = db.Prepare("select name from foo where id = ?")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer stmt.Close()
-// 	var name string
-// 	err = stmt.QueryRow("3").Scan(&name)
-// sqlStmt := `
-// 	create table foo (id integer not null primary key, name text);
-// 	delete from foo;
-// 	`
-// 	_, err = db.Exec(sqlStmt)
-// 	if err != nil {
-// 		log.Printf("%q: %s\n", err, sqlStmt)
-// 		return
-// 	}
-
-// stmt, err := db.Prepare("INSERT INTO projects(id, mascot, release, category) VALUES( ?, ?, ?, ? )")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer stmt.Close() // Prepared statements take up server resources and should be closed after use.
-
-// 	for id, project := range projects {
-// 		if _, err := stmt.Exec(id+1, project.mascot, project.release, "open source"); err != nil {
-// 			log.Fatal(err)
-// 		}
-// 	}

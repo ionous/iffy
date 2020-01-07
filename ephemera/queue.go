@@ -1,12 +1,18 @@
 package ephemera
 
-type Queued struct {
-	id int64
-}
-
-// wrapper which can write to a db.... or not.
+// Queue provides a wrapper which can write to a db.... or not.
 type Queue interface {
-	Prep(which string, keys ...string)
+	Prep(which string, keys ...Col)
 	// for now, panics on error
 	Write(which string, args ...interface{}) Queued
+}
+
+// Col describes a column in Queue.
+type Col struct {
+	ColumnName, TypeName string
+}
+
+// Queued provides an opaque return value for rows written by Queues
+type Queued struct {
+	id int64
 }

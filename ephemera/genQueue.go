@@ -7,13 +7,16 @@ type GenQueue struct {
 	Tables map[string]interface{}
 }
 
-//"insert into foo(id, name) values(?, ?)"
-func (jq *GenQueue) Prep(which string, keys ...string) {
+func (jq *GenQueue) Prep(which string, cols ...Col) {
 	if jq.keys == nil {
 		jq.keys = make(map[string][]string)
 	}
 	if jq.Tables == nil {
 		jq.Tables = make(map[string]interface{})
+	}
+	keys := make([]string, len(cols))
+	for i, c := range cols {
+		keys[i] = c.ColumnName
 	}
 	jq.keys[which] = keys
 }
@@ -21,7 +24,7 @@ func (jq *GenQueue) Prep(which string, keys ...string) {
 func (jq *GenQueue) Write(which string, args ...interface{}) (ret Queued) {
 	keys := jq.keys[which]
 	if len(keys) != len(args) {
-		log.Fatal("mismatched keys for ", which)
+		log.Fatalln("mismatched keys for", which)
 	} else {
 		type Row map[string]interface{}
 		type Rows []Row

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
+	"os/user"
+	"path"
 
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/debug"
@@ -78,7 +81,7 @@ func (r *Parser) parse(m reader.Map) {
 
 		log.Println("parsing", currId, currType)
 		if fn, ok := r.table[currType]; !ok {
-			log.Fatal("unknown type ", currType)
+			log.Fatalln("unknown type", currType)
 		} else {
 			r.lastId, r.lastType, r.lastValue = currId, currType, currValue
 			fn(r, currValue)
@@ -358,32 +361,39 @@ var fns = map[string]Parse{
 	},
 }
 
+// 	flag.Parse() for processing command line args
 func main() {
-	// if db, e := sql.Open("sqlite3",
-	// 	"file:test.db?cache=shared&mode=memory"); e != nil {
-	// 	log.Fatal(e)
-	// } else {
-	var top reader.Map
-	if e := json.Unmarshal([]byte(debug.Blob), &top); e != nil {
-		log.Fatal(e)
-	}
-	q := &ephemera.GenQueue{}
-	rec := ephemera.NewRecorder("blob", q)
-	r := Parser{Recorder: rec,
-		table:      fns,
-		oneTime:    make(map[string]bool),
-		categories: make(map[string]CategoryEvent),
-	}
-
-	top.Expect(itemType, "story")
-	r.parse(top)
-	if b, e := json.MarshalIndent(q.Tables, "", "  "); e != nil {
-		log.Fatal(e)
+	// const mem = 	"file:test.db?cache=shared&mode=memory";
+	if user, e := user.Current(); e != nil {
+		log.Fatalln(e)
 	} else {
-		pretty.Println("tables", string(b))
+		const fileName = path.Join(user.HomeDir, "iffyTest.db")
+		if db, e := sql.Open("sqlite3", fileName); e != nil {
+			log.Fatalln("db open", e)
+		} else {
+			var top reader.Map
+			if e := json.Unmarshal([]byte(debug.Blob), &top); e != nil {
+				log.Fatalln("read json", e)
+			}
+			genq := &ephemera.GenQueue{}
+			dbq := ephemera.NewDBQueue(db)
+			q := ephemera.NewStack(genq, dbq)
+			rec := ephemera.NewRecorder("blob", q)
+			r := Parser{Recorder: rec,
+				table:      fns,
+				oneTime:    make(map[string]bool),
+				categories: make(map[string]CategoryEvent),
+			}
 
+			top.Expect(itemType, "story")
+			r.parse(top)
+			if b, e := json.MarshalIndent(genq.Tables, "", "  "); e != nil {
+				log.Fatalln(e)
+			} else {
+				pretty.Println("tables", string(b))
+			}
+
+			defer db.Close()
+		}
 	}
-
-	// defer db.Close()
-	// }
 }

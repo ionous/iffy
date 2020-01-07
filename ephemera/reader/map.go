@@ -30,6 +30,6 @@ func (m Map) SliceOf(key string) []interface{} {
 
 func (m Map) Expect(key, want string) {
 	if have, ok := m[key]; !ok || want != have {
-		log.Fatal("wanted ", want, " have ", have)
+		log.Fatalln("wanted", want, "have", have)
 	}
 }
