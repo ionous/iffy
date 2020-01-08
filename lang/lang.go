@@ -1,10 +1,11 @@
 package lang
 
 import (
-	"bitbucket.org/pkg/inflect"
 	"regexp"
 	"strings"
 	"unicode"
+
+	"bitbucket.org/pkg/inflect"
 )
 
 var Articles = []string{"the", "a", "an", "our", "some"}
@@ -15,12 +16,14 @@ var articleBare = regexp.MustCompile("^(" + articleBar + ")$")
 const NewLine = "\n"
 const Space = " "
 
+// IsArticle returns true if the passed string starts with one of the common determiners.
 func IsArticle(s string) bool {
 	return articleBare.MatchString(s)
 }
 
-func SliceArticle(str string) (article, bare string) {
-	n := strings.TrimSpace(str)
+// SliceArticle splits the passed string into a common determiner (if any) and the remaining text.
+func SliceArticle(s string) (article, bare string) {
+	n := strings.TrimSpace(s)
 	if pair := articles.FindStringIndex(n); pair == nil {
 		bare = n
 	} else {
@@ -31,12 +34,13 @@ func SliceArticle(str string) (article, bare string) {
 	return article, bare
 }
 
-func StripArticle(str string) string {
-	_, bare := SliceArticle(str)
+// StripArticle removes common determiners from the start of the passed string.
+func StripArticle(s string) string {
+	_, bare := SliceArticle(s)
 	return bare
 }
 
-//
+// Singularize attempts to return the singular form of the passed assumed plural string.
 func Singularize(s string) (ret string) {
 	if len(s) > 0 {
 		ret = inflect.Singularize(s)
@@ -44,12 +48,17 @@ func Singularize(s string) (ret string) {
 	return
 }
 
-//
+// Pluralize attempts to return the plural form of the passed assumed singular string.
 func Pluralize(s string) (ret string) {
 	if len(s) > 0 {
 		ret = inflect.Pluralize(s)
 	}
 	return
+}
+
+// IsPlural returns true if the passed string seems pluralized.
+func IsPlural(s string) bool {
+	return s != inflect.Singularize(s)
 }
 
 // Capitalize returns a new string, starting the first word with a capital.
@@ -77,6 +86,7 @@ func Titlecase(s string) (ret string) {
 	return
 }
 
+// Lowerspace returns the passed string in lowercase with common word separators changed into spaces.
 func Lowerspace(s string) (ret string) {
 	if len(s) > 0 {
 		res := inflect.Humanize(s)
@@ -85,10 +95,12 @@ func Lowerspace(s string) (ret string) {
 	return
 }
 
+// Lowercase is an alias for strings.ToLower
 func Lowercase(s string) string {
 	return strings.ToLower(s)
 }
 
+// StartsWith returns true if the passed string starts with any one of the passed strings in set
 func StartsWith(s string, set ...string) (ok bool) {
 	for _, x := range set {
 		if strings.HasPrefix(s, x) {
@@ -99,7 +111,8 @@ func StartsWith(s string, set ...string) (ok bool) {
 	return ok
 }
 
-//http://www.mudconnect.com/SMF/index.php?topic=74725.0
+// StartsWithVowel returns true if the passed strings starts with a vowel or vowel sound.
+// http://www.mudconnect.com/SMF/index.php?topic=74725.0
 func StartsWithVowel(str string) (vowelSound bool) {
 	s := strings.ToUpper(str)
 	if StartsWith(s, "A", "E", "I", "O", "U") {
@@ -110,4 +123,9 @@ func StartsWithVowel(str string) (vowelSound bool) {
 		vowelSound = true
 	}
 	return vowelSound
+}
+
+// ContainsPunct returns true if any rune of s returns true for unicode.IsPunct.
+func ContainsPunct(s string) bool {
+	return strings.IndexFunc(s, unicode.IsPunct) >= 0
 }

@@ -1,11 +1,9 @@
 package assembly
 
 import (
-	"database/sql"
 	"os/user"
 	"path"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 )
 
@@ -26,35 +24,17 @@ func getPath() (ret string, err error) {
 	return
 }
 
-func MissingKinds(db *sql.DB, cb func(kind string)) (err error) {
-	if kinds, e := db.Query(
-		`select distinct named.name as kind 
-			 from named
-			 where kind not in (
-			 	select kind from ancestry
-			 ) and named.category = 'kind'`); e != nil {
-		err = e
-	} else {
-		for kinds.Next() {
-			var k string
-			if e := kinds.Scan(&k); e != nil {
-				err = e
-				break
-			} else {
-				cb(k)
-			}
-		}
-		if e := kinds.Err(); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}
-
 func NewWriter(q ephemera.Queue) *Writer {
-	q.Prep("Ancestry",
-		ephemera.Col{"kind", "text"},
-		ephemera.Col{"path", "text"})
+	q.Prep("ancestry",
+		ephemera.Col{Name: "kind", Type: "text"},
+		ephemera.Col{Name: "path", Type: "text"},
+	)
+	//
+	q.Prep("property",
+		ephemera.Col{Name: "field", Type: "text"},
+		ephemera.Col{Name: "kind", Type: "text"},
+		ephemera.Col{Name: "type", Type: "text"},
+	)
 	return &Writer{q}
 }
 
@@ -64,6 +44,11 @@ type Writer struct {
 
 // write kind and comma separated ancestors
 func (w *Writer) WriteAncestor(kind, path string) {
-	// fix error
-	w.q.Write("Ancestry", kind, path)
+	// fix return error
+	w.q.Write("ancestry", kind, path)
+}
+
+func (w *Writer) WriteField(field, owner, fieldType string) {
+	// fix return error
+	w.q.Write("property", field, owner, fieldType)
 }

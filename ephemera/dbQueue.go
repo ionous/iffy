@@ -25,7 +25,7 @@ const AutoKey = "ROWID"
 func (q *DbQueue) Create(which string, cols []Col) (err error) {
 	desc := make([]string, len(cols))
 	for i, c := range cols {
-		desc[i] = c.ColumnName + "  " + c.TypeName
+		desc[i] = c.Name + "  " + c.Type
 	}
 	create := "drop table if exists " + which + "; create table " + which + "(" + strings.Join(desc, ", ") + ");"
 	if _, e := q.db.Exec(create); e != nil {
@@ -48,7 +48,7 @@ func (q *DbQueue) Prep(which string, cols ...Col) {
 		}
 		keys := make([]string, len(cols))
 		for i, c := range cols {
-			keys[i] = c.ColumnName
+			keys[i] = c.Name
 		}
 		query := "INSERT into " + which +
 			"(" + strings.Join(keys, ", ") + ")" +

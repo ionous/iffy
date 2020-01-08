@@ -175,6 +175,5 @@ func TestMissingKinds(t *testing.T) {
 		if len(missing) != 1 || missing[0] != "R" {
 			t.Fatal("expected R, have", missing)
 		}
-
 	}
 }

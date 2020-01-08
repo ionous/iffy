@@ -102,33 +102,14 @@ const (
 	itemValue = "value"
 )
 
-const (
-	PRIM_TEXT   = "text" // string
-	PRIM_DIGI   = "digi" // number
-	PRIM_EXPR   = "expr" // text expression
-	PRIM_COMP   = "comp" // number computation
-	PRIM_PROG   = "prog" // program
-	PRIM_ASPECT = "attr"
-)
-
-const (
-	NAMED_ASPECT      = "aspect"
-	NAMED_CERTAINTY   = "certainty"
-	NAMED_FIELD       = "field"
-	NAMED_KIND        = "kind"
-	NAMED_NOUN        = "noun"
-	NAMED_RELATIVIZER = "relativizer"
-	NAMED_TRAIT       = "trait"
-)
-
 func parseAttrs(r *Parser, item reader.Map) {
-	defer r.on(NAMED_TRAIT, func(trait ephemera.Named) {
+	defer r.on(ephemera.NAMED_TRAIT, func(trait ephemera.Named) {
 		for _, noun := range r.nouns.Named {
 			r.Value(trait, noun, true)
 		}
 	})()
 	for _, it := range item.SliceOf("$ATTRIBUTE") {
-		r.catStr(reader.Cast(it), NAMED_TRAIT)
+		r.catStr(reader.Cast(it), ephemera.NAMED_TRAIT)
 	}
 }
 
@@ -157,9 +138,9 @@ var fns = map[string]Parse{
 	// run "The {property} of {+noun} is the {[text]:: %lines}"
 	// ex. The description of the nets is xxx
 	"noun_assignment": func(r *Parser, item reader.Map) {
-		val := r.namedStr(item, PRIM_EXPR, "$LINES")
-		prop := r.namedStr(item, NAMED_FIELD, "$PROPERTY")
-		defer r.on(NAMED_NOUN, func(noun ephemera.Named) {
+		val := r.namedStr(item, ephemera.PRIM_EXPR, "$LINES")
+		prop := r.namedStr(item, ephemera.NAMED_FIELD, "$PROPERTY")
+		defer r.on(ephemera.NAMED_NOUN, func(noun ephemera.Named) {
 			r.Value(prop, noun, val)
 		})()
 		r.parseSlice(item.SliceOf("$NOUN"))
@@ -168,7 +149,7 @@ var fns = map[string]Parse{
 	// "{relation} {+noun} {are_being} {+noun}."
 	// ex. On the beach are shells.
 	"relative_to_noun": func(r *Parser, item reader.Map) {
-		relation := r.namedStr(item, NAMED_RELATIVIZER, "$RELATION")
+		relation := r.namedStr(item, ephemera.NAMED_RELATIVIZER, "$RELATION")
 		//
 		r.parseSlice(item.SliceOf("$NOUN"))
 		leadingNouns := r.nouns.Swap(nil)
@@ -185,38 +166,38 @@ var fns = map[string]Parse{
 	// "{plural_kinds} {are_an} kind of {kind}."
 	// ex. "cats are a kind of animal"
 	"kinds_of_thing": func(r *Parser, item reader.Map) {
-		kind := r.namedStr(item, NAMED_KIND, "$PLURAL_KINDS")
-		parent := r.namedStr(item, NAMED_KIND, "$KIND")
+		kind := r.namedStr(item, ephemera.NAMED_KIND, "$PLURAL_KINDS")
+		parent := r.namedStr(item, ephemera.NAMED_KIND, "$KIND")
 		r.Kind(kind, parent)
 	},
 
 	// "{qualities} {are_an} kind of value."
 	// ex. colors are a kind of value
 	"kinds_of_quality": func(r *Parser, item reader.Map) {
-		aspect := r.namedStr(item, NAMED_ASPECT, "$QUALITY")
+		aspect := r.namedStr(item, ephemera.NAMED_ASPECT, "$QUALITY")
 		r.Aspect(aspect)
 	},
 
 	// "{plural_kinds} {attribute_phrase}"
 	// ex. animals are fast or slow.
 	"class_attributes": func(r *Parser, item reader.Map) {
-		kind := r.namedStr(item, NAMED_KIND, "$PLURAL_KINDS")
+		kind := r.namedStr(item, ephemera.NAMED_KIND, "$PLURAL_KINDS")
 		//
 		var traits []ephemera.Named
-		defer r.on(NAMED_TRAIT, func(trait ephemera.Named) {
+		defer r.on(ephemera.NAMED_TRAIT, func(trait ephemera.Named) {
 			traits = append(traits, trait)
 		})()
 		r.parse(item.MapOf("$ATTRIBUTE_PHRASE"))
 		// create an implied aspect named after the first trait
-		r.Primitive(PRIM_ASPECT, kind, traits[0])
+		r.Primitive(ephemera.PRIM_ASPECT, kind, traits[0])
 	},
 
 	// "{qualities} {attribute_phrase}"
 	// (the) colors are red, blue, or green.
 	"quality_attributes": func(r *Parser, item reader.Map) {
-		aspect := r.namedStr(item, NAMED_ASPECT, "$QUALITIES")
+		aspect := r.namedStr(item, ephemera.NAMED_ASPECT, "$QUALITIES")
 		rank := 0
-		defer r.on(NAMED_TRAIT, func(trait ephemera.Named) {
+		defer r.on(ephemera.NAMED_TRAIT, func(trait ephemera.Named) {
 			r.Trait(trait, aspect, rank)
 			rank += 1
 		})()
@@ -226,9 +207,9 @@ var fns = map[string]Parse{
 	//"{plural_kinds} {are_being} {certainty} {attribute}.");
 	// horses are usually fast.
 	"certainties": func(r *Parser, item reader.Map) {
-		certainty := r.namedStr(item, NAMED_CERTAINTY, "$CERTAINTY")
-		trait := r.namedStr(item, NAMED_TRAIT, "$ATTRIBUTE")
-		kind := r.namedStr(item, NAMED_KIND, "$PLURAL_KINDS")
+		certainty := r.namedStr(item, ephemera.NAMED_CERTAINTY, "$CERTAINTY")
+		trait := r.namedStr(item, ephemera.NAMED_TRAIT, "$ATTRIBUTE")
+		kind := r.namedStr(item, ephemera.NAMED_KIND, "$PLURAL_KINDS")
 		r.Certainty(certainty, trait, kind)
 	},
 
@@ -236,8 +217,8 @@ var fns = map[string]Parse{
 	// ex. cats have some text called breed.
 	// ex. horses have an aspect called speed.
 	"kinds_possess_properties": func(r *Parser, item reader.Map) {
-		kind := r.namedStr(item, NAMED_KIND, "$PLURAL_KINDS")
-		prop := r.namedStr(item, NAMED_KIND, "$PROPERTY")
+		kind := r.namedStr(item, ephemera.NAMED_KIND, "$PLURAL_KINDS")
+		prop := r.namedStr(item, ephemera.NAMED_KIND, "$PROPERTY")
 		primType := r.getStr(item, "$PRIMITIVE_TYPE")
 		r.Primitive(primType, kind, prop)
 	},
@@ -263,7 +244,7 @@ var fns = map[string]Parse{
 	// ex. (the cat and the hat) are in (the book)
 	// ex. (Hector and Maria) are suspicious of (Santa and Santana).
 	"noun_relation": func(r *Parser, item reader.Map) {
-		relation := r.namedStr(item, NAMED_RELATIVIZER, "$RELATION")
+		relation := r.namedStr(item, ephemera.NAMED_RELATIVIZER, "$RELATION")
 		//
 		leadingNouns := r.nouns.Swap(nil)
 		r.parseSlice(item.SliceOf("$NOUN"))
@@ -280,11 +261,11 @@ var fns = map[string]Parse{
 	"noun": func(r *Parser, item reader.Map) {
 		once := "noun"
 		if r.once(once) {
-			things := r.Named(NAMED_KIND, "things", once)
-			nounType := r.Named(NAMED_FIELD, "nounType", once)
-			common := r.Named(NAMED_TRAIT, "common", once)
-			proper := r.Named(NAMED_TRAIT, "proper", once)
-			r.Primitive(PRIM_ASPECT, things, nounType)
+			things := r.Named(ephemera.NAMED_KIND, "things", once)
+			nounType := r.Named(ephemera.NAMED_FIELD, "nounType", once)
+			common := r.Named(ephemera.NAMED_TRAIT, "common", once)
+			proper := r.Named(ephemera.NAMED_TRAIT, "proper", once)
+			r.Primitive(ephemera.PRIM_ASPECT, things, nounType)
 			r.Trait(common, nounType, 0)
 			r.Trait(proper, nounType, 1)
 		}
@@ -295,20 +276,20 @@ var fns = map[string]Parse{
 	"common_noun": func(r *Parser, item reader.Map) {
 		id := r.lastId
 		det := r.getStr(item, "$DETERMINER")
-		noun := r.namedStr(item, NAMED_NOUN, "$COMMON_NAME")
+		noun := r.namedStr(item, ephemera.NAMED_NOUN, "$COMMON_NAME")
 		r.nouns.Add(noun)
 		// set common nounType to true ( implicitly defined by "noun" )
-		nounType := r.Named(NAMED_TRAIT, "common", id)
+		nounType := r.Named(ephemera.NAMED_TRAIT, "common", id)
 		r.Value(nounType, noun, true)
 		//
 		if det[0] != '$' {
-			article := r.Named(NAMED_FIELD, "indefinite article", id)
+			article := r.Named(ephemera.NAMED_FIELD, "indefinite article", id)
 			r.Value(article, noun, det)
 			once := "common_noun"
 			if r.once(once) {
-				indefinite := r.Named(NAMED_FIELD, "indefinite article", once)
-				things := r.Named(NAMED_KIND, "things", once)
-				r.Primitive(PRIM_TEXT, things, indefinite)
+				indefinite := r.Named(ephemera.NAMED_FIELD, "indefinite article", once)
+				things := r.Named(ephemera.NAMED_KIND, "things", once)
+				r.Primitive(ephemera.PRIM_TEXT, things, indefinite)
 			}
 		}
 	},
@@ -317,10 +298,10 @@ var fns = map[string]Parse{
 	// common / proper setting
 	"proper_noun": func(r *Parser, item reader.Map) {
 		id := r.lastId
-		noun := r.namedStr(item, NAMED_NOUN, "$PROPER_NAME")
+		noun := r.namedStr(item, ephemera.NAMED_NOUN, "$PROPER_NAME")
 		r.nouns.Add(noun)
 		// set proper nounType to true ( implicitly defined by "noun" )
-		nounType := r.Named(NAMED_TRAIT, "proper", id)
+		nounType := r.Named(ephemera.NAMED_TRAIT, "proper", id)
 		r.Value(nounType, noun, true)
 	},
 
@@ -328,7 +309,7 @@ var fns = map[string]Parse{
 	// ex. "(the box) is a closed container on the beach"
 	"kind_of_noun": func(r *Parser, item reader.Map) {
 		//
-		kind := r.namedStr(item, NAMED_KIND, "$KIND")
+		kind := r.namedStr(item, ephemera.NAMED_KIND, "$KIND")
 		for _, noun := range r.nouns.Named {
 			r.Noun(noun, kind)
 		}
@@ -350,13 +331,13 @@ var fns = map[string]Parse{
 		once := "summary"
 		id := r.lastId
 		if r.once(once) {
-			things := r.Named(NAMED_KIND, "things", once)
-			appear := r.Named(NAMED_FIELD, "appearance", once)
-			r.Primitive(PRIM_EXPR, things, appear)
+			things := r.Named(ephemera.NAMED_KIND, "things", once)
+			appear := r.Named(ephemera.NAMED_FIELD, "appearance", once)
+			r.Primitive(ephemera.PRIM_EXPR, things, appear)
 		}
-		prop := r.Named(NAMED_FIELD, "appearance", id)
+		prop := r.Named(ephemera.NAMED_FIELD, "appearance", id)
 		noun := r.nouns.Last()
-		val := r.namedStr(item, PRIM_EXPR, "$LINES")
+		val := r.namedStr(item, ephemera.PRIM_EXPR, "$LINES")
 		r.Value(prop, noun, val)
 	},
 }
@@ -367,7 +348,7 @@ func main() {
 	if user, e := user.Current(); e != nil {
 		log.Fatalln(e)
 	} else {
-		const fileName = path.Join(user.HomeDir, "iffyTest.db")
+		fileName := path.Join(user.HomeDir, "iffyTest.db")
 		if db, e := sql.Open("sqlite3", fileName); e != nil {
 			log.Fatalln("db open", e)
 		} else {

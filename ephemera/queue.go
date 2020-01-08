@@ -9,7 +9,7 @@ type Queue interface {
 
 // Col describes a column in Queue.
 type Col struct {
-	ColumnName, TypeName string
+	Name, Type string
 }
 
 // Queued provides an opaque return value for rows written by Queues

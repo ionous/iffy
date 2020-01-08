@@ -6,6 +6,25 @@ type Recorder struct {
 	// Source of ephemera for logging, revoking, etc.
 }
 
+const (
+	PRIM_TEXT   = "text" // string
+	PRIM_DIGI   = "digi" // number
+	PRIM_EXPR   = "expr" // text expression
+	PRIM_COMP   = "comp" // number computation
+	PRIM_PROG   = "prog" // program
+	PRIM_ASPECT = "attr"
+)
+
+const (
+	NAMED_ASPECT      = "aspect"
+	NAMED_CERTAINTY   = "certainty"
+	NAMED_FIELD       = "field"
+	NAMED_KIND        = "kind"
+	NAMED_NOUN        = "noun"
+	NAMED_RELATIVIZER = "relativizer"
+	NAMED_TRAIT       = "trait"
+)
+
 // tdb: should enums be stored as plain strings or as named entities
 // ( see also primitives )
 // one advantage in naming is we can locate them; one disadvantage is increased db size secondary
@@ -38,7 +57,7 @@ func NewRecorder(srcURI string, q Queue) *Recorder {
 		Col{"idNamedSingluar", "int"})
 	q.Prep("primitive",
 		Col{"primType", "text"},
-		Col{"idNamedArchetype", "int"},
+		Col{"idNamedKind", "int"},
 		Col{"idNamedField", "int"})
 	q.Prep("relation",
 		Col{"idNamedRelation", "int"},

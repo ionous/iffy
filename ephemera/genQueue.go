@@ -16,7 +16,7 @@ func (jq *GenQueue) Prep(which string, cols ...Col) {
 	}
 	keys := make([]string, len(cols))
 	for i, c := range cols {
-		keys[i] = c.ColumnName
+		keys[i] = c.Name
 	}
 	jq.keys[which] = keys
 }
