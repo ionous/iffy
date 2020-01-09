@@ -1,9 +1,6 @@
 package assembly
 
 import (
-	"os/user"
-	"path"
-
 	"github.com/ionous/iffy/ephemera"
 )
 
@@ -13,15 +10,6 @@ type Output struct {
 func (out *Output) Conflict(e error) {
 }
 func (out *Output) Ambiguity(e error) {
-}
-
-func getPath() (ret string, err error) {
-	if user, e := user.Current(); e != nil {
-		err = e
-	} else {
-		ret = path.Join(user.HomeDir, "test.db")
-	}
-	return
 }
 
 func NewWriter(q ephemera.Queue) *Writer {

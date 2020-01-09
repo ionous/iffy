@@ -42,7 +42,7 @@ func writeFields(db *sql.DB, kinds []kp, kfps []kfp, missing ...string) (err err
 	dbq := ephemera.NewDBQueue(db)
 	r := ephemera.NewRecorder("ancestorTest", dbq)
 	w := NewWriter(dbq)
-	// create some hierarchy
+	// create some fake hierarchy
 	for _, p := range kinds {
 		w.WriteAncestor(p.kind, p.path)
 	}
@@ -52,6 +52,7 @@ func writeFields(db *sql.DB, kinds []kp, kfps []kfp, missing ...string) (err err
 		field := r.Named(ephemera.NAMED_FIELD, p.field, "test")
 		r.Primitive(p.fieldType, kind, field)
 	}
+	// name some fields that arent otherwise referenced
 	for _, m := range missing {
 		r.Named(ephemera.NAMED_FIELD, m, "test")
 	}
@@ -60,6 +61,7 @@ func writeFields(db *sql.DB, kinds []kp, kfps []kfp, missing ...string) (err err
 	}
 	return
 }
+
 func matchProperties(db *sql.DB, expected []kfp) (err error) {
 	if it, e := db.Query(`select kind,field,type from property order by kind, field, type`); e != nil {
 		err = e
@@ -139,6 +141,8 @@ func TestFieldLca(t *testing.T) {
 	}
 }
 
+// TestFieldTypeMismatch verifies that ephemera with conflicting primitive types generates an error
+// ex. T.a:text, T.a:digi
 func TestFieldTypeMismatch(t *testing.T) {
 	const source = "file:test.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", source); e != nil {
@@ -146,9 +150,7 @@ func TestFieldTypeMismatch(t *testing.T) {
 	} else {
 		defer db.Close()
 		if e := writeFields(db,
-			[]kp{
-				{"T", ""},
-			},
+			[]kp{{"T", ""}},
 			[]kfp{
 				{"T", "a", ephemera.PRIM_TEXT},
 				{"T", "a", ephemera.PRIM_DIGI},

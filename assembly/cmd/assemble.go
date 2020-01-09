@@ -36,8 +36,8 @@ func main() {
 		} else {
 
 		}
-		// [-] adds property definitions to classes
-		// [-] adds enumerations to classes
+		// [-] adds enumerations to classes: aspects, then traits
+		// - the downside of lca'ing: merging two overlapping sets of traits from different types.
 		// [-] adds relative / relation properties
 		// [-] finalizes class definitions
 		// [-] parses any table definitions
@@ -46,5 +46,7 @@ func main() {
 		// [] makes event listeners
 		// [] computes aliases
 		// [] sets up printed name property
+		// - backtracing to source:
+		// ex. each "important" table entry gets an separate entry pointing back to original source
 	}
 }

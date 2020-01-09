@@ -189,7 +189,9 @@ var fns = map[string]Parse{
 		})()
 		r.parse(item.MapOf("$ATTRIBUTE_PHRASE"))
 		// create an implied aspect named after the first trait
-		r.Primitive(ephemera.PRIM_ASPECT, kind, traits[0])
+		// fix? maybe we should include the columns of named in the returned struct so we can pick out the source better.
+		aspect := r.Named(ephemera.NAMED_ASPECT, traits[0].String(), item.StrOf(itemId))
+		r.Primitive(ephemera.PRIM_ASPECT, kind, aspect)
 	},
 
 	// "{qualities} {attribute_phrase}"
@@ -262,7 +264,7 @@ var fns = map[string]Parse{
 		once := "noun"
 		if r.once(once) {
 			things := r.Named(ephemera.NAMED_KIND, "things", once)
-			nounType := r.Named(ephemera.NAMED_FIELD, "nounType", once)
+			nounType := r.Named(ephemera.NAMED_ASPECT, "nounType", once)
 			common := r.Named(ephemera.NAMED_TRAIT, "common", once)
 			proper := r.Named(ephemera.NAMED_TRAIT, "proper", once)
 			r.Primitive(ephemera.PRIM_ASPECT, things, nounType)

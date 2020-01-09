@@ -2,6 +2,9 @@ package assembly
 
 import (
 	"database/sql"
+	"os/user"
+	"path"
+	"reflect"
 	"strconv"
 	"testing"
 
@@ -9,6 +12,16 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+func getPath(file string) (ret string, err error) {
+	if user, e := user.Current(); e != nil {
+		err = e
+	} else {
+		ret = path.Join(user.HomeDir, file)
+	}
+	return
+}
+
+// TestAncestors verifies valid parent-child ephemera can generate a valid ancestry table.
 func TestAncestors(t *testing.T) {
 	const source = "file:test.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", source); e != nil {
@@ -30,8 +43,8 @@ func TestAncestors(t *testing.T) {
 			"M", "J",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named("kind", pairs[i], strconv.Itoa(i))
-			ancestor := rec.Named("kind", pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			ancestor := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.Kind(kid, ancestor)
 		}
 		//
@@ -69,6 +82,8 @@ func TestAncestors(t *testing.T) {
 	}
 }
 
+// TestAncestorCycle verifies cycles in parent-child ephemera generate errors.
+// ex. P inherits from T; T inherits from P.
 func TestAncestorCycle(t *testing.T) {
 	const source = "file:test.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", source); e != nil {
@@ -83,8 +98,8 @@ func TestAncestorCycle(t *testing.T) {
 			"T", "P",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named("kind", pairs[i], strconv.Itoa(i))
-			parent := rec.Named("kind", pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.Kind(kid, parent)
 		}
 		//
@@ -97,6 +112,8 @@ func TestAncestorCycle(t *testing.T) {
 	}
 }
 
+// TestAncestorConflict verifies conflicting parent ephemera (multiple inheritance) generates an error.
+// ex. P,Q inherits from T; K inherits from P and Q.
 func TestAncestorConflict(t *testing.T) {
 	const source = "file:test.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", source); e != nil {
@@ -113,8 +130,8 @@ func TestAncestorConflict(t *testing.T) {
 			"K", "Q",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named("kind", pairs[i], strconv.Itoa(i))
-			parent := rec.Named("kind", pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.Kind(kid, parent)
 		}
 		//
@@ -130,11 +147,10 @@ func TestAncestorConflict(t *testing.T) {
 	}
 }
 
+// TestMissingKinds to verify the kinds mentioned in parent-child ephemera exist.
 func TestMissingKinds(t *testing.T) {
 	const source = "file:test.db?cache=shared&mode=memory"
-	/*if source, e := getPath(); e != nil {
-		t.Fatal(e)
-	} else*/if db, e := sql.Open("sqlite3", source); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -147,8 +163,8 @@ func TestMissingKinds(t *testing.T) {
 			"P", "R",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named("kind", pairs[i], strconv.Itoa(i))
-			parent := rec.Named("kind", pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.Kind(kid, parent)
 		}
 		// add the kinds
@@ -174,6 +190,40 @@ func TestMissingKinds(t *testing.T) {
 		}
 		if len(missing) != 1 || missing[0] != "R" {
 			t.Fatal("expected R, have", missing)
+		}
+	}
+}
+
+// TestMissingAspects detects fields labeled as aspects which are missing from the aspects ephemera.
+func TestMissingAspects(t *testing.T) {
+	const source = "file:test.db?cache=shared&mode=memory"
+	if db, e := sql.Open("sqlite3", source); e != nil {
+		t.Fatal(e)
+	} else {
+		defer db.Close()
+		dbq := ephemera.NewDBQueue(db)
+		rec := ephemera.NewRecorder("ancestorTest", dbq)
+
+		parent := rec.Named(ephemera.NAMED_KIND, "K", "container")
+		for i, aspect := range []string{
+			// known, unknown
+			"A", "F",
+			"C", "D",
+			"E", "B",
+		} {
+			a := rec.Named(ephemera.NAMED_ASPECT, aspect, "test")
+			if known := i&1 == 0; known {
+				rec.Aspect(a)
+			}
+			rec.Primitive(ephemera.PRIM_ASPECT, parent, a)
+		}
+		expected := []string{"B", "D", "F"}
+		if missing, e := undeclaredAspects(db); e != nil {
+			t.Fatal(e)
+		} else if matches := reflect.DeepEqual(missing, expected); !matches {
+			t.Fatal("want:", expected, "have:", missing)
+		} else {
+			t.Log("okay")
 		}
 	}
 }

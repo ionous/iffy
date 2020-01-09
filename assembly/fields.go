@@ -2,23 +2,31 @@ package assembly
 
 import (
 	"database/sql"
+	"sort"
 	"strings"
+
+	"github.com/ionous/iffy/ephemera"
 
 	"github.com/ionous/errutil"
 )
 
-// goal:
-// . finalized table of property, kind, type.
-// considerations
+// goal: build table of property, kind, type.
+// considerations:
 // . property's lowest common ancestor ( lca )
-// o ambiguity when properties collapse into "thing" ( lca implicitly the root )
-// . contradiction in type
+// o ambiguity when properties collapse into root ( and/or an implicit kind )
+// . contradiction in type ( alt: runtime can fit into property by type )
 // . missing properties ( named but not specified )
-// o misspellings, near spellings
+// o misspellings, near spellings ( ex. for missing fields )
 func DetermineFields(w *Writer, db *sql.DB) (err error) {
-	if it, e := db.Query(
+	// select primitive aspects which arent named in aspects
+	// the primitive field's name is the aspect name
+	if missingAspects, e := undeclaredAspects(db); e != nil {
+		err = e
+	} else {
+		var curr, last fieldInfo
 		// fix: probably want source line out of this too
-		`select nk.name as kind, nf.name as field, p.primType as type, a.path as parents
+		if e := queryAll(db,
+			`select nk.name as kind, nf.name as field, p.primType as type, a.path as parents
 		from primitive p join named nk
 			on (p.idNamedKind = nk.rowid)
 		left join named nf
@@ -26,22 +34,16 @@ func DetermineFields(w *Writer, db *sql.DB) (err error) {
 		left join ancestry a
 			on (a.kind = nk.name)
 		order by nf.name, nk.name
-		`); e != nil {
-		err = e
-	} else {
-		var last fieldInfo // holds our lca
-		defer it.Close()
-		for it.Next() {
-			var curr fieldInfo
-			if e := it.Scan(&curr.Kind, &curr.Field, &curr.Type, &curr.Parents); e != nil {
-				err = e
-				break
-			} else {
+		`, func() (err error) {
 				// we're at a new field, so write the old one.
 				if last.Field != curr.Field {
-					last.Flush(w)
 					curr.updateHierarchy()
-					last = curr
+					if curr.Type == ephemera.PRIM_ASPECT && sort.SearchStrings(missingAspects, curr.Field) >= 0 {
+						err = errutil.New("unknown aspect declared as field of kind", curr.Field, curr.Kind)
+					} else {
+						last.Flush(w)
+						last = curr
+					}
 				} else {
 					if len(last.Kind) == 0 {
 						curr.updateHierarchy()
@@ -53,7 +55,6 @@ func DetermineFields(w *Writer, db *sql.DB) (err error) {
 						if last.Type != curr.Type {
 							e := errutil.New("type mismatch", last.Field, last.Type, "!=", curr.Type)
 							err = e
-							break
 						} else if last.Kind != curr.Kind {
 							// warn if we have collapsed into root?
 							overlap := findOverlap(last.Hierarchy, curr.updateHierarchy())
@@ -61,13 +62,38 @@ func DetermineFields(w *Writer, db *sql.DB) (err error) {
 						}
 					}
 				}
-			}
-		}
-		if e := it.Err(); e != nil {
-			err = errutil.Append(err, e)
+				return
+			}, &curr.Kind, &curr.Field, &curr.Type, &curr.Parents); e != nil {
+			err = e
 		} else {
 			last.Flush(w)
 		}
+	}
+	return
+}
+
+func undeclaredAspects(db *sql.DB) (ret []string, err error) {
+	var str string
+	var aspects []string
+	if e := queryAll(db,
+		`select name from
+			( select distinct n.name as name
+				from primitive p, named n
+				where p.primType = 'aspect'
+				and p.idNamedField = n.rowid )
+		where name not in 
+			( select n.name
+				from aspect a, named n
+				where a.idNamedAspect = n.rowid )
+		`, func() (err error) {
+			aspects = append(aspects, str)
+			return
+		},
+		&str); e != nil {
+		err = e
+	} else {
+		sort.Strings(aspects)
+		ret = aspects
 	}
 	return
 }

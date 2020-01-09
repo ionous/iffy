@@ -7,12 +7,13 @@ type Recorder struct {
 }
 
 const (
-	PRIM_TEXT   = "text" // string
-	PRIM_DIGI   = "digi" // number
-	PRIM_EXPR   = "expr" // text expression
-	PRIM_COMP   = "comp" // number computation
-	PRIM_PROG   = "prog" // program
-	PRIM_ASPECT = "attr"
+	PRIM_TEXT   = "text"   // string
+	PRIM_DIGI   = "digi"   // number
+	PRIM_EXPR   = "expr"   // text expression
+	PRIM_COMP   = "comp"   // number computation
+	PRIM_PROG   = "prog"   // program
+	PRIM_ASPECT = "aspect" // fix? rename "prop"?
+	PRIM_TRAIT  = "trait"  // fix? rename "attr"?
 )
 
 const (
@@ -25,11 +26,8 @@ const (
 	NAMED_TRAIT       = "trait"
 )
 
-// tdb: should enums be stored as plain strings or as named entities
-// ( see also primitives )
-// one advantage in naming is we can locate them; one disadvantage is increased db size secondary
-
 func NewRecorder(srcURI string, q Queue) *Recorder {
+	// fix? should enums ( prim_..., named_... ) be stored as plain strings or as named entities?
 	q.Prep("source",
 		Col{"src", "text"})
 	q.Prep("named",
