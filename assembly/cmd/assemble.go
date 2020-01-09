@@ -31,10 +31,10 @@ func main() {
 		w := assembly.NewWriter(q)
 		if e := assembly.DetermineAncestry(w, db, "things"); e != nil {
 			log.Fatalln(e)
-		} else e := assembly.DetermineFields(w, db); e != nil {
+		} else if e := assembly.DetermineFields(w, db); e != nil {
 			log.Fatalln(e)
-		} else {
-
+		} else if e := assembly.DetermineTraits(w, db); e != nil {
+			log.Fatalln(e)
 		}
 		// [-] adds enumerations to classes: aspects, then traits
 		// - the downside of lca'ing: merging two overlapping sets of traits from different types.

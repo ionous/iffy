@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/ionous/iffy/dbutil"
+
 	"github.com/ionous/iffy/ephemera"
 
 	"github.com/ionous/errutil"
@@ -25,13 +27,13 @@ func DetermineFields(w *Writer, db *sql.DB) (err error) {
 	} else {
 		var curr, last fieldInfo
 		// fix: probably want source line out of this too
-		if e := queryAll(db,
+		if e := dbutil.QueryAll(db,
 			`select nk.name as kind, nf.name as field, p.primType as type, a.path as parents
-		from primitive p join named nk
+		from eph_primitive p join eph_named nk
 			on (p.idNamedKind = nk.rowid)
-		left join named nf
+		left join eph_named nf
 			on (p.idNamedField = nf.rowid)
-		left join ancestry a
+		left join mdl_ancestry a
 			on (a.kind = nk.name)
 		order by nf.name, nk.name
 		`, func() (err error) {
@@ -44,23 +46,16 @@ func DetermineFields(w *Writer, db *sql.DB) (err error) {
 						last.Flush(w)
 						last = curr
 					}
-				} else {
-					if len(last.Kind) == 0 {
-						curr.updateHierarchy()
-						last = curr
-					} else {
-						// if the types have changed
-						// for now we yield a mismatch
-						// ( we could allow the same named field in different kinds if we wanted )
-						if last.Type != curr.Type {
-							e := errutil.New("type mismatch", last.Field, last.Type, "!=", curr.Type)
-							err = e
-						} else if last.Kind != curr.Kind {
-							// warn if we have collapsed into root?
-							overlap := findOverlap(last.Hierarchy, curr.updateHierarchy())
-							last, last.Hierarchy = curr, overlap
-						}
-					}
+				} else if last.Type != curr.Type {
+					// field is the same but the type of the field differs
+					// future: /allow the same named field in different kinds?
+					e := errutil.New("type mismatch", last.Field, last.Type, "!=", curr.Type)
+					err = e
+				} else if last.Kind != curr.Kind {
+					// field and type are the same, kind differs; find a common type for the field.
+					// warn if we have collapsed into root?
+					overlap := findOverlap(last.Hierarchy, curr.updateHierarchy())
+					last, last.Hierarchy = curr, overlap
 				}
 				return
 			}, &curr.Kind, &curr.Field, &curr.Type, &curr.Parents); e != nil {
@@ -75,15 +70,15 @@ func DetermineFields(w *Writer, db *sql.DB) (err error) {
 func undeclaredAspects(db *sql.DB) (ret []string, err error) {
 	var str string
 	var aspects []string
-	if e := queryAll(db,
+	if e := dbutil.QueryAll(db,
 		`select name from
 			( select distinct n.name as name
-				from primitive p, named n
+				from eph_primitive p, eph_named n
 				where p.primType = 'aspect'
 				and p.idNamedField = n.rowid )
 		where name not in 
 			( select n.name
-				from aspect a, named n
+				from eph_aspect a, eph_named n
 				where a.idNamedAspect = n.rowid )
 		`, func() (err error) {
 			aspects = append(aspects, str)

@@ -45,7 +45,7 @@ func TestAncestors(t *testing.T) {
 		for i := 0; i < len(pairs); i += 2 {
 			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
 			ancestor := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
-			rec.Kind(kid, ancestor)
+			rec.NewKind(kid, ancestor)
 		}
 		//
 		kinds := &cachedKinds{}
@@ -100,7 +100,7 @@ func TestAncestorCycle(t *testing.T) {
 		for i := 0; i < len(pairs); i += 2 {
 			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
 			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
-			rec.Kind(kid, parent)
+			rec.NewKind(kid, parent)
 		}
 		//
 		kinds := &cachedKinds{}
@@ -132,7 +132,7 @@ func TestAncestorConflict(t *testing.T) {
 		for i := 0; i < len(pairs); i += 2 {
 			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
 			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
-			rec.Kind(kid, parent)
+			rec.NewKind(kid, parent)
 		}
 		//
 		kinds := &cachedKinds{}
@@ -165,7 +165,7 @@ func TestMissingKinds(t *testing.T) {
 		for i := 0; i < len(pairs); i += 2 {
 			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
 			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
-			rec.Kind(kid, parent)
+			rec.NewKind(kid, parent)
 		}
 		// add the kinds
 		kinds := &cachedKinds{}
@@ -213,9 +213,9 @@ func TestMissingAspects(t *testing.T) {
 		} {
 			a := rec.Named(ephemera.NAMED_ASPECT, aspect, "test")
 			if known := i&1 == 0; known {
-				rec.Aspect(a)
+				rec.NewAspect(a)
 			}
-			rec.Primitive(ephemera.PRIM_ASPECT, parent, a)
+			rec.NewPrimitive(ephemera.PRIM_ASPECT, parent, a)
 		}
 		expected := []string{"B", "D", "F"}
 		if missing, e := undeclaredAspects(db); e != nil {

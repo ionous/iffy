@@ -3,7 +3,7 @@ package ephemera
 import (
 	"database/sql"
 
-	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dbutil"
 )
 
 // KidsOf the passed ancestor as specified in the Kinds table.
@@ -11,28 +11,20 @@ import (
 func KidsOf(db *sql.DB, ancestor string, cb func(kid string)) (err error) {
 	// query the child names of the parent named p
 	if siblings, e := db.Query(
-		`select distinct named.name as kid 
-					from named,( select idNamedKind
-								from kind,( select rowid as parentId 
-										    from named 
-										    where named.name = ? )
+		`select distinct n.name as kid 
+					from eph_named n,( select idNamedKind
+								from eph_kind,( select rowid as parentId 
+										    from eph_named n
+										    where n.name = ? )
 								where idNamedParent = parentId )
-					where named.rowid = idNamedKind`, ancestor); e != nil {
+					where n.rowid = idNamedKind`, ancestor); e != nil {
 		err = e
 	} else {
-		for cnt := 0; siblings.Next(); cnt++ {
-			var kid string
-			if e := siblings.Scan(&kid); e != nil {
-				err = e
-				break
-			} else {
-				cb(kid)
-			}
-		}
-		// tests if early exit
-		if e := siblings.Err(); e != nil {
-			err = errutil.Append(err, e)
-		}
+		var kid string
+		err = dbutil.ScanAll(siblings, func() (err error) {
+			cb(kid)
+			return
+		}, &kid)
 	}
 	return
 }

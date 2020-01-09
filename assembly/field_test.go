@@ -8,6 +8,7 @@ import (
 	"github.com/kr/pretty"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 )
 
@@ -36,21 +37,21 @@ func TestLca(t *testing.T) {
 }
 
 type kfp struct{ kind, field, fieldType string }
-type kp struct{ kind, path string }
+type pair struct{ key, value string }
 
-func writeFields(db *sql.DB, kinds []kp, kfps []kfp, missing ...string) (err error) {
+func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err error) {
 	dbq := ephemera.NewDBQueue(db)
 	r := ephemera.NewRecorder("ancestorTest", dbq)
 	w := NewWriter(dbq)
 	// create some fake hierarchy
 	for _, p := range kinds {
-		w.WriteAncestor(p.kind, p.path)
+		w.WriteAncestor(p.key, p.value)
 	}
 	// write some primitives
 	for _, p := range kfps {
 		kind := r.Named(ephemera.NAMED_KIND, p.kind, "test")
 		field := r.Named(ephemera.NAMED_FIELD, p.field, "test")
-		r.Primitive(p.fieldType, kind, field)
+		r.NewPrimitive(p.fieldType, kind, field)
 	}
 	// name some fields that arent otherwise referenced
 	for _, m := range missing {
@@ -62,28 +63,18 @@ func writeFields(db *sql.DB, kinds []kp, kfps []kfp, missing ...string) (err err
 	return
 }
 
-func matchProperties(db *sql.DB, expected []kfp) (err error) {
-	if it, e := db.Query(`select kind,field,type from property order by kind, field, type`); e != nil {
+func matchProperties(db *sql.DB, want []kfp) (err error) {
+	var curr kfp
+	var have []kfp
+	if e := dbutil.QueryAll(db,
+		`select kind,field,type from mdl_property order by kind, field, type`,
+		func() (err error) {
+			have = append(have, curr)
+			return
+		}, &curr.kind, &curr.field, &curr.fieldType); e != nil {
 		err = e
-	} else {
-		defer it.Close()
-		for cnt := 0; it.Next(); cnt++ {
-			var curr kfp
-			if e := it.Scan(&curr.kind, &curr.field, &curr.fieldType); e != nil {
-				err = e
-				break
-			} else {
-				want := expected[cnt]
-				if !reflect.DeepEqual(curr, want) {
-					err = errutil.New("mismatch", "have:", pretty.Sprint(curr), "want:", pretty.Sprint(want))
-					break
-				}
-			}
-		}
-		// tests if early exit
-		if e := it.Err(); e != nil {
-			err = errutil.Append(err, e)
-		}
+	} else if !reflect.DeepEqual(have, want) {
+		err = errutil.New("mismatch", "have:", pretty.Sprint(have), "want:", pretty.Sprint(want))
 	}
 	return
 }
@@ -95,7 +86,7 @@ func TestFields(t *testing.T) {
 	} else {
 		defer db.Close()
 		if e := writeFields(db,
-			[]kp{
+			[]pair{
 				{"T", ""},
 				{"P", "T"},
 				{"Q", "T"},
@@ -123,7 +114,7 @@ func TestFieldLca(t *testing.T) {
 	} else {
 		defer db.Close()
 		if e := writeFields(db,
-			[]kp{
+			[]pair{
 				{"T", ""},
 				{"P", "T"},
 				{"Q", "T"},
@@ -150,7 +141,7 @@ func TestFieldTypeMismatch(t *testing.T) {
 	} else {
 		defer db.Close()
 		if e := writeFields(db,
-			[]kp{{"T", ""}},
+			[]pair{{"T", ""}},
 			[]kfp{
 				{"T", "a", ephemera.PRIM_TEXT},
 				{"T", "a", ephemera.PRIM_DIGI},
@@ -162,8 +153,6 @@ func TestFieldTypeMismatch(t *testing.T) {
 	}
 }
 
-// FIX FIX missing properties ( named but not specified )
-// select from named where kind == NAMED_FIELD not exists in
 func TestFieldMissing(t *testing.T) {
 	const source = "file:test.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", source); e != nil {
@@ -171,7 +160,7 @@ func TestFieldMissing(t *testing.T) {
 	} else {
 		defer db.Close()
 		if e := writeFields(db,
-			[]kp{{"T", ""}},
+			[]pair{{"T", ""}},
 			nil,
 			"z"); e != nil {
 			t.Fatal(e)

@@ -28,59 +28,59 @@ const (
 
 func NewRecorder(srcURI string, q Queue) *Recorder {
 	// fix? should enums ( prim_..., named_... ) be stored as plain strings or as named entities?
-	q.Prep("source",
+	q.Prep("eph_source",
 		Col{"src", "text"})
-	q.Prep("named",
+	q.Prep("eph_named",
 		Col{"name", "text"},
 		Col{"category", "text"},
 		Col{"idSource", "int"},
 		Col{"offset", "text"})
-	q.Prep("alias",
+	q.Prep("eph_alias",
 		Col{"idNamedAlias", "int"},
 		Col{"idNamedActual", "int"})
-	q.Prep("aspect",
+	q.Prep("eph_aspect",
 		Col{"idNamedAspect", "int"})
-	q.Prep("certainty",
+	q.Prep("eph_certainty",
 		Col{"value", "text"},
 		Col{"idNamedTrait", "int"},
 		Col{"idNamedAspect", "int"})
-	q.Prep("kind",
+	q.Prep("eph_kind",
 		Col{"idNamedKind", "int"},
 		Col{"idNamedParent", "int"})
-	q.Prep("noun",
+	q.Prep("eph_noun",
 		Col{"idNamedNoun", "int"},
 		Col{"idNamedKind", "int"})
-	q.Prep("plural",
+	q.Prep("eph_plural",
 		Col{"idNamedPlural", "int"},
 		Col{"idNamedSingluar", "int"})
-	q.Prep("primitive",
+	q.Prep("eph_primitive",
 		Col{"primType", "text"},
 		Col{"idNamedKind", "int"},
 		Col{"idNamedField", "int"})
-	q.Prep("relation",
+	q.Prep("eph_relation",
 		Col{"idNamedRelation", "int"},
 		Col{"idNamedPrimary", "int"},
 		Col{"idNamedCardinality", "int"},
 		Col{"idNamedSecondary", "int"})
-	q.Prep("relative",
+	q.Prep("eph_relative",
 		Col{"idNamedRelativizer", "int"},
 		Col{"idNamedHead", "int"},
 		Col{"idNamedDependent", "int"})
-	q.Prep("trait",
+	q.Prep("eph_trait",
 		Col{"idNamedTrait", "int"},
 		Col{"idNamedAspect", "int"},
 		Col{"rank", "int"})
-	q.Prep("value",
+	q.Prep("eph_value",
 		Col{"idNamedField", "int"},
 		Col{"idNamedNoun", "int"},
 		Col{"data", "blob"})
-	//q.Prep("Implication"},
+	//q.Prep("eph_Implication"},
 	// Col{"idNamedScope"},
 	// Col{"idNamedTrait"},
 	// Col{"idNamedCertainty"},
 	// Col{"idNamedImpliedTrait"})
 	//
-	srcId := q.Write("source", srcURI)
+	srcId := q.Write("eph_source", srcURI)
 	return &Recorder{q, srcId}
 }
 
@@ -89,66 +89,66 @@ func NewRecorder(srcURI string, q Queue) *Recorder {
 // names are not unique, one name can be many types.
 // ofs depends on the source, might be item.id$parameter
 func (r *Recorder) Named(category, name, ofs string) Named {
-	namedId := r.q.Write("named", name, category, r.src.id, ofs)
+	namedId := r.q.Write("eph_named", name, category, r.src.id, ofs)
 	return Named{namedId.id, name}
 }
 
 var None Named
 
 // Alias provides a new name for another name.
-func (r *Recorder) Alias(alias, actual Named) {
-	r.q.Write("alias", alias, actual)
+func (r *Recorder) NewAlias(alias, actual Named) {
+	r.q.Write("eph_alias", alias, actual)
 }
 
 // Aspect explicitly declares the existence of an aspect.
-func (r *Recorder) Aspect(aspect Named) {
-	r.q.Write("aspect", aspect)
+func (r *Recorder) NewAspect(aspect Named) {
+	r.q.Write("eph_aspect", aspect)
 }
 
 // Certainty supplies a kind with a default trait.
-func (r *Recorder) Certainty(certainty, trait, kind Named) {
+func (r *Recorder) NewCertainty(certainty, trait, kind Named) {
 	// usually fast horses.
-	r.q.Write("certainty", certainty, trait, kind)
+	r.q.Write("eph_certainty", certainty, trait, kind)
 }
 
 // Kind connects a kind to its parent kind.
-func (r *Recorder) Kind(kind, parent Named) {
-	r.q.Write("kind", kind, parent)
+func (r *Recorder) NewKind(kind, parent Named) {
+	r.q.Write("eph_kind", kind, parent)
 }
 
 // Noun connects a noun to its kind.
-func (r *Recorder) Noun(noun, kind Named) {
-	r.q.Write("noun", noun, kind)
+func (r *Recorder) NewNoun(noun, kind Named) {
+	r.q.Write("eph_noun", noun, kind)
 }
 
 // Plural maps the plural form of a name to its singular form.
-func (r *Recorder) Plural(plural, singluar Named) {
-	r.q.Write("plural", plural, singluar)
+func (r *Recorder) NewPlural(plural, singluar Named) {
+	r.q.Write("eph_plural", plural, singluar)
 }
 
 // Primitive property in the named kind.
-func (r *Recorder) Primitive(primType string, kind, prop Named) {
-	r.q.Write("primitive", primType, kind, prop)
+func (r *Recorder) NewPrimitive(primType string, kind, prop Named) {
+	r.q.Write("eph_primitive", primType, kind, prop)
 }
 
 // Relation defines a connection between a primary and secondary kind.
-func (r *Recorder) Relation(relation, primary, cardinality, secondary Named) {
-	r.q.Write("relation", relation, primary, cardinality, secondary)
+func (r *Recorder) NewRelation(relation, primary, cardinality, secondary Named) {
+	r.q.Write("eph_relation", relation, primary, cardinality, secondary)
 }
 
 // Relative connects two specific nouns using a relativizer.
-func (r *Recorder) Relative(relativizer, primary, secondary Named) {
-	r.q.Write("relative", relativizer, primary, secondary)
+func (r *Recorder) NewRelative(relativizer, primary, secondary Named) {
+	r.q.Write("eph_relative", relativizer, primary, secondary)
 }
 
 // Trait records a member of an aspect and its order ( rank. )
-func (r *Recorder) Trait(trait, aspect Named, rank int) {
-	r.q.Write("trait", trait, aspect, rank)
+func (r *Recorder) NewTrait(trait, aspect Named, rank int) {
+	r.q.Write("eph_trait", trait, aspect, rank)
 }
 
 // Value assigns the property of a noun a value;
 // traits can be assigned by naming the individual trait and setting a true ( or false ) value.
 // ( reverses order of primitive parameters for maximum confusion )
-func (r *Recorder) Value(prop, noun Named, value interface{}) {
-	r.q.Write("value", prop, noun, value)
+func (r *Recorder) NewValue(prop, noun Named, value interface{}) {
+	r.q.Write("eph_value", prop, noun, value)
 }
