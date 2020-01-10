@@ -11,6 +11,10 @@ type Named struct {
 	str string
 }
 
+func (ns *Named) IsValid() bool {
+	return ns.id > 0
+}
+
 func (ns *Named) String() string {
 	return ns.str
 }

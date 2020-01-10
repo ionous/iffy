@@ -183,8 +183,9 @@ func TestMissingKinds(t *testing.T) {
 		}
 		// now test for our missing "R"
 		var missing []string
-		if e := MissingKinds(db, func(k string) {
+		if e := MissingKinds(db, func(k string)  (err error) {
 			missing = append(missing, k)
+			return 
 		}); e != nil {
 			t.Fatal(e)
 		}

@@ -166,8 +166,9 @@ func TestFieldMissing(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			var missing []string
-			if e := MissingFields(db, func(n string) {
+			if e := MissingFields(db, func(n string) (err error) {
 				missing = append(missing, n)
+				return
 			}); e != nil {
 				t.Fatal(e)
 			}

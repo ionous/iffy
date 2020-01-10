@@ -22,13 +22,37 @@ import (
 func DetermineFields(w *Writer, db *sql.DB) (err error) {
 	// select primitive aspects which arent named in aspects
 	// the primitive field's name is the aspect name
+	var out pendingFields
 	if missingAspects, e := undeclaredAspects(db); e != nil {
 		err = e
+	} else if e := out.determineFields(db, missingAspects); e != nil {
+		err = e
 	} else {
-		var curr, last fieldInfo
-		// fix: probably want source line out of this too
-		if e := dbutil.QueryAll(db,
-			`select nk.name as kind, nf.name as field, p.primType as type, a.path as parents
+		err = out.write(w)
+	}
+	return
+}
+
+// we cant read and write to the same db simultaneously
+type pendingField struct {
+	field, owner, fieldType string
+}
+type pendingFields struct {
+	list []pendingField
+}
+
+func (out *pendingFields) write(w *Writer) (err error) {
+	for _, f := range out.list {
+		w.WriteField(f.field, f.owner, f.fieldType)
+	}
+	return
+}
+
+func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (err error) {
+	var curr, last fieldInfo
+	// fix: probably want source line out of this too
+	if e := dbutil.QueryAll(db,
+		`select nk.name as kind, nf.name as field, p.primType as type, a.path as parents
 		from eph_primitive p join eph_named nk
 			on (p.idNamedKind = nk.rowid)
 		left join eph_named nf
@@ -37,32 +61,31 @@ func DetermineFields(w *Writer, db *sql.DB) (err error) {
 			on (a.kind = nk.name)
 		order by nf.name, nk.name
 		`, func() (err error) {
-				// we're at a new field, so write the old one.
-				if last.Field != curr.Field {
-					curr.updateHierarchy()
-					if curr.Type == ephemera.PRIM_ASPECT && sort.SearchStrings(missingAspects, curr.Field) >= 0 {
-						err = errutil.New("unknown aspect declared as field of kind", curr.Field, curr.Kind)
-					} else {
-						last.Flush(w)
-						last = curr
-					}
-				} else if last.Type != curr.Type {
-					// field is the same but the type of the field differs
-					// future: /allow the same named field in different kinds?
-					e := errutil.New("type mismatch", last.Field, last.Type, "!=", curr.Type)
-					err = e
-				} else if last.Kind != curr.Kind {
-					// field and type are the same, kind differs; find a common type for the field.
-					// warn if we have collapsed into root?
-					overlap := findOverlap(last.Hierarchy, curr.updateHierarchy())
-					last, last.Hierarchy = curr, overlap
+			// we're at a new field, so write the old one.
+			if last.Field != curr.Field {
+				curr.updateHierarchy()
+				if curr.Type == ephemera.PRIM_ASPECT && sort.SearchStrings(missingAspects, curr.Field) >= 0 {
+					err = errutil.New("unknown aspect declared as field of kind", curr.Field, curr.Kind)
+				} else {
+					last.Flush(out)
+					last = curr
 				}
-				return
-			}, &curr.Kind, &curr.Field, &curr.Type, &curr.Parents); e != nil {
-			err = e
-		} else {
-			last.Flush(w)
-		}
+			} else if last.Type != curr.Type {
+				// field is the same but the type of the field differs
+				// future: /allow the same named field in different kinds?
+				e := errutil.New("type mismatch", last.Field, last.Type, "!=", curr.Type)
+				err = e
+			} else if last.Kind != curr.Kind {
+				// field and type are the same, kind differs; find a common type for the field.
+				// warn if we have collapsed into root?
+				overlap := findOverlap(last.Hierarchy, curr.updateHierarchy())
+				last, last.Hierarchy = curr, overlap
+			}
+			return
+		}, &curr.Kind, &curr.Field, &curr.Type, &curr.Parents); e != nil {
+		err = e
+	} else {
+		last.Flush(out)
 	}
 	return
 }
@@ -117,10 +140,10 @@ type fieldInfo struct {
 }
 
 // ancestors holds lca
-func (i *fieldInfo) Flush(w *Writer) {
+func (i *fieldInfo) Flush(out *pendingFields) {
 	if len(i.Kind) > 0 {
 		lca := i.Hierarchy[0]
-		w.WriteField(i.Field, lca, i.Type)
+		out.list = append(out.list, pendingField{i.Field, lca, i.Type})
 	}
 }
 

@@ -16,6 +16,7 @@ import (
 // o misspellings, near spellings ( ex. for missing traits )
 func DetermineTraits(w *Writer, db *sql.DB) (err error) {
 	var curr, last traitInfo
+	var traits []traitInfo // cant read and write to the db simultaneously
 	if e := dbutil.QueryAll(db, `select nt.name, na.name
 	from eph_trait t join eph_named nt
 		on (t.idNamedTrait = nt.rowid)
@@ -27,13 +28,18 @@ func DetermineTraits(w *Writer, db *sql.DB) (err error) {
 			err = errutil.New("same trait different aspect", curr.Trait, curr.Aspect, last.Aspect)
 
 		case !traitsMatch:
-			w.WriteTrait(curr.Aspect, curr.Trait)
+			traits = append(traits, curr)
 			last = curr
 		}
 		return
 	}, &curr.Trait, &curr.Aspect); e != nil {
 		err = e
+	} else {
+		for _, t := range traits {
+			w.WriteTrait(t.Aspect, t.Trait)
+		}
 	}
+
 	return
 }
 
