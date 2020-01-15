@@ -15,7 +15,7 @@ import (
 // . singular kinds ( the definition of kinds should always use plural names )
 // . kinds containing punctuation ( especially "," since that used for the expanded hierarchy )
 // . misspellings, near spellings
-func DetermineAncestry(w *Writer, db *sql.DB, k string) (err error) {
+func DetermineAncestry(w *Modeler, db *sql.DB, k string) (err error) {
 	kinds := &cachedKinds{} // collect all kinds
 	if e := kinds.AddAncestorsOf(db, k); e != nil {
 		// for k, n := range kinds.cache {
@@ -33,10 +33,10 @@ func DetermineAncestry(w *Writer, db *sql.DB, k string) (err error) {
 			} else if !lang.IsPlural(k) {
 				e := errutil.New("kind expected a plural name", k)
 				err = errutil.Append(err, e)
-			} else {
+			} else if e := w.WriteAncestor(k, v.GetAncestors()); e != nil {
 				// fix? do we want to store kinds as all "uppercase"
 				// fix? future? mispellings? ( or leave that to a spellcheck in the html doc )
-				w.WriteAncestor(k, v.GetAncestors())
+				err = errutil.Append(err, e)
 			}
 		}
 	}

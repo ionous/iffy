@@ -1,6 +1,6 @@
 package ephemera
 
-import "log"
+import "github.com/ionous/errutil"
 
 type GenQueue struct {
 	keys   map[string][]string
@@ -14,17 +14,14 @@ func (jq *GenQueue) Prep(which string, cols ...Col) {
 	if jq.Tables == nil {
 		jq.Tables = make(map[string]interface{})
 	}
-	keys := make([]string, len(cols))
-	for i, c := range cols {
-		keys[i] = c.Name
-	}
+	keys := NamesOf(cols)
 	jq.keys[which] = keys
 }
 
-func (jq *GenQueue) Write(which string, args ...interface{}) (ret Queued) {
+func (jq *GenQueue) Write(which string, args ...interface{}) (ret Queued, err error) {
 	keys := jq.keys[which]
 	if len(keys) != len(args) {
-		log.Fatalln("mismatched keys for", which)
+		err = errutil.New("mismatched keys for", which)
 	} else {
 		type Row map[string]interface{}
 		type Rows []Row

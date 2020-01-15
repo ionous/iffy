@@ -19,7 +19,7 @@ import (
 // . contradiction in type ( alt: runtime can fit into property by type )
 // . missing properties ( named but not specified )
 // o misspellings, near spellings ( ex. for missing fields )
-func DetermineFields(w *Writer, db *sql.DB) (err error) {
+func DetermineFields(w *Modeler, db *sql.DB) (err error) {
 	// select primitive aspects which arent named in aspects
 	// the primitive field's name is the aspect name
 	var out pendingFields
@@ -41,9 +41,11 @@ type pendingFields struct {
 	list []pendingField
 }
 
-func (out *pendingFields) write(w *Writer) (err error) {
+func (out *pendingFields) write(w *Modeler) (err error) {
 	for _, f := range out.list {
-		w.WriteField(f.field, f.owner, f.fieldType)
+		if e := w.WriteField(f.field, f.owner, f.fieldType); e != nil {
+			err = errutil.Append(err, e)
+		}
 	}
 	return
 }

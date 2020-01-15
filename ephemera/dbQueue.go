@@ -34,41 +34,38 @@ func (q *DbQueue) Create(which string, cols []Col) (err error) {
 	return
 }
 
+// Prep creates a new table (which) and prepares a insert statement for it.
 func (q *DbQueue) Prep(which string, cols ...Col) {
+	// build a string like: "insert into foo(col1, col2, ...) values(?, ?, ...)"
+	keys := NamesOf(cols)
+	vals := "?"
+	if kcnt := len(keys) - 1; kcnt > 0 {
+		vals += strings.Repeat(",?", kcnt)
+	}
+	q.PrepStatement(which, "INSERT into "+which+
+		"("+strings.Join(keys, ", ")+")"+
+		" values "+"("+vals+");", cols)
+}
+
+func (q *DbQueue) PrepStatement(which, query string, cols []Col) {
 	if _, ok := q.statements[which]; ok {
 		log.Fatalln("prep", which, "already exists")
 	} else if e := q.Create(which, cols); e != nil {
 		log.Fatalln("prep", e)
+	} else if stmt, e := q.db.Prepare(query); e != nil {
+		log.Fatalln("prep insert", query, e)
 	} else {
-		//
-		//"insert into foo(id, name) values(?, ?)"
-		vals := "?"
-		if kcnt := len(cols) - 1; kcnt > 0 {
-			vals += strings.Repeat(",?", kcnt)
-		}
-		keys := make([]string, len(cols))
-		for i, c := range cols {
-			keys[i] = c.Name
-		}
-		query := "INSERT into " + which +
-			"(" + strings.Join(keys, ", ") + ")" +
-			" values " + "(" + vals + ");"
-		if stmt, e := q.db.Prepare(query); e != nil {
-			log.Fatalln("prep insert", query, e)
-		} else {
-			q.statements[which] = stmt
-		}
+		q.statements[which] = stmt
 	}
-	return
 }
 
-func (q *DbQueue) Write(which string, args ...interface{}) (ret Queued) {
+func (q *DbQueue) Write(which string, args ...interface{}) (ret Queued, err error) {
 	if stmt, ok := q.statements[which]; !ok {
-		log.Fatalln(which, "doesn't exist")
+		err = errutil.New(which, "doesn't exist")
 	} else if res, e := stmt.Exec(args...); e != nil {
-		log.Fatalln("write", e)
+		err = errutil.New("write", e)
 	} else if id, e := res.LastInsertId(); e != nil {
-		log.Fatalln("last id", e)
+		err = errutil.New("last id", e)
 	} else {
 		ret = Queued{id}
 	}

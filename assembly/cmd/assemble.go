@@ -28,20 +28,18 @@ func main() {
 	} else {
 		defer db.Close()
 		q := ephemera.NewDBQueue(db)
-		w := assembly.NewWriter(q)
+		w := assembly.NewModeler(q)
 		if e := assembly.DetermineAncestry(w, db, "things"); e != nil {
 			log.Fatalln(e)
 		} else if e := assembly.DetermineFields(w, db); e != nil {
 			log.Fatalln(e)
-		} else if e := assembly.DetermineTraits(w, db); e != nil {
+		} else if e := assembly.DetermineAspects(w, db); e != nil {
 			log.Fatalln(e)
 		}
-		// [-] adds enumerations to classes: aspects, then traits
-		// - the downside of lca'ing: merging two overlapping sets of traits from different types.
-		// [-] adds relative / relation properties
-		// [-] finalizes class definitions
-		// [-] parses any table definitions
+		// [-] adds relations between kinds
+		// [-] creates instances
 		// [-] sets instance properties
+		// [-] relates instances
 		// [] makes action handlers
 		// [] makes event listeners
 		// [] computes aliases

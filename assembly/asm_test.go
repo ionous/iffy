@@ -23,8 +23,7 @@ func getPath(file string) (ret string, err error) {
 
 // TestAncestors verifies valid parent-child ephemera can generate a valid ancestry table.
 func TestAncestors(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -85,8 +84,7 @@ func TestAncestors(t *testing.T) {
 // TestAncestorCycle verifies cycles in parent-child ephemera generate errors.
 // ex. P inherits from T; T inherits from P.
 func TestAncestorCycle(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -115,8 +113,7 @@ func TestAncestorCycle(t *testing.T) {
 // TestAncestorConflict verifies conflicting parent ephemera (multiple inheritance) generates an error.
 // ex. P,Q inherits from T; K inherits from P and Q.
 func TestAncestorConflict(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -149,8 +146,7 @@ func TestAncestorConflict(t *testing.T) {
 
 // TestMissingKinds to verify the kinds mentioned in parent-child ephemera exist.
 func TestMissingKinds(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -176,16 +172,18 @@ func TestMissingKinds(t *testing.T) {
 			t.Fatal(e)
 		}
 		//
-		w := NewWriter(dbq)
+		w := NewModeler(dbq)
 		for k, v := range kinds.cache {
 			k, path := k, v.GetAncestors()
-			w.WriteAncestor(k, path)
+			if e := w.WriteAncestor(k, path); e != nil {
+				t.Fatal(e)
+			}
 		}
 		// now test for our missing "R"
 		var missing []string
-		if e := MissingKinds(db, func(k string)  (err error) {
+		if e := MissingKinds(db, func(k string) (err error) {
 			missing = append(missing, k)
-			return 
+			return
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -197,8 +195,7 @@ func TestMissingKinds(t *testing.T) {
 
 // TestMissingAspects detects fields labeled as aspects which are missing from the aspects ephemera.
 func TestMissingAspects(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()

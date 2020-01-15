@@ -42,10 +42,12 @@ type pair struct{ key, value string }
 func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err error) {
 	dbq := ephemera.NewDBQueue(db)
 	r := ephemera.NewRecorder("ancestorTest", dbq)
-	w := NewWriter(dbq)
+	w := NewModeler(dbq)
 	// create some fake hierarchy
 	for _, p := range kinds {
-		w.WriteAncestor(p.key, p.value)
+		if e := w.WriteAncestor(p.key, p.value); e != nil {
+			err = errutil.Append(err, e)
+		}
 	}
 	// write some primitives
 	for _, p := range kfps {
@@ -58,7 +60,7 @@ func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err e
 		r.Named(ephemera.NAMED_FIELD, m, "test")
 	}
 	if e := DetermineFields(w, db); e != nil {
-		err = e
+		err = errutil.Append(err, e)
 	}
 	return
 }
@@ -80,8 +82,8 @@ func matchProperties(db *sql.DB, want []kfp) (err error) {
 }
 
 func TestFields(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	const source = memory
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -108,8 +110,8 @@ func TestFields(t *testing.T) {
 }
 
 func TestFieldLca(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	const source = memory
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -135,8 +137,8 @@ func TestFieldLca(t *testing.T) {
 // TestFieldTypeMismatch verifies that ephemera with conflicting primitive types generates an error
 // ex. T.a:text, T.a:digi
 func TestFieldTypeMismatch(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	const source = memory
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -154,8 +156,8 @@ func TestFieldTypeMismatch(t *testing.T) {
 }
 
 func TestFieldMissing(t *testing.T) {
-	const source = "file:test.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	const source = memory
+	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()

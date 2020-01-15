@@ -158,7 +158,7 @@ var fns = map[string]Parse{
 		//
 		for _, a := range leadingNouns {
 			for _, b := range trailingNouns {
-				r.NewRelative(relation, a, b)
+				r.NewRelative(a, relation, b)
 			}
 		}
 	},
@@ -254,7 +254,7 @@ var fns = map[string]Parse{
 		//
 		for _, n := range leadingNouns {
 			for _, d := range trailingNouns {
-				r.NewRelative(n, d, relation)
+				r.NewRelative(n, relation, d)
 			}
 		}
 	},
@@ -346,7 +346,7 @@ var fns = map[string]Parse{
 
 // 	flag.Parse() for processing command line args
 func main() {
-	// const mem = 	"file:test.db?cache=shared&mode=memory";
+	// const memory = "file:test.db?cache=shared&mode=memory"
 	if user, e := user.Current(); e != nil {
 		log.Fatalln(e)
 	} else {
