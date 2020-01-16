@@ -14,7 +14,7 @@ func MissingKinds(db *sql.DB, cb func(string) error) error {
 		where n.category = 'kind'
 		and not exists (
 			select 1 from mdl_ancestry a
-			where n.name == a.kind
+			where n.name = a.kind
 		)`,
 		func() error { return cb(k) },
 		&k)
@@ -28,7 +28,7 @@ func MissingFields(db *sql.DB, cb func(string) error) error {
 		where n.category = 'field'
 		and not exists (
 			select 1 from mdl_property p
-			where n.name == p.field
+			where n.name = p.field
 		)`,
 		func() error { return cb(k) },
 		&k)
@@ -42,7 +42,7 @@ func MissingTraits(db *sql.DB, cb func(string) error) error {
 		where n.category = 'trait'
 		and not exists (
 			select 1 from mdl_rank r
-			where n.name == r.trait
+			where n.name = r.trait
 		)`,
 		func() error { return cb(k) },
 		&k)
@@ -56,7 +56,7 @@ func MissingAspects(db *sql.DB, cb func(string) error) error {
 		where n.category = 'aspect'
 		and not exists (
 			select 1 from mdl_rank r
-			where n.name == r.aspect
+			where n.name = r.aspect
 		)`,
 		func() error { return cb(k) },
 		&k)
