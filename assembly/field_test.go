@@ -14,7 +14,7 @@ import (
 
 func TestLca(t *testing.T) {
 	match := func(a, b, c []string) bool {
-		chain := findOverlap(a, b)
+		_, chain := findOverlap(a, b)
 		return reflect.DeepEqual(chain, c)
 	}
 	if !match([]string{"A"}, []string{"A"}, []string{"A"}) {
@@ -39,28 +39,36 @@ func TestLca(t *testing.T) {
 type kfp struct{ kind, field, fieldType string }
 type pair struct{ key, value string }
 
-func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err error) {
-	dbq := ephemera.NewDBQueue(db)
-	r := ephemera.NewRecorder("ancestorTest", dbq)
-	w := NewModeler(dbq)
-	// create some fake hierarchy
+// create some fake hierarchy
+func writeHierarchy(w *Modeler, kinds []pair) (err error) {
 	for _, p := range kinds {
 		if e := w.WriteAncestor(p.key, p.value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
-	// write some primitives
-	for _, p := range kfps {
-		kind := r.Named(ephemera.NAMED_KIND, p.kind, "test")
-		field := r.Named(ephemera.NAMED_FIELD, p.field, "test")
-		r.NewPrimitive(p.fieldType, kind, field)
-	}
-	// name some fields that arent otherwise referenced
-	for _, m := range missing {
-		r.Named(ephemera.NAMED_FIELD, m, "test")
-	}
-	if e := DetermineFields(w, db); e != nil {
-		err = errutil.Append(err, e)
+	return
+}
+
+func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err error) {
+	dbq := ephemera.NewDBQueue(db)
+	r := ephemera.NewRecorder("ancestorTest", dbq)
+	w := NewModeler(dbq)
+	if e := writeHierarchy(w, kinds); e != nil {
+		err = e
+	} else {
+		// write some primitives
+		for _, p := range kfps {
+			kind := r.Named(ephemera.NAMED_KIND, p.kind, "test")
+			field := r.Named(ephemera.NAMED_FIELD, p.field, "test")
+			r.NewPrimitive(p.fieldType, kind, field)
+		}
+		// name some fields that arent otherwise referenced
+		for _, m := range missing {
+			r.Named(ephemera.NAMED_FIELD, m, "test")
+		}
+		if e := DetermineFields(w, db); e != nil {
+			err = errutil.Append(err, e)
+		}
 	}
 	return
 }

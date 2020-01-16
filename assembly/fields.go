@@ -5,11 +5,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ionous/iffy/dbutil"
-
-	"github.com/ionous/iffy/ephemera"
-
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/ephemera"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // goal: build table of property, kind, type.
@@ -50,6 +49,7 @@ func (out *pendingFields) write(w *Modeler) (err error) {
 	return
 }
 
+// fix? is it possible to use upsert to allow us to ratchet up the hierarchy?
 func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (err error) {
 	var curr, last fieldInfo
 	// fix: probably want source line out of this too
@@ -74,13 +74,14 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 				}
 			} else if last.Type != curr.Type {
 				// field is the same but the type of the field differs
-				// future: /allow the same named field in different kinds?
+				// future: allow the same named field in different kinds.
 				e := errutil.New("type mismatch", last.Field, last.Type, "!=", curr.Type)
 				err = e
 			} else if last.Kind != curr.Kind {
 				// field and type are the same, kind differs; find a common type for the field.
+				// currently, there always will be a valid one: the root.
 				// warn if we have collapsed into root?
-				overlap := findOverlap(last.Hierarchy, curr.updateHierarchy())
+				_, overlap := findOverlap(last.Hierarchy, curr.updateHierarchy())
 				last, last.Hierarchy = curr, overlap
 			}
 			return
@@ -118,22 +119,32 @@ func undeclaredAspects(db *sql.DB) (ret []string, err error) {
 	return
 }
 
-// return the chain of lca
-func findOverlap(a, b []string) (ret []string) {
+// given a two hierarchies, return where they overlap
+// since all kinds have the same root type --
+// this always succeeds.
+func findOverlap(a, b []string) (retCmp int, retOvr []string) {
 	// root is on the right
-	adepth, bdepth := len(a), len(b)
-	if adepth > bdepth {
-		a = a[adepth-bdepth:]
-	} else if bdepth > adepth {
-		b = b[bdepth-adepth:]
-	}
-	for i, ael := range a {
-		if bel := b[i]; bel == ael {
-			ret = b[i:]
-			break
+	if acnt, bcnt := len(a), len(b); acnt != 0 && bcnt != 0 {
+		if acnt > bcnt {
+			a = a[acnt-bcnt:]
+			retCmp = 1 // b might still be the same
+		} else if bcnt > acnt {
+			b = b[bcnt-acnt:]
+			retCmp = -1 // a might still be the same
+		}
+		// now they're the same length;
+		// they might be the same hierarchy
+		for i, ael := range a {
+			if bel := b[i]; bel == ael {
+				retOvr = b[i:]
+				break
+			}
+			// if the first element didnt match
+			// then neither is a match
+			retCmp = 0
 		}
 	}
-	return ret
+	return
 }
 
 type fieldInfo struct {
@@ -149,6 +160,7 @@ func (i *fieldInfo) Flush(out *pendingFields) {
 	}
 }
 
+// split Parents into a slice of strings
 func (i *fieldInfo) updateHierarchy() []string {
 	i.Hierarchy = append([]string{i.Kind}, strings.Split(i.Parents, ",")...)
 	return i.Hierarchy
