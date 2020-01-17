@@ -46,4 +46,12 @@ func TestOverlap(t *testing.T) {
 	} else if len(over) != 0 {
 		t.Fatal("got:", over)
 	}
+	// both the same
+	if cmp, over := findOverlap(
+		[]string{"a", "b"},
+		[]string{"a", "b"}); cmp != 1 {
+		t.Fatal("expected match", cmp)
+	} else if len(over) != 2 {
+		t.Fatal("got:", over)
+	}
 }

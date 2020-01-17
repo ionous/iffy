@@ -119,15 +119,16 @@ func undeclaredAspects(db *sql.DB) (ret []string, err error) {
 	return
 }
 
-// given a two hierarchies, return where they overlap
-// since all kinds have the same root type --
-// this always succeeds.
+// given a two hierarchies, return where they overlap.
+// if the returned list is the same as b, return 1
+// if not, and the returned list is the same as a, return -1
+// otherwise, if the return list is shorter than a or b, return 0.
 func findOverlap(a, b []string) (retCmp int, retOvr []string) {
 	// root is on the right
 	if acnt, bcnt := len(a), len(b); acnt != 0 && bcnt != 0 {
+		retCmp = 1 // preliminarily, lets assume they are equal
 		if acnt > bcnt {
 			a = a[acnt-bcnt:]
-			retCmp = 1 // b might still be the same
 		} else if bcnt > acnt {
 			b = b[bcnt-acnt:]
 			retCmp = -1 // a might still be the same

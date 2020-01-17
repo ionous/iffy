@@ -17,13 +17,14 @@ const (
 )
 
 const (
-	NAMED_ASPECT      = "aspect"
-	NAMED_CERTAINTY   = "certainty"
-	NAMED_FIELD       = "field"
-	NAMED_KIND        = "kind"
-	NAMED_NOUN        = "noun"
-	NAMED_RELATIVIZER = "relativizer"
-	NAMED_TRAIT       = "trait"
+	NAMED_ASPECT    = "aspect"
+	NAMED_CERTAINTY = "certainty"
+	NAMED_FIELD     = "field"
+	NAMED_KIND      = "kind"
+	NAMED_NOUN      = "noun"
+	NAMED_RELATION  = "relation"
+	NAMED_VERB      = "verb"
+	NAMED_TRAIT     = "trait"
 )
 
 const (
@@ -36,54 +37,56 @@ const (
 func NewRecorder(srcURI string, q Queue) (ret *Recorder) {
 	// fix? should enums ( prim_..., named_... ) be stored as plain strings or as named entities?
 	q.Prep("eph_source",
-		Col{"src", "text"})
+		Col{Name: "src", Type: "text"})
 	q.Prep("eph_named",
-		Col{"name", "text"},
-		Col{"category", "text"},
-		Col{"idSource", "int"},
-		Col{"offset", "text"})
+		Col{Name: "name", Type: "text"},
+		Col{Name: "category", Type: "text"},
+		Col{Name: "idSource", Type: "int"},
+		Col{Name: "offset", Type: "text"})
 	q.Prep("eph_alias",
-		Col{"idNamedAlias", "int"},
-		Col{"idNamedActual", "int"})
+		Col{Name: "idNamedAlias", Type: "int"},
+		Col{Name: "idNamedActual", Type: "int"})
 	q.Prep("eph_aspect",
-		Col{"idNamedAspect", "int"})
+		Col{Name: "idNamedAspect", Type: "int"})
 	q.Prep("eph_certainty",
-		Col{"value", "text"},
-		Col{"idNamedTrait", "int"},
-		Col{"idNamedAspect", "int"})
+		Col{Name: "value", Type: "text"},
+		Col{Name: "idNamedTrait", Type: "int"},
+		Col{Name: "idNamedAspect", Type: "int"})
 	q.Prep("eph_kind",
-		Col{"idNamedKind", "int"},
-		Col{"idNamedParent", "int"})
+		Col{Name: "idNamedKind", Type: "int"},
+		Col{Name: "idNamedParent", Type: "int"})
 	q.Prep("eph_noun",
-		Col{"idNamedNoun", "int"},
-		Col{"idNamedKind", "int"})
+		Col{Name: "idNamedNoun", Type: "int"},
+		Col{Name: "idNamedKind", Type: "int"})
 	q.Prep("eph_plural",
-		Col{"idNamedPlural", "int"},
-		Col{"idNamedSingluar", "int"})
+		Col{Name: "idNamedPlural", Type: "int"},
+		Col{Name: "idNamedSingluar", Type: "int"})
 	q.Prep("eph_primitive",
-		Col{"primType", "text"},
-		Col{"idNamedKind", "int"},
-		Col{"idNamedField", "int"})
+		Col{Name: "primType", Type: "text"},
+		Col{Name: "idNamedKind", Type: "int"},
+		Col{Name: "idNamedField", Type: "int"})
 	q.Prep("eph_relation",
-		Col{"idNamedRelation", "int"},
-		Col{"idNamedPrimary", "int"},
-		Col{"idNamedSecondary", "int"},
-		Col{"idNamedCardinality", "int"})
+		Col{Name: "idNamedRelation", Type: "int"},
+		Col{Name: "idNamedKind", Type: "int"},
+		Col{Name: "idNamedOtherKind", Type: "int"},
+		Col{Name: "cardinality",
+			Type:  "text",
+			Check: "check (cardinality in ('one-one','one-any','any-one','any-any'))"})
 	q.Prep("eph_relative",
-		Col{"idNamedHead", "int"},
-		Col{"idNamedVerb", "int"},
-		Col{"idNamedDependent", "int"})
+		Col{Name: "idNamedHead", Type: "int"},
+		Col{Name: "idNamedVerb", Type: "int"},
+		Col{Name: "idNamedDependent", Type: "int"})
 	q.Prep("eph_trait",
-		Col{"idNamedTrait", "int"},
-		Col{"idNamedAspect", "int"},
-		Col{"rank", "int"})
+		Col{Name: "idNamedTrait", Type: "int"},
+		Col{Name: "idNamedAspect", Type: "int"},
+		Col{Name: "rank", Type: "int"})
 	q.Prep("eph_value",
-		Col{"idNamedField", "int"},
-		Col{"idNamedNoun", "int"},
-		Col{"data", "blob"})
+		Col{Name: "idNamedField", Type: "int"},
+		Col{Name: "idNamedNoun", Type: "int"},
+		Col{Name: "data", Type: "blob"})
 	q.Prep("eph_verb",
-		Col{"idNamedVerb", "int"},
-		Col{"idNamedRelation", "int"})
+		Col{Name: "idNamedVerb", Type: "int"},
+		Col{Name: "idNamedRelation", Type: "int"})
 	//q.Prep("eph_Implication"},
 	// Col{"idNamedScope"},
 	// Col{"idNamedTrait"},
@@ -164,8 +167,8 @@ func (r *Recorder) NewPrimitive(primType string, kind, prop Named) {
 }
 
 // Relation defines a connection between a primary and secondary kind.
-func (r *Recorder) NewRelation(relation, primary, secondary, cardinality Named) {
-	if _, e := r.q.Write("eph_relation", relation, primary, secondary, cardinality); e != nil {
+func (r *Recorder) NewRelation(relation, primaryKind, secondaryKind Named, cardinality string) {
+	if _, e := r.q.Write("eph_relation", relation, primaryKind, secondaryKind, cardinality); e != nil {
 		panic(e)
 	}
 }

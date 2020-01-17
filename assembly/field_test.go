@@ -77,7 +77,7 @@ func matchProperties(db *sql.DB, want []kfp) (err error) {
 	var curr kfp
 	var have []kfp
 	if e := dbutil.QueryAll(db,
-		`select kind,field,type from mdl_property order by kind, field, type`,
+		`select kind,field,type from mdl_field order by kind, field, type`,
 		func() (err error) {
 			have = append(have, curr)
 			return

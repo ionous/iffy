@@ -149,7 +149,7 @@ var fns = map[string]Parse{
 	// "{relation} {+noun} {are_being} {+noun}."
 	// ex. On the beach are shells.
 	"relative_to_noun": func(r *Parser, item reader.Map) {
-		relation := r.namedStr(item, ephemera.NAMED_RELATIVIZER, "$RELATION")
+		relation := r.namedStr(item, ephemera.NAMED_VERB, "$RELATION")
 		//
 		r.parseSlice(item.SliceOf("$NOUN"))
 		leadingNouns := r.nouns.Swap(nil)
@@ -246,7 +246,7 @@ var fns = map[string]Parse{
 	// ex. (the cat and the hat) are in (the book)
 	// ex. (Hector and Maria) are suspicious of (Santa and Santana).
 	"noun_relation": func(r *Parser, item reader.Map) {
-		relation := r.namedStr(item, ephemera.NAMED_RELATIVIZER, "$RELATION")
+		relation := r.namedStr(item, ephemera.NAMED_VERB, "$RELATION")
 		//
 		leadingNouns := r.nouns.Swap(nil)
 		r.parseSlice(item.SliceOf("$NOUN"))

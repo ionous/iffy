@@ -5,3 +5,4 @@ notes
 .vscode
 ephemera/cmd/parse
 ephemera/cmd/stem
+assembly/debug.test

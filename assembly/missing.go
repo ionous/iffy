@@ -27,7 +27,7 @@ func MissingFields(db *sql.DB, cb func(string) error) error {
 		`select distinct n.name from eph_named n
 		where n.category = 'field'
 		and not exists (
-			select 1 from mdl_property p
+			select 1 from mdl_field p
 			where n.name = p.field
 		)`,
 		func() error { return cb(k) },
@@ -41,7 +41,7 @@ func MissingTraits(db *sql.DB, cb func(string) error) error {
 		`select distinct n.name from eph_named n
 		where n.category = 'trait'
 		and not exists (
-			select 1 from mdl_rank r
+			select 1 from mdl_aspect r
 			where n.name = r.trait
 		)`,
 		func() error { return cb(k) },
@@ -55,7 +55,7 @@ func MissingAspects(db *sql.DB, cb func(string) error) error {
 		`select distinct n.name from eph_named n
 		where n.category = 'aspect'
 		and not exists (
-			select 1 from mdl_rank r
+			select 1 from mdl_aspect r
 			where n.name = r.aspect
 		)`,
 		func() error { return cb(k) },
