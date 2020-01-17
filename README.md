@@ -7,7 +7,7 @@ Current work involves re-implementing the sashimi compiler ( more accurately cal
 The basic flow is [Makisu](https://github.com/ionous/makisu) story editor -> story file -> ephemera database -> story database -> game.
 
 Rough versions of the editor, file export, ephemera database, and game exist. Remaining steps include:
-* generate story database from ephemera
+* assemble story database from ephemera
 * adapt game code to use the story database
 * rework hosting environment to run games
 * port story libraries so that games can actually do interesting things ( move from room to room, open doors,  etc. )
