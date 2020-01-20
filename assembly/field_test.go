@@ -40,7 +40,7 @@ type kfp struct{ kind, field, fieldType string }
 type pair struct{ key, value string }
 
 // create some fake hierarchy
-func writeHierarchy(w *Modeler, kinds []pair) (err error) {
+func fakeHierarchy(w *Modeler, kinds []pair) (err error) {
 	for _, p := range kinds {
 		if e := w.WriteAncestor(p.key, p.value); e != nil {
 			err = errutil.Append(err, e)
@@ -51,20 +51,20 @@ func writeHierarchy(w *Modeler, kinds []pair) (err error) {
 
 func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err error) {
 	dbq := ephemera.NewDBQueue(db)
-	r := ephemera.NewRecorder("ancestorTest", dbq)
+	rec := ephemera.NewRecorder("ancestorTest", dbq)
 	w := NewModeler(dbq)
-	if e := writeHierarchy(w, kinds); e != nil {
+	if e := fakeHierarchy(w, kinds); e != nil {
 		err = e
 	} else {
 		// write some primitives
 		for _, p := range kfps {
-			kind := r.Named(ephemera.NAMED_KIND, p.kind, "test")
-			field := r.Named(ephemera.NAMED_FIELD, p.field, "test")
-			r.NewPrimitive(p.fieldType, kind, field)
+			kind := rec.Named(ephemera.NAMED_KIND, p.kind, "test")
+			field := rec.Named(ephemera.NAMED_FIELD, p.field, "test")
+			rec.NewPrimitive(p.fieldType, kind, field)
 		}
 		// name some fields that arent otherwise referenced
 		for _, m := range missing {
-			r.Named(ephemera.NAMED_FIELD, m, "test")
+			rec.Named(ephemera.NAMED_FIELD, m, "test")
 		}
 		if e := DetermineFields(w, db); e != nil {
 			err = errutil.Append(err, e)
@@ -91,7 +91,7 @@ func matchProperties(db *sql.DB, want []kfp) (err error) {
 
 func TestFields(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -119,7 +119,7 @@ func TestFields(t *testing.T) {
 
 func TestFieldLca(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -146,7 +146,7 @@ func TestFieldLca(t *testing.T) {
 // ex. T.a:text, T.a:digi
 func TestFieldTypeMismatch(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -165,7 +165,7 @@ func TestFieldTypeMismatch(t *testing.T) {
 
 func TestFieldMissing(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()

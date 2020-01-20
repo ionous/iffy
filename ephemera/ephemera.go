@@ -43,6 +43,7 @@ func NewRecorder(srcURI string, q Queue) (ret *Recorder) {
 		Col{Name: "category", Type: "text"},
 		Col{Name: "idSource", Type: "int"},
 		Col{Name: "offset", Type: "text"})
+	// aliases are used for user input, not story modeling
 	q.Prep("eph_alias",
 		Col{Name: "idNamedAlias", Type: "int"},
 		Col{Name: "idNamedActual", Type: "int"})

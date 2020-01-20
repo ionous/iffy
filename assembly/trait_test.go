@@ -14,20 +14,20 @@ import (
 
 func makeTraits(db *sql.DB, pairs []pair) (err error) {
 	dbq := ephemera.NewDBQueue(db)
-	r := ephemera.NewRecorder("test", dbq)
+	rec := ephemera.NewRecorder("test", dbq)
 	w := NewModeler(dbq)
 
 	for _, p := range pairs {
 		var aspect, trait ephemera.Named
 		if len(p.key) > 0 {
-			aspect = r.Named(ephemera.NAMED_ASPECT, p.key, "key")
+			aspect = rec.Named(ephemera.NAMED_ASPECT, p.key, "key")
 		}
 		if len(p.value) > 0 {
-			trait = r.Named(ephemera.NAMED_TRAIT, p.value, "value")
+			trait = rec.Named(ephemera.NAMED_TRAIT, p.value, "value")
 		}
 		if aspect.IsValid() && trait.IsValid() {
-			r.NewAspect(aspect)
-			r.NewTrait(trait, aspect, 0)
+			rec.NewAspect(aspect)
+			rec.NewTrait(trait, aspect, 0)
 		}
 	}
 	return DetermineAspects(w, db)
@@ -57,7 +57,7 @@ func matchTraits(db *sql.DB, want []expectedTrait) (err error) {
 // TestTraits to verify that aspects/traits in ephemera can become part of the model.
 func TestTraits(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -90,7 +90,7 @@ func TestTraits(t *testing.T) {
 // TestTraitConflicts
 func TestTraitConflicts(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -108,7 +108,7 @@ func TestTraitConflicts(t *testing.T) {
 }
 func TestTraitMissingAspect(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()
@@ -136,7 +136,7 @@ func TestTraitMissingAspect(t *testing.T) {
 
 func TestTraitMissingTraits(t *testing.T) {
 	const source = memory
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
 		defer db.Close()

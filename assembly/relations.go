@@ -2,7 +2,6 @@ package assembly
 
 import (
 	"database/sql"
-	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
@@ -14,41 +13,30 @@ type relInfo struct {
 	kind, otherKind       hierarchy
 }
 
-func (p *relInfo) flush(w *Modeler) (err error) {
+func (p *relInfo) flush(store *relStore) (err error) {
 	if len(p.relation) > 0 {
-		if !p.kind.valid || !p.otherKind.valid {
-			err = errutil.New("couldnt determine valid lowest common ancestor")
-		} else {
-			err = w.WriteRelation(p.relation, p.kind.name, p.cardinality, p.otherKind.name)
-		}
+		store.list = append(store.list, *p)
 	}
 	return
 }
 
-// by default, lca contains kind --
-// but it might not once new kinds are merged into it.
-type hierarchy struct {
-	name    string
-	parents string   // mdl hierarchy of kind
-	lca     []string // root is on the right.
-	valid   bool     // valid if lca is a named part
+// we cant read and write to the database simultaneously with a single db? object
+// so we collect the desired output and write it in a loop
+type relStore struct {
+	list []relInfo
 }
 
-// normalize name, parents into an array of kinds.
-func (h *hierarchy) getAncestry() []string {
-	return append([]string{h.name}, strings.Split(h.parents, ",")...)
-}
-
-func (h *hierarchy) set(lca []string) {
-	h.lca, h.valid = lca, len(lca) > 1
-}
-func (h *hierarchy) update(other *hierarchy) {
-	if h.name != other.name {
-		cmp, lca := findOverlap(h.lca, other.getAncestry())
-		h.name = other.name
-		h.valid = cmp != 0
-		h.lca = lca
+func (store *relStore) write(w *Modeler) (err error) {
+	for _, p := range store.list {
+		if !p.kind.valid || !p.otherKind.valid {
+			e := errutil.New("couldnt determine valid lowest common ancestor")
+			err = errutil.Append(err, e)
+		} else if e := w.WriteRelation(p.relation, p.kind.name,
+			p.cardinality, p.otherKind.name); e != nil {
+			err = errutil.Append(err, e)
+		}
 	}
+	return
 }
 
 // in, eph_relation: R, K, cardinality, Q
@@ -56,6 +44,7 @@ func (h *hierarchy) update(other *hierarchy) {
 // fix? right now the coalesce allows missing kinds through,
 // the behavior otherwise is Scan error on column index 5, and not particularly helpful
 func DetermineRelations(w *Modeler, db *sql.DB) (err error) {
+	var store relStore
 	var curr, last relInfo
 	// we select by R, sorted by R, C, K, Q
 	// when C differs, we error.
@@ -73,22 +62,20 @@ func DetermineRelations(w *Modeler, db *sql.DB) (err error) {
 			on (r.idNamedKind = nk.rowid)
 		left join eph_named nq
 			on (r.idNamedOtherkind = nq.rowid)
-		left join mdl_ancestry ak
+		left join mdl_kind ak
 			on (ak.kind = nk.name)
-		left join mdl_ancestry aq
+		left join mdl_kind aq
 			on (aq.kind = nq.name)
 		order by nr.name, r.cardinality, nk.name, nq.name
 		`, func() (err error) {
 			// when R differs, write to the output.
 			if last.relation != curr.relation {
-				if e := last.flush(w); e != nil {
-					err = e
-				} else {
-					// move curr into last for the next queried row.
-					curr.kind.set(curr.kind.getAncestry())
-					curr.otherKind.set(curr.otherKind.getAncestry())
-					last = curr
-				}
+				last.flush(&store)
+				// move curr into last for the next queried row.
+				curr.kind.set(curr.kind.getAncestry())
+				curr.otherKind.set(curr.otherKind.getAncestry())
+				last = curr
+
 			} else if last.cardinality != curr.cardinality {
 				// same relation can't have different cardinality(s)
 				err = errutil.New("cardinality mismatch", curr.relation, last.cardinality, curr.cardinality)
@@ -105,7 +92,8 @@ func DetermineRelations(w *Modeler, db *sql.DB) (err error) {
 	); e != nil {
 		err = e
 	} else {
-		err = last.flush(w)
+		last.flush(&store)
+		err = store.write(w)
 	}
 	return
 }

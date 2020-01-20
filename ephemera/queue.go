@@ -1,5 +1,7 @@
 package ephemera
 
+import "database/sql/driver"
+
 // Queue provides a wrapper which can write to a db.... or not.
 type Queue interface {
 	Prep(which string, keys ...Col)
@@ -7,22 +9,22 @@ type Queue interface {
 	Write(which string, args ...interface{}) (Queued, error)
 }
 
-// Col describes a column in Queue.
-type Col struct {
-	Name, Type, Check string
-}
-
-// Queued provides an opaque return value for rows written by Queues
+// Queued provides a semi-opaque return value for rows written by Queues
 type Queued struct {
 	id int64
 }
 
-func NamesOf(cols []Col) []string {
-	keys := make([]string, 0, len(cols))
-	for _, c := range cols {
-		if len(c.Name) > 0 {
-			keys = append(keys, c.Name)
-		}
+// Scan converts a database value into a Queued entry. ( opposite of Value )
+func (ns *Queued) Scan(value interface{}) (err error) {
+	if v, e := driver.DefaultParameterConverter.ConvertValue(value); e != nil {
+		err = e
+	} else {
+		ns.id = v.(int64)
 	}
-	return keys
+	return
+}
+
+// Value converts a Queued entry into a database value. ( opposite of Scan )
+func (ns Queued) Value() (driver.Value, error) {
+	return ns.id, nil
 }

@@ -54,12 +54,12 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 	var curr, last fieldInfo
 	// fix: probably want source line out of this too
 	if e := dbutil.QueryAll(db,
-		`select nk.name as kind, nf.name as field, p.primType as type, a.path as parents
+		`select nk.name, nf.name, p.primType, a.path
 		from eph_primitive p join eph_named nk
 			on (p.idNamedKind = nk.rowid)
 		left join eph_named nf
 			on (p.idNamedField = nf.rowid)
-		left join mdl_ancestry a
+		left join mdl_kind a
 			on (a.kind = nk.name)
 		order by nf.name, nk.name
 		`, func() (err error) {

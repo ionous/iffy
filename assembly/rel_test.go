@@ -82,7 +82,7 @@ func TestRelationCreation(t *testing.T) {
 		defer db.Close()
 		dbq := ephemera.NewDBQueue(db)
 		w := NewModeler(dbq)
-		if e := writeHierarchy(w, []pair{
+		if e := fakeHierarchy(w, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
@@ -116,7 +116,7 @@ func TestRelationCardinality(t *testing.T) {
 		defer db.Close()
 		dbq := ephemera.NewDBQueue(db)
 		w := NewModeler(dbq)
-		if e := writeHierarchy(w, []pair{
+		if e := fakeHierarchy(w, []pair{
 			{"P", ""},
 		}); e != nil {
 			t.Fatal(e)
@@ -142,7 +142,7 @@ func TestRelationLCASuccess(t *testing.T) {
 		defer db.Close()
 		dbq := ephemera.NewDBQueue(db)
 		w := NewModeler(dbq)
-		if e := writeHierarchy(w, []pair{
+		if e := fakeHierarchy(w, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
@@ -174,7 +174,7 @@ func TestRelationLCAFail(t *testing.T) {
 		defer db.Close()
 		dbq := ephemera.NewDBQueue(db)
 		w := NewModeler(dbq)
-		if e := writeHierarchy(w, []pair{
+		if e := fakeHierarchy(w, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},

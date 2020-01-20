@@ -6,7 +6,7 @@ import (
 )
 
 func NewModeler(q ephemera.Queue) *Modeler {
-	q.Prep("mdl_ancestry",
+	q.Prep("mdl_kind",
 		ephemera.Col{Name: "kind", Type: "text"},
 		ephemera.Col{Name: "path", Type: "text"},
 		ephemera.Col{Check: "primary key(kind)"},
@@ -30,6 +30,19 @@ func NewModeler(q ephemera.Queue) *Modeler {
 		ephemera.Col{Name: "rank", Type: "int"},
 		ephemera.Col{Check: "primary key(aspect, trait)"},
 	)
+	q.Prep("mdl_noun",
+		ephemera.Col{Name: "kind", Type: "text"},
+		// the full text of 'integer' is required for ids
+		// also, to get the auto-generated id, we place the declaration in "check".
+		ephemera.Col{Check: "id integer primary key"},
+	)
+	// where rank 0 is a better match than rank 1
+	q.Prep("mdl_name",
+		ephemera.Col{Name: "idModelNoun", Type: "int"},
+		ephemera.Col{Name: "name", Type: "text"},
+		ephemera.Col{Name: "rank", Type: "int"},
+	)
+
 	vcols := []ephemera.Col{
 		{Name: "relation", Type: "text"},
 		{Name: "stem", Type: "text"},
@@ -56,7 +69,7 @@ type Modeler struct {
 
 // write kind and comma separated ancestors
 func (w *Modeler) WriteAncestor(kind, path string) (err error) {
-	if _, e := w.q.Write("mdl_ancestry", kind, path); e != nil {
+	if _, e := w.q.Write("mdl_kind", kind, path); e != nil {
 		err = e
 	}
 	return
@@ -67,6 +80,15 @@ func (w *Modeler) WriteField(field, owner, fieldType string) (err error) {
 		err = e
 	}
 	return
+}
+
+func (w *Modeler) WriteNoun(kind string) (ephemera.Queued, error) {
+	return w.q.Write("mdl_noun", kind)
+}
+
+// WriteName for noun
+func (w *Modeler) WriteName(noun ephemera.Queued, name string, rank int) (ephemera.Queued, error) {
+	return w.q.Write("mdl_name", noun, name, rank)
 }
 
 func (w *Modeler) WriteRelation(relation, kind, cardinality, other string) (err error) {

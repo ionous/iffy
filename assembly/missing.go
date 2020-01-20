@@ -13,7 +13,7 @@ func MissingKinds(db *sql.DB, cb func(string) error) error {
 		`select distinct name from eph_named n
 		where n.category = 'kind'
 		and not exists (
-			select 1 from mdl_ancestry a
+			select 1 from mdl_kind a
 			where n.name = a.kind
 		)`,
 		func() error { return cb(k) },
