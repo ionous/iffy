@@ -166,8 +166,8 @@ func TestRelationLcaSuccess(t *testing.T) {
 	}
 }
 
-// TestRelationLca
-func TestRelationLcaFail(t *testing.T) {
+// TestRelationLcaFailure to verify a mismatched relation hierarchy generates an error.
+func TestRelationLcaFailure(t *testing.T) {
 	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {

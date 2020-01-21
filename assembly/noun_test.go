@@ -38,9 +38,9 @@ func TestNounFormation(t *testing.T) {
 		} else {
 			want := []modeledNoun{
 				{"apple", "T", 0},
+				{"machine gun", "T", 0},
 				{"gun", "T", 1},
 				{"machine", "T", 2},
-				{"machine gun", "T", 0},
 				{"pear", "T", 0},
 			}
 			if !reflect.DeepEqual(got, want) {
@@ -60,7 +60,7 @@ func collectNouns(db *sql.DB) (ret []modeledNoun, err error) {
 		`select n.name, i.kind, n.rank
 		from mdl_name n join mdl_noun i
 			on (n.idModelNoun = i.id)
-		order by name`,
+		order by i.id, rank, name`,
 		func() (err error) {
 			nouns = append(nouns, curr)
 			return
@@ -86,8 +86,8 @@ func addNouns(rec *ephemera.Recorder, els []pair) (err error) {
 	return
 }
 
-// TestNounLca to verify we can successfully determine the lowest common ancestor of nouns.
-func TestNounLca(t *testing.T) {
+// TestNounLcaSucess to verify we can successfully determine the lowest common ancestor of nouns.
+func TestNounLcaSucess(t *testing.T) {
 	const source = memory
 	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
@@ -131,5 +131,72 @@ func TestNounLca(t *testing.T) {
 	}
 }
 
-// noun failed lca
-// multipart noun name
+// TestNounLcaFailure to verify a mismatched noun hierarchy generates an error.
+func TestNounLcaFailure(t *testing.T) {
+	const source = memory
+	if db, e := sql.Open("sqlite3", source); e != nil {
+		t.Fatal(e)
+	} else {
+		defer db.Close()
+		dbq := ephemera.NewDBQueue(db)
+		rec := ephemera.NewRecorder(t.Name(), dbq)
+		w := NewModeler(dbq)
+		if e := fakeHierarchy(w, []pair{
+			{"T", ""},
+			{"P", "T"},
+			{"C", "P,T"},
+			{"D", "P,T"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := addNouns(rec, []pair{
+			{"apple", "C"},
+			{"apple", "D"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := DetermineNouns(w, db); e == nil {
+			t.Fatal("expected failure")
+		} else {
+			t.Log("okay:", e)
+		}
+	}
+}
+
+// TestNounParts to verify a single noun generates multi part names
+func TestNounParts(t *testing.T) {
+	const source = memory
+	if db, e := sql.Open("sqlite3", source); e != nil {
+		t.Fatal(e)
+	} else {
+		defer db.Close()
+		dbq := ephemera.NewDBQueue(db)
+		rec := ephemera.NewRecorder(t.Name(), dbq)
+		w := NewModeler(dbq)
+		if e := fakeHierarchy(w, []pair{
+			{"T", ""},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := addNouns(rec, []pair{
+			{"collection of words", "T"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := DetermineNouns(w, db); e != nil {
+			t.Fatal(e)
+		} else if got, e := collectNouns(db); e != nil {
+			t.Fatal(e)
+		} else {
+			want := []modeledNoun{
+				{"collection of words", "T", 0},
+				{"words", "T", 1},
+				{"of", "T", 2},
+				{"collection", "T", 3},
+			}
+
+			if !reflect.DeepEqual(got, want) {
+				e := errutil.New("mismatch",
+					"have:", pretty.Sprint(got),
+					"want:", pretty.Sprint(want))
+				t.Fatal(e)
+			}
+		}
+	}
+}
