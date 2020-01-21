@@ -20,7 +20,7 @@ func (c *cachedKind) String() string {
 
 // GetAncestors returns a comma separated string of this kind's parent, and its parent's search.
 func (c *cachedKind) GetAncestors() string {
-	list := make([]string, 0, 0)
+	var list []string
 	for t := c.parent; t != nil; t = t.parent {
 		list = append(list, t.String())
 	}

@@ -12,30 +12,6 @@ import (
 	"github.com/ionous/iffy/ephemera"
 )
 
-func TestLca(t *testing.T) {
-	match := func(a, b, c []string) bool {
-		_, chain := findOverlap(a, b)
-		return reflect.DeepEqual(chain, c)
-	}
-	if !match([]string{"A"}, []string{"A"}, []string{"A"}) {
-		t.Fatal("expected lowest common ancestor A")
-	} else if !match([]string{"A"}, []string{"B", "A"}, []string{"A"}) {
-		t.Fatal("expected lowest common ancestor A")
-	} else if !match([]string{"B", "A"}, []string{"B", "A"}, []string{"B", "A"}) {
-		t.Fatal("expected lowest common ancestor A")
-	} else if !match([]string{"D", "C", "B", "A"}, []string{"B", "A"}, []string{"B", "A"}) {
-		t.Fatal("expected lowest common ancestor B")
-	} else if !match([]string{"B", "A"}, []string{"D", "C", "B", "A"}, []string{"B", "A"}) {
-		t.Fatal("expected lowest common ancestor B")
-	} else if !match([]string{"E", "F", "B", "A"}, []string{"D", "C", "B", "A"}, []string{"B", "A"}) {
-		t.Fatal("expected lowest common ancestor B")
-	} else if !match([]string{"D", "C", "B", "A"}, []string{"E", "F", "B", "A"}, []string{"B", "A"}) {
-		t.Fatal("expected lowest common ancestor B")
-	} else if !match([]string{"D", "E", "F"}, []string{"C", "B", "A"}, nil) {
-		t.Fatal("expected no lowest common ancestor")
-	}
-}
-
 type kfp struct{ kind, field, fieldType string }
 type pair struct{ key, value string }
 
@@ -151,7 +127,9 @@ func TestFieldTypeMismatch(t *testing.T) {
 	} else {
 		defer db.Close()
 		if e := writeFields(db,
-			[]pair{{"T", ""}},
+			[]pair{
+				{"T", ""},
+			},
 			[]kfp{
 				{"T", "a", ephemera.PRIM_TEXT},
 				{"T", "a", ephemera.PRIM_DIGI},
@@ -170,7 +148,9 @@ func TestFieldMissing(t *testing.T) {
 	} else {
 		defer db.Close()
 		if e := writeFields(db,
-			[]pair{{"T", ""}},
+			[]pair{
+				{"T", ""},
+			},
 			nil,
 			"z"); e != nil {
 			t.Fatal(e)

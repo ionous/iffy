@@ -55,3 +55,29 @@ func TestOverlap(t *testing.T) {
 		t.Fatal("got:", over)
 	}
 }
+
+func TestOverlapLca(t *testing.T) {
+	match := func(a, b, c []string) bool {
+		_, chain := findOverlap(a, b)
+		return reflect.DeepEqual(chain, c)
+	}
+	if !match([]string{"A"}, []string{"A"}, []string{"A"}) {
+		t.Fatal("expected lowest common ancestor A")
+	} else if !match([]string{"A"}, []string{"B", "A"}, []string{"A"}) {
+		t.Fatal("expected lowest common ancestor A")
+	} else if !match([]string{"B", "A"}, []string{"B", "A"}, []string{"B", "A"}) {
+		t.Fatal("expected lowest common ancestor A")
+	} else if !match([]string{"D", "C", "B", "A"}, []string{"B", "A"}, []string{"B", "A"}) {
+		t.Fatal("expected lowest common ancestor B")
+	} else if !match([]string{"B", "A"}, []string{"D", "C", "B", "A"}, []string{"B", "A"}) {
+		t.Fatal("expected lowest common ancestor B")
+	} else if !match([]string{"E", "F", "B", "A"}, []string{"D", "C", "B", "A"}, []string{"B", "A"}) {
+		t.Fatal("expected lowest common ancestor B")
+	} else if !match([]string{"D", "C", "B", "A"}, []string{"E", "F", "B", "A"}, []string{"B", "A"}) {
+		t.Fatal("expected lowest common ancestor B")
+	} else if !match([]string{"D", "P", "T"}, []string{"T"}, []string{"T"}) {
+		t.Fatal("expected lowest common ancestor T")
+	} else if !match([]string{"D", "E", "F"}, []string{"C", "B", "A"}, nil) {
+		t.Fatal("expected no lowest common ancestor")
+	}
+}

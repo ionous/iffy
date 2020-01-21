@@ -12,13 +12,20 @@ type hierarchy struct {
 }
 
 // normalize name, parents into an array of kinds.
-func (h *hierarchy) getAncestry() []string {
-	return append([]string{h.name}, strings.Split(h.parents, ",")...)
+func (h *hierarchy) getAncestry() (ret []string) {
+	parts := []string{h.name}
+	if len(h.parents) > 0 {
+		ret = append(parts, strings.Split(h.parents, ",")...)
+	} else {
+		ret = parts
+	}
+	return
 }
 
 func (h *hierarchy) set(lca []string) {
-	h.lca, h.valid = lca, len(lca) > 1
+	h.lca, h.valid = lca, len(lca) > 0
 }
+
 func (h *hierarchy) update(other *hierarchy) {
 	if h.name != other.name {
 		cmp, lca := findOverlap(h.lca, other.getAncestry())

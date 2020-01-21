@@ -134,8 +134,8 @@ func TestRelationCardinality(t *testing.T) {
 	}
 }
 
-// TestRelationLCA
-func TestRelationLCASuccess(t *testing.T) {
+// TestRelationLca
+func TestRelationLcaSuccess(t *testing.T) {
 	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {
@@ -166,8 +166,8 @@ func TestRelationLCASuccess(t *testing.T) {
 	}
 }
 
-// TestRelationLCA
-func TestRelationLCAFail(t *testing.T) {
+// TestRelationLca
+func TestRelationLcaFail(t *testing.T) {
 	if db, e := sql.Open("sqlite3", memory); e != nil {
 		t.Fatal(e)
 	} else {

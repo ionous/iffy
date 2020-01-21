@@ -48,8 +48,8 @@ func DetermineRelations(w *Modeler, db *sql.DB) (err error) {
 	var curr, last relInfo
 	// we select by R, sorted by R, C, K, Q
 	// when C differs, we error.
-	// when K differs, we LCA K.
-	// when Q differs, we LCA Q.
+	// when K differs, we Lca K.
+	// when Q differs, we Lca Q.
 	if e := dbutil.QueryAll(db,
 		`select
 			nr.name,
