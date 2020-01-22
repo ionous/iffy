@@ -1,9 +1,26 @@
 package assembly
 
 import (
+	"database/sql"
+
 	"github.com/ionous/iffy/ephemera"
 	"github.com/reiver/go-porterstemmer"
 )
+
+func NewModelerDB(db *sql.DB) *Modeler {
+	dbq := ephemera.NewDBQueue(db)
+	// create a reusable view for resolving ephemera back to strings
+	if _, e := db.Exec(`create view if not exists 
+			eph_named_default 
+			as select nk.name as kind, nf.name as field, p.value as value 
+			from eph_default p join eph_named nk
+				on (p.idNamedKind = nk.rowid)
+			left join eph_named nf
+				on (p.idNamedField = nf.rowid);`); e != nil {
+		panic(e)
+	}
+	return NewModeler(dbq)
+}
 
 func NewModeler(q ephemera.Queue) *Modeler {
 	q.Prep("mdl_kind",
@@ -17,6 +34,10 @@ func NewModeler(q ephemera.Queue) *Modeler {
 		ephemera.Col{Name: "cardinality", Type: "text"},
 		ephemera.Col{Name: "otherKind", Type: "text"},
 		ephemera.Col{Check: "primary key(relation)"},
+	)
+	q.Prep("mdl_default",
+		ephemera.Col{Name: "idModelField", Type: "text"},
+		ephemera.Col{Name: "value", Type: "blob"},
 	)
 	q.Prep("mdl_field",
 		ephemera.Col{Name: "field", Type: "text"},
@@ -60,6 +81,7 @@ func NewModeler(q ephemera.Queue) *Modeler {
 					where v.relation=?1 and v.stem=?2
 				)`, vcols)
 	}
+
 	return &Modeler{q}
 }
 
@@ -68,46 +90,53 @@ type Modeler struct {
 }
 
 // write kind and comma separated ancestors
-func (w *Modeler) WriteAncestor(kind, path string) (err error) {
-	if _, e := w.q.Write("mdl_kind", kind, path); e != nil {
+func (m *Modeler) WriteAncestor(kind, path string) (err error) {
+	if _, e := m.q.Write("mdl_kind", kind, path); e != nil {
 		err = e
 	}
 	return
 }
 
-func (w *Modeler) WriteField(field, owner, fieldType string) (err error) {
-	if _, e := w.q.Write("mdl_field", field, owner, fieldType); e != nil {
+func (m *Modeler) WriteField(field, kind, fieldType string) (err error) {
+	if _, e := m.q.Write("mdl_field", field, kind, fieldType); e != nil {
 		err = e
 	}
 	return
 }
 
-func (w *Modeler) WriteNoun(kind string) (ephemera.Queued, error) {
-	return w.q.Write("mdl_noun", kind)
+func (m *Modeler) WriteDefault(idModelField int64, value interface{}) (err error) {
+	if _, e := m.q.Write("mdl_default", idModelField, value); e != nil {
+		err = e
+	}
+	return
+}
+
+func (m *Modeler) WriteNoun(kind string) (ephemera.Queued, error) {
+	return m.q.Write("mdl_noun", kind)
 }
 
 // WriteName for noun
-func (w *Modeler) WriteName(noun ephemera.Queued, name string, rank int) (ephemera.Queued, error) {
-	return w.q.Write("mdl_name", noun, name, rank)
+func (m *Modeler) WriteName(noun ephemera.Queued, name string, rank int) (ephemera.Queued, error) {
+	return m.q.Write("mdl_name", noun, name, rank)
 }
 
-func (w *Modeler) WriteRelation(relation, kind, cardinality, other string) (err error) {
-	if _, e := w.q.Write("mdl_rel", relation, kind, cardinality, other); e != nil {
+func (m *Modeler) WriteRelation(relation, kind, cardinality, other string) (err error) {
+	if _, e := m.q.Write("mdl_rel", relation, kind, cardinality, other); e != nil {
 		err = e
 	}
 	return
 }
 
-func (w *Modeler) WriteTrait(aspect, trait string) (err error) {
-	if _, e := w.q.Write("mdl_aspect", aspect, trait, 0); e != nil {
+func (m *Modeler) WriteTrait(aspect, trait string) (err error) {
+	if _, e := m.q.Write("mdl_aspect", aspect, trait, 0); e != nil {
 		err = e
 	}
 	return
 }
 
-func (w *Modeler) WriteVerb(relation, verb string) (err error) {
+func (m *Modeler) WriteVerb(relation, verb string) (err error) {
 	stem := porterstemmer.StemString(verb)
-	if _, e := w.q.Write("mdl_verb", relation, stem); e != nil {
+	if _, e := m.q.Write("mdl_verb", relation, stem); e != nil {
 		err = e
 	}
 	return

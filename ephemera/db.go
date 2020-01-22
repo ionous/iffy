@@ -12,12 +12,12 @@ func KidsOf(db *sql.DB, ancestor string, cb func(kid string)) (err error) {
 	// query the child names of the parent named p
 	if siblings, e := db.Query(
 		`select distinct n.name as kid 
-					from eph_named n,( select idNamedKind
-								from eph_kind,( select rowid as parentId 
-										    from eph_named n
-										    where n.name = ? )
-								where idNamedParent = parentId )
-					where n.rowid = idNamedKind`, ancestor); e != nil {
+			from eph_named n,( select idNamedKind
+				from eph_kind,( select rowid as parentId 
+				    from eph_named n
+				    where n.name = ? )
+				where idNamedParent = parentId )
+			where n.rowid = idNamedKind`, ancestor); e != nil {
 		err = e
 	} else {
 		var kid string

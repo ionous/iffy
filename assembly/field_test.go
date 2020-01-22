@@ -12,19 +12,6 @@ import (
 	"github.com/ionous/iffy/ephemera"
 )
 
-type kfp struct{ kind, field, fieldType string }
-type pair struct{ key, value string }
-
-// create some fake hierarchy
-func fakeHierarchy(w *Modeler, kinds []pair) (err error) {
-	for _, p := range kinds {
-		if e := w.WriteAncestor(p.key, p.value); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}
-
 func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err error) {
 	dbq := ephemera.NewDBQueue(db)
 	rec := ephemera.NewRecorder("ancestorTest", dbq)
@@ -137,36 +124,6 @@ func TestFieldTypeMismatch(t *testing.T) {
 			t.Log("okay:", e)
 		} else {
 			t.Fatal("expected error")
-		}
-	}
-}
-
-func TestFieldMissing(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
-		t.Fatal(e)
-	} else {
-		defer db.Close()
-		if e := writeFields(db,
-			[]pair{
-				{"T", ""},
-			},
-			nil,
-			"z"); e != nil {
-			t.Fatal(e)
-		} else {
-			var missing []string
-			if e := MissingFields(db, func(n string) (err error) {
-				missing = append(missing, n)
-				return
-			}); e != nil {
-				t.Fatal(e)
-			}
-			if !reflect.DeepEqual(missing, []string{"z"}) {
-				t.Fatal("expected match", missing)
-			} else {
-				t.Log("okay, missing", missing)
-			}
 		}
 	}
 }
