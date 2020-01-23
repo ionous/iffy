@@ -13,9 +13,9 @@ import (
 //       mdl_kind(kind, path): for hierarchy.
 //       mdl_field(kind, field, type)
 // considerations:
-// . property's actual kind
+// . property's actual kind ( default specified against a derived type )
 // . contradiction in specified values
-// . contradiction in specified value vs type type ( alt: implicit conversion )
+// . contradiction in specified value vs field type ( alt: implicit conversion )
 // . missing properties ( kind, field pair doesn't exist in model )
 // o certainties: usually, seldom, never, always.
 // o misspellings, near spellings ( ex. for missing fields )
@@ -26,23 +26,12 @@ func DetermineDefaults(m *Modeler, db *sql.DB) (err error) {
 	var list []defaultInfo
 	// collect mdl_field rowid, type, and value.
 	if e := dbutil.QueryAll(db, `
-		/* table of hierarchy */
-		with tree(kind,path,field,value) as 
-		(select first.kind, first.path, p.field, p.value  
-		    /* seed the search for kinds with the requested ephemera */
-		    from eph_named_default p left join mdl_kind first
-			on first.kind=p.kind 
-			union all
-			select super.kind, super.path, field, value 
-			from tree kid, mdl_kind super
-			where super.kind = substr(kid.path,0,instr(kid.path||",", ",")) 
-		)
-		select mf.rowid, mf.type, tree.value 
-			from tree join mdl_field mf 
-		   /* we are filtering kinds where the field in question is declared.
-		      it'd be nicer to do this when we seed */
-			where mf.field= tree.field 
-			and mf.kind = tree.kind;`,
+	select ep.idModelField, mf.type, ed.value 
+	from eph_modeled_default ep 
+		join mdl_field mf 
+		on mf.rowid= ep.idModelField
+	left join eph_default ed
+		on ed.rowid = ep.idEphDefault`,
 		func() (err error) {
 			list = append(list, curr)
 			return

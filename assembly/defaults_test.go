@@ -49,7 +49,49 @@ func TestDefaultsAssigment(test *testing.T) {
 		t.Fatal(e)
 	}
 }
-func TestDefaultsMissingField(t *testing.T) {
+
+// TestDefaultsUnknownField missing properties ( kind, field pair doesn't exist in model )
+func TestDefaultsUnknownField(test *testing.T) {
+	t := newAssemblyTest(test, true)
+	defer t.Close()
+	//
+	if e := fakeHierarchy(t.modeler, []pair{
+		{"T", ""},
+		{"P", "T"},
+		{"C", "P,T"},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := fakeFields(t.modeler, []kfp{
+		{"T", "d", ephemera.PRIM_DIGI},
+		{"T", "t", ephemera.PRIM_TEXT},
+		{"T", "t2", ephemera.PRIM_TEXT},
+		{"P", "p", ephemera.PRIM_TEXT},
+		{"C", "c", ephemera.PRIM_TEXT},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := writeDefaults(t.rec, []defaultValue{
+		{"T", "t", "some text"},
+		{"P", "t2", "other text"},
+		{"C", "c", "c text"},
+		{"P", "c", "invalid"}, // this pair doesnt exist
+		{"T", "p", "invalid"}, // this pair doesnt exist
+		{"C", "d", 123},
+	}); e != nil {
+		t.Fatal(e)
+	} else {
+		var got []pair
+		if e := MissingDefaults(t.db, func(k, f string) (err error) {
+			got = append(got, pair{k, f})
+			return
+		}); e != nil {
+			t.Fatal(e)
+		} else if !reflect.DeepEqual(got, []pair{
+			{"P", "c"},
+			{"T", "p"},
+		}) {
+			t.Fatal("mismatched", got)
+		}
+	}
 }
 
 func TestDefaultsConflictingValues(t *testing.T) {
