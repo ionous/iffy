@@ -33,22 +33,14 @@ func TestNounFormation(t *testing.T) {
 			t.Fatal(e)
 		} else if e := DetermineNouns(w, db); e != nil {
 			t.Fatal(e)
-		} else if got, e := collectNouns(db); e != nil {
+		} else if e := matchNouns(db, []modeledNoun{
+			{"apple", "T", 0},
+			{"machine gun", "T", 0},
+			{"gun", "T", 1},
+			{"machine", "T", 2},
+			{"pear", "T", 0},
+		}); e != nil {
 			t.Fatal(e)
-		} else {
-			want := []modeledNoun{
-				{"apple", "T", 0},
-				{"machine gun", "T", 0},
-				{"gun", "T", 1},
-				{"machine", "T", 2},
-				{"pear", "T", 0},
-			}
-			if !reflect.DeepEqual(got, want) {
-				e := errutil.New("mismatch",
-					"have:", pretty.Sprint(got),
-					"want:", pretty.Sprint(want))
-				t.Fatal(e)
-			}
 		}
 	}
 }
@@ -113,20 +105,12 @@ func TestNounLcaSucess(t *testing.T) {
 			t.Fatal(e)
 		} else if e := DetermineNouns(w, db); e != nil {
 			t.Fatal(e)
-		} else if got, e := collectNouns(db); e != nil {
+		} else if e := matchNouns(db, []modeledNoun{
+			{"apple", "P", 0},
+			{"bandanna", "C", 0},
+			{"pear", "T", 0},
+		}); e != nil {
 			t.Fatal(e)
-		} else {
-			want := []modeledNoun{
-				{"apple", "P", 0},
-				{"bandanna", "C", 0},
-				{"pear", "T", 0},
-			}
-			if !reflect.DeepEqual(got, want) {
-				e := errutil.New("mismatch",
-					"have:", pretty.Sprint(got),
-					"want:", pretty.Sprint(want))
-				t.Fatal(e)
-			}
 		}
 	}
 }
@@ -181,22 +165,25 @@ func TestNounParts(t *testing.T) {
 			t.Fatal(e)
 		} else if e := DetermineNouns(w, db); e != nil {
 			t.Fatal(e)
-		} else if got, e := collectNouns(db); e != nil {
+		} else if e := matchNouns(db, []modeledNoun{
+			{"collection of words", "T", 0},
+			{"words", "T", 1},
+			{"of", "T", 2},
+			{"collection", "T", 3},
+		}); e != nil {
 			t.Fatal(e)
-		} else {
-			want := []modeledNoun{
-				{"collection of words", "T", 0},
-				{"words", "T", 1},
-				{"of", "T", 2},
-				{"collection", "T", 3},
-			}
-
-			if !reflect.DeepEqual(got, want) {
-				e := errutil.New("mismatch",
-					"have:", pretty.Sprint(got),
-					"want:", pretty.Sprint(want))
-				t.Fatal(e)
-			}
 		}
 	}
+}
+
+func matchNouns(db *sql.DB, want []modeledNoun) (err error) {
+	if got, e := collectNouns(db); e != nil {
+		err = e
+	} else if !reflect.DeepEqual(got, want) {
+		e := errutil.New("mismatch",
+			"have:", pretty.Sprint(got),
+			"want:", pretty.Sprint(want))
+		err = e
+	}
+	return
 }
