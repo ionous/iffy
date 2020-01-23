@@ -24,34 +24,36 @@ func NewModelerDB(db *sql.DB) *Modeler {
 	if _, e := db.Exec(`create view if not exists 
 	eph_modeled_default as
 	with tree(kind, path, idEphDefault, field, idModelField) as 
-	/* seed the query with the default ephemera;
-	   the idEphDefault and field will be constant over the hierarchy for each ephemera.
+	/* seed the query with the defaults ephemera　(kind,field,value requests;
+	   the idEphDefault and field will be constant over the hierarchy for each entry.
 	*/
 	(select ep.kind, parent.path, ep.idEphDefault, ep.field, 
 		/* for each kind in the hierarchy, try to find the modeled kind, field pair */
 		( select m.rowid from mdl_field m
-			where m.kind= ep.kind
-			and m.field= ep.field
+			where m.kind = ep.kind
+			and m.field = ep.field
 		) as idModelField
 		/* find the parent path for the kind named by the seed */
 	    from eph_named_default ep
 	   	join mdl_kind parent
-		on parent.kind=ep.kind 
+		on parent.kind = ep.kind 
 	union all
 		/* add in the parents of each referenced kind */
 		select super.kind, super.path, tree.idEphDefault, tree.field,
 			( select m.rowid from mdl_field m
-				where m.kind= super.kind
-				and m.field= tree.field
+				where m.kind = super.kind
+				and m.field = tree.field
 			 ) as idModelField
 		from tree, mdl_kind super
 		/* stop once we have found the modeled kind,field parent */
-		where super.kind = substr(tree.path,0,instr(tree.path||",", ",")) 
+		where idModelField is null
+		/* clip the parent kind from the ancestry path */
+		and super.kind = substr(tree.path,0,instr(tree.path||",", ",")) 
 	)
 	/* return the modeled kind,field,type and each ephemera's kind,field,value;
 	    idModelField is 0 for missing kinds or kinds below the ephemera's kind, field pair
 	 */
-	select idEphDefault, coalesce(idModelField,0) as idModelField  from tree`); e != nil {
+	select idEphDefault, coalesce(idModelField,0) as idModelField from tree`); e != nil {
 		panic(e)
 	}
 	return NewModeler(dbq)
