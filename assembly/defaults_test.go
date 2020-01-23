@@ -93,6 +93,8 @@ func TestDefaultsUnknownField(test *testing.T) {
 		}
 	}
 }
+
+// TestDefaultsValuesDuplicate to verify that duplicate values are okay
 func TestDefaultsValuesDuplicate(test *testing.T) {
 	t := newAssemblyTest(test, true)
 	defer t.Close()
@@ -123,6 +125,7 @@ func TestDefaultsValuesDuplicate(test *testing.T) {
 	}
 }
 
+// TestDefaultsValuesConflict to verify that conflicting values are not okay
 func TestDefaultsValuesConflict(t *testing.T) {
 	testConflict := func(test *testing.T, vals []defaultValue) (err error) {
 		t := newAssemblyTest(test, true)
@@ -170,9 +173,41 @@ func TestDefaultsValuesConflict(t *testing.T) {
 	}
 }
 
+// TestDefaultsInvalidType
 func TestDefaultsInvalidType(t *testing.T) {
 	//- for now, we only allow text and number [ text and digi ]
 	// - later we could add ambiguity for conversion [ 4 -> "4" ]
+	testInvalid := func(test *testing.T, vals []defaultValue) (err error) {
+		t := newAssemblyTest(test, true)
+		defer t.Close()
+		//
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"T", ""},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := fakeFields(t.modeler, []kfp{
+			{"T", "d", ephemera.PRIM_DIGI},
+			{"T", "t", ephemera.PRIM_TEXT},
+		}); e != nil {
+			err = e
+		} else if e := writeDefaults(t.rec, vals); e != nil {
+			err = e
+		} else if e := DetermineDefaults(t.modeler, t.db); e == nil {
+			err = errutil.New("expected error")
+		} else {
+			t.Log("okay:", e)
+		}
+		return
+	}
+	if e := testInvalid(t, []defaultValue{
+		{"T", "t", 1.2},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := testInvalid(t, []defaultValue{
+		{"T", "d", "1.2"},
+	}); e != nil {
+		t.Fatal(e)
+	}
 }
 
 type defaultValue struct {
