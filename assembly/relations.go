@@ -75,7 +75,6 @@ func DetermineRelations(w *Modeler, db *sql.DB) (err error) {
 				curr.kind.set(curr.kind.getAncestry())
 				curr.otherKind.set(curr.otherKind.getAncestry())
 				last = curr
-
 			} else if last.cardinality != curr.cardinality {
 				// same relation can't have different cardinality(s)
 				err = errutil.New("cardinality mismatch", curr.relation, last.cardinality, curr.cardinality)

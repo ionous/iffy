@@ -93,8 +93,81 @@ func TestDefaultsUnknownField(test *testing.T) {
 		}
 	}
 }
+func TestDefaultsValuesDuplicate(test *testing.T) {
+	t := newAssemblyTest(test, true)
+	defer t.Close()
+	//
+	if e := fakeHierarchy(t.modeler, []pair{
+		{"T", ""},
+		{"P", "T"},
+		{"C", "P,T"},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := fakeFields(t.modeler, []kfp{
+		{"T", "d", ephemera.PRIM_DIGI},
+		{"T", "t", ephemera.PRIM_TEXT},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := writeDefaults(t.rec, []defaultValue{
+		{"T", "t", "text"},
+		{"P", "t", "text"},
+		{"C", "t", "text"},
+		//
+		{"T", "d", 123},
+		{"P", "d", 123},
+		{"C", "d", 123},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := DetermineDefaults(t.modeler, t.db); e != nil {
+		t.Fatal(e)
+	}
+}
 
-func TestDefaultsConflictingValues(t *testing.T) {
+func TestDefaultsValuesConflict(t *testing.T) {
+	testConflict := func(test *testing.T, vals []defaultValue) (err error) {
+		t := newAssemblyTest(test, true)
+		defer t.Close()
+		//
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"T", ""},
+			{"P", "T"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := fakeFields(t.modeler, []kfp{
+			{"T", "d", ephemera.PRIM_DIGI},
+			{"T", "t", ephemera.PRIM_TEXT},
+		}); e != nil {
+			err = e
+		} else if e := writeDefaults(t.rec, vals); e != nil {
+			err = e
+		} else if e := DetermineDefaults(t.modeler, t.db); e == nil {
+			err = errutil.New("expected error")
+		} else {
+			t.Log("okay:", e)
+		}
+		return
+	}
+	if e := testConflict(t, []defaultValue{
+		{"T", "t", "a"},
+		{"T", "t", "b"},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := testConflict(t, []defaultValue{
+		{"T", "t", "a"},
+		{"P", "t", "b"},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := testConflict(t, []defaultValue{
+		{"T", "d", 1},
+		{"T", "d", 2},
+	}); e != nil {
+		t.Fatal(e)
+	} else if e := testConflict(t, []defaultValue{
+		{"T", "d", 1},
+		{"P", "d", 2},
+	}); e != nil {
+		t.Fatal(e)
+	}
 }
 
 func TestDefaultsInvalidType(t *testing.T) {
@@ -102,10 +175,6 @@ func TestDefaultsInvalidType(t *testing.T) {
 	// - later we could add ambiguity for conversion [ 4 -> "4" ]
 }
 
-type defaultInfo struct {
-	idModelField int64
-	value        interface{}
-}
 type defaultValue struct {
 	kind, field string
 	value       interface{}
@@ -115,7 +184,8 @@ type defaultValue struct {
 func matchDefaults(db *sql.DB, want []defaultValue) (err error) {
 	var curr defaultValue
 	var have []defaultValue
-	if e := dbutil.QueryAll(db, `select kind,field,value 
+	if e := dbutil.QueryAll(db,
+		`select kind,field,value 
 			from mdl_default d, mdl_field f 
 			on d.idModelField = f.rowid
 			order by kind, field, value`,
