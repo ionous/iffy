@@ -1,7 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
 	"strconv"
 	"testing"
 
@@ -11,12 +10,12 @@ import (
 
 // TestAncestors verifies valid parent-child ephemera can generate a valid ancestry table.
 func TestAncestors(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder("ancestorTest", dbq)
+		defer t.Close()
+		db, rec := t.db, t.rec
+		//
 		pairs := []string{
 			// kind, ancestor
 			"P", "T",
@@ -72,12 +71,12 @@ func TestAncestors(t *testing.T) {
 // TestAncestorCycle verifies cycles in parent-child ephemera generate errors.
 // ex. P inherits from T; T inherits from P.
 func TestAncestorCycle(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder("ancestorTest", dbq)
+		defer t.Close()
+		db, rec := t.db, t.rec
+		//
 		pairs := []string{
 			// kind, ancestor
 			"P", "T",
@@ -101,12 +100,12 @@ func TestAncestorCycle(t *testing.T) {
 // TestAncestorConflict verifies conflicting parent ephemera (multiple inheritance) generates an error.
 // ex. P,Q inherits from T; K inherits from P and Q.
 func TestAncestorConflict(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder("ancestorTest", dbq)
+		defer t.Close()
+		db, rec := t.db, t.rec
+		//
 		pairs := []string{
 			// kind, ancestor
 			"P", "T",

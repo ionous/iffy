@@ -12,11 +12,9 @@ import (
 	"github.com/ionous/iffy/ephemera"
 )
 
-func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err error) {
-	dbq := ephemera.NewDBQueue(db)
-	rec := ephemera.NewRecorder("ancestorTest", dbq)
-	w := NewModeler(dbq)
-	if e := fakeHierarchy(w, kinds); e != nil {
+func writeFields(t *assemblyTest, kinds []pair, kfps []kfp, missing ...string) (err error) {
+	db, rec, m := t.db, t.rec, t.modeler
+	if e := fakeHierarchy(m, kinds); e != nil {
 		err = e
 	} else {
 		// write some primitives
@@ -29,7 +27,7 @@ func writeFields(db *sql.DB, kinds []pair, kfps []kfp, missing ...string) (err e
 		for _, m := range missing {
 			rec.Named(ephemera.NAMED_FIELD, m, "test")
 		}
-		if e := DetermineFields(w, db); e != nil {
+		if e := DetermineFields(m, db); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
@@ -53,12 +51,12 @@ func matchProperties(db *sql.DB, want []kfp) (err error) {
 }
 
 func TestFields(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		if e := writeFields(db,
+		defer t.Close()
+		//
+		if e := writeFields(t,
 			[]pair{
 				{"T", ""},
 				{"P", "T"},
@@ -70,7 +68,7 @@ func TestFields(t *testing.T) {
 				{"T", "c", ephemera.PRIM_TEXT},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := matchProperties(db, []kfp{
+		} else if e := matchProperties(t.db, []kfp{
 			{"P", "a", ephemera.PRIM_TEXT},
 			{"Q", "b", ephemera.PRIM_TEXT},
 			{"T", "c", ephemera.PRIM_TEXT},
@@ -81,12 +79,12 @@ func TestFields(t *testing.T) {
 }
 
 func TestFieldLca(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		if e := writeFields(db,
+		defer t.Close()
+		//
+		if e := writeFields(t,
 			[]pair{
 				{"T", ""},
 				{"P", "T"},
@@ -97,7 +95,7 @@ func TestFieldLca(t *testing.T) {
 				{"Q", "a", ephemera.PRIM_TEXT},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := matchProperties(db, []kfp{
+		} else if e := matchProperties(t.db, []kfp{
 			{"T", "a", ephemera.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
@@ -108,12 +106,12 @@ func TestFieldLca(t *testing.T) {
 // TestFieldTypeMismatch verifies that ephemera with conflicting primitive types generates an error
 // ex. T.a:text, T.a:digi
 func TestFieldTypeMismatch(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		if e := writeFields(db,
+		defer t.Close()
+		//
+		if e := writeFields(t,
 			[]pair{
 				{"T", ""},
 			},

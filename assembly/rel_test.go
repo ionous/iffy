@@ -12,26 +12,24 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const memory = "file:test.db?cache=shared&mode=memory"
-
 // TestVerbMismatches verifies that we can collapse multiple relation-verb pairs so long as the verb-stem pair match
 // while ensuring the same stem cannot be used in multiple relations.
 func TestVerbMismatches(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		w := NewModeler(dbq)
-		if e := w.WriteVerb("R", "contains"); e != nil {
+		defer t.Close()
+		m := t.modeler
+		//
+		if e := m.WriteVerb("R", "contains"); e != nil {
 			t.Fatal(e)
-		} else if e := w.WriteVerb("R", "containing"); e != nil {
+		} else if e := m.WriteVerb("R", "containing"); e != nil {
 			t.Fatal(e)
-		} else if e := w.WriteVerb("Q", "supporting"); e != nil {
+		} else if e := m.WriteVerb("Q", "supporting"); e != nil {
 			t.Fatal(e)
-		} else if e := w.WriteVerb("Q", "supports"); e != nil {
+		} else if e := m.WriteVerb("Q", "supports"); e != nil {
 			t.Fatal(e)
-		} else if e := w.WriteVerb("R", "supports"); e == nil {
+		} else if e := m.WriteVerb("R", "supports"); e == nil {
 			t.Log("expected error")
 		} else {
 			t.Log("okay:", e)
@@ -76,27 +74,27 @@ func matchRelations(db *sql.DB, want []dbrel) (err error) {
 
 // TestRelationCreation to verify it's possible to build relations
 func TestRelationCreation(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addRelations(
-			ephemera.NewRecorder("TestRelationCreation", dbq), []dbrel{
+			rec, []dbrel{
 				{"R", "P", "Q", ephemera.ONE_TO_MANY},
 				{"G", "P", "Q", ephemera.MANY_TO_ONE},
 				{"G", "P", "Q", ephemera.MANY_TO_ONE},
 				{"H", "P", "P", ephemera.ONE_TO_MANY},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(w, db); e != nil {
+		} else if e := DetermineRelations(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelations(db, []dbrel{
 			{"G", "P", "Q", ephemera.MANY_TO_ONE},
@@ -110,23 +108,22 @@ func TestRelationCreation(t *testing.T) {
 
 // TestRelationCardinality detects conflicting cardinalities
 func TestRelationCardinality(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"P", ""},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(
-			ephemera.NewRecorder("TestRelationCreation", dbq), []dbrel{
-				{"R", "P", "P", ephemera.ONE_TO_MANY},
-				{"R", "P", "P", ephemera.MANY_TO_ONE},
-			}); e != nil {
+		} else if e := addRelations(rec, []dbrel{
+			{"R", "P", "P", ephemera.ONE_TO_MANY},
+			{"R", "P", "P", ephemera.MANY_TO_ONE},
+		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(w, db); e == nil {
+		} else if e := DetermineRelations(m, db); e == nil {
 			t.Fatal("expected error")
 		} else {
 			t.Log("okay:", e)
@@ -136,27 +133,26 @@ func TestRelationCardinality(t *testing.T) {
 
 // TestRelationLca
 func TestRelationLcaSuccess(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
 			{"D", "P,T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(
-			ephemera.NewRecorder("TestRelationCreation", dbq), []dbrel{
-				{"R", "P", "T", ephemera.ONE_TO_MANY},
-				{"R", "D", "T", ephemera.ONE_TO_MANY},
-				{"R", "C", "T", ephemera.ONE_TO_MANY},
-			}); e != nil {
+		} else if e := addRelations(rec, []dbrel{
+			{"R", "P", "T", ephemera.ONE_TO_MANY},
+			{"R", "D", "T", ephemera.ONE_TO_MANY},
+			{"R", "C", "T", ephemera.ONE_TO_MANY},
+		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(w, db); e != nil {
+		} else if e := DetermineRelations(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelations(db, []dbrel{
 			{"R", "P", "T", ephemera.ONE_TO_MANY},
@@ -168,26 +164,25 @@ func TestRelationLcaSuccess(t *testing.T) {
 
 // TestRelationLcaFailure to verify a mismatched relation hierarchy generates an error.
 func TestRelationLcaFailure(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
 			{"D", "P,T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(
-			ephemera.NewRecorder("TestRelationCreation", dbq), []dbrel{
-				{"R", "D", "T", ephemera.ONE_TO_MANY},
-				{"R", "C", "T", ephemera.ONE_TO_MANY},
-			}); e != nil {
+		} else if e := addRelations(rec, []dbrel{
+			{"R", "D", "T", ephemera.ONE_TO_MANY},
+			{"R", "C", "T", ephemera.ONE_TO_MANY},
+		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(w, db); e == nil {
+		} else if e := DetermineRelations(m, db); e == nil {
 			t.Fatal("expected error")
 		} else {
 			t.Log("okay:", e)

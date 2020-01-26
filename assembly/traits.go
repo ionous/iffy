@@ -14,7 +14,7 @@ import (
 // . missing traits ( named but not specified )
 // . missing aspects ( named but not specified )
 // o misspellings, near spellings ( ex. for missing traits )
-func DetermineAspects(w *Modeler, db *sql.DB) (err error) {
+func DetermineAspects(m *Modeler, db *sql.DB) (err error) {
 	var curr, last traitInfo
 	var traits []traitInfo // cant read and write to the db simultaneously
 	if e := dbutil.QueryAll(db, `select nt.name, na.name
@@ -36,7 +36,7 @@ func DetermineAspects(w *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		for _, t := range traits {
-			if e := w.WriteTrait(t.Aspect, t.Trait); e != nil {
+			if e := m.WriteTrait(t.Aspect, t.Trait); e != nil {
 				err = errutil.Append(err, e)
 			}
 		}

@@ -20,27 +20,32 @@ func getPath(file string) (ret string, err error) {
 	return
 }
 
-func newAssemblyTest(t *testing.T, useMemory bool) (ret *assemblyTest) {
+const memory = "file:test.db?cache=shared&mode=memory"
+
+func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 	var source string
-	if useMemory {
-		source = memory
-	} else if path, e := getPath(t.Name() + ".db"); e != nil {
-		t.Fatal(e)
-	} else {
+	if len(path) > 0 {
 		source = path
-	}
-	if db, e := sql.Open("sqlite3", source); e != nil {
-		t.Fatal(e)
+	} else if p, e := getPath(t.Name() + ".db"); e != nil {
+		err = e
 	} else {
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder(t.Name(), dbq)
-		mdl := NewModelerDB(db)
-		ret = &assemblyTest{
-			T:       t,
-			db:      db,
-			dbq:     dbq,
-			rec:     rec,
-			modeler: mdl,
+		source = p
+	}
+	//
+	if err == nil {
+		if db, e := sql.Open("sqlite3", source); e != nil {
+			err = e
+		} else {
+			dbq := ephemera.NewDBQueue(db)
+			rec := ephemera.NewRecorder(t.Name(), dbq)
+			mdl := NewModelerDB(db)
+			ret = &assemblyTest{
+				T:       t,
+				db:      db,
+				dbq:     dbq,
+				rec:     rec,
+				modeler: mdl,
+			}
 		}
 	}
 	return
@@ -61,10 +66,15 @@ func (t *assemblyTest) Close() {
 type kfp struct{ kind, field, fieldType string }
 type pair struct{ key, value string }
 
+type prop struct {
+	owner, prop string
+	value       interface{}
+}
+
 // create some fake hierarchy
-func fakeHierarchy(w *Modeler, kinds []pair) (err error) {
+func fakeHierarchy(m *Modeler, kinds []pair) (err error) {
 	for _, p := range kinds {
-		if e := w.WriteAncestor(p.key, p.value); e != nil {
+		if e := m.WriteAncestor(p.key, p.value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
@@ -72,9 +82,9 @@ func fakeHierarchy(w *Modeler, kinds []pair) (err error) {
 }
 
 // create some fake hierarchy; mdl_field: field, kind, type.
-func fakeFields(w *Modeler, kinds []kfp) (err error) {
+func fakeFields(m *Modeler, kinds []kfp) (err error) {
 	for _, p := range kinds {
-		if e := w.WriteField(p.field, p.kind, p.fieldType); e != nil {
+		if e := m.WriteField(p.field, p.kind, p.fieldType); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

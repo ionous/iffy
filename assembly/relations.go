@@ -26,12 +26,12 @@ type relStore struct {
 	list []relInfo
 }
 
-func (store *relStore) write(w *Modeler) (err error) {
+func (store *relStore) write(m *Modeler) (err error) {
 	for _, p := range store.list {
 		if !p.kind.valid || !p.otherKind.valid {
 			e := errutil.New("couldnt determine valid lowest common ancestor")
 			err = errutil.Append(err, e)
-		} else if e := w.WriteRelation(p.relation, p.kind.name,
+		} else if e := m.WriteRelation(p.relation, p.kind.name,
 			p.cardinality, p.otherKind.name); e != nil {
 			err = errutil.Append(err, e)
 		}
@@ -43,7 +43,7 @@ func (store *relStore) write(w *Modeler) (err error) {
 // out, mdl_rel: R, K(lca), Q(lca), cardinality
 // fix? right now the coalesce allows missing kinds through,
 // the behavior otherwise is Scan error on column index 5, and not particularly helpful
-func DetermineRelations(w *Modeler, db *sql.DB) (err error) {
+func DetermineRelations(m *Modeler, db *sql.DB) (err error) {
 	var store relStore
 	var curr, last relInfo
 	// we select by R, sorted by R, C, K, Q
@@ -92,7 +92,7 @@ func DetermineRelations(w *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		last.flush(&store)
-		err = store.write(w)
+		err = store.write(m)
 	}
 	return
 }

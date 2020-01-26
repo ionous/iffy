@@ -1,7 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
 	"reflect"
 	"strconv"
 	"testing"
@@ -12,12 +11,12 @@ import (
 
 // TestMissingKinds to verify the kinds mentioned in parent-child ephemera exist.
 func TestMissingKinds(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder("ancestorTest", dbq)
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
 		pairs := []string{
 			// kind, ancestor
 			"P", "T",
@@ -37,11 +36,9 @@ func TestMissingKinds(t *testing.T) {
 			}
 			t.Fatal(e)
 		}
-		//
-		w := NewModeler(dbq)
 		for k, v := range kinds.cache {
 			k, path := k, v.GetAncestors()
-			if e := w.WriteAncestor(k, path); e != nil {
+			if e := m.WriteAncestor(k, path); e != nil {
 				t.Fatal(e)
 			}
 		}
@@ -61,13 +58,12 @@ func TestMissingKinds(t *testing.T) {
 
 // TestMissingAspects detects fields labeled as aspects which are missing from the aspects ephemera.
 func TestMissingAspects(t *testing.T) {
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder("ancestorTest", dbq)
-
+		defer t.Close()
+		db, rec := t.db, t.rec
+		//
 		parent := rec.Named(ephemera.NAMED_KIND, "K", "container")
 		for i, aspect := range []string{
 			// known, unknown
@@ -90,24 +86,22 @@ func TestMissingAspects(t *testing.T) {
 			t.Log("okay")
 		}
 	}
+
 }
 
 func TestMissingField(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		if e := writeFields(db,
-			[]pair{
-				{"T", ""},
-			},
-			nil,
-			"z"); e != nil {
+		defer t.Close()
+		//
+		if e := writeFields(t, []pair{
+			{"T", ""},
+		}, nil, "z"); e != nil {
 			t.Fatal(e)
 		} else {
 			var missing []string
-			if e := MissingFields(db, func(n string) (err error) {
+			if e := MissingFields(t.db, func(n string) (err error) {
 				missing = append(missing, n)
 				return
 			}); e != nil {

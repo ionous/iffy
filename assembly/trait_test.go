@@ -56,11 +56,12 @@ func matchTraits(db *sql.DB, want []expectedTrait) (err error) {
 
 // TestTraits to verify that aspects/traits in ephemera can become part of the model.
 func TestTraits(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
+		defer t.Close()
+		db := t.db
+		//
 		if e := makeTraits(db,
 			[]pair{
 				{"A", "x"},
@@ -89,17 +90,17 @@ func TestTraits(t *testing.T) {
 
 // TestTraitConflicts
 func TestTraitConflicts(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		if e := makeTraits(db,
-			[]pair{
-				{"A", "x"},
-				{"C", "z"},
-				{"B", "x"},
-			}); e == nil {
+		defer t.Close()
+		db := t.db
+		//
+		if e := makeTraits(db, []pair{
+			{"A", "x"},
+			{"C", "z"},
+			{"B", "x"},
+		}); e == nil {
 			t.Fatal("expected an error")
 		} else {
 			t.Log("okay:", e)
@@ -107,16 +108,15 @@ func TestTraitConflicts(t *testing.T) {
 	}
 }
 func TestTraitMissingAspect(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		if e := makeTraits(db,
-			[]pair{
-				{"A", "x"},
-				{"Z", ""},
-			}); e != nil {
+		defer t.Close()
+		db := t.db
+		if e := makeTraits(db, []pair{
+			{"A", "x"},
+			{"Z", ""},
+		}); e != nil {
 			t.Fatal(e)
 		} else {
 			var aspects []string
@@ -135,17 +135,16 @@ func TestTraitMissingAspect(t *testing.T) {
 }
 
 func TestTraitMissingTraits(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		if e := makeTraits(db,
-			[]pair{
-				{"A", "x"},
-				{"", "y"},
-				{"", "z"},
-			}); e != nil {
+		defer t.Close()
+		db := t.db
+		if e := makeTraits(db, []pair{
+			{"A", "x"},
+			{"", "y"},
+			{"", "z"},
+		}); e != nil {
 			t.Fatal(e)
 		} else {
 			var traits []string
