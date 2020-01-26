@@ -26,27 +26,26 @@ func DetermineDefaults(m *Modeler, db *sql.DB) (err error) {
 	var store defaultStore
 	var curr, last defaultInfo
 	if e := dbutil.QueryAll(db,
-		`select mf.rowid, mf.kind, mf.field, mf.type, ed.value 
+		`select at.target, mf.field, mf.type, ed.value 
 	from asm_default_tree at 
 		join mdl_field mf 
 		on mf.rowid= at.idModelField
 	left join eph_default ed
 		on ed.rowid = at.idEphDefault
-	order by at.idModelField`,
+	order by at.target, mf.field`,
 		func() (err error) {
 			if nv, e := convertField(curr.fieldType, curr.value); e != nil {
 				err = e
 			} else if !last.isValid() {
 				last, last.value = curr, nv
-			} else if last.idModelField != curr.idModelField {
-				store.add(last) // if the idModelField is the same, so is kind, field, type.
+			} else if last.kind != curr.kind || last.field != curr.field {
+				store.add(last)
 				last, last.value = curr, nv
 			} else if !reflect.DeepEqual(last.value, nv) {
-				err = errutil.Fmt("conflicting defaults: %s != %v:%T", last.String(), nv, nv)
+				err = errutil.Fmt("conflicting defaults: %s != %s:%T", last.String(), curr.String(), nv)
 			}
 			return
 		},
-		&curr.idModelField,
 		&curr.kind, &curr.field, &curr.fieldType,
 		&curr.value,
 	); e != nil {
@@ -59,14 +58,14 @@ func DetermineDefaults(m *Modeler, db *sql.DB) (err error) {
 }
 
 type defaultInfo struct {
-	idModelField           int64 // for tracking
 	kind, field, fieldType string
 	value                  interface{}
 }
 
 func (n *defaultInfo) isValid() bool {
-	return n.idModelField > 0
+	return len(n.field) > 0
 }
+
 func (n *defaultInfo) String() string {
 	return n.kind + "." + n.field + ":" + n.fieldType + fmt.Sprintf("(%v:%T)", n.value, n.value)
 }

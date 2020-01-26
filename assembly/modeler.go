@@ -41,11 +41,11 @@ func NewModelerDB(db *sql.DB) *Modeler {
 		join(`create temp view 
 			asm_default_tree as`,
 			searchForFieldsInKind(
-				"idEphDefault",       // output column
-				"asm_default as src", // asm_default is a view of eph_default with names resolved to strings
-				"src.field",          // matched against mdl_field.field
-				"src.idEphDefault",   // pull one column up through the hierarchy
-				"src.kind",           // the initial kind of the hierarchy ( for every row in src )
+				"idEphDefault, target",                 // output columns, includes: idModelField
+				"asm_default as src",                   // asm_default is a view of eph_default with names resolved to strings
+				"src.field",                            // matched against mdl_field.field
+				"src.idEphDefault, src.kind as target", // pull one column up through the hierarchy
+				"src.kind",                             // the initial kind of the hierarchy ( for every row in src )
 			)),
 	); e != nil {
 		panic(e)
@@ -56,10 +56,10 @@ func NewModelerDB(db *sql.DB) *Modeler {
 		join(`create temp view 
 			asm_value_tree as`,
 			searchForFieldsInKind(
-				"idEphValue, noun",        // output columns
-				"asm_value as src",        // asm_value is a view of eph_value with names resolved to strings
-				"src.prop",                // matched against mdl_field.field
-				"src.idEphValue, mn.noun", // pull two columns up through the hierarchy
+				"idEphValue, target",                // output columns, includes: idModelField
+				"asm_value as src",                  // asm_value is a view of eph_value with names resolved to strings
+				"src.prop",                          // matched against mdl_field.field
+				"src.idEphValue, mn.noun as target", // pull two columns up through the hierarchy
 				// for every named noun or partial noun in src,
 				// find the best noun
 				// and use that noun's kind as the seed of the hierarchical search.

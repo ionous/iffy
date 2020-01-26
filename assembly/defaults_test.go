@@ -34,6 +34,7 @@ func TestDefaultsAssigment(t *testing.T) {
 			t.Fatal(e)
 		} else if e := writeDefaults(t.rec, []prop{
 			{"T", "t", "some text"},
+			{"P", "t", "override text"},
 			{"P", "t2", "other text"},
 			{"C", "c", "c text"},
 			{"C", "d", 123},
@@ -43,10 +44,10 @@ func TestDefaultsAssigment(t *testing.T) {
 			t.Fatal(e)
 		} else if e := matchDefaults(t.db, []prop{
 			{"C", "c", "c text"},
-			// default scanner uses https://golang.org/pkg/database/sql/#Scanner
-			{"T", "d", int64(123)}, //
+			{"C", "d", int64(123)}, // re: int64 -- default scanner uses https://golang.org/pkg/database/sql/#Scanner
+			{"P", "t", "override text"},
+			{"P", "t2", "other text"},
 			{"T", "t", "some text"},
-			{"T", "t2", "other text"},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -120,11 +121,11 @@ func TestDefaultsValuesDuplicate(t *testing.T) {
 			t.Fatal(e)
 		} else if e := writeDefaults(t.rec, []prop{
 			{"T", "t", "text"},
-			{"P", "t", "text"},
+			{"T", "t", "text"},
 			{"C", "t", "text"},
 			//
 			{"T", "d", 123},
-			{"P", "d", 123},
+			{"T", "d", 123},
 			{"C", "d", 123},
 		}); e != nil {
 			t.Fatal(e)
@@ -162,25 +163,14 @@ func TestDefaultsValuesConflict(t *testing.T) {
 		}
 		return
 	}
-
 	if e := testConflict(t, []prop{
 		{"T", "t", "a"},
 		{"T", "t", "b"},
 	}); e != nil {
 		t.Fatal(e)
 	} else if e := testConflict(t, []prop{
-		{"T", "t", "a"},
-		{"P", "t", "b"},
-	}); e != nil {
-		t.Fatal(e)
-	} else if e := testConflict(t, []prop{
 		{"T", "d", 1},
 		{"T", "d", 2},
-	}); e != nil {
-		t.Fatal(e)
-	} else if e := testConflict(t, []prop{
-		{"T", "d", 1},
-		{"P", "d", 2},
 	}); e != nil {
 		t.Fatal(e)
 	}
