@@ -96,9 +96,9 @@ func NewRecorder(srcURI string, q Queue) (ret *Recorder) {
 		Col{Name: "idNamedAspect", Type: "int"},
 		Col{Name: "rank", Type: "int"})
 	q.Prep("eph_value",
-		Col{Name: "idNamedField", Type: "int"},
 		Col{Name: "idNamedNoun", Type: "int"},
-		Col{Name: "data", Type: "blob"})
+		Col{Name: "idNamedProp", Type: "int"},
+		Col{Name: "value", Type: "blob"})
 	q.Prep("eph_verb",
 		Col{Name: "idNamedVerb", Type: "int"},
 		Col{Name: "idNamedRelation", Type: "int"})
@@ -211,10 +211,9 @@ func (r *Recorder) NewTrait(trait, aspect Named, rank int) {
 }
 
 // NewValue assigns the property of a noun a value;
-// Newtraits can be assigned by naming the individual trait and setting a true ( or false ) value.
-// New( reverses order of primitive parameters for maximum confusion )
-func (r *Recorder) NewValue(prop, noun Named, value interface{}) {
-	if _, e := r.q.Write("eph_value", prop, noun, value); e != nil {
+// traits can be assigned by naming the individual trait and setting a true ( or false ) value.
+func (r *Recorder) NewValue(noun, prop Named, value interface{}) {
+	if _, e := r.q.Write("eph_value", noun, prop, value); e != nil {
 		panic(e)
 	}
 }

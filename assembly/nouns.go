@@ -2,19 +2,18 @@ package assembly
 
 import (
 	"database/sql"
-	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 )
 
 // output:
-// - mdl_noun: id, kind, [ scene ]
-// - mdl_name: inst.id, name part, rank
+// - mdl_noun: noun(int), kind, [ scene ]
+// - mdl_name: noun, name part, rank
 //
 // inputs:
 // - mdl_kind: kind, path
-// - eph_noun: id, kind
+// - eph_noun: noun, kind
 // - eph_name: for nouns.
 type nounInfo struct {
 	noun string
@@ -33,22 +32,13 @@ type nounStore struct {
 	list []nounInfo
 }
 
-func (store *nounStore) write(w *Modeler) (err error) {
+func (store *nounStore) write(m *Modeler) (err error) {
 	for _, p := range store.list {
 		if !p.kind.valid {
 			e := errutil.New("couldnt determine valid lowest common ancestor")
 			err = errutil.Append(err, e)
-		} else if n, e := w.WriteNoun(p.kind.name); e != nil {
+		} else if e := m.WriteNounWithNames(p.noun, p.kind.name); e != nil {
 			err = errutil.Append(err, e)
-		} else {
-			w.WriteName(n, p.noun, 0)
-			split := strings.Fields(p.noun)
-			if cnt := len(split); cnt > 1 {
-				for i, k := range split {
-					rank := cnt - i
-					w.WriteName(n, k, rank)
-				}
-			}
 		}
 	}
 	return

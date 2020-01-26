@@ -105,7 +105,7 @@ const (
 func parseAttrs(r *Parser, item reader.Map) {
 	defer r.on(ephemera.NAMED_TRAIT, func(trait ephemera.Named) {
 		for _, noun := range r.nouns.Named {
-			r.NewValue(trait, noun, true)
+			r.NewValue(noun, trait, true)
 		}
 	})()
 	for _, it := range item.SliceOf("$ATTRIBUTE") {
@@ -141,7 +141,7 @@ var fns = map[string]Parse{
 		val := r.namedStr(item, ephemera.PRIM_EXPR, "$LINES")
 		prop := r.namedStr(item, ephemera.NAMED_FIELD, "$PROPERTY")
 		defer r.on(ephemera.NAMED_NOUN, func(noun ephemera.Named) {
-			r.NewValue(prop, noun, val)
+			r.NewValue(noun, prop, val)
 		})()
 		r.parseSlice(item.SliceOf("$NOUN"))
 	},
@@ -282,11 +282,11 @@ var fns = map[string]Parse{
 		r.nouns.Add(noun)
 		// set common nounType to true ( implicitly defined by "noun" )
 		nounType := r.Named(ephemera.NAMED_TRAIT, "common", id)
-		r.NewValue(nounType, noun, true)
+		r.NewValue(noun, nounType, true)
 		//
 		if det[0] != '$' {
 			article := r.Named(ephemera.NAMED_FIELD, "indefinite article", id)
-			r.NewValue(article, noun, det)
+			r.NewValue(noun, article, det)
 			once := "common_noun"
 			if r.once(once) {
 				indefinite := r.Named(ephemera.NAMED_FIELD, "indefinite article", once)
@@ -304,7 +304,7 @@ var fns = map[string]Parse{
 		r.nouns.Add(noun)
 		// set proper nounType to true ( implicitly defined by "noun" )
 		nounType := r.Named(ephemera.NAMED_TRAIT, "proper", id)
-		r.NewValue(nounType, noun, true)
+		r.NewValue(noun, nounType, true)
 	},
 
 	// run: "{are_an} {*attribute} {kind} {?noun_relation}"
@@ -340,7 +340,7 @@ var fns = map[string]Parse{
 		prop := r.Named(ephemera.NAMED_FIELD, "appearance", id)
 		noun := r.nouns.Last()
 		val := r.namedStr(item, ephemera.PRIM_EXPR, "$LINES")
-		r.NewValue(prop, noun, val)
+		r.NewValue(noun, prop, val)
 	},
 }
 

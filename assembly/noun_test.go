@@ -13,15 +13,13 @@ import (
 
 // TestNounFormation to verify we can successfully assemble nouns from ephemera
 func TestNounFormation(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder(t.Name(), dbq)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)
@@ -31,7 +29,7 @@ func TestNounFormation(t *testing.T) {
 			{"machine gun", "T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(w, db); e != nil {
+		} else if e := DetermineNouns(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(db, []modeledNoun{
 			{"apple", "T", 0},
@@ -50,9 +48,10 @@ func collectNouns(db *sql.DB) (ret []modeledNoun, err error) {
 	var nouns []modeledNoun
 	if e := dbutil.QueryAll(db,
 		`select n.name, i.kind, n.rank
-		from mdl_name n join mdl_noun i
-			on (n.idModelNoun = i.id)
-		order by i.id, rank, name`,
+		from mdl_name n 
+		join mdl_noun i
+			on (n.noun = i.noun)
+		order by i.noun, rank, name`,
 		func() (err error) {
 			nouns = append(nouns, curr)
 			return
@@ -80,15 +79,13 @@ func addNouns(rec *ephemera.Recorder, els []pair) (err error) {
 
 // TestNounLcaSucess to verify we can successfully determine the lowest common ancestor of nouns.
 func TestNounLcaSucess(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder(t.Name(), dbq)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
@@ -103,7 +100,7 @@ func TestNounLcaSucess(t *testing.T) {
 			{"bandanna", "C"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(w, db); e != nil {
+		} else if e := DetermineNouns(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(db, []modeledNoun{
 			{"apple", "P", 0},
@@ -117,15 +114,13 @@ func TestNounLcaSucess(t *testing.T) {
 
 // TestNounLcaFailure to verify a mismatched noun hierarchy generates an error.
 func TestNounLcaFailure(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder(t.Name(), dbq)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
@@ -137,7 +132,7 @@ func TestNounLcaFailure(t *testing.T) {
 			{"apple", "D"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(w, db); e == nil {
+		} else if e := DetermineNouns(m, db); e == nil {
 			t.Fatal("expected failure")
 		} else {
 			t.Log("okay:", e)
@@ -147,15 +142,13 @@ func TestNounLcaFailure(t *testing.T) {
 
 // TestNounParts to verify a single noun generates multi part names
 func TestNounParts(t *testing.T) {
-	const source = memory
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer db.Close()
-		dbq := ephemera.NewDBQueue(db)
-		rec := ephemera.NewRecorder(t.Name(), dbq)
-		w := NewModeler(dbq)
-		if e := fakeHierarchy(w, []pair{
+		defer t.Close()
+		db, rec, m := t.db, t.rec, t.modeler
+		//
+		if e := fakeHierarchy(m, []pair{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)
@@ -163,7 +156,7 @@ func TestNounParts(t *testing.T) {
 			{"collection of words", "T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(w, db); e != nil {
+		} else if e := DetermineNouns(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(db, []modeledNoun{
 			{"collection of words", "T", 0},

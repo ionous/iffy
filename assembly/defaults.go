@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"reflect"
-	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
@@ -12,8 +11,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// goal: build table of mdl_field,default value
-// uses: eph_named_default(kind, field, value): for the user's requested defaults.
+// goal: build table of mdl_default(mdl_field,value) for kinds
+// uses: asm_default(kind, field, value): for the user's requested defaults.
 //       mdl_kind(kind, path): for hierarchy.
 //       mdl_field(kind, field, type)
 // considerations:
@@ -26,26 +25,24 @@ import (
 func DetermineDefaults(m *Modeler, db *sql.DB) (err error) {
 	var store defaultStore
 	var curr, last defaultInfo
-	if e := dbutil.QueryAll(db, `
-	select ep.idModelField, mf.kind, mf.field, mf.type, ed.value 
-	from eph_modeled_default ep 
+	if e := dbutil.QueryAll(db,
+		`select mf.rowid, mf.kind, mf.field, mf.type, ed.value 
+	from asm_default_tree at 
 		join mdl_field mf 
-		on mf.rowid= ep.idModelField
+		on mf.rowid= at.idModelField
 	left join eph_default ed
-		on ed.rowid = ep.idEphDefault
-	order by ep.idModelField`,
+		on ed.rowid = at.idEphDefault
+	order by at.idModelField`,
 		func() (err error) {
-			// if the modelField is the same, so is kind, field, type.
-			if last.idModelField != curr.idModelField {
-				if e := store.add(&curr); e != nil {
-					err = e
-				} else {
-					last = curr
-				}
-			} else if newValue, e := convertField(last.fieldType, curr.value); e != nil {
+			if nv, e := convertField(curr.fieldType, curr.value); e != nil {
 				err = e
-			} else if !reflect.DeepEqual(last.value, newValue) {
-				err = errutil.New("conflicting defaults", last, "!=", newValue, reflect.TypeOf(last.value), "!=", reflect.TypeOf(newValue))
+			} else if !last.isValid() {
+				last, last.value = curr, nv
+			} else if last.idModelField != curr.idModelField {
+				store.add(last) // if the idModelField is the same, so is kind, field, type.
+				last, last.value = curr, nv
+			} else if !reflect.DeepEqual(last.value, nv) {
+				err = errutil.Fmt("conflicting defaults: %s != %v:%T", last.String(), nv, nv)
 			}
 			return
 		},
@@ -54,26 +51,41 @@ func DetermineDefaults(m *Modeler, db *sql.DB) (err error) {
 		&curr.value,
 	); e != nil {
 		err = e
-	} else if e := store.add(&last); e != nil {
-		err = e
 	} else {
+		store.add(last)
 		err = store.write(m)
 	}
 	return
 }
 
 type defaultInfo struct {
-	idModelField           int64
+	idModelField           int64 // for tracking
 	kind, field, fieldType string
 	value                  interface{}
 }
 
+func (n *defaultInfo) isValid() bool {
+	return n.idModelField > 0
+}
 func (n *defaultInfo) String() string {
-	return strings.Join([]string{n.kind, n.field, n.fieldType, fmt.Sprint(n.value)}, " ")
+	return n.kind + "." + n.field + ":" + n.fieldType + fmt.Sprintf("(%v:%T)", n.value, n.value)
 }
 
 type defaultStore struct {
 	list []defaultInfo
+}
+
+func (store *defaultStore) add(n defaultInfo) {
+	store.list = append(store.list, n)
+}
+
+func (store *defaultStore) write(m *Modeler) (err error) {
+	for _, n := range store.list {
+		if e := m.WriteDefault(n.kind, n.field, n.value); e != nil {
+			err = errutil.Append(err, e)
+		}
+	}
+	return
 }
 
 // out types are currently: int, float32, or string.
@@ -97,27 +109,6 @@ func convertField(fieldType string, value interface{}) (ret interface{}, err err
 		}
 	default:
 		err = errutil.New("unhandled field type", fieldType)
-	}
-	return
-}
-
-func (store *defaultStore) add(n *defaultInfo) (err error) {
-	if n.idModelField > 0 {
-		if v, e := convertField(n.fieldType, n.value); e != nil {
-			err = e
-		} else {
-			n.value = v
-			store.list = append(store.list, *n)
-		}
-	}
-	return
-}
-
-func (store *defaultStore) write(m *Modeler) (err error) {
-	for _, n := range store.list {
-		if e := m.WriteDefault(n.idModelField, n.value); e != nil {
-			err = errutil.Append(err, e)
-		}
 	}
 	return
 }
