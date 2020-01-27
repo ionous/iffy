@@ -228,7 +228,7 @@ func matchDefaults(db *sql.DB, want []prop) (err error) {
 			have = append(have, curr)
 			return
 		},
-		&curr.owner, &curr.prop, &curr.value); e != nil {
+		&curr.target, &curr.prop, &curr.value); e != nil {
 		err = e
 	} else if !reflect.DeepEqual(have, want) {
 		err = errutil.New("mismatch",
@@ -241,7 +241,7 @@ func matchDefaults(db *sql.DB, want []prop) (err error) {
 // write ephemera describing some initial values
 func writeDefaults(rec *ephemera.Recorder, defaults []prop) (err error) {
 	for _, el := range defaults {
-		namedKind := rec.Named(ephemera.NAMED_KIND, el.owner, "test")
+		namedKind := rec.Named(ephemera.NAMED_KIND, el.target, "test")
 		namedField := rec.Named(ephemera.NAMED_FIELD, el.prop, "test")
 		rec.NewDefault(namedKind, namedField, el.value)
 	}

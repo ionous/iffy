@@ -149,7 +149,6 @@ func NewModeler(q ephemera.Queue) *Modeler {
 	)
 	q.Prep("mdl_value",
 		ephemera.Col{Name: "noun", Type: "text"},
-		ephemera.Col{Name: "kind", Type: "text"},
 		ephemera.Col{Name: "field", Type: "text"},
 		ephemera.Col{Name: "value", Type: "blob"},
 	)

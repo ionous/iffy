@@ -67,8 +67,8 @@ type kfp struct{ kind, field, fieldType string }
 type pair struct{ key, value string }
 
 type prop struct {
-	owner, prop string
-	value       interface{}
+	target, prop string
+	value        interface{}
 }
 
 // create some fake hierarchy

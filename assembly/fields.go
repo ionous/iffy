@@ -34,7 +34,7 @@ func DetermineFields(m *Modeler, db *sql.DB) (err error) {
 
 // we cant read and write to the same db simultaneously
 type pendingField struct {
-	field, owner, fieldType string
+	field, target, fieldType string
 }
 type pendingFields struct {
 	list []pendingField
@@ -42,7 +42,7 @@ type pendingFields struct {
 
 func (out *pendingFields) write(m *Modeler) (err error) {
 	for _, f := range out.list {
-		if e := m.WriteField(f.field, f.owner, f.fieldType); e != nil {
+		if e := m.WriteField(f.field, f.target, f.fieldType); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
