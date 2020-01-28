@@ -18,14 +18,15 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 			from asm_default as asm 
 			join mdl_trait mt
 				on (asm.prop=mt.trait)
-			join mdl_aspect ma
-				using (aspect)
+			join mdl_field mf
+				on (mf.type = 'aspect')
+				and (mf.field = mt.aspect)
 		union all 
 		select asm.kind, mt.aspect, mt.trait, true as value
 			from asm_default as asm 
 			join mdl_trait mt
-				on (asm.prop=mt.aspect)
-				and (asm.value=mt.trait)
+				on (asm.prop = mt.aspect)
+				and (asm.value = mt.trait)
 		)
 		select at.kind, at.aspect, at.trait, at.value from aspect at
 		/* filter if the same named trait appears in different aspects */

@@ -84,7 +84,7 @@ func fakeHierarchy(m *Modeler, kinds []pair) (err error) {
 // create some fake model hierarchy; mdl_field: field, kind, type.
 func fakeFields(m *Modeler, kinds []kfp) (err error) {
 	for _, p := range kinds {
-		if e := m.WriteField(p.field, p.kind, p.fieldType); e != nil {
+		if e := m.WriteField(p.kind, p.field, p.fieldType); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

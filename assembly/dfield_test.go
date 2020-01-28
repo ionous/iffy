@@ -61,55 +61,8 @@ func TestDefaultFieldAssigment(t *testing.T) {
 	}
 }
 
-// TestDefaultFieldUnknownField missing properties ( kind, field pair doesn't exist in model )
-func xTestDefaultFieldUnknownField(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
-		t.Fatal(e)
-	} else {
-		defer t.Close()
-		//
-		if e := fakeHierarchy(t.modeler, []pair{
-			{"T", ""},
-			{"P", "T"},
-			{"C", "P,T"},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := fakeFields(t.modeler, []kfp{
-			{"T", "d", ephemera.PRIM_DIGI},
-			{"T", "t", ephemera.PRIM_TEXT},
-			{"T", "t2", ephemera.PRIM_TEXT},
-			{"P", "p", ephemera.PRIM_TEXT},
-			{"C", "c", ephemera.PRIM_TEXT},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := addDefaults(t.rec, []triplet{
-			{"T", "t", "some text"},
-			{"P", "t2", "other text"},
-			{"C", "c", "c text"},
-			{"P", "c", "invalid"}, // this pair doesnt exist
-			{"T", "p", "invalid"}, // this pair doesnt exist
-			{"C", "d", 123},
-		}); e != nil {
-			t.Fatal(e)
-		} else {
-			var got []pair
-			if e := MissingDefaults(t.db, func(k, f string) (err error) {
-				got = append(got, pair{k, f})
-				return
-			}); e != nil {
-				t.Fatal(e)
-			} else if !reflect.DeepEqual(got, []pair{
-				{"P", "c"},
-				{"T", "p"},
-			}) {
-				t.Fatal("mismatched", got)
-			}
-		}
-	}
-}
-
-// TestDefaultFieldValuesDuplicate to verify that duplicate values are okay
-func TestDefaultFieldValuesDuplicate(t *testing.T) {
+// TestDefaultFieldDuplicate to verify that duplicate values are okay
+func TestDefaultFieldDuplicate(t *testing.T) {
 	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
@@ -142,8 +95,8 @@ func TestDefaultFieldValuesDuplicate(t *testing.T) {
 	}
 }
 
-// TestDefaultFieldValuesConflict to verify that conflicting values are not okay
-func TestDefaultFieldValuesConflict(t *testing.T) {
+// TestDefaultFieldsConflict to verify that conflicting values are not okay
+func TestDefaultFieldsConflict(t *testing.T) {
 	testConflict := func(t *testing.T, vals []triplet) (err error) {
 		if t, e := newAssemblyTest(t, memory); e != nil {
 			err = e

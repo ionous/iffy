@@ -63,10 +63,6 @@ func NewModeler(q ephemera.Queue) *Modeler {
 		ephemera.Col{Name: "rank", Type: "int"},
 		ephemera.Col{Check: "primary key(aspect, trait)"},
 	)
-	q.Prep("mdl_aspect",
-		ephemera.Col{Name: "kind", Type: "text"},
-		ephemera.Col{Name: "aspect", Type: "text"},
-	)
 	q.Prep("mdl_rel",
 		ephemera.Col{Name: "relation", Type: "text"},
 		ephemera.Col{Name: "kind", Type: "text"},
@@ -75,8 +71,8 @@ func NewModeler(q ephemera.Queue) *Modeler {
 		ephemera.Col{Check: "primary key(relation)"},
 	)
 	q.Prep("mdl_field",
-		ephemera.Col{Name: "field", Type: "text"},
 		ephemera.Col{Name: "kind", Type: "text"},
+		ephemera.Col{Name: "field", Type: "text"},
 		ephemera.Col{Name: "type", Type: "text"},
 		ephemera.Col{Check: "primary key(kind, field)"},
 	)
@@ -133,8 +129,8 @@ func (m *Modeler) WriteAncestor(kind, path string) (err error) {
 	return e
 }
 
-func (m *Modeler) WriteField(field, kind, fieldType string) error {
-	_, e := m.q.Write("mdl_field", field, kind, fieldType)
+func (m *Modeler) WriteField(kind, field, fieldType string) error {
+	_, e := m.q.Write("mdl_field", kind, field, fieldType)
 	return e
 }
 
@@ -187,8 +183,7 @@ func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
 }
 
 func (m *Modeler) WriteAspect(kind, aspect string) error {
-	_, e := m.q.Write("mdl_aspect", kind, aspect)
-	return e
+	return m.WriteField(kind, aspect, ephemera.PRIM_ASPECT)
 }
 
 // WriteValue: store the initial value of an instance's field used at start of play.

@@ -47,10 +47,8 @@ func TestDefaultTraitAssignment(t *testing.T) {
 		} else if e := matchDefaults(t.db, []triplet{
 			{"P", "A", "y"},
 			{"P", "B", "z"},
-			//
 			{"Q", "A", "w"},
 			{"Q", "B", "z"},
-			//
 			{"T", "A", "x"},
 		}); e != nil {
 			t.Fatal(e)

@@ -42,7 +42,7 @@ type pendingFields struct {
 
 func (out *pendingFields) write(m *Modeler) (err error) {
 	for _, f := range out.list {
-		if e := m.WriteField(f.field, f.target, f.fieldType); e != nil {
+		if e := m.WriteField(f.target, f.field, f.fieldType); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
