@@ -12,8 +12,8 @@ const (
 	PRIM_EXPR   = "expr"   // text expression
 	PRIM_COMP   = "comp"   // number computation
 	PRIM_PROG   = "prog"   // program
-	PRIM_ASPECT = "aspect" // fix? rename "prop"?
-	PRIM_TRAIT  = "trait"  // fix? rename "attr"?
+	PRIM_ASPECT = "aspect" // string
+	PRIM_TRAIT  = "trait"  // string
 )
 
 const (

@@ -2,6 +2,7 @@ package assembly
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
@@ -9,8 +10,8 @@ import (
 )
 
 func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
-	var store defaultValueStore
-	var curr, last defaultValue
+	var store defaultTraitStore
+	var curr, last defaultTrait
 	if e := dbutil.QueryAll(db,
 		// normalize aspect and trait requests
 		`with aspect as (
@@ -37,19 +38,19 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 			),  at.kind || ",")
 			order by at.kind, at.aspect, at.trait, at.value`,
 		func() (err error) {
-			if v, ok := curr.value.(int64); !ok || v == 0 {
-				// future: re: certainty values
+			if !curr.value {
+				// future: possibly a switch for false values that tries to select a single opposite?
+				// possibly a separate table for opposites? ( re: relations )
 				err = errutil.Fmt("only positive traits are accepted right now")
-			} else if last.target != curr.target || last.fieldType != curr.fieldType {
+			} else if last.kind != curr.kind || last.aspect != curr.aspect {
 				store.add(last)
 				last = curr
-			} else if last.field != curr.field {
+			} else if last.trait != curr.trait {
 				err = errutil.Fmt("conflicting defaults: %s != %s", last.String(), curr.String())
 			}
 			return
 		},
-		// kind, aspect, trait
-		&curr.target, &curr.fieldType, &curr.field,
+		&curr.kind, &curr.aspect, &curr.trait,
 		&curr.value,
 	); e != nil {
 		err = e
@@ -60,9 +61,28 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 	return
 }
 
-func (store *defaultValueStore) writeTraits(m *Modeler) (err error) {
+type defaultTrait struct {
+	kind, aspect, trait string
+	value               bool
+}
+
+func (n *defaultTrait) String() string {
+	return n.kind + "." + n.aspect + ":" + n.trait + fmt.Sprintf("(%v:%T)", n.value, n.value)
+}
+
+type defaultTraitStore struct {
+	list []defaultTrait
+}
+
+func (store *defaultTraitStore) add(n defaultTrait) {
+	if len(n.kind) > 0 {
+		store.list = append(store.list, n)
+	}
+}
+
+func (store *defaultTraitStore) writeTraits(m *Modeler) (err error) {
 	for _, n := range store.list {
-		if e := m.WriteDefault(n.target, n.fieldType, n.field); e != nil {
+		if e := m.WriteDefault(n.kind, n.aspect, n.trait); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
