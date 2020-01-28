@@ -16,9 +16,8 @@ func TestMissingKinds(t *testing.T) {
 	} else {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
-		//
+		// kind, ancestor
 		pairs := []string{
-			// kind, ancestor
 			"P", "T",
 			"Q", "T",
 			"P", "R",
@@ -86,7 +85,6 @@ func TestMissingAspects(t *testing.T) {
 			t.Log("okay")
 		}
 	}
-
 }
 
 func TestMissingField(t *testing.T) {
@@ -95,9 +93,15 @@ func TestMissingField(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := writeFields(t, []pair{
+		if e := fakeHierarchy(t.modeler, []pair{
 			{"T", ""},
-		}, nil, "z"); e != nil {
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := writeMissing(t.rec, []string{
+			"z",
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := DetermineFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else {
 			var missing []string

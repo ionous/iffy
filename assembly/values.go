@@ -21,19 +21,21 @@ func DetermineValues(m *Modeler, db *sql.DB) (err error) {
 	var store defaultValueStore
 	var curr, last defaultValue
 	if e := dbutil.QueryAll(db,
-		`select at.target, mf.field, mf.type, ev.value
-	from asm_value_tree at
+		`select asm.noun, mf.field, mf.type, asm.value
+			from asm_noun as asm
 		join mdl_field mf
-		on mf.rowid = at.idModelField
-	left join eph_value ev
-		on ev.rowid = at.idEphValue
-	order by at.target, mf.field`,
+			on (asm.prop=mf.field)
+		where instr((
+			select mk.kind || "," || mk.path || ","
+			from mdl_kind mk 
+			join mdl_noun mn
+			using (kind)
+			where (mn.noun=asm.noun)
+		), mf.kind || ",")`,
 		func() (err error) {
 			// if the modelField is the same, so is kind, field, type.
 			if nv, e := convertField(curr.fieldType, curr.value); e != nil {
 				err = e
-			} else if !last.isValid() {
-				last, last.value = curr, nv
 			} else if last.target != curr.target || last.field != curr.field {
 				store.add(last)
 				last, last.value = curr, nv

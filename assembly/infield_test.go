@@ -29,6 +29,7 @@ func TestFieldAssignment(t *testing.T) {
 			{"apple", "T"},
 			{"pear", "K"},
 			{"machine gun", "L"},
+			{"gun", "L"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeFields(m, []kfp{
@@ -36,7 +37,7 @@ func TestFieldAssignment(t *testing.T) {
 			{"K", "d", ephemera.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(rec, []prop{
+		} else if e := addValues(rec, []triplet{
 			{"apple", "t", "some text"},
 			{"pear", "d", 123},
 			{"machine", "d", 321},
@@ -45,10 +46,10 @@ func TestFieldAssignment(t *testing.T) {
 			t.Fatal(e)
 		} else if e := DetermineValues(t.modeler, t.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchValues(t.db, []prop{
+		} else if e := matchValues(t.db, []triplet{
 			{"apple", "t", "some text"},
+			{"gun", "t", "more text"},
 			{"machine gun", "d", int64(321)},
-			{"machine gun", "t", "more text"},
 			{"pear", "d", int64(123)}, // int64, re: go's default scanner.
 		}); e != nil {
 			t.Fatal(e)
@@ -57,9 +58,9 @@ func TestFieldAssignment(t *testing.T) {
 }
 
 // match generated model defaults
-func matchValues(db *sql.DB, want []prop) (err error) {
-	var curr prop
-	var have []prop
+func matchValues(db *sql.DB, want []triplet) (err error) {
+	var curr triplet
+	var have []triplet
 	if e := dbutil.QueryAll(db,
 		`select noun, field, value 
 			from mdl_value
@@ -80,10 +81,10 @@ func matchValues(db *sql.DB, want []prop) (err error) {
 
 // eph_value: fake noun, prop, value
 // prop: k, f, v
-func addValues(rec *ephemera.Recorder, vals []prop) (err error) {
+func addValues(rec *ephemera.Recorder, vals []triplet) (err error) {
 	for _, v := range vals {
 		noun := rec.Named(ephemera.NAMED_NOUN, v.target, "test")
-		prop := rec.Named(ephemera.NAMED_FIELD, v.prop, "test")
+		prop := rec.Named(ephemera.NAMED_PROPERTY, v.prop, "test")
 		value := v.value
 		rec.NewValue(noun, prop, value)
 	}

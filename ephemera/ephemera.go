@@ -21,6 +21,7 @@ const (
 	NAMED_CERTAINTY = "certainty"
 	NAMED_FIELD     = "field"
 	NAMED_KIND      = "kind"
+	NAMED_PROPERTY  = "prop" // field, trait, or aspect
 	NAMED_NOUN      = "noun"
 	NAMED_RELATION  = "relation"
 	NAMED_VERB      = "verb"
@@ -56,16 +57,13 @@ func NewRecorder(srcURI string, q Queue) (ret *Recorder) {
 		Col{Name: "idNamedActual", Type: "int"})
 	q.Prep("eph_aspect",
 		Col{Name: "idNamedAspect", Type: "int"})
-	q.Prep("eph_certainty",
-		Col{Name: "certainty",
-			Type:  "text",
-			Check: "check (certainty in ('usually','always','seldom','never'))",
-		},
-		Col{Name: "idNamedTrait", Type: "int"},
-		Col{Name: "idNamedAspect", Type: "int"})
 	q.Prep("eph_default",
 		Col{Name: "idNamedKind", Type: "int"},
-		Col{Name: "idNamedField", Type: "int"},
+		// field, trait, or aspect
+		Col{Name: "idNamedProp", Type: "int"},
+		// future: un/certainty for defaults and values
+		// 	Col{Name: "certainty", Type:  "text",
+		// 	Check: "check (certainty in ('usually','always','seldom','never'))"},
 		Col{Name: "value", Type: "blob"})
 	q.Prep("eph_kind",
 		Col{Name: "idNamedKind", Type: "int"},

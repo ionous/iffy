@@ -36,7 +36,8 @@ func DetermineAspects(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		for _, t := range traits {
-			if e := m.WriteTrait(t.Aspect, t.Trait); e != nil {
+			// rank is not set yet.
+			if e := m.WriteTrait(t.Aspect, t.Trait, 0); e != nil {
 				err = errutil.Append(err, e)
 			}
 		}

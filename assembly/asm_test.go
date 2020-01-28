@@ -66,12 +66,12 @@ func (t *assemblyTest) Close() {
 type kfp struct{ kind, field, fieldType string }
 type pair struct{ key, value string }
 
-type prop struct {
+type triplet struct {
 	target, prop string
 	value        interface{}
 }
 
-// create some fake hierarchy
+// create some fake model hierarchy
 func fakeHierarchy(m *Modeler, kinds []pair) (err error) {
 	for _, p := range kinds {
 		if e := m.WriteAncestor(p.key, p.value); e != nil {
@@ -81,10 +81,31 @@ func fakeHierarchy(m *Modeler, kinds []pair) (err error) {
 	return
 }
 
-// create some fake hierarchy; mdl_field: field, kind, type.
+// create some fake model hierarchy; mdl_field: field, kind, type.
 func fakeFields(m *Modeler, kinds []kfp) (err error) {
 	for _, p := range kinds {
 		if e := m.WriteField(p.field, p.kind, p.fieldType); e != nil {
+			err = errutil.Append(err, e)
+		}
+	}
+	return
+}
+
+// write aspect, trait pairs
+func fakeTraits(m *Modeler, traits []pair) (err error) {
+	for _, t := range traits {
+		// rank is not set yet, see DetermineAspects
+		if e := m.WriteTrait(t.key, t.value, 0); e != nil {
+			err = errutil.Append(err, e)
+		}
+	}
+	return
+}
+
+// write kind, aspect pairs
+func fakeAspects(m *Modeler, kindAspects []pair) (err error) {
+	for _, t := range kindAspects {
+		if e := m.WriteAspect(t.key, t.value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

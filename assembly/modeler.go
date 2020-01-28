@@ -2,7 +2,6 @@ package assembly
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 
 	"github.com/ionous/errutil"
@@ -12,10 +11,18 @@ import (
 
 func NewModelerDB(db *sql.DB) *Modeler {
 	dbq := ephemera.NewDBQueue(db)
-
+	// asm_default: view for resolving initial default ephemera back to strings
+	if _, e := db.Exec(`create temp view 
+	asm_default as
+		select p.rowid as idEphDefault, nk.name as kind, nf.name as prop, p.value as value
+	from eph_default p join eph_named nk
+		on (p.idNamedKind = nk.rowid)
+	left join eph_named nf
+ 		on (p.idNamedProp = nf.rowid)`); e != nil {
+		panic(e)
+	}
 	// asm_value: view for resolving value ephemera back to strings
-	if _, e := db.Exec(
-		`create temp view
+	if _, e := db.Exec(`create temp view
 	asm_value as
 		select pv.rowid as idEphValue, nn.name, np.name as prop, pv.value
 	from eph_value pv join eph_named nn
@@ -24,91 +31,23 @@ func NewModelerDB(db *sql.DB) *Modeler {
 		on (pv.idNamedProp = np.rowid)`); e != nil {
 		panic(e)
 	}
-
-	// asm_default: view for resolving initial default ephemera back to strings
-	if _, e := db.Exec(`create temp view
-	asm_default as
-		select p.rowid as idEphDefault, nk.name as kind, nf.name as field, p.value as value
-	from eph_default p join eph_named nk
-		on (p.idNamedKind = nk.rowid)
-	left join eph_named nf
- 		on (p.idNamedField = nf.rowid)`); e != nil {
-		panic(e)
-	}
-
-	// asm_default_tree: view for mapping ephemera defaults to mdl_field
-	if _, e := db.Exec(
-		join(`create temp view 
-			asm_default_tree as`,
-			searchForFieldsInKind(
-				"idEphDefault, target",                 // output columns, includes: idModelField
-				"asm_default as src",                   // asm_default is a view of eph_default with names resolved to strings
-				"src.field",                            // matched against mdl_field.field
-				"src.idEphDefault, src.kind as target", // pull one column up through the hierarchy
-				"src.kind",                             // the initial kind of the hierarchy ( for every row in src )
-			)),
-	); e != nil {
-		panic(e)
-	}
-
-	// asm_value_tree: view for mapping ephemera values to mdl_field
-	if _, e := db.Exec(
-		join(`create temp view 
-			asm_value_tree as`,
-			searchForFieldsInKind(
-				"idEphValue, target",                // output columns, includes: idModelField
-				"asm_value as src",                  // asm_value is a view of eph_value with names resolved to strings
-				"src.prop",                          // matched against mdl_field.field
-				"src.idEphValue, mn.noun as target", // pull two columns up through the hierarchy
-				// for every named noun or partial noun in src,
-				// find the best noun
-				// and use that noun's kind as the seed of the hierarchical search.
-				`mn.kind join mdl_noun mn /* kind, noun */
-					on mn.noun = ( 
-					/* find the best noun */
-						select m.noun 
-						from mdl_name m   /* noun, name, rank */
-						where m.name = src.name
-						order by m.rank
-						limit 1 
-					)`),
-			`where idModelField != 0 /* we dont need missing fields */`),
-	); e != nil {
+	// asm_noun: view for value ephemera back to nouns
+	if _, e := db.Exec(`create temp view 
+	asm_noun as 
+		select *, ( 
+			select n.noun 
+			from mdl_name as n
+			where asm.name = n.name 
+		 	order by rank
+			limit 1 
+		) as noun
+	from asm_value as asm`); e != nil {
 		panic(e)
 	}
 	return NewModeler(dbq)
 }
 
-func searchForFieldsInKind(correlationOut, srcTable, fieldName, correlatedCols, mkMatch string) string {
-	// to get the idModelField as output, we match field ( and kind ) by name
-	return fmt.Sprintf(`
-	with tree(kind, path, %[5]s, field, idModelField) as
-	(select mk.kind, mk.path, %[2]s, %[3]s,
-	/* for each implied kind, look for the requested field */
-		( select m.rowid from mdl_field m
-			where m.kind = mk.kind
-			and m.field = %[3]s
-		) as idModelField
- 	/* for each row in source, look for the implied kind */
-	    from %[1]s           /* eph id, name, prop, value */
-		join mdl_kind mk
-		on mk.kind = %[4]s
-	union all
-	/* for each parent kind, keep looking for the requested field */
-		select super.kind, super.path, %[5]s, tree.field,
-			( select m.rowid from mdl_field m
-				where m.kind = super.kind
-				and m.field = tree.field
-			 ) as idModelField
-		from tree, mdl_kind super
-		where idModelField is null /* keep going til found  */
-		and super.kind = substr(tree.path,0,instr(tree.path||",", ","))
-	)
-	select %[5]s, coalesce(idModelField,0) as idModelField from tree`,
-		srcTable, correlatedCols, fieldName, mkMatch, correlationOut)
-}
-
-func join(str ...string) string {
+func cat(str ...string) string {
 	return strings.Join(str, " ")
 }
 
@@ -118,11 +57,15 @@ func NewModeler(q ephemera.Queue) *Modeler {
 		ephemera.Col{Name: "path", Type: "text"},
 		ephemera.Col{Check: "primary key(kind)"},
 	)
-	q.Prep("mdl_aspect",
+	q.Prep("mdl_trait",
 		ephemera.Col{Name: "aspect", Type: "text"},
 		ephemera.Col{Name: "trait", Type: "text"},
 		ephemera.Col{Name: "rank", Type: "int"},
 		ephemera.Col{Check: "primary key(aspect, trait)"},
+	)
+	q.Prep("mdl_aspect",
+		ephemera.Col{Name: "kind", Type: "text"},
+		ephemera.Col{Name: "aspect", Type: "text"},
 	)
 	q.Prep("mdl_rel",
 		ephemera.Col{Name: "relation", Type: "text"},
@@ -159,7 +102,6 @@ func NewModeler(q ephemera.Queue) *Modeler {
 		ephemera.Col{Name: "name", Type: "text"},
 		ephemera.Col{Name: "rank", Type: "int"},
 	)
-
 	vcols := []ephemera.Col{
 		{Name: "relation", Type: "text"},
 		{Name: "stem", Type: "text"},
@@ -239,8 +181,13 @@ func (m *Modeler) WriteRelation(relation, kind, cardinality, other string) error
 	return e
 }
 
-func (m *Modeler) WriteTrait(aspect, trait string) error {
-	_, e := m.q.Write("mdl_aspect", aspect, trait, 0)
+func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
+	_, e := m.q.Write("mdl_trait", aspect, trait, rank)
+	return e
+}
+
+func (m *Modeler) WriteAspect(kind, aspect string) error {
+	_, e := m.q.Write("mdl_aspect", kind, aspect)
 	return e
 }
 

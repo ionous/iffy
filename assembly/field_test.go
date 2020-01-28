@@ -12,24 +12,20 @@ import (
 	"github.com/ionous/iffy/ephemera"
 )
 
-func writeFields(t *assemblyTest, kinds []pair, kfps []kfp, missing ...string) (err error) {
-	db, rec, m := t.db, t.rec, t.modeler
-	if e := fakeHierarchy(m, kinds); e != nil {
-		err = e
-	} else {
-		// write some primitives
-		for _, p := range kfps {
-			kind := rec.Named(ephemera.NAMED_KIND, p.kind, "test")
-			field := rec.Named(ephemera.NAMED_FIELD, p.field, "test")
-			rec.NewPrimitive(p.fieldType, kind, field)
-		}
-		// name some fields that arent otherwise referenced
-		for _, m := range missing {
-			rec.Named(ephemera.NAMED_FIELD, m, "test")
-		}
-		if e := DetermineFields(m, db); e != nil {
-			err = errutil.Append(err, e)
-		}
+// write some primitives
+func writeFields(rec *ephemera.Recorder, kfps []kfp) (err error) {
+	for _, p := range kfps {
+		kind := rec.Named(ephemera.NAMED_KIND, p.kind, "test")
+		field := rec.Named(ephemera.NAMED_FIELD, p.field, "test")
+		rec.NewPrimitive(p.fieldType, kind, field)
+	}
+	return
+}
+
+// name some fields that arent otherwise referenced
+func writeMissing(rec *ephemera.Recorder, missing []string) (err error) {
+	for _, m := range missing {
+		rec.Named(ephemera.NAMED_FIELD, m, "test")
 	}
 	return
 }
@@ -56,17 +52,19 @@ func TestFields(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := writeFields(t,
-			[]pair{
-				{"T", ""},
-				{"P", "T"},
-				{"Q", "T"},
-			},
-			[]kfp{
-				{"P", "a", ephemera.PRIM_TEXT},
-				{"Q", "b", ephemera.PRIM_TEXT},
-				{"T", "c", ephemera.PRIM_TEXT},
-			}); e != nil {
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"T", ""},
+			{"P", "T"},
+			{"Q", "T"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := writeFields(t.rec, []kfp{
+			{"P", "a", ephemera.PRIM_TEXT},
+			{"Q", "b", ephemera.PRIM_TEXT},
+			{"T", "c", ephemera.PRIM_TEXT},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := DetermineFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchProperties(t.db, []kfp{
 			{"P", "a", ephemera.PRIM_TEXT},
@@ -84,16 +82,18 @@ func TestFieldLca(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := writeFields(t,
-			[]pair{
-				{"T", ""},
-				{"P", "T"},
-				{"Q", "T"},
-			},
-			[]kfp{
-				{"P", "a", ephemera.PRIM_TEXT},
-				{"Q", "a", ephemera.PRIM_TEXT},
-			}); e != nil {
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"T", ""},
+			{"P", "T"},
+			{"Q", "T"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := writeFields(t.rec, []kfp{
+			{"P", "a", ephemera.PRIM_TEXT},
+			{"Q", "a", ephemera.PRIM_TEXT},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := DetermineFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchProperties(t.db, []kfp{
 			{"T", "a", ephemera.PRIM_TEXT},
@@ -110,15 +110,16 @@ func TestFieldTypeMismatch(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer t.Close()
-		//
-		if e := writeFields(t,
-			[]pair{
-				{"T", ""},
-			},
-			[]kfp{
-				{"T", "a", ephemera.PRIM_TEXT},
-				{"T", "a", ephemera.PRIM_DIGI},
-			}); e != nil {
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"T", ""},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := writeFields(t.rec, []kfp{
+			{"T", "a", ephemera.PRIM_TEXT},
+			{"T", "a", ephemera.PRIM_DIGI},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := DetermineFields(t.modeler, t.db); e != nil {
 			t.Log("okay:", e)
 		} else {
 			t.Fatal("expected error")
