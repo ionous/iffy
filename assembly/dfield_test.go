@@ -3,7 +3,6 @@ package assembly
 import (
 	"testing"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -41,7 +40,7 @@ func TestDefaultFieldAssigment(t *testing.T) {
 			{"C", "d", 123},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := determineDefaultFields(t.modeler, t.db); e != nil {
+		} else if e := DetermineDefaults(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchDefaults(t.db, []triplet{
 			{"C", "c", "c text"},
@@ -88,46 +87,5 @@ func TestDefaultFieldDuplicate(t *testing.T) {
 		} else if e := determineDefaultFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		}
-	}
-}
-
-// TestDefaultFieldsConflict to verify that conflicting values are not okay
-func TestDefaultFieldsConflict(t *testing.T) {
-	testConflict := func(t *testing.T, vals []triplet) (err error) {
-		if t, e := newAssemblyTest(t, memory); e != nil {
-			err = e
-		} else {
-			defer t.Close()
-			//
-			if e := fakeHierarchy(t.modeler, []pair{
-				{"T", ""},
-				{"P", "T"},
-			}); e != nil {
-				t.Fatal(e)
-			} else if e := fakeFields(t.modeler, []kfp{
-				{"T", "d", ephemera.PRIM_DIGI},
-				{"T", "t", ephemera.PRIM_TEXT},
-			}); e != nil {
-				err = e
-			} else if e := addDefaults(t.rec, vals); e != nil {
-				err = e
-			} else if e := determineDefaultFields(t.modeler, t.db); e == nil {
-				err = errutil.New("expected error")
-			} else {
-				t.Log("okay:", e)
-			}
-		}
-		return
-	}
-	if e := testConflict(t, []triplet{
-		{"T", "t", "a"},
-		{"T", "t", "b"},
-	}); e != nil {
-		t.Fatal(e)
-	} else if e := testConflict(t, []triplet{
-		{"T", "d", 1},
-		{"T", "d", 2},
-	}); e != nil {
-		t.Fatal(e)
 	}
 }

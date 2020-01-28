@@ -18,7 +18,7 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 		select asm.kind, mt.aspect, mt.trait, asm.value 
 			from asm_default as asm 
 			join mdl_trait mt
-				on (asm.prop=mt.trait)
+				on (asm.prop = mt.trait)
 			join mdl_field mf
 				on (mf.type = 'aspect')
 				and (mf.field = mt.aspect)

@@ -42,7 +42,7 @@ func TestDefaultTraitAssignment(t *testing.T) {
 			{"Q", "w", true},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := determineDefaultTraits(t.modeler, t.db); e != nil {
+		} else if e := DetermineDefaults(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchDefaults(t.db, []triplet{
 			{"P", "A", "y"},

@@ -19,6 +19,7 @@ func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
  			from asm_default as asm
  		join mdl_field mf
  			on (asm.prop = mf.field)
+ 			and (mf.type != 'aspect')
  		/* is the field's declared kind in the path of the user specified kind */		
  		where instr((
  			select mk.kind || "," || mk.path || ","
