@@ -12,64 +12,39 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// match generated model defaults
-func matchDefaults(db *sql.DB, want []triplet) (err error) {
-	var curr triplet
-	var have []triplet
-	if e := dbutil.QueryAll(db,
-		`select kind, field, value 
-			from mdl_default
-			order by kind, field, value`,
-		func() (err error) {
-			have = append(have, curr)
-			return
-		},
-		&curr.target, &curr.prop, &curr.value); e != nil {
-		err = e
-	} else if !reflect.DeepEqual(have, want) {
-		err = errutil.New("mismatch",
-			"have:", pretty.Sprint(have),
-			"want:", pretty.Sprint(want))
+// TestDefaultDuplicates to verify that duplicate default specifications are okay
+func TestDefaultDuplicates(t *testing.T) {
+	if t, e := newDefaultsTest(t, memory, []triplet{
+		{"T", "t", "text"},
+		{"T", "t", "text"},
+		{"P", "t", "text"},
+		//
+		{"T", "d", 123},
+		{"T", "d", 123},
+		{"P", "d", 123},
+		//
+		{"T", "A", "y"},
+		{"T", "y", true},
+		{"P", "x", true},
+		{"P", "A", "x"},
+	}); e != nil {
+		t.Fatal(e)
+	} else {
+		defer t.Close()
+		if e := DetermineDefaults(t.modeler, t.db); e != nil {
+			t.Fatal(e)
+		}
 	}
-	return
-}
-
-// write ephemera describing some initial values
-func addDefaults(rec *ephemera.Recorder, defaults []triplet) (err error) {
-	for _, el := range defaults {
-		namedKind := rec.Named(ephemera.NAMED_KIND, el.target, "test")
-		namedField := rec.Named(ephemera.NAMED_PROPERTY, el.prop, "test")
-		rec.NewDefault(namedKind, namedField, el.value)
-	}
-	return
 }
 
 // TestDefaultConflict to verify that conflicting values for the same default are not okay
 func TestDefaultConflict(t *testing.T) {
 	testConflict := func(t *testing.T, vals []triplet) (err error) {
-		if t, e := newAssemblyTest(t, memory); e != nil {
-			err = e
+		if t, e := newDefaultsTest(t, memory, vals); e != nil {
+			t.Fatal(e)
 		} else {
 			defer t.Close()
-			//
-			if e := fakeHierarchy(t.modeler, []pair{
-				{"T", ""},
-				{"P", "T"},
-			}); e != nil {
-				t.Fatal(e)
-			} else if e := fakeFields(t.modeler, []kfp{
-				{"T", "d", ephemera.PRIM_DIGI},
-				{"T", "t", ephemera.PRIM_TEXT},
-				{"T", "A", ephemera.PRIM_ASPECT},
-			}); e != nil {
-				err = e
-			} else if e := fakeTraits(t.modeler, []pair{
-				{"A", "x"}, {"A", "y"}, {"A", "z"},
-			}); e != nil {
-				err = e
-			} else if e := addDefaults(t.rec, vals); e != nil {
-				err = e
-			} else if e := DetermineDefaults(t.modeler, t.db); e == nil {
+			if e := DetermineDefaults(t.modeler, t.db); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)
@@ -112,28 +87,11 @@ func TestDefaultBadValue(t *testing.T) {
 	//- for now, we only allow text and number [ text and digi ]
 	// - later we could add ambiguity for conversion [ 4 -> "4" ]
 	testInvalid := func(t *testing.T, vals []triplet) (err error) {
-		if t, e := newAssemblyTest(t, memory); e != nil {
+		if t, e := newDefaultsTest(t, memory, vals); e != nil {
 			err = e
 		} else {
 			defer t.Close()
-			//
-			if e := fakeHierarchy(t.modeler, []pair{
-				{"T", ""},
-			}); e != nil {
-				t.Fatal(e)
-			} else if e := fakeFields(t.modeler, []kfp{
-				{"T", "d", ephemera.PRIM_DIGI},
-				{"T", "t", ephemera.PRIM_TEXT},
-				{"T", "A", ephemera.PRIM_ASPECT},
-			}); e != nil {
-				err = e
-			} else if e := fakeTraits(t.modeler, []pair{
-				{"A", "x"}, {"A", "y"}, {"A", "z"},
-			}); e != nil {
-				err = e
-			} else if e := addDefaults(t.rec, vals); e != nil {
-				err = e
-			} else if e := DetermineDefaults(t.modeler, t.db); e == nil {
+			if e := DetermineDefaults(t.modeler, t.db); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)
@@ -181,4 +139,67 @@ func TestDefaultBadValue(t *testing.T) {
 		t.Fatal(e)
 	}
 	*/
+}
+
+// match generated model defaults
+func matchDefaults(db *sql.DB, want []triplet) (err error) {
+	var curr triplet
+	var have []triplet
+	if e := dbutil.QueryAll(db,
+		`select kind, field, value 
+			from mdl_default
+			order by kind, field, value`,
+		func() (err error) {
+			have = append(have, curr)
+			return
+		},
+		&curr.target, &curr.prop, &curr.value); e != nil {
+		err = e
+	} else if !reflect.DeepEqual(have, want) {
+		err = errutil.New("mismatch",
+			"have:", pretty.Sprint(have),
+			"want:", pretty.Sprint(want))
+	}
+	return
+}
+
+// write ephemera describing some initial values
+func addDefaults(rec *ephemera.Recorder, defaults []triplet) (err error) {
+	for _, el := range defaults {
+		namedKind := rec.Named(ephemera.NAMED_KIND, el.target, "test")
+		namedField := rec.Named(ephemera.NAMED_PROPERTY, el.prop, "test")
+		rec.NewDefault(namedKind, namedField, el.value)
+	}
+	return
+}
+
+func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemblyTest, err error) {
+	if t, e := newAssemblyTest(t, path); e != nil {
+		err = e
+	} else {
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"T", ""},
+			{"P", "T"},
+		}); e != nil {
+			err = e
+		} else if e := fakeFields(t.modeler, []kfp{
+			{"T", "d", ephemera.PRIM_DIGI},
+			{"T", "t", ephemera.PRIM_TEXT},
+			{"T", "A", ephemera.PRIM_ASPECT},
+		}); e != nil {
+			err = e
+		} else if e := fakeTraits(t.modeler, []pair{
+			{"A", "x"}, {"A", "y"}, {"A", "z"},
+		}); e != nil {
+			err = e
+		} else if e := addDefaults(t.rec, defaults); e != nil {
+			err = e
+		}
+		if err != nil {
+			t.Close()
+		} else {
+			ret = t
+		}
+	}
+	return
 }

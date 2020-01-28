@@ -55,37 +55,3 @@ func TestDefaultFieldAssigment(t *testing.T) {
 		}
 	}
 }
-
-// TestDefaultFieldDuplicate to verify that duplicate values are okay
-func TestDefaultFieldDuplicate(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
-		t.Fatal(e)
-	} else {
-		defer t.Close()
-		//
-		if e := fakeHierarchy(t.modeler, []pair{
-			{"T", ""},
-			{"P", "T"},
-			{"C", "P,T"},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := fakeFields(t.modeler, []kfp{
-			{"T", "d", ephemera.PRIM_DIGI},
-			{"T", "t", ephemera.PRIM_TEXT},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := addDefaults(t.rec, []triplet{
-			{"T", "t", "text"},
-			{"T", "t", "text"},
-			{"C", "t", "text"},
-			//
-			{"T", "d", 123},
-			{"T", "d", 123},
-			{"C", "d", 123},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := determineDefaultFields(t.modeler, t.db); e != nil {
-			t.Fatal(e)
-		}
-	}
-}
