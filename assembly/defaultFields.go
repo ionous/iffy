@@ -11,10 +11,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func determineDefaultAspects(m *Modeler, db *sql.DB) (err error) {
-	return
-}
-
 func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
 	var store defaultValueStore
 	var curr, last defaultValue
@@ -25,10 +21,10 @@ func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
  			on (asm.prop = mf.field)
  		/* is the field's declared kind in the path of the user specified kind */		
  		where instr((
-	 			select mk.kind || "," || mk.path || ","
-				from mdl_kind mk 
-				where mk.kind = asm.kind
-			),  mf.kind || ",")
+ 			select mk.kind || "," || mk.path || ","
+			from mdl_kind mk 
+			where mk.kind = asm.kind
+		),  mf.kind || ",")
 		order by asm.kind, mf.field`,
 		func() (err error) {
 			if nv, e := convertField(curr.fieldType, curr.value); e != nil {

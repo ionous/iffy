@@ -12,19 +12,29 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 	var store defaultValueStore
 	var curr, last defaultValue
 	if e := dbutil.QueryAll(db,
-		`select asm.kind, ma.aspect, mt.trait, asm.value 
-		from asm_default as asm 
-		join mdl_aspect ma
-			on (ma.aspect=mt.aspect)
-		join mdl_trait mt
-			on (asm.prop=mt.trait)
+		// normalize aspect and trait requests
+		`with aspect as (
+		select asm.kind, mt.aspect, mt.trait, asm.value 
+			from asm_default as asm 
+			join mdl_trait mt
+				on (asm.prop=mt.trait)
+			join mdl_aspect ma
+				using (aspect)
+		union all 
+		select asm.kind, mt.aspect, mt.trait, true as value
+			from asm_default as asm 
+			join mdl_trait mt
+				on (asm.prop=mt.aspect)
+				and (asm.value=mt.trait)
+		)
+		select at.kind, at.aspect, at.trait, at.value from aspect at
 		/* filter if the same named trait appears in different aspects */
-		where instr((
-			select mk.kind || "," || mk.path || ","
-			from mdl_kind mk 
-			where mk.kind = asm.kind
-		),  ma.kind || ",")
-		order by asm.kind, ma.aspect, mt.trait, asm.value`,
+			where instr((
+				select mk.kind || "," || mk.path || ","
+				from mdl_kind mk 
+				where mk.kind = at.kind
+			),  at.kind || ",")
+			order by at.kind, at.aspect, at.trait, at.value`,
 		func() (err error) {
 			if v, ok := curr.value.(int64); !ok || v == 0 {
 				// future: re: certainty values

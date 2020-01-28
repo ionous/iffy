@@ -16,9 +16,11 @@ func TestDefaultTraitAssignment(t *testing.T) {
 		if e := fakeHierarchy(t.modeler, []pair{
 			{"T", ""},
 			{"P", "T"},
+			{"Q", "T"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeTraits(t.modeler, []pair{
+			{"A", "w"},
 			{"A", "x"},
 			{"A", "y"},
 			{"B", "z"},
@@ -27,12 +29,17 @@ func TestDefaultTraitAssignment(t *testing.T) {
 		} else if e := fakeAspects(t.modeler, []pair{
 			{"T", "A"},
 			{"P", "B"},
+			{"Q", "B"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addDefaults(t.rec, []triplet{
 			{"T", "x", true},
 			{"P", "y", true},
 			{"P", "z", true},
+			//
+			{"Q", "A", "w"},
+			{"Q", "B", "z"},
+			{"Q", "w", true},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := determineDefaultTraits(t.modeler, t.db); e != nil {
@@ -40,6 +47,10 @@ func TestDefaultTraitAssignment(t *testing.T) {
 		} else if e := matchDefaults(t.db, []triplet{
 			{"P", "A", "y"},
 			{"P", "B", "z"},
+			//
+			{"Q", "A", "w"},
+			{"Q", "B", "z"},
+			//
 			{"T", "A", "x"},
 		}); e != nil {
 			t.Fatal(e)

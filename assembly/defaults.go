@@ -19,8 +19,6 @@ func DetermineDefaults(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else if e := determineDefaultTraits(m, db); e != nil {
 		err = e
-	} else if e := determineDefaultAspects(m, db); e != nil {
-		err = e
 	}
 	return
 }
