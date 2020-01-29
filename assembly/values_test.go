@@ -92,18 +92,16 @@ func TestInitialTraitAssignment(t *testing.T) {
 			{"gun", "z", true},
 		}); e != nil {
 			t.Fatal(e)
+		} else if e := DetermineValues(t.modeler, t.db); e != nil {
+			t.Fatal(e)
+		} else if e := matchValues(t.db, []triplet{
+			{"apple", "A", "y"},
+			{"gun", "B", "z"},
+			{"machine gun", "A", "w"},
+			{"pear", "A", "x"},
+		}); e != nil {
+			t.Fatal(e)
 		}
-
-		//  else if e := DetermineValues(t.modeler, t.db); e != nil {
-		// 	t.Fatal(e)
-		// } else if e := matchValues(t.db, []triplet{
-		// 	{"apple", "A", "y"},
-		// 	{"gun", "B", "z"},
-		// 	{"machine gun", "A", "w"},
-		// 	{"pear", "A", "x"},
-		// }); e != nil {
-		// 	t.Fatal(e)
-		// }
 	}
 }
 
@@ -113,7 +111,7 @@ func matchValues(db *sql.DB, want []triplet) (err error) {
 	var have []triplet
 	if e := dbutil.QueryAll(db,
 		`select noun, field, value 
-			from mdl_value
+			from start_value
 			order by noun, field, value`,
 		func() (err error) {
 			have = append(have, curr)

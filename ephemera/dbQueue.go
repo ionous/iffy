@@ -36,6 +36,10 @@ func (q *DbQueue) Create(which string, cols []Col) (err error) {
 
 // Prep creates a new table (which) and prepares a insert statement for it.
 func (q *DbQueue) Prep(which string, cols ...Col) {
+	q.PrepCols(which, cols)
+}
+
+func (q *DbQueue) PrepCols(which string, cols []Col) {
 	// build a string like: "insert into foo(col1, col2, ...) values(?, ?, ...)"
 	keys := NamesOf(cols)
 	vals := "?"

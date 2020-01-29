@@ -16,6 +16,7 @@ func determineInitialFields(m *Modeler, db *sql.DB) (err error) {
 			from asm_noun as asm
 		join mdl_field mf
 			on (asm.prop = mf.field)
+			and (mf.type != 'aspect')
 		where instr((
 			select mk.kind || "," || mk.path || ","
 			from mdl_kind mk 
