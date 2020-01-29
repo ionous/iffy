@@ -12,8 +12,8 @@ import (
 )
 
 func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
-	var store defaultValueStore
-	var curr, last defaultValue
+	var store valueStore
+	var curr, last valueInfo
 	if e := dbutil.QueryAll(db,
 		`select asm.kind, mf.field, mf.type, asm.value
  			from asm_default as asm
@@ -44,31 +44,31 @@ func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		store.add(last)
-		err = store.writeDefaults(m)
+		err = store.writeDefaultFields(m)
 	}
 	return
 }
 
-type defaultValue struct {
+type valueInfo struct {
 	target, field, fieldType string
 	value                    interface{}
 }
 
-func (n *defaultValue) String() string {
+func (n *valueInfo) String() string {
 	return n.target + "." + n.field + ":" + n.fieldType + fmt.Sprintf("(%v:%T)", n.value, n.value)
 }
 
-type defaultValueStore struct {
-	list []defaultValue
+type valueStore struct {
+	list []valueInfo
 }
 
-func (store *defaultValueStore) add(n defaultValue) {
+func (store *valueStore) add(n valueInfo) {
 	if len(n.target) > 0 {
 		store.list = append(store.list, n)
 	}
 }
 
-func (store *defaultValueStore) writeDefaults(m *Modeler) (err error) {
+func (store *valueStore) writeDefaultFields(m *Modeler) (err error) {
 	for _, n := range store.list {
 		if e := m.WriteDefault(n.target, n.field, n.value); e != nil {
 			err = errutil.Append(err, e)
@@ -77,7 +77,7 @@ func (store *defaultValueStore) writeDefaults(m *Modeler) (err error) {
 	return
 }
 
-func (store *defaultValueStore) writeValues(m *Modeler) (err error) {
+func (store *valueStore) writeInitialFields(m *Modeler) (err error) {
 	for _, n := range store.list {
 		if e := m.WriteValue(n.target, n.field, n.value); e != nil {
 			err = errutil.Append(err, e)

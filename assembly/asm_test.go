@@ -101,13 +101,3 @@ func fakeTraits(m *Modeler, traits []pair) (err error) {
 	}
 	return
 }
-
-// write kind, aspect pairs
-func fakeAspects(m *Modeler, kindAspects []pair) (err error) {
-	for _, t := range kindAspects {
-		if e := m.WriteAspect(t.key, t.value); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}

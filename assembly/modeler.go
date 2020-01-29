@@ -182,10 +182,6 @@ func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
 	return e
 }
 
-func (m *Modeler) WriteAspect(kind, aspect string) error {
-	return m.WriteField(kind, aspect, ephemera.PRIM_ASPECT)
-}
-
 // WriteValue: store the initial value of an instance's field used at start of play.
 func (m *Modeler) WriteValue(noun, field string, value interface{}) error {
 	_, e := m.q.Write("mdl_value", noun, field, value)

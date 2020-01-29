@@ -15,8 +15,8 @@ import (
 // . missing aspects ( named but not specified )
 // o misspellings, near spellings ( ex. for missing traits )
 func DetermineAspects(m *Modeler, db *sql.DB) (err error) {
-	var curr, last traitInfo
-	var traits []traitInfo // cant read and write to the db simultaneously
+	var curr, last aspectInfo
+	var traits []aspectInfo // cant read and write to the db simultaneously
 	if e := dbutil.QueryAll(db, `select nt.name, na.name
 	from eph_trait t join eph_named nt
 		on (t.idNamedTrait = nt.rowid)
@@ -45,7 +45,7 @@ func DetermineAspects(m *Modeler, db *sql.DB) (err error) {
 	return
 }
 
-type traitInfo struct {
+type aspectInfo struct {
 	Aspect string
 	Trait  string
 }

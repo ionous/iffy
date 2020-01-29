@@ -11,40 +11,38 @@ import (
 	"github.com/kr/pretty"
 )
 
-// TestFieldAssignment to verify initial values for fields can be assigned to instances.
-func TestFieldAssignment(t *testing.T) {
+// TestInitialFieldAssignment to verify initial values for fields can be assigned to instances.
+func TestInitialFieldAssignment(t *testing.T) {
 	if t, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer t.Close()
-		m, rec := t.modeler, t.rec
-		//
-		if e := fakeHierarchy(m, []pair{
-			{"T", ""},
-			{"K", "T"},
-			{"L", "K,T"},
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"K", ""},
+			{"L", "K"},
+			{"M", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeNouns(m, []pair{
-			{"apple", "T"},
-			{"pear", "K"},
-			{"machine gun", "L"},
-			{"gun", "L"},
+		} else if e := fakeFields(t.modeler, []kfp{
+			{"K", "t", ephemera.PRIM_TEXT},
+			{"L", "d", ephemera.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeFields(m, []kfp{
-			{"T", "t", ephemera.PRIM_TEXT},
-			{"K", "d", ephemera.PRIM_DIGI},
+		} else if e := fakeNouns(t.modeler, []pair{
+			{"apple", "K"},
+			{"pear", "L"},
+			{"machine gun", "M"},
+			{"gun", "M"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(rec, []triplet{
+		} else if e := addValues(t.rec, []triplet{
 			{"apple", "t", "some text"},
 			{"pear", "d", 123},
 			{"machine", "d", 321},
 			{"gun", "t", "more text"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineValues(t.modeler, t.db); e != nil {
+		} else if e := determineInitialFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchValues(t.db, []triplet{
 			{"apple", "t", "some text"},
@@ -54,6 +52,58 @@ func TestFieldAssignment(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		}
+	}
+}
+
+// TestInitialTraitAssignments to verify default traits can be assigned to kinds.
+func TestInitialTraitAssignment(t *testing.T) {
+	if t, e := newAssemblyTest(t, memory); e != nil {
+		t.Fatal(e)
+	} else {
+		defer t.Close()
+		//
+		if e := fakeHierarchy(t.modeler, []pair{
+			{"K", ""},
+			{"L", "K"},
+			{"M", "L,K"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := fakeFields(t.modeler, []kfp{
+			{"K", "A", ephemera.PRIM_ASPECT},
+			{"L", "B", ephemera.PRIM_ASPECT},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := fakeTraits(t.modeler, []pair{
+			{"A", "w"}, {"A", "x"}, {"A", "y"},
+			{"B", "z"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := fakeNouns(t.modeler, []pair{
+			{"apple", "K"},
+			{"pear", "L"},
+			{"machine gun", "M"},
+			{"gun", "M"},
+		}); e != nil {
+			t.Fatal(e)
+		} else if e := addValues(t.rec, []triplet{
+			{"apple", "A", "y"},
+			{"pear", "x", true},
+			{"machine", "w", true},
+			{"gun", "z", true},
+		}); e != nil {
+			t.Fatal(e)
+		}
+
+		//  else if e := DetermineValues(t.modeler, t.db); e != nil {
+		// 	t.Fatal(e)
+		// } else if e := matchValues(t.db, []triplet{
+		// 	{"apple", "A", "y"},
+		// 	{"gun", "B", "z"},
+		// 	{"machine gun", "A", "w"},
+		// 	{"pear", "A", "x"},
+		// }); e != nil {
+		// 	t.Fatal(e)
+		// }
 	}
 }
 

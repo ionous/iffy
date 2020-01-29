@@ -2,24 +2,25 @@ package assembly
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
+func determineInitialTraits(m *Modeler, db *sql.DB) (err error) {
 	var store traitStore
 	var curr, last traitInfo
 	if e := dbutil.QueryAll(db,
 		// normalize aspect and trait requests
-		`select asm.kind, mt.aspect, mt.trait,
-			ifnull(nullif(asm.value, mt.trait), 1)
-		from asm_default as asm
+		`select asm.noun, mt.aspect, mt.trait, 
+		 	ifnull(nullif(asm.value, mt.trait), 1)
+		from asm_noun as asm 
 		join mdl_trait mt
 			on (asm.prop = mt.trait) 
 			or (asm.prop = mt.aspect and asm.value= mt.trait)
+		join mdl_noun mn
+			using (noun)
 		join mdl_kind mk
 			using (kind)
 		join mdl_field mf
@@ -27,9 +28,9 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 			and (mf.field = mt.aspect)
 		where instr((
 			/* path of the noun's kind should contain the kind which declared the aspect*/
-			select mk.kind || "," || mk.path || ","
-			),  mf.kind || ",")
-		order by asm.kind, mt.aspect, mt.trait`,
+				select mk.kind || "," || mk.path || ","
+			), mf.kind || ",")
+		order by noun, aspect, trait`,
 		func() (err error) {
 			if !curr.value {
 				// future: possibly a switch for false values that tries to select a single opposite?
@@ -49,44 +50,7 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		store.add(last)
-		err = store.writeDefaultTraits(m)
-	}
-	return
-}
-
-type traitInfo struct {
-	target, aspect, trait string
-	value                 bool
-}
-
-func (n *traitInfo) String() string {
-	return n.target + "." + n.aspect + ":" + n.trait + fmt.Sprintf("(%v:%T)", n.value, n.value)
-}
-
-type traitStore struct {
-	list []traitInfo
-}
-
-func (store *traitStore) add(n traitInfo) {
-	if len(n.target) > 0 {
-		store.list = append(store.list, n)
-	}
-}
-
-func (store *traitStore) writeDefaultTraits(m *Modeler) (err error) {
-	for _, n := range store.list {
-		if e := m.WriteDefault(n.target, n.aspect, n.trait); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}
-
-func (store *traitStore) writeInitialTraits(m *Modeler) (err error) {
-	for _, n := range store.list {
-		if e := m.WriteValue(n.target, n.aspect, n.trait); e != nil {
-			err = errutil.Append(err, e)
-		}
+		err = store.writeInitialTraits(m)
 	}
 	return
 }

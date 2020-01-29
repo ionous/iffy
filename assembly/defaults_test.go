@@ -20,26 +20,26 @@ func TestDefaultFieldAssigment(t *testing.T) {
 		defer t.Close()
 		//
 		if e := fakeHierarchy(t.modeler, []pair{
-			{"T", ""},
-			{"P", "T"},
-			{"D", "T"},
-			{"C", "P,T"},
+			{"K", ""},
+			{"L", "K"},
+			{"D", "K"},
+			{"C", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeFields(t.modeler, []kfp{
-			{"T", "d", ephemera.PRIM_DIGI},
-			{"T", "t", ephemera.PRIM_TEXT},
-			{"T", "t2", ephemera.PRIM_TEXT},
-			{"P", "x", ephemera.PRIM_TEXT},
+			{"K", "d", ephemera.PRIM_DIGI},
+			{"K", "t", ephemera.PRIM_TEXT},
+			{"K", "t2", ephemera.PRIM_TEXT},
+			{"L", "x", ephemera.PRIM_TEXT},
 			{"D", "x", ephemera.PRIM_TEXT},
 			{"C", "c", ephemera.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addDefaults(t.rec, []triplet{
-			{"T", "t", "some text"},
-			{"P", "t", "override text"},
-			{"P", "t2", "other text"},
-			{"P", "x", "x in p"},
+			{"K", "t", "some text"},
+			{"L", "t", "override text"},
+			{"L", "t2", "other text"},
+			{"L", "x", "x in p"},
 			{"D", "x", "x in d"},
 			{"C", "c", "c text"},
 			{"C", "d", 123},
@@ -51,10 +51,10 @@ func TestDefaultFieldAssigment(t *testing.T) {
 			{"C", "c", "c text"},
 			{"C", "d", int64(123)}, // re: int64 -- default scanner uses https://golang.org/pkg/database/sql/#Scanner
 			{"D", "x", "x in d"},
-			{"P", "t", "override text"},
-			{"P", "t2", "other text"},
-			{"P", "x", "x in p"},
-			{"T", "t", "some text"},
+			{"K", "t", "some text"},
+			{"L", "t", "override text"},
+			{"L", "t2", "other text"},
+			{"L", "x", "x in p"},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -63,48 +63,26 @@ func TestDefaultFieldAssigment(t *testing.T) {
 
 // TestDefaultTraitAssignment to verify default traits can be assigned to kinds.
 func TestDefaultTraitAssignment(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if t, e := newDefaultsTest(t, "", []triplet{
+		{"K", "x", true},
+		{"L", "y", true},
+		{"L", "z", true},
+		//
+		{"N", "A", "w"},
+		{"N", "B", "z"},
+		{"N", "w", true},
+	}); e != nil {
 		t.Fatal(e)
 	} else {
 		defer t.Close()
-		//
-		if e := fakeHierarchy(t.modeler, []pair{
-			{"T", ""},
-			{"P", "T"},
-			{"Q", "T"},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := fakeTraits(t.modeler, []pair{
-			{"A", "w"},
-			{"A", "x"},
-			{"A", "y"},
-			{"B", "z"},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := fakeAspects(t.modeler, []pair{
-			{"T", "A"},
-			{"P", "B"},
-			{"Q", "B"},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := addDefaults(t.rec, []triplet{
-			{"T", "x", true},
-			{"P", "y", true},
-			{"P", "z", true},
-			//
-			{"Q", "A", "w"},
-			{"Q", "B", "z"},
-			{"Q", "w", true},
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := DetermineDefaults(t.modeler, t.db); e != nil {
+		if e := DetermineDefaults(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchDefaults(t.db, []triplet{
-			{"P", "A", "y"},
-			{"P", "B", "z"},
-			{"Q", "A", "w"},
-			{"Q", "B", "z"},
-			{"T", "A", "x"},
+			{"K", "A", "x"},
+			{"L", "A", "y"},
+			{"L", "B", "z"},
+			{"N", "A", "w"},
+			{"N", "B", "z"},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -114,18 +92,18 @@ func TestDefaultTraitAssignment(t *testing.T) {
 // TestDefaultDuplicates to verify that duplicate default specifications are okay
 func TestDefaultDuplicates(t *testing.T) {
 	if t, e := newDefaultsTest(t, memory, []triplet{
-		{"T", "t", "text"},
-		{"T", "t", "text"},
-		{"P", "t", "text"},
+		{"K", "t", "text"},
+		{"K", "t", "text"},
+		{"L", "t", "text"},
 		//
-		{"T", "d", 123},
-		{"T", "d", 123},
-		{"P", "d", 123},
+		{"K", "d", 123},
+		{"K", "d", 123},
+		{"L", "d", 123},
 		//
-		{"T", "A", "y"},
-		{"T", "y", true},
-		{"P", "x", true},
-		{"P", "A", "x"},
+		{"K", "A", "y"},
+		{"K", "y", true},
+		{"L", "x", true},
+		{"L", "A", "x"},
 	}); e != nil {
 		t.Fatal(e)
 	} else {
@@ -152,30 +130,30 @@ func TestDefaultConflict(t *testing.T) {
 		return
 	}
 	if e := testConflict(t, []triplet{
-		{"T", "t", "a"},
-		{"T", "t", "b"},
+		{"K", "t", "a"},
+		{"K", "t", "b"},
 	}); e != nil {
 		t.Fatal(e)
 	} else if e := testConflict(t, []triplet{
-		{"T", "d", 1},
-		{"T", "d", 2},
+		{"K", "d", 1},
+		{"K", "d", 2},
 	}); e != nil {
 		t.Fatal(e)
 	}
 
 	if e := testConflict(t, []triplet{
-		{"T", "A", "x"},
-		{"T", "A", "z"},
+		{"K", "A", "x"},
+		{"K", "A", "y"},
 	}); e != nil {
 		t.Fatal(e)
 	} else if e := testConflict(t, []triplet{
-		{"T", "x", true},
-		{"T", "z", true},
+		{"K", "x", true},
+		{"K", "y", true},
 	}); e != nil {
 		t.Fatal(e)
 	} else if e := testConflict(t, []triplet{
-		{"T", "A", "x"},
-		{"T", "z", true},
+		{"K", "A", "x"},
+		{"K", "y", true},
 	}); e != nil {
 		t.Fatal(e)
 	}
@@ -200,18 +178,18 @@ func TestDefaultBadValue(t *testing.T) {
 	}
 
 	if e := testInvalid(t, []triplet{
-		{"T", "t", 1.2},
+		{"K", "t", 1.2},
 	}); e != nil {
 		t.Fatal(e)
 	} else if e := testInvalid(t, []triplet{
-		{"T", "d", "1.2"},
+		{"K", "d", "1.2"},
 	}); e != nil {
 		t.Fatal(e)
 	}
 	// try to set trait like values
 
 	if e := testInvalid(t, []triplet{
-		{"T", "t", false},
+		{"K", "t", false},
 	}); e != nil {
 		t.Fatal(e)
 	}
@@ -221,7 +199,7 @@ func TestDefaultBadValue(t *testing.T) {
 	   could switch to text ( "true", "false" ) perhaps and add some check/query
 	   during determination
 	   if e := testInvalid(t, []triplet{
-	       {"T", "d", true},
+	       {"K", "d", true},
 	   }); e != nil {
 	       t.Fatal(e)
 	   }
@@ -233,7 +211,7 @@ func TestDefaultBadValue(t *testing.T) {
 	or possibly by changing the determination query.
 
 	if e := testInvalid(t, []triplet{
-		{"T", "A", 1.2},
+		{"K", "A", 1.2},
 	}); e != nil {
 		t.Fatal(e)
 	}
@@ -277,18 +255,22 @@ func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemb
 		err = e
 	} else {
 		if e := fakeHierarchy(t.modeler, []pair{
-			{"T", ""},
-			{"P", "T"},
+			{"K", ""},
+			{"L", "K"},
+			{"N", "K"},
 		}); e != nil {
 			err = e
 		} else if e := fakeFields(t.modeler, []kfp{
-			{"T", "d", ephemera.PRIM_DIGI},
-			{"T", "t", ephemera.PRIM_TEXT},
-			{"T", "A", ephemera.PRIM_ASPECT},
+			{"K", "d", ephemera.PRIM_DIGI},
+			{"K", "t", ephemera.PRIM_TEXT},
+			{"K", "A", ephemera.PRIM_ASPECT},
+			{"L", "B", ephemera.PRIM_ASPECT},
+			{"N", "B", ephemera.PRIM_ASPECT},
 		}); e != nil {
 			err = e
 		} else if e := fakeTraits(t.modeler, []pair{
-			{"A", "x"}, {"A", "y"}, {"A", "z"},
+			{"A", "w"}, {"A", "x"}, {"A", "y"},
+			{"B", "z"},
 		}); e != nil {
 			err = e
 		} else if e := addDefaults(t.rec, defaults); e != nil {
