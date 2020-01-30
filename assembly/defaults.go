@@ -2,8 +2,6 @@ package assembly
 
 import (
 	"database/sql"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // goal: build table of mdl_default(kind,field,value) for archetypes.

@@ -9,7 +9,6 @@ import (
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/kr/pretty"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // TestDefaultFieldAssigment to verify default values can be assigned to kinds.

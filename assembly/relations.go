@@ -5,7 +5,6 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type relInfo struct {
@@ -40,7 +39,7 @@ func (store *relStore) write(m *Modeler) (err error) {
 }
 
 // in, eph_relation: R, K, cardinality, Q
-// out, mdl_rel: R, K(lca), Q(lca), cardinality
+// out, mdl_relation: R, K(lca), Q(lca), cardinality
 // fix? right now the coalesce allows missing kinds through,
 // the behavior otherwise is Scan error on column index 5, and not particularly helpful
 func DetermineRelations(m *Modeler, db *sql.DB) (err error) {

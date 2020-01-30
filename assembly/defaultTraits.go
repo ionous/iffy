@@ -6,7 +6,6 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {

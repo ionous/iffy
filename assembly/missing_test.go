@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/ephemera"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // TestMissingKinds to verify the kinds mentioned in parent-child ephemera exist.

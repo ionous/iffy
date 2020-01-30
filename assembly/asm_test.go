@@ -8,7 +8,6 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func getPath(file string) (ret string, err error) {

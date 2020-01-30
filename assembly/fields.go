@@ -8,7 +8,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // goal: build table of property, kind, type.

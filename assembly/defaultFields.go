@@ -8,7 +8,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {

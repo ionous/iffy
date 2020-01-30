@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/ephemera"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // TestAncestors verifies valid parent-child ephemera can generate a valid ancestry table.
