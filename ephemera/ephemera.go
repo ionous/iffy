@@ -29,10 +29,10 @@ const (
 )
 
 const (
-	MANY_TO_ONE  = "any-one"
-	ONE_TO_MANY  = "one-any"
-	MANY_TO_MANY = "any-any"
-	ONE_TO_ONE   = "one-one"
+	ONE_TO_ONE   = "one_one"
+	ONE_TO_MANY  = "one_any"
+	MANY_TO_ONE  = "any_one"
+	MANY_TO_MANY = "any_any"
 )
 
 const (
@@ -84,10 +84,10 @@ func NewRecorder(srcURI string, q Queue) (ret *Recorder) {
 		Col{Name: "idNamedOtherKind", Type: "int"},
 		Col{Name: "cardinality",
 			Type:  "text",
-			Check: "check (cardinality in ('one-one','one-any','any-one','any-any'))"})
+			Check: "check (cardinality in ('one_one','one_any','any_one','any_any'))"})
 	q.Prep("eph_relative",
 		Col{Name: "idNamedHead", Type: "int"},
-		Col{Name: "idNamedVerb", Type: "int"},
+		Col{Name: "idNamedStem", Type: "int"},
 		Col{Name: "idNamedDependent", Type: "int"})
 	q.Prep("eph_trait",
 		Col{Name: "idNamedTrait", Type: "int"},
@@ -98,9 +98,10 @@ func NewRecorder(srcURI string, q Queue) (ret *Recorder) {
 		Col{Name: "idNamedProp", Type: "int"},
 		Col{Name: "value", Type: "blob"})
 	q.Prep("eph_verb",
-		Col{Name: "idNamedVerb", Type: "int"},
-		Col{Name: "idNamedRelation", Type: "int"})
-	//q.Prep("eph_Implication"},
+		Col{Name: "idNamedStem", Type: "int"},
+		Col{Name: "idNamedRelation", Type: "int"},
+		Col{Name: "verb", Type: "string"})
+	//q.Prep("eph_implication"},
 	// Col{"idNamedScope"},
 	// Col{"idNamedTrait"},
 	// Col{"idNamedCertainty"},
@@ -194,9 +195,9 @@ func (r *Recorder) NewRelation(relation, primaryKind, secondaryKind Named, cardi
 	}
 }
 
-// NewRelative connects two specific nouns using a verb.
-func (r *Recorder) NewRelative(primary, verb, secondary Named) {
-	if _, e := r.q.Write("eph_relative", primary, verb, secondary); e != nil {
+// NewRelative connects two specific nouns using a verb stem.
+func (r *Recorder) NewRelative(primary, stem, secondary Named) {
+	if _, e := r.q.Write("eph_relative", primary, stem, secondary); e != nil {
 		panic(e)
 	}
 }
@@ -217,8 +218,8 @@ func (r *Recorder) NewValue(noun, prop Named, value interface{}) {
 }
 
 // NewRelative connects two specific nouns using a verb.
-func (r *Recorder) NewVerb(verb, relation Named) {
-	if _, e := r.q.Write("eph_verb", verb, relation); e != nil {
+func (r *Recorder) NewVerb(stem, relation Named, verb string) {
+	if _, e := r.q.Write("eph_verb", stem, relation, verb); e != nil {
 		panic(e)
 	}
 }

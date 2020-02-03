@@ -9,7 +9,6 @@ import (
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/kr/pretty"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // TestVerbMismatches verifies that we can collapse multiple relation-verb pairs so long as the verb-stem pair match
@@ -60,7 +59,7 @@ func matchRelations(db *sql.DB, want []dbrel) (err error) {
 	if e := dbutil.QueryAll(db,
 		`select relation, kind, otherKind, cardinality
 			from mdl_rel 
-			order by relation, kind, otherKind, cardinality`,
+		order by relation, kind, otherKind, cardinality`,
 		func() (err error) {
 			have = append(have, curr)
 			return

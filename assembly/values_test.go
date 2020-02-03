@@ -111,7 +111,7 @@ func matchValues(db *sql.DB, want []triplet) (err error) {
 	var have []triplet
 	if e := dbutil.QueryAll(db,
 		`select noun, field, value 
-			from start_value
+			from start_val
 			order by noun, field, value`,
 		func() (err error) {
 			have = append(have, curr)

@@ -11,28 +11,30 @@ import (
 
 func NewModelerDB(db *sql.DB) *Modeler {
 	dbq := ephemera.NewDBQueue(db)
-	// asm_default: view for resolving initial default ephemera back to strings
-	if _, e := db.Exec(`create temp view 
+	if _, e := db.Exec(`
+	/* resolve default ephemera to strings.
+	 */
+	create temp view 
 	asm_default as
 		select p.rowid as idEphDefault, nk.name as kind, nf.name as prop, p.value as value
 	from eph_default p join eph_named nk
 		on (p.idNamedKind = nk.rowid)
 	left join eph_named nf
- 		on (p.idNamedProp = nf.rowid)`); e != nil {
-		panic(e)
-	}
-	// asm_value: view for resolving value ephemera back to strings
-	if _, e := db.Exec(`create temp view
+ 		on (p.idNamedProp = nf.rowid);
+
+	/* resolve value ephemera to strings.
+	 */
+	create temp view
 	asm_value as
 		select pv.rowid as idEphValue, nn.name, np.name as prop, pv.value
 	from eph_value pv join eph_named nn
 		on (pv.idNamedNoun = nn.rowid)
 	left join eph_named np
-		on (pv.idNamedProp = np.rowid)`); e != nil {
-		panic(e)
-	}
-	// asm_noun: view for value ephemera back to nouns
-	if _, e := db.Exec(`create temp view 
+		on (pv.idNamedProp = np.rowid);
+	
+	/* resolve value ephemera to nouns.
+	 */
+	create temp view
 	asm_noun as 
 		select *, ( 
 			select n.noun 
@@ -41,9 +43,48 @@ func NewModelerDB(db *sql.DB) *Modeler {
 		 	order by rank
 			limit 1 
 		) as noun
-	from asm_value as asm`); e != nil {
+	from asm_value as asm;
+	
+	/* resolve relative ephemera to strings.
+	 */
+	create temp view
+	asm_relative as
+	select rel.rowid as idEphRel, 
+		na.name as noun, 
+		nv.name as stem,
+		nb.name as otherNoun
+	from eph_relative rel
+	join eph_named na
+		on (rel.idNamedHead = na.rowid)
+	left join eph_named nv
+ 		on (rel.idNamedStem = nv.rowid)
+ 	left join eph_named nb
+ 		on (rel.idNamedDependent = nb.rowid);
+	
+	/* resolve relative ephemera to actual nouns and relations:
+	 * ( idEphRel, noun, stem, otherNoun, relation, kind, cardinality. )
+	 */
+	create temp view
+	asm_relation as
+		select 
+			idEphRel, relation, cardinality, 
+		case cardinality 
+			when 'one_one' then min(noun,otherNoun)
+			else noun 
+		end as noun, 
+		case cardinality 
+			when 'one_one' then max(noun,otherNoun)
+			else otherNoun 
+		end as otherNoun
+	from asm_relative ar
+	join mdl_verb mv
+		using (stem)
+	join mdl_rel mr
+		using (relation);
+	`); e != nil {
 		panic(e)
 	}
+	//
 	return NewModeler(dbq)
 }
 
@@ -65,31 +106,31 @@ func NewModeler(q *ephemera.DbQueue) *Modeler {
 	})
 	q.PrepCols("mdl_rel", []ephemera.Col{
 		{Name: "relation", Type: "text"},
-		{Name: "kind", Type: "text"},
-		{Name: "cardinality", Type: "text"},
-		{Name: "otherKind", Type: "text"},
+		{Name: "kind", Type: "text"},        /* reference to mdl_kind */
+		{Name: "cardinality", Type: "text"}, /* one of MANY/ONE */
+		{Name: "otherKind", Type: "text"},   /* reference to mdl_kind */
 		{Check: "primary key(relation)"},
 	})
 	q.PrepCols("mdl_field", []ephemera.Col{
-		{Name: "kind", Type: "text"},
+		{Name: "kind", Type: "text"}, /* reference to mdl_kind */
 		{Name: "field", Type: "text"},
-		{Name: "type", Type: "text"},
+		{Name: "type", Type: "text"}, /* one of PRIM_type */
 		{Check: "primary key(kind, field)"},
 	})
 	q.PrepCols("mdl_default", []ephemera.Col{
-		{Name: "kind", Type: "text"},
-		{Name: "field", Type: "text"},
+		{Name: "kind", Type: "text"},  /* reference to mdl_kind */
+		{Name: "field", Type: "text"}, /* partial reference to mdl_field */
 		{Name: "value", Type: "blob"},
 	})
 	q.PrepCols("mdl_noun", []ephemera.Col{
 		{Name: "noun", Type: "text"},
-		{Name: "kind", Type: "text"},
+		{Name: "kind", Type: "text"}, /* reference to mdl_kind */
 		{Check: "primary key(noun)"},
 	})
 	// names are built from noun parts, and possibly from custom aliases.
 	// where rank 0 is a better match than rank 1
 	q.PrepCols("mdl_name", []ephemera.Col{
-		{Name: "noun", Type: "text"},
+		{Name: "noun", Type: "text"}, /* reference to mdl_noun */
 		{Name: "name", Type: "text"},
 		{Name: "rank", Type: "int"},
 	})
@@ -101,15 +142,21 @@ func NewModeler(q *ephemera.DbQueue) *Modeler {
 					select 1 from mdl_verb v
 					where v.relation=?1 and v.stem=?2
 				)`, []ephemera.Col{
-			{Name: "relation", Type: "text"},
+			{Name: "relation", Type: "text"}, /* reference to mdl_rel */
 			{Name: "stem", Type: "text"},
 			{Check: "unique(stem)"},
 		})
-	q.PrepCols("start_value", []ephemera.Col{
-		{Name: "noun", Type: "text"},
-		{Name: "field", Type: "text"},
+	q.PrepCols("start_val", []ephemera.Col{
+		{Name: "noun", Type: "text"},  /* reference to mdl_noun */
+		{Name: "field", Type: "text"}, /* partial reference to mdl_field */
 		{Name: "value", Type: "blob"},
 	})
+	q.PrepCols("start_rel", []ephemera.Col{
+		{Name: "noun", Type: "text"},      /* reference to mdl_noun */
+		{Name: "relation", Type: "text"},  /* reference to mdl_rel */
+		{Name: "otherNoun", Type: "text"}, /* reference to mdl_noun */
+	})
+	//
 	return &Modeler{q}
 }
 
@@ -166,8 +213,8 @@ func (m *Modeler) WriteNounWithNames(noun, kind string) (err error) {
 	return
 }
 
-func (m *Modeler) WriteRelation(relation, kind, cardinality, other string) error {
-	_, e := m.q.Write("mdl_rel", relation, kind, cardinality, other)
+func (m *Modeler) WriteRelation(relation, kind, cardinality, otherKind string) error {
+	_, e := m.q.Write("mdl_rel", relation, kind, cardinality, otherKind)
 	return e
 }
 
@@ -178,7 +225,7 @@ func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
 
 // WriteValue: store the initial value of an instance's field used at start of play.
 func (m *Modeler) WriteValue(noun, field string, value interface{}) error {
-	_, e := m.q.Write("start_value", noun, field, value)
+	_, e := m.q.Write("start_val", noun, field, value)
 	return e
 }
 
