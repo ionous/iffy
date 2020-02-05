@@ -61,26 +61,94 @@ func NewModelerDB(db *sql.DB) *Modeler {
  	left join eph_named nb
  		on (rel.idNamedDependent = nb.rowid);
 	
-	/* resolve relative ephemera to actual nouns and relations:
-	 * ( idEphRel, noun, stem, otherNoun, relation, kind, cardinality. )
+	/* resolve relative ephemera to nouns and relations
+	use left join(s) to return nulls for missing elements 
 	 */
 	create temp view
 	asm_relation as
+	select 	
+		idEphRel, 
+		stem, relation, cardinality, 
+		
+		/* first contains the kind of the user specified noun;
+			swapped contains the kind of the relation 
+		*/
+		first.noun as noun, 
+		case when instr((
+		 			select mk.kind || "," || mk.path || ","
+					from mdl_kind mk
+					where mk.kind = first.kind
+				),  swapped.kind || ",") 
+				then first.kind 
+		end as kind,
+
+		/* second contains the kind of the other user specified noun;
+			swapped contains the other kind of the relation
+		 */
+		second.noun as otherNoun,
+		case when instr((
+		 			select mk.kind || "," || mk.path || ","
+					from mdl_kind mk
+					where mk.kind = second.kind
+				),  swapped.otherKind || ",") 
+				then second.kind
+		end as otherKind
+	from (
 		select 
-			idEphRel, relation, cardinality, 
-		case cardinality 
-			when 'one_one' then min(noun,otherNoun)
-			else noun 
-		end as noun, 
-		case cardinality 
-			when 'one_one' then max(noun,otherNoun)
-			else otherNoun 
-		end as otherNoun
-	from asm_relative ar
-	join mdl_verb mv
-		using (stem)
-	join mdl_rel mr
-		using (relation);
+			idEphRel,stem,relation,cardinality,
+			case swap when 1 then otherNoun else noun end as noun,
+			case swap when 1 then noun else otherNoun end as otherNoun,
+			case swap when 1 then otherKind else kind end as kind,
+			case swap when 1 then kind else otherKind end as otherKind
+		from (
+			select *, (cardinality = 'one_one') and (noun > otherNoun) as swap
+				from asm_relative ar
+				left join mdl_verb mv
+					using (stem)
+				left join mdl_rel mr
+					using (relation)
+		)
+	) as swapped
+	left join mdl_noun first
+		 on (first.noun = swapped.noun)
+	left join mdl_noun second 
+		on (second.noun = swapped.otherNoun);
+
+	/* the bits of asm_relation which didnt make it into the start_rel table.
+	 */
+	create temp view 
+	res_mismatch as
+	select idEphRel, stem, relation, cardinality, noun, kind, otherNoun, otherKind
+	from asm_relation asm
+	where max(asm.relation, asm.kind, asm.otherKind) is null
+	or case asm.cardinality
+		when 'one_one' then
+		exists(
+			select 1 
+			from start_rel rel 
+			where (asm.relation = rel.relation) 
+			and ((asm.noun = rel.noun) and (asm.otherNoun != rel.otherNoun)
+			or (asm.otherNoun = rel.otherNoun) and (asm.noun != rel.noun))
+		)
+		when 'one_any' then 
+		exists(
+			/* given otherNoun there is only one valid noun */
+			select 1 
+			from start_rel rel 
+			where (asm.relation = rel.relation)
+			and (asm.otherNoun = rel.otherNoun) 
+			and (asm.noun != rel.noun)
+		)
+		when 'any_one' then 
+		exists(
+			/* given noun there is only one valid otherNoun */
+			select 1 
+			from start_rel rel 
+			where (asm.relation = rel.relation)
+			and (asm.noun = rel.noun) 
+			and (asm.otherNoun != rel.otherNoun)
+		)
+	end;
 	`); e != nil {
 		panic(e)
 	}

@@ -62,7 +62,7 @@ func TestDefaultFieldAssigment(t *testing.T) {
 
 // TestDefaultTraitAssignment to verify default traits can be assigned to kinds.
 func TestDefaultTraitAssignment(t *testing.T) {
-	if t, e := newDefaultsTest(t, "", []triplet{
+	if t, e := newDefaultsTest(t, memory, []triplet{
 		{"K", "x", true},
 		{"L", "y", true},
 		{"L", "z", true},

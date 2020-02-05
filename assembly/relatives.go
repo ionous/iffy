@@ -7,20 +7,13 @@ func DetermineRelatives(db *sql.DB) error {
 	_, e := db.Exec(`
 insert into start_rel( noun, relation, otherNoun )
 select distinct noun, relation, otherNoun from (
-	select *, rank() over n1 as n1, rank() over n2 as n2
-	from asm_relation a 
-	where (a.cardinality != 'one_one')
-	or (a.noun = a.otherNoun)
-	/* exclude cross column results for 1-1 relations */
-	or not exists (
-		select 1 from asm_relation b 
-		where (a.relation = b.relation)
-		and (a.noun = b.otherNoun)
-	)
+	select *, row_number() over n1 as n1, row_number() over n2 as n2
+	from asm_relation
+	where max(noun, stem, otherNoun, relation, kind, otherKind) is not null
 	window 
-	/* count the number of times the noun, other noun appears */
-      n1 AS (partition by noun order by idEphRel),
-	  n2 AS (partition by otherNoun order by idEphRel)
+	/* count the times the nouns appear in their respective columns */
+      n1 as (partition by relation,noun),
+	  n2 as (partition by relation,otherNoun)
 ) 
 where case cardinality
 	when 'one_one'
