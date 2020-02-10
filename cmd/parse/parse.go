@@ -209,7 +209,7 @@ var fns = map[string]Parse{
 	//"{plural_kinds} {are_being} {certainty} {attribute}.");
 	// horses are usually fast.
 	"certainties": func(r *Parser, item reader.Map) {
-		certainty := r.namedStr(item, ephemera.NAMED_CERTAINTY, "$CERTAINTY")
+		certainty := r.getStr(item, "$CERTAINTY")
 		trait := r.namedStr(item, ephemera.NAMED_TRAIT, "$ATTRIBUTE")
 		kind := r.namedStr(item, ephemera.NAMED_KIND, "$PLURAL_KINDS")
 		r.NewCertainty(certainty, trait, kind)

@@ -92,7 +92,7 @@ func matchRelatives(db *sql.DB, want [][3]string) (err error) {
 	var have [][3]string
 	if e := dbutil.QueryAll(db,
 		`select relation, noun, otherNoun
-			from start_rel
+			from mdl_pair
 			order by relation, noun, otherNoun`,
 		func() (err error) {
 			have = append(have, curr)
@@ -123,7 +123,7 @@ func TestOneToOneViolations(t *testing.T) {
 					`select distinct coalesce(noun, ''), 
 									 coalesce(stem, ''), 
 									 coalesce(otherNoun, '')
-					from res_mismatch`,
+					from asm_mismatch`,
 					func() (err error) {
 						have = append(have, got)
 						return

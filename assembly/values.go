@@ -4,7 +4,7 @@ import (
 	"database/sql"
 )
 
-// goal: build table of start_val(noun, field, value) for instances.
+// goal: build table of mdl_start(noun, field, value) for instances.
 // considerations:
 // . property's actual kind ( default specified against a derived type )
 // . contradiction in specified values

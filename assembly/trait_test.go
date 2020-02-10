@@ -38,7 +38,7 @@ func matchTraits(db *sql.DB, want []expectedTrait) (err error) {
 	var curr expectedTrait
 	var have []expectedTrait
 	if e := dbutil.QueryAll(db,
-		`select aspect, trait, rank from mdl_trait order by aspect, trait, rank`,
+		`select aspect, trait, rank from mdl_aspect order by aspect, trait, rank`,
 		func() (err error) {
 			have = append(have, curr)
 			return

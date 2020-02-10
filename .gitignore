@@ -6,3 +6,7 @@ notes
 ephemera/cmd/parse
 ephemera/cmd/stem
 assembly/debug.test
+cmd/stem/stem
+cmd/parse/parse
+cmd/atlas/atlas
+cmd/asm/asm

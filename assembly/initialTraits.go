@@ -15,7 +15,7 @@ func determineInitialTraits(m *Modeler, db *sql.DB) (err error) {
 		`select asm.noun, mt.aspect, mt.trait, 
 		 	ifnull(nullif(asm.value, mt.trait), 1)
 		from asm_noun as asm 
-		join mdl_trait mt
+		join mdl_aspect mt
 			on (asm.prop = mt.trait) 
 			or (asm.prop = mt.aspect and asm.value= mt.trait)
 		join mdl_noun mn

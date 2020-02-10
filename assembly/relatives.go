@@ -5,7 +5,7 @@ import "database/sql"
 // goal: build tables of noun, relation, otherNoun
 func DetermineRelatives(db *sql.DB) error {
 	_, e := db.Exec(`
-insert into start_rel( noun, relation, otherNoun )
+insert into mdl_pair( noun, relation, otherNoun )
 select distinct noun, relation, otherNoun from (
 	select *, row_number() over n1 as n1, row_number() over n2 as n2
 	from asm_relation
