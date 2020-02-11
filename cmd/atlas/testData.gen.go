@@ -27,7 +27,6 @@ func testDataTemplate() string {
 		"\t(\"cars\", \"flightiness\", \"flightless\"),\n" +
 		"\t(\"cars\", \"num wheels\", 4);\n" +
 		"\n" +
-		"/* to match kind this should really be aspect */\n" +
 		"insert into mdl_aspect(aspect, trait) values\n" +
 		"\t(\"flightiness\", \"flightless\"),\n" +
 		"\t(\"flightiness\", \"glide worthy\"),\n" +
@@ -50,9 +49,6 @@ func testDataTemplate() string {
 		"\t(\"riker\", \"riker\", 0),\n" +
 		"\t(\"picard\", \"picard\", 0);\n" +
 		"\n" +
-		"/* what is verb good for in the run time?\n" +
-		"create table asm_verb(relation text, stem text, unique(stem));\n" +
-		"*/\n" +
 		"insert into mdl_start(noun, field, value) values\n" +
 		"\t( \"dune buggy\", \"num wheels\", 3);\n" +
 		"\n" +
@@ -62,7 +58,8 @@ func testDataTemplate() string {
 		"\n" +
 		"insert into mdl_spec(type, name, spec) values\n" +
 		"\t(\"kind\",  \"things\", \"From inform: 'Represents anything interactive in the world. People, pieces of scenery, furniture, doors and mislaid umbrellas might all be examples, and so might more surprising things like the sound of birdsong or a shaft of sunlight.'\"),\n" +
-		"\t(\"aspect\", \"flightiness\", \"The flight worthiness of vehicles, an example of an aspect with several traits.\");\n" +
+		"\t(\"aspect\", \"flightiness\", \"The flight worthiness of vehicles, an example of an aspect with several traits.\"),\n" +
+		"\t(\"field\", \"cars.num wheels\", \"Not all cars are created equal, or even even.\");\n" +
 		"\n" +
 		""
 	return tmpl

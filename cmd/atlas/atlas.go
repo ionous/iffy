@@ -13,6 +13,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+//go:generate templify -p main -o atlas.gen.go atlas.sql
+func CreateAtlas(db *sql.DB) error {
+	_, e := db.Exec(atlasTemplate())
+	return e
+}
+
 func main() {
 	var testData bool
 	flag.BoolVar(&testData, "test", false, "use testdata")

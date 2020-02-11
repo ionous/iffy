@@ -16,7 +16,6 @@ insert into mdl_default(kind, field, value) values
 	("cars", "flightiness", "flightless"),
 	("cars", "num wheels", 4);
 
-/* to match kind this should really be aspect */
 insert into mdl_aspect(aspect, trait) values
 	("flightiness", "flightless"),
 	("flightiness", "glide worthy"),
@@ -39,9 +38,6 @@ insert into mdl_name(noun, name, rank) values
 	("riker", "riker", 0),
 	("picard", "picard", 0);
 
-/* what is verb good for in the run time?
-create table asm_verb(relation text, stem text, unique(stem));
-*/
 insert into mdl_start(noun, field, value) values
 	( "dune buggy", "num wheels", 3);
 
@@ -51,5 +47,6 @@ insert into mdl_pair(noun, relation, otherNoun) values
 
 insert into mdl_spec(type, name, spec) values
 	("kind",  "things", "From inform: 'Represents anything interactive in the world. People, pieces of scenery, furniture, doors and mislaid umbrellas might all be examples, and so might more surprising things like the sound of birdsong or a shaft of sunlight.'"),
-	("aspect", "flightiness", "The flight worthiness of vehicles, an example of an aspect with several traits.");
+	("aspect", "flightiness", "The flight worthiness of vehicles, an example of an aspect with several traits."),
+	("field", "cars.num wheels", "Not all cars are created equal, or even even.");
 
