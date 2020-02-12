@@ -82,13 +82,14 @@ var funcMap = template.FuncMap{
 	"Safe": func(s string) string {
 		return spaces.ReplaceAllString(s, "-")
 	},
-	"changing": func(i int, key string, els reflect.Value) (ret bool) {
-		if i == 0 {
+	// return true if the struct field in els before idx differs from the one at idx
+	"changing": func(idx int, field string, els reflect.Value) (ret bool) {
+		if idx == 0 {
 			ret = true
 		} else {
-			curr, prev := els.Index(i), els.Index(i-1)
-			c := curr.Elem().FieldByName(key).Interface()
-			p := prev.Elem().FieldByName(key).Interface()
+			curr, prev := els.Index(idx), els.Index(idx-1)
+			c := curr.Elem().FieldByName(field).Interface()
+			p := prev.Elem().FieldByName(field).Interface()
 			ret = c != p
 		}
 		return

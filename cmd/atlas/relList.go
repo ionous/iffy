@@ -14,10 +14,10 @@ func listOfRelations(w io.Writer, db *sql.DB) (err error) {
 	var rels []*Relation
 	var rel Relation
 	if e := dbutil.QueryAll(db, `
-		select *, coalesce((
+		select relation, kind, cardinality, otherKind, coalesce((
 			select spec from mdl_spec 
 			where type='relation' and name=relation
-		), '')
+			limit 1), '')
 		from mdl_rel
 		order by relation`,
 		func() (err error) {

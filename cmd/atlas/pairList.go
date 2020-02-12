@@ -1,74 +1,65 @@
 package main
 
-import "text/template"
+import (
+	"database/sql"
+	"fmt"
+	"io"
+	"text/template"
 
-type Pair struct {
-	First, Second string
-}
-
-// func listOfNouns(w io.Writer, db *sql.DB) (err error) {
-// 	// originally used a channel, but the template iterates over the same elements multiple times
-// 	var nouns []Noun
-// 	var name, kind, spec string
-// 	if e := dbutil.QueryAll(db, `
-// 		select noun, kind, coalesce(spec, '')
-// 		from mdl_noun
-// 		left join mdl_spec
-// 			on (type='noun' and name=noun)
-// 		order by noun`,
-// 		func() (err error) {
-// 			var prop, value, rel string
-// 			var props []Prop
-// 			// var relation string
-// 			var relations []string
-// 			if e := dbutil.QueryAll(db,
-// 				fmt.Sprintf(`
-// 					select field, value
-// 					from mdl_start
-// 					where noun='%s'
-// 					order by field`, name),
-// 				func() (err error) {
-// 					props = append(props, Prop{Name: name, Value: value})
-// 					return
-// 				},
-// 				&prop, &value); e != nil {
-// 				err = e
-// 			} else if e := dbutil.QueryAll(db,
-// 				fmt.Sprintf(`select
-// 					distinct relation
-// 					from mdl_pair
-// 					where noun='%s'
-// 					or otherNoun='%s'
-// 					order by relation`, name, name),
-// 				func() (err error) {
-// 					relations = append(relations, rel)
-// 					return
-// 				}, &rel); e != nil {
-// 				err = e
-// 			} else {
-// 				nouns = append(nouns, Noun{
-// 					name, kind, spec,
-// 					props,
-// 					relations,
-// 				})
-// 			}
-// 			return
-// 		}, &name, &kind, &spec); e != nil {
-// 		err = e
-// 	} else {
-// 		err = nounTemplate.Execute(w, nouns)
-// 	}
-// 	return
-// }
+	"github.com/ionous/iffy/dbutil"
+)
 
 type Pairing struct {
 	Rel   *Relation
 	Pairs []*Pair
 }
 
+type Pair struct {
+	First, Second string
+}
+
+func listOfPairs(w io.Writer, relation string, db *sql.DB) (err error) {
+	var rel Relation
+	var pair Pair
+	var pairs []*Pair
+
+	if e := dbutil.QueryAll(db,
+		fmt.Sprintf(`
+		select relation, kind, cardinality, otherKind, coalesce((
+			select spec from mdl_spec 
+			where type='relation' and name=relation
+			limit 1), '')
+		from mdl_rel
+		where relation = '%s'`, relation),
+		func() (err error) {
+			return
+		}, &rel.Name, &rel.Kind, &rel.Cardinality, &rel.OtherKind, &rel.Spec); e != nil {
+		err = e
+	} else if e := dbutil.QueryAll(db,
+		fmt.Sprintf(`
+		select noun, otherNoun
+		from mdl_pair
+		where relation = '%s'`, relation),
+		func() (err error) {
+			pin := pair
+			pairs = append(pairs, &pin)
+			return
+		}, &pair.First, &pair.Second,
+	); e != nil {
+		err = e
+	} else {
+		pin := rel
+		err = pairTemplate.Execute(w, &Pairing{
+			Rel:   &pin,
+			Pairs: pairs,
+		})
+	}
+	return
+}
+
 var pairTemplate = template.Must(template.New("pairs").Funcs(funcMap).Parse(`
 <h1>{{.Rel.Name|Title}}</h1>
-{{ .Rel.Text }}. {{ .Rel.Spec }}
+{{ .Rel.Text }}.{{ if .Rel.Spec }} {{ .Rel.Spec }}{{ end }}
 <table>
 	{{- range $i, $el := .Pairs }}
 <tr>
