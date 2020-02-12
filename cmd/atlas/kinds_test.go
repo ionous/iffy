@@ -6,16 +6,16 @@ import (
 	"os"
 )
 
-func xExampleKindData() {
+func ExampleKindData() {
 	str := func(s string) sql.NullString {
 		return sql.NullString{String: s, Valid: true}
 	}
 	kindsTemplate.Execute(os.Stdout, []Kind{
 		{Name: "things", Path: "", Spec: "The things.",
 			Props: []Prop{
-				{str("doe"), str("a deer"), str("A female deer.")},
-				{str("flightiness"), str("flightless"), str("An example aspect.")},
-				{Name: str("ray"), Value: str("5")},
+				{"doe", "a deer", str("A female deer.")},
+				{"flightiness", "flightless", str("An example aspect.")},
+				{Name: "ray", Value: "5"},
 			},
 			Nouns: []string{"something", "someone"}},
 	})
@@ -41,13 +41,14 @@ func xExampleKindData() {
 
 // FIX -- this is still missing links to aspects
 func ExampleKindDB() {
+	const memory = "file:ExampleKindDB.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", memory); e != nil {
 		log.Fatalln("couldnt open db ", e)
 	} else if e := createTestData(db); e != nil {
 		log.Fatal("couldnt create test data ", e)
 	} else if e := CreateAtlas(db); e != nil {
 		log.Fatal("couldnt create atlas tables ", e)
-	} else if e := kinds(os.Stdout, db); e != nil {
+	} else if e := listOfKinds(os.Stdout, db); e != nil {
 		log.Fatal("couldnt process kinds ", e)
 	}
 
@@ -90,7 +91,7 @@ func ExampleKindDB() {
 	// </dl>
 	//
 	// <h3>Nouns</h3>
-	// 	<a href="/atlas/nouns#dune buggy">Dune Buggy</a>.
+	// 	<a href="/atlas/nouns#dune-buggy">Dune Buggy</a>.
 }
 
 const memory = "file:test.db?cache=shared&mode=memory"

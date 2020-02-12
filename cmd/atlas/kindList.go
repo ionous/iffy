@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"log"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -23,14 +23,15 @@ type Kind struct {
 }
 
 type Prop struct {
-	Name, Value, Spec sql.NullString
+	Name, Value string
+	Spec        sql.NullString
 }
 
 func (k Kind) Parent() string {
 	return strings.Split(k.Path, ",")[0]
 }
 
-func kinds(w io.Writer, db *sql.DB) (err error) {
+func listOfKinds(w io.Writer, db *sql.DB) (err error) {
 	// originally used a channel, but the template iterates over the same elements multiple times
 	var kind Kind
 	var kinds []Kind
@@ -69,27 +70,30 @@ func kinds(w io.Writer, db *sql.DB) (err error) {
 		}, &kind.Name, &kind.Path, &kind.Spec); e != nil {
 		err = e
 	} else {
-		log.Println("listing", len(kinds), "kinds")
 		err = kindsTemplate.Execute(w, kinds)
 	}
 	return
 }
 
+var spaces = regexp.MustCompile(`\s+`)
 var funcMap = template.FuncMap{
 	"Title": strings.Title,
+	"Safe": func(s string) string {
+		return spaces.ReplaceAllString(s, "-")
+	},
 }
 
 var kindsTemplate = template.Must(template.New("kinds").Funcs(funcMap).Parse(`
 <h1>Kinds</h1>
 {{range $i, $_ := .}}
 	{{- if $i}}, {{end -}}
-	<a href="#{{- .Name -}}">{{.Name|Title}}</a>{{/**/ -}}
+	<a href="#{{ .Name|Safe }}">{{.Name|Title}}</a>{{/**/ -}}
 {{- end}}.
 {{ range . }}
 <h2 id="{{.Name}}">{{.Name|Title}}</h2>
 <span>Parent kind: {{/**/ -}}	
 {{ if .Parent -}}
-	<a href="#{{.Parent}}">{{.Parent|Title}}</a>.
+	<a href="#{{.Parent|Safe}}">{{.Parent|Title}}</a>.
 {{- else -}}
 	none.
 {{- end -}}
@@ -101,7 +105,7 @@ var kindsTemplate = template.Must(template.New("kinds").Funcs(funcMap).Parse(`
 <h3>Properties</h3>{{- /**/}}
 <dl>{{- /**/ -}}
 {{- range .Props }}
-	<dt>{{.Name.String|Title}}: <span>{{.Value.String}}.</span></dt>
+	<dt>{{.Name|Title}}: <span>{{.Value}}.</span></dt>
 	{{- if .Spec.Valid -}}
 	<dd>{{ .Spec.String }}</dd>
 	{{- end -}}
@@ -115,7 +119,7 @@ var kindsTemplate = template.Must(template.New("kinds").Funcs(funcMap).Parse(`
 <h3>Nouns</h3>{{- /**/ -}}
 {{ range $i, $_ := .Nouns }}
 	{{- if $i }},{{ end }}
-	<a href="/atlas/nouns#{{.}}">{{.|Title}}</a>
+	<a href="/atlas/nouns#{{.|Safe}}">{{.|Title}}</a>
 	{{- end -}}.
 {{end -}}
 {{- end -}}

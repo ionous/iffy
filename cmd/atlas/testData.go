@@ -7,7 +7,6 @@ import (
 )
 
 //go:generate templify -p main -o testData.gen.go testData.sql
-
 func createTestData(db *sql.DB) (err error) {
 	if e := tables.CreateModel(db); e != nil {
 		err = e

@@ -56,7 +56,7 @@ func Atlas(db *sql.DB) web.Resource {
 						case "kinds":
 							return &web.Wrapper{
 								Gets: func(w http.ResponseWriter) error {
-									return kinds(w, db)
+									return listOfKinds(w, db)
 								},
 							}
 						}
