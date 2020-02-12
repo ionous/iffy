@@ -9,7 +9,7 @@ import (
 )
 
 func ExamplePairData() {
-	pairTemplate.Execute(os.Stdout, Pairing{
+	templates.ExecuteTemplate(os.Stdout, "pairList", Pairing{
 		Rel: &Relation{
 			Name:        "authorship",
 			Kind:        "people",
@@ -18,27 +18,28 @@ func ExamplePairData() {
 			Spec:        "Writers and their works.",
 		},
 		Pairs: []*Pair{
-			{First: "N.K. Jemisin", Second: "The City We Became"},
-			{First: "N.K. Jemisin", Second: "How Long 'Til Black Future Month"},
-			{First: "Ted Chiang", Second: "Exhalation"},
+			{First: "n. k. jemisin", Second: "the city we became"},
+			{First: "n. k. jemisin", Second: "how long til black future month"},
+			{First: "rudy rucker", Second: "realware"},
 		},
 	})
 
 	// Output:
 	// <h1>Authorship</h1>
-	// Relates people to many books. Writers and their works.
+	// Relates <a href="/atlas/kinds#people">People</a> to many <a href="/atlas/kinds#books">Books</a>.
+	//  Writers and their works.
 	// <table>
 	// <tr>
-	//   <td>N.K. Jemisin</td>
-	//   <td>The City We Became</td>
+	//   <td><a href="/atlas/nouns#n.-k.-jemisin">N. K. Jemisin</a></td>
+	//   <td><a href="/atlas/nouns#the-city-we-became">The City We Became</a></td>
 	// </tr>
 	// <tr>
 	//   <td></td>
-	//   <td>How Long 'Til Black Future Month</td>
+	//   <td><a href="/atlas/nouns#how-long-til-black-future-month">How Long Til Black Future Month</a></td>
 	// </tr>
 	// <tr>
-	//   <td>Ted Chiang</td>
-	//   <td>Exhalation</td>
+	//   <td><a href="/atlas/nouns#rudy-rucker">Rudy Rucker</a></td>
+	//   <td><a href="/atlas/nouns#realware">Realware</a></td>
 	// </tr>
 	// </table>
 }
@@ -57,15 +58,15 @@ func ExamplePairDB() {
 
 	// Output:
 	// <h1>Containing</h1>
-	// Relates vehicles to many people.
+	// Relates <a href="/atlas/kinds#vehicles">Vehicles</a> to many <a href="/atlas/kinds#people">People</a>.
 	// <table>
 	// <tr>
-	//   <td>Dune Buggy</td>
-	//   <td>Picard</td>
+	//   <td><a href="/atlas/nouns#dune-buggy">Dune Buggy</a></td>
+	//   <td><a href="/atlas/nouns#picard">Picard</a></td>
 	// </tr>
 	// <tr>
-	//   <td>Enterprise</td>
-	//   <td>Riker</td>
+	//   <td><a href="/atlas/nouns#enterprise">Enterprise</a></td>
+	//   <td><a href="/atlas/nouns#riker">Riker</a></td>
 	// </tr>
 	// </table>
 }

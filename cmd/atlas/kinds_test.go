@@ -10,7 +10,7 @@ func ExampleKindData() {
 	str := func(s string) sql.NullString {
 		return sql.NullString{String: s, Valid: true}
 	}
-	kindsTemplate.Execute(os.Stdout, []Kind{
+	templates.ExecuteTemplate(os.Stdout, "kindList", []Kind{
 		{Name: "things", Path: "", Spec: "The things.",
 			Props: []Prop{
 				{"doe", "a deer", str("A female deer.")},
@@ -57,11 +57,11 @@ func ExampleKindDB() {
 	// <a href="#things">Things</a>, <a href="#people">People</a>, <a href="#vehicles">Vehicles</a>, <a href="#cars">Cars</a>.
 	//
 	// <h2 id="things">Things</h2>
-	// <span>Parent kind: none.</span> <span class="spec">From inform: 'Represents anything interactive in the world. People, pieces of scenery, furniture, doors and mislaid umbrellas might all be examples, and so might more surprising things like the sound of birdsong or a shaft of sunlight.'</span>
+	// <span>Parent kind: none.</span> <span class="spec">From inform: &#39;Represents anything interactive in the world. People, pieces of scenery, furniture, doors and mislaid umbrellas might all be examples, and so might more surprising things like the sound of birdsong or a shaft of sunlight.&#39;</span>
 	//
 	// <h3>Properties</h3>
 	// <dl>
-	// 	<dt>Brief: <span>"".</span></dt><dd></dd>
+	// 	<dt>Brief: <span>&#34;&#34;.</span></dt><dd></dd>
 	// </dl>
 	// <h2 id="people">People</h2>
 	// <span>Parent kind: <a href="#things">Things</a>.</span> <span class="spec"></span>

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"text/template"
 
 	"github.com/ionous/iffy/dbutil"
 )
@@ -49,7 +48,7 @@ func listOfPairs(w io.Writer, relation string, db *sql.DB) (err error) {
 		err = e
 	} else {
 		pin := rel
-		err = pairTemplate.Execute(w, &Pairing{
+		err = templates.ExecuteTemplate(w, "pairList", &Pairing{
 			Rel:   &pin,
 			Pairs: pairs,
 		})
@@ -57,15 +56,29 @@ func listOfPairs(w io.Writer, relation string, db *sql.DB) (err error) {
 	return
 }
 
-var pairTemplate = template.Must(template.New("pairs").Funcs(funcMap).Parse(`
+func init() {
+	registerTemplate("relHeader", `Relates
+	{{- if HasPrefix .Cardinality "any_" }} many
+	{{- end -}}
+{{- "" }} <a href="/atlas/kinds#{{.Kind|Safe}}">{{.Kind|Title}}</a> to
+	{{- if HasSuffix .Cardinality "_any" }} many
+	{{- end -}} 
+{{- "" }} <a href="/atlas/kinds#{{.OtherKind|Safe}}">{{.OtherKind|Title}}</a>.
+	{{- if .Spec }}
+{{ "" }} {{ .Spec }}
+	{{- end -}}
+`)
+
+	registerTemplate("pairList", `
 <h1>{{.Rel.Name|Title}}</h1>
-{{ .Rel.Text }}.{{ if .Rel.Spec }} {{ .Rel.Spec }}{{ end }}
+{{ template "relHeader" .Rel }}
 <table>
 	{{- range $i, $el := .Pairs }}
 <tr>
-  <td>{{ if changing $i "First" $.Pairs }}{{.First|Title}}{{end}}</td>
-  <td>{{ if changing $i "Second" $.Pairs }}{{.Second|Title}}{{end}}</td>
+  <td>{{ if changing $i "First" $.Pairs }}<a href="/atlas/nouns#{{.First|Safe}}">{{.First|Title}}</a>{{end}}</td>
+  <td>{{ if changing $i "Second" $.Pairs }}<a href="/atlas/nouns#{{.Second|Safe}}">{{.Second|Title}}</a>{{end}}</td>
 </tr>
 	{{- end }}
 </table>
-`))
+`)
+}

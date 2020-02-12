@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 
@@ -63,7 +62,7 @@ func Atlas(db *sql.DB) web.Resource {
 						return
 					},
 					Gets: func(w http.ResponseWriter) error {
-						return links.Execute(w, []struct{ Link, Text string }{
+						return templates.ExecuteTemplate(w, "links", []struct{ Link, Text string }{
 							{"/atlas/kinds/", "kinds"},
 							{"/atlas/nouns/", "nouns"},
 						})
@@ -74,14 +73,6 @@ func Atlas(db *sql.DB) web.Resource {
 		},
 	}
 }
-
-var links = template.Must(template.New("links").Parse(`
-<ul>
-{{range .}}
-<li><a href="{{.Link}}">{{.Text}}</a></li>
-{{end}}
-</ul>
-`))
 
 func Empty(name string) web.Resource {
 	return &web.Wrapper{

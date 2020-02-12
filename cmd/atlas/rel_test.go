@@ -9,7 +9,7 @@ import (
 )
 
 func ExampleRelData() {
-	relTemplate.Execute(os.Stdout, []Relation{
+	templates.ExecuteTemplate(os.Stdout, "relList", []Relation{
 		{"containing", "containers", tables.ONE_TO_MANY, "things", "Containers contain stuff."},
 		{"driving", "people", tables.ONE_TO_ONE, "cars", "No backseat drivers please."},
 	})

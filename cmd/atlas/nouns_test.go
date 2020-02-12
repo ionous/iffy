@@ -7,7 +7,7 @@ import (
 )
 
 func ExampleNounData() {
-	nounTemplate.Execute(os.Stdout, []Noun{
+	templates.ExecuteTemplate(os.Stdout, "nounList", []Noun{
 		{Name: "pants", Kind: "clothes", Spec: "An important start to every day, the putting on of.",
 			Props: []Prop{
 				// possibly links back to the declaring kind?

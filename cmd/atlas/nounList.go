@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"text/template"
 
 	"github.com/ionous/iffy/dbutil"
 )
@@ -65,12 +64,13 @@ func listOfNouns(w io.Writer, db *sql.DB) (err error) {
 		}, &name, &kind, &spec); e != nil {
 		err = e
 	} else {
-		err = nounTemplate.Execute(w, nouns)
+		err = templates.ExecuteTemplate(w, "nounList", nouns)
 	}
 	return
 }
 
-var nounTemplate = template.Must(template.New("nouns").Funcs(funcMap).Parse(`
+func init() {
+	registerTemplate("nounList", `
 <h1>Nouns</h1>
 	{{- range $i, $_ := . -}}
 {{- if $i -}},{{ end }}
@@ -109,4 +109,5 @@ none.
 			{{- end -}}.
 		{{- end -}}
 	{{- end -}}
-`))
+`)
+}

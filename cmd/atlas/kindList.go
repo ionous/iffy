@@ -4,10 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"reflect"
-	"regexp"
 	"strings"
-	"text/template"
 
 	"github.com/ionous/iffy/dbutil"
 )
@@ -71,32 +68,13 @@ func listOfKinds(w io.Writer, db *sql.DB) (err error) {
 		}, &kind.Name, &kind.Path, &kind.Spec); e != nil {
 		err = e
 	} else {
-		err = kindsTemplate.Execute(w, kinds)
+		err = templates.ExecuteTemplate(w, "kindList", kinds)
 	}
 	return
 }
 
-var spaces = regexp.MustCompile(`\s+`)
-var funcMap = template.FuncMap{
-	"Title": strings.Title,
-	"Safe": func(s string) string {
-		return spaces.ReplaceAllString(s, "-")
-	},
-	// return true if the struct field in els before idx differs from the one at idx
-	"changing": func(idx int, field string, els reflect.Value) (ret bool) {
-		if idx == 0 {
-			ret = true
-		} else {
-			curr, prev := els.Index(idx), els.Index(idx-1)
-			c := curr.Elem().FieldByName(field).Interface()
-			p := prev.Elem().FieldByName(field).Interface()
-			ret = c != p
-		}
-		return
-	},
-}
-
-var kindsTemplate = template.Must(template.New("kinds").Funcs(funcMap).Parse(`
+func init() {
+	registerTemplate("kindList", `
 <h1>Kinds</h1>
 {{range $i, $_ := .}}
 	{{- if $i}}, {{end -}}
@@ -104,7 +82,7 @@ var kindsTemplate = template.Must(template.New("kinds").Funcs(funcMap).Parse(`
 {{- end}}.
 {{ range . }}
 <h2 id="{{.Name}}">{{.Name|Title}}</h2>
-<span>Parent kind: {{/**/ -}}	
+<span>Parent kind: {{/**/ -}}  
 {{ if .Parent -}}
 	<a href="#{{.Parent|Safe}}">{{.Parent|Title}}</a>.
 {{- else -}}
@@ -136,4 +114,5 @@ var kindsTemplate = template.Must(template.New("kinds").Funcs(funcMap).Parse(`
 	{{- end -}}.
 {{end -}}
 {{- end -}}
-`))
+`)
+}

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"io"
 	"strings"
-	"text/template"
 
 	"github.com/ionous/iffy/dbutil"
 )
@@ -27,7 +26,7 @@ func listOfRelations(w io.Writer, db *sql.DB) (err error) {
 		}, &rel.Name, &rel.Kind, &rel.Cardinality, &rel.OtherKind, &rel.Spec); e != nil {
 		err = e
 	} else {
-		err = relTemplate.Execute(w, rels)
+		err = templates.ExecuteTemplate(w, "relList", rels)
 	}
 	return
 }
@@ -52,7 +51,8 @@ func (r *Relation) Text() string {
 	return strings.Join(els, " ")
 }
 
-var relTemplate = template.Must(template.New("rels").Funcs(funcMap).Parse(`
+func init() {
+	registerTemplate("relList", `
 <h1>Relations</h1>
 <dl>
 	{{- range $i, $_ := . }}
@@ -60,4 +60,5 @@ var relTemplate = template.Must(template.New("rels").Funcs(funcMap).Parse(`
    <dd>{{.Text}}. {{.Spec}}</dd>
 	{{- end }}
 </dl>
-`))
+`)
+}
