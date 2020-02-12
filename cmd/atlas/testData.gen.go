@@ -59,6 +59,8 @@ func testDataTemplate() string {
 		"insert into mdl_spec(type, name, spec) values\n" +
 		"\t(\"kind\",  \"things\", \"From inform: 'Represents anything interactive in the world. People, pieces of scenery, furniture, doors and mislaid umbrellas might all be examples, and so might more surprising things like the sound of birdsong or a shaft of sunlight.'\"),\n" +
 		"\t(\"aspect\", \"flightiness\", \"The flight worthiness of vehicles, an example of an aspect with several traits.\"),\n" +
+		"\t(\"trait\", \"glide worthy\", \"Better at landing than taking off.\"),\n" +
+		"\t(\"relation\", \"containing\", \"The outside of insides.\"),\n" +
 		"\t(\"field\", \"cars.num wheels\", \"Not all cars are created equal, or even even.\");\n" +
 		"\n" +
 		""

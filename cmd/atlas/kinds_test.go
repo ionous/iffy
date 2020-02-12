@@ -39,7 +39,6 @@ func ExampleKindData() {
 	// 	<a href="/atlas/nouns#someone">Someone</a>.
 }
 
-// FIX -- this is still missing links to aspects
 func ExampleKindDB() {
 	const memory = "file:ExampleKindDB.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", memory); e != nil {

@@ -19,10 +19,11 @@ func listOfNouns(w io.Writer, db *sql.DB) (err error) {
 	var nouns []Noun
 	var name, kind, spec string
 	if e := dbutil.QueryAll(db, `
-		select noun, kind, coalesce(spec, '')
+		select noun, kind, coalesce((
+			select spec from mdl_spec 
+			where type='noun' and name=noun
+			limit 1), '')
 		from mdl_noun
-		left join mdl_spec
-			on (type='noun' and name=noun)
 		order by noun`,
 		func() (err error) {
 			var prop, value, rel string

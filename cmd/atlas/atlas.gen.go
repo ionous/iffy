@@ -11,7 +11,7 @@ package main
 func atlasTemplate() string {
 	var tmpl = "/* any default values defined for the kind;\n" +
 		" null spec indicates the field isnt declared in this kind */\n" +
-		"create view\n" +
+		"create temp view\n" +
 		"atlas_fields as\n" +
 		"select kind, field, value, null as spec\n" +
 		"\tfrom mdl_default md \n" +

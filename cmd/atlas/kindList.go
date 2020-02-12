@@ -34,10 +34,11 @@ func listOfKinds(w io.Writer, db *sql.DB) (err error) {
 	var kind Kind
 	var kinds []Kind
 	if e := dbutil.QueryAll(db, `
-		select kind, path, coalesce(spec, '')
+		select kind, path, coalesce((
+			select spec from mdl_spec 
+			where type='kind' and name=kind
+			limit 1), '')
 		from mdl_kind
-		left join mdl_spec 
-			on (type='kind' and name=kind)
 		order by path, kind`,
 		func() (err error) {
 			var prop Prop
