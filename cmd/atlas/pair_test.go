@@ -4,43 +4,46 @@ import (
 	"database/sql"
 	"log"
 	"os"
+
+	"github.com/ionous/iffy/tables"
 )
 
-func ExampleKindData() {
-	str := func(s string) sql.NullString {
-		return sql.NullString{String: s, Valid: true}
-	}
-	kindsTemplate.Execute(os.Stdout, []Kind{
-		{Name: "things", Path: "", Spec: "The things.",
-			Props: []Prop{
-				{"doe", "a deer", str("A female deer.")},
-				{"flightiness", "flightless", str("An example aspect.")},
-				{Name: "ray", Value: "5"},
-			},
-			Nouns: []string{"something", "someone"}},
+func ExamplePairData() {
+	pairTemplate.Execute(os.Stdout, Pairing{
+		Rel: &Relation{
+			Name:        "authorship",
+			Kind:        "people",
+			Cardinality: tables.ONE_TO_MANY,
+			OtherKind:   "books",
+			Spec:        "Writers and their works.",
+		},
+		Pairs: []*Pair{
+			{First: "N.K. Jemisin", Second: "The City We Became"},
+			{First: "N.K. Jemisin", Second: "How Long 'Til Black Future Month"},
+			{First: "Ted Chiang", Second: "Exhalation"},
+		},
 	})
 
 	// Output:
-	// <h1>Kinds</h1>
-	// <a href="#things">Things</a>.
-	//
-	// <h2 id="things">Things</h2>
-	// <span>Parent kind: none.</span> <span class="spec">The things.</span>
-	//
-	// <h3>Properties</h3>
-	// <dl>
-	// 	<dt>Doe: <span>a deer.</span></dt><dd>A female deer.</dd>
-	// 	<dt>Flightiness: <span>flightless.</span></dt><dd>An example aspect.</dd>
-	// 	<dt>Ray: <span>5.</span></dt>
-	// </dl>
-	//
-	// <h3>Nouns</h3>
-	// 	<a href="/atlas/nouns#something">Something</a>,
-	// 	<a href="/atlas/nouns#someone">Someone</a>.
+	// <h1>Authorship</h1>
+	// Relates people to many books. Writers and their works.
+	// <table>
+	// <tr>
+	//   <td>N.K. Jemisin</td>
+	//   <td>The City We Became</td>
+	// </tr>
+	// <tr>
+	//   <td></td>
+	//   <td>How Long 'Til Black Future Month</td>
+	// </tr>
+	// <tr>
+	//   <td>Ted Chiang</td>
+	//   <td>Exhalation</td>
+	// </tr>
+	// </table>
 }
 
-// FIX -- this is still missing links to aspects
-func ExampleKindDB() {
+func xExamplePairDB() {
 	const memory = "file:ExampleKindDB.db?cache=shared&mode=memory"
 	if db, e := sql.Open("sqlite3", memory); e != nil {
 		log.Fatalln("couldnt open db ", e)

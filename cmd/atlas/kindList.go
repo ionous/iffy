@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"reflect"
 	"regexp"
 	"strings"
 	"text/template"
@@ -80,6 +81,17 @@ var funcMap = template.FuncMap{
 	"Title": strings.Title,
 	"Safe": func(s string) string {
 		return spaces.ReplaceAllString(s, "-")
+	},
+	"changing": func(i int, key string, els reflect.Value) (ret bool) {
+		if i == 0 {
+			ret = true
+		} else {
+			curr, prev := els.Index(i), els.Index(i-1)
+			c := curr.Elem().FieldByName(key).Interface()
+			p := prev.Elem().FieldByName(key).Interface()
+			ret = c != p
+		}
+		return
 	},
 }
 
