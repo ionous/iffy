@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
 
@@ -26,12 +27,12 @@ func TestDefaultFieldAssigment(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeFields(t.modeler, []kfp{
-			{"K", "d", ephemera.PRIM_DIGI},
-			{"K", "t", ephemera.PRIM_TEXT},
-			{"K", "t2", ephemera.PRIM_TEXT},
-			{"L", "x", ephemera.PRIM_TEXT},
-			{"D", "x", ephemera.PRIM_TEXT},
-			{"C", "c", ephemera.PRIM_TEXT},
+			{"K", "d", tables.PRIM_DIGI},
+			{"K", "t", tables.PRIM_TEXT},
+			{"K", "t2", tables.PRIM_TEXT},
+			{"L", "x", tables.PRIM_TEXT},
+			{"D", "x", tables.PRIM_TEXT},
+			{"C", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addDefaults(t.rec, []triplet{
@@ -242,8 +243,8 @@ func matchDefaults(db *sql.DB, want []triplet) (err error) {
 // write ephemera describing some initial values
 func addDefaults(rec *ephemera.Recorder, defaults []triplet) (err error) {
 	for _, el := range defaults {
-		namedKind := rec.Named(ephemera.NAMED_KIND, el.target, "test")
-		namedField := rec.Named(ephemera.NAMED_PROPERTY, el.prop, "test")
+		namedKind := rec.Named(tables.NAMED_KIND, el.target, "test")
+		namedField := rec.Named(tables.NAMED_PROPERTY, el.prop, "test")
 		rec.NewDefault(namedKind, namedField, el.value)
 	}
 	return
@@ -260,11 +261,11 @@ func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemb
 		}); e != nil {
 			err = e
 		} else if e := fakeFields(t.modeler, []kfp{
-			{"K", "d", ephemera.PRIM_DIGI},
-			{"K", "t", ephemera.PRIM_TEXT},
-			{"K", "A", ephemera.PRIM_ASPECT},
-			{"L", "B", ephemera.PRIM_ASPECT},
-			{"N", "B", ephemera.PRIM_ASPECT},
+			{"K", "d", tables.PRIM_DIGI},
+			{"K", "t", tables.PRIM_TEXT},
+			{"K", "A", tables.PRIM_ASPECT},
+			{"L", "B", tables.PRIM_ASPECT},
+			{"N", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			err = e
 		} else if e := fakeTraits(t.modeler, []pair{

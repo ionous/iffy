@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 )
 
 // TestMissingKinds to verify the kinds mentioned in parent-child ephemera exist.
@@ -22,8 +22,8 @@ func TestMissingKinds(t *testing.T) {
 			"P", "R",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			parent := rec.Named(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.NewKind(kid, parent)
 		}
 		// add the kinds
@@ -62,18 +62,18 @@ func TestMissingAspects(t *testing.T) {
 		defer t.Close()
 		db, rec := t.db, t.rec
 		//
-		parent := rec.Named(ephemera.NAMED_KIND, "K", "container")
+		parent := rec.Named(tables.NAMED_KIND, "K", "container")
 		for i, aspect := range []string{
 			// known, unknown
 			"A", "F",
 			"C", "D",
 			"E", "B",
 		} {
-			a := rec.Named(ephemera.NAMED_ASPECT, aspect, "test")
+			a := rec.Named(tables.NAMED_ASPECT, aspect, "test")
 			if known := i&1 == 0; known {
 				rec.NewAspect(a)
 			}
-			rec.NewPrimitive(ephemera.PRIM_ASPECT, parent, a)
+			rec.NewPrimitive(tables.PRIM_ASPECT, parent, a)
 		}
 		expected := []string{"B", "D", "F"}
 		if missing, e := undeclaredAspects(db); e != nil {
@@ -133,11 +133,11 @@ func xTestMissingUnknownField(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeFields(t.modeler, []kfp{
-			{"T", "d", ephemera.PRIM_DIGI},
-			{"T", "t", ephemera.PRIM_TEXT},
-			{"T", "t2", ephemera.PRIM_TEXT},
-			{"P", "p", ephemera.PRIM_TEXT},
-			{"C", "c", ephemera.PRIM_TEXT},
+			{"T", "d", tables.PRIM_DIGI},
+			{"T", "t", tables.PRIM_TEXT},
+			{"T", "t2", tables.PRIM_TEXT},
+			{"P", "p", tables.PRIM_TEXT},
+			{"C", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addDefaults(t.rec, []triplet{

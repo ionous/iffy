@@ -7,7 +7,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
-	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 )
 
 func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
@@ -88,7 +88,7 @@ func (store *valueStore) writeInitialFields(m *Modeler) (err error) {
 // out types are currently: int, float32, or string.
 func convertField(fieldType string, value interface{}) (ret interface{}, err error) {
 	switch v := reflect.ValueOf(value); fieldType {
-	case ephemera.PRIM_DIGI:
+	case tables.PRIM_DIGI:
 		switch k := v.Kind(); k {
 		case reflect.Float64:
 			ret = float32(v.Float())
@@ -97,7 +97,7 @@ func convertField(fieldType string, value interface{}) (ret interface{}, err err
 		default:
 			err = errutil.New("can't convert from", k, "to int")
 		}
-	case ephemera.PRIM_TEXT:
+	case tables.PRIM_TEXT:
 		switch k := v.Kind(); k {
 		case reflect.String:
 			ret = v.String()

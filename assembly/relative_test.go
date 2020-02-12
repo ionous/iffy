@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
 
@@ -199,10 +200,10 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			err = e
 		} else if e := fakeRelations(t.modeler, [][4]string{
 			// relation, kind, cardinality, otherKind
-			{"Rel1", "K", ephemera.ONE_TO_ONE, "K"},
-			{"Rel1x", "K", ephemera.ONE_TO_MANY, "K"},
-			{"Relx1", "K", ephemera.MANY_TO_ONE, "K"},
-			{"Relxx", "K", ephemera.MANY_TO_MANY, "K"},
+			{"Rel1", "K", tables.ONE_TO_ONE, "K"},
+			{"Rel1x", "K", tables.ONE_TO_MANY, "K"},
+			{"Relx1", "K", tables.MANY_TO_ONE, "K"},
+			{"Relxx", "K", tables.MANY_TO_MANY, "K"},
 		}); e != nil {
 			err = e
 		} else if e := fakeVerbs(t.modeler, [][2]string{
@@ -239,9 +240,9 @@ func addRelatives(rec *ephemera.Recorder, els [][3]string) (err error) {
 
 // add ephemera
 func addRelative(rec *ephemera.Recorder, noun, stem, otherNoun string) (err error) {
-	name := rec.Named(ephemera.NAMED_NOUN, noun, "test")
-	namedStem := rec.Named(ephemera.NAMED_VERB, stem, "test")
-	otherName := rec.Named(ephemera.NAMED_NOUN, otherNoun, "test")
+	name := rec.Named(tables.NAMED_NOUN, noun, "test")
+	namedStem := rec.Named(tables.NAMED_VERB, stem, "test")
+	otherName := rec.Named(tables.NAMED_NOUN, otherNoun, "test")
 	rec.NewRelative(name, namedStem, otherName)
 	return
 }

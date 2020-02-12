@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
 
@@ -44,9 +45,9 @@ type dbrel struct {
 // ( from which assembly will determine relations )
 func addRelations(rec *ephemera.Recorder, els []dbrel) (err error) {
 	for _, el := range els {
-		r := rec.Named(ephemera.NAMED_RELATION, el.r, "test")
-		k := rec.Named(ephemera.NAMED_KIND, el.k, "test")
-		q := rec.Named(ephemera.NAMED_KIND, el.q, "test")
+		r := rec.Named(tables.NAMED_RELATION, el.r, "test")
+		k := rec.Named(tables.NAMED_KIND, el.k, "test")
+		q := rec.Named(tables.NAMED_KIND, el.q, "test")
 		c := el.c
 		rec.NewRelation(r, k, q, c)
 	}
@@ -87,18 +88,18 @@ func TestRelationCreation(t *testing.T) {
 			t.Fatal(e)
 		} else if e := addRelations(
 			rec, []dbrel{
-				{"R", "P", "Q", ephemera.ONE_TO_MANY},
-				{"G", "P", "Q", ephemera.MANY_TO_ONE},
-				{"G", "P", "Q", ephemera.MANY_TO_ONE},
-				{"H", "P", "P", ephemera.ONE_TO_MANY},
+				{"R", "P", "Q", tables.ONE_TO_MANY},
+				{"G", "P", "Q", tables.MANY_TO_ONE},
+				{"G", "P", "Q", tables.MANY_TO_ONE},
+				{"H", "P", "P", tables.ONE_TO_MANY},
 			}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineRelations(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelations(db, []dbrel{
-			{"G", "P", "Q", ephemera.MANY_TO_ONE},
-			{"H", "P", "P", ephemera.ONE_TO_MANY},
-			{"R", "P", "Q", ephemera.ONE_TO_MANY},
+			{"G", "P", "Q", tables.MANY_TO_ONE},
+			{"H", "P", "P", tables.ONE_TO_MANY},
+			{"R", "P", "Q", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -118,8 +119,8 @@ func TestRelationCardinality(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addRelations(rec, []dbrel{
-			{"R", "P", "P", ephemera.ONE_TO_MANY},
-			{"R", "P", "P", ephemera.MANY_TO_ONE},
+			{"R", "P", "P", tables.ONE_TO_MANY},
+			{"R", "P", "P", tables.MANY_TO_ONE},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineRelations(m, db); e == nil {
@@ -146,15 +147,15 @@ func TestRelationLcaSuccess(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addRelations(rec, []dbrel{
-			{"R", "P", "T", ephemera.ONE_TO_MANY},
-			{"R", "D", "T", ephemera.ONE_TO_MANY},
-			{"R", "C", "T", ephemera.ONE_TO_MANY},
+			{"R", "P", "T", tables.ONE_TO_MANY},
+			{"R", "D", "T", tables.ONE_TO_MANY},
+			{"R", "C", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineRelations(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelations(db, []dbrel{
-			{"R", "P", "T", ephemera.ONE_TO_MANY},
+			{"R", "P", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -177,8 +178,8 @@ func TestRelationLcaFailure(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addRelations(rec, []dbrel{
-			{"R", "D", "T", ephemera.ONE_TO_MANY},
-			{"R", "C", "T", ephemera.ONE_TO_MANY},
+			{"R", "D", "T", tables.ONE_TO_MANY},
+			{"R", "C", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineRelations(m, db); e == nil {

@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
 
@@ -24,8 +25,8 @@ func TestInitialFieldAssignment(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeFields(t.modeler, []kfp{
-			{"K", "t", ephemera.PRIM_TEXT},
-			{"L", "d", ephemera.PRIM_DIGI},
+			{"K", "t", tables.PRIM_TEXT},
+			{"L", "d", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeNouns(t.modeler, []pair{
@@ -69,8 +70,8 @@ func TestInitialTraitAssignment(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeFields(t.modeler, []kfp{
-			{"K", "A", ephemera.PRIM_ASPECT},
-			{"L", "B", ephemera.PRIM_ASPECT},
+			{"K", "A", tables.PRIM_ASPECT},
+			{"L", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := fakeTraits(t.modeler, []pair{
@@ -131,8 +132,8 @@ func matchValues(db *sql.DB, want []triplet) (err error) {
 // prop: k, f, v
 func addValues(rec *ephemera.Recorder, vals []triplet) (err error) {
 	for _, v := range vals {
-		noun := rec.Named(ephemera.NAMED_NOUN, v.target, "test")
-		prop := rec.Named(ephemera.NAMED_PROPERTY, v.prop, "test")
+		noun := rec.Named(tables.NAMED_NOUN, v.target, "test")
+		prop := rec.Named(tables.NAMED_PROPERTY, v.prop, "test")
 		value := v.value
 		rec.NewValue(noun, prop, value)
 	}

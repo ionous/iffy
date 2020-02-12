@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 )
 
 // TestAncestors verifies valid parent-child ephemera can generate a valid ancestry table.
@@ -28,8 +28,8 @@ func TestAncestors(t *testing.T) {
 			"M", "J",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			ancestor := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			ancestor := rec.Named(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.NewKind(kid, ancestor)
 		}
 		//
@@ -82,8 +82,8 @@ func TestAncestorCycle(t *testing.T) {
 			"T", "P",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			parent := rec.Named(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.NewKind(kid, parent)
 		}
 		//
@@ -113,8 +113,8 @@ func TestAncestorConflict(t *testing.T) {
 			"K", "Q",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.Named(ephemera.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			parent := rec.Named(ephemera.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.Named(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
+			parent := rec.Named(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
 			rec.NewKind(kid, parent)
 		}
 		//

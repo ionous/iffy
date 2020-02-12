@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
 
@@ -70,8 +71,8 @@ type modeledNoun struct {
 
 func addNouns(rec *ephemera.Recorder, els []pair) (err error) {
 	for _, el := range els {
-		n := rec.Named(ephemera.NAMED_NOUN, el.key, "test")
-		k := rec.Named(ephemera.NAMED_KIND, el.value, "test")
+		n := rec.Named(tables.NAMED_NOUN, el.key, "test")
+		k := rec.Named(tables.NAMED_KIND, el.value, "test")
 		rec.NewNoun(n, k)
 	}
 	return

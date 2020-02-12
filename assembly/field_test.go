@@ -10,13 +10,14 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 )
 
 // write some primitives
 func writeFields(rec *ephemera.Recorder, kfps []kfp) (err error) {
 	for _, p := range kfps {
-		kind := rec.Named(ephemera.NAMED_KIND, p.kind, "test")
-		field := rec.Named(ephemera.NAMED_FIELD, p.field, "test")
+		kind := rec.Named(tables.NAMED_KIND, p.kind, "test")
+		field := rec.Named(tables.NAMED_FIELD, p.field, "test")
 		rec.NewPrimitive(p.fieldType, kind, field)
 	}
 	return
@@ -25,7 +26,7 @@ func writeFields(rec *ephemera.Recorder, kfps []kfp) (err error) {
 // name some fields that arent otherwise referenced
 func writeMissing(rec *ephemera.Recorder, missing []string) (err error) {
 	for _, m := range missing {
-		rec.Named(ephemera.NAMED_FIELD, m, "test")
+		rec.Named(tables.NAMED_FIELD, m, "test")
 	}
 	return
 }
@@ -61,17 +62,17 @@ func TestFields(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := writeFields(t.rec, []kfp{
-			{"P", "a", ephemera.PRIM_TEXT},
-			{"Q", "b", ephemera.PRIM_TEXT},
-			{"T", "c", ephemera.PRIM_TEXT},
+			{"P", "a", tables.PRIM_TEXT},
+			{"Q", "b", tables.PRIM_TEXT},
+			{"T", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchProperties(t.db, []kfp{
-			{"P", "a", ephemera.PRIM_TEXT},
-			{"Q", "b", ephemera.PRIM_TEXT},
-			{"T", "c", ephemera.PRIM_TEXT},
+			{"P", "a", tables.PRIM_TEXT},
+			{"Q", "b", tables.PRIM_TEXT},
+			{"T", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -91,14 +92,14 @@ func TestFieldLca(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := writeFields(t.rec, []kfp{
-			{"P", "a", ephemera.PRIM_TEXT},
-			{"Q", "a", ephemera.PRIM_TEXT},
+			{"P", "a", tables.PRIM_TEXT},
+			{"Q", "a", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchProperties(t.db, []kfp{
-			{"T", "a", ephemera.PRIM_TEXT},
+			{"T", "a", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -117,8 +118,8 @@ func TestFieldTypeMismatch(t *testing.T) {
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := writeFields(t.rec, []kfp{
-			{"T", "a", ephemera.PRIM_TEXT},
-			{"T", "a", ephemera.PRIM_DIGI},
+			{"T", "a", tables.PRIM_TEXT},
+			{"T", "a", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineFields(t.modeler, t.db); e != nil {

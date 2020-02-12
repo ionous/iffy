@@ -7,7 +7,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
-	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 )
 
 // goal: build table of property, kind, type.
@@ -65,7 +65,7 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 			// we're at a new field, so write the old one.
 			if last.Field != curr.Field {
 				curr.updateHierarchy()
-				if curr.Type == ephemera.PRIM_ASPECT && sort.SearchStrings(missingAspects, curr.Field) >= 0 {
+				if curr.Type == tables.PRIM_ASPECT && sort.SearchStrings(missingAspects, curr.Field) >= 0 {
 					err = errutil.New("unknown aspect declared as field of kind", curr.Field, curr.Kind)
 				} else {
 					last.Flush(out)

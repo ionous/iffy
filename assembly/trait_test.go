@@ -10,16 +10,17 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 )
 
 func addTraits(rec *ephemera.Recorder, pairs []pair) (err error) {
 	for _, p := range pairs {
 		var aspect, trait ephemera.Named
 		if len(p.key) > 0 {
-			aspect = rec.Named(ephemera.NAMED_ASPECT, p.key, "key")
+			aspect = rec.Named(tables.NAMED_ASPECT, p.key, "key")
 		}
 		if len(p.value) > 0 {
-			trait = rec.Named(ephemera.NAMED_TRAIT, p.value, "value")
+			trait = rec.Named(tables.NAMED_TRAIT, p.value, "value")
 		}
 		if aspect.IsValid() && trait.IsValid() {
 			rec.NewAspect(aspect)
