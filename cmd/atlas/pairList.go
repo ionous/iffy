@@ -58,25 +58,25 @@ func listOfPairs(w io.Writer, relation string, db *sql.DB) (err error) {
 
 func init() {
 	registerTemplate("relHeader", `Relates
-	{{- if HasPrefix .Cardinality "any_" }} many
+	{{- if prefix .Cardinality "any_" }} many
 	{{- end -}}
-{{- "" }} <a href="/atlas/kinds#{{.Kind|Safe}}">{{.Kind|Title}}</a> to
-	{{- if HasSuffix .Cardinality "_any" }} many
+{{- "" }} <a href="/atlas/kinds#{{.Kind|safe}}">{{.Kind|title}}</a> to
+	{{- if suffix .Cardinality "_any" }} many
 	{{- end -}} 
-{{- "" }} <a href="/atlas/kinds#{{.OtherKind|Safe}}">{{.OtherKind|Title}}</a>.
+{{- "" }} <a href="/atlas/kinds#{{.OtherKind|safe}}">{{.OtherKind|title}}</a>.
 	{{- if .Spec }}
 {{ "" }} {{ .Spec }}
 	{{- end -}}
 `)
 
 	registerTemplate("pairList", `
-<h1>{{.Rel.Name|Title}}</h1>
+<h1>{{.Rel.Name|title}}</h1>
 {{ template "relHeader" .Rel }}
 <table>
 	{{- range $i, $el := .Pairs }}
 <tr>
-  <td>{{ if changing $i "First" $.Pairs }}<a href="/atlas/nouns#{{.First|Safe}}">{{.First|Title}}</a>{{end}}</td>
-  <td>{{ if changing $i "Second" $.Pairs }}<a href="/atlas/nouns#{{.Second|Safe}}">{{.Second|Title}}</a>{{end}}</td>
+  <td>{{ if changing $i "First" $.Pairs }}<a href="/atlas/nouns#{{.First|safe}}">{{.First|title}}</a>{{end}}</td>
+  <td>{{ if changing $i "Second" $.Pairs }}<a href="/atlas/nouns#{{.Second|safe}}">{{.Second|title}}</a>{{end}}</td>
 </tr>
 	{{- end }}
 </table>

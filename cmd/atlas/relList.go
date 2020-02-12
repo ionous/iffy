@@ -56,7 +56,7 @@ func init() {
 <h1>Relations</h1>
 <dl>
 	{{- range $i, $_ := . }}
-  <dt><a href="/atlas/relations/{{.Name|Safe}}">{{.Name|Title}}</a></dt>
+  <dt><a href="/atlas/relations/{{.Name|safe}}">{{.Name|title}}</a></dt>
    <dd>{{.Text}}. {{.Spec}}</dd>
 	{{- end }}
 </dl>

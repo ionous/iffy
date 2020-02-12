@@ -78,13 +78,13 @@ func init() {
 <h1>Kinds</h1>
 {{range $i, $_ := .}}
 	{{- if $i}}, {{end -}}
-	<a href="#{{ .Name|Safe }}">{{.Name|Title}}</a>{{/**/ -}}
+	<a href="#{{ .Name|safe }}">{{.Name|title}}</a>{{/**/ -}}
 {{- end}}.
 {{ range . }}
-<h2 id="{{.Name}}">{{.Name|Title}}</h2>
+<h2 id="{{.Name}}">{{.Name|title}}</h2>
 <span>Parent kind: {{/**/ -}}  
 {{ if .Parent -}}
-	<a href="#{{.Parent|Safe}}">{{.Parent|Title}}</a>.
+	<a href="#{{.Parent|safe}}">{{.Parent|title}}</a>.
 {{- else -}}
 	none.
 {{- end -}}
@@ -96,7 +96,7 @@ func init() {
 <h3>Properties</h3>{{- /**/}}
 <dl>{{- /**/ -}}
 {{- range .Props }}
-	<dt>{{.Name|Title}}: <span>{{.Value}}.</span></dt>
+	<dt>{{.Name|title}}: <span>{{.Value}}.</span></dt>
 	{{- if .Spec.Valid -}}
 	<dd>{{ .Spec.String }}</dd>
 	{{- end -}}
@@ -110,7 +110,7 @@ func init() {
 <h3>Nouns</h3>{{- /**/ -}}
 {{ range $i, $_ := .Nouns }}
 	{{- if $i }},{{ end }}
-	<a href="/atlas/nouns#{{.|Safe}}">{{.|Title}}</a>
+	<a href="/atlas/nouns#{{.|safe}}">{{.|title}}</a>
 	{{- end -}}.
 {{end -}}
 {{- end -}}

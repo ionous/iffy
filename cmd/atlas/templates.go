@@ -10,12 +10,12 @@ import (
 var spaces = regexp.MustCompile(`\s+`)
 
 var funcMap = template.FuncMap{
-	"Title": strings.Title,
-	"Safe": func(s string) string {
+	"title": strings.Title,
+	"safe": func(s string) string {
 		return spaces.ReplaceAllString(s, "-")
 	},
-	"HasPrefix": strings.HasPrefix,
-	"HasSuffix": strings.HasSuffix,
+	"prefix": strings.HasPrefix,
+	"suffix": strings.HasSuffix,
 	// return true if the struct field in els before idx differs from the one at idx
 	"changing": func(idx int, field string, els reflect.Value) (ret bool) {
 		if idx == 0 {

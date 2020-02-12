@@ -74,15 +74,15 @@ func init() {
 <h1>Nouns</h1>
 	{{- range $i, $_ := . -}}
 {{- if $i -}},{{ end }}
-  <a href="#{{.Name|Safe}}">{{.Name|Title}}</a>{{- "" -}}
+  <a href="#{{.Name|safe}}">{{.Name|title}}</a>{{- "" -}}
 	{{- end }}.
 	{{- range . -}}
 {{ "" }}
 
-<h2 id="{{.Name}}">{{.Name|Title}}</h2>
+<h2 id="{{.Name}}">{{.Name|title}}</h2>
 <span>Kind: {{"" -}}	
 		{{ if .Kind -}}
-<a href="/atlas/kinds#{{.Kind|Safe}}">{{.Kind|Title}}</a>.
+<a href="/atlas/kinds#{{.Kind|safe}}">{{.Kind|title}}</a>.
 		{{- else -}}
 none.
 		{{- end -}}
@@ -95,7 +95,7 @@ none.
 <ul>{{- "" -}}
 			{{- range $i, $_ := .Props -}}
 {{- if $i -}}{{ end }}
-  <li>{{.Name|Title}}: <span>{{.Value}}.</span></li>{{- "" -}}
+  <li>{{.Name|title}}: <span>{{.Value}}.</span></li>{{- "" -}}
 			{{ end }}
 </ul>{{- "" -}}
 			{{- end }}
@@ -105,7 +105,7 @@ none.
 <h3>Relations</h3>{{- "" -}}
 			{{- range $i, $_ := .Relations -}}
 				{{- if $i }},{{ end }}
-  <a href="/atlas/relations/{{.|Safe}}">{{.|Title}}</a>
+  <a href="/atlas/relations/{{.|safe}}">{{.|title}}</a>
 			{{- end -}}.
 		{{- end -}}
 	{{- end -}}
