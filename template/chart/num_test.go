@@ -74,7 +74,7 @@ func TestNum(t *testing.T) {
 			t.Log("output:", v)
 			// no error returned, then our values should match
 			if v != test.value {
-				t.Fatalf("wanted:", test.value)
+				t.Fatal("wanted:", test.value)
 				break
 			}
 		} else {
@@ -87,7 +87,7 @@ func TestNum(t *testing.T) {
 					t.Fatal("unexpected error", e)
 					break
 				} else if c.end != test.endpoint {
-					t.Fatalf("mismatched endpoint at %s", e)
+					t.Fatal("mismatched endpoint at", e)
 					break
 				}
 			}

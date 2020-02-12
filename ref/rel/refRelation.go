@@ -35,9 +35,9 @@ func (rel *RefRelation) GetTable() *index.Table {
 // Relate defines a connection between two objects.
 func (rel *RefRelation) Relate(src, dst rt.Object, onInsert index.OnInsert) (changed bool, err error) {
 	if s, ok := reduce(src); !ok {
-		err = errutil.Fmt("primary object is anonymous", src.Type())
+		err = errutil.New("primary object is anonymous", src.Type())
 	} else if d, ok := reduce(dst); !ok {
-		err = errutil.Fmt("secondary object is anonymous", dst.Type())
+		err = errutil.New("secondary object is anonymous", dst.Type())
 	} else {
 		changed, err = rel.Table.RelatePair(s, d, onInsert)
 	}
