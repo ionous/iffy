@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"io"
-	"strings"
 
 	"github.com/ionous/iffy/dbutil"
 )
@@ -35,29 +34,13 @@ type Relation struct {
 	Name, Kind, Cardinality, OtherKind, Spec string
 }
 
-func (r *Relation) Text() string {
-	// fmt.Relates [many] kinds to [many] kinds.
-	var els []string
-	els = append(els, "Relates")
-	if strings.HasPrefix(r.Cardinality, "any_") {
-		els = append(els, "many")
-	}
-	els = append(els, r.Kind)
-	els = append(els, "to")
-	if strings.HasSuffix(r.Cardinality, "_any") {
-		els = append(els, "many")
-	}
-	els = append(els, r.OtherKind)
-	return strings.Join(els, " ")
-}
-
 func init() {
 	registerTemplate("relList", `
 <h1>Relations</h1>
 <dl>
 	{{- range $i, $_ := . }}
   <dt><a href="/atlas/relations/{{.Name|safe}}">{{.Name|title}}</a></dt>
-   <dd>{{.Text}}. {{.Spec}}</dd>
+   <dd>{{ template "relHeader" . }}</dd>
 	{{- end }}
 </dl>
 `)

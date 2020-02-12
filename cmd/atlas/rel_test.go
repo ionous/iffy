@@ -18,9 +18,11 @@ func ExampleRelData() {
 	// <h1>Relations</h1>
 	// <dl>
 	//   <dt><a href="/atlas/relations/containing">Containing</a></dt>
-	//    <dd>Relates containers to many things. Containers contain stuff.</dd>
+	//    <dd>Relates <a href="/atlas/kinds#containers">Containers</a> to many <a href="/atlas/kinds#things">Things</a>.
+	//  Containers contain stuff.</dd>
 	//   <dt><a href="/atlas/relations/driving">Driving</a></dt>
-	//    <dd>Relates people to cars. No backseat drivers please.</dd>
+	//    <dd>Relates <a href="/atlas/kinds#people">People</a> to <a href="/atlas/kinds#cars">Cars</a>.
+	//  No backseat drivers please.</dd>
 	// </dl>
 }
 
@@ -40,6 +42,7 @@ func ExampleRelDB() {
 	// <h1>Relations</h1>
 	// <dl>
 	//   <dt><a href="/atlas/relations/containing">Containing</a></dt>
-	//    <dd>Relates vehicles to many people. </dd>
+	//    <dd>Relates <a href="/atlas/kinds#vehicles">Vehicles</a> to many <a href="/atlas/kinds#people">People</a>.
+	//  The outside of insides.</dd>
 	// </dl>
 }

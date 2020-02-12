@@ -4,10 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
-	"log"
 
 	"github.com/ionous/iffy/dbutil"
-	"github.com/kr/pretty"
 )
 
 func listOfAspects(w io.Writer, db *sql.DB) (err error) {
@@ -65,7 +63,6 @@ func listOfAspects(w io.Writer, db *sql.DB) (err error) {
 		}, &aname, &aspec); e != nil {
 		err = e
 	} else {
-		log.Println(pretty.Sprint(aspects))
 		err = templates.ExecuteTemplate(w, "aspectList", aspects)
 	}
 	return

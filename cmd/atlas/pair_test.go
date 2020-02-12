@@ -59,6 +59,7 @@ func ExamplePairDB() {
 	// Output:
 	// <h1>Containing</h1>
 	// Relates <a href="/atlas/kinds#vehicles">Vehicles</a> to many <a href="/atlas/kinds#people">People</a>.
+	//  The outside of insides.
 	// <table>
 	// <tr>
 	//   <td><a href="/atlas/nouns#dune-buggy">Dune Buggy</a></td>
