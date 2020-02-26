@@ -2,15 +2,16 @@ package express
 
 import (
 	"bytes"
+	"io"
+	r "reflect"
+	"testing"
+
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/spec/ops"
-	"io"
-	r "reflect"
-	"testing"
 )
 
 // TestOps to verify iffy statements.
@@ -63,8 +64,8 @@ func TestOps(t *testing.T) {
 		} else {
 			testEqual(t, &TestScore{
 				NumberEval: &core.Add{
-					A: &core.Num{Num: 5},
-					B: &core.Num{Num: 5},
+					A: &core.NumValue{Num: 5},
+					B: &core.NumValue{Num: 5},
 				},
 			}, root.NumberEval)
 		}

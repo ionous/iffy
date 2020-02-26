@@ -18,7 +18,7 @@ type Commands struct {
 	//
 	*AllTrue
 	*AnyTrue
-	*Bool
+	*BoolValue
 	*Buffer
 	*Choose
 	*ChooseNum
@@ -51,7 +51,7 @@ type Commands struct {
 	*Join
 	*Len
 	*ListUp
-	*Num
+	*NumValue
 	*Numbers
 	*Object
 	*Objects
@@ -77,7 +77,7 @@ type Commands struct {
 	*StoppingText
 	// *State
 	// *StopNow
-	*Text
+	*TextValue
 	*Texts
 	*TopObject
 	// *Using

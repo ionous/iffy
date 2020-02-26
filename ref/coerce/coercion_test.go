@@ -1,12 +1,13 @@
 package coerce_test
 
 import (
+	r "reflect"
+	"testing"
+
 	"github.com/ionous/iffy/ref/coerce"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/sliceOf"
 	"github.com/kr/pretty"
-	r "reflect"
-	"testing"
 )
 
 type TestText struct{ Text string }
@@ -18,7 +19,7 @@ func TestCoercion(t *testing.T) {
 	// . bool <=> bool, string<=>string, eval<=>eval.
 	// . NumericType <=> NumericType
 	// . string <=> enumerated value
-	t.Run("bool", func(t *testing.T) {
+	t.Run("bool value", func(t *testing.T) {
 		var dst, src bool
 		src = true
 		if e := coerce.Value(r.ValueOf(&dst).Elem(), r.ValueOf(src)); e != nil {

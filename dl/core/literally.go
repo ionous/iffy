@@ -30,14 +30,14 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 	switch srcType := src.Type(); {
 	case kindOf.Bool(srcType):
 		v := src.Bool()
-		ret = &Bool{v}
+		ret = &BoolValue{v}
 
 	case kindOf.Int(srcType):
 		v := src.Int()
 		if kindOf.NumListEval(dstType) {
 			ret = &Numbers{[]float64{float64(v)}}
 		} else {
-			ret = &Num{float64(v)}
+			ret = &NumValue{float64(v)}
 		}
 
 	case kindOf.Float(srcType):
@@ -45,7 +45,7 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 		if kindOf.NumListEval(dstType) {
 			ret = &Numbers{[]float64{v}}
 		} else {
-			ret = &Num{v}
+			ret = &NumValue{v}
 		}
 
 	// -- string for a command.
@@ -54,7 +54,7 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 		v := src.String()
 		switch {
 		case kindOf.TextEval(dstType):
-			ret = &Text{v}
+			ret = &TextValue{v}
 		case kindOf.ObjectEval(dstType):
 			if v == "@" {
 				ret = &TopObject{}

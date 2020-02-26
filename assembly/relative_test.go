@@ -13,7 +13,7 @@ import (
 )
 
 // todo: check the wrong nouns using a verb, using the wrong verb, etc.
-
+// todo: ensure that the same stem can be used in multiple relations ( so long as the kinds differ, ex. in room, vs in box. )
 func TestRelativeFormation(t *testing.T) {
 	if t, e := newRelativesTest(t, memory, [][3]string{
 		{"a", "v1", "a"},

@@ -9,7 +9,7 @@ type Stack struct {
 	Types
 }
 
-// NewStack creates a registry such that everything in this ill also go to parent,
+// NewStack creates a registry such that everything in this will also go to parent,
 // but not everything in parent will be available via this.
 func NewStack(parent TypeRegistry) *Stack {
 	return &Stack{

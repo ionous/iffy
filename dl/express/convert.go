@@ -192,14 +192,14 @@ func (c *converter) sequence(name string, args int) (err error) {
 func (c *converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
 	case types.Quote:
-		if cmd, e := c.cmds.EmplaceCommand(&core.Text{fn.Value()}); e != nil {
+		if cmd, e := c.cmds.EmplaceCommand(&core.TextValue{fn.Value()}); e != nil {
 			err = e
 		} else {
 			c.push(cmd)
 		}
 
 	case types.Number:
-		if cmd, e := c.cmds.EmplaceCommand(&core.Num{fn.Value()}); e != nil {
+		if cmd, e := c.cmds.EmplaceCommand(&core.NumValue{fn.Value()}); e != nil {
 			err = e
 		} else {
 			c.push(cmd)

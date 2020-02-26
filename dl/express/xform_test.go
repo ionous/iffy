@@ -1,6 +1,9 @@
 package express
 
 import (
+	r "reflect"
+	"testing"
+
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/unique"
@@ -8,8 +11,6 @@ import (
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/kr/pretty"
 	testify "github.com/stretchr/testify/assert"
-	r "reflect"
-	"testing"
 )
 
 // TestXform to verify the use of the command string converter.
@@ -45,7 +46,7 @@ func TestXform(t *testing.T) {
 	})
 	t.Run("num", func(t *testing.T) {
 		// FIX: its ugly that references can be rendered into anything.... but numbers cant.
-		num := "{13|printNum!}"
+		num := "{13|printNum?}"
 		testEqual(t, numRes(),
 			templatize(t, xf, num))
 	})
@@ -71,23 +72,23 @@ func templatize(t *testing.T, xform ops.Transform, s string) (ret interface{}) {
 }
 
 func numRes() rt.TextEval {
-	return &core.PrintNum{&core.Num{13}}
+	return &core.PrintNum{&core.NumValue{13}}
 }
 func shuffleRes() rt.TextEval {
 	return &core.CycleText{
 		Id: "$cycleCounter#1",
 		Values: []rt.TextEval{
-			&core.Text{"a"},
-			&core.Text{"b"},
-			&core.Text{"c"},
+			&core.TextValue{"a"},
+			&core.TextValue{"b"},
+			&core.TextValue{"c"},
 		},
 	}
 }
 func ifsRes() rt.TextEval {
 	return &core.ChooseText{
 		If:    &GetAt{Name: "x"},
-		True:  &core.Text{"a"},
-		False: &core.Text{"b"},
+		True:  &core.TextValue{"a"},
+		False: &core.TextValue{"b"},
 	}
 }
 func partsRes() rt.TextEval {
@@ -102,7 +103,7 @@ func twoPartRes() rt.TextEval {
 			Obj:  &GetAt{"status"},
 			Prop: "score",
 		},
-		&core.Text{"/"},
+		&core.TextValue{"/"},
 		&Render{
 			Obj:  &GetAt{"story"},
 			Prop: "turn",

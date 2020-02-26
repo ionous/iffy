@@ -1,9 +1,10 @@
 package kindOf
 
 import (
+	r "reflect"
+
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/rt"
-	r "reflect"
 )
 
 // Bool kind.
@@ -87,6 +88,7 @@ func ObjListEval(rtype r.Type) bool {
 // switches dont work well with .Interface().(type) when dst is nil.
 var object = r.TypeOf((*rt.Object)(nil)).Elem()
 var identId = r.TypeOf((*ident.Id)(nil)).Elem()
+var TypeExecute = r.TypeOf((*rt.Execute)(nil)).Elem()
 var TypeBoolEval = r.TypeOf((*rt.BoolEval)(nil)).Elem()
 var TypeNumEval = r.TypeOf((*rt.NumberEval)(nil)).Elem()
 var TypeTextEval = r.TypeOf((*rt.TextEval)(nil)).Elem()

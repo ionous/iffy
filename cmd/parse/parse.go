@@ -1,3 +1,5 @@
+// Package main for 'parse".
+// Generates ephemera from a story file.
 package main
 
 import (
@@ -345,7 +347,6 @@ var fns = map[string]Parse{
 	},
 }
 
-// 	flag.Parse() for processing command line args
 func main() {
 	// const memory = "file:test.db?cache=shared&mode=memory"
 	if user, e := user.Current(); e != nil {

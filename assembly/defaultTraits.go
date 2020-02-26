@@ -13,6 +13,8 @@ func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 	var curr, last traitInfo
 	if e := dbutil.QueryAll(db,
 		// normalize aspect and trait requests
+		// we have to do traits and aspects at the same time because
+		// they talk about the same pool of values, and could generate conflicts.
 		`select asm.kind, mt.aspect, mt.trait,
 			ifnull(nullif(asm.value, mt.trait), 1)
 		from asm_default as asm

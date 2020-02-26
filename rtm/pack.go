@@ -275,7 +275,7 @@ func toBoolEval(rtm *Rtm, dst, src r.Value) (err error) {
 	if e := coerce.Value(r.ValueOf(&v).Elem(), src); e != nil {
 		err = e
 	} else {
-		dst.Set(r.ValueOf(&core.Bool{v}))
+		dst.Set(r.ValueOf(&core.BoolValue{v}))
 	}
 	return
 }
@@ -284,7 +284,7 @@ func toNumberEval(rtm *Rtm, dst, src r.Value) (err error) {
 	if e := coerce.Value(r.ValueOf(&v).Elem(), src); e != nil {
 		err = e
 	} else {
-		dst.Set(r.ValueOf(&core.Num{v}))
+		dst.Set(r.ValueOf(&core.NumValue{v}))
 	}
 	return
 }
@@ -293,7 +293,7 @@ func toTextEval(rtm *Rtm, dst, src r.Value) (err error) {
 	if e := coerce.Value(r.ValueOf(&v).Elem(), src); e != nil {
 		err = e
 	} else {
-		dst.Set(r.ValueOf(&core.Text{v}))
+		dst.Set(r.ValueOf(&core.TextValue{v}))
 	}
 	return
 }

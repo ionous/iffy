@@ -7,7 +7,7 @@ import (
 
 type CompareType int
 
-// CompareTo generates comparision flags.
+// CompareTo generates comparison flags.
 // FIX: im not sure this is really needed anymore.
 type CompareTo interface {
 	Compare() CompareType

@@ -4,10 +4,10 @@ import (
 	"io"
 )
 
-// Sep implements io.Writer, treating every Write a new word.
+// Sep implements io.Writer, treating every Write as a new word.
 type Sep struct {
 	io.Writer
-	last  string // seperators
+	last  string // separators
 	queue string // last string sent to Write()
 	cnt   int    // number of non-zero writes to the underlying writer.
 }

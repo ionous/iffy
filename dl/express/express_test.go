@@ -25,7 +25,7 @@ func TestExpress(t *testing.T) {
 		str  string
 		want interface{}
 	}{
-		{"literal", "5", &core.Num{5}},
+		{"literal", "5", &core.NumValue{5}},
 		{"no dot", "A", &core.Object{"A"}},
 		{"little dot", "a.b.c",
 			&Render{
@@ -40,33 +40,33 @@ func TestExpress(t *testing.T) {
 		{"binary", "A.num * B.num", binary},
 		{"chain", "5 + A.num * B.num",
 			&core.Add{
-				&core.Num{5},
+				&core.NumValue{5},
 				binary,
 			},
 		},
 		{"text cmp", "'a' < 'b'",
 			&core.CompareText{
-				&core.Text{"a"},
+				&core.TextValue{"a"},
 				&core.LessThan{},
-				&core.Text{"b"},
+				&core.TextValue{"b"},
 			},
 		},
 		{"num cmp", "7 >= 8",
 			&core.CompareNum{
-				&core.Num{7},
+				&core.NumValue{7},
 				&core.GreaterOrEqual{},
-				&core.Num{8},
+				&core.NumValue{8},
 			},
 		},
 		{"math", "(5+6)*(1+2)",
 			&core.Mul{
 				&core.Add{
-					&core.Num{5},
-					&core.Num{6},
+					&core.NumValue{5},
+					&core.NumValue{6},
 				},
 				&core.Add{
-					&core.Num{1},
-					&core.Num{2},
+					&core.NumValue{1},
+					&core.NumValue{2},
 				},
 			},
 		},

@@ -1,12 +1,13 @@
 package core_test
 
 import (
+	"testing"
+
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/tests"
-	"testing"
 )
 
 func TestCore(t *testing.T) {
@@ -34,8 +35,8 @@ func TestCore(t *testing.T) {
 			var n tests.Bool
 			c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 			if c.Cmd("all true").Begin() {
-				c.Cmd("bool", a)
-				c.Cmd("bool", b)
+				c.Cmd("bool value", a)
+				c.Cmd("bool value", b)
 				c.End()
 			}
 			//
@@ -55,8 +56,8 @@ func TestCore(t *testing.T) {
 			var n tests.Bool
 			c := cmds.NewBuilder(&n, ops.Transformer(core.Transform))
 			if c.Cmd("any true").Begin() {
-				c.Cmd("bool", a)
-				c.Cmd("bool", b)
+				c.Cmd("bool value", a)
+				c.Cmd("bool value", b)
 				c.End()
 			}
 			//

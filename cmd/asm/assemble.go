@@ -1,3 +1,5 @@
+// Package main for 'asm'.
+// Generates a model database from ephemera data.
 package main
 
 import (
