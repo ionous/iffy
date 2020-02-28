@@ -1,5 +1,6 @@
 // Package main for 'spec".
 // Exports golang DSL for use in editing story files.
+// Currently, this only generates imperative commands.
 package main
 
 import (
@@ -28,6 +29,8 @@ func main() {
 	var all []dict
 	var slots []r.Type
 
+	groups := make(Groups)
+
 	// slots that commands can fit into
 	for _, slot := range assembly.Slots {
 		i := r.TypeOf(slot.Type).Elem()
@@ -40,7 +43,7 @@ func main() {
 			"desc": desc,
 			"uses": uses,
 		}
-		addGroup(out, slot.Group)
+		groups.addGroup(out, slot.Group)
 		addDesc(out, slot.Desc)
 		all = append(all, out)
 	}
@@ -64,7 +67,6 @@ func main() {
 		params := make(dict)
 
 		unique.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
-
 			prettyField := prettyName(f.Name)
 			key := nameOfAttr(f)
 
@@ -112,8 +114,16 @@ func main() {
 				"slots":  slotNames,
 			},
 		}
-		addGroup(out, run.Group)
+		groups.addGroup(out, run.Group)
 		addDesc(out, run.Desc)
+		all = append(all, out)
+	}
+
+	for groupName, _ := range groups {
+		out := dict{
+			"name": groupName,
+			"uses": "group",
+		}
 		all = append(all, out)
 	}
 
@@ -150,12 +160,18 @@ func updateTokens(phrase string, tokens []string) (ret []string) {
 	return
 }
 
-func addGroup(out dict, group string) {
+type Groups map[string]bool
+
+func (g *Groups) addGroup(out dict, group string) {
+	// even no commas results in one group;
+	// ideally, id think an empty string would be no groups.... but alas.
 	if len(group) > 0 {
 		if groups := strings.Split(group, ","); len(groups) > 0 {
+			for i, group := range groups {
+				(*g)[group] = true
+				groups[i] = strings.ToLower(group)
+			}
 			out["group"] = groups
-		} else {
-			out["group"] = group
 		}
 	}
 }
