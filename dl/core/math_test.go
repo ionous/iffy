@@ -1,13 +1,14 @@
 package core_test
 
 import (
+	"testing"
+
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ref/unique"
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec"
 	"github.com/ionous/iffy/spec/ops"
 	"github.com/ionous/iffy/tests"
-	"testing"
 )
 
 func TestMath(t *testing.T) {
@@ -37,42 +38,42 @@ func TestMath(t *testing.T) {
 	}
 	t.Run("Add", func(t *testing.T) {
 		if e := match(t, 11, func(c spec.Block) {
-			c.Cmd("add", 1, 10)
+			c.Cmd("sum of", 1, 10)
 		}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("Sub", func(t *testing.T) {
 		if e := match(t, -9, func(c spec.Block) {
-			c.Cmd("sub", 1, 10)
+			c.Cmd("diff of", 1, 10)
 		}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("Mul", func(t *testing.T) {
 		if e := match(t, 200, func(c spec.Block) {
-			c.Cmd("mul", 20, 10)
+			c.Cmd("product of", 20, 10)
 		}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("Div", func(t *testing.T) {
 		if e := match(t, 2, func(c spec.Block) {
-			c.Cmd("div", 20, 10)
+			c.Cmd("quotient of", 20, 10)
 		}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("Div By Zero", func(t *testing.T) {
 		if e := match(t, 200, func(c spec.Block) {
-			c.Cmd("div", 20, 10)
+			c.Cmd("quotient of", 20, 10)
 		}); e == nil {
 			t.Fatal("expected error")
 		}
 	})
 	t.Run("Mod", func(t *testing.T) {
 		if e := match(t, 1, func(c spec.Block) {
-			c.Cmd("mod", 3, 2)
+			c.Cmd("remainder of", 3, 2)
 		}); e != nil {
 			t.Fatal(e)
 		}

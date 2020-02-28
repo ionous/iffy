@@ -1,6 +1,8 @@
 package rules_test
 
 import (
+	"testing"
+
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/rules"
 	"github.com/ionous/iffy/ident"
@@ -9,7 +11,6 @@ import (
 	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/spec/ops"
 	testify "github.com/stretchr/testify/assert"
-	"testing"
 )
 
 // Factorial computes an integer multiplied by the factorial of the integer below it.
@@ -40,8 +41,8 @@ func TestFactorial(t *testing.T) {
 		c.End()
 	}
 	if c.Cmd("number rule", "factorial").Begin() {
-		if c.Param("decide").Cmd("mul", c.Cmd("get", "@", "num")).Begin() {
-			c.Cmd("determine", c.Cmd("factorial", c.Cmd("sub", c.Cmd("get", "@", "num"), 1)))
+		if c.Param("decide").Cmd("product of", c.Cmd("get", "@", "num")).Begin() {
+			c.Cmd("determine", c.Cmd("factorial", c.Cmd("diff of", c.Cmd("get", "@", "num"), 1)))
 			c.End()
 		}
 		c.End()

@@ -21,13 +21,13 @@ func (cmd Pair) Get(run rt.Runtime) (reta, retb float64, err error) {
 	return
 }
 
-type Add Pair
-type Sub Pair
-type Mul Pair
-type Div Pair
-type Mod Pair
+type SumOf Pair
+type DiffOf Pair
+type ProductOf Pair
+type QuotientOf Pair
+type RemainderOf Pair
 
-func (cmd *Add) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (cmd *SumOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := Pair(*cmd).Get(run); e != nil {
 		err = errutil.New("Add", e)
 	} else {
@@ -36,7 +36,7 @@ func (cmd *Add) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
-func (cmd *Sub) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (cmd *DiffOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := Pair(*cmd).Get(run); e != nil {
 		err = errutil.New("Sub", e)
 	} else {
@@ -45,7 +45,7 @@ func (cmd *Sub) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
-func (cmd *Mul) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (cmd *ProductOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := Pair(*cmd).Get(run); e != nil {
 		err = errutil.New("Mul", e)
 	} else {
@@ -54,7 +54,7 @@ func (cmd *Mul) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
-func (cmd *Div) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (cmd *QuotientOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := Pair(*cmd).Get(run); e != nil {
 		err = errutil.New("Div", e)
 	} else if math.Abs(b) <= 1e-5 {
@@ -65,7 +65,7 @@ func (cmd *Div) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
-func (cmd *Mod) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (cmd *RemainderOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := Pair(*cmd).Get(run); e != nil {
 		err = errutil.New("Mod", e)
 	} else {

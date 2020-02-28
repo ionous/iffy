@@ -13,11 +13,11 @@ import (
 
 func TestExpress(t *testing.T) {
 	// A.num
-	bigDot := &Render{&core.Object{"A"}, "num"}
+	bigDot := &Render{&core.ObjectName{"A"}, "num"}
 	// A.num * B.num
-	binary := &core.Mul{
+	binary := &core.ProductOf{
 		bigDot,
-		&Render{&core.Object{"B"}, "num"},
+		&Render{&core.ObjectName{"B"}, "num"},
 	}
 	//
 	tests := []struct {
@@ -26,7 +26,7 @@ func TestExpress(t *testing.T) {
 		want interface{}
 	}{
 		{"literal", "5", &core.NumValue{5}},
-		{"no dot", "A", &core.Object{"A"}},
+		{"no dot", "A", &core.ObjectName{"A"}},
 		{"little dot", "a.b.c",
 			&Render{
 				Obj: &Render{
@@ -39,7 +39,7 @@ func TestExpress(t *testing.T) {
 		{"big dot", "A.num", bigDot},
 		{"binary", "A.num * B.num", binary},
 		{"chain", "5 + A.num * B.num",
-			&core.Add{
+			&core.SumOf{
 				&core.NumValue{5},
 				binary,
 			},
@@ -59,12 +59,12 @@ func TestExpress(t *testing.T) {
 			},
 		},
 		{"math", "(5+6)*(1+2)",
-			&core.Mul{
-				&core.Add{
+			&core.ProductOf{
+				&core.SumOf{
 					&core.NumValue{5},
 					&core.NumValue{6},
 				},
-				&core.Add{
+				&core.SumOf{
 					&core.NumValue{1},
 					&core.NumValue{2},
 				},

@@ -63,7 +63,7 @@ func TestOps(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			testEqual(t, &TestScore{
-				NumberEval: &core.Add{
+				NumberEval: &core.SumOf{
 					A: &core.NumValue{Num: 5},
 					B: &core.NumValue{Num: 5},
 				},
@@ -82,7 +82,7 @@ func TestOps(t *testing.T) {
 			// FIX: since the numeval works above, why do we need render? why not just GetAt?
 			//
 			testEqual(t, &TestScore{&Render{
-				&core.Object{"Story"}, "score"},
+				&core.ObjectName{"Story"}, "score"},
 			}, root.NumberEval)
 		}
 	})
@@ -95,7 +95,7 @@ func TestOps(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			testEqual(t, &TestScore{&Render{
-				&core.Object{"Story"}, "score"},
+				&core.ObjectName{"Story"}, "score"},
 			}, root.NumberEval)
 		}
 	})
@@ -107,7 +107,7 @@ func TestOps(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			testEqual(t, &TestScore{&Render{
-				&core.Object{"Story"}, "score"},
+				&core.ObjectName{"Story"}, "score"},
 			}, root.NumberEval)
 		}
 	})

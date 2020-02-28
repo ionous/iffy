@@ -10,11 +10,11 @@ type Classes struct {
 }
 
 type Commands struct {
-	*Add
-	*Sub
-	*Mul
-	*Div
-	*Mod
+	*SumOf
+	*DiffOf
+	*ProductOf
+	*QuotientOf
+	*RemainderOf
 	//
 	*AllTrue
 	*AnyTrue
@@ -53,8 +53,8 @@ type Commands struct {
 	*ListUp
 	*NumValue
 	*Numbers
-	*Object
-	*Objects
+	*ObjectName
+	*ObjectNames
 	// *ObjListContains
 	// *ObjListIsEmpty
 	*PrintBracket

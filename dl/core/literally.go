@@ -59,13 +59,13 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 			if v == "@" {
 				ret = &TopObject{}
 			} else {
-				ret = &Object{v}
+				ret = &ObjectName{v}
 			}
 		case kindOf.TextListEval(dstType):
 			ret = &Texts{[]string{v}}
 
 		case kindOf.ObjListEval(dstType):
-			ret = &Objects{[]string{v}}
+			ret = &ObjectNames{[]string{v}}
 		}
 
 	case srcType.Kind() == r.Slice && kindOf.Float(srcType.Elem()):
@@ -78,7 +78,7 @@ func literally(src r.Value, dstType r.Type) (ret interface{}) {
 		case kindOf.TextListEval(dstType):
 			ret = &Texts{v}
 		case kindOf.ObjListEval(dstType):
-			ret = &Objects{v}
+			ret = &ObjectNames{v}
 		}
 	}
 	return

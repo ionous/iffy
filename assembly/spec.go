@@ -44,7 +44,7 @@ var Slots = []Slot{
 
 var Runs = []Run{
 	{
-		Type:   (*core.Add)(nil),
+		Type:   (*core.SumOf)(nil),
 		Group:  "math",
 		Desc:   "Add Numbers: Add two numbers.",
 		Phrase: "( $1 + $2 )",
@@ -144,7 +144,7 @@ var Runs = []Run{
 	// 	Desc:  "runs a pattern",
 	// },
 	{
-		Type:   (*core.Div)(nil),
+		Type:   (*core.QuotientOf)(nil),
 		Group:  "math",
 		Phrase: "( $1 / $2 )",
 		Desc:   "Divide Numbers: Divide one number by another.",
@@ -262,13 +262,13 @@ var Runs = []Run{
 	// 	Desc:  "prints the object prefixed by the appropriate definite article",
 	// },
 	{
-		Type:   (*core.Mod)(nil),
+		Type:   (*core.RemainderOf)(nil),
 		Group:  "math",
 		Phrase: "( $1 % $2 )",
 		Desc:   "Modulus Numbers: Divide one number by another, and return the remainder.",
 	},
 	{
-		Type:   (*core.Mul)(nil),
+		Type:   (*core.ProductOf)(nil),
 		Group:  "math",
 		Phrase: "( $1 * $2 )",
 		Desc:   "Multiply Numbers: Multiply two numbers.",
@@ -285,12 +285,12 @@ var Runs = []Run{
 	},
 
 	{
-		Type:  (*core.Object)(nil),
+		Type:  (*core.ObjectName)(nil),
 		Group: "objects",
 		Desc:  "Named Object: Searches through the scope for a matching name.",
 	},
 	{
-		Type:  (*core.Objects)(nil),
+		Type:  (*core.ObjectNames)(nil),
 		Group: "objects",
 		Desc:  "Object List: Searches through the scope for matching names.",
 	},
@@ -357,7 +357,7 @@ var Runs = []Run{
 	},
 	{
 		Type:  (*core.Range)(nil),
-		Group: "Flow",
+		Group: "flow",
 		Desc:  "Range of Numbers: Generates a series of numbers.",
 	},
 	{
@@ -382,7 +382,7 @@ var Runs = []Run{
 	// FIX: any list
 	{
 		Type:  (*core.Reverse)(nil),
-		Group: "Objects",
+		Group: "objects",
 		Desc:  "Reverse Object List: returns the listed objects, last first.",
 	},
 
@@ -396,27 +396,27 @@ var Runs = []Run{
 	// FIX: set any; with type picked during assembly
 	{
 		Type:  (*core.SetBool)(nil),
-		Group: "object",
+		Group: "objects",
 		Desc:  "Set Bool: Sets the named property to the passed boolean value.",
 	},
 	{
 		Type:  (*core.SetNum)(nil),
-		Group: "object",
+		Group: "objects",
 		Desc:  "Set Number: sets the named property to the passed number.",
 	},
 	{
 		Type:  (*core.SetObj)(nil),
-		Group: "object",
+		Group: "objects",
 		Desc:  "Set Object: Sets the named property to the passed object ( reference. )",
 	},
 	{
 		Type:  (*core.SetState)(nil),
-		Group: "object",
+		Group: "objects",
 		Desc:  "Set State: Sets the object to the passed state.",
 	},
 	{
 		Type:  (*core.SetText)(nil),
-		Group: "object",
+		Group: "objects",
 		Desc:  "Set Text: Sets the named property to the passed string.",
 	},
 
@@ -431,7 +431,7 @@ var Runs = []Run{
 		Desc:  "Stopping Text: When called multiple times returns each of its inputs in turn, sticking to the last one.",
 	},
 	{
-		Type:   (*core.Sub)(nil),
+		Type:   (*core.DiffOf)(nil),
 		Group:  "math",
 		Phrase: "( $1 - $2 )",
 		Desc:   "Subtract Numbers: Subtract two numbers.",

@@ -302,7 +302,7 @@ func toObjEval(rtm *Rtm, dst, src r.Value) (err error) {
 	if e := rtm.pack(r.ValueOf(&v).Elem(), src); e != nil {
 		err = e
 	} else {
-		dst.Set(r.ValueOf(&core.Object{v.Name}))
+		dst.Set(r.ValueOf(&core.ObjectName{v.Name}))
 	}
 	return
 }

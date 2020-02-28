@@ -1,6 +1,9 @@
 package ops_test
 
 import (
+	r "reflect"
+	"testing"
+
 	"github.com/ionous/iffy/dl/core" // for interesting evals, including literals.
 	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/ref/obj"
@@ -12,8 +15,6 @@ import (
 	. "github.com/ionous/iffy/tests" // BaseClass
 	"github.com/ionous/sliceOf"
 	testify "github.com/stretchr/testify/assert"
-	r "reflect"
-	"testing"
 )
 
 func TestShadows(t *testing.T) {
@@ -33,9 +34,9 @@ func TestShadows(t *testing.T) {
 	c := cmds.NewBuilder(&root, ops.Transformer(ops.Transformer(core.Transform)))
 	// FIX: without the cmd -- it doesnt error.
 	// FIX: and what about using the same param twice?
-	c.Cmd("add", 1, 2)
+	c.Cmd("sum of", 1, 2)
 	if c.Cmd("BaseClass").Begin() {
-		c.Param("Num").Cmd("add", 1, 2)
+		c.Param("Num").Cmd("sum of", 1, 2)
 		c.Param("Text").Val("3")
 		c.Param("Nums").Val(sliceOf.Float(1, 2, 3))
 		c.Param("Strings").Val(sliceOf.String("1", "2", "3"))

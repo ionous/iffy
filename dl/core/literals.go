@@ -75,13 +75,13 @@ func (TopObject) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	return
 }
 
-// Object searches for objects in the world by name.
-type Object struct {
+// ObjectName searches for objects in the world by name.
+type ObjectName struct {
 	Name string
 }
 
 // GetObject searches through the scope for an object matching Name
-func (op *Object) GetObject(run rt.Runtime) (ret rt.Object, err error) {
+func (op *ObjectName) GetObject(run rt.Runtime) (ret rt.Object, err error) {
 	if obj, ok := run.GetObject(op.Name); !ok {
 		err = errutil.New("couldnt find object", op.Name)
 	} else {
@@ -108,11 +108,11 @@ func (l *Texts) GetTextStream(rt.Runtime) (rt.TextStream, error) {
 	return stream.NewTextStream(stream.FromList(l.Values)), nil
 }
 
-// Objects specifies multiple object names.
-type Objects struct {
+// ObjectNames specifies multiple object names.
+type ObjectNames struct {
 	Names []string
 }
 
-func (l *Objects) GetObjectStream(run rt.Runtime) (rt.ObjectStream, error) {
+func (l *ObjectNames) GetObjectStream(run rt.Runtime) (rt.ObjectStream, error) {
 	return stream.NewNameStream(run, l.Names), nil
 }

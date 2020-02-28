@@ -230,7 +230,7 @@ func groupTest(t *testing.T, match string, names []string, patternSpec ...func(s
 		var span printer.Span
 		run, e := rtm.New(classes).Objects(objects).Rules(rules).Writer(&span).Rtm()
 		if assert.NoError(e) {
-			prn := &PrintNondescriptObjects{&core.Objects{names}}
+			prn := &PrintNondescriptObjects{&core.ObjectNames{names}}
 			if e := prn.Execute(run); assert.NoError(e) {
 				if assert.Equal(match, span.String()) {
 					t.Log("matched:", match)

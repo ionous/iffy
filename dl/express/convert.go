@@ -212,7 +212,7 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 			// obj.a.b.c => Get{c Get{b Get{a GetAt{obj}}}}
 			var op rt.ObjectEval
 			if name := fields[0]; lang.IsCapitalized(name) {
-				op = &core.Object{name}
+				op = &core.ObjectName{name}
 			} else {
 				op = &GetAt{name}
 			}
@@ -261,15 +261,15 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 	case types.Operator:
 		switch fn {
 		case types.MUL:
-			err = c.binary(&core.Mul{})
+			err = c.binary(&core.ProductOf{})
 		case types.QUO:
-			err = c.binary(&core.Div{})
+			err = c.binary(&core.QuotientOf{})
 		case types.REM:
-			err = c.binary(&core.Mod{})
+			err = c.binary(&core.RemainderOf{})
 		case types.ADD:
-			err = c.binary(&core.Add{})
+			err = c.binary(&core.SumOf{})
 		case types.SUB:
-			err = c.binary(&core.Sub{})
+			err = c.binary(&core.DiffOf{})
 		case types.EQL:
 			err = c.compare(&core.EqualTo{})
 		case types.NEQ:
