@@ -26,6 +26,7 @@ import (
 // “num”, “txt”: might? be useful for typedefs or triggered with tags.
 //
 func main() {
+
 	var all []dict
 	var slots []r.Type
 
@@ -58,64 +59,23 @@ func main() {
 			panic(fmt.Sprintln("missing slot for type", t.Name()))
 		}
 		typeName := nameOfType(t)
-		prettyType := prettyName(t.Name())
-		// fix: uppercase $ parameters mixed with text
-		// could possibly get from tags on the original command registration.
-		// or could use blank text fields and join in-order
-		tokens := []string{prettyType}
-		// keyed by token
-		params := make(dict)
+		tokens, params := parse(t)
 
-		unique.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
-			prettyField := prettyName(f.Name)
-			key := nameOfAttr(f)
-
-			var typeString string
-			var repeats bool
-			switch kind := f.Type.Kind(); kind {
-			case r.Bool:
-				typeString = "bool"
-			case r.Float32, r.Float64, r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-				// some sort of type  hint? ex. possibly link to custom types
-				typeString = "number"
-
-			case r.Slice:
-				typeString = nameOfType(f.Type.Elem())
-				repeats = true
-			case r.Interface: // a reference to another type
-				typeString = nameOfType(f.Type)
-			case r.String:
-				typeString = "text"
-			default:
-
-				// Array, Map, Ptr, Struct
-				// Uint, Uint8, Uint16, Uint32, Uint64
-				panic(fmt.Sprintln("unhandled type", t.Name(), f.Name, kind.String()))
-			}
-			tokens = append(tokens, key)
-			m := dict{
-				"label": prettyField,
-				"type":  typeString,
-				// optional: tdb
-			}
-			if repeats {
-				m["repeats"] = true
-			}
-			params[key] = m
-			return
-		})
-
+		with := dict{
+			"slots": slotNames,
+		}
 		out := dict{
 			"name": typeName,
 			"uses": "run",
-			"with": dict{
-				"tokens": updateTokens(run.Phrase, tokens),
-				"params": params,
-				"slots":  slotNames,
-			},
+			"with": with,
+		}
+		if !addSpec(out, t) {
+			with["params"] = params
+			with["tokens"] = updateTokens(run.Phrase, tokens)
 		}
 		groups.addGroup(out, run.Group)
 		addDesc(out, run.Desc)
+
 		all = append(all, out)
 	}
 
@@ -134,6 +94,75 @@ func main() {
 		fmt.Print("const spec = ")
 		fmt.Println(string(b))
 	}
+}
+
+func addSpec(out dict, rtype r.Type) (ret bool) {
+	if spec := spec(rtype); len(spec) > 0 {
+		out["spec"] = spec
+		ret = true
+	}
+	return
+}
+
+func spec(rtype r.Type) (ret string) {
+	unique.WalkProperties(rtype,
+		func(f *r.StructField, path []int) (done bool) {
+			t := unique.Tag(f.Tag)
+			ret, done = t.Find("spec")
+			return
+		})
+	return
+}
+
+func parse(t r.Type) ([]string, dict) {
+	// fix: uppercase $ parameters mixed with text
+	// could possibly get from tags on the original command registration.
+	// or could use blank text fields and join in-order
+	prettyType := prettyName(t.Name())
+
+	tokens := []string{prettyType}
+	// keyed by token
+	params := make(dict)
+
+	unique.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
+		prettyField := prettyName(f.Name)
+		key := nameOfAttr(f)
+
+		var typeString string
+		var repeats bool
+		switch kind := f.Type.Kind(); kind {
+		case r.Bool:
+			typeString = "bool"
+		case r.Float32, r.Float64, r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
+			// some sort of type  hint? ex. possibly link to custom types
+			typeString = "number"
+
+		case r.Slice:
+			typeString = nameOfType(f.Type.Elem())
+			repeats = true
+		case r.Interface: // a reference to another type
+			typeString = nameOfType(f.Type)
+		case r.String:
+			typeString = "text"
+		default:
+
+			// Array, Map, Ptr, Struct
+			// Uint, Uint8, Uint16, Uint32, Uint64
+			panic(fmt.Sprintln("unhandled type", t.Name(), f.Name, kind.String()))
+		}
+		tokens = append(tokens, key)
+		m := dict{
+			"label": prettyField,
+			"type":  typeString,
+			// optional: tdb
+		}
+		if repeats {
+			m["repeats"] = true
+		}
+		params[key] = m
+		return
+	})
+	return tokens, params
 }
 
 var tokenPlaceholders = regexp.MustCompile(`^\$([0-9]+)$`)
@@ -198,7 +227,7 @@ func nameOfType(t r.Type) string {
 }
 
 func prettyName(n string) string {
-	return inflect.Humanize(n)
+	return strings.ToLower(inflect.Humanize(n))
 }
 
 func nameOfAttr(f *r.StructField) string {

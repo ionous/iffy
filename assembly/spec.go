@@ -17,6 +17,7 @@ type Run struct {
 	Group string      // display group(s)
 	Desc  string
 	//
+	Spec   string   // embedded pre-token string
 	Phrase string   // token string
 	Locals []string // FIX: names put into scope
 }

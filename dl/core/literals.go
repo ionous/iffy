@@ -1,10 +1,11 @@
 package core
 
 import (
+	"strconv"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/stream"
-	"strconv"
 )
 
 // BoolValue specifies a simple true/false value.
@@ -49,7 +50,7 @@ func (n *NumValue) String() string {
 
 // TextValue specifies a string value.
 type TextValue struct {
-	Text string
+	Text string `if:"spec:{text:lines|quote}"`
 }
 
 // GetText implements interface TextEval providing the dl with a text literal.
