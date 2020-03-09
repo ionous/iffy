@@ -1,0 +1,16 @@
+.mk-run-ctrl[data-tag="paragraph"]  {
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+.mk-slot-ctrl[data-tag="execute"]  {
+  display: list-item;
+}
+
+.mk-run-ctrl__item--repeats[data-tag="execute"]  {
+  display: block;
+  list-style: none;
+  margin-left: 2em;
+  padding-left: 1em;
+  border-left: 3px double rgba(239, 207, 173, 0.7); 
+}
