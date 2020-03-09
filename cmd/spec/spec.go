@@ -8,13 +8,14 @@ import (
 	"fmt"
 	r "reflect"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
-	"unicode"
 
 	"bitbucket.org/pkg/inflect"
 
-	"github.com/ionous/iffy/assembly"
+	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/ref/unique"
 )
 
@@ -27,65 +28,92 @@ import (
 //
 func main() {
 
-	var all []dict
+	var all []export.Dict
 	var slots []r.Type
 
 	groups := make(Groups)
 
 	// slots that commands can fit into
-	for _, slot := range assembly.Slots {
+	for slotName, slot := range export.Slots {
+		spec := getSpec(slot.Type)
 		i := r.TypeOf(slot.Type).Elem()
+		//
 		slots = append(slots, i)
-		name := nameOfType(i)
-		desc := prettyName(name)
-		uses := "slot"
-		out := dict{
-			"name": name,
-			"desc": desc,
-			"uses": uses,
+		if len(spec.Name) == 0 {
+			spec.Name = slotName
 		}
-		groups.addGroup(out, slot.Group)
-		addDesc(out, slot.Desc)
+		if len(spec.Desc) == 0 {
+			spec.Desc = export.Prettify(slotName)
+		}
+		if len(spec.Group) == 0 {
+			spec.Group = slot.Group
+		}
+		out := export.Dict{
+			"name": spec.Name,
+			"desc": spec.Desc,
+			"uses": "slot",
+		}
+		groups.addGroup(out, spec.Group)
+		addDesc(out, spec.Desc)
 		all = append(all, out)
 	}
 
-	for _, run := range assembly.Runs {
-		if run.Type == nil {
-			continue
-		}
+	for typeName, run := range export.Runs {
+		spec := getSpec(run.Type)
 		t := r.TypeOf(run.Type).Elem()
-		slotNames := slotsOf(t, slots)
+		//
+		slotNames := run.Slots
 		if len(slotNames) == 0 {
-			panic(fmt.Sprintln("missing slot for type", t.Name()))
+			slotNames = slotsOf(t, slots)
+			if len(slotNames) == 0 {
+				panic(fmt.Sprintln("missing slot for type", t.Name()))
+			}
 		}
-		typeName := nameOfType(t)
-		tokens, params := parse(t)
+		sort.Strings(slotNames)
+		if len(spec.Name) == 0 {
+			spec.Name = typeName
+		}
+		if len(spec.Desc) == 0 {
+			spec.Desc = run.Desc
+		}
+		if len(spec.Group) == 0 {
+			spec.Group = run.Group
+		}
 
-		with := dict{
+		with := export.Dict{
 			"slots": slotNames,
 		}
-		out := dict{
-			"name": typeName,
+		out := export.Dict{
+			"name": spec.Name,
 			"uses": "run",
 			"with": with,
 		}
-		if !addSpec(out, t) {
+		// missing spec, missing slots.
+		if len(spec.Spec) != 0 {
+			out["spec"] = spec.Spec
+		} else {
+			tokens, params := parse(t)
 			with["params"] = params
 			with["tokens"] = updateTokens(run.Phrase, tokens)
 		}
-		groups.addGroup(out, run.Group)
-		addDesc(out, run.Desc)
+		groups.addGroup(out, spec.Group)
+		addDesc(out, spec.Desc)
 
 		all = append(all, out)
 	}
 
 	for groupName, _ := range groups {
-		out := dict{
+		out := export.Dict{
 			"name": groupName,
 			"uses": "group",
 		}
 		all = append(all, out)
 	}
+
+	sort.Slice(all, func(i, j int) bool {
+		return all[i]["uses"].(string) > all[j]["uses"].(string) &&
+			all[i]["name"].(string) < all[j]["name"].(string)
+	})
 
 	if b, e := json.MarshalIndent(all, "", "  "); e != nil {
 		panic(b)
@@ -96,64 +124,33 @@ func main() {
 	}
 }
 
-func addSpec(out dict, rtype r.Type) (ret bool) {
-	if spec := spec(rtype); len(spec) > 0 {
-		out["spec"] = spec
-		ret = true
+func getSpec(ptrValue interface{}) (ret composer.Spec) {
+	if c, ok := ptrValue.(composer.SpecInterface); ok {
+		ret = c.Compose()
 	}
 	return
 }
 
-func spec(rtype r.Type) (ret string) {
-	unique.WalkProperties(rtype,
-		func(f *r.StructField, path []int) (done bool) {
-			t := unique.Tag(f.Tag)
-			ret, done = t.Find("spec")
-			return
-		})
-	return
-}
+var specType = r.TypeOf((*composer.Spec)(nil)).Elem()
 
-func parse(t r.Type) ([]string, dict) {
+func parse(t r.Type) ([]string, export.Dict) {
 	// fix: uppercase $ parameters mixed with text
 	// could possibly get from tags on the original command registration.
 	// or could use blank text fields and join in-order
-	prettyType := prettyName(t.Name())
+	prettyType := export.Prettify(t.Name())
 
 	tokens := []string{prettyType}
 	// keyed by token
-	params := make(dict)
+	params := make(export.Dict)
 
 	unique.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
-		prettyField := prettyName(f.Name)
-		key := nameOfAttr(f)
-
-		var typeString string
-		var repeats bool
-		switch kind := f.Type.Kind(); kind {
-		case r.Bool:
-			typeString = "bool"
-		case r.Float32, r.Float64, r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-			// some sort of type  hint? ex. possibly link to custom types
-			typeString = "number"
-
-		case r.Slice:
-			typeString = nameOfType(f.Type.Elem())
-			repeats = true
-		case r.Interface: // a reference to another type
-			typeString = nameOfType(f.Type)
-		case r.String:
-			typeString = "text"
-		default:
-
-			// Array, Map, Ptr, Struct
-			// Uint, Uint8, Uint16, Uint32, Uint64
-			panic(fmt.Sprintln("unhandled type", t.Name(), f.Name, kind.String()))
-		}
+		prettyField := export.Prettify(f.Name)
+		key := export.Tokenize(f)
+		typeName, repeats := nameOfType(f.Type)
 		tokens = append(tokens, key)
-		m := dict{
+		m := export.Dict{
 			"label": prettyField,
-			"type":  typeString,
+			"type":  typeName,
 			// optional: tdb
 		}
 		if repeats {
@@ -166,8 +163,6 @@ func parse(t r.Type) ([]string, dict) {
 }
 
 var tokenPlaceholders = regexp.MustCompile(`^\$([0-9]+)$`)
-
-type dict map[string]interface{}
 
 func updateTokens(phrase string, tokens []string) (ret []string) {
 	if len(phrase) == 0 {
@@ -191,7 +186,7 @@ func updateTokens(phrase string, tokens []string) (ret []string) {
 
 type Groups map[string]bool
 
-func (g *Groups) addGroup(out dict, group string) {
+func (g *Groups) addGroup(out export.Dict, group string) {
 	// even no commas results in one group;
 	// ideally, id think an empty string would be no groups.... but alas.
 	if len(group) > 0 {
@@ -200,12 +195,13 @@ func (g *Groups) addGroup(out dict, group string) {
 				(*g)[group] = true
 				groups[i] = strings.ToLower(group)
 			}
+			sort.Strings(groups)
 			out["group"] = groups
 		}
 	}
 }
 
-func addDesc(out dict, desc string) {
+func addDesc(out export.Dict, desc string) {
 	if len(desc) > 0 {
 		out["desc"] = desc
 	}
@@ -215,28 +211,56 @@ func slotsOf(slat r.Type, slots []r.Type) (ret []string) {
 	ptrType := r.PtrTo(slat)
 	for _, slot := range slots {
 		if ptrType.Implements(slot) {
-			n := nameOfType(slot)
-			ret = append(ret, n)
+			slotName := findTypeName(slot)
+			ret = append(ret, slotName)
 		}
 	}
 	return
 }
 
-func nameOfType(t r.Type) string {
-	return inflect.Underscore(t.Name())
+func nameOfType(t r.Type) (typeName string, repeats bool) {
+	switch kind := t.Kind(); kind {
+	case r.Bool:
+		typeName = "bool"
+	case r.Float32, r.Float64, r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
+		// some sort of type  hint? ex. possibly link to custom types
+		typeName = "number"
+	case r.Slice:
+		typeName, _ = nameOfType(t.Elem())
+		repeats = true
+	case r.Interface: // a reference to another type
+		typeName = findTypeName(t)
+	case r.String:
+		typeName = "text"
+	default:
+		// Array, Map, Ptr, Struct
+		// Uint, Uint8, Uint16, Uint32, Uint64
+		panic(fmt.Sprintln("unhandled type", t.Name(), kind.String()))
+	}
+	return
 }
 
-func prettyName(n string) string {
-	return strings.ToLower(inflect.Humanize(n))
-}
+var reverseLookup map[r.Type]string
 
-func nameOfAttr(f *r.StructField) string {
-	return "$" + strings.Map(func(c rune) (ret rune) {
-		if c == ' ' {
-			ret = '_'
-		} else {
-			ret = unicode.ToUpper(c)
+func findTypeName(t r.Type) (ret string) {
+	if len(reverseLookup) == 0 {
+		reverseLookup = make(map[r.Type]string)
+		for typeName, run := range export.Runs {
+			t := r.TypeOf(run.Type).Elem()
+			reverseLookup[t] = typeName
 		}
-		return
-	}, prettyName(f.Name))
+		for typeName, slot := range export.Slots {
+			t := r.TypeOf(slot.Type).Elem()
+			reverseLookup[t] = typeName
+		}
+	}
+
+	if n, ok := reverseLookup[t]; ok {
+		ret = n
+	} else {
+		n := inflect.Underscore(t.Name())
+		println("falling back to name", n)
+		ret = n
+	}
+	return
 }

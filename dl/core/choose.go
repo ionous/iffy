@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -9,6 +10,15 @@ type Choose struct {
 	If    rt.BoolEval
 	True  rt.ExecuteList
 	False rt.ExecuteList
+}
+
+func (*Choose) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "bool_value",
+		Spec:  "if {choose%if:bool_eval} then: {true*execute|ghost} else: {false*execute|ghost}",
+		Group: "literals",
+		Desc:  "Bool Value: specify an explicit true or false value.",
+	}
 }
 
 // Choose one of two number evaluations based on a boolean test.

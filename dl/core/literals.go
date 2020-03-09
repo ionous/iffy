@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/stream"
 )
@@ -11,6 +12,15 @@ import (
 // BoolValue specifies a simple true/false value.
 type BoolValue struct {
 	Bool bool
+}
+
+func (*BoolValue) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "bool_value",
+		Spec:  "{bool:bool_eval}",
+		Group: "literals",
+		Desc:  "Bool Value: specify an explicit true or false value.",
+	}
 }
 
 // GetBool implements BoolEval; providing the dl with a boolean literal.
@@ -50,7 +60,16 @@ func (n *NumValue) String() string {
 
 // TextValue specifies a string value.
 type TextValue struct {
-	Text string `if:"spec:{text:lines|quote}"`
+	Text string
+}
+
+func (*TextValue) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "text_value",
+		Spec:  "{text:lines|quote}",
+		Group: "literals",
+		Desc:  "Text Value: specify one or more lines of text.",
+	}
 }
 
 // GetText implements interface TextEval providing the dl with a text literal.

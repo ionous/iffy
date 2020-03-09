@@ -21,6 +21,11 @@ func Int(rtype r.Type) (ret bool) {
 	return
 }
 
+// Interface returns true if the passed type is an interface
+func Interface(rtype r.Type) bool {
+	return rtype.Kind() == r.Interface
+}
+
 // Float returns true if reflect.Value.Float() would succeed.
 func Float(rtype r.Type) (ret bool) {
 	switch rtype.Kind() {
@@ -30,7 +35,7 @@ func Float(rtype r.Type) (ret bool) {
 	return
 }
 
-// Number returns true if the passed kind is a float or int
+// Number returns true if the passed type is a float or int
 func Number(rtype r.Type) bool {
 	return Int(rtype) || Float(rtype)
 }
@@ -85,9 +90,15 @@ func ObjListEval(rtype r.Type) bool {
 	return rtype.Implements(TypeObjListEval)
 }
 
+func Execute(rtype r.Type) bool {
+	return rtype.Implements(TypeExecute)
+}
+
 // switches dont work well with .Interface().(type) when dst is nil.
 var object = r.TypeOf((*rt.Object)(nil)).Elem()
 var identId = r.TypeOf((*ident.Id)(nil)).Elem()
+
+var TypeString = r.TypeOf("")
 var TypeExecute = r.TypeOf((*rt.Execute)(nil)).Elem()
 var TypeBoolEval = r.TypeOf((*rt.BoolEval)(nil)).Elem()
 var TypeNumEval = r.TypeOf((*rt.NumberEval)(nil)).Elem()

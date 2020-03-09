@@ -2,11 +2,12 @@ package enum
 
 import (
 	"fmt"
-	"github.com/ionous/iffy/ref/unique"
-	"github.com/stretchr/testify/assert"
 	r "reflect"
 	"strings"
 	"testing"
+
+	"github.com/ionous/iffy/ref/unique"
+	"github.com/stretchr/testify/assert"
 )
 
 // TestEnumChoices verifies a stringerified enum generates good choices.

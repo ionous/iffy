@@ -1,8 +1,9 @@
 package enum
 
 import (
-	"github.com/ionous/iffy/ref/unique"
 	r "reflect"
+
+	"github.com/ionous/iffy/ref/unique"
 )
 
 // Register the passed table data into the global registry.
