@@ -16,6 +16,7 @@ import (
   "github.com/kr/pretty"
 )
 
+// read simple unit test story into memory as a golang struct
 func TestImportProg(t *testing.T) {
   var in export.Dict
   if e := json.Unmarshal([]byte(sayStory), &in); e != nil {
@@ -30,6 +31,7 @@ func TestImportProg(t *testing.T) {
   }
 }
 
+// read simple unit test story into sqlite, extract as a golang struct
 func TestProcessProg(t *testing.T) {
   const memory = "file:test.db?cache=shared&mode=memory"
   if db, e := sql.Open("sqlite3", memory); e != nil {
