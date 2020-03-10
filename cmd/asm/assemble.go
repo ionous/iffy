@@ -9,7 +9,6 @@ import (
 	"path"
 
 	"github.com/ionous/iffy/assembly"
-	"github.com/ionous/iffy/ephemera"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -29,8 +28,7 @@ func main() {
 		log.Fatalln("db open", e)
 	} else {
 		defer db.Close()
-		q := ephemera.NewDBQueue(db)
-		w := assembly.NewModeler(q)
+		w := assembly.NewModeler(db)
 		if e := assembly.DetermineAncestry(w, db, "things"); e != nil {
 			log.Fatalln(e)
 		} else if e := assembly.DetermineFields(w, db); e != nil {

@@ -49,6 +49,7 @@ func TestRelativeFormation(t *testing.T) {
 		{"a", "vx", "b"},
 	}); e != nil {
 		t.Fatal(e)
+		return
 	} else {
 		defer t.Close()
 		if e := DetermineRelatives(t.db); e != nil {
@@ -176,6 +177,7 @@ func TestOneToOneViolations(t *testing.T) {
 }
 
 func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *assemblyTest, err error) {
+	ret = &assemblyTest{T: t}
 	if t, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {

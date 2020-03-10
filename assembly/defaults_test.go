@@ -250,6 +250,7 @@ func addDefaults(rec *ephemera.Recorder, defaults []triplet) (err error) {
 }
 
 func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemblyTest, err error) {
+	ret = &assemblyTest{T: t}
 	if t, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {

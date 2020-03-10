@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/tables"
 )
 
 func TestImportStory(t *testing.T) {
@@ -16,14 +17,16 @@ func TestImportStory(t *testing.T) {
 		t.Fatal("db open", e)
 	} else {
 		defer db.Close()
+		if e := tables.CreateEphemera(db); e != nil {
+			t.Fatal("create ephemera", e)
+		}
 		var in reader.Map
 		if e := json.Unmarshal([]byte(debug.Blob), &in); e != nil {
 			t.Fatal("read json", e)
 		} else if ok := in.Expect(itemType, "story"); !ok {
 			t.Fatal("read story")
 		} else {
-			dbq := ephemera.NewDBQueue(db)
-			rec := ephemera.NewRecorder(t.Name(), dbq)
+			rec := ephemera.NewRecorder(t.Name(), db)
 			r := Parser{Recorder: rec,
 				table:      fns,
 				oneTime:    make(map[string]bool),

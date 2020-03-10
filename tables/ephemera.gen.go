@@ -23,7 +23,7 @@ func ephemeraTemplate() string {
 		"create table eph_trait( idNamedTrait int, idNamedAspect int, rank int );\n" +
 		"create table eph_value( idNamedNoun int, idNamedProp int, value blob );\n" +
 		"create table eph_verb( idNamedStem int, idNamedRelation int, verb text );\n" +
-		"create table eph_test( idNamedTest text, idProg int, expect text );\n" +
+		"create table eph_check( idNamedTest text, idProg int, expect text );\n" +
 		"create table eph_prog( idSource int, type text, prog blob );"
 	return tmpl
 }

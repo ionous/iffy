@@ -8,6 +8,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/tables"
 )
 
 func getPath(file string) (ret string, err error) {
@@ -22,6 +23,7 @@ func getPath(file string) (ret string, err error) {
 const memory = "file:test.db?cache=shared&mode=memory"
 
 func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
+	ret = &assemblyTest{T: t}
 	var source string
 	if len(path) > 0 {
 		source = path
@@ -34,14 +36,14 @@ func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 	if err == nil {
 		if db, e := sql.Open("sqlite3", source); e != nil {
 			err = e
+		} else if e := tables.CreateEphemera(db); e != nil {
+			err = e
 		} else {
-			dbq := ephemera.NewDBQueue(db)
-			rec := ephemera.NewRecorder(t.Name(), dbq)
+			rec := ephemera.NewRecorder(t.Name(), db)
 			mdl := NewModelerDB(db)
 			ret = &assemblyTest{
 				T:       t,
 				db:      db,
-				dbq:     dbq,
 				rec:     rec,
 				modeler: mdl,
 			}
@@ -53,7 +55,6 @@ func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 type assemblyTest struct {
 	*testing.T
 	db      *sql.DB
-	dbq     *ephemera.DbQueue
 	rec     *ephemera.Recorder
 	modeler *Modeler
 }

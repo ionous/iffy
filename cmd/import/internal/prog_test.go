@@ -50,7 +50,7 @@ func TestProcessProg(t *testing.T) {
         var testName string
         var progid int
         var expect string
-        if e := db.QueryRow("select * from eph_test").Scan(&testName, &progid, &expect); e != nil {
+        if e := db.QueryRow("select * from eph_check").Scan(&testName, &progid, &expect); e != nil {
           t.Fatal(e)
         } else {
           t.Log(testName, progid, expect)

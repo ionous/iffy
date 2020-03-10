@@ -33,7 +33,7 @@ type Parser struct {
 
 func NewParser(srcURI string, db *sql.DB, fnds map[string]Parse) *Parser {
 	registerGob()
-	rec := ephemera.NewRecorder(srcURI, ephemera.NewDBQueue(db))
+	rec := ephemera.NewRecorder(srcURI, db)
 	return &Parser{
 		Recorder:   rec,
 		table:      fns,

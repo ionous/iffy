@@ -5,121 +5,57 @@ import (
 	"strings"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 	"github.com/reiver/go-porterstemmer"
 )
 
 func NewModelerDB(db *sql.DB) *Modeler {
-	dbq := ephemera.NewDBQueue(db)
-	if e := tables.CreateAssembly(db); e != nil {
+	if e := tables.CreateModel(db); e != nil {
+		panic(e)
+	} else if e := tables.CreateAssembly(db); e != nil {
 		panic(e)
 	}
-	return NewModeler(dbq)
+	return NewModeler(db)
 }
 
 func cat(str ...string) string {
 	return strings.Join(str, " ")
 }
 
-func NewModeler(q *ephemera.DbQueue) *Modeler {
-	q.Prep("mdl_kind", []tables.Col{
-		{Name: "kind", Type: "text"},
-		{Name: "path", Type: "text"},
-		{Check: "primary key(kind)"},
-	})
-	q.Prep("mdl_aspect", []tables.Col{
-		{Name: "aspect", Type: "text"},
-		{Name: "trait", Type: "text"},
-		{Name: "rank", Type: "int"},
-		{Check: "primary key(aspect, trait)"},
-	})
-	q.Prep("mdl_rel", []tables.Col{
-		{Name: "relation", Type: "text"},
-		{Name: "kind", Type: "text"},        /* reference to mdl_kind */
-		{Name: "cardinality", Type: "text"}, /* one of MANY/ONE */
-		{Name: "otherKind", Type: "text"},   /* reference to mdl_kind */
-		{Check: "primary key(relation)"},
-	})
-	q.Prep("mdl_field", []tables.Col{
-		{Name: "kind", Type: "text"}, /* reference to mdl_kind */
-		{Name: "field", Type: "text"},
-		{Name: "type", Type: "text"}, /* one of PRIM_type */
-		{Check: "primary key(kind, field)"},
-	})
-	q.Prep("mdl_default", []tables.Col{
-		{Name: "kind", Type: "text"},  /* reference to mdl_kind */
-		{Name: "field", Type: "text"}, /* partial reference to mdl_field */
-		{Name: "value", Type: "blob"},
-	})
-	q.Prep("mdl_noun", []tables.Col{
-		{Name: "noun", Type: "text"},
-		{Name: "kind", Type: "text"}, /* reference to mdl_kind */
-		{Check: "primary key(noun)"},
-	})
-	// names are built from noun parts, and possibly from custom aliases.
-	// where rank 0 is a better match than rank 1
-	q.Prep("mdl_name", []tables.Col{
-		{Name: "noun", Type: "text"}, /* reference to mdl_noun */
-		{Name: "name", Type: "text"},
-		{Name: "rank", Type: "int"},
-	})
-	// insert without duplication of the relation, stem pair
-	q.PrepStatement("asm_verb",
-		`insert into asm_verb(relation, stem)
-				select ?1, ?2
-				where not exists (
-					select 1 from asm_verb v
-					where v.relation=?1 and v.stem=?2
-				)`, []tables.Col{
-			{Name: "relation", Type: "text"}, /* reference to mdl_rel */
-			{Name: "stem", Type: "text"},
-			{Check: "unique(stem)"},
-		})
-	q.Prep("mdl_start", []tables.Col{
-		{Name: "noun", Type: "text"},  /* reference to mdl_noun */
-		{Name: "field", Type: "text"}, /* partial reference to mdl_field */
-		{Name: "value", Type: "blob"},
-	})
-	q.Prep("mdl_pair", []tables.Col{
-		{Name: "noun", Type: "text"},      /* reference to mdl_noun */
-		{Name: "relation", Type: "text"},  /* reference to mdl_rel */
-		{Name: "otherNoun", Type: "text"}, /* reference to mdl_noun */
-	})
-	//
-	return &Modeler{q}
+func NewModeler(db *sql.DB) *Modeler {
+	return &Modeler{tables.NewCache(db)}
 }
 
 type Modeler struct {
-	q ephemera.Queue
+	cache *tables.Cache
 }
 
 // write kind and comma separated ancestors
 func (m *Modeler) WriteAncestor(kind, path string) (err error) {
-	_, e := m.q.Write("mdl_kind", kind, path)
+	_, e := m.cache.Exec(mdl_kind, kind, path)
 	return e
 }
 
 func (m *Modeler) WriteField(kind, field, fieldType string) error {
-	_, e := m.q.Write("mdl_field", kind, field, fieldType)
+	_, e := m.cache.Exec(mdl_field, kind, field, fieldType)
 	return e
 }
 
 // WriteDefault: if no specific value has been assigned to the an instance of the idModelField's kind,
 // the passed default value will be used for that instance's kind.
 func (m *Modeler) WriteDefault(kind, field string, value interface{}) error {
-	_, e := m.q.Write("mdl_default", kind, field, value)
+	_, e := m.cache.Exec(mdl_default, kind, field, value)
 	return e
 }
 
 func (m *Modeler) WriteNoun(noun, kind string) error {
-	_, e := m.q.Write("mdl_noun", noun, kind)
+	_, e := m.cache.Exec(mdl_noun, noun, kind)
 	return e
 }
 
 // WriteName for noun
 func (m *Modeler) WriteName(noun, name string, rank int) error {
-	_, e := m.q.Write("mdl_name", noun, name, rank)
+	_, e := m.cache.Exec(mdl_name, noun, name, rank)
 	return e
 }
 
@@ -144,23 +80,40 @@ func (m *Modeler) WriteNounWithNames(noun, kind string) (err error) {
 }
 
 func (m *Modeler) WriteRelation(relation, kind, cardinality, otherKind string) error {
-	_, e := m.q.Write("mdl_rel", relation, kind, cardinality, otherKind)
+	_, e := m.cache.Exec(mdl_rel, relation, kind, cardinality, otherKind)
 	return e
 }
 
 func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
-	_, e := m.q.Write("mdl_aspect", aspect, trait, rank)
+	_, e := m.cache.Exec(mdl_aspect, aspect, trait, rank)
 	return e
 }
 
 // WriteValue: store the initial value of an instance's field used at start of play.
 func (m *Modeler) WriteValue(noun, field string, value interface{}) error {
-	_, e := m.q.Write("mdl_start", noun, field, value)
+	_, e := m.cache.Exec(mdl_start, noun, field, value)
 	return e
 }
 
 func (m *Modeler) WriteVerb(relation, verb string) error {
+	const asm_verb = `insert into asm_verb(relation, stem)
+				select ?1, ?2
+				where not exists (
+					select 1 from asm_verb v
+					where v.relation=?1 and v.stem=?2
+				)`
 	stem := porterstemmer.StemString(verb)
-	_, e := m.q.Write("asm_verb", relation, stem)
+	_, e := m.cache.Exec(asm_verb, relation, stem)
 	return e
 }
+
+var mdl_spec = tables.Insert("mdl_spec", "type", "name", "spec")
+var mdl_aspect = tables.Insert("mdl_aspect", "aspect", "trait", "rank")
+var mdl_kind = tables.Insert("mdl_kind", "kind", "path")
+var mdl_field = tables.Insert("mdl_field", "kind", "field", "type")
+var mdl_default = tables.Insert("mdl_default", "kind", "field", "value")
+var mdl_rel = tables.Insert("mdl_rel", "relation", "kind", "cardinality", "otherKind")
+var mdl_noun = tables.Insert("mdl_noun", "noun", "kind")
+var mdl_name = tables.Insert("mdl_name", "noun", "name", "rank")
+var mdl_pair = tables.Insert("mdl_pair", "noun", "relation", "otherNoun")
+var mdl_start = tables.Insert("mdl_start", "noun", "field", "value")

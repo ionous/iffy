@@ -15,7 +15,7 @@ import (
 // while ensuring the same stem cannot be used in multiple relations.
 func TestVerbMismatches(t *testing.T) {
 	if t, e := newAssemblyTest(t, memory); e != nil {
-		t.Fatal(e)
+		t.Fatal("error creating test", e)
 	} else {
 		defer t.Close()
 		m := t.modeler
