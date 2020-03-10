@@ -1,49 +1,98 @@
 package internal
 
 import (
+  "bytes"
+  "database/sql"
+  "encoding/gob"
   "encoding/json"
   "testing"
 
   "github.com/ionous/iffy/dl/check"
   "github.com/ionous/iffy/dl/core"
+  "github.com/ionous/iffy/ephemera/reader"
   "github.com/ionous/iffy/export"
   "github.com/ionous/iffy/rt"
+  "github.com/ionous/iffy/tables"
   "github.com/kr/pretty"
 )
 
-func TestImport(t *testing.T) {
+func TestImportProg(t *testing.T) {
   var in export.Dict
   if e := json.Unmarshal([]byte(sayStory), &in); e != nil {
     t.Fatal(e)
   } else {
     var prog check.Test
-    if e := Import(&prog, in, export.Runs); e != nil {
+    if e := ImportProg(&prog, in, export.Runs); e != nil {
       t.Fatal(e)
+    } else if diff := pretty.Diff(sayTest, prog); len(diff) > 0 {
+      t.Fatal(diff)
+    }
+  }
+}
+
+func TestProcessProg(t *testing.T) {
+  const memory = "file:test.db?cache=shared&mode=memory"
+  if db, e := sql.Open("sqlite3", memory); e != nil {
+    t.Fatal("db open", e)
+  } else if e := tables.CreateEphemera(db); e != nil {
+    t.Fatal("create eph", e)
+  } else {
+    defer db.Close()
+    var in reader.Map
+    if e := json.Unmarshal([]byte(sayStory), &in); e != nil {
+      t.Fatal("read json", e)
     } else {
-      want := check.Test{TestName: "hello, goodbye",
-        Go: []rt.Execute{
-          &core.Choose{
-            If: &core.BoolValue{Bool: true},
-            True: []rt.Execute{
-              &core.Say{
-                Text: &core.TextValue{Text: "hello"},
-              },
-            },
-            False: []rt.Execute{
-              &core.Say{
-                Text: &core.TextValue{Text: "goodbye"},
-              },
-            },
-          },
-        },
-        Lines: "hello",
-      }
+      r := NewParser(t.Name(), db, fns)
       //
-      if diff := pretty.Diff(want, prog); len(diff) > 0 {
-        t.Fatal(diff)
+      if e := r.parseItem(in); e != nil {
+        t.Fatal(e)
+      } else {
+        var testName string
+        var progid int
+        var expect string
+        if e := db.QueryRow("select * from eph_test").Scan(&testName, &progid, &expect); e != nil {
+          t.Fatal(e)
+        } else {
+          t.Log(testName, progid, expect)
+          //
+          var id int
+          var typeName string
+          var prog []byte
+          if e := db.QueryRow("select * from eph_prog").Scan(&id, &typeName, &prog); e != nil {
+            t.Fatal(e)
+          } else {
+            var res check.Test
+            t.Log(id, typeName)
+            dec := gob.NewDecoder(bytes.NewBuffer(prog))
+            if e := dec.Decode(&res); e != nil {
+              t.Fatal(e)
+            } else if diff := pretty.Diff(sayTest, res); len(diff) > 0 {
+              t.Fatal(diff)
+            }
+          }
+        }
       }
     }
   }
+}
+
+var sayTest = check.Test{TestName: "hello, goodbye",
+  Go: []rt.Execute{
+    &core.Choose{
+      If: &core.BoolValue{Bool: true},
+      True: []rt.Execute{
+        &core.Say{
+          Text: &core.TextValue{Text: "hello"},
+        },
+      },
+      False: []rt.Execute{
+        &core.Say{
+          Text: &core.TextValue{Text: "goodbye"},
+        },
+      },
+    },
+  },
+  Lines: "hello",
 }
 
 var sayStory = `{

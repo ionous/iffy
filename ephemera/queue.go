@@ -1,10 +1,14 @@
 package ephemera
 
-import "database/sql/driver"
+import (
+	"database/sql/driver"
+
+	"github.com/ionous/iffy/tables"
+)
 
 // Queue provides a wrapper which can write to a db.... or not.
 type Queue interface {
-	Prep(which string, keys ...Col)
+	Prep(which string, cols []tables.Col)
 	// for now, panics on error
 	Write(which string, args ...interface{}) (Queued, error)
 }

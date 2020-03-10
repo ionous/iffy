@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/tables"
 )
 
 type DbQueue struct {
@@ -22,7 +23,7 @@ func NewDBQueue(db *sql.DB) *DbQueue {
 
 const AutoKey = "ROWID"
 
-func (q *DbQueue) Create(which string, cols []Col) (err error) {
+func (q *DbQueue) Create(which string, cols []tables.Col) (err error) {
 	desc := make([]string, len(cols))
 	for i, c := range cols {
 		desc[i] = c.Name + "  " + c.Type + " " + c.Check
@@ -35,23 +36,12 @@ func (q *DbQueue) Create(which string, cols []Col) (err error) {
 }
 
 // Prep creates a new table (which) and prepares a insert statement for it.
-func (q *DbQueue) Prep(which string, cols ...Col) {
-	q.PrepCols(which, cols)
+func (q *DbQueue) Prep(which string, cols []tables.Col) {
+	keys := tables.NamesOf(cols)
+	q.PrepStatement(which, tables.Insert(which, keys...), cols)
 }
 
-func (q *DbQueue) PrepCols(which string, cols []Col) {
-	// build a string like: "insert into foo(col1, col2, ...) values(?, ?, ...)"
-	keys := NamesOf(cols)
-	vals := "?"
-	if kcnt := len(keys) - 1; kcnt > 0 {
-		vals += strings.Repeat(",?", kcnt)
-	}
-	q.PrepStatement(which, "INSERT into "+which+
-		"("+strings.Join(keys, ", ")+")"+
-		" values "+"("+vals+");", cols)
-}
-
-func (q *DbQueue) PrepStatement(which, query string, cols []Col) {
+func (q *DbQueue) PrepStatement(which, query string, cols []tables.Col) {
 	if _, ok := q.statements[which]; ok {
 		log.Fatalln("prep", which, "already exists")
 	} else if e := q.Create(which, cols); e != nil {

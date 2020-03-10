@@ -23,43 +23,43 @@ func cat(str ...string) string {
 }
 
 func NewModeler(q *ephemera.DbQueue) *Modeler {
-	q.PrepCols("mdl_kind", []ephemera.Col{
+	q.Prep("mdl_kind", []tables.Col{
 		{Name: "kind", Type: "text"},
 		{Name: "path", Type: "text"},
 		{Check: "primary key(kind)"},
 	})
-	q.PrepCols("mdl_aspect", []ephemera.Col{
+	q.Prep("mdl_aspect", []tables.Col{
 		{Name: "aspect", Type: "text"},
 		{Name: "trait", Type: "text"},
 		{Name: "rank", Type: "int"},
 		{Check: "primary key(aspect, trait)"},
 	})
-	q.PrepCols("mdl_rel", []ephemera.Col{
+	q.Prep("mdl_rel", []tables.Col{
 		{Name: "relation", Type: "text"},
 		{Name: "kind", Type: "text"},        /* reference to mdl_kind */
 		{Name: "cardinality", Type: "text"}, /* one of MANY/ONE */
 		{Name: "otherKind", Type: "text"},   /* reference to mdl_kind */
 		{Check: "primary key(relation)"},
 	})
-	q.PrepCols("mdl_field", []ephemera.Col{
+	q.Prep("mdl_field", []tables.Col{
 		{Name: "kind", Type: "text"}, /* reference to mdl_kind */
 		{Name: "field", Type: "text"},
 		{Name: "type", Type: "text"}, /* one of PRIM_type */
 		{Check: "primary key(kind, field)"},
 	})
-	q.PrepCols("mdl_default", []ephemera.Col{
+	q.Prep("mdl_default", []tables.Col{
 		{Name: "kind", Type: "text"},  /* reference to mdl_kind */
 		{Name: "field", Type: "text"}, /* partial reference to mdl_field */
 		{Name: "value", Type: "blob"},
 	})
-	q.PrepCols("mdl_noun", []ephemera.Col{
+	q.Prep("mdl_noun", []tables.Col{
 		{Name: "noun", Type: "text"},
 		{Name: "kind", Type: "text"}, /* reference to mdl_kind */
 		{Check: "primary key(noun)"},
 	})
 	// names are built from noun parts, and possibly from custom aliases.
 	// where rank 0 is a better match than rank 1
-	q.PrepCols("mdl_name", []ephemera.Col{
+	q.Prep("mdl_name", []tables.Col{
 		{Name: "noun", Type: "text"}, /* reference to mdl_noun */
 		{Name: "name", Type: "text"},
 		{Name: "rank", Type: "int"},
@@ -71,17 +71,17 @@ func NewModeler(q *ephemera.DbQueue) *Modeler {
 				where not exists (
 					select 1 from asm_verb v
 					where v.relation=?1 and v.stem=?2
-				)`, []ephemera.Col{
+				)`, []tables.Col{
 			{Name: "relation", Type: "text"}, /* reference to mdl_rel */
 			{Name: "stem", Type: "text"},
 			{Check: "unique(stem)"},
 		})
-	q.PrepCols("mdl_start", []ephemera.Col{
+	q.Prep("mdl_start", []tables.Col{
 		{Name: "noun", Type: "text"},  /* reference to mdl_noun */
 		{Name: "field", Type: "text"}, /* partial reference to mdl_field */
 		{Name: "value", Type: "blob"},
 	})
-	q.PrepCols("mdl_pair", []ephemera.Col{
+	q.Prep("mdl_pair", []tables.Col{
 		{Name: "noun", Type: "text"},      /* reference to mdl_noun */
 		{Name: "relation", Type: "text"},  /* reference to mdl_rel */
 		{Name: "otherNoun", Type: "text"}, /* reference to mdl_noun */

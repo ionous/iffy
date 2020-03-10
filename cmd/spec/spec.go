@@ -1,6 +1,6 @@
-// Package main for 'spec".
 // Exports golang DSL for use in editing story files.
-// Currently, this only generates imperative commands.
+// Currently, this only generates the imperative commands,
+// the modeling parts of the language currently live in the composer javascript
 package main
 
 import (

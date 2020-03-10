@@ -34,6 +34,8 @@ func (op *Test) Execute(run rt.Runtime) (err error) {
 		err = errutil.New("Test", op.TestName, "encountered error:", e)
 	} else if t != op.Lines {
 		err = errutil.New("Test", op.TestName, "expected:", op.Lines, "got:", t)
+	} else {
+		println("test", t)
 	}
 	return
 }

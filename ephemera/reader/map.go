@@ -1,13 +1,16 @@
 package reader
 
-import "log"
-
 type Map map[string]interface{}
 
-// go can be annoying sometimes
-// you cant directly Cast b/t equivalent but inexact types
-func Cast(i interface{}) Map {
+// go can be annoying.
+// when dealing with interface{}, you cant explicitly cast b/t equivalent but inexact types.
+func Box(i interface{}) Map {
+	// and yet you can implicitly cast b/t those types, b/c reasons.
 	return i.(map[string]interface{})
+}
+
+func Unbox(m Map) map[string]interface{} {
+	return m
 }
 
 func (m Map) StrOf(key string) (ret string) {
@@ -19,7 +22,7 @@ func (m Map) StrOf(key string) (ret string) {
 
 func (m Map) MapOf(key string) (ret Map) {
 	if v, ok := m[key]; ok {
-		ret = Cast(v)
+		ret = Box(v)
 	}
 	return ret
 }
@@ -28,8 +31,9 @@ func (m Map) SliceOf(key string) []interface{} {
 	return ret
 }
 
-func (m Map) Expect(key, want string) {
-	if have, ok := m[key]; !ok || want != have {
-		log.Fatalln("wanted", want, "have", have)
+func (m Map) Expect(key, want string) (okay bool) {
+	if have, ok := m[key]; ok && want == have {
+		okay = true
 	}
+	return
 }

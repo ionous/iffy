@@ -1,9 +1,11 @@
 package internal
 
 import (
+	"database/sql"
 	r "reflect"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/ref/unique"
@@ -16,7 +18,19 @@ const (
 	itemValue = "value"
 )
 
-func Import(targetPtr interface{}, inData export.Dict, types map[string]export.Run) (err error) {
+func ImportStory(in reader.Map, db *sql.DB) (err error) {
+	id := in[itemId].(string)
+	p := NewParser(id, db, fns)
+	if !in.Expect(itemType, "story") {
+		err = errutil.New("story data not found")
+	} else {
+		err = p.parseItem(in)
+	}
+	return
+}
+
+// read in-memory json into go-lang structs
+func ImportProg(targetPtr interface{}, inData export.Dict, types map[string]export.Run) (err error) {
 	out := r.ValueOf(targetPtr).Elem()
 	return Unmarshall(out, inData, types)
 }

@@ -20,6 +20,7 @@ const (
 	NAMED_RELATION  = "relation"
 	NAMED_VERB      = "verb"
 	NAMED_TRAIT     = "trait"
+	NAMED_TEST      = "test"
 )
 
 const (

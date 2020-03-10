@@ -1,80 +1,101 @@
 package ephemera
 
+import "github.com/ionous/iffy/tables"
+
 type Recorder struct {
 	q   Queue
 	src Queued
-	// Source of ephemera for logging, revoking, etc.
+	// fix
+	// we dont really need the "queue" interface anymore --
+	// it was good for initial testing/ experimentation --
+	// but we can live without
+	// itd be nicer to move to table caching instead
+	cache *tables.Cache
 }
 
-func NewRecorder(srcURI string, q Queue) (ret *Recorder) {
+func NewRecorder(srcURI string, q *DbQueue) (ret *Recorder) {
 	// fix? should enums ( prim_..., named_... ) be stored as plain strings or as named entities?
-	q.Prep("eph_source",
-		Col{Name: "src", Type: "text"})
-	q.Prep("eph_named",
-		Col{Name: "name", Type: "text"},
-		Col{Name: "category", Type: "text"},
-		Col{Name: "idSource", Type: "int"},
-		Col{Name: "offset", Type: "text"})
+	q.Prep("eph_source", []tables.Col{
+		{Name: "src", Type: "text"},
+	})
+	q.Prep("eph_named", []tables.Col{
+		{Name: "name", Type: "text"},
+		{Name: "category", Type: "text"},
+		{Name: "idSource", Type: "int"},
+		{Name: "offset", Type: "text"},
+	})
 	// aliases are used for user input, not story modeling
-	q.Prep("eph_alias",
-		Col{Name: "idNamedAlias", Type: "int"},
-		Col{Name: "idNamedActual", Type: "int"})
-	q.Prep("eph_aspect",
-		Col{Name: "idNamedAspect", Type: "int"})
-	q.Prep("eph_default",
-		Col{Name: "idNamedKind", Type: "int"},
+	q.Prep("eph_alias", []tables.Col{
+		{Name: "idNamedAlias", Type: "int"},
+		{Name: "idNamedActual", Type: "int"},
+	})
+	q.Prep("eph_aspect", []tables.Col{
+		{Name: "idNamedAspect", Type: "int"},
+	})
+	q.Prep("eph_default", []tables.Col{
+		{Name: "idNamedKind", Type: "int"},
 		// field, trait, or aspect
-		Col{Name: "idNamedProp", Type: "int"},
+		{Name: "idNamedProp", Type: "int"},
 		// future: un/certainty for defaults and values
-		// 	Col{Name: "certainty", Type:  "text",
+		// 	{Name: "certainty", Type:  "text",
 		// 	Check: "check (certainty in ('usually','always','seldom','never'))"},
-		Col{Name: "value", Type: "blob"})
-	q.Prep("eph_kind",
-		Col{Name: "idNamedKind", Type: "int"},
-		Col{Name: "idNamedParent", Type: "int"})
-	q.Prep("eph_noun",
-		Col{Name: "idNamedNoun", Type: "int"},
-		Col{Name: "idNamedKind", Type: "int"})
-	q.Prep("eph_plural",
-		Col{Name: "idNamedPlural", Type: "int"},
-		Col{Name: "idNamedSingluar", Type: "int"})
-	q.Prep("eph_primitive",
-		Col{Name: "primType", Type: "text"},
-		Col{Name: "idNamedKind", Type: "int"},
-		Col{Name: "idNamedField", Type: "int"})
-	q.Prep("eph_relation",
-		Col{Name: "idNamedRelation", Type: "int"},
-		Col{Name: "idNamedKind", Type: "int"},
-		Col{Name: "idNamedOtherKind", Type: "int"},
-		Col{Name: "cardinality",
+		{Name: "value", Type: "blob"},
+	})
+	q.Prep("eph_kind", []tables.Col{
+		{Name: "idNamedKind", Type: "int"},
+		{Name: "idNamedParent", Type: "int"},
+	})
+	q.Prep("eph_noun", []tables.Col{
+		{Name: "idNamedNoun", Type: "int"},
+		{Name: "idNamedKind", Type: "int"},
+	})
+	q.Prep("eph_plural", []tables.Col{
+		{Name: "idNamedPlural", Type: "int"},
+		{Name: "idNamedSingluar", Type: "int"},
+	})
+	q.Prep("eph_primitive", []tables.Col{
+		{Name: "primType", Type: "text"},
+		{Name: "idNamedKind", Type: "int"},
+		{Name: "idNamedField", Type: "int"},
+	})
+	q.Prep("eph_relation", []tables.Col{
+		{Name: "idNamedRelation", Type: "int"},
+		{Name: "idNamedKind", Type: "int"},
+		{Name: "idNamedOtherKind", Type: "int"},
+		{Name: "cardinality",
 			Type:  "text",
-			Check: "check (cardinality in ('one_one','one_any','any_one','any_any'))"})
-	q.Prep("eph_relative",
-		Col{Name: "idNamedHead", Type: "int"},
-		Col{Name: "idNamedStem", Type: "int"},
-		Col{Name: "idNamedDependent", Type: "int"})
-	q.Prep("eph_trait",
-		Col{Name: "idNamedTrait", Type: "int"},
-		Col{Name: "idNamedAspect", Type: "int"},
-		Col{Name: "rank", Type: "int"})
-	q.Prep("eph_value",
-		Col{Name: "idNamedNoun", Type: "int"},
-		Col{Name: "idNamedProp", Type: "int"},
-		Col{Name: "value", Type: "blob"})
-	q.Prep("eph_verb",
-		Col{Name: "idNamedStem", Type: "int"},
-		Col{Name: "idNamedRelation", Type: "int"},
-		Col{Name: "verb", Type: "string"})
+			Check: "check (cardinality in ('one_one','one_any','any_one','any_any'))"},
+	})
+	q.Prep("eph_relative", []tables.Col{
+		{Name: "idNamedHead", Type: "int"},
+		{Name: "idNamedStem", Type: "int"},
+		{Name: "idNamedDependent", Type: "int"},
+	})
+	q.Prep("eph_trait", []tables.Col{
+		{Name: "idNamedTrait", Type: "int"},
+		{Name: "idNamedAspect", Type: "int"},
+		{Name: "rank", Type: "int"},
+	})
+	q.Prep("eph_value", []tables.Col{
+		{Name: "idNamedNoun", Type: "int"},
+		{Name: "idNamedProp", Type: "int"},
+		{Name: "value", Type: "blob"},
+	})
+	q.Prep("eph_verb", []tables.Col{
+		{Name: "idNamedStem", Type: "int"},
+		{Name: "idNamedRelation", Type: "int"},
+		{Name: "verb", Type: "string"},
+	})
 	//q.Prep("eph_implication"},
-	// Col{"idNamedScope"},
-	// Col{"idNamedTrait"},
-	// Col{"idNamedCertainty"},
-	// Col{"idNamedImpliedTrait"})
+	// tables.Col{"idNamedScope"},
+	// tables.Col{"idNamedTrait"},
+	// tables.Col{"idNamedCertainty"},
+	// tables.Col{"idNamedImpliedTrait"}
 	//
 	if srcId, e := q.Write("eph_source", srcURI); e != nil {
 		panic(e) // fix? backwards compat
 	} else {
-		ret = &Recorder{q, srcId}
+		ret = &Recorder{q, srcId, tables.NewCache(q.db)}
 	}
 	return
 }
@@ -92,98 +113,94 @@ func (r *Recorder) Named(category, name, ofs string) (ret Named) {
 	return
 }
 
+type Prog struct{ Named }
+
+func (r *Recorder) NewProg(rootType string, blob []byte) (ret Prog) {
+	id := r.cache.Must(ephProg, r.src, rootType, blob)
+	ret = Prog{Named{id, rootType}}
+	return
+}
+
+var ephProg = tables.Insert("eph_prog", "idSource", "type", "prog")
+
 var None Named
 
 // NewAlias provides a new name for another name.
 func (r *Recorder) NewAlias(alias, actual Named) {
-	if _, e := r.q.Write("eph_alias", alias, actual); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_alias", alias, actual)
 }
 
 // NewAspect explicitly declares the existence of an aspect.
 func (r *Recorder) NewAspect(aspect Named) {
-	if _, e := r.q.Write("eph_aspect", aspect); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_aspect", aspect)
 }
 
 // NewCertainty supplies a kind with a default trait.
 func (r *Recorder) NewCertainty(certainty string, trait, kind Named) {
 	// usually fast horses.
-	if _, e := r.q.Write("eph_certainty", certainty, trait, kind); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_certainty", certainty, trait, kind)
 }
 
 // NewDefault supplies a kind with a default value.
 func (r *Recorder) NewDefault(kind, field Named, value interface{}) {
 	// height horses 5.
-	if _, e := r.q.Write("eph_default", kind, field, value); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_default", kind, field, value)
 }
 
 // NewKind connects a kind to its parent kind.
 func (r *Recorder) NewKind(kind, parent Named) {
-	if _, e := r.q.Write("eph_kind", kind, parent); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_kind", kind, parent)
 }
 
 // NewNoun connects a noun to its kind.
 func (r *Recorder) NewNoun(noun, kind Named) {
-	if _, e := r.q.Write("eph_noun", noun, kind); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_noun", noun, kind)
 }
 
 // NewPlural maps the plural form of a name to its singular form.
 func (r *Recorder) NewPlural(plural, singluar Named) {
-	if _, e := r.q.Write("eph_plural", plural, singluar); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_plural", plural, singluar)
 }
 
 // NewPrimitive property in the named kind.
 func (r *Recorder) NewPrimitive(primType string, kind, prop Named) {
-	if _, e := r.q.Write("eph_primitive", primType, kind, prop); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_primitive", primType, kind, prop)
 }
 
 // NewRelation defines a connection between a primary and secondary kind.
 func (r *Recorder) NewRelation(relation, primaryKind, secondaryKind Named, cardinality string) {
-	if _, e := r.q.Write("eph_relation", relation, primaryKind, secondaryKind, cardinality); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_relation", relation, primaryKind, secondaryKind, cardinality)
 }
 
 // NewRelative connects two specific nouns using a verb stem.
 func (r *Recorder) NewRelative(primary, stem, secondary Named) {
-	if _, e := r.q.Write("eph_relative", primary, stem, secondary); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_relative", primary, stem, secondary)
 }
 
 // NewTrait records a member of an aspect and its order ( rank. )
 func (r *Recorder) NewTrait(trait, aspect Named, rank int) {
-	if _, e := r.q.Write("eph_trait", trait, aspect, rank); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_trait", trait, aspect, rank)
 }
 
 // NewValue assigns the property of a noun a value;
 // traits can be assigned by naming the individual trait and setting a true ( or false ) value.
 func (r *Recorder) NewValue(noun, prop Named, value interface{}) {
-	if _, e := r.q.Write("eph_value", noun, prop, value); e != nil {
-		panic(e)
-	}
+	r.mustWrite("eph_value", noun, prop, value)
 }
 
 // NewRelative connects two specific nouns using a verb.
 func (r *Recorder) NewVerb(stem, relation Named, verb string) {
-	if _, e := r.q.Write("eph_verb", stem, relation, verb); e != nil {
+	r.mustWrite("eph_verb", stem, relation, verb)
+}
+
+func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
+	r.cache.Must(ephTest, test, prog, expect)
+}
+
+func (r *Recorder) mustWrite(which string, args ...interface{}) {
+	if _, e := r.q.Write(which, args...); e != nil {
 		panic(e)
 	}
 }
+
+var ephTest = tables.Insert("eph_test", "idNamedTest", "idProg", "expect")
