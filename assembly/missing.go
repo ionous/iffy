@@ -4,13 +4,13 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 // MissingKinds returns named kinds which don't have a defined ancestry.
 func MissingKinds(db *sql.DB, cb func(string) error) error {
 	var k string
-	return dbutil.QueryAll(db,
+	return tables.QueryAll(db,
 		`select distinct name from eph_named n
 		where n.category = 'kind'
 		and not exists (
@@ -24,7 +24,7 @@ func MissingKinds(db *sql.DB, cb func(string) error) error {
 // MissingFields returns named fields which don't have a defined property.
 func MissingFields(db *sql.DB, cb func(string) error) error {
 	var k string
-	return dbutil.QueryAll(db,
+	return tables.QueryAll(db,
 		`select distinct n.name from eph_named n
 		where n.category = 'field'
 		and not exists (
@@ -38,7 +38,7 @@ func MissingFields(db *sql.DB, cb func(string) error) error {
 //
 func MissingTraits(db *sql.DB, cb func(string) error) error {
 	var k string
-	return dbutil.QueryAll(db,
+	return tables.QueryAll(db,
 		`select distinct n.name from eph_named n
 		where n.category = 'trait'
 		and not exists (
@@ -52,7 +52,7 @@ func MissingTraits(db *sql.DB, cb func(string) error) error {
 //
 func MissingAspects(db *sql.DB, cb func(string) error) error {
 	var k string
-	return dbutil.QueryAll(db,
+	return tables.QueryAll(db,
 		`select distinct n.name from eph_named n
 		where n.category = 'aspect'
 		and not exists (

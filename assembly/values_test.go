@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
@@ -110,7 +109,7 @@ func TestInitialTraitAssignment(t *testing.T) {
 func matchValues(db *sql.DB, want []triplet) (err error) {
 	var curr triplet
 	var have []triplet
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select noun, field, value 
 			from mdl_start
 			order by noun, field, value`,

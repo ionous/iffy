@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
@@ -47,7 +46,7 @@ func TestNounFormation(t *testing.T) {
 func collectNouns(db *sql.DB) (ret []modeledNoun, err error) {
 	var curr modeledNoun
 	var nouns []modeledNoun
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select n.name, i.kind, n.rank
 		from mdl_name n 
 		join mdl_noun i

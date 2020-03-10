@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 	var store traitStore
 	var curr, last traitInfo
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		// normalize aspect and trait requests
 		// we have to do traits and aspects at the same time because
 		// they talk about the same pool of values, and could generate conflicts.

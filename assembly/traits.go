@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 // goal: build table of trait, aspect, rank.
@@ -17,7 +17,7 @@ import (
 func DetermineAspects(m *Modeler, db *sql.DB) (err error) {
 	var curr, last aspectInfo
 	var traits []aspectInfo // cant read and write to the db simultaneously
-	if e := dbutil.QueryAll(db, `select nt.name, na.name
+	if e := tables.QueryAll(db, `select nt.name, na.name
 	from eph_trait t join eph_named nt
 		on (t.idNamedTrait = nt.rowid)
 	left join eph_named na

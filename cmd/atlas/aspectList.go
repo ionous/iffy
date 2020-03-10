@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 func listOfAspects(w io.Writer, db *sql.DB) (err error) {
@@ -14,7 +14,7 @@ func listOfAspects(w io.Writer, db *sql.DB) (err error) {
 	var aname, aspec string
 
 	//var name, kind, spec string
-	if e := dbutil.QueryAll(db, `
+	if e := tables.QueryAll(db, `
 		select distinct aspect, coalesce((
 			select spec from mdl_spec 
 			where type='aspect' and name=aspect
@@ -25,7 +25,7 @@ func listOfAspects(w io.Writer, db *sql.DB) (err error) {
 			// 1. collect traits by name
 			var trait Trait
 			var traits []Trait
-			if e := dbutil.QueryAll(db, fmt.Sprintf(`
+			if e := tables.QueryAll(db, fmt.Sprintf(`
 				select trait, coalesce((
 					select spec from mdl_spec 
 					where type='trait' and name=trait
@@ -40,7 +40,7 @@ func listOfAspects(w io.Writer, db *sql.DB) (err error) {
 				// 2. collect kinds affected by traits
 				var kind string
 				var kinds []string
-				if e := dbutil.QueryAll(db, fmt.Sprintf(`
+				if e := tables.QueryAll(db, fmt.Sprintf(`
 					select kind
 					from mdl_field
 					where type = 'aspect' 

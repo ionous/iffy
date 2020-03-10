@@ -8,7 +8,6 @@ import (
 	"github.com/kr/pretty"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 )
@@ -34,7 +33,7 @@ func writeMissing(rec *ephemera.Recorder, missing []string) (err error) {
 func matchProperties(db *sql.DB, want []kfp) (err error) {
 	var curr kfp
 	var have []kfp
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select kind, field, type 
 		from mdl_field 
 		order by kind, field, type`,

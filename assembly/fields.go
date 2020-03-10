@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -52,7 +51,7 @@ func (out *pendingFields) write(m *Modeler) (err error) {
 func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (err error) {
 	var curr, last fieldInfo
 	// fix: probably want source line out of this too
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select nk.name, nf.name, p.primType, a.path
 		from eph_primitive p join eph_named nk
 			on (p.idNamedKind = nk.rowid)
@@ -95,7 +94,7 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 func undeclaredAspects(db *sql.DB) (ret []string, err error) {
 	var str string
 	var aspects []string
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select name from
 			( select distinct n.name as name
 				from eph_primitive p, eph_named n

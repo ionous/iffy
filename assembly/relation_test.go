@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
@@ -57,7 +56,7 @@ func addRelations(rec *ephemera.Recorder, els []dbrel) (err error) {
 func matchRelations(db *sql.DB, want []dbrel) (err error) {
 	var curr dbrel
 	var have []dbrel
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select relation, kind, otherKind, cardinality
 			from mdl_rel 
 		order by relation, kind, otherKind, cardinality`,

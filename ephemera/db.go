@@ -3,7 +3,7 @@ package ephemera
 import (
 	"database/sql"
 
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 // KidsOf the passed ancestor as specified in the Kinds table.
@@ -21,7 +21,7 @@ func KidsOf(db *sql.DB, ancestor string, cb func(kid string)) (err error) {
 		err = e
 	} else {
 		var kid string
-		err = dbutil.ScanAll(siblings, func() (err error) {
+		err = tables.ScanAll(siblings, func() (err error) {
 			cb(kid)
 			return
 		}, &kid)

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 type relInfo struct {
@@ -49,7 +49,7 @@ func DetermineRelations(m *Modeler, db *sql.DB) (err error) {
 	// when C differs, we error.
 	// when K differs, we Lca K.
 	// when Q differs, we Lca Q.
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select
 			nr.name,
 			r.cardinality,

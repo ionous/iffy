@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 type Pairing struct {
@@ -22,7 +22,7 @@ func listOfPairs(w io.Writer, relation string, db *sql.DB) (err error) {
 	var pair Pair
 	var pairs []*Pair
 
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		fmt.Sprintf(`
 		select relation, kind, cardinality, otherKind, coalesce((
 			select spec from mdl_spec 
@@ -34,7 +34,7 @@ func listOfPairs(w io.Writer, relation string, db *sql.DB) (err error) {
 			return
 		}, &rel.Name, &rel.Kind, &rel.Cardinality, &rel.OtherKind, &rel.Spec); e != nil {
 		err = e
-	} else if e := dbutil.QueryAll(db,
+	} else if e := tables.QueryAll(db,
 		fmt.Sprintf(`
 		select noun, otherNoun
 		from mdl_pair

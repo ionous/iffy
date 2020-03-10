@@ -8,7 +8,6 @@ import (
 	"github.com/kr/pretty"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 )
@@ -38,7 +37,7 @@ type expectedTrait struct {
 func matchTraits(db *sql.DB, want []expectedTrait) (err error) {
 	var curr expectedTrait
 	var have []expectedTrait
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select aspect, trait, rank from mdl_aspect order by aspect, trait, rank`,
 		func() (err error) {
 			have = append(have, curr)

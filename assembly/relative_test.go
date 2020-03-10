@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
@@ -91,7 +90,7 @@ func TestRelativeFormation(t *testing.T) {
 func matchRelatives(db *sql.DB, want [][3]string) (err error) {
 	var curr [3]string
 	var have [][3]string
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select relation, noun, otherNoun
 			from mdl_pair
 			order by relation, noun, otherNoun`,
@@ -120,7 +119,7 @@ func TestOneToOneViolations(t *testing.T) {
 			} else {
 				var have [][3]string
 				var got [3]string
-				if e := dbutil.QueryAll(t.db,
+				if e := tables.QueryAll(t.db,
 					`select distinct coalesce(noun, ''), 
 									 coalesce(stem, ''), 
 									 coalesce(otherNoun, '')

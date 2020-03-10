@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 type Noun struct {
@@ -18,7 +18,7 @@ func listOfNouns(w io.Writer, db *sql.DB) (err error) {
 	// originally used a channel, but the template iterates over the same elements multiple times
 	var nouns []Noun
 	var name, kind, spec string
-	if e := dbutil.QueryAll(db, `
+	if e := tables.QueryAll(db, `
 		select noun, kind, coalesce((
 			select spec from mdl_spec 
 			where type='noun' and name=noun
@@ -30,7 +30,7 @@ func listOfNouns(w io.Writer, db *sql.DB) (err error) {
 			var props []Prop
 			// var relation string
 			var relations []string
-			if e := dbutil.QueryAll(db,
+			if e := tables.QueryAll(db,
 				fmt.Sprintf(`
 					select field, value 
 					from mdl_start 
@@ -42,7 +42,7 @@ func listOfNouns(w io.Writer, db *sql.DB) (err error) {
 				},
 				&prop, &value); e != nil {
 				err = e
-			} else if e := dbutil.QueryAll(db,
+			} else if e := tables.QueryAll(db,
 				fmt.Sprintf(`select 
 					distinct relation 
 					from mdl_pair 

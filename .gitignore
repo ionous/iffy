@@ -12,3 +12,4 @@ cmd/atlas/atlas
 cmd/asm/asm
 cmd/spec/spec.js
 cmd/spec/spec
+cmd/import/parse

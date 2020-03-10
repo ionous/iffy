@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"io"
 
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 func listOfRelations(w io.Writer, db *sql.DB) (err error) {
 	// 	// originally used a channel, but the template iterates over the same elements multiple times
 	var rels []*Relation
 	var rel Relation
-	if e := dbutil.QueryAll(db, `
+	if e := tables.QueryAll(db, `
 		select relation, kind, cardinality, otherKind, coalesce((
 			select spec from mdl_spec 
 			where type='relation' and name=relation

@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 // some things we could do:
@@ -33,7 +33,7 @@ func listOfKinds(w io.Writer, db *sql.DB) (err error) {
 	// originally used a channel, but the template iterates over the same elements multiple times
 	var kind Kind
 	var kinds []Kind
-	if e := dbutil.QueryAll(db, `
+	if e := tables.QueryAll(db, `
 		select kind, path, coalesce((
 			select spec from mdl_spec 
 			where type='kind' and name=kind
@@ -45,7 +45,7 @@ func listOfKinds(w io.Writer, db *sql.DB) (err error) {
 			var props []Prop
 			var noun string
 			var nouns []string
-			if e := dbutil.QueryAll(db,
+			if e := tables.QueryAll(db,
 				fmt.Sprintf("select field, value, spec from atlas_fields where kind='%s' order by field", kind.Name),
 				func() (err error) {
 					props = append(props, prop)
@@ -53,7 +53,7 @@ func listOfKinds(w io.Writer, db *sql.DB) (err error) {
 				},
 				&prop.Name, &prop.Value, &prop.Spec); e != nil {
 				err = e
-			} else if e := dbutil.QueryAll(db,
+			} else if e := tables.QueryAll(db,
 				fmt.Sprintf("select noun from mdl_noun where kind='%s' order by noun", kind.Name),
 				func() (err error) {
 					nouns = append(nouns, noun)

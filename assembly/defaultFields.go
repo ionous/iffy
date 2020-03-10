@@ -6,14 +6,13 @@ import (
 	"reflect"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
 	"github.com/ionous/iffy/tables"
 )
 
 func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
 	var store valueStore
 	var curr, last valueInfo
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select asm.kind, mf.field, mf.type, asm.value
  			from asm_default as asm
  		join mdl_field mf

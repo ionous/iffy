@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 // output:
@@ -47,7 +47,7 @@ func (store *nounStore) write(m *Modeler) (err error) {
 func DetermineNouns(m *Modeler, db *sql.DB) (err error) {
 	var store nounStore
 	var curr, last nounInfo
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		`select nn.name, nk.name, coalesce(ak.path, "")
 		from eph_noun n join eph_named nn
 			on (n.idNamedNoun = nn.rowid)

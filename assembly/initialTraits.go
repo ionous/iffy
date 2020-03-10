@@ -4,13 +4,13 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dbutil"
+	"github.com/ionous/iffy/tables"
 )
 
 func determineInitialTraits(m *Modeler, db *sql.DB) (err error) {
 	var store traitStore
 	var curr, last traitInfo
-	if e := dbutil.QueryAll(db,
+	if e := tables.QueryAll(db,
 		// normalize aspect and trait requests
 		`select asm.noun, mt.aspect, mt.trait, 
 		 	ifnull(nullif(asm.value, mt.trait), 1)
