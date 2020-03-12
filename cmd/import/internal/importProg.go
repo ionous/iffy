@@ -18,19 +18,13 @@ const (
 	itemValue = "value"
 )
 
-func ImportStory(in reader.Map, db *sql.DB) (err error) {
-	id := in[itemId].(string)
-	p := NewParser(id, db, fns)
-	if !in.Expect(itemType, "story") {
-		err = errutil.New("story data not found")
-	} else {
-		err = p.parseItem(in)
-	}
-	return
+func ImportStory(src string, in reader.Map, db *sql.DB) error {
+	p := NewParser(src, db, generators)
+	return p.parseItem(in)
 }
 
 // read in-memory json into go-lang structs
-func ImportProg(targetPtr interface{}, inData export.Dict, types map[string]export.Run) (err error) {
+func readProg(targetPtr interface{}, inData export.Dict, types map[string]export.Run) (err error) {
 	out := r.ValueOf(targetPtr).Elem()
 	return Unmarshall(out, inData, types)
 }

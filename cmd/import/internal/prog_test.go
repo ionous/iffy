@@ -23,7 +23,7 @@ func TestImportProg(t *testing.T) {
     t.Fatal(e)
   } else {
     var prog check.Test
-    if e := ImportProg(&prog, in, export.Runs); e != nil {
+    if e := readProg(&prog, in, export.Runs); e != nil {
       t.Fatal(e)
     } else if diff := pretty.Diff(sayTest, prog); len(diff) > 0 {
       t.Fatal(diff)
@@ -44,7 +44,7 @@ func TestProcessProg(t *testing.T) {
     if e := json.Unmarshal([]byte(sayStory), &in); e != nil {
       t.Fatal("read json", e)
     } else {
-      r := NewParser(t.Name(), db, fns)
+      r := NewParser(t.Name(), db, generators)
       //
       if e := r.parseItem(in); e != nil {
         t.Fatal(e)

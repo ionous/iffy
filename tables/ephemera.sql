@@ -15,5 +15,3 @@ create table eph_trait( idNamedTrait int, idNamedAspect int, rank int );
 create table eph_value( idNamedNoun int, idNamedProp int, value blob );
 create table eph_verb( idNamedStem int, idNamedRelation int, verb text );
 create table eph_prog( idSource int, type text, prog blob );
-
-

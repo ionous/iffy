@@ -34,6 +34,9 @@ func modelTemplate() string {
 		"create table mdl_pair(noun text, relation text, otherNoun text);\n" +
 		"/* initial values for various noun properties. these change over the course of a game. */\n" +
 		"create table mdl_start(noun text, field text, value blob);\n" +
-		""
+		"/* stored programs, a work in progress */ \n" +
+		"create table mdl_prog( idSource int, type text, prog blob );\n" +
+		"/* stored tests, a work in progress */ \n" +
+		"create table mdl_check( idNamedTest text, idProg int, expect text );"
 	return tmpl
 }

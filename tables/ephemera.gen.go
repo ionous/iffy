@@ -11,6 +11,8 @@ package tables
 func ephemeraTemplate() string {
 	var tmpl = "create table eph_alias( idNamedAlias int, idNamedActual int );\n" +
 		"create table eph_aspect( idNamedAspect int );\n" +
+		"create table eph_certainty( certainty text, idNamedTrait int, idNamedKind text );\n" +
+		"create table eph_check( idNamedTest text, idProg int, expect text );\n" +
 		"create table eph_default( idNamedKind int, idNamedProp int, value blob );\n" +
 		"create table eph_kind( idNamedKind int, idNamedParent int );\n" +
 		"create table eph_named( name text, category text, idSource int, offset text );\n" +
@@ -23,7 +25,7 @@ func ephemeraTemplate() string {
 		"create table eph_trait( idNamedTrait int, idNamedAspect int, rank int );\n" +
 		"create table eph_value( idNamedNoun int, idNamedProp int, value blob );\n" +
 		"create table eph_verb( idNamedStem int, idNamedRelation int, verb text );\n" +
-		"create table eph_check( idNamedTest text, idProg int, expect text );\n" +
-		"create table eph_prog( idSource int, type text, prog blob );"
+		"create table eph_prog( idSource int, type text, prog blob );\n" +
+		""
 	return tmpl
 }

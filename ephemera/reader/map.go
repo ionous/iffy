@@ -31,7 +31,7 @@ func (m Map) SliceOf(key string) []interface{} {
 	return ret
 }
 
-func (m Map) Expect(key, want string) (okay bool) {
+func (m Map) Has(key, want string) (okay bool) {
 	if have, ok := m[key]; ok && want == have {
 		okay = true
 	}

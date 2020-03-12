@@ -9,15 +9,6 @@ import (
 	"github.com/reiver/go-porterstemmer"
 )
 
-func NewModelerDB(db *sql.DB) *Modeler {
-	if e := tables.CreateModel(db); e != nil {
-		panic(e)
-	} else if e := tables.CreateAssembly(db); e != nil {
-		panic(e)
-	}
-	return NewModeler(db)
-}
-
 func cat(str ...string) string {
 	return strings.Join(str, " ")
 }

@@ -6,10 +6,11 @@ notes
 ephemera/cmd/parse
 ephemera/cmd/stem
 assembly/debug.test
-cmd/stem/stem
-cmd/parse/parse
-cmd/atlas/atlas
 cmd/asm/asm
-cmd/spec/spec.js
+cmd/atlas/atlas
+cmd/compose/compose
+cmd/import/import
+cmd/play/play
 cmd/spec/spec
-cmd/import/parse
+cmd/spec/spec.js
+cmd/stem/stem

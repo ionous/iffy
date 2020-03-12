@@ -38,6 +38,10 @@ func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 			err = e
 		} else if e := tables.CreateEphemera(db); e != nil {
 			err = e
+		} else if e := tables.CreateModel(db); e != nil {
+			err = e
+		} else if e := tables.CreateAssembly(db); e != nil {
+			err = e
 		} else {
 			rec := ephemera.NewRecorder(t.Name(), db)
 			mdl := NewModelerDB(db)

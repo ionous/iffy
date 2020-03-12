@@ -36,7 +36,7 @@ func NewParser(srcURI string, db *sql.DB, fnds map[string]Parse) *Parser {
 	rec := ephemera.NewRecorder(srcURI, db)
 	return &Parser{
 		Recorder:   rec,
-		table:      fns,
+		table:      generators,
 		oneTime:    make(map[string]bool),
 		categories: make(map[string]CategoryEvent),
 	}

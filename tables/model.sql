@@ -23,3 +23,7 @@ create table mdl_name(noun text, name text, rank int);
 create table mdl_pair(noun text, relation text, otherNoun text);
 /* initial values for various noun properties. these change over the course of a game. */
 create table mdl_start(noun text, field text, value blob);
+/* stored programs, a work in progress */ 
+create table mdl_prog( idSource int, type text, prog blob );
+/* stored tests, a work in progress */ 
+create table mdl_check( idNamedTest text, idProg int, expect text );
