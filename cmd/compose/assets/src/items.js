@@ -49,7 +49,7 @@ class TypeSet {
   }
 }
 
-let allTypes;
+let allTypes; // TypeSet singleton, contained/reset by Types.
 
 // global
 class Types {
