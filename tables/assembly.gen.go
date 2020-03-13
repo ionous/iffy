@@ -9,7 +9,15 @@ package tables
 // assemblyTemplate is a generated function returning the template as a string.
 // That string should be parsed by the functions of the golang's template package.
 func assemblyTemplate() string {
-	var tmpl = "/* resolve default ephemera to strings.\n" +
+	var tmpl = "/* resolve test ephemera to strings\n" +
+		" */\n" +
+		"create temp view\n" +
+		"asm_check as\n" +
+		"\tselect nk.name as name, idProg, expect \n" +
+		"from eph_check p join eph_named nk\n" +
+		"\ton (p.idNamedTest = nk.rowid);\n" +
+		"\n" +
+		"/* resolve default ephemera to strings.\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_default as\n" +
@@ -18,6 +26,7 @@ func assemblyTemplate() string {
 		"\ton (p.idNamedKind = nk.rowid)\n" +
 		"left join eph_named nf\n" +
 		"\t\ton (p.idNamedProp = nf.rowid);\n" +
+		"\n" +
 		"\n" +
 		"/* resolve value ephemera to strings.\n" +
 		" */\n" +

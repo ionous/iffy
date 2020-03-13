@@ -12,7 +12,7 @@ func ephemeraTemplate() string {
 	var tmpl = "create table eph_alias( idNamedAlias int, idNamedActual int );\n" +
 		"create table eph_aspect( idNamedAspect int );\n" +
 		"create table eph_certainty( certainty text, idNamedTrait int, idNamedKind text );\n" +
-		"create table eph_check( idNamedTest text, idProg int, expect text );\n" +
+		"create table eph_check( idNamedTest int, idProg int, expect text );\n" +
 		"create table eph_default( idNamedKind int, idNamedProp int, value blob );\n" +
 		"create table eph_kind( idNamedKind int, idNamedParent int );\n" +
 		"create table eph_named( name text, category text, idSource int, offset text );\n" +

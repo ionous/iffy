@@ -1,3 +1,11 @@
+/* resolve test ephemera to strings
+ */
+create temp view
+asm_check as
+	select nk.name as name, idProg, expect 
+from eph_check p join eph_named nk
+	on (p.idNamedTest = nk.rowid);
+
 /* resolve default ephemera to strings.
  */
 create temp view 
@@ -7,6 +15,7 @@ from eph_default p join eph_named nk
 	on (p.idNamedKind = nk.rowid)
 left join eph_named nf
 		on (p.idNamedProp = nf.rowid);
+
 
 /* resolve value ephemera to strings.
  */

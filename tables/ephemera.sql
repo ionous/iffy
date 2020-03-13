@@ -1,7 +1,7 @@
 create table eph_alias( idNamedAlias int, idNamedActual int );
 create table eph_aspect( idNamedAspect int );
 create table eph_certainty( certainty text, idNamedTrait int, idNamedKind text );
-create table eph_check( idNamedTest text, idProg int, expect text );
+create table eph_check( idNamedTest int, idProg int, expect text );
 create table eph_default( idNamedKind int, idNamedProp int, value blob );
 create table eph_kind( idNamedKind int, idNamedParent int );
 create table eph_named( name text, category text, idSource int, offset text );

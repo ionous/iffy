@@ -1,6 +1,10 @@
 package tables
 
-import "database/sql"
+import (
+	"database/sql"
+
+	_ "github.com/mattn/go-sqlite3"
+)
 
 //go:generate templify -p tables -o ephemera.gen.go ephemera.sql
 func CreateEphemera(db *sql.DB) error {
