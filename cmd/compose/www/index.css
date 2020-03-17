@@ -5,10 +5,11 @@ body {
 .mk-container {
   display: grid;
   grid-template-columns: 200px auto;
-  grid-template-rows: auto 20%;
+  grid-template-rows: 2rem auto 20%;
   grid-gap: 10px;
   height: 100%;
   grid-template-areas: 
+    "header buttons"
     "sidebar editor"
     "sidebar context";
 }
@@ -16,6 +17,27 @@ body {
   color: #404040;
   background-color: #f4f5f7; /* ~solitude */
 }
+.mk-header {
+  grid-area: header;
+  padding: 5px;
+  font-family: sans-serif;
+  font-style: italic;
+  align-self: center;
+}
+.mk-buttons-form {
+  overflow: visible;
+  /*float: right;
+  clear: both;*/
+  margin-right: 3px;
+  margin-left: 3px;
+  padding-top: 5px;
+}
+.mk-buttons {
+  grid-area: buttons;
+  }
+.mk-header button {
+  margin-left: 5em;
+  }
 .mk-browser {
   grid-area: sidebar;
   overflow-y: scroll;

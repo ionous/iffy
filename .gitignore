@@ -14,3 +14,4 @@ cmd/play/play
 cmd/spec/spec
 cmd/spec/spec.js
 cmd/stem/stem
+cmd/compose/compose
