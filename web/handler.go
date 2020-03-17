@@ -23,15 +23,25 @@ func HandleResource(root Resource) http.HandlerFunc {
 func handleResponse(w http.ResponseWriter, r *http.Request, root Resource) (err error) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	// chop off the leading and trailing slash. wise? i dont know.
-	if res, e := FindResource(root, r.URL.Path[1:len(r.URL.Path)-1]); e != nil {
+	if res, e := FindResource(root, strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/"), "/")); e != nil {
 		http.NotFound(w, r)
 		err = e
-	} else if r.Method != "GET" {
-		http.Error(w, r.Method, http.StatusMethodNotAllowed)
-		err = errutil.Fmt("method %s not allowed", r.Method)
-	} else if e := res.Get(w); e != nil {
-		http.Error(w, e.Error(), http.StatusInternalServerError)
-		err = e
+	} else {
+		switch r.Method {
+		case "GET":
+			if e := res.Get(w); e != nil {
+				http.Error(w, e.Error(), http.StatusInternalServerError)
+				err = e
+			}
+		case "PUT":
+			if e := res.Put(r.Body, w); e != nil {
+				http.Error(w, e.Error(), http.StatusInternalServerError)
+				err = e
+			}
+		default:
+			http.Error(w, r.Method, http.StatusMethodNotAllowed)
+			err = errutil.Fmt("method %s not allowed", r.Method)
+		}
 	}
 	return
 }

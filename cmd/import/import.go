@@ -56,7 +56,7 @@ func readJson(filePath string) (ret reader.Map, err error) {
 		err = e
 	} else {
 		dec := json.NewDecoder(fp)
-		if e := dec.Decode(&ret); e != nil && e == io.EOF {
+		if e := dec.Decode(&ret); e != nil && e != io.EOF {
 			err = e
 		}
 	}
