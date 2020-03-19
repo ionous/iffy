@@ -22,6 +22,8 @@ func main() {
 	flag.Parse()
 	if e := assemble(outFile, inFile); e != nil {
 		log.Fatalln(e)
+	} else {
+		log.Println("Assembled", inFile, "into", outFile)
 	}
 }
 
@@ -30,6 +32,8 @@ func assemble(outFile, inFile string) (err error) {
 		err = e
 	} else if outFile, e := filepath.Abs(outFile); e != nil {
 		err = e
+	} else if e := os.Remove(outFile); e != nil && !os.IsNotExist(e) {
+		err = errutil.New("couldn't clean output file", outFile, e)
 	} else if db, e := sql.Open("sqlite3", outFile); e != nil {
 		err = errutil.New("couldn't create output file", outFile, e)
 	} else {

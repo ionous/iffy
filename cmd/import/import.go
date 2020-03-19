@@ -38,6 +38,8 @@ func distill(outFile, inFile string) (err error) {
 		err = e
 	} else if inData, e := readJson(inFile); e != nil {
 		err = errutil.New("couldn't read file", inFile, e)
+	} else if e := os.Remove(outFile); e != nil && !os.IsNotExist(e) {
+		err = errutil.New("couldn't clean output file", outFile, e)
 	} else if outDB, e := sql.Open("sqlite3", outFile); e != nil {
 		err = errutil.New("couldn't create output file", outFile, e)
 	} else {

@@ -8,10 +8,10 @@ ephemera/cmd/stem
 assembly/debug.test
 cmd/asm/asm
 cmd/atlas/atlas
+cmd/check/check
 cmd/compose/compose
 cmd/import/import
 cmd/play/play
 cmd/spec/spec
 cmd/spec/spec.js
 cmd/stem/stem
-cmd/compose/compose

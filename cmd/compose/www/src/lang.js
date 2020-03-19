@@ -2,7 +2,7 @@
 function localLang(make) {
    make.group("Testing", function() {
     make.run("test", "story_statement",
-      "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {+execute|ghost}.");
+      "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.");
   });
 
   make.group("Story Statements", function() {

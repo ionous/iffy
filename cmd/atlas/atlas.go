@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"golang.org/x/net/context"
+
 	"github.com/ionous/iffy/web"
 	"github.com/ionous/iffy/web/support"
 	_ "github.com/mattn/go-sqlite3"
@@ -54,14 +56,14 @@ func Atlas(db *sql.DB) web.Resource {
 							ret = Empty(name)
 						case "kinds":
 							return &web.Wrapper{
-								Gets: func(w http.ResponseWriter) error {
+								Gets: func(ctx context.Context, w http.ResponseWriter) error {
 									return listOfKinds(w, db)
 								},
 							}
 						}
 						return
 					},
-					Gets: func(w http.ResponseWriter) error {
+					Gets: func(ctx context.Context, w http.ResponseWriter) error {
 						return templates.ExecuteTemplate(w, "links", []struct{ Link, Text string }{
 							{"/atlas/kinds/", "kinds"},
 							{"/atlas/nouns/", "nouns"},
@@ -76,7 +78,7 @@ func Atlas(db *sql.DB) web.Resource {
 
 func Empty(name string) web.Resource {
 	return &web.Wrapper{
-		Gets: func(w http.ResponseWriter) error {
+		Gets: func(ctx context.Context, w http.ResponseWriter) error {
 			_, e := fmt.Fprintf(w, "No %s to see here", name)
 			return e
 		},

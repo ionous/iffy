@@ -12,7 +12,7 @@ import (
 // providing responses to http get and post requests.
 func HandleResource(root Resource) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("handling", r.URL.Path, r.Method)
+		log.Println("( handling", r.URL.Path, r.Method, ")")
 		if e := handleResponse(w, r, root); e != nil {
 			log.Println(e)
 		}
@@ -27,14 +27,15 @@ func handleResponse(w http.ResponseWriter, r *http.Request, root Resource) (err 
 		http.NotFound(w, r)
 		err = e
 	} else {
+		ctx := r.Context()
 		switch r.Method {
 		case "GET":
-			if e := res.Get(w); e != nil {
+			if e := res.Get(ctx, w); e != nil {
 				http.Error(w, e.Error(), http.StatusInternalServerError)
 				err = e
 			}
 		case "PUT":
-			if e := res.Put(r.Body, w); e != nil {
+			if e := res.Put(ctx, r.Body, w); e != nil {
 				http.Error(w, e.Error(), http.StatusInternalServerError)
 				err = e
 			}

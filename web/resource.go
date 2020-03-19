@@ -4,6 +4,8 @@ import (
 	"io"
 	"net/http"
 
+	"golang.org/x/net/context"
+
 	"github.com/ionous/errutil"
 )
 
@@ -13,16 +15,16 @@ type Resource interface {
 	// Return the named sub-resource
 	Find(string) Resource
 	// Write the resource
-	Get(http.ResponseWriter) error
+	Get(context.Context, http.ResponseWriter) error
 	// Receive a resource
-	Put(io.Reader, http.ResponseWriter) error
+	Put(context.Context, io.Reader, http.ResponseWriter) error
 }
 
 // Turn one or more Resource compatible functions into a full interface implementation.
 type Wrapper struct {
 	Finds func(string) Resource
-	Gets  func(http.ResponseWriter) error
-	Puts  func(io.Reader, http.ResponseWriter) error
+	Gets  func(context.Context, http.ResponseWriter) error
+	Puts  func(context.Context, io.Reader, http.ResponseWriter) error
 }
 
 func (n *Wrapper) Find(child string) (ret Resource) {
@@ -32,18 +34,18 @@ func (n *Wrapper) Find(child string) (ret Resource) {
 	return
 }
 
-func (n *Wrapper) Get(w http.ResponseWriter) (err error) {
+func (n *Wrapper) Get(ctx context.Context, w http.ResponseWriter) (err error) {
 	if get := n.Gets; get != nil {
-		err = get(w)
+		err = get(ctx, w)
 	} else {
 		err = errutil.New("unsupported get")
 	}
 	return
 }
 
-func (n *Wrapper) Put(r io.Reader, w http.ResponseWriter) (err error) {
+func (n *Wrapper) Put(ctx context.Context, r io.Reader, w http.ResponseWriter) (err error) {
 	if put := n.Puts; put != nil {
-		err = put(r, w)
+		err = put(ctx, r, w)
 	} else {
 		err = errutil.New("unsupported put")
 	}

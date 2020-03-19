@@ -8,7 +8,7 @@ function getStory() {
         "type": "text",
         "value": "hello, goodbye"
       },
-      "$EXECUTE": [
+      "$GO": [
         {
           "id": "id-1709ef632af-1",
           "type": "execute",

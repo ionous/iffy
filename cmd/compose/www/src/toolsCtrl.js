@@ -2,7 +2,7 @@ Vue.component('mk-tools', {
   template:
   `<div class="mk-buttons-form">
       <button disabled>Play</button>
-      <button :disabled="!allow.testing" @click="onTest">Test</button>
+      <button :disabled="!allow.testing" @click="onTest">Check</button>
       <span v-if="msg">{{msg}}</span>
     </div>`,
   data() {
@@ -38,7 +38,7 @@ Vue.component('mk-tools', {
       const { story } = app.$data;
       const serial = JSON.stringify(story.item, 0, 2);
       // console.log("testing", serial);
-      xhr.open("PUT", "/story/test");
+      xhr.open("PUT", "/story/check");
       xhr.setRequestHeader("Content-Type", "application/json");
       xhr.send(serial);
     },

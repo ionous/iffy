@@ -1,6 +1,8 @@
 package check
 
 import (
+	"log"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
@@ -35,7 +37,8 @@ func (op *Test) Execute(run rt.Runtime) (err error) {
 	} else if t != op.Lines {
 		err = errutil.New("Test", op.TestName, "expected:", op.Lines, "got:", t)
 	} else {
-		println("test", op.TestName, ":", t)
+		// FIX FIX FIX
+		log.Println("Test '"+op.TestName+"':", t)
 	}
 	return
 }
