@@ -30,7 +30,7 @@ func Compose(cfg *Config) {
 	http.HandleFunc("/story/", web.HandleResource(StoryApi(cfg)))
 
 	log.Println("Composer using", cfg.Documents)
-	log.Println("Listening on port", cfg.Port+"...")
+	log.Println("Listening on port", strconv.Itoa(cfg.Port)+"...")
 	if e := http.ListenAndServe(":3000", nil); e != nil {
 		log.Fatal(e)
 	}
