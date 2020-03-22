@@ -15,7 +15,7 @@ type Relation interface {
 	// Returns previous data, if any.
 	Relate(Object, Object, index.OnInsert) (bool, error)
 	// Returns existing data, if any.
-	GetRelative(Object, Object) (interface{}, bool)
+	// GetRelative(Object, Object) (interface{}, bool)
 	// hrm.
 	GetTable() *index.Table
 }

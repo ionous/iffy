@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
+// Expression provides a local alias for postfix.Expression.
 type Expression = postfix.Expression
 
 // Parse the passed template string into an expression.

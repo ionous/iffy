@@ -1,11 +1,12 @@
 package core
 
 import (
-	"github.com/ionous/iffy/ref/kindOf"
 	r "reflect"
+
+	"github.com/ionous/iffy/ref/kindOf"
 )
 
-// Transform converts values specified by a scriptinto values usable by the runtime.
+// Transform converts values specified by a script into values usable by the runtime.
 // For instance, a string into a request for an object; an int into a number eval.
 // See also express.NewTransform which can create templates from author specified strings.
 // FIX: this uses core, but should it be a part of core?

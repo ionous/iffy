@@ -5,6 +5,7 @@ import (
 )
 
 // Function element of an Expression.
+// Examples of function(s) are mathematical and boolean operators, if,else blocks, iffy commands, etc.
 type Function interface {
 	// Arity the number of required function arguments;
 	// Should be a constant number for each function instance.
@@ -14,6 +15,8 @@ type Function interface {
 	Precedence() int
 }
 
+// Expression provides a series of post fix functions:
+// even primitive values are represented here as zero-arity functions returning the value in question.
 type Expression []Function
 
 func (x Expression) String() string {
