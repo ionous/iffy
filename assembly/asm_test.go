@@ -44,7 +44,7 @@ func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 			err = e
 		} else {
 			rec := ephemera.NewRecorder(t.Name(), db)
-			mdl := NewModelerDB(db)
+			mdl := NewModeler(db)
 			ret = &assemblyTest{
 				T:       t,
 				db:      db,
