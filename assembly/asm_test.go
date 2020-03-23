@@ -6,7 +6,6 @@ import (
 	"path"
 	"testing"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 )
@@ -73,35 +72,4 @@ type pair struct{ key, value string }
 type triplet struct {
 	target, prop string
 	value        interface{}
-}
-
-// create some fake model hierarchy
-func fakeHierarchy(m *Modeler, kinds []pair) (err error) {
-	for _, p := range kinds {
-		if e := m.WriteAncestor(p.key, p.value); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}
-
-// create some fake model hierarchy; mdl_field: field, kind, type.
-func fakeFields(m *Modeler, kinds []kfp) (err error) {
-	for _, p := range kinds {
-		if e := m.WriteField(p.kind, p.field, p.fieldType); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}
-
-// write aspect, trait pairs
-func fakeTraits(m *Modeler, traits []pair) (err error) {
-	for _, t := range traits {
-		// rank is not set yet, see DetermineAspects
-		if e := m.WriteTrait(t.key, t.value, 0); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
 }

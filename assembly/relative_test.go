@@ -181,13 +181,13 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 	if t, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"N", "K"},
 		}); e != nil {
 			err = e
-		} else if e := fakeNouns(t.modeler, []pair{
+		} else if e := AddTestNouns(t.modeler, []TargetField{
 			{"a", "K"},
 			{"b", "K"},
 			{"c", "K"},
@@ -199,7 +199,7 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			{"z", "K"},
 		}); e != nil {
 			err = e
-		} else if e := fakeRelations(t.modeler, [][4]string{
+		} else if e := AddTestRelations(t.modeler, [][4]string{
 			// relation, kind, cardinality, otherKind
 			{"Rel1", "K", tables.ONE_TO_ONE, "K"},
 			{"Rel1x", "K", tables.ONE_TO_MANY, "K"},
@@ -207,7 +207,7 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			{"Relxx", "K", tables.MANY_TO_MANY, "K"},
 		}); e != nil {
 			err = e
-		} else if e := fakeVerbs(t.modeler, [][2]string{
+		} else if e := AddTestVerbs(t.modeler, [][2]string{
 			// rel, verb
 			{"Rel1", "v1"},
 			{"Rel1x", "v1x"},
@@ -245,26 +245,5 @@ func addRelative(rec *ephemera.Recorder, noun, stem, otherNoun string) (err erro
 	namedStem := rec.Named(tables.NAMED_VERB, stem, "test")
 	otherName := rec.Named(tables.NAMED_NOUN, otherNoun, "test")
 	rec.NewRelative(name, namedStem, otherName)
-	return
-}
-
-// add modeled data: relation, kind, cardinality, otherKind
-func fakeRelations(m *Modeler, relations [][4]string) (err error) {
-	for _, el := range relations {
-		relation, kind, cardinality, otherKind := el[0], el[1], el[2], el[3]
-		if e := m.WriteRelation(relation, kind, cardinality, otherKind); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}
-
-func fakeVerbs(m *Modeler, relationStem [][2]string) (err error) {
-	for _, el := range relationStem {
-		rel, verb := el[0], el[1]
-		if e := m.WriteVerb(rel, verb); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
 	return
 }

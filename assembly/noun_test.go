@@ -19,24 +19,24 @@ func TestNounFormation(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addNouns(rec, []pair{
 			{"apple", "T"},
 			{"pear", "T"},
-			{"machine gun", "T"},
+			{"toy boat", "T"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineNouns(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(db, []modeledNoun{
 			{"apple", "T", 0},
-			{"machine gun", "T", 0},
-			{"gun", "T", 1},
-			{"machine", "T", 2},
 			{"pear", "T", 0},
+			{"toy boat", "T", 0},
+			{"boat", "T", 1},
+			{"toy", "T", 2},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -85,7 +85,7 @@ func TestNounLcaSucess(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
@@ -120,7 +120,7 @@ func TestNounLcaFailure(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
@@ -148,7 +148,7 @@ func TestNounParts(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)

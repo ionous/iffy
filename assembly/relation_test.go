@@ -79,7 +79,7 @@ func TestRelationCreation(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
@@ -113,7 +113,7 @@ func TestRelationCardinality(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"P", ""},
 		}); e != nil {
 			t.Fatal(e)
@@ -138,7 +138,7 @@ func TestRelationLcaSuccess(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
@@ -169,7 +169,7 @@ func TestRelationLcaFailure(t *testing.T) {
 		defer t.Close()
 		db, rec, m := t.db, t.rec, t.modeler
 		//
-		if e := fakeHierarchy(m, []pair{
+		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},

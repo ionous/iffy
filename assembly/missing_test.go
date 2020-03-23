@@ -92,7 +92,7 @@ func TestMissingField(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)
@@ -126,13 +126,13 @@ func xTestMissingUnknownField(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeFields(t.modeler, []kfp{
+		} else if e := AddTestFields(t.modeler, []TargetValue{
 			{"T", "d", tables.PRIM_DIGI},
 			{"T", "t", tables.PRIM_TEXT},
 			{"T", "t2", tables.PRIM_TEXT},

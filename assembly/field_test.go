@@ -54,7 +54,7 @@ func TestFields(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
@@ -84,7 +84,7 @@ func TestFieldLca(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
@@ -112,7 +112,7 @@ func TestFieldTypeMismatch(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer t.Close()
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)

@@ -17,38 +17,38 @@ func TestInitialFieldAssignment(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer t.Close()
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"M", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeFields(t.modeler, []kfp{
+		} else if e := AddTestFields(t.modeler, []TargetValue{
 			{"K", "t", tables.PRIM_TEXT},
 			{"L", "d", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeNouns(t.modeler, []pair{
+		} else if e := AddTestNouns(t.modeler, []TargetField{
 			{"apple", "K"},
 			{"pear", "L"},
-			{"machine gun", "M"},
-			{"gun", "M"},
+			{"toy boat", "M"},
+			{"boat", "M"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(t.rec, []triplet{
+		} else if e := addValues(t.rec, []TargetValue{
 			{"apple", "t", "some text"},
 			{"pear", "d", 123},
-			{"machine", "d", 321},
-			{"gun", "t", "more text"},
+			{"toy", "d", 321},
+			{"boat", "t", "more text"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := determineInitialFields(t.modeler, t.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchValues(t.db, []triplet{
+		} else if e := matchValues(t.db, []TargetValue{
 			{"apple", "t", "some text"},
-			{"gun", "t", "more text"},
-			{"machine gun", "d", int64(321)},
+			{"boat", "t", "more text"},
 			{"pear", "d", int64(123)}, // int64, re: go's default scanner.
+			{"toy boat", "d", int64(321)},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -62,43 +62,43 @@ func TestInitialTraitAssignment(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"M", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeFields(t.modeler, []kfp{
+		} else if e := AddTestFields(t.modeler, []TargetValue{
 			{"K", "A", tables.PRIM_ASPECT},
 			{"L", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeTraits(t.modeler, []pair{
+		} else if e := AddTestTraits(t.modeler, []TargetField{
 			{"A", "w"}, {"A", "x"}, {"A", "y"},
 			{"B", "z"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeNouns(t.modeler, []pair{
+		} else if e := AddTestNouns(t.modeler, []TargetField{
 			{"apple", "K"},
 			{"pear", "L"},
-			{"machine gun", "M"},
-			{"gun", "M"},
+			{"toy boat", "M"},
+			{"boat", "M"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(t.rec, []triplet{
+		} else if e := addValues(t.rec, []TargetValue{
 			{"apple", "A", "y"},
 			{"pear", "x", true},
-			{"machine", "w", true},
-			{"gun", "z", true},
+			{"toy", "w", true},
+			{"boat", "z", true},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := DetermineValues(t.modeler, t.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchValues(t.db, []triplet{
+		} else if e := matchValues(t.db, []TargetValue{
 			{"apple", "A", "y"},
-			{"gun", "B", "z"},
-			{"machine gun", "A", "w"},
+			{"boat", "B", "z"},
 			{"pear", "A", "x"},
+			{"toy boat", "A", "w"},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -106,9 +106,9 @@ func TestInitialTraitAssignment(t *testing.T) {
 }
 
 // match generated model defaults
-func matchValues(db *sql.DB, want []triplet) (err error) {
-	var curr triplet
-	var have []triplet
+func matchValues(db *sql.DB, want []TargetValue) (err error) {
+	var curr TargetValue
+	var have []TargetValue
 	if e := tables.QueryAll(db,
 		`select noun, field, value 
 			from mdl_start
@@ -117,7 +117,7 @@ func matchValues(db *sql.DB, want []triplet) (err error) {
 			have = append(have, curr)
 			return
 		},
-		&curr.target, &curr.prop, &curr.value); e != nil {
+		&curr.Target, &curr.Field, &curr.Value); e != nil {
 		err = e
 	} else if !reflect.DeepEqual(have, want) {
 		err = errutil.New("mismatch",
@@ -129,24 +129,12 @@ func matchValues(db *sql.DB, want []triplet) (err error) {
 
 // eph_value: fake noun, prop, value
 // prop: k, f, v
-func addValues(rec *ephemera.Recorder, vals []triplet) (err error) {
+func addValues(rec *ephemera.Recorder, vals []TargetValue) (err error) {
 	for _, v := range vals {
-		noun := rec.Named(tables.NAMED_NOUN, v.target, "test")
-		prop := rec.Named(tables.NAMED_PROPERTY, v.prop, "test")
-		value := v.value
+		noun := rec.Named(tables.NAMED_NOUN, v.Target, "test")
+		prop := rec.Named(tables.NAMED_PROPERTY, v.Field, "test")
+		value := v.Value
 		rec.NewValue(noun, prop, value)
-	}
-	return
-}
-
-// mdl_noun:  kind, ret id noun
-// mdl_name: noun, name, rank
-func fakeNouns(m *Modeler, els []pair) (err error) {
-	for _, el := range els {
-		noun, kind := el.key, el.value
-		if e := m.WriteNounWithNames(noun, kind); e != nil {
-			err = errutil.Append(err, e)
-		}
 	}
 	return
 }

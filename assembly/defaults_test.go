@@ -18,14 +18,14 @@ func TestDefaultFieldAssigment(t *testing.T) {
 	} else {
 		defer t.Close()
 		//
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"D", "K"},
 			{"C", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := fakeFields(t.modeler, []kfp{
+		} else if e := AddTestFields(t.modeler, []TargetValue{
 			{"K", "d", tables.PRIM_DIGI},
 			{"K", "t", tables.PRIM_TEXT},
 			{"K", "t2", tables.PRIM_TEXT},
@@ -254,13 +254,13 @@ func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemb
 	if t, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {
-		if e := fakeHierarchy(t.modeler, []pair{
+		if e := AddTestHierarchy(t.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"N", "K"},
 		}); e != nil {
 			err = e
-		} else if e := fakeFields(t.modeler, []kfp{
+		} else if e := AddTestFields(t.modeler, []TargetValue{
 			{"K", "d", tables.PRIM_DIGI},
 			{"K", "t", tables.PRIM_TEXT},
 			{"K", "A", tables.PRIM_ASPECT},
@@ -268,7 +268,7 @@ func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemb
 			{"N", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			err = e
-		} else if e := fakeTraits(t.modeler, []pair{
+		} else if e := AddTestTraits(t.modeler, []TargetField{
 			{"A", "w"}, {"A", "x"}, {"A", "y"},
 			{"B", "z"},
 		}); e != nil {
