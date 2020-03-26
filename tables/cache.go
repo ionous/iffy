@@ -56,6 +56,15 @@ func (c *Cache) Exec(q string, args ...interface{}) (ret int64, err error) {
 	return
 }
 
+func (c *Cache) Query(q string, args ...interface{}) (ret *sql.Rows, err error) {
+	if stmt, e := c.prep(q); e != nil {
+		err = e
+	} else {
+		ret, err = stmt.Query(args...)
+	}
+	return
+}
+
 // QueryRow mimics db.QueryRow but returns Scanner instead of Row
 // so that we can defer any errors encountered while preparing the cached statement.
 func (c *Cache) QueryRow(q string, args ...interface{}) (ret RowScanner) {

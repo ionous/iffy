@@ -29,3 +29,9 @@ func CreateRun(db *sql.DB) error {
 	_, e := db.Exec(runTemplate())
 	return e
 }
+
+//go:generate templify -p tables -o runViews.gen.go runViews.sql
+func CreateRunViews(db *sql.DB) error {
+	_, e := db.Exec(runViewsTemplate())
+	return e
+}

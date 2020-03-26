@@ -1,4 +1,4 @@
-package live
+package qna
 
 import (
 	"database/sql"
@@ -6,6 +6,7 @@ import (
 	"path"
 	"testing"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/assembly"
 	"github.com/ionous/iffy/tables"
 )
@@ -33,16 +34,16 @@ func sqlFile(t *testing.T, path string) (ret string, err error) {
 }
 
 func TestGetField(t *testing.T) {
-
-	if source, e := sqlFile(t, ""); e != nil {
+	if source, e := sqlFile(t, memory); e != nil {
 		t.Fatal(e)
 	} else if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else if e := tables.CreateModel(db); e != nil {
 		t.Fatal(e)
+	} else if e := tables.CreateRunViews(db); e != nil {
+		t.Fatal(e)
 	} else {
 		m := assembly.NewModeler(db)
-
 		if e := assembly.AddTestHierarchy(m, []assembly.TargetField{
 			{"K", ""},
 			{"A", "K"},
@@ -71,10 +72,52 @@ func TestGetField(t *testing.T) {
 			t.Fatal(e)
 		} else if e := assembly.AddTestDefaults(m, []assembly.TargetValue{
 			{"K", "d", 42},
-			{"F", "d", 13},
+			{"A", "t", "chippo"},
 			{"L", "t", "weazy"},
+			{"F", "d", 13},
 		}); e != nil {
 			t.Fatal(e)
+		} else {
+			numValues := []struct {
+				name  string
+				value float64
+			}{
+				{"apple", 5},
+				{"boat", 13},
+				{"duck", 1},
+				{"toy boat", 42},
+			}
+			txtValues := []struct {
+				name  string
+				value string
+			}{
+				{"apple", ""},
+				{"boat", "xyzzy"},
+				{"duck", "chippo"},
+				{"toy boat", "boboat"},
+			}
+
+			q := NewValues(db)
+			for _, v := range numValues {
+				for i := 0; i < 2; i++ {
+					var num float64
+					if e := q.GetField(v.name, "d", &num); e != nil {
+						t.Fatal(e)
+					} else if num != v.value {
+						t.Fatal(errutil.New("mismatch", v.name, num, v.value))
+					}
+				}
+			}
+			for _, v := range txtValues {
+				for i := 0; i < 2; i++ {
+					var txt string
+					if e := q.GetField(v.name, "t", &txt); e != nil {
+						t.Fatal(e)
+					} else if txt != v.value {
+						t.Fatal(errutil.New("mismatch", v.name, "got:", txt, "expected:", v.value))
+					}
+				}
+			}
 		}
 	}
 }
