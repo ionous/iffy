@@ -7,6 +7,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
+// Values populates itself from the database on demand.
 type Values struct {
 	pairs mapType
 	db    *tables.Cache
@@ -25,47 +26,9 @@ type mapTarget struct {
 }
 
 func (k *mapTarget) Scan(v interface{}) (err error) {
+	// bytes will need special processing ( copies )
 	k.pairs[k.key], k.value = v, v
 	return
-}
-
-func setValue(pv interface{}, v interface{}) (err error) {
-	switch out := pv.(type) {
-	case *int64:
-		switch v := v.(type) {
-		case nil:
-			*out = 0.0
-		case int64:
-			*out = int64(v)
-		case float64:
-			*out = int64(v)
-		default:
-			err = errutil.New("expected number output")
-		}
-	case *float64:
-		switch v := v.(type) {
-		case nil:
-			*out = 0.0
-		case int64:
-			*out = float64(v)
-		case float64:
-			*out = float64(v)
-		default:
-			err = errutil.New("expected number output")
-		}
-	case *string:
-		if v == nil {
-			*out = ""
-		} else if v, ok := v.(string); !ok {
-			err = errutil.New("expected string output")
-		} else {
-			*out = v
-		}
-	default:
-		err = errutil.New("unexpected output type")
-	}
-	return
-
 }
 
 func NewValues(db *sql.DB) *Values {
@@ -78,24 +41,24 @@ func NewValues(db *sql.DB) *Values {
 // get class,
 
 // GetValue sets the value of the passed pointer to the value of the named property.
-func (n *Values) GetField(noun, field string, pv interface{}) (err error) {
-	key := keyType{noun, field}
+func (n *Values) GetField(obj, field string, pv interface{}) (err error) {
+	key := keyType{obj, field}
 	if v, ok := n.pairs[key]; ok {
-		err = setValue(pv, v)
+		err = Assign(pv, v)
 	} else {
 		tgt := mapTarget{key: key, pairs: n.pairs}
 		if e := n.db.QueryRow("select value from run_init where noun=? and field=? order by tier limit 1",
-			noun, field).Scan(&tgt); e == nil {
-			err = setValue(pv, tgt.value)
+			obj, field).Scan(&tgt); e == nil {
+			err = Assign(pv, tgt.value)
 			//
 		} else if e == sql.ErrNoRows {
 			n.pairs[key] = nil
-			err = setValue(pv, nil)
+			err = Assign(pv, nil)
 			// option 1: generate the zero value in sql, somehow
 			// option 2: reflect -- mattn already uses reflect
 			// option 3: scan to an interface? and have a generic/switch unpack
 			// option 4: assume pv is zero already.
-			// option 5: store nil and use setValue below to create/set zero
+			// option 5: store nil and use Assign below to create/set zero
 		} else {
 			err = e
 		}
@@ -103,9 +66,11 @@ func (n *Values) GetField(noun, field string, pv interface{}) (err error) {
 	return err
 }
 
-// SetValue sets the named property to the passed value.
+// Assign sets the named property to the passed value.
 func (n *Values) SetField(obj, field string, v interface{}) (err error) {
-	return notImplemented
+	key := keyType{obj, field}
+	n.pairs[key] = v
+	return
 }
 
 var notImplemented = errutil.New("not implemented")
