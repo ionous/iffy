@@ -30,6 +30,5 @@ func TestLoop(t *testing.T) {
 				t.Log("loop", i, "of", cnt, index, first, last)
 			}
 		}
-
 	}
 }

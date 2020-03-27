@@ -4,11 +4,12 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/tables"
 )
 
-// Values populates itself from the database on demand.
-type Values struct {
+// ObjectValues populates itself from the database on demand.
+type ObjectValues struct {
 	pairs mapType
 	db    *tables.Cache
 }
@@ -31,8 +32,8 @@ func (k *mapTarget) Scan(v interface{}) (err error) {
 	return
 }
 
-func NewValues(db *sql.DB) *Values {
-	return &Values{make(mapType), tables.NewCache(db)}
+func NewObjectValues(db *sql.DB) *ObjectValues {
+	return &ObjectValues{make(mapType), tables.NewCache(db)}
 }
 
 // other possibilities as needed:
@@ -41,14 +42,22 @@ func NewValues(db *sql.DB) *Values {
 // get class,
 
 // GetValue sets the value of the passed pointer to the value of the named property.
-func (n *Values) GetField(obj, field string, pv interface{}) (err error) {
+func (n *ObjectValues) GetObject(obj, field string, pv interface{}) (err error) {
 	key := keyType{obj, field}
 	if v, ok := n.pairs[key]; ok {
 		err = Assign(pv, v)
 	} else {
 		tgt := mapTarget{key: key, pairs: n.pairs}
-		if e := n.db.QueryRow("select value from run_init where noun=? and field=? order by tier limit 1",
-			obj, field).Scan(&tgt); e == nil {
+		var rows tables.RowScanner
+		switch field {
+		case object.Exists:
+			rows = n.db.QueryRow("select count() from mdl_noun where noun=?",
+				obj)
+		default:
+			rows = n.db.QueryRow("select value from run_init where noun=? and field=? order by tier limit 1",
+				obj, field)
+		}
+		if e := rows.Scan(&tgt); e == nil {
 			err = Assign(pv, tgt.value)
 			//
 		} else if e == sql.ErrNoRows {
@@ -63,11 +72,12 @@ func (n *Values) GetField(obj, field string, pv interface{}) (err error) {
 			err = e
 		}
 	}
+
 	return err
 }
 
 // Assign sets the named property to the passed value.
-func (n *Values) SetField(obj, field string, v interface{}) (err error) {
+func (n *ObjectValues) SetObject(obj, field string, v interface{}) (err error) {
 	key := keyType{obj, field}
 	n.pairs[key] = v
 	return

@@ -6,8 +6,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/assembly"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -33,7 +33,7 @@ func sqlFile(t *testing.T, path string) (ret string, err error) {
 	return
 }
 
-func TestGetField(t *testing.T) {
+func TestGetObjectValues(t *testing.T) {
 	if source, e := sqlFile(t, memory); e != nil {
 		t.Fatal(e)
 	} else if db, e := sql.Open("sqlite3", source); e != nil {
@@ -96,25 +96,43 @@ func TestGetField(t *testing.T) {
 				{"duck", "chippo"},
 				{"toy boat", "boboat"},
 			}
+			existence := []struct {
+				name   string
+				exists bool
+			}{
+				{"apple", true},
+				{"boat", true},
+				{"duck", true},
+				{"toy boat", true},
+				{"speedboat", false},
+			}
 
-			q := NewValues(db)
+			q := NewObjectValues(db)
+			for _, v := range existence {
+				var exists bool
+				if e := q.GetObject(v.name, object.Exists, &exists); e != nil {
+					t.Fatal("existence", v.name, e)
+				} else if v.exists != exists {
+					t.Fatal("existence", v.name, "wanted", v.exists)
+				}
+			}
 			for _, v := range numValues {
 				for i := 0; i < 2; i++ {
 					var num float64
-					if e := q.GetField(v.name, "d", &num); e != nil {
+					if e := q.GetObject(v.name, "d", &num); e != nil {
 						t.Fatal(e)
 					} else if num != v.value {
-						t.Fatal(errutil.New("mismatch", v.name, num, v.value))
+						t.Fatal("mismatch", v.name, num, v.value)
 					}
 				}
 			}
 			for _, v := range txtValues {
 				for i := 0; i < 2; i++ {
 					var txt string
-					if e := q.GetField(v.name, "t", &txt); e != nil {
+					if e := q.GetObject(v.name, "t", &txt); e != nil {
 						t.Fatal(e)
 					} else if txt != v.value {
-						t.Fatal(errutil.New("mismatch", v.name, "got:", txt, "expected:", v.value))
+						t.Fatal("mismatch", v.name, "got:", txt, "expected:", v.value)
 					}
 				}
 			}
