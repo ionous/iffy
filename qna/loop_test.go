@@ -6,10 +6,10 @@ func TestLoop(t *testing.T) {
 	caps := [][]struct{ first, last bool }{
 		{{true, true}},
 		{{true, false}, {false, true}},
-		{{true, false}, {false, false}, {true, true}},
+		{{true, false}, {false, false}, {false, true}},
 	}
 	for c, cap := range caps {
-		lf := NewLoop(nil)
+		var lf LoopFactory
 		for i, cnt := 0, len(cap); i < cnt; i++ {
 			cap := cap[i]
 			count := i + 1
@@ -24,7 +24,7 @@ func TestLoop(t *testing.T) {
 				t.Fatal("first error", first, "at", c, i, e)
 			} else if e := s.GetVariable("last", &last); e != nil || last != cap.last {
 				t.Fatal("last error", last, "at", c, i, e)
-			} else if _, ok := s.GetVariable("nothing", nil).(UnknownLoopVariable); !ok {
+			} else if _, ok := s.GetVariable("nothing", nil).(UnknownVariable); !ok {
 				t.Fatal("expected loop error")
 			} else {
 				t.Log("loop", i, "of", cnt, index, first, last)
