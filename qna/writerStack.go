@@ -29,8 +29,3 @@ func (k *WriterStack) Writer() (ret io.Writer) {
 	}
 	return
 }
-
-// Write writes to the top writer of the stack, or os.Stdout if there is none.
-func (k *WriterStack) Write(p []byte) (n int, err error) {
-	return k.Writer().Write(p)
-}

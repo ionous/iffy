@@ -16,6 +16,10 @@ func (k *ScopeStack) PopScope() {
 	}
 }
 
+func (k *ScopeStack) Scope() VariableScope {
+	return k
+}
+
 // GetVariable writes the value at 'name' into the value pointed to by 'pv'.
 func (k *ScopeStack) GetVariable(name string, pv interface{}) (err error) {
 	return k.visit(name, func(scope VariableScope) error {
