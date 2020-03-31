@@ -15,8 +15,8 @@ type Execute interface {
 	Execute(Runtime) error
 }
 
-// WriteText runs a bit of code that writes into w.
-type WriteText interface {
+// TextWriter runs a bit of code that writes into w.
+type TextWriter interface {
 	WriteText(Runtime, io.Writer) error
 }
 

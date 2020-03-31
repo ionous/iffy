@@ -30,7 +30,7 @@ type ChooseNum struct {
 // Choose one of two text phrases based on a boolean test.
 type ChooseText struct {
 	If          rt.BoolEval
-	True, False rt.WriteText
+	True, False rt.TextWriter
 }
 
 // Choose one of two object evaluations based on a boolean test.
@@ -60,7 +60,7 @@ func (op *ChooseText) WriteText(run rt.Runtime, w io.Writer) (err error) {
 	if b, e := op.If.GetBool(run); e != nil {
 		err = e
 	} else {
-		var next rt.WriteText
+		var next rt.TextWriter
 		if b {
 			next = op.True
 		} else {

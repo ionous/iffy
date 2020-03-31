@@ -10,7 +10,7 @@ import (
 
 // Say some bit of text.
 type Say struct {
-	Text rt.WriteText
+	Text rt.TextWriter
 }
 
 // Compose defines a spec for the composer editor.

@@ -1,6 +1,9 @@
 package rt
 
-import "io"
+import (
+	"bytes"
+	"io"
+)
 
 // Pluralize turns single words into their plural variants.
 type Pluralize interface {
@@ -73,6 +76,16 @@ func WritersBlock(run Runtime, w io.Writer, fn func() error) (err error) {
 		err = e
 	} else if closer, ok := w.(io.Closer); ok {
 		err = closer.Close()
+	}
+	return
+}
+
+func GetText(run Runtime, eval TextWriter) (ret string, err error) {
+	var buf bytes.Buffer
+	if e := eval.WriteText(run, &buf); e != nil {
+		err = e
+	} else {
+		ret = buf.String()
 	}
 	return
 }

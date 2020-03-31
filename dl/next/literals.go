@@ -10,13 +10,13 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// BoolValue specifies a simple true/false value.
-type BoolValue struct {
+// Bool specifies a simple true/false value.
+type Bool struct {
 	Bool bool
 }
 
 // Compose returns a spec for use by the composer editor.
-func (*BoolValue) Compose() composer.Spec {
+func (*Bool) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "bool_value",
 		Spec:  "{bool:bool_eval}",
@@ -26,37 +26,45 @@ func (*BoolValue) Compose() composer.Spec {
 }
 
 // GetBool implements BoolEval; providing the dl with a boolean literal.
-func (b *BoolValue) GetBool(rt.Runtime) (bool, error) {
+func (b *Bool) GetBool(rt.Runtime) (bool, error) {
 	return b.Bool, nil
 }
 
 // String uses strconv.FormatBool.
-func (b *BoolValue) String() string {
+func (b *Bool) String() string {
 	return strconv.FormatBool(b.Bool)
 }
 
-// NumValue specifies a number value.
-type NumValue struct {
+// Number specifies a number value.
+type Number struct {
 	Num float64
 }
 
+func (*Number) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "num_value",
+		Group: "literals",
+		Desc:  "Number Value: Specify a particular number.",
+	}
+}
+
 // GetNumber implements NumberEval providing the dl with a number literal.
-func (n *NumValue) GetNumber(rt.Runtime) (float64, error) {
+func (n *Number) GetNumber(rt.Runtime) (float64, error) {
 	return n.Num, nil
 }
 
 // Int converts to native int.
-func (n *NumValue) Int() int {
+func (n *Number) Int() int {
 	return int(n.Num)
 }
 
 // Float converts to native float.
-func (n *NumValue) Float() float64 {
+func (n *Number) Float() float64 {
 	return n.Num
 }
 
 // String returns a nicely formatted float, with no decimal point when possible.
-func (n *NumValue) String() string {
+func (n *Number) String() string {
 	return strconv.FormatFloat(n.Num, 'g', -1, 64)
 }
 
