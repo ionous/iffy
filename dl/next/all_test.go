@@ -7,8 +7,7 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-func TestAll(t *testing.T) {
-	// functions that turn execute blocks into text
+func TestAllTrue(t *testing.T) {
 	run := &rt.Panic{}
 	var l boolList
 	evals := []rt.BoolEval{}
@@ -36,6 +35,35 @@ func TestAll(t *testing.T) {
 		t.Fatal("expected only two got tested", l.asks)
 	}
 
+}
+
+func TestAnyTrue(t *testing.T) {
+	run := &rt.Panic{}
+	var l boolList
+	evals := []rt.BoolEval{}
+	for i := 0; i < 3; i++ {
+		test := &AnyTrue{evals}
+		if ok, e := test.GetBool(run); e != nil {
+			t.Fatal(e)
+		} else if ok {
+			t.Fatal("expected failure")
+		} else if l.asks != i {
+			t.Fatal("expected all got tested", l.asks)
+		}
+		//
+		l.asks, l.vals = 0, append(l.vals, false)
+		evals = append(evals, &l)
+	}
+	// turn one true.
+	l.vals[1] = true
+	test := &AnyTrue{evals}
+	if ok, e := test.GetBool(run); e != nil {
+		t.Fatal(e)
+	} else if !ok {
+		t.Fatal("expected success")
+	} else if l.asks != 2 {
+		t.Fatal("expected two got tested", l.asks)
+	}
 }
 
 type boolList struct {
