@@ -1,8 +1,9 @@
 package rt
 
 import (
-	"bytes"
 	"io"
+
+	"github.com/ionous/iffy/scope"
 )
 
 // Pluralize turns single words into their plural variants.
@@ -10,19 +11,9 @@ type Pluralize interface {
 	Pluralize(single string) string
 }
 
-// VariableScope reads from and writes to a pool of named variables;
-// the variables, their names, and initial values depend on the implementation and its context.
-// Often, scopes are arranged in a stack with the newest scope checked for variables first, the oldest last.
-type VariableScope interface {
-	// GetVariable writes the value at 'name' into the value pointed to by 'pv'.
-	GetVariable(name string, pv interface{}) error
-	// SetVariable writes the value of 'v' into the value at 'name'.
-	SetVariable(name string, v interface{}) error
-}
-
 type VariableStack interface {
-	Scope() VariableScope
-	PushScope(VariableScope)
+	scope.VariableScope
+	PushScope(scope.VariableScope)
 	PopScope()
 }
 
@@ -40,10 +31,10 @@ type ObjectValues interface {
 // }
 
 // Ancestors customizes the parent-child event hierarchy.
-type Ancestors interface {
-	// GetAncestors returns a stream of objects starting with the parent of the passed object, walking up whatever hierarchy the particular runtime implementation has defined.
-	GetAncestors(Runtime, string) (ObjectStream, error)
-}
+// type Ancestors interface {
+// 	// GetAncestors returns a stream of objects starting with the parent of the passed object, walking up whatever hierarchy the particular runtime implementation has defined.
+// 	GetAncestors(Runtime, string) (ObjectStream, error)
+// }
 
 type WriterStack interface {
 	Writer() io.Writer
@@ -80,22 +71,21 @@ func WritersBlock(run Runtime, w io.Writer, fn func() error) (err error) {
 	return
 }
 
-func GetText(run Runtime, eval TextWriter) (ret string, err error) {
-	var buf bytes.Buffer
-	if e := eval.WriteText(run, &buf); e != nil {
-		err = e
-	} else {
-		ret = buf.String()
-	}
+// ScopeBlock brings the names of an object's properties into scope for the duration of fn.
+func ScopeBlock(run Runtime, scope scope.VariableScope, block Execute) (err error) {
+	run.PushScope(scope)
+	err = block.Execute(run)
+	run.PopScope()
 	return
 }
 
-// ScopeBlock brings the names of an object's properties into scope for the duration of fn.
-func ScopeBlock(run Runtime, scope VariableScope, fn func()) {
-	run.PushScope(scope)
-	fn()
-	run.PopScope()
-}
+// // ScopeBlock brings the names of an object's properties into scope for the duration of fn.
+// func ScopeBlock(run Runtime, scope VariableScope, fn func() error) (err error) {
+// 	run.PushScope(scope)
+// 	err = fn()
+// 	run.PopScope()
+// 	return
+// }
 
 // PORTING....
 // func Determine(run Runtime, p interface{}) error {

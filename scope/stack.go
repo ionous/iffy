@@ -1,4 +1,4 @@
-package qna
+package scope
 
 type ScopeStack struct {
 	stack []VariableScope
@@ -14,10 +14,6 @@ func (k *ScopeStack) PopScope() {
 	} else {
 		k.stack = k.stack[0 : cnt-1]
 	}
-}
-
-func (k *ScopeStack) Scope() VariableScope {
-	return k
 }
 
 // GetVariable writes the value at 'name' into the value pointed to by 'pv'.

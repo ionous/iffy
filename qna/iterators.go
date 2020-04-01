@@ -25,6 +25,7 @@ func (it *NumberList) HasNext() bool {
 
 func (it *NumberList) GetNumber() (ret float64, err error) {
 	err = Assign(&ret, it.list[it.i])
+	it.i++
 	return
 }
 
@@ -35,20 +36,9 @@ func NewTextList(list []string) *TextList {
 func (it *TextList) HasNext() bool {
 	return it.i < len(it.list)
 }
+
 func (it *TextList) GetText() (ret string, err error) {
 	err = Assign(&ret, it.list[it.i])
-	return
-}
-
-func NewObjectList(list []string) *ObjectList {
-	return &ObjectList{list: list}
-}
-
-func (it *ObjectList) HasNext() bool {
-	return it.i < len(it.list)
-}
-
-func (it *ObjectList) GetObject() (ret string, err error) {
-	err = Assign(&ret, it.list[it.i])
+	it.i++
 	return
 }

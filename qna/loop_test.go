@@ -1,6 +1,10 @@
 package qna
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/ionous/iffy/scope"
+)
 
 func TestLoop(t *testing.T) {
 	caps := [][]struct{ first, last bool }{
@@ -14,7 +18,7 @@ func TestLoop(t *testing.T) {
 			cap := cap[i]
 			count := i + 1
 			atEnd := count == cnt
-			s := lf.NextScope(!atEnd)
+			s := lf.NextScope(scope.EmptyScope{}, !atEnd)
 			var index int
 			var first, last bool
 
@@ -24,7 +28,7 @@ func TestLoop(t *testing.T) {
 				t.Fatal("first error", first, "at", c, i, e)
 			} else if e := s.GetVariable("last", &last); e != nil || last != cap.last {
 				t.Fatal("last error", last, "at", c, i, e)
-			} else if _, ok := s.GetVariable("nothing", nil).(UnknownVariable); !ok {
+			} else if _, ok := s.GetVariable("nothing", nil).(scope.UnknownVariable); !ok {
 				t.Fatal("expected loop error")
 			} else {
 				t.Log("loop", i, "of", cnt, index, first, last)

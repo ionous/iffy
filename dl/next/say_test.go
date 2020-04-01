@@ -16,8 +16,7 @@ var helloThereWorld = rt.Block{
 
 func ExampleSpan() {
 	var run sayTester
-	span := &Span{helloThereWorld}
-	if e := span.WriteText(&run, os.Stdout); e != nil {
+	if e := rt.WriteText(&run, os.Stdout, &Span{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -26,17 +25,16 @@ func ExampleSpan() {
 
 func ExampleBracket() {
 	var run sayTester
-	span := &Bracket{helloThereWorld}
-	if e := span.WriteText(&run, os.Stdout); e != nil {
+	if e := rt.WriteText(&run, os.Stdout, &Bracket{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
 	// ( hello there world )
 }
+
 func ExampleSlash() {
 	var run sayTester
-	slash := &Slash{helloThereWorld}
-	if e := slash.WriteText(&run, os.Stdout); e != nil {
+	if e := rt.WriteText(&run, os.Stdout, &Slash{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -45,8 +43,7 @@ func ExampleSlash() {
 
 func ExampleCommas() {
 	var run sayTester
-	commas := &Commas{helloThereWorld}
-	if e := commas.WriteText(&run, os.Stdout); e != nil {
+	if e := rt.WriteText(&run, os.Stdout, &Commas{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:

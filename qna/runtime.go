@@ -2,6 +2,8 @@ package qna
 
 import (
 	"database/sql"
+
+	"github.com/ionous/iffy/scope"
 )
 
 func NewRuntime(db *sql.DB) (ret *Runner) {
@@ -12,7 +14,7 @@ func NewRuntime(db *sql.DB) (ret *Runner) {
 
 type Runner struct {
 	WriterStack
-	ScopeStack
+	scope.ScopeStack
 	Randomizer
 	*ObjectValues
 }

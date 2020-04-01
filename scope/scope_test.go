@@ -1,4 +1,4 @@
-package qna
+package scope
 
 import "testing"
 
@@ -84,7 +84,7 @@ func TestScopeStack(t *testing.T) {
 type mockScope struct {
 	name       string
 	gets, sets int
-	val        int64
+	val        int
 }
 
 func (k *mockScope) GetVariable(name string, pv interface{}) (err error) {
@@ -92,7 +92,8 @@ func (k *mockScope) GetVariable(name string, pv interface{}) (err error) {
 		err = UnknownVariable(name)
 	} else {
 		k.gets++
-		err = Assign(pv, k.val)
+		pi := pv.(*int)
+		(*pi) = k.val
 	}
 	return
 }
@@ -102,7 +103,7 @@ func (k *mockScope) SetVariable(name string, v interface{}) (err error) {
 		err = UnknownVariable(name)
 	} else {
 		k.sets++
-		err = Assign(&k.val, v)
+		k.val = v.(int)
 	}
 	return
 }

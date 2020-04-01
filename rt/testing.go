@@ -1,6 +1,10 @@
 package rt
 
-import "io"
+import (
+	"io"
+
+	"github.com/ionous/iffy/scope"
+)
 
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
@@ -20,10 +24,13 @@ func (Panic) PushWriter(io.Writer) {
 func (Panic) PopWriter() {
 	panic("Runtime panic")
 }
-func (Panic) Scope() VariableScope {
+func (Panic) GetVariable(name string, pv interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) PushScope(VariableScope) {
+func (Panic) SetVariable(name string, v interface{}) error {
+	panic("Runtime panic")
+}
+func (Panic) PushScope(scope.VariableScope) {
 	panic("Runtime panic")
 }
 func (Panic) PopScope() {
@@ -31,4 +38,20 @@ func (Panic) PopScope() {
 }
 func (Panic) Random(inclusiveMin, exclusiveMax int) int {
 	panic("Runtime panic")
+}
+
+// WriteText evaluates t and outputs the results to w.
+func WriteText(run Runtime, w io.Writer, eval TextEval) (err error) {
+	if t, e := eval.GetText(run); e != nil {
+		err = e
+	} else {
+		io.WriteString(w, t)
+	}
+	return
+}
+
+// Run executes the passed statement using the passed runtime.
+// It's helpful especially for testing.
+func Run(run Runtime, exec Execute) (err error) {
+	return exec.Execute(run)
 }

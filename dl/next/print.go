@@ -1,7 +1,6 @@
 package next
 
 import (
-	"io"
 	"strconv"
 
 	"github.com/divan/num2words"
@@ -22,13 +21,13 @@ func (*PrintNum) Compose() composer.Spec {
 	}
 }
 
-func (p *PrintNum) WriteText(run rt.Runtime, w io.Writer) (err error) {
+func (p *PrintNum) GetText(run rt.Runtime) (ret string, err error) {
 	if n, e := p.Num.GetNumber(run); e != nil {
 		err = e
 	} else if s := strconv.FormatFloat(n, 'g', -1, 64); len(s) > 0 {
-		_, err = io.WriteString(w, s)
+		ret = s
 	} else {
-		_, err = io.WriteString(w, "<num>")
+		ret = "<num>"
 	}
 	return
 }
@@ -46,13 +45,13 @@ func (*PrintNumWord) Compose() composer.Spec {
 	}
 }
 
-func (p *PrintNumWord) WriteText(run rt.Runtime, w io.Writer) (err error) {
+func (p *PrintNumWord) GetText(run rt.Runtime) (ret string, err error) {
 	if n, e := p.Num.GetNumber(run); e != nil {
 		err = e
 	} else if s := num2words.Convert(int(n)); len(s) > 0 {
-		_, err = io.WriteString(w, s)
+		ret = s
 	} else {
-		_, err = io.WriteString(w, "<num>")
+		ret = "<num>"
 	}
 	return
 }

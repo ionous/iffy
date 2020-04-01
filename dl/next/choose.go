@@ -1,8 +1,6 @@
 package next
 
 import (
-	"io"
-
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
@@ -10,8 +8,8 @@ import (
 // Choose to execute one of two blocks based on a boolean test.
 type Choose struct {
 	If    rt.BoolEval
-	True  rt.Block
-	False rt.Block
+	True  rt.Execute
+	False rt.Execute
 }
 
 func (*Choose) Compose() composer.Spec {
@@ -30,13 +28,7 @@ type ChooseNum struct {
 // Choose one of two text phrases based on a boolean test.
 type ChooseText struct {
 	If          rt.BoolEval
-	True, False rt.TextWriter
-}
-
-// Choose one of two object evaluations based on a boolean test.
-type ChooseObj struct {
-	If          rt.BoolEval
-	True, False rt.ObjectEval
+	True, False rt.TextEval
 }
 
 func (op *ChooseNum) GetNumber(run rt.Runtime) (ret float64, err error) {
@@ -56,35 +48,18 @@ func (op *ChooseNum) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
-func (op *ChooseText) WriteText(run rt.Runtime, w io.Writer) (err error) {
+func (op *ChooseText) GetText(run rt.Runtime) (ret string, err error) {
 	if b, e := op.If.GetBool(run); e != nil {
 		err = e
 	} else {
-		var next rt.TextWriter
+		var next rt.TextEval
 		if b {
 			next = op.True
 		} else {
 			next = op.False
 		}
 		if next != nil {
-			err = next.WriteText(run, w)
-		}
-	}
-	return
-}
-
-func (op *ChooseObj) GetObject(run rt.Runtime) (ret string, err error) {
-	if b, e := op.If.GetBool(run); e != nil {
-		err = e
-	} else {
-		var next rt.ObjectEval
-		if b {
-			next = op.True
-		} else {
-			next = op.False
-		}
-		if next != nil {
-			ret, err = next.GetObject(run)
+			ret, err = next.GetText(run)
 		}
 	}
 	return
@@ -95,7 +70,7 @@ func (op *Choose) Execute(run rt.Runtime) (err error) {
 	if b, e := op.If.GetBool(run); e != nil {
 		err = e
 	} else {
-		var next rt.Block
+		var next rt.Execute
 		if b {
 			next = op.True
 		} else {

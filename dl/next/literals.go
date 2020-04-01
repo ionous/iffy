@@ -1,7 +1,6 @@
 package next
 
 import (
-	"io"
 	"strconv"
 
 	"github.com/ionous/iffy/dl/composer"
@@ -83,9 +82,9 @@ func (*Text) Compose() composer.Spec {
 }
 
 // GetText implements interface TextEval providing the dl with a text literal.
-func (t *Text) WriteText(run rt.Runtime, w io.Writer) error {
-	_, e := io.WriteString(w, t.Text)
-	return e
+func (t *Text) GetText(run rt.Runtime) (ret string, err error) {
+	ret = t.Text
+	return
 }
 
 // String returns the text.
@@ -130,14 +129,4 @@ type Texts struct {
 
 func (l *Texts) GetTextStream(rt.Runtime) (rt.TextStream, error) {
 	return qna.NewTextList(l.Values), nil
-}
-
-// ObjectNames specifies multiple object names.
-type ObjectNames struct {
-	Names []string
-}
-
-// GetObjectStream returns a stream of names without bothering to validate if they exist
-func (l *ObjectNames) GetObjectStream(run rt.Runtime) (rt.ObjectStream, error) {
-	return qna.NewObjectList(l.Names), nil
 }

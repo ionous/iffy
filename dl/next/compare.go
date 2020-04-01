@@ -53,15 +53,9 @@ type CompareNum struct {
 }
 
 type CompareText struct {
-	A  rt.TextWriter
+	A  rt.TextEval
 	Is CompareTo
-	B  rt.TextWriter
-}
-
-type CompareObj struct {
-	A  rt.ObjectEval
-	Is CompareTo
-	B  rt.ObjectEval
+	B  rt.TextEval
 }
 
 func (comp *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -84,42 +78,25 @@ func (comp *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
 }
 
 func (comp *CompareText) GetBool(run rt.Runtime) (ret bool, err error) {
-	if src, e := rt.GetText(run, comp.A); e != nil {
+	if src, e := comp.A.GetText(run); e != nil {
 		err = errutil.New("CompareText.A", e)
-	} else if tgt, e := rt.GetText(run, comp.B); e != nil {
+	} else if tgt, e := comp.B.GetText(run); e != nil {
 		err = errutil.New("CompareText.B", e)
 	} else {
-		ret, err = compareStr(comp.Is.Compare(), src, tgt)
+		switch cmp := comp.Is.Compare(); cmp {
+		case Compare_EqualTo:
+			ret = src == tgt
+		case Compare_LessThan:
+			ret = src < tgt
+		case Compare_GreaterThan:
+			ret = src > tgt
+		case Compare_GreaterThan | Compare_EqualTo:
+			ret = src >= tgt
+		case Compare_LessThan | Compare_EqualTo:
+			ret = src <= tgt
+		default:
+			err = errutil.New("CompareText.Is", cmp, "unknown operand")
+		}
 	}
-	return
-}
-
-func (comp *CompareObj) GetBool(run rt.Runtime) (ret bool, err error) {
-	if src, e := comp.A.GetObject(run); e != nil {
-		err = errutil.New("CompareObject.A", e)
-	} else if tgt, e := comp.B.GetObject(run); e != nil {
-		err = errutil.New("CompareObject.B", e)
-	} else {
-		ret, err = compareStr(comp.Is.Compare(), src, tgt)
-	}
-	return
-}
-
-func compareStr(cmp CompareType, src, tgt string) (ret bool, err error) {
-	switch cmp {
-	case Compare_EqualTo:
-		ret = src == tgt
-	case Compare_LessThan:
-		ret = src < tgt
-	case Compare_GreaterThan:
-		ret = src > tgt
-	case Compare_GreaterThan | Compare_EqualTo:
-		ret = src >= tgt
-	case Compare_LessThan | Compare_EqualTo:
-		ret = src <= tgt
-	default:
-		err = errutil.New("CompareText.Is", cmp, "unknown operand")
-	}
-
 	return
 }

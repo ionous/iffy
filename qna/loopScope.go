@@ -1,5 +1,7 @@
 package qna
 
+import "github.com/ionous/iffy/scope"
+
 // LoopFactory or iterator variables while looping ( ex. through a series of objects. )
 // index: counts the loop iterations, starting with 1.
 // first: returns true for the first iteration, and false thereafter.
@@ -10,13 +12,14 @@ type LoopFactory struct {
 
 // NewScope creates a scope for this round of the loop;
 // updates the internal counter for the next round of the loop.
-func (l *LoopFactory) NextScope(hasNext bool) VariableScope {
+func (l *LoopFactory) NextScope(val scope.ReadOnly, hasNext bool) scope.VariableScope {
 	l.i++ // pre-inc, because while i starts at zero, the loop counter starts at one.
-	return &loopScope{currIndex: l.i, hasNext: hasNext}
+	return &loopScope{val: val, currIndex: l.i, hasNext: hasNext}
 }
 
 // internal, implements VariableScope.
 type loopScope struct {
+	val       scope.ReadOnly
 	currIndex int
 	hasNext   bool
 }
@@ -31,12 +34,12 @@ func (l *loopScope) GetVariable(n string, pv interface{}) (err error) {
 	case "last":
 		err = Assign(pv, !l.hasNext)
 	default:
-		err = UnknownVariable(n)
+		err = l.val.GetVariable(n, pv)
 	}
 	return
 }
 
 // SetVariable always returns an UnknownVariable error; iterator variables are not writable.
 func (l *loopScope) SetVariable(n string, v interface{}) (err error) {
-	return UnknownVariable(n)
+	return scope.UnknownVariable(n)
 }
