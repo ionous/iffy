@@ -1,11 +1,11 @@
 package check
 
 import (
+	"bytes"
 	"log"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -13,10 +13,10 @@ type Commands struct {
 	*Test
 }
 
-// Test that the output of running
+// Test that the output of running 'Go' statements prints 'Lines'
 type Test struct {
 	TestName string
-	Go       rt.ExecuteList
+	Go       rt.Execute
 	Lines    string
 }
 
@@ -31,14 +31,21 @@ func (*Test) Compose() composer.Spec {
 
 // Execute evals, eats the returns
 func (op *Test) Execute(run rt.Runtime) (err error) {
-	b := core.Buffer{op.Go}
-	if t, e := b.GetText(run); e != nil {
+	return
+}
+
+// GetBool returns true if the test succeeded, otherwise it returns an error.
+func (op *Test) GetBool(run rt.Runtime) (okay bool, err error) {
+	var buf bytes.Buffer
+	if e := rt.WritersBlock(run, &buf, func() error {
+		return op.Go.Execute(run)
+	}); e != nil {
 		err = errutil.New("Test", op.TestName, "encountered error:", e)
-	} else if t != op.Lines {
+	} else if t := buf.String(); t != op.Lines {
 		err = errutil.New("Test", op.TestName, "expected:", op.Lines, "got:", t)
 	} else {
-		// FIX FIX FIX
 		log.Println("Test '"+op.TestName+"':", t)
+		okay = true
 	}
 	return
 }
