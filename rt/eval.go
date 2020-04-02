@@ -39,7 +39,7 @@ type TextListEval interface {
 type NumberStream interface {
 	// HasNext returns true if the iterator can be safely advanced.
 	HasNext() bool
-	// GetNumbers advances the iterator.
+	// GetNumber advances the iterator.
 	GetNumber() (float64, error)
 }
 
@@ -53,5 +53,6 @@ type TextStream interface {
 
 // StreamCount provides an optional interface for determining the number of elements in a stream.
 type StreamCount interface {
+	// Count returns the remaining length of the stream.
 	Count() int
 }

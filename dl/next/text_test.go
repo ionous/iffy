@@ -40,17 +40,12 @@ func TestText(t *testing.T) {
 
 	t.Run("join", func(t *testing.T) {
 		testTrue(t, &CompareText{
-			&Join{
-				Elems: &Texts{oneTwoThree},
-			},
+			&Join{Elems: &Texts{oneTwoThree}},
 			&EqualTo{},
 			&Text{"onetwothree"},
 		})
 		testTrue(t, &CompareText{
-			&Join{
-				Elems: &Texts{oneTwoThree},
-				Sep:   &Text{" "},
-			},
+			&Join{&Texts{oneTwoThree}, &Text{" "}},
 			&EqualTo{},
 			&Text{"one two three"},
 		})

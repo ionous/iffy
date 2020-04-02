@@ -46,7 +46,7 @@ type Join struct {
 }
 
 func (op *Join) GetText(run rt.Runtime) (ret string, err error) {
-	if sep, e := rt.GetOptionalText(run, op.Sep); e != nil {
+	if sep, e := rt.GetOptionalText(run, op.Sep, ""); e != nil {
 		err = e
 	} else if it, e := rt.GetTextStream(run, op.Elems); e != nil {
 		err = e

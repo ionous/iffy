@@ -60,9 +60,21 @@ func GetText(run Runtime, eval TextEval) (ret string, err error) {
 }
 
 // GetOptionalText runs the optionally specified eval.
-func GetOptionalText(run Runtime, eval TextEval) (ret string, err error) {
-	if eval != nil {
+func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, err error) {
+	if eval == nil {
+		ret = fallback
+	} else {
 		ret, err = eval.GetText(run)
+	}
+	return
+}
+
+// GetOptionalNumber runs the optionally specified eval.
+func GetOptionalNumber(run Runtime, eval NumberEval, fallback float64) (ret float64, err error) {
+	if eval == nil {
+		ret = fallback
+	} else {
+		ret, err = eval.GetNumber(run)
 	}
 	return
 }
