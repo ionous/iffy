@@ -44,24 +44,26 @@ func TestGetObjectValues(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		m := assembly.NewModeler(db)
-		if e := assembly.AddTestHierarchy(m, []assembly.TargetField{
+		pathsOfKind := []assembly.TargetField{
 			{"K", ""},
 			{"A", "K"},
 			{"L", "K"},
 			{"F", "L,K"},
-		}); e != nil {
+		}
+		kindsOfNoun := []assembly.TargetField{
+			{"apple", "K"},
+			{"duck", "A"},
+			{"toy boat", "L"},
+			{"boat", "F"},
+		}
+		if e := assembly.AddTestHierarchy(m, pathsOfKind); e != nil {
 			t.Fatal(e)
 		} else if e := assembly.AddTestFields(m, []assembly.TargetValue{
 			{"K", "d", tables.PRIM_DIGI},
 			{"K", "t", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := assembly.AddTestNouns(m, []assembly.TargetField{
-			{"apple", "K"},
-			{"duck", "A"},
-			{"toy boat", "L"},
-			{"boat", "F"},
-		}); e != nil {
+		} else if e := assembly.AddTestNouns(m, kindsOfNoun); e != nil {
 			t.Fatal(e)
 		} else if e := assembly.AddTestStarts(m, []assembly.TargetValue{
 			{"apple", "d", 5},
@@ -108,34 +110,77 @@ func TestGetObjectValues(t *testing.T) {
 			}
 
 			q := NewObjectValues(db)
-			for _, v := range existence {
-				var exists bool
-				if e := q.GetObject(v.name, object.Exists, &exists); e != nil {
-					t.Fatal("existence", v.name, e)
-				} else if v.exists != exists {
-					t.Fatal("existence", v.name, "wanted", v.exists)
-				}
-			}
-			for _, v := range numValues {
-				for i := 0; i < 2; i++ {
-					var num float64
-					if e := q.GetObject(v.name, "d", &num); e != nil {
-						t.Fatal(e)
-					} else if num != v.value {
-						t.Fatal("mismatch", v.name, num, v.value)
+
+			// ensure we can ask for object existence
+			t.Run("object exists", func(t *testing.T) {
+				for _, v := range existence {
+					var exists bool
+					if e := q.GetObject(v.name, object.Exists, &exists); e != nil {
+						t.Fatal("existence", v.name, e)
+					} else if v.exists != exists {
+						t.Fatal("existence", v.name, "wanted", v.exists)
 					}
 				}
-			}
-			for _, v := range txtValues {
-				for i := 0; i < 2; i++ {
-					var txt string
-					if e := q.GetObject(v.name, "t", &txt); e != nil {
-						t.Fatal(e)
-					} else if txt != v.value {
-						t.Fatal("mismatch", v.name, "got:", txt, "expected:", v.value)
+			})
+			// ensure queries for kinds work
+			t.Run("object kind", func(t *testing.T) {
+				for _, v := range kindsOfNoun {
+					for i := 0; i < 2; i++ {
+						var kind string
+						if e := q.GetObject(v.Target, object.Kind, &kind); e != nil {
+							t.Fatal(e)
+						} else if kind != v.Field {
+							t.Fatal("mismatch", v.Target, "got:", kind, "expected:", v.Field)
+						}
 					}
 				}
-			}
+				var kind string
+				if e := q.GetObject("speedboat", object.Kind, &kind); e == nil {
+					t.Fatal("expected error; got", kind)
+				}
+			})
+			// ensure queries for paths work
+			t.Run("object kinds", func(t *testing.T) {
+				for _, v := range pathsOfKind {
+					for i := 0; i < 2; i++ {
+						var path string
+						if e := q.GetObject(v.Target, object.Kinds, &path); e != nil {
+							t.Fatal(e)
+						} else if path != v.Field {
+							t.Fatal("mismatch", v.Target, "got:", path, "expected:", v.Field)
+						}
+					}
+				}
+				var path string
+				if e := q.GetObject("speedboat", object.Kinds, &path); e == nil {
+					t.Fatal("expected error; got", path)
+				}
+			})
+			t.Run("get numbers", func(t *testing.T) {
+				for _, v := range numValues {
+					for i := 0; i < 2; i++ {
+						var num float64
+						if e := q.GetObject(v.name, "d", &num); e != nil {
+							t.Fatal(e)
+						} else if num != v.value {
+							t.Fatal("mismatch", v.name, num, v.value)
+						}
+					}
+				}
+			})
+			t.Run("get text", func(t *testing.T) {
+				for _, v := range txtValues {
+					for i := 0; i < 2; i++ {
+						var txt string
+						if e := q.GetObject(v.name, "t", &txt); e != nil {
+							t.Fatal(e)
+						} else if txt != v.value {
+							t.Fatal("mismatch", v.name, "got:", txt, "expected:", v.value)
+						}
+					}
+				}
+			})
+
 		}
 	}
 }

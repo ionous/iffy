@@ -1,6 +1,8 @@
 package next
 
 import (
+	"strings"
+
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
@@ -50,11 +52,20 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = e
 	} else {
+		// get the kind of the object
 		var objKind string
 		if e := run.GetObject(obj, object.Kind, &objKind); e != nil {
 			err = e
+		} else if objKind == tgtKind {
+			ret = true
 		} else {
-			ret = run.IsCompatible(objKind, tgtKind)
+			// get the path associated with the object kind
+			var fullPath string
+			if e := run.GetObject(objKind, object.Kinds, &fullPath); e != nil {
+				err = e
+			} else {
+				ret = strings.Contains(fullPath+",", tgtKind+",")
+			}
 		}
 	}
 	return

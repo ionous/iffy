@@ -47,13 +47,27 @@ func (n *ObjectValues) GetObject(obj, field string, pv interface{}) (err error) 
 	if v, ok := n.pairs[key]; ok {
 		err = Assign(pv, v)
 	} else {
+		var permissive bool
 		tgt := mapTarget{key: key, pairs: n.pairs}
 		var rows tables.RowScanner
 		switch field {
+		case object.Kind:
+			rows = n.db.QueryRow("select kind from mdl_noun where noun=?",
+				obj)
+		case object.Kinds:
+			// objects and kinds are distinct namespaces
+			// so we can reuse the object property cache to cache kind info
+			// alternatively, we could give each object its path...
+			// and that might be a little bit nicer.
+			rows = n.db.QueryRow("select path from mdl_kind where kind=?",
+				obj)
 		case object.Exists:
 			rows = n.db.QueryRow("select count() from mdl_noun where noun=?",
 				obj)
 		default:
+			// FIX? needs more work to determine if the field really exists
+			// ex. possibly a union query of class field with a nil value
+			permissive = true
 			rows = n.db.QueryRow("select value from run_init where noun=? and field=? order by tier limit 1",
 				obj, field)
 		}
@@ -61,13 +75,12 @@ func (n *ObjectValues) GetObject(obj, field string, pv interface{}) (err error) 
 			err = Assign(pv, tgt.value)
 			//
 		} else if e == sql.ErrNoRows {
-			n.pairs[key] = nil
-			err = Assign(pv, nil)
-			// option 1: generate the zero value in sql, somehow
-			// option 2: reflect -- mattn already uses reflect
-			// option 3: scan to an interface? and have a generic/switch unpack
-			// option 4: assume pv is zero already.
-			// option 5: store nil and use Assign below to create/set zero
+			if !permissive {
+				err = errutil.New("field not found", obj, field)
+			} else {
+				n.pairs[key] = nil
+				err = Assign(pv, nil)
+			}
 		} else {
 			err = e
 		}

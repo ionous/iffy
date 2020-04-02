@@ -13,8 +13,12 @@ func TestObjects(t *testing.T) {
 	base, derived := &Text{"base"}, &Text{"derived"}
 
 	run := modelTest{clsMap: map[string]string{
+		// objects:
 		this.Text: base.Text,
 		that.Text: derived.Text,
+		// hierarchy:
+		base.Text:    "",
+		derived.Text: base.Text,
 	}}
 
 	t.Run("exists", func(t *testing.T) {
@@ -49,26 +53,31 @@ type modelTest struct {
 	clsMap map[string]string
 }
 
-func (m *modelTest) GetObject(obj, field string, pv interface{}) (err error) {
+func (m *modelTest) GetObject(name, field string, pv interface{}) (err error) {
 	switch field {
 	case object.Exists:
-		_, ok := m.clsMap[obj]
+		_, ok := m.clsMap[name]
 		bptr := pv.(*bool)
 		*bptr = ok
 
 	case object.Kind:
-		if cls, ok := m.clsMap[obj]; !ok {
-			err = errutil.New("unknown object", cls)
+		if cls, ok := m.clsMap[name]; !ok {
+			err = errutil.New("unknown", name)
 		} else {
 			sptr := pv.(*string)
 			*sptr = cls
 		}
+
+	case object.Kinds:
+		if path, ok := m.clsMap[name]; !ok {
+			err = errutil.New("unknown", name)
+		} else {
+			sptr := pv.(*string)
+			*sptr = path
+		}
+
 	default:
 		err = errutil.New("unknown field", field)
 	}
 	return
-}
-
-func (m *modelTest) IsCompatible(childKind, parentKind string) bool {
-	return parentKind == childKind || parentKind == "base"
 }

@@ -28,7 +28,6 @@ type Model interface {
 	// 	GetObject(name string) (string, bool)
 	// 	// GetRelation with the passed name.
 	// 	GetRelation(name string) (Relation, bool)
-	IsCompatible(childKind, parentKind string) bool
 }
 
 // Ancestors customizes the parent-child event hierarchy.
