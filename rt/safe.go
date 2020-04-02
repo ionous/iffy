@@ -1,9 +1,7 @@
 package rt
 
-import "github.com/ionous/errutil"
-
 // Run executes the passed statement using the passed runtime;
-// errors if the passed exec is nil.
+// does *not* error if the passed exec is nil.
 func Run(run Runtime, exec Execute) (err error) {
 	if exec != nil {
 		err = exec.Execute(run)
@@ -15,7 +13,7 @@ func Run(run Runtime, exec Execute) (err error) {
 // errors if the passed eval is nil.
 func GetBool(run Runtime, eval BoolEval) (okay bool, err error) {
 	if eval == nil {
-		err = errutil.New("empty boolean eval")
+		err = MissingEval("empty boolean eval")
 	} else {
 		okay, err = eval.GetBool(run)
 	}
@@ -26,7 +24,7 @@ func GetBool(run Runtime, eval BoolEval) (okay bool, err error) {
 // errors if the passed eval is nil.
 func GetNumber(run Runtime, eval NumberEval) (ret float64, err error) {
 	if eval == nil {
-		err = errutil.New("empty number eval")
+		err = MissingEval("empty number eval")
 	} else {
 		ret, err = eval.GetNumber(run)
 	}
@@ -37,9 +35,15 @@ func GetNumber(run Runtime, eval NumberEval) (ret float64, err error) {
 // errors if the passed eval is nil.
 func GetText(run Runtime, eval TextEval) (ret string, err error) {
 	if eval == nil {
-		err = errutil.New("empty text eval")
+		err = MissingEval("empty text eval")
 	} else {
 		ret, err = eval.GetText(run)
 	}
 	return
 }
+
+// MissingEval error type for unknown variables while processing loops.
+type MissingEval string
+
+// Error returns the name of the unknown variable.
+func (e MissingEval) Error() string { return string(e) }
