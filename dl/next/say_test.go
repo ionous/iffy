@@ -50,10 +50,10 @@ func ExampleCommas() {
 	// hello, there, and world
 }
 
-type sayBase struct {
+type baseRuntime struct {
 	rt.Panic
 }
 type sayTester struct {
-	sayBase
+	baseRuntime
 	qna.WriterStack
 }

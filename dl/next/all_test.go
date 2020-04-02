@@ -13,7 +13,7 @@ func TestAllTrue(t *testing.T) {
 	evals := []rt.BoolEval{}
 	for i := 0; i < 3; i++ {
 		test := &AllTrue{evals}
-		if ok, e := test.GetBool(run); e != nil {
+		if ok, e := rt.GetBool(run, test); e != nil {
 			t.Fatal(e)
 		} else if !ok {
 			t.Fatal("expected success")
@@ -27,7 +27,7 @@ func TestAllTrue(t *testing.T) {
 	// turn one false.
 	l.vals[1] = false
 	test := &AllTrue{evals}
-	if ok, e := test.GetBool(run); e != nil {
+	if ok, e := rt.GetBool(run, test); e != nil {
 		t.Fatal(e)
 	} else if ok {
 		t.Fatal("expected failure")
@@ -43,7 +43,7 @@ func TestAnyTrue(t *testing.T) {
 	evals := []rt.BoolEval{}
 	for i := 0; i < 3; i++ {
 		test := &AnyTrue{evals}
-		if ok, e := test.GetBool(run); e != nil {
+		if ok, e := rt.GetBool(run, test); e != nil {
 			t.Fatal(e)
 		} else if ok {
 			t.Fatal("expected failure")
@@ -57,7 +57,7 @@ func TestAnyTrue(t *testing.T) {
 	// turn one true.
 	l.vals[1] = true
 	test := &AnyTrue{evals}
-	if ok, e := test.GetBool(run); e != nil {
+	if ok, e := rt.GetBool(run, test); e != nil {
 		t.Fatal(e)
 	} else if !ok {
 		t.Fatal("expected success")

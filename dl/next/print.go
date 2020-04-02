@@ -22,7 +22,7 @@ func (*PrintNum) Compose() composer.Spec {
 }
 
 func (p *PrintNum) GetText(run rt.Runtime) (ret string, err error) {
-	if n, e := p.Num.GetNumber(run); e != nil {
+	if n, e := rt.GetNumber(run, p.Num); e != nil {
 		err = e
 	} else if s := strconv.FormatFloat(n, 'g', -1, 64); len(s) > 0 {
 		ret = s
@@ -46,7 +46,7 @@ func (*PrintNumWord) Compose() composer.Spec {
 }
 
 func (p *PrintNumWord) GetText(run rt.Runtime) (ret string, err error) {
-	if n, e := p.Num.GetNumber(run); e != nil {
+	if n, e := rt.GetNumber(run, p.Num); e != nil {
 		err = e
 	} else if s := num2words.Convert(int(n)); len(s) > 0 {
 		ret = s

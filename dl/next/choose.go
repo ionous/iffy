@@ -32,7 +32,7 @@ type ChooseText struct {
 }
 
 func (op *ChooseNum) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if b, e := op.If.GetBool(run); e != nil {
+	if b, e := rt.GetBool(run, op.If); e != nil {
 		err = e
 	} else {
 		var next rt.NumberEval
@@ -42,14 +42,14 @@ func (op *ChooseNum) GetNumber(run rt.Runtime) (ret float64, err error) {
 			next = op.False
 		}
 		if next != nil {
-			ret, err = next.GetNumber(run)
+			ret, err = rt.GetNumber(run, next)
 		}
 	}
 	return
 }
 
 func (op *ChooseText) GetText(run rt.Runtime) (ret string, err error) {
-	if b, e := op.If.GetBool(run); e != nil {
+	if b, e := rt.GetBool(run, op.If); e != nil {
 		err = e
 	} else {
 		var next rt.TextEval
@@ -59,7 +59,7 @@ func (op *ChooseText) GetText(run rt.Runtime) (ret string, err error) {
 			next = op.False
 		}
 		if next != nil {
-			ret, err = next.GetText(run)
+			ret, err = rt.GetText(run, next)
 		}
 	}
 	return
@@ -67,7 +67,7 @@ func (op *ChooseText) GetText(run rt.Runtime) (ret string, err error) {
 
 // Execute evals, eats the returns
 func (op *Choose) Execute(run rt.Runtime) (err error) {
-	if b, e := op.If.GetBool(run); e != nil {
+	if b, e := rt.GetBool(run, op.If); e != nil {
 		err = e
 	} else {
 		var next rt.Execute

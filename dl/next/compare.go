@@ -59,9 +59,9 @@ type CompareText struct {
 }
 
 func (comp *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
-	if src, e := comp.A.GetNumber(run); e != nil {
+	if src, e := rt.GetNumber(run, comp.A); e != nil {
 		err = errutil.New("CompareNum.A", e)
-	} else if tgt, e := comp.B.GetNumber(run); e != nil {
+	} else if tgt, e := rt.GetNumber(run, comp.B); e != nil {
 		err = errutil.New("CompareNum.B", e)
 	} else {
 		d := src - tgt
@@ -78,9 +78,9 @@ func (comp *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
 }
 
 func (comp *CompareText) GetBool(run rt.Runtime) (ret bool, err error) {
-	if src, e := comp.A.GetText(run); e != nil {
+	if src, e := rt.GetText(run, comp.A); e != nil {
 		err = errutil.New("CompareText.A", e)
-	} else if tgt, e := comp.B.GetText(run); e != nil {
+	} else if tgt, e := rt.GetText(run, comp.B); e != nil {
 		err = errutil.New("CompareText.B", e)
 	} else {
 		switch cmp := comp.Is.Compare(); cmp {

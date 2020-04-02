@@ -42,16 +42,10 @@ func (Panic) Random(inclusiveMin, exclusiveMax int) int {
 
 // WriteText evaluates t and outputs the results to w.
 func WriteText(run Runtime, w io.Writer, eval TextEval) (err error) {
-	if t, e := eval.GetText(run); e != nil {
+	if t, e := GetText(run, eval); e != nil {
 		err = e
 	} else {
 		io.WriteString(w, t)
 	}
 	return
-}
-
-// Run executes the passed statement using the passed runtime.
-// It's helpful especially for testing.
-func Run(run Runtime, exec Execute) (err error) {
-	return exec.Execute(run)
 }

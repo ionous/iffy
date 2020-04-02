@@ -20,7 +20,7 @@ func (a *AllTrue) GetBool(run rt.Runtime) (okay bool, err error) {
 
 func (a *AllTrue) anyFalse(run rt.Runtime) (ret bool, err error) {
 	for _, b := range a.Test {
-		if ok, e := b.GetBool(run); e != nil {
+		if ok, e := rt.GetBool(run, b); e != nil {
 			err = e
 			break
 		} else if !ok {
@@ -40,7 +40,7 @@ type AnyTrue struct {
 
 func (a *AnyTrue) GetBool(run rt.Runtime) (okay bool, err error) {
 	for _, b := range a.Test {
-		if ok, e := b.GetBool(run); e != nil {
+		if ok, e := rt.GetBool(run, b); e != nil {
 			err = e
 			break
 		} else if ok {

@@ -99,7 +99,7 @@ type ObjectName struct {
 
 // GetObject returns the object name if it exists
 func (op *ObjectName) GetObject(run rt.Runtime) (ret string, err error) {
-	if ok, e := op.GetBool(run); e != nil {
+	if ok, e := rt.GetBool(run, op); e != nil {
 		err = e
 	} else if ok {
 		ret = op.Name

@@ -49,7 +49,7 @@ func ExampleEndings() {
 var oneTwoThree = []string{"one", "two", "three"}
 
 type forTester struct {
-	sayBase
+	baseRuntime
 	qna.WriterStack
 	scope.ScopeStack
 }

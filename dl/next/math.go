@@ -8,9 +8,9 @@ import (
 )
 
 func getPair(run rt.Runtime, a, b rt.NumberEval) (reta, retb float64, err error) {
-	if a, e := a.GetNumber(run); e != nil {
+	if a, e := rt.GetNumber(run, a); e != nil {
 		err = errutil.New("couldnt get first operand, because", e)
-	} else if b, e := b.GetNumber(run); e != nil {
+	} else if b, e := rt.GetNumber(run, b); e != nil {
 		err = errutil.New("couldnt get second operand, because", e)
 	} else {
 		reta, retb = a, b

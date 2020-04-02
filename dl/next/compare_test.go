@@ -10,7 +10,7 @@ func TestCompareNumbers(t *testing.T) {
 	test := func(a float64, op CompareTo, b float64, res bool) {
 		var run rt.Panic
 		cmp := &CompareNum{&Number{a}, op, &Number{b}}
-		if ok, e := cmp.GetBool(run); e != nil {
+		if ok, e := rt.GetBool(run, cmp); e != nil {
 			t.Fatal(e)
 		} else if res != ok {
 			t.Fatal("mismatch")
@@ -33,7 +33,7 @@ func TestCompareText(t *testing.T) {
 	test := func(a string, op CompareTo, b string, res bool) {
 		var run rt.Panic
 		cmp := &CompareText{&Text{a}, op, &Text{b}}
-		if ok, e := cmp.GetBool(run); e != nil {
+		if ok, e := rt.GetBool(run, cmp); e != nil {
 			t.Fatal(e)
 		} else if res != ok {
 			t.Fatal("mismatch")
