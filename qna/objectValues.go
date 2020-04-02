@@ -55,11 +55,12 @@ func (n *ObjectValues) GetObject(obj, field string, pv interface{}) (err error) 
 			rows = n.db.QueryRow("select kind from mdl_noun where noun=?",
 				obj)
 		case object.Kinds:
-			// objects and kinds are distinct namespaces
-			// so we can reuse the object property cache to cache kind info
-			// alternatively, we could give each object its path...
-			// and that might be a little bit nicer.
-			rows = n.db.QueryRow("select path from mdl_kind where kind=?",
+			rows = n.db.QueryRow(
+				`select kind || ( case path when '' then ('') else ("," || path) end ) as path
+				from mdl_noun mn 
+				join mdl_kind mk 
+					using (kind)
+				where noun=?`,
 				obj)
 		case object.Exists:
 			rows = n.db.QueryRow("select count() from mdl_noun where noun=?",

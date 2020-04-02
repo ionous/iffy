@@ -17,8 +17,8 @@ func TestObjects(t *testing.T) {
 		this.Text: base.Text,
 		that.Text: derived.Text,
 		// hierarchy:
-		base.Text:    "",
-		derived.Text: base.Text,
+		base.Text:    base.Text,
+		derived.Text: derived.Text + "," + base.Text,
 	}}
 
 	t.Run("exists", func(t *testing.T) {
@@ -34,7 +34,7 @@ func TestObjects(t *testing.T) {
 	})
 	t.Run("is kind of", func(t *testing.T) {
 		testTrue(t, &run, &IsKindOf{this, base})
-		testTrue(t, &run, &IsKindOf{that, base}) //
+		testTrue(t, &run, &IsKindOf{that, base})
 
 		testTrue(t, &run, &IsKindOf{that, derived})
 		testTrue(t, &run, &IsNot{&IsKindOf{this, derived}})
@@ -69,8 +69,10 @@ func (m *modelTest) GetObject(name, field string, pv interface{}) (err error) {
 		}
 
 	case object.Kinds:
-		if path, ok := m.clsMap[name]; !ok {
+		if cls, ok := m.clsMap[name]; !ok {
 			err = errutil.New("unknown", name)
+		} else if path, ok := m.clsMap[cls]; !ok {
+			err = errutil.New("unknown class", cls)
 		} else {
 			sptr := pv.(*string)
 			*sptr = path

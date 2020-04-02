@@ -56,6 +56,12 @@ func TestGetObjectValues(t *testing.T) {
 			{"toy boat", "L"},
 			{"boat", "F"},
 		}
+		pathsOfNoun := []assembly.TargetField{
+			{"apple", "K"},
+			{"duck", "A,K"},
+			{"toy boat", "L,K"},
+			{"boat", "F,L,K"},
+		}
 		if e := assembly.AddTestHierarchy(m, pathsOfKind); e != nil {
 			t.Fatal(e)
 		} else if e := assembly.AddTestFields(m, []assembly.TargetValue{
@@ -141,7 +147,7 @@ func TestGetObjectValues(t *testing.T) {
 			})
 			// ensure queries for paths work
 			t.Run("object kinds", func(t *testing.T) {
-				for _, v := range pathsOfKind {
+				for _, v := range pathsOfNoun {
 					for i := 0; i < 2; i++ {
 						var path string
 						if e := q.GetObject(v.Target, object.Kinds, &path); e != nil {
