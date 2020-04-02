@@ -9,6 +9,9 @@ import (
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
 
+func (Panic) IsCompatible(childKind, parentKind string) bool {
+	panic("Runtime panic")
+}
 func (Panic) GetObject(obj, field string, pv interface{}) error {
 	panic("Runtime panic")
 }

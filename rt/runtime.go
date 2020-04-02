@@ -23,12 +23,13 @@ type ObjectValues interface {
 }
 
 // // Model interacts with the predefined world.
-// type Model interface {
-// 	// GetObject with the passed name.
-// 	GetObject(name string) (string, bool)
-// 	// GetRelation with the passed name.
-// 	GetRelation(name string) (Relation, bool)
-// }
+type Model interface {
+	// 	// GetObject with the passed name.
+	// 	GetObject(name string) (string, bool)
+	// 	// GetRelation with the passed name.
+	// 	GetRelation(name string) (Relation, bool)
+	IsCompatible(childKind, parentKind string) bool
+}
 
 // Ancestors customizes the parent-child event hierarchy.
 // type Ancestors interface {
@@ -44,7 +45,7 @@ type WriterStack interface {
 
 // Runtime environment for an in-progress game.
 type Runtime interface {
-	//Model
+	Model
 	ObjectValues
 	WriterStack
 	VariableStack

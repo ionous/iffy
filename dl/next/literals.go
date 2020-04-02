@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
 )
@@ -90,27 +89,6 @@ func (t *Text) GetText(run rt.Runtime) (ret string, err error) {
 // String returns the text.
 func (t *Text) String() string {
 	return t.Text
-}
-
-// ObjectName searches for objects in the world by name.
-type ObjectName struct {
-	Name string
-}
-
-// GetObject returns the object name if it exists
-func (op *ObjectName) GetObject(run rt.Runtime) (ret string, err error) {
-	if ok, e := rt.GetBool(run, op); e != nil {
-		err = e
-	} else if ok {
-		ret = op.Name
-	}
-	return
-}
-
-// GetBool returns true if the object exists
-func (op *ObjectName) GetBool(run rt.Runtime) (ret bool, err error) {
-	e := run.GetObject(op.Name, object.Exists, &ret)
-	return ret, e
 }
 
 // Numbers specifies multiple float values.
