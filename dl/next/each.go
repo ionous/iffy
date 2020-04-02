@@ -20,7 +20,7 @@ type ForEachNum struct {
 }
 
 func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
-	if it, e := f.In.GetNumberStream(run); e != nil {
+	if it, e := rt.GetNumberStream(run, f.In); e != nil {
 		err = e
 	} else {
 		err = loop(run, it, f.Go, f.Else, func() (ret scope.ReadOnly, err error) {
@@ -44,7 +44,7 @@ type ForEachText struct {
 }
 
 func (f *ForEachText) Execute(run rt.Runtime) (err error) {
-	if it, e := f.In.GetTextStream(run); e != nil {
+	if it, e := rt.GetTextStream(run, f.In); e != nil {
 		err = e
 	} else {
 		err = loop(run, it, f.Go, f.Else, func() (ret scope.ReadOnly, err error) {

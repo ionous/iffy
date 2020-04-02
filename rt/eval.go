@@ -2,7 +2,6 @@ package rt
 
 import "github.com/ionous/errutil"
 
-const StreamEnd errutil.Error = "stream end"
 const StreamExceeded errutil.Error = "stream exceeded"
 
 // Execute runs a bit of code that has no return value.
@@ -38,12 +37,21 @@ type TextListEval interface {
 
 // NumberStream provides a way to iterate over a set of numbers.
 type NumberStream interface {
+	// HasNext returns true if the iterator can be safely advanced.
 	HasNext() bool
+	// GetNumbers advances the iterator.
 	GetNumber() (float64, error)
 }
 
 // TextStream provides a way to iterate over a set of strings.
 type TextStream interface {
+	// HasNext returns true if the iterator can be safely advanced.
 	HasNext() bool
+	// GetText advances the iterator.
 	GetText() (string, error)
+}
+
+// StreamCount provides an optional interface for determining the number of elements in a stream.
+type StreamCount interface {
+	Count() int
 }

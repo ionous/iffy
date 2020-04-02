@@ -37,4 +37,22 @@ func TestText(t *testing.T) {
 			&Text{"bull"},
 		}})
 	})
+
+	t.Run("join", func(t *testing.T) {
+		testTrue(t, &CompareText{
+			&Join{
+				Elems: &Texts{oneTwoThree},
+			},
+			&EqualTo{},
+			&Text{"onetwothree"},
+		})
+		testTrue(t, &CompareText{
+			&Join{
+				Elems: &Texts{oneTwoThree},
+				Sep:   &Text{" "},
+			},
+			&EqualTo{},
+			&Text{"one two three"},
+		})
+	})
 }

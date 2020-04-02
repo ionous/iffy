@@ -39,13 +39,3 @@ func (Panic) PopScope() {
 func (Panic) Random(inclusiveMin, exclusiveMax int) int {
 	panic("Runtime panic")
 }
-
-// WriteText evaluates t and outputs the results to w.
-func WriteText(run Runtime, w io.Writer, eval TextEval) (err error) {
-	if t, e := GetText(run, eval); e != nil {
-		err = e
-	} else {
-		io.WriteString(w, t)
-	}
-	return
-}
