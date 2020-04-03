@@ -32,7 +32,7 @@ func (op *Exists) GetBool(run rt.Runtime) (ret bool, err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else {
-		err = run.GetObject(obj, object.Exists, &ret)
+		err = run.GetField(obj, object.Exists, &ret)
 	}
 	return
 }
@@ -41,7 +41,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else {
-		err = run.GetObject(obj, object.Kind, &ret)
+		err = run.GetField(obj, object.Kind, &ret)
 	}
 	return
 }
@@ -54,7 +54,7 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 	} else {
 		// get the path associated with the object
 		var fullPath string
-		if e := run.GetObject(obj, object.Kinds, &fullPath); e != nil {
+		if e := run.GetField(obj, object.Kinds, &fullPath); e != nil {
 			err = e
 		} else {
 			ret = strings.Contains(fullPath+",", tgtKind+",")
@@ -70,7 +70,7 @@ func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = e
 	} else {
 		var objKind string
-		if e := run.GetObject(obj, object.Kind, &objKind); e != nil {
+		if e := run.GetField(obj, object.Kind, &objKind); e != nil {
 			err = e
 		} else {
 			ret = objKind == tgtKind

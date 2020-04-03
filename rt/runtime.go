@@ -17,9 +17,9 @@ type VariableStack interface {
 	PopScope()
 }
 
-type ObjectValues interface {
-	GetObject(obj, field string, pv interface{}) error
-	SetObject(obj, field string, v interface{}) error
+type Fields interface {
+	GetField(target, field string, pv interface{}) error
+	SetField(target, field string, v interface{}) error
 }
 
 // // Model interacts with the predefined world.
@@ -37,7 +37,7 @@ type Model interface {
 // }
 
 type WriterStack interface {
-	Writer() io.Writer
+	io.Writer
 	PushWriter(io.Writer)
 	PopWriter()
 }
@@ -45,7 +45,7 @@ type WriterStack interface {
 // Runtime environment for an in-progress game.
 type Runtime interface {
 	Model
-	ObjectValues
+	Fields
 	WriterStack
 	VariableStack
 	Random(inclusiveMin, exclusiveMax int) int

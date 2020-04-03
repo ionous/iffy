@@ -64,7 +64,7 @@ var Runs = map[string]Run{
 		Desc:  "Any True: returns true if any of the evaluations are true.",
 	},
 	"bool_value": {
-		Type:  (*core.BoolValue)(nil),
+		Type:  (*core.Bool)(nil),
 		Group: "literals",
 		Desc:  "Bool Value: specifies an explicit true/false value.",
 	},
@@ -274,9 +274,8 @@ var Runs = map[string]Run{
 		Desc:   "Multiply Numbers: Multiply two numbers.",
 	},
 	"num_value": {
-		Type:  (*core.NumValue)(nil),
+		Type:  (*core.Number)(nil),
 		Group: "literals",
-		Desc:  "Number Value: Specify a particular number.",
 	},
 	"numbers": {
 		Type:  (*core.Numbers)(nil),

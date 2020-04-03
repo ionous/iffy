@@ -53,7 +53,7 @@ type modelTest struct {
 	clsMap map[string]string
 }
 
-func (m *modelTest) GetObject(name, field string, pv interface{}) (err error) {
+func (m *modelTest) GetField(name, field string, pv interface{}) (err error) {
 	switch field {
 	case object.Exists:
 		_, ok := m.clsMap[name]

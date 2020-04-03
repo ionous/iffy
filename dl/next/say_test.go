@@ -2,7 +2,6 @@ package next
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
@@ -16,7 +15,7 @@ var helloThereWorld = rt.Block{
 
 func ExampleSpan() {
 	var run sayTester
-	if e := rt.WriteText(&run, os.Stdout, &Span{helloThereWorld}); e != nil {
+	if e := rt.WriteText(&run, &Span{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -25,7 +24,7 @@ func ExampleSpan() {
 
 func ExampleBracket() {
 	var run sayTester
-	if e := rt.WriteText(&run, os.Stdout, &Bracket{helloThereWorld}); e != nil {
+	if e := rt.WriteText(&run, &Bracket{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -34,7 +33,7 @@ func ExampleBracket() {
 
 func ExampleSlash() {
 	var run sayTester
-	if e := rt.WriteText(&run, os.Stdout, &Slash{helloThereWorld}); e != nil {
+	if e := rt.WriteText(&run, &Slash{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -43,7 +42,7 @@ func ExampleSlash() {
 
 func ExampleCommas() {
 	var run sayTester
-	if e := rt.WriteText(&run, os.Stdout, &Commas{helloThereWorld}); e != nil {
+	if e := rt.WriteText(&run, &Commas{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:

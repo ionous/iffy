@@ -8,7 +8,7 @@ import (
 
 func NewRuntime(db *sql.DB) (ret *Runner) {
 	return &Runner{
-		ObjectValues: NewObjectValues(db),
+		Fields: NewObjectValues(db),
 	}
 }
 
@@ -16,5 +16,5 @@ type Runner struct {
 	WriterStack
 	scope.ScopeStack
 	Randomizer
-	*ObjectValues
+	*Fields
 }

@@ -21,7 +21,7 @@ func (*Say) Compose() composer.Spec {
 
 // Execute writes text to the runtime's current writer.
 func (p *Say) Execute(run rt.Runtime) (err error) {
-	return rt.WriteText(run, run.Writer(), p.Text)
+	return rt.WriteText(run, p.Text)
 }
 
 // Span collects text printed during a block and writes the text with spaces.

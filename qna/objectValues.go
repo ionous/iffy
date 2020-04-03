@@ -8,8 +8,8 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-// ObjectValues populates itself from the database on demand.
-type ObjectValues struct {
+// Fields populates itself from the database on demand.
+type Fields struct {
 	pairs mapType
 	db    *tables.Cache
 }
@@ -32,8 +32,8 @@ func (k *mapTarget) Scan(v interface{}) (err error) {
 	return
 }
 
-func NewObjectValues(db *sql.DB) *ObjectValues {
-	return &ObjectValues{make(mapType), tables.NewCache(db)}
+func NewObjectValues(db *sql.DB) *Fields {
+	return &Fields{make(mapType), tables.NewCache(db)}
 }
 
 // other possibilities as needed:
@@ -42,7 +42,7 @@ func NewObjectValues(db *sql.DB) *ObjectValues {
 // get class,
 
 // GetValue sets the value of the passed pointer to the value of the named property.
-func (n *ObjectValues) GetObject(obj, field string, pv interface{}) (err error) {
+func (n *Fields) GetField(obj, field string, pv interface{}) (err error) {
 	key := keyType{obj, field}
 	if v, ok := n.pairs[key]; ok {
 		err = Assign(pv, v)
@@ -91,7 +91,7 @@ func (n *ObjectValues) GetObject(obj, field string, pv interface{}) (err error) 
 }
 
 // Assign sets the named property to the passed value.
-func (n *ObjectValues) SetObject(obj, field string, v interface{}) (err error) {
+func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 	key := keyType{obj, field}
 	n.pairs[key] = v
 	return

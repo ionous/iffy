@@ -16,6 +16,38 @@ type Range struct {
 	Start, Stop, Step rt.NumberEval
 }
 
+type LenOfNumbers struct {
+	Elems rt.NumListEval
+}
+
+type LenOfTexts struct {
+	Elems rt.TextListEval
+}
+
+func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
+	// FIX? maybe the evals themselves should implement Count and not the activated stream.
+	if elems, e := rt.GetNumberStream(run, op.Elems); e != nil {
+		err = e
+	} else if l, ok := elems.(rt.StreamCount); !ok {
+		err = errutil.Fmt("unknown number list %T", elems)
+	} else {
+		ret = float64(l.Count())
+	}
+	return
+}
+
+func (op *LenOfTexts) GetNumber(run rt.Runtime) (ret float64, err error) {
+	// FIX? maybe the evals themselves should implement Count and not the activated stream.
+	if elems, e := rt.GetTextStream(run, op.Elems); e != nil {
+		err = e
+	} else if l, ok := elems.(rt.StreamCount); !ok {
+		err = errutil.Fmt("unknown text list %T", elems)
+	} else {
+		ret = float64(l.Count())
+	}
+	return
+}
+
 func (op *Range) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
 	if start, e := rt.GetOptionalNumber(run, op.Start, 1); e != nil {
 		err = e

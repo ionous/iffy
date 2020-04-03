@@ -1,8 +1,6 @@
 package rt
 
-import (
-	"io"
-)
+import "io"
 
 // MissingEval error type for unknown variables while processing loops.
 type MissingEval string
@@ -20,11 +18,12 @@ func Run(run Runtime, exec Execute) (err error) {
 }
 
 // WriteText evaluates t and outputs the results to w.
-func WriteText(run Runtime, w io.Writer, eval TextEval) (err error) {
+func WriteText(run Runtime, eval TextEval) (err error) {
 	if t, e := GetText(run, eval); e != nil {
 		err = e
 	} else {
-		io.WriteString(w, t)
+		_, e := io.WriteString(run, t)
+		err = e
 	}
 	return
 }

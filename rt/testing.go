@@ -9,16 +9,13 @@ import (
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
 
-func (Panic) IsCompatible(childKind, parentKind string) bool {
+func (Panic) GetField(target, field string, pv interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) GetObject(obj, field string, pv interface{}) error {
+func (Panic) SetField(target, field string, v interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) SetObject(obj, field string, v interface{}) error {
-	panic("Runtime panic")
-}
-func (Panic) Writer() io.Writer {
+func (Panic) Write(p []byte) (n int, err error) {
 	panic("Runtime panic")
 }
 func (Panic) PushWriter(io.Writer) {

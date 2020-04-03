@@ -9,6 +9,10 @@ type WriterStack struct {
 	stack []io.Writer
 }
 
+func (k *WriterStack) Write(p []byte) (n int, err error) {
+	return k.Writer().Write(p)
+}
+
 func (k *WriterStack) PushWriter(w io.Writer) {
 	k.stack = append(k.stack, w)
 }
