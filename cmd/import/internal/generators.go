@@ -12,13 +12,15 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
+var cmds = makeTypeMap(export.Runs)
+
 var generators = map[string]Parse{
 	"test": func(r *Parser, item reader.Map) (err error) {
 		test := r.namedStr(item, tables.NAMED_TEST, "$TEST_NAME")
 		expect := r.getStr(item, "$LINES")
 
 		var prog check.Test // parentItem is { id:..., type:"test", value:... }
-		if e := readProg(&prog, reader.Unbox(r.parentItem), export.Runs); e != nil {
+		if e := readProg(&prog, reader.Unbox(r.parentItem), cmds); e != nil {
 			err = e
 		} else {
 			var buf bytes.Buffer

@@ -11,8 +11,8 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/export"
+	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rtm"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -60,11 +60,12 @@ func checkFile(inFile string) (err error) {
 	return
 }
 
-func runTest(prog rt.Execute) (err error) {
-	if run, e := rtm.New(nil).Rtm(); e != nil {
+func runTest(prog rt.BoolEval) (err error) {
+	run := qna.NewRuntime(nil)
+	if ok, e := rt.GetBool(run, prog); e != nil {
 		err = e
-	} else if e := prog.Execute(run); e != nil {
-		err = e
+	} else if !ok {
+		err = errutil.New("unexpected failure", prog)
 	}
 	return
 }
@@ -79,8 +80,8 @@ var registeredGob = false
 
 func registerGob() {
 	if !registeredGob {
-		for _, t := range export.Runs {
-			gob.Register(t.Type)
+		for _, cmd := range export.Runs {
+			gob.Register(cmd)
 		}
 		registeredGob = true
 	}

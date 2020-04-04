@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -24,6 +25,15 @@ type ProductOf struct{ A, B rt.NumberEval }
 type QuotientOf struct{ A, B rt.NumberEval }
 type RemainderOf struct{ A, B rt.NumberEval }
 
+func (*SumOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "sum_of",
+		Group: "math",
+		Desc:  "Add Numbers: Add two numbers.",
+		Spec:  "( $1 + $2 )",
+	}
+}
+
 func (cmd *SumOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
 		err = errutil.New("Add", e)
@@ -31,6 +41,15 @@ func (cmd *SumOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 		ret = a + b
 	}
 	return
+}
+
+func (*DiffOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "diff_of",
+		Group: "math",
+		Spec:  "( $1 - $2 )",
+		Desc:  "Subtract Numbers: Subtract two numbers.",
+	}
 }
 
 func (cmd *DiffOf) GetNumber(run rt.Runtime) (ret float64, err error) {
@@ -42,6 +61,15 @@ func (cmd *DiffOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
+func (*ProductOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "product_of",
+		Group: "math",
+		Spec:  "( $1 * $2 )",
+		Desc:  "Multiply Numbers: Multiply two numbers.",
+	}
+}
+
 func (cmd *ProductOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
 		err = errutil.New("Mul", e)
@@ -49,6 +77,15 @@ func (cmd *ProductOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 		ret = a * b
 	}
 	return
+}
+
+func (*QuotientOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "quotient_of",
+		Group: "math",
+		Spec:  "( $1 / $2 )",
+		Desc:  "Divide Numbers: Divide one number by another.",
+	}
 }
 
 func (cmd *QuotientOf) GetNumber(run rt.Runtime) (ret float64, err error) {
@@ -60,6 +97,15 @@ func (cmd *QuotientOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 		ret = a / b
 	}
 	return
+}
+
+func (*RemainderOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "remainder_of",
+		Group: "math",
+		Spec:  "( $1 % $2 )",
+		Desc:  "Modulus Numbers: Divide one number by another, and return the remainder.",
+	}
 }
 
 func (cmd *RemainderOf) GetNumber(run rt.Runtime) (ret float64, err error) {

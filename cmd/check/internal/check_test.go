@@ -3,37 +3,39 @@ package internal
 import (
 	"testing"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/check"
-	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/next"
+	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rtm"
 )
 
 func TestCheck(t *testing.T) {
-	prog := check.Test{TestName: "hello, goodbye",
-		Go: []rt.Execute{
-			&core.Choose{
-				If: &core.BoolValue{Bool: true},
-				True: []rt.Execute{
-					&core.Say{
-						Text: &core.TextValue{Text: "hello"},
-					},
-				},
-				False: []rt.Execute{
-					&core.Say{
-						Text: &core.TextValue{Text: "goodbye"},
-					},
-				},
+	prog := &check.Test{
+		TestName: "hello, goodbye",
+		Go: &next.Choose{
+			If: &next.Bool{Bool: true},
+			True: &next.Say{
+				Text: &next.Text{"hello"},
+			},
+
+			False: &next.Say{
+				Text: &next.Text{"goodbye"},
 			},
 		},
 		Lines: "hello",
 	}
-
-	//run rt.Runtime
-	// run, e := rtm.New(classes).Rtm()
-	if run, e := rtm.New(nil).Rtm(); e != nil {
-		t.Fatal(e)
-	} else if e := prog.Execute(run); e != nil {
+	if e := runTest(prog); e != nil {
 		t.Fatal(e)
 	}
+}
+
+func runTest(prog rt.BoolEval) (err error) {
+	run := qna.NewRuntime(nil)
+	if ok, e := rt.GetBool(run, prog); e != nil {
+		err = e
+	} else if !ok {
+		err = errutil.New("unexpected failure", prog)
+	}
+	return
 }

@@ -13,6 +13,26 @@ type Bool struct {
 	Bool bool
 }
 
+// Number specifies a number value.
+type Number struct {
+	Num float64
+}
+
+// Text specifies a string value.
+type Text struct {
+	Text string
+}
+
+// Numbers specifies multiple float values.
+type Numbers struct {
+	Values []float64
+}
+
+// Texts specifies multiple strings.
+type Texts struct {
+	Values []string
+}
+
 // Compose returns a spec for use by the composer editor.
 func (*Bool) Compose() composer.Spec {
 	return composer.Spec{
@@ -31,11 +51,6 @@ func (b *Bool) GetBool(rt.Runtime) (bool, error) {
 // String uses strconv.FormatBool.
 func (b *Bool) String() string {
 	return strconv.FormatBool(b.Bool)
-}
-
-// Number specifies a number value.
-type Number struct {
-	Num float64
 }
 
 func (*Number) Compose() composer.Spec {
@@ -66,11 +81,6 @@ func (n *Number) String() string {
 	return strconv.FormatFloat(n.Num, 'g', -1, 64)
 }
 
-// Text specifies a string value.
-type Text struct {
-	Text string
-}
-
 func (*Text) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "text_value",
@@ -91,18 +101,24 @@ func (t *Text) String() string {
 	return t.Text
 }
 
-// Numbers specifies multiple float values.
-type Numbers struct {
-	Values []float64
+func (*Numbers) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "numbers",
+		Group: "literals",
+		Desc:  "Number List: Specify a list of multiple numbers.",
+	}
 }
 
 func (l *Numbers) GetNumberStream(rt.Runtime) (rt.Iterator, error) {
 	return stream.NewNumberList(l.Values), nil
 }
 
-// Texts specifies multiple strings.
-type Texts struct {
-	Values []string
+func (*Texts) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "texts",
+		Group: "literals",
+		Desc:  "Text List: specifies multiple string values.",
+	}
 }
 
 func (l *Texts) GetTextStream(rt.Runtime) (rt.Iterator, error) {

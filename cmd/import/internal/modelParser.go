@@ -46,8 +46,8 @@ var registeredGob = false
 
 func registerGob() {
 	if !registeredGob {
-		for _, t := range export.Runs {
-			gob.Register(t.Type)
+		for _, cmd := range export.Runs {
+			gob.Register(cmd)
 		}
 		registeredGob = true
 	}

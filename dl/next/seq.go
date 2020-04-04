@@ -1,6 +1,7 @@
 package next
 
 import (
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
@@ -44,6 +45,14 @@ func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret i
 	return
 }
 
+func (*CycleText) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "cycle_text",
+		Group: "cycle",
+		Desc:  "Cycle Text: When called multiple times, returns each of its inputs in turn.",
+	}
+}
+
 func (op *CycleText) GetText(run rt.Runtime) (ret string, err error) {
 	if curr, e := op.updateCounter(run, wrap); e != nil {
 		err = e
@@ -51,6 +60,14 @@ func (op *CycleText) GetText(run rt.Runtime) (ret string, err error) {
 		ret, err = rt.GetText(run, op.Elems[curr])
 	}
 	return
+}
+
+func (*ShuffleText) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "shuffle_text",
+		Group: "format",
+		Desc:  "Shuffle Text: When called multiple times returns its inputs at random.",
+	}
 }
 
 func (op *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
@@ -71,6 +88,14 @@ func (op *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
 		ret, err = rt.GetText(run, op.Elems[sel])
 	}
 	return
+}
+
+func (*StoppingText) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "stopping_text",
+		Group: "format",
+		Desc:  "Stopping Text: When called multiple times returns each of its inputs in turn, sticking to the last one.",
+	}
 }
 
 func (op *StoppingText) GetText(run rt.Runtime) (ret string, err error) {

@@ -12,13 +12,6 @@ type Choose struct {
 	False rt.Execute
 }
 
-func (*Choose) Compose() composer.Spec {
-	return composer.Spec{
-		Name: "choose",
-		Spec: "if {choose%if:bool_eval} then: {true*execute|ghost} else: {false*execute|ghost}",
-	}
-}
-
 // Choose one of two number evaluations based on a boolean test.
 type ChooseNum struct {
 	If          rt.BoolEval
@@ -29,6 +22,37 @@ type ChooseNum struct {
 type ChooseText struct {
 	If          rt.BoolEval
 	True, False rt.TextEval
+}
+
+func (*Choose) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "choose",
+		Spec: "if {choose%if:bool_eval} then: {true*execute|ghost} else: {false*execute|ghost}",
+	}
+}
+
+// Execute evals, eats the returns
+func (op *Choose) Execute(run rt.Runtime) (err error) {
+	if b, e := rt.GetBool(run, op.If); e != nil {
+		err = e
+	} else {
+		var next rt.Execute
+		if b {
+			next = op.True
+		} else {
+			next = op.False
+		}
+		err = next.Execute(run)
+	}
+	return
+}
+
+func (*ChooseNum) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "choose_num",
+		Group: "math",
+		Desc:  "Choose Number: Pick one of two numbers based on a boolean test.",
+	}
 }
 
 func (op *ChooseNum) GetNumber(run rt.Runtime) (ret float64, err error) {
@@ -48,6 +72,14 @@ func (op *ChooseNum) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
+func (*ChooseText) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "choose_text",
+		Group: "format",
+		Desc:  "Choose Text: Pick one of two strings based on a boolean test.",
+	}
+}
+
 func (op *ChooseText) GetText(run rt.Runtime) (ret string, err error) {
 	if b, e := rt.GetBool(run, op.If); e != nil {
 		err = e
@@ -61,22 +93,6 @@ func (op *ChooseText) GetText(run rt.Runtime) (ret string, err error) {
 		if next != nil {
 			ret, err = rt.GetText(run, next)
 		}
-	}
-	return
-}
-
-// Execute evals, eats the returns
-func (op *Choose) Execute(run rt.Runtime) (err error) {
-	if b, e := rt.GetBool(run, op.If); e != nil {
-		err = e
-	} else {
-		var next rt.Execute
-		if b {
-			next = op.True
-		} else {
-			next = op.False
-		}
-		err = next.Execute(run)
 	}
 	return
 }

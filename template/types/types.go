@@ -16,8 +16,8 @@ type Quote string
 // Number as a postfix function.
 type Number float64
 
-// Boolean as a postfix function.
-type Boolean bool
+// Bool as a postfix function.
+type Bool bool
 
 // Reference refers to an object property by name.
 // note: there are potentially two ways of representing references:
@@ -62,9 +62,9 @@ func (Number) Arity() int       { return 0 }
 func (Number) Precedence() int  { return 0 }
 func (k Number) Value() float64 { return float64(k) }
 
-func (Boolean) Arity() int      { return 0 }
-func (Boolean) Precedence() int { return 0 }
-func (k Boolean) Value() bool   { return bool(k) }
+func (Bool) Arity() int      { return 0 }
+func (Bool) Precedence() int { return 0 }
+func (k Bool) Value() bool   { return bool(k) }
 
 func (Reference) Arity() int        { return 0 }
 func (Reference) Precedence() int   { return 0 }
@@ -82,7 +82,7 @@ func (k Quote) String() string {
 func (k Number) String() string {
 	return strconv.FormatFloat(float64(k), 'g', -1, 64)
 }
-func (k Boolean) String() string {
+func (k Bool) String() string {
 	return strconv.FormatBool(bool(k))
 }
 func (k Reference) String() string {

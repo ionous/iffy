@@ -1,6 +1,7 @@
 package next
 
 import (
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/stream"
 )
@@ -10,6 +11,14 @@ type GetVar struct {
 	Name string
 }
 
+func (*GetVar) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "get_var",
+		Spec:  "Get var $1",
+		Group: "variables",
+		Desc:  "Get Variable: Return the value of the named variable.",
+	}
+}
 func (p *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
 	err = run.GetVariable(p.Name, &ret)
 	return

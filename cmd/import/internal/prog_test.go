@@ -8,10 +8,9 @@ import (
   "testing"
 
   "github.com/ionous/iffy/dl/check"
-  "github.com/ionous/iffy/dl/core"
+  "github.com/ionous/iffy/dl/next"
   "github.com/ionous/iffy/ephemera/reader"
   "github.com/ionous/iffy/export"
-  "github.com/ionous/iffy/rt"
   "github.com/ionous/iffy/tables"
   "github.com/kr/pretty"
 )
@@ -23,7 +22,8 @@ func TestImportProg(t *testing.T) {
     t.Fatal(e)
   } else {
     var prog check.Test
-    if e := readProg(&prog, in, export.Runs); e != nil {
+    cmds := makeTypeMap(export.Runs)
+    if e := readProg(&prog, in, cmds); e != nil {
       t.Fatal(e)
     } else if diff := pretty.Diff(sayTest, prog); len(diff) > 0 {
       t.Fatal(diff)
@@ -78,20 +78,15 @@ func TestProcessProg(t *testing.T) {
   }
 }
 
-var sayTest = check.Test{TestName: "hello, goodbye",
-  Go: []rt.Execute{
-    &core.Choose{
-      If: &core.BoolValue{Bool: true},
-      True: []rt.Execute{
-        &core.Say{
-          Text: &core.TextValue{Text: "hello"},
-        },
-      },
-      False: []rt.Execute{
-        &core.Say{
-          Text: &core.TextValue{Text: "goodbye"},
-        },
-      },
+var sayTest = check.Test{
+  TestName: "hello, goodbye",
+  Go: &next.Choose{
+    If: &next.Bool{true},
+    True: &next.Say{
+      Text: &next.Text{"hello"},
+    },
+    False: &next.Say{
+      Text: &next.Text{"goodbye"},
     },
   },
   Lines: "hello",
@@ -101,96 +96,90 @@ var sayStory = `{
     "id": "id-1709ef632af-3",
     "type": "test",
     "value": {
-      "$TEST_NAME": {
-        "id": "id-1709ef632af-0",
-        "type": "text",
-        "value": "hello, goodbye"
-      },
-      "$GO": [
-        {
-          "id": "id-1709ef632af-1",
-          "type": "execute",
-          "value": {
-            "id": "id-1709ef632af-7",
-            "type": "choose",
+        "$GO": {
+            "id": "id-1709ef632af-1",
+            "type": "execute",
             "value": {
-              "$FALSE": [
-                {
-                  "id": "id-1709ef632af-4",
-                  "type": "execute",
-                  "value": {
-                    "id": "id-1709ef632af-15",
-                    "type": "say",
-                    "value": {
-                      "$TEXT": {
-                        "id": "id-1709ef632af-14",
-                        "type": "text_eval",
-                        "value": {
-                          "id": "id-1709ef632af-20",
-                          "type": "text_value",
-                          "value": {
-                            "$TEXT": {
-                              "id": "id-1709ef632af-19",
-                              "type": "lines",
-                              "value": "goodbye"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "$IF": {
-                "id": "id-1709ef632af-5",
-                "type": "bool_eval",
+                "id": "id-1709ef632af-7",
+                "type": "choose",
                 "value": {
-                  "id": "id-1709ef632af-9",
-                  "type": "bool_value",
-                  "value": {
-                    "$BOOL": {
-                      "id": "id-1709ef632af-8",
-                      "type": "bool",
-                      "value": "$TRUE"
-                    }
-                  }
-                }
-              },
-              "$TRUE": [
-                {
-                  "id": "id-1709ef632af-6",
-                  "type": "execute",
-                  "value": {
-                    "id": "id-1709ef632af-11",
-                    "type": "say",
-                    "value": {
-                      "$TEXT": {
-                        "id": "id-1709ef632af-10",
-                        "type": "text_eval",
+                    "$FALSE": {
+                        "id": "id-1709ef632af-4",
+                        "type": "execute",
                         "value": {
-                          "id": "id-1709ef632af-13",
-                          "type": "text_value",
-                          "value": {
-                            "$TEXT": {
-                              "id": "id-1709ef632af-12",
-                              "type": "lines",
-                              "value": "hello"
+                            "id": "id-1709ef632af-15",
+                            "type": "say_text",
+                            "value": {
+                                "$TEXT": {
+                                    "id": "id-1709ef632af-14",
+                                    "type": "text_eval",
+                                    "value": {
+                                        "id": "id-1709ef632af-20",
+                                        "type": "text_value",
+                                        "value": {
+                                            "$TEXT": {
+                                                "id": "id-1709ef632af-19",
+                                                "type": "lines",
+                                                "value": "goodbye"
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                          }
                         }
-                      }
+                    },
+                    "$IF": {
+                        "id": "id-1709ef632af-5",
+                        "type": "bool_eval",
+                        "value": {
+                            "id": "id-1709ef632af-9",
+                            "type": "bool_value",
+                            "value": {
+                                "$BOOL": {
+                                    "id": "id-1709ef632af-8",
+                                    "type": "bool",
+                                    "value": "$TRUE"
+                                }
+                            }
+                        }
+                    },
+                    "$TRUE": {
+                        "id": "id-1709ef632af-6",
+                        "type": "execute",
+                        "value": {
+                            "id": "id-1709ef632af-11",
+                            "type": "say_text",
+                            "value": {
+                                "$TEXT": {
+                                    "id": "id-1709ef632af-10",
+                                    "type": "text_eval",
+                                    "value": {
+                                        "id": "id-1709ef632af-13",
+                                        "type": "text_value",
+                                        "value": {
+                                            "$TEXT": {
+                                                "id": "id-1709ef632af-12",
+                                                "type": "lines",
+                                                "value": "hello"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                  }
                 }
-              ]
             }
-          }
+        },
+        "$LINES": {
+            "id": "id-1709ef632af-2",
+            "type": "lines",
+            "value": "hello"
+        },
+        "$TEST_NAME": {
+            "id": "id-1709ef632af-0",
+            "type": "text",
+            "value": "hello, goodbye"
         }
-      ],
-      "$LINES": {
-        "id": "id-1709ef632af-2",
-        "type": "lines",
-        "value": "hello"
-      }
     }
-  }`
+}`

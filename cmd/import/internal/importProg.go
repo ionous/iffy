@@ -5,6 +5,7 @@ import (
 	r "reflect"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/ref/kindOf"
@@ -23,13 +24,27 @@ func ImportStory(src string, in reader.Map, db *sql.DB) error {
 	return p.parseItem(in)
 }
 
+type typeMap map[string]composer.Specification
+
+func makeTypeMap(runs []composer.Specification) typeMap {
+	m := make(typeMap)
+	for _, cmd := range runs {
+		if n := cmd.Compose().Name; len(n) == 0 {
+			panic(errutil.Fmt("missing name for spec %T", cmd))
+		} else {
+			m[n] = cmd
+		}
+	}
+	return m
+}
+
 // read in-memory json into go-lang structs
-func readProg(targetPtr interface{}, inData export.Dict, types map[string]export.Run) (err error) {
+func readProg(targetPtr interface{}, inData export.Dict, types typeMap) (err error) {
 	out := r.ValueOf(targetPtr).Elem()
 	return Unmarshall(out, inData, types)
 }
 
-func Unmarshall(out r.Value, inData export.Dict, types map[string]export.Run) (err error) {
+func Unmarshall(out r.Value, inData export.Dict, types typeMap) (err error) {
 	if inVal, ok := inData[itemValue].(map[string]interface{}); !ok {
 		err = errutil.New("unexpected value in data", inData)
 	} else if e := unmarshall(out, inVal, types); e != nil {
@@ -39,7 +54,7 @@ func Unmarshall(out r.Value, inData export.Dict, types map[string]export.Run) (e
 	return
 }
 
-func unmarshall(out r.Value, in export.Dict, types map[string]export.Run) (err error) {
+func unmarshall(out r.Value, in export.Dict, types typeMap) (err error) {
 	var processed []string
 
 	unique.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
@@ -75,7 +90,7 @@ func unmarshall(out r.Value, in export.Dict, types map[string]export.Run) (err e
 	return
 }
 
-func importValue(outAt r.Value, inVal interface{}, types map[string]export.Run) (err error) {
+func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 	switch outType := outAt.Type(); {
 	case kindOf.Float(outType):
 		err = unpack(inVal, func(v interface{}) (err error) {
@@ -174,12 +189,12 @@ func unpack(inVal interface{}, setter func(interface{}) error) (err error) {
 	return
 }
 
-func importSlot(slot export.Dict, slotType r.Type, types map[string]export.Run) (ret r.Value, err error) {
+func importSlot(slot export.Dict, slotType r.Type, types typeMap) (ret r.Value, err error) {
 	typeName, _ := slot[itemType].(string)
-	if run, ok := types[typeName]; !ok {
+	if cmd, ok := types[typeName]; !ok {
 		err = errutil.New("unknown type", typeName, slot)
 	} else {
-		rtype := r.TypeOf(run.Type)
+		rtype := r.TypeOf(cmd)
 		if !rtype.AssignableTo(slotType) {
 			err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
 		} else {

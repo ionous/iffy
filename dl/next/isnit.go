@@ -2,6 +2,7 @@ package next
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -17,6 +18,14 @@ type IsNot struct {
 	Test rt.BoolEval
 }
 
+func (*Is) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "is_true",
+		Group: "logic",
+		Desc:  "Is True: Transparently returns the result of a boolean expression.",
+	}
+}
+
 func (op *Is) GetBool(run rt.Runtime) (ret bool, err error) {
 	if val, e := rt.GetBool(run, op.Test); e != nil {
 		err = errutil.New("IsNot.Negate", e)
@@ -24,6 +33,14 @@ func (op *Is) GetBool(run rt.Runtime) (ret bool, err error) {
 		ret = val
 	}
 	return
+}
+
+func (*IsNot) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "is_not",
+		Group: "logic",
+		Desc:  "Is Not: Returns the opposite value.",
+	}
 }
 
 func (op *IsNot) GetBool(run rt.Runtime) (ret bool, err error) {

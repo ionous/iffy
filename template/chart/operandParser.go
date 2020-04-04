@@ -72,9 +72,9 @@ func boolean(r []string) (ret postfix.Function, okay bool) {
 	if len(r) == 1 {
 		switch r[0] {
 		case "true":
-			ret, okay = types.Boolean(true), true
+			ret, okay = types.Bool(true), true
 		case "false":
-			ret, okay = types.Boolean(false), true
+			ret, okay = types.Bool(false), true
 		}
 	}
 	return

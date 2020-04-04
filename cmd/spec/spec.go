@@ -58,27 +58,18 @@ func main() {
 		all = append(all, out)
 	}
 
-	for typeName, run := range export.Runs {
-		spec := getSpec(run.Type)
-		t := r.TypeOf(run.Type).Elem()
+	for _, cmd := range export.Runs {
+		rtype := r.TypeOf(cmd).Elem()
+		spec := cmd.Compose()
+		if len(spec.Name) == 0 {
+			panic(fmt.Sprintln("missing name for type", rtype.Name()))
+		}
 		//
-		slotNames := run.Slots
+		slotNames := slotsOf(rtype, slots)
 		if len(slotNames) == 0 {
-			slotNames = slotsOf(t, slots)
-			if len(slotNames) == 0 {
-				panic(fmt.Sprintln("missing slot for type", t.Name()))
-			}
+			panic(fmt.Sprintln("missing slot for type", rtype.Name()))
 		}
 		sort.Strings(slotNames)
-		if len(spec.Name) == 0 {
-			spec.Name = typeName
-		}
-		if len(spec.Desc) == 0 {
-			spec.Desc = run.Desc
-		}
-		if len(spec.Group) == 0 {
-			spec.Group = run.Group
-		}
 
 		with := export.Dict{
 			"slots": slotNames,
@@ -92,9 +83,9 @@ func main() {
 		if len(spec.Spec) != 0 {
 			out["spec"] = spec.Spec
 		} else {
-			tokens, params := parse(t)
+			tokens, params := parse(rtype)
 			with["params"] = params
-			with["tokens"] = updateTokens(run.Phrase, tokens)
+			with["tokens"] = updateTokens(spec.Spec, tokens)
 		}
 		groups.addGroup(out, spec.Group)
 		addDesc(out, spec.Desc)
@@ -125,7 +116,7 @@ func main() {
 }
 
 func getSpec(ptrValue interface{}) (ret composer.Spec) {
-	if c, ok := ptrValue.(composer.SpecInterface); ok {
+	if c, ok := ptrValue.(composer.Specification); ok {
 		ret = c.Compose()
 	}
 	return
@@ -245,9 +236,10 @@ var reverseLookup map[r.Type]string
 func findTypeName(t r.Type) (ret string) {
 	if len(reverseLookup) == 0 {
 		reverseLookup = make(map[r.Type]string)
-		for typeName, run := range export.Runs {
-			t := r.TypeOf(run.Type).Elem()
-			reverseLookup[t] = typeName
+		for _, cmd := range export.Runs {
+			runType := r.TypeOf(cmd).Elem()
+			typeName := cmd.Compose().Name
+			reverseLookup[runType] = typeName
 		}
 		for typeName, slot := range export.Slots {
 			t := r.TypeOf(slot.Type).Elem()

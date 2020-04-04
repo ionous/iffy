@@ -3,6 +3,7 @@ package next
 import (
 	"strings"
 
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
@@ -28,6 +29,14 @@ type IsExactKindOf struct {
 	Obj, Kind rt.TextEval
 }
 
+func (*Exists) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "exists",
+		Group: "objects",
+		Desc:  "Exists: True if the named object exists.",
+	}
+}
+
 func (op *Exists) GetBool(run rt.Runtime) (ret bool, err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
@@ -37,6 +46,14 @@ func (op *Exists) GetBool(run rt.Runtime) (ret bool, err error) {
 	return
 }
 
+func (*KindOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "class_name",
+		Group: "objects",
+		Desc:  "Kind Of: Friendly name of the object's class.",
+	}
+}
+
 func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
@@ -44,6 +61,15 @@ func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 		err = run.GetField(obj, object.Kind, &ret)
 	}
 	return
+}
+
+func (*IsKindOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "is_class",
+		Spec:  "Is $OBJ a kind of $CLASS",
+		Group: "objects",
+		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",
+	}
 }
 
 func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -61,6 +87,14 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		}
 	}
 	return
+}
+
+func (*IsExactKindOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "is_exact_class",
+		Group: "objects",
+		Desc:  "Is Exact Kind: True if the object is exactly the named kind.",
+	}
 }
 
 func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {

@@ -1,6 +1,7 @@
 package next
 
 import (
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/stream"
 )
@@ -8,6 +9,15 @@ import (
 // GetField a property value from an object by name.
 type GetField struct {
 	Obj, Field rt.TextEval
+}
+
+func (*GetField) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "get_field",
+		Spec:  "Get $2 of $1",
+		Group: "objects",
+		Desc:  "Get Field: Return the value of the named object property.",
+	}
 }
 
 func (op *GetField) GetBool(run rt.Runtime) (ret bool, err error) {

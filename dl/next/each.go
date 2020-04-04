@@ -2,6 +2,7 @@ package next
 
 import (
 	"github.com/ionous/iffy/assign"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
 )
@@ -9,14 +10,39 @@ import (
 // DoNothing implements Execute, but .... does nothing.
 type DoNothing struct{}
 
-func (DoNothing) Execute(rt.Runtime) error { return nil }
-
 // ForEacNum visits values in a list of numbers.
 // For each value visited it executes a block of statements, pushing a NumberCounter object into the scope as @.
 // If the list is empty, it executes an alternative block of statements.
 type ForEachNum struct {
 	In       rt.NumListEval
 	Go, Else rt.Execute
+}
+
+// ForEachText visits values in a text list.
+// For each value visited it executes a block of statements, pushing a TextCounter object into the scope as @.
+// If the list is empty, it executes an alternative block of statements.
+type ForEachText struct {
+	In       rt.TextListEval
+	Go, Else rt.Execute
+}
+
+func (*DoNothing) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "do_nothing",
+		Group: "exec",
+		Desc:  "Do Nothing: Statement which does nothing.",
+	}
+}
+
+func (DoNothing) Execute(rt.Runtime) error { return nil }
+
+func (*ForEachNum) Compose() composer.Spec {
+	return composer.Spec{
+		Name:   "for_each_num",
+		Group:  "exec",
+		Desc:   "For Each Number: Loops over the passed list of numbers, or runs the 'else' statement if empty.",
+		Locals: []string{"index", "first", "last", "num"},
+	}
 }
 
 func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
@@ -38,12 +64,13 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-// ForEachText visits values in a text list.
-// For each value visited it executes a block of statements, pushing a TextCounter object into the scope as @.
-// If the list is empty, it executes an alternative block of statements.
-type ForEachText struct {
-	In       rt.TextListEval
-	Go, Else rt.Execute
+func (*ForEachText) Compose() composer.Spec {
+	return composer.Spec{
+		Name:   "for_each_text",
+		Group:  "exec",
+		Desc:   "For Each Text: Loops over the passed list of text, or runs the 'else' statement if empty.",
+		Locals: []string{"index", "first", "last", "text"},
+	}
 }
 
 func (f *ForEachText) Execute(run rt.Runtime) (err error) {

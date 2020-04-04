@@ -5,12 +5,33 @@ import (
 	"strings"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
 
 // IsEmpty determines whether the text contains any characters at all.
 type IsEmpty struct {
 	Text rt.TextEval
+}
+
+// Includes determines whether text contains part.
+type Includes struct {
+	Text rt.TextEval
+	Part rt.TextEval
+}
+
+// Join combines multiple pieces of text.
+type Join struct {
+	Elems rt.TextListEval
+	Sep   rt.TextEval
+}
+
+func (*IsEmpty) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "is_empty",
+		Group: "strings",
+		Desc:  "Is Empty: True if the text is empty.",
+	}
 }
 
 func (op *IsEmpty) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -22,10 +43,12 @@ func (op *IsEmpty) GetBool(run rt.Runtime) (ret bool, err error) {
 	return
 }
 
-// Includes determines whether text contains part.
-type Includes struct {
-	Text rt.TextEval
-	Part rt.TextEval
+func (*Includes) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "includes",
+		Group: "strings",
+		Desc:  "Includes Text: True if text contains text.",
+	}
 }
 
 func (op *Includes) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -39,10 +62,12 @@ func (op *Includes) GetBool(run rt.Runtime) (ret bool, err error) {
 	return
 }
 
-// Join combines multiple pieces of text.
-type Join struct {
-	Elems rt.TextListEval
-	Sep   rt.TextEval
+func (*Join) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "join",
+		Group: "strings",
+		Desc:  "Join Strings: Returns multiple pieces of text as a single new piece of text.",
+	}
 }
 
 func (op *Join) GetText(run rt.Runtime) (ret string, err error) {

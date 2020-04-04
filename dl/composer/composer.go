@@ -2,8 +2,9 @@ package composer
 
 type Spec struct {
 	Name, Spec, Group, Desc string
+	Locals                  []string
 }
 
-type SpecInterface interface {
+type Specification interface {
 	Compose() Spec
 }

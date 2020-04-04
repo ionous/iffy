@@ -29,11 +29,6 @@ func (*Test) Compose() composer.Spec {
 	}
 }
 
-// Execute evals, eats the returns
-func (op *Test) Execute(run rt.Runtime) (err error) {
-	return
-}
-
 // GetBool returns true if the test succeeded, otherwise it returns an error.
 func (op *Test) GetBool(run rt.Runtime) (okay bool, err error) {
 	var buf bytes.Buffer

@@ -1,12 +1,30 @@
 package next
 
-import "github.com/ionous/iffy/rt"
+import (
+	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/rt"
+)
 
 // AllTrue returns false only when one of its specified tests returns false.
 // It does not necessarily run all of the tests, it exits as soon as any test return false.
 // An empty list returns true.
 type AllTrue struct {
 	Test []rt.BoolEval
+}
+
+// AnyTrue returns true only when one of its specified tests returns true.
+// It does not necessarily run all of the tests, it exits as soon as any test return true.
+// An empty list returns false.
+type AnyTrue struct {
+	Test []rt.BoolEval
+}
+
+func (*AllTrue) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "all_true",
+		Group: "logic",
+		Desc:  "All True: returns true if all of the evaluations are true.",
+	}
 }
 
 func (a *AllTrue) GetBool(run rt.Runtime) (okay bool, err error) {
@@ -31,11 +49,12 @@ func (a *AllTrue) anyFalse(run rt.Runtime) (ret bool, err error) {
 	return
 }
 
-// AnyTrue returns true only when one of its specified tests returns true.
-// It does not necessarily run all of the tests, it exits as soon as any test return true.
-// An empty list returns false.
-type AnyTrue struct {
-	Test []rt.BoolEval
+func (*AnyTrue) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "any_true",
+		Group: "logic",
+		Desc:  "Any True: returns true if any of the evaluations are true.",
+	}
 }
 
 func (a *AnyTrue) GetBool(run rt.Runtime) (okay bool, err error) {

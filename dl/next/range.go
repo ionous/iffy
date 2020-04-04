@@ -3,6 +3,7 @@ package next
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/assign"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/stream"
 )
@@ -26,6 +27,14 @@ type LenOfTexts struct {
 	Elems rt.TextListEval
 }
 
+func (*LenOfNumbers) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "len",
+		Group: "format",
+		Desc:  "Length of Number List: Determines the number of elements in a list of numbers.",
+	}
+}
+
 func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
 	// FIX? maybe the evals themselves should implement Count and not the activated stream.
 	if elems, e := rt.GetNumberStream(run, op.Elems); e != nil {
@@ -38,6 +47,14 @@ func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
 	return
 }
 
+func (*LenOfTexts) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "len",
+		Group: "format",
+		Desc:  "Length of Text List: Determines the number of text elements in a list.",
+	}
+}
+
 func (op *LenOfTexts) GetNumber(run rt.Runtime) (ret float64, err error) {
 	// FIX? maybe the evals themselves should implement Count and not the activated stream.
 	if elems, e := rt.GetTextStream(run, op.Elems); e != nil {
@@ -48,6 +65,14 @@ func (op *LenOfTexts) GetNumber(run rt.Runtime) (ret float64, err error) {
 		ret = float64(l.Remaining())
 	}
 	return
+}
+
+func (*Range) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "range_over",
+		Group: "flow",
+		Desc:  "Range of numbers: Generates a series of numbers.",
+	}
 }
 
 func (op *Range) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
