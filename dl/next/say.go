@@ -1,9 +1,11 @@
 package next
 
 import (
+	"bytes"
+
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/printer"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/print"
 )
 
 // Say some bit of text.
@@ -20,8 +22,33 @@ func (*Say) Compose() composer.Spec {
 }
 
 // Execute writes text to the runtime's current writer.
-func (p *Say) Execute(run rt.Runtime) (err error) {
-	return rt.WriteText(run, p.Text)
+func (op *Say) Execute(run rt.Runtime) (err error) {
+	return rt.WriteText(run, op.Text)
+}
+
+// Buffer collects text said by other statements and returns them as a string.
+// Unlike Span, it does not add or alter spaces between writes.
+type Buffer struct {
+	Block rt.Execute
+}
+
+// Compose defines a spec for the composer editor.
+func (*Buffer) Compose() composer.Spec {
+	return composer.Spec{
+		Group: "printing",
+	}
+}
+
+func (op *Buffer) GetText(run rt.Runtime) (ret string, err error) {
+	var buf bytes.Buffer
+	if e := rt.WritersBlock(run, &buf, func() error {
+		return op.Block.Execute(run)
+	}); e != nil {
+		err = e
+	} else {
+		ret = buf.String()
+	}
+	return
 }
 
 // Span collects text printed during a block and writes the text with spaces.
@@ -36,10 +63,10 @@ func (*Span) Compose() composer.Spec {
 	}
 }
 
-func (p *Span) GetText(run rt.Runtime) (ret string, err error) {
-	var span printer.Spanner // separate punctuation with spaces
+func (op *Span) GetText(run rt.Runtime) (ret string, err error) {
+	var span print.Spanner // separate punctuation with spaces
 	if e := rt.WritersBlock(run, &span, func() error {
-		return p.Block.Execute(run)
+		return op.Block.Execute(run)
 	}); e != nil {
 		err = e
 	} else {
@@ -61,10 +88,10 @@ func (*Bracket) Compose() composer.Spec {
 	}
 }
 
-func (p *Bracket) GetText(run rt.Runtime) (ret string, err error) {
-	var span printer.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, printer.Bracket(&span), func() error {
-		return p.Block.Execute(run)
+func (op *Bracket) GetText(run rt.Runtime) (ret string, err error) {
+	var span print.Spanner // separate punctuation with spaces
+	if e := rt.WritersBlock(run, print.Bracket(&span), func() error {
+		return op.Block.Execute(run)
 	}); e != nil {
 		err = e
 	} else {
@@ -85,10 +112,10 @@ func (*Slash) Compose() composer.Spec {
 	}
 }
 
-func (p *Slash) GetText(run rt.Runtime) (ret string, err error) {
-	var span printer.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, printer.Slash(&span), func() error {
-		return p.Block.Execute(run)
+func (op *Slash) GetText(run rt.Runtime) (ret string, err error) {
+	var span print.Spanner // separate punctuation with spaces
+	if e := rt.WritersBlock(run, print.Slash(&span), func() error {
+		return op.Block.Execute(run)
 	}); e != nil {
 		err = e
 	} else {
@@ -109,10 +136,10 @@ func (*Commas) Compose() composer.Spec {
 	}
 }
 
-func (p *Commas) GetText(run rt.Runtime) (ret string, err error) {
-	var span printer.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, printer.AndSeparator(&span), func() error {
-		return p.Block.Execute(run)
+func (op *Commas) GetText(run rt.Runtime) (ret string, err error) {
+	var span print.Spanner // separate punctuation with spaces
+	if e := rt.WritersBlock(run, print.AndSeparator(&span), func() error {
+		return op.Block.Execute(run)
 	}); e != nil {
 		err = e
 	} else {

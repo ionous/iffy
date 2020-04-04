@@ -33,7 +33,7 @@ func sqlFile(t *testing.T, path string) (ret string, err error) {
 	return
 }
 
-func TestGetObjectValues(t *testing.T) {
+func TestGetFieldValues(t *testing.T) {
 	if source, e := sqlFile(t, memory); e != nil {
 		t.Fatal(e)
 	} else if db, e := sql.Open("sqlite3", source); e != nil {
@@ -121,7 +121,7 @@ func TestGetObjectValues(t *testing.T) {
 			t.Run("object exists", func(t *testing.T) {
 				for _, v := range existence {
 					var exists bool
-					if e := q.GetObject(v.name, object.Exists, &exists); e != nil {
+					if e := q.GetField(v.name, object.Exists, &exists); e != nil {
 						t.Fatal("existence", v.name, e)
 					} else if v.exists != exists {
 						t.Fatal("existence", v.name, "wanted", v.exists)
@@ -133,7 +133,7 @@ func TestGetObjectValues(t *testing.T) {
 				for _, v := range kindsOfNoun {
 					for i := 0; i < 2; i++ {
 						var kind string
-						if e := q.GetObject(v.Target, object.Kind, &kind); e != nil {
+						if e := q.GetField(v.Target, object.Kind, &kind); e != nil {
 							t.Fatal(e)
 						} else if kind != v.Field {
 							t.Fatal("mismatch", v.Target, "got:", kind, "expected:", v.Field)
@@ -141,7 +141,7 @@ func TestGetObjectValues(t *testing.T) {
 					}
 				}
 				var kind string
-				if e := q.GetObject("speedboat", object.Kind, &kind); e == nil {
+				if e := q.GetField("speedboat", object.Kind, &kind); e == nil {
 					t.Fatal("expected error; got", kind)
 				}
 			})
@@ -150,7 +150,7 @@ func TestGetObjectValues(t *testing.T) {
 				for _, v := range pathsOfNoun {
 					for i := 0; i < 2; i++ {
 						var path string
-						if e := q.GetObject(v.Target, object.Kinds, &path); e != nil {
+						if e := q.GetField(v.Target, object.Kinds, &path); e != nil {
 							t.Fatal(e)
 						} else if path != v.Field {
 							t.Fatal("mismatch", v.Target, "got:", path, "expected:", v.Field)
@@ -158,7 +158,7 @@ func TestGetObjectValues(t *testing.T) {
 					}
 				}
 				var path string
-				if e := q.GetObject("speedboat", object.Kinds, &path); e == nil {
+				if e := q.GetField("speedboat", object.Kinds, &path); e == nil {
 					t.Fatal("expected error; got", path)
 				}
 			})
@@ -166,7 +166,7 @@ func TestGetObjectValues(t *testing.T) {
 				for _, v := range numValues {
 					for i := 0; i < 2; i++ {
 						var num float64
-						if e := q.GetObject(v.name, "d", &num); e != nil {
+						if e := q.GetField(v.name, "d", &num); e != nil {
 							t.Fatal(e)
 						} else if num != v.value {
 							t.Fatal("mismatch", v.name, num, v.value)
@@ -178,7 +178,7 @@ func TestGetObjectValues(t *testing.T) {
 				for _, v := range txtValues {
 					for i := 0; i < 2; i++ {
 						var txt string
-						if e := q.GetObject(v.name, "t", &txt); e != nil {
+						if e := q.GetField(v.name, "t", &txt); e != nil {
 							t.Fatal(e)
 						} else if txt != v.value {
 							t.Fatal("mismatch", v.name, "got:", txt, "expected:", v.value)

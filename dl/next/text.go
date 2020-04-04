@@ -53,7 +53,8 @@ func (op *Join) GetText(run rt.Runtime) (ret string, err error) {
 	} else {
 		var buf bytes.Buffer
 		for it.HasNext() {
-			if txt, e := it.GetText(); e != nil {
+			var txt string
+			if e := it.GetNext(&txt); e != nil {
 				err = e
 				break
 			} else {

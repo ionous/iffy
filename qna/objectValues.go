@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/tables"
 )
@@ -45,7 +46,7 @@ func NewObjectValues(db *sql.DB) *Fields {
 func (n *Fields) GetField(obj, field string, pv interface{}) (err error) {
 	key := keyType{obj, field}
 	if v, ok := n.pairs[key]; ok {
-		err = Assign(pv, v)
+		err = assign.ToValue(pv, v)
 	} else {
 		var permissive bool
 		tgt := mapTarget{key: key, pairs: n.pairs}
@@ -73,14 +74,14 @@ func (n *Fields) GetField(obj, field string, pv interface{}) (err error) {
 				obj, field)
 		}
 		if e := rows.Scan(&tgt); e == nil {
-			err = Assign(pv, tgt.value)
+			err = assign.ToValue(pv, tgt.value)
 			//
 		} else if e == sql.ErrNoRows {
 			if !permissive {
 				err = errutil.New("field not found", obj, field)
 			} else {
 				n.pairs[key] = nil
-				err = Assign(pv, nil)
+				err = assign.ToValue(pv, nil)
 			}
 		} else {
 			err = e
@@ -90,7 +91,7 @@ func (n *Fields) GetField(obj, field string, pv interface{}) (err error) {
 	return err
 }
 
-// Assign sets the named property to the passed value.
+// SetField to the passed value.
 func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 	key := keyType{obj, field}
 	n.pairs[key] = v

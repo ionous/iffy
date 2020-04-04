@@ -1,12 +1,7 @@
 package rt
 
-import "github.com/ionous/errutil"
-
-const StreamExceeded errutil.Error = "stream exceeded"
-
 // Execute runs a bit of code that has no return value.
 type Execute interface {
-	// fix: rename to Run() to simplify look of Execute.Execute with embedded
 	Execute(Runtime) error
 }
 
@@ -27,32 +22,24 @@ type TextEval interface {
 
 // NumListEval returns or generates a series of numbers.
 type NumListEval interface {
-	GetNumberStream(Runtime) (NumberStream, error)
+	GetNumberStream(Runtime) (Iterator, error)
 }
 
 // NumListEval returns or generates a series of strings.
 type TextListEval interface {
-	GetTextStream(Runtime) (TextStream, error)
+	GetTextStream(Runtime) (Iterator, error)
 }
 
-// NumberStream provides a way to iterate over a set of numbers.
-type NumberStream interface {
+// Iterator provides a way to iterate over a stream of values.
+// The underlying implementation and values returned depends on the stream.
+type Iterator interface {
 	// HasNext returns true if the iterator can be safely advanced.
 	HasNext() bool
-	// GetNumber advances the iterator.
-	GetNumber() (float64, error)
+	// GetNext returns the next value in the stream and advances the iterator.
+	GetNext(pv interface{}) error
 }
 
-// TextStream provides a way to iterate over a set of strings.
-type TextStream interface {
-	// HasNext returns true if the iterator can be safely advanced.
-	HasNext() bool
-	// GetText advances the iterator.
-	GetText() (string, error)
-}
-
-// StreamCount provides an optional interface for determining the number of elements in a stream.
+// StreamCount optionally implemented for iterators to determine the length of remaining stream.
 type StreamCount interface {
-	// Count returns the remaining length of the stream.
-	Count() int
+	Remaining() int
 }

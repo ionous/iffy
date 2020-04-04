@@ -1,6 +1,9 @@
 package next
 
-import "github.com/ionous/iffy/rt"
+import (
+	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
+)
 
 // GetVariable writes the value at 'name'
 type GetVar struct {
@@ -22,23 +25,22 @@ func (p *GetVar) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 
-// FIX:
-// func (p *GetVar) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
-// 	var values []float64
-// 	if e := run.GetVariable(p.Name, &values); e != nil {
-// 		err = e
-// 	} else {
-// 		ret = qna.NewNumberList(values)
-// 	}
-// 	return
-// }
+func (p *GetVar) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
+	var values []float64
+	if e := run.GetVariable(p.Name, &values); e != nil {
+		err = e
+	} else {
+		ret = stream.NewNumberList(values)
+	}
+	return
+}
 
-// func (p *GetVar) GetTextStream(run rt.Runtime) (ret rt.TextStream, err error) {
-// 	var values []string
-// 	if e := run.GetVariable(p.Name, &values); e != nil {
-// 		err = e
-// 	} else {
-// 		ret = qna.NewTextList(values)
-// 	}
-// 	return
-// }
+func (p *GetVar) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
+	var values []string
+	if e := run.GetVariable(p.Name, &values); e != nil {
+		err = e
+	} else {
+		ret = stream.NewTextList(values)
+	}
+	return
+}

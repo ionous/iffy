@@ -2,7 +2,9 @@ package next
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 )
 
 // Range generates a series of integers r[i] = (start + step*i) where i>=0
@@ -31,7 +33,7 @@ func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
 	} else if l, ok := elems.(rt.StreamCount); !ok {
 		err = errutil.Fmt("unknown number list %T", elems)
 	} else {
-		ret = float64(l.Count())
+		ret = float64(l.Remaining())
 	}
 	return
 }
@@ -43,12 +45,12 @@ func (op *LenOfTexts) GetNumber(run rt.Runtime) (ret float64, err error) {
 	} else if l, ok := elems.(rt.StreamCount); !ok {
 		err = errutil.Fmt("unknown text list %T", elems)
 	} else {
-		ret = float64(l.Count())
+		ret = float64(l.Remaining())
 	}
 	return
 }
 
-func (op *Range) GetNumberStream(run rt.Runtime) (ret rt.NumberStream, err error) {
+func (op *Range) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
 	if start, e := rt.GetOptionalNumber(run, op.Start, 1); e != nil {
 		err = e
 	} else if stop, e := rt.GetOptionalNumber(run, op.Stop, start); e != nil {
@@ -74,18 +76,22 @@ func (it *rangeIt) HasNext() (okay bool) {
 }
 
 // GetNumber advances the iterator.
-func (it *rangeIt) GetNumber() (ret float64, err error) {
+func (it *rangeIt) GetNext(pv interface{}) (err error) {
 	if !it.HasNext() {
-		err = rt.StreamExceeded
+		err = stream.Exceeded
 	} else {
 		now, next := it.next, it.next+it.step
-		ret, it.next = float64(now), next
+		if e := assign.ToFloat(pv, float64(now)); e != nil {
+			err = e
+		} else {
+			it.next = next
+		}
 	}
 	return
 }
 
-// Count returns the remaining length of the stream.
-func (it *rangeIt) Count() (ret int) {
+// Remaining returns the remaining length of the stream.
+func (it *rangeIt) Remaining() (ret int) {
 	if cnt := 1 + (it.stop-it.next)/it.step; cnt > 0 {
 		ret = cnt
 	}

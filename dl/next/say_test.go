@@ -3,8 +3,8 @@ package next
 import (
 	"fmt"
 
-	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/print"
 )
 
 var helloThereWorld = rt.Block{
@@ -54,5 +54,5 @@ type baseRuntime struct {
 }
 type sayTester struct {
 	baseRuntime
-	qna.WriterStack
+	print.Stack
 }

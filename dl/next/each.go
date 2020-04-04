@@ -1,9 +1,9 @@
 package next
 
 import (
-	"github.com/ionous/iffy/qna"
+	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/scope"
+	"github.com/ionous/iffy/rt/scope"
 )
 
 // DoNothing implements Execute, but .... does nothing.
@@ -24,10 +24,13 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else {
 		err = loop(run, it, f.Go, f.Else, func() (ret scope.ReadOnly, err error) {
-			if v, e := it.GetNumber(); e != nil {
+			var num float64
+			if e := it.GetNext(&num); e != nil {
 				err = e
 			} else {
-				ret = eachNumber(v)
+				ret = &readOnlyValue{"num", func(pv interface{}) error {
+					return assign.ToFloat(pv, num)
+				}}
 			}
 			return
 		})
@@ -48,10 +51,13 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else {
 		err = loop(run, it, f.Go, f.Else, func() (ret scope.ReadOnly, err error) {
-			if v, e := it.GetText(); e != nil {
+			var txt string
+			if e := it.GetNext(&txt); e != nil {
 				err = e
 			} else {
-				ret = eachText(v)
+				ret = &readOnlyValue{"text", func(pv interface{}) error {
+					return assign.ToString(pv, txt)
+				}}
 			}
 			return
 		})
@@ -59,22 +65,14 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-type eachNumber float64
-
-func (h eachNumber) GetVariable(n string, pv interface{}) (err error) {
-	if n == "num" {
-		err = qna.Assign(pv, float64(h))
-	} else {
-		err = scope.UnknownVariable(n)
-	}
-	return
+type readOnlyValue struct {
+	name    string
+	convert func(pv interface{}) error
 }
 
-type eachText string
-
-func (h eachText) GetVariable(n string, pv interface{}) (err error) {
-	if n == "text" {
-		err = qna.Assign(pv, string(h))
+func (h *readOnlyValue) GetVariable(n string, pv interface{}) (err error) {
+	if n == h.name {
+		err = h.convert(pv)
 	} else {
 		err = scope.UnknownVariable(n)
 	}
@@ -87,7 +85,7 @@ func loop(run rt.Runtime, it interface{ HasNext() bool }, Go, Else rt.Execute, n
 			err = e
 		}
 	} else {
-		var lf qna.LoopFactory
+		var lf scope.LoopFactory
 		for it.HasNext() {
 			if varscope, e := next(); e != nil {
 				err = e

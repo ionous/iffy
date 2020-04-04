@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
 )
 
 // Bool specifies a simple true/false value.
@@ -96,8 +96,8 @@ type Numbers struct {
 	Values []float64
 }
 
-func (l *Numbers) GetNumberStream(rt.Runtime) (rt.NumberStream, error) {
-	return qna.NewNumberList(l.Values), nil
+func (l *Numbers) GetNumberStream(rt.Runtime) (rt.Iterator, error) {
+	return stream.NewNumberList(l.Values), nil
 }
 
 // Texts specifies multiple strings.
@@ -105,6 +105,6 @@ type Texts struct {
 	Values []string
 }
 
-func (l *Texts) GetTextStream(rt.Runtime) (rt.TextStream, error) {
-	return qna.NewTextList(l.Values), nil
+func (l *Texts) GetTextStream(rt.Runtime) (rt.Iterator, error) {
+	return stream.NewTextList(l.Values), nil
 }

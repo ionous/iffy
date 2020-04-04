@@ -1,10 +1,6 @@
 package rt
 
-import (
-	"io"
-
-	"github.com/ionous/iffy/scope"
-)
+import "io"
 
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
@@ -30,7 +26,7 @@ func (Panic) GetVariable(name string, pv interface{}) error {
 func (Panic) SetVariable(name string, v interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) PushScope(scope.VariableScope) {
+func (Panic) PushScope(VariableScope) {
 	panic("Runtime panic")
 }
 func (Panic) PopScope() {

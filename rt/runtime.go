@@ -1,19 +1,25 @@
 package rt
 
-import (
-	"io"
-
-	"github.com/ionous/iffy/scope"
-)
+import "io"
 
 // Pluralize turns single words into their plural variants.
 type Pluralize interface {
 	Pluralize(single string) string
 }
 
+// VariableScope reads from and writes to a pool of named variables;
+// the variables, their names, and initial values depend on the implementation and its context.
+// Often, scopes are arranged in a stack with the newest scope checked for variables first, the oldest last.
+type VariableScope interface {
+	// GetVariable writes the value at 'name' into the value pointed to by 'pv'.
+	GetVariable(name string, pv interface{}) error
+	// SetVariable writes the value of 'v' into the value at 'name'.
+	SetVariable(name string, v interface{}) error
+}
+
 type VariableStack interface {
-	scope.VariableScope
-	PushScope(scope.VariableScope)
+	VariableScope
+	PushScope(VariableScope)
 	PopScope()
 }
 
@@ -53,7 +59,7 @@ type Runtime interface {
 	// Ancestors
 	// Pattern
 	// Pluralize
-	// Pack(pdst, src r.Value) error
+
 }
 
 // WritersBlock applies a writer to the runtime for the duration of fn.
@@ -72,7 +78,7 @@ func WritersBlock(run Runtime, w io.Writer, fn func() error) (err error) {
 }
 
 // ScopeBlock brings the names of an object's properties into scope for the duration of fn.
-func ScopeBlock(run Runtime, scope scope.VariableScope, block Execute) (err error) {
+func ScopeBlock(run Runtime, scope VariableScope, block Execute) (err error) {
 	run.PushScope(scope)
 	err = block.Execute(run)
 	run.PopScope()

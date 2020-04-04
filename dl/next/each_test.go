@@ -3,9 +3,9 @@ package next
 import (
 	"fmt"
 
-	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/scope"
+	"github.com/ionous/iffy/rt/print"
+	"github.com/ionous/iffy/rt/scope"
 )
 
 // ExampleIndex verifies the loop index property.
@@ -50,6 +50,6 @@ var oneTwoThree = []string{"one", "two", "three"}
 
 type forTester struct {
 	baseRuntime
-	qna.WriterStack
+	print.Stack
 	scope.ScopeStack
 }

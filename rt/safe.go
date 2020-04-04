@@ -78,7 +78,7 @@ func GetOptionalNumber(run Runtime, eval NumberEval, fallback float64) (ret floa
 	return
 }
 
-func GetTextStream(run Runtime, eval TextListEval) (ret TextStream, err error) {
+func GetTextStream(run Runtime, eval TextListEval) (ret Iterator, err error) {
 	if eval == nil {
 		ret = &EmptyStream{}
 	} else {
@@ -87,7 +87,7 @@ func GetTextStream(run Runtime, eval TextListEval) (ret TextStream, err error) {
 	return
 }
 
-func GetNumberStream(run Runtime, eval NumListEval) (ret NumberStream, err error) {
+func GetNumberStream(run Runtime, eval NumListEval) (ret Iterator, err error) {
 	if eval == nil {
 		ret = &EmptyStream{}
 	} else {
