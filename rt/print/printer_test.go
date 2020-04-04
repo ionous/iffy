@@ -1,60 +1,58 @@
-package printer
+package print
 
 import (
 	"io"
 	"testing"
-
-	testify "github.com/stretchr/testify/assert"
 )
 
 func TestBracket(t *testing.T) {
-	assert := testify.New(t)
-	//
 	var buffer Spanner
 	w := Bracket(&buffer)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
 	w.Close()
-	assert.Equal("( hello you )", buffer.String())
+	if str := buffer.String(); str != "( hello you )" {
+		t.Fatal("mismatched", str)
+	}
 }
 
 func TestManualBracket(t *testing.T) {
-	assert := testify.New(t)
-	//
 	var buffer Spanner
 	w := &buffer
 	io.WriteString(w, "hello")
 	io.WriteString(w, "( you )")
 	io.WriteString(w, "guys")
-	assert.Equal("hello ( you ) guys", buffer.String())
+	if str := buffer.String(); str != "hello ( you ) guys" {
+		t.Fatal("mismatched", str)
+	}
 }
 
 func TestCapitalize(t *testing.T) {
-	assert := testify.New(t)
-	//
 	var buffer Spanner
 	w := Capitalize(&buffer)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
-	assert.Equal("Hello you", buffer.String())
+	if str := buffer.String(); str != "Hello you" {
+		t.Fatal("mismatched", str)
+	}
 }
 
 func TestLowercase(t *testing.T) {
-	assert := testify.New(t)
-	//
 	var buffer Spanner
 	w := Lowercase(&buffer)
 	io.WriteString(w, "Hello")
 	io.WriteString(w, "Hugh")
-	assert.Equal("hello hugh", buffer.String())
+	if str := buffer.String(); str != "hello hugh" {
+		t.Fatal("mismatched", str)
+	}
 }
 
 func TestTitlecase(t *testing.T) {
-	assert := testify.New(t)
-	//
 	var buffer Spanner
 	w := TitleCase(&buffer)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
-	assert.Equal("Hello You", buffer.String())
+	if str := buffer.String(); str != "Hello You" {
+		t.Fatal("mismatched", str)
+	}
 }

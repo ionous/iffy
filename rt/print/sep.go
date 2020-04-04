@@ -1,4 +1,4 @@
-package printer
+package print
 
 import (
 	"io"
@@ -13,13 +13,13 @@ type Sep struct {
 }
 
 // AndSeparator creates a phrase: a, b, c, and d.
-// Note: spacing between words is left to printer.Spacing.
+// Note: spacing between words is left to print.Spacing.
 func AndSeparator(w io.Writer) io.WriteCloser {
 	return &Sep{Writer: w, last: "and"}
 }
 
 // OrSeparator creates a phrase: a, b, c, or d.
-// Note: spacing between words is left to printer.Spacing.
+// Note: spacing between words is left to print.Spacing.
 func OrSeparator(w io.Writer) io.WriteCloser {
 	return &Sep{Writer: w, last: "or"}
 }
