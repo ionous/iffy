@@ -1,6 +1,11 @@
-package qna
+package stream
 
-import "github.com/ionous/errutil"
+import (
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/assign"
+)
+
+const Exceeded errutil.Error = "stream exceeded"
 
 type NumberList struct {
 	i    int
@@ -16,7 +21,7 @@ func NewNumberList(list []float64) *NumberList {
 	return &NumberList{list: list}
 }
 
-func (it *NumberList) Count() int {
+func (it *NumberList) Remaining() int {
 	return len(it.list) - it.i
 }
 
@@ -24,10 +29,10 @@ func (it *NumberList) HasNext() bool {
 	return it.i < len(it.list)
 }
 
-func (it *NumberList) GetNumber() (ret float64, err error) {
+func (it *NumberList) GetNext(pv interface{}) (err error) {
 	if !it.HasNext() {
-		err = StreamExceeded
-	} else if e := Assign(&ret, it.list[it.i]); e != nil {
+		err = Exceeded
+	} else if e := assign.ToFloat(pv, it.list[it.i]); e != nil {
 		err = e
 	} else {
 		it.i++
@@ -39,7 +44,7 @@ func NewTextList(list []string) *TextList {
 	return &TextList{list: list}
 }
 
-func (it *TextList) Count() int {
+func (it *TextList) Remaining() int {
 	return len(it.list) - it.i
 }
 
@@ -47,15 +52,13 @@ func (it *TextList) HasNext() bool {
 	return it.i < len(it.list)
 }
 
-func (it *TextList) GetText() (ret string, err error) {
+func (it *TextList) GetNext(pv interface{}) (err error) {
 	if !it.HasNext() {
-		err = StreamExceeded
-	} else if e := Assign(&ret, it.list[it.i]); e != nil {
+		err = Exceeded
+	} else if e := assign.ToString(pv, it.list[it.i]); e != nil {
 		err = e
 	} else {
 		it.i++
 	}
 	return
 }
-
-const StreamExceeded errutil.Error = "stream exceeded"
