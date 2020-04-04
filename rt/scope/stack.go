@@ -1,10 +1,12 @@
 package scope
 
+import "github.com/ionous/iffy/rt"
+
 type ScopeStack struct {
-	stack []VariableScope
+	stack []rt.VariableScope
 }
 
-func (k *ScopeStack) PushScope(scope VariableScope) {
+func (k *ScopeStack) PushScope(scope rt.VariableScope) {
 	k.stack = append(k.stack, scope)
 }
 
@@ -18,19 +20,19 @@ func (k *ScopeStack) PopScope() {
 
 // GetVariable writes the value at 'name' into the value pointed to by 'pv'.
 func (k *ScopeStack) GetVariable(name string, pv interface{}) (err error) {
-	return k.visit(name, func(scope VariableScope) error {
+	return k.visit(name, func(scope rt.VariableScope) error {
 		return scope.GetVariable(name, pv)
 	})
 }
 
 // SetVariable writes the value of 'v' into the value at 'name'.
 func (k *ScopeStack) SetVariable(name string, v interface{}) (err error) {
-	return k.visit(name, func(scope VariableScope) error {
+	return k.visit(name, func(scope rt.VariableScope) error {
 		return scope.SetVariable(name, v)
 	})
 }
 
-func (k *ScopeStack) visit(name string, visitor func(VariableScope) error) (err error) {
+func (k *ScopeStack) visit(name string, visitor func(rt.VariableScope) error) (err error) {
 	for i := len(k.stack) - 1; i >= 0; i-- {
 		switch e := visitor(k.stack[i]); e.(type) {
 		case nil:
