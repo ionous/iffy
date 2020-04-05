@@ -28,25 +28,7 @@ func (*AllTrue) Compose() composer.Spec {
 }
 
 func (a *AllTrue) GetBool(run rt.Runtime) (okay bool, err error) {
-	if anyFalse, e := a.anyFalse(run); e != nil {
-		err = e
-	} else {
-		okay = !anyFalse
-	}
-	return
-}
-
-func (a *AllTrue) anyFalse(run rt.Runtime) (ret bool, err error) {
-	for _, b := range a.Test {
-		if ok, e := rt.GetBool(run, b); e != nil {
-			err = e
-			break
-		} else if !ok {
-			ret = true
-			break
-		}
-	}
-	return
+	return rt.GetAllTrue(run, a.Test)
 }
 
 func (*AnyTrue) Compose() composer.Spec {

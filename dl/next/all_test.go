@@ -34,7 +34,6 @@ func TestAllTrue(t *testing.T) {
 	} else if l.asks != 2 {
 		t.Fatal("expected only two got tested", l.asks)
 	}
-
 }
 
 func TestAnyTrue(t *testing.T) {
