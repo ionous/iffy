@@ -62,7 +62,6 @@ var Runs = []composer.Specification{
 	(*next.ForEachText)(nil),
 
 	(*next.GetField)(nil),
-
 	(*next.GetVar)(nil),
 
 	(*next.Is)(nil),
