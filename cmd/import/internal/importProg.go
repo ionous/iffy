@@ -8,7 +8,6 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/export"
-	"github.com/ionous/iffy/ref/kindOf"
 	"github.com/ionous/iffy/ref/unique"
 )
 
@@ -91,8 +90,8 @@ func unmarshall(out r.Value, in export.Dict, types typeMap) (err error) {
 }
 
 func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
-	switch outType := outAt.Type(); {
-	case kindOf.Float(outType):
+	switch outType := outAt.Type(); outType.Kind() {
+	case r.Float32, r.Float64:
 		err = unpack(inVal, func(v interface{}) (err error) {
 			// float64, for JSON numbers
 			if n, ok := v.(float64); !ok {
@@ -103,7 +102,7 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 			}
 			return
 		})
-	case kindOf.Int(outType):
+	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
 		err = unpack(inVal, func(v interface{}) (err error) {
 			// float64, for JSON numbers
 			if n, ok := v.(float64); !ok {
@@ -114,7 +113,7 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 			return
 		})
 
-	case outType.Kind() == r.Bool:
+	case r.Bool:
 		// fix? boolean values are stored as enumerations
 		err = unpack(inVal, func(v interface{}) (err error) {
 			// string, for JSON strings
@@ -126,7 +125,7 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 			return
 		})
 
-	case outType.Kind() == r.String:
+	case r.String:
 		err = unpack(inVal, func(v interface{}) (err error) {
 			// string, for JSON strings
 			if str, ok := v.(string); !ok {
@@ -137,7 +136,7 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 			return
 		})
 
-	case outType.Kind() == r.Interface:
+	case r.Interface:
 		if e := unpack(inVal, func(v interface{}) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
@@ -152,27 +151,29 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 			err = errutil.Append(err, e)
 		}
 
-	case outType.Kind() == r.Slice && kindOf.Interface(outType.Elem()):
-		// []interface{}, for JSON arrays
-		if items, ok := inVal.([]interface{}); ok {
-			elType := outType.Elem()
-			if slice := outAt; len(items) > 0 {
-				for _, item := range items {
-					if e := unpack(item, func(v interface{}) (err error) {
-						// map[string]interface{}, for JSON objects
-						if slot, ok := v.(map[string]interface{}); !ok {
-							err = errutil.New("value not a slot")
-						} else if v, e := importSlot(slot, elType, types); e != nil {
-							err = e
-						} else {
-							slice = r.Append(slice, v)
+	case r.Slice:
+		if outType.Elem().Kind() == r.Interface {
+			// []interface{}, for JSON arrays
+			if items, ok := inVal.([]interface{}); ok {
+				elType := outType.Elem()
+				if slice := outAt; len(items) > 0 {
+					for _, item := range items {
+						if e := unpack(item, func(v interface{}) (err error) {
+							// map[string]interface{}, for JSON objects
+							if slot, ok := v.(map[string]interface{}); !ok {
+								err = errutil.New("value not a slot")
+							} else if v, e := importSlot(slot, elType, types); e != nil {
+								err = e
+							} else {
+								slice = r.Append(slice, v)
+							}
+							return
+						}); e != nil {
+							err = errutil.Append(err, e)
 						}
-						return
-					}); e != nil {
-						err = errutil.Append(err, e)
 					}
+					outAt.Set(slice)
 				}
-				outAt.Set(slice)
 			}
 		}
 	}

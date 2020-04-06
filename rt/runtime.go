@@ -12,7 +12,7 @@ type Pluralize interface {
 // Often, scopes are arranged in a stack with the newest scope checked for variables first, the oldest last.
 type VariableScope interface {
 	// GetVariable writes the value at 'name' into the value pointed to by 'pv'.
-	GetVariable(name string, pv interface{}) error
+	GetVariable(name string) (interface{}, error)
 	// SetVariable writes the value of 'v' into the value at 'name'.
 	SetVariable(name string, v interface{}) error
 }
@@ -24,16 +24,8 @@ type VariableStack interface {
 }
 
 type Fields interface {
-	GetField(target, field string, pv interface{}) error
+	GetField(target, field string) (interface{}, error)
 	SetField(target, field string, v interface{}) error
-}
-
-// // Model interacts with the predefined world.
-type Model interface {
-	// 	// GetObject with the passed name.
-	// 	GetObject(name string) (string, bool)
-	// 	// GetRelation with the passed name.
-	// 	GetRelation(name string) (Relation, bool)
 }
 
 // Ancestors customizes the parent-child event hierarchy.
@@ -50,14 +42,12 @@ type WriterStack interface {
 
 // Runtime environment for an in-progress game.
 type Runtime interface {
-	Model
 	Fields
 	WriterStack
 	VariableStack
 	Random(inclusiveMin, exclusiveMax int) int
 
 	// Ancestors
-	// Pattern
 	// Pluralize
 
 }
@@ -84,16 +74,3 @@ func ScopeBlock(run Runtime, scope VariableScope, block Execute) (err error) {
 	run.PopScope()
 	return
 }
-
-// // ScopeBlock brings the names of an object's properties into scope for the duration of fn.
-// func ScopeBlock(run Runtime, scope VariableScope, fn func() error) (err error) {
-// 	run.PushScope(scope)
-// 	err = fn()
-// 	run.PopScope()
-// 	return
-// }
-
-// PORTING....
-// func Determine(run Runtime, p interface{}) error {
-// 	return run.ExecuteMatching(run.Emplace(p))
-// }

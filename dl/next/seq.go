@@ -1,6 +1,7 @@
 package next
 
 import (
+	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -33,8 +34,9 @@ type StoppingText struct {
 // if persistence wasn't necessary, we could use in-memory private fields of the commands
 func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret int, err error) {
 	if max := len(op.Elems); max > 0 {
-		var curr int
-		if e := run.GetField(op.Tgt, object.Counter, &curr); e != nil {
+		if p, e := run.GetField(op.Tgt, object.Counter); e != nil {
+			err = e
+		} else if curr, e := assign.ToInt(p); e != nil {
 			err = e
 		} else if e := run.SetField(op.Tgt, object.Counter, inc(curr, max)); e != nil {
 			err = e

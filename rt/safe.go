@@ -58,6 +58,16 @@ func GetText(run Runtime, eval TextEval) (ret string, err error) {
 	return
 }
 
+// GetOptionalNumber runs the optionally specified eval.
+func GetOptionalNumber(run Runtime, eval NumberEval, fallback float64) (ret float64, err error) {
+	if eval == nil {
+		ret = fallback
+	} else {
+		ret, err = eval.GetNumber(run)
+	}
+	return
+}
+
 // GetOptionalText runs the optionally specified eval.
 func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, err error) {
 	if eval == nil {
@@ -68,12 +78,11 @@ func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, e
 	return
 }
 
-// GetOptionalNumber runs the optionally specified eval.
-func GetOptionalNumber(run Runtime, eval NumberEval, fallback float64) (ret float64, err error) {
+func GetNumberStream(run Runtime, eval NumListEval) (ret Iterator, err error) {
 	if eval == nil {
-		ret = fallback
+		ret = EmptyStream(true)
 	} else {
-		ret, err = eval.GetNumber(run)
+		ret, err = eval.GetNumberStream(run)
 	}
 	return
 }
@@ -87,11 +96,44 @@ func GetTextStream(run Runtime, eval TextListEval) (ret Iterator, err error) {
 	return
 }
 
-func GetNumberStream(run Runtime, eval NumListEval) (ret Iterator, err error) {
-	if eval == nil {
-		ret = EmptyStream(true)
+func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
+	if it, e := eval.GetNumberStream(run); e != nil {
+		err = e
 	} else {
-		ret, err = eval.GetNumberStream(run)
+		var vals []float64
+		for it.HasNext() {
+			var v float64
+			if e := it.GetNext(&v); e != nil {
+				err = e
+				break
+			} else {
+				vals = append(vals, v)
+			}
+		}
+		if err == nil {
+			ret = vals
+		}
+	}
+	return
+}
+
+func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
+	if it, e := eval.GetTextStream(run); e != nil {
+		err = e
+	} else {
+		var vals []string
+		for it.HasNext() {
+			var v string
+			if e := it.GetNext(&v); e != nil {
+				err = e
+				break
+			} else {
+				vals = append(vals, v)
+			}
+		}
+		if err == nil {
+			ret = vals
+		}
 	}
 	return
 }

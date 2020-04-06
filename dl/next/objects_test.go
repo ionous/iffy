@@ -53,19 +53,17 @@ type modelTest struct {
 	clsMap map[string]string
 }
 
-func (m *modelTest) GetField(name, field string, pv interface{}) (err error) {
+func (m *modelTest) GetField(name, field string) (ret interface{}, err error) {
 	switch field {
 	case object.Exists:
 		_, ok := m.clsMap[name]
-		bptr := pv.(*bool)
-		*bptr = ok
+		ret = ok
 
 	case object.Kind:
 		if cls, ok := m.clsMap[name]; !ok {
 			err = errutil.New("unknown", name)
 		} else {
-			sptr := pv.(*string)
-			*sptr = cls
+			ret = cls
 		}
 
 	case object.Kinds:
@@ -74,8 +72,7 @@ func (m *modelTest) GetField(name, field string, pv interface{}) (err error) {
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("unknown class", cls)
 		} else {
-			sptr := pv.(*string)
-			*sptr = path
+			ret = path
 		}
 
 	default:

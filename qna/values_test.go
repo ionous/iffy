@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/assembly"
+	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/tables"
 )
@@ -120,9 +121,10 @@ func TestGetFieldValues(t *testing.T) {
 			// ensure we can ask for object existence
 			t.Run("object exists", func(t *testing.T) {
 				for _, v := range existence {
-					var exists bool
-					if e := q.GetField(v.name, object.Exists, &exists); e != nil {
+					if p, e := q.GetField(v.name, object.Exists); e != nil {
 						t.Fatal("existence", v.name, e)
+					} else if exists, e := assign.ToBool(p); e != nil {
+						t.Fatal("assign", e)
 					} else if v.exists != exists {
 						t.Fatal("existence", v.name, "wanted", v.exists)
 					}
@@ -132,42 +134,43 @@ func TestGetFieldValues(t *testing.T) {
 			t.Run("object kind", func(t *testing.T) {
 				for _, v := range kindsOfNoun {
 					for i := 0; i < 2; i++ {
-						var kind string
-						if e := q.GetField(v.Target, object.Kind, &kind); e != nil {
+						if p, e := q.GetField(v.Target, object.Kind); e != nil {
 							t.Fatal(e)
+						} else if kind, e := assign.ToString(p); e != nil {
+							t.Fatal("assign", e)
 						} else if kind != v.Field {
 							t.Fatal("mismatch", v.Target, "got:", kind, "expected:", v.Field)
 						}
 					}
 				}
-				var kind string
-				if e := q.GetField("speedboat", object.Kind, &kind); e == nil {
-					t.Fatal("expected error; got", kind)
+				if k, e := q.GetField("speedboat", object.Kind); e == nil {
+					t.Fatal("expected error; got", k)
 				}
 			})
 			// ensure queries for paths work
 			t.Run("object kinds", func(t *testing.T) {
 				for _, v := range pathsOfNoun {
 					for i := 0; i < 2; i++ {
-						var path string
-						if e := q.GetField(v.Target, object.Kinds, &path); e != nil {
+						if p, e := q.GetField(v.Target, object.Kinds); e != nil {
 							t.Fatal(e)
+						} else if path, e := assign.ToString(p); e != nil {
+							t.Fatal("assign", e)
 						} else if path != v.Field {
 							t.Fatal("mismatch", v.Target, "got:", path, "expected:", v.Field)
 						}
 					}
 				}
-				var path string
-				if e := q.GetField("speedboat", object.Kinds, &path); e == nil {
+				if path, e := q.GetField("speedboat", object.Kinds); e == nil {
 					t.Fatal("expected error; got", path)
 				}
 			})
 			t.Run("get numbers", func(t *testing.T) {
 				for _, v := range numValues {
 					for i := 0; i < 2; i++ {
-						var num float64
-						if e := q.GetField(v.name, "d", &num); e != nil {
+						if p, e := q.GetField(v.name, "d"); e != nil {
 							t.Fatal(e)
+						} else if num, e := assign.ToFloat(p); e != nil {
+							t.Fatal("assign", e)
 						} else if num != v.value {
 							t.Fatal("mismatch", v.name, num, v.value)
 						}
@@ -177,16 +180,16 @@ func TestGetFieldValues(t *testing.T) {
 			t.Run("get text", func(t *testing.T) {
 				for _, v := range txtValues {
 					for i := 0; i < 2; i++ {
-						var txt string
-						if e := q.GetField(v.name, "t", &txt); e != nil {
+						if p, e := q.GetField(v.name, "t"); e != nil {
 							t.Fatal(e)
+						} else if txt, e := assign.ToString(p); e != nil {
+							t.Fatal("assign", e)
 						} else if txt != v.value {
 							t.Fatal("mismatch", v.name, "got:", txt, "expected:", v.value)
 						}
 					}
 				}
 			})
-
 		}
 	}
 }

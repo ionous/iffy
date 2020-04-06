@@ -7,6 +7,9 @@ type ScopeStack struct {
 }
 
 func (k *ScopeStack) PushScope(scope rt.VariableScope) {
+	if len(k.stack) > 25 {
+		panic("stack overflow")
+	}
 	k.stack = append(k.stack, scope)
 }
 
@@ -18,11 +21,17 @@ func (k *ScopeStack) PopScope() {
 	}
 }
 
-// GetVariable writes the value at 'name' into the value pointed to by 'pv'.
-func (k *ScopeStack) GetVariable(name string, pv interface{}) (err error) {
-	return k.visit(name, func(scope rt.VariableScope) error {
-		return scope.GetVariable(name, pv)
+// GetVariable returns the value at 'name'
+func (k *ScopeStack) GetVariable(name string) (ret interface{}, err error) {
+	err = k.visit(name, func(scope rt.VariableScope) (err error) {
+		if v, e := scope.GetVariable(name); e != nil {
+			err = e
+		} else {
+			ret = v
+		}
+		return err
 	})
+	return
 }
 
 // SetVariable writes the value of 'v' into the value at 'name'.

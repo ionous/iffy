@@ -1,7 +1,7 @@
 package pattern
 
 import (
-	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/stream"
 )
@@ -22,7 +22,7 @@ func (k *textIterator) GetNext(pv interface{}) (err error) {
 	if !k.HasNext() {
 		err = stream.Exceeded
 	} else if pit, ok := pv.(*rt.Iterator); !ok {
-		err = errutil.Fmt("expected *iterator, got %T", pv)
+		err = assign.Mismatch("GetNext", pit, pv)
 	} else {
 		ind := k.order[k.curr]
 		if it, e := rt.GetTextStream(k.run, k.rules[ind]); e != nil {

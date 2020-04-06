@@ -4,7 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/tables"
 )
@@ -43,10 +42,10 @@ func NewObjectValues(db *sql.DB) *Fields {
 // get class,
 
 // GetValue sets the value of the passed pointer to the value of the named property.
-func (n *Fields) GetField(obj, field string, pv interface{}) (err error) {
+func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 	key := keyType{obj, field}
 	if v, ok := n.pairs[key]; ok {
-		err = assign.ToValue(pv, v)
+		ret = v
 	} else {
 		var permissive bool
 		tgt := mapTarget{key: key, pairs: n.pairs}
@@ -74,21 +73,20 @@ func (n *Fields) GetField(obj, field string, pv interface{}) (err error) {
 				obj, field)
 		}
 		if e := rows.Scan(&tgt); e == nil {
-			err = assign.ToValue(pv, tgt.value)
+			ret = tgt.value
 			//
 		} else if e == sql.ErrNoRows {
 			if !permissive {
 				err = errutil.New("field not found", obj, field)
 			} else {
 				n.pairs[key] = nil
-				err = assign.ToValue(pv, nil)
+				ret = nil
 			}
 		} else {
 			err = e
 		}
 	}
-
-	return err
+	return
 }
 
 // SetField to the passed value.

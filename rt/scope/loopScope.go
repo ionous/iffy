@@ -1,9 +1,6 @@
 package scope
 
-import (
-	"github.com/ionous/iffy/assign"
-	"github.com/ionous/iffy/rt"
-)
+import "github.com/ionous/iffy/rt"
 
 // LoopFactory or iterator variables while looping ( ex. through a series of objects. )
 // index: counts the loop iterations, starting with 1.
@@ -28,16 +25,16 @@ type loopScope struct {
 }
 
 // GetVariable returns values for the iterator variables (index,first,last) and anything up-
-func (l *loopScope) GetVariable(n string, pv interface{}) (err error) {
+func (l *loopScope) GetVariable(n string) (ret interface{}, err error) {
 	switch n {
 	case "index":
-		err = assign.ToFloat(pv, float64(l.currIndex))
+		ret = float64(l.currIndex)
 	case "first":
-		err = assign.ToBool(pv, l.currIndex == 1)
+		ret = bool(l.currIndex == 1)
 	case "last":
-		err = assign.ToBool(pv, !l.hasNext)
+		ret = bool(!l.hasNext)
 	default:
-		err = l.val.GetVariable(n, pv)
+		ret, err = l.val.GetVariable(n)
 	}
 	return
 }

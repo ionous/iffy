@@ -32,7 +32,7 @@ func (it *NumberList) HasNext() bool {
 func (it *NumberList) GetNext(pv interface{}) (err error) {
 	if !it.HasNext() {
 		err = Exceeded
-	} else if e := assign.ToFloat(pv, it.list[it.i]); e != nil {
+	} else if e := assign.FloatPtr(pv, it.list[it.i]); e != nil {
 		err = e
 	} else {
 		it.i++
@@ -55,7 +55,7 @@ func (it *TextList) HasNext() bool {
 func (it *TextList) GetNext(pv interface{}) (err error) {
 	if !it.HasNext() {
 		err = Exceeded
-	} else if e := assign.ToString(pv, it.list[it.i]); e != nil {
+	} else if e := assign.StringPtr(pv, it.list[it.i]); e != nil {
 		err = e
 	} else {
 		it.i++

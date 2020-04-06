@@ -36,7 +36,7 @@ func (*SumOf) Compose() composer.Spec {
 
 func (cmd *SumOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("Add", e)
+		err = errutil.New("SumOf", e)
 	} else {
 		ret = a + b
 	}
@@ -54,7 +54,7 @@ func (*DiffOf) Compose() composer.Spec {
 
 func (cmd *DiffOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("Sub", e)
+		err = errutil.New("DiffOf", e)
 	} else {
 		ret = a - b
 	}
@@ -72,7 +72,7 @@ func (*ProductOf) Compose() composer.Spec {
 
 func (cmd *ProductOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("Mul", e)
+		err = errutil.New("ProductOf", e)
 	} else {
 		ret = a * b
 	}
@@ -90,9 +90,9 @@ func (*QuotientOf) Compose() composer.Spec {
 
 func (cmd *QuotientOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("Div", e)
+		err = errutil.New("QuotientOf", e)
 	} else if math.Abs(b) <= 1e-5 {
-		err = errutil.New("Div second operand is too small")
+		err = errutil.New("QuotientOf second operand is too small")
 	} else {
 		ret = a / b
 	}
@@ -110,7 +110,7 @@ func (*RemainderOf) Compose() composer.Spec {
 
 func (cmd *RemainderOf) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("Mod", e)
+		err = errutil.New("RemainderOf", e)
 	} else {
 		ret = math.Mod(a, b)
 	}

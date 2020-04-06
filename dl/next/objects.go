@@ -3,6 +3,7 @@ package next
 import (
 	"strings"
 
+	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -40,8 +41,10 @@ func (*Exists) Compose() composer.Spec {
 func (op *Exists) GetBool(run rt.Runtime) (ret bool, err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
+	} else if p, e := run.GetField(obj, object.Exists); e != nil {
+		err = e
 	} else {
-		err = run.GetField(obj, object.Exists, &ret)
+		ret, err = assign.ToBool(p)
 	}
 	return
 }
@@ -57,8 +60,10 @@ func (*KindOf) Compose() composer.Spec {
 func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
+	} else if p, e := run.GetField(obj, object.Kind); e != nil {
+		err = e
 	} else {
-		err = run.GetField(obj, object.Kind, &ret)
+		ret, err = assign.ToString(p)
 	}
 	return
 }
@@ -77,14 +82,12 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = e
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = e
+	} else if p, e := run.GetField(obj, object.Kinds); e != nil {
+		err = e
+	} else if fullPath, e := assign.ToString(p); e != nil {
+		err = e
 	} else {
-		// get the path associated with the object
-		var fullPath string
-		if e := run.GetField(obj, object.Kinds, &fullPath); e != nil {
-			err = e
-		} else {
-			ret = strings.Contains(fullPath+",", tgtKind+",")
-		}
+		ret = strings.Contains(fullPath+",", tgtKind+",")
 	}
 	return
 }
@@ -102,13 +105,12 @@ func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = e
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = e
+	} else if p, e := run.GetField(obj, object.Kind); e != nil {
+		err = e
+	} else if objKind, e := assign.ToString(p); e != nil {
+		err = e
 	} else {
-		var objKind string
-		if e := run.GetField(obj, object.Kind, &objKind); e != nil {
-			err = e
-		} else {
-			ret = objKind == tgtKind
-		}
+		ret = objKind == tgtKind
 	}
 	return
 }

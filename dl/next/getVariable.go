@@ -3,10 +3,9 @@ package next
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
 )
 
-// GetVariable writes the value at 'name'
+// GetVariable reads from the value at name.
 type GetVar struct {
 	Name string
 }
@@ -19,37 +18,48 @@ func (*GetVar) Compose() composer.Spec {
 		Desc:  "Get Variable: Return the value of the named variable.",
 	}
 }
-func (p *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
-	err = run.GetVariable(p.Name, &ret)
-	return
-}
 
-func (p *GetVar) GetNumber(run rt.Runtime) (ret float64, err error) {
-	err = run.GetVariable(p.Name, &ret)
-	return
-}
-
-func (p *GetVar) GetText(run rt.Runtime) (ret string, err error) {
-	err = run.GetVariable(p.Name, &ret)
-	return
-}
-
-func (p *GetVar) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	var values []float64
-	if e := run.GetVariable(p.Name, &values); e != nil {
+func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
+	if p, e := run.GetVariable(op.Name); e != nil {
 		err = e
 	} else {
-		ret = stream.NewNumberList(values)
+		ret, err = GetBool(run, p)
 	}
 	return
 }
 
-func (p *GetVar) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	var values []string
-	if e := run.GetVariable(p.Name, &values); e != nil {
+func (op *GetVar) GetNumber(run rt.Runtime) (ret float64, err error) {
+	if p, e := run.GetVariable(op.Name); e != nil {
 		err = e
 	} else {
-		ret = stream.NewTextList(values)
+		ret, err = GetNumber(run, p)
+	}
+	return
+}
+
+func (op *GetVar) GetText(run rt.Runtime) (ret string, err error) {
+	if p, e := run.GetVariable(op.Name); e != nil {
+		err = e
+	} else {
+		ret, err = GetText(run, p)
+	}
+	return
+}
+
+func (op *GetVar) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
+	if p, e := run.GetVariable(op.Name); e != nil {
+		err = e
+	} else {
+		ret, err = GetNumbers(run, p)
+	}
+	return
+}
+
+func (op *GetVar) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
+	if p, e := run.GetVariable(op.Name); e != nil {
+		err = e
+	} else {
+		ret, err = GetTexts(run, p)
 	}
 	return
 }

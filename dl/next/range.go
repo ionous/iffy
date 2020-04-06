@@ -40,7 +40,7 @@ func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if elems, e := rt.GetNumberStream(run, op.Elems); e != nil {
 		err = e
 	} else if l, ok := elems.(rt.StreamCount); !ok {
-		err = errutil.Fmt("unknown number list %T", elems)
+		err = assign.Mismatch("unknown number list", l, elems)
 	} else {
 		ret = float64(l.Remaining())
 	}
@@ -60,7 +60,7 @@ func (op *LenOfTexts) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if elems, e := rt.GetTextStream(run, op.Elems); e != nil {
 		err = e
 	} else if l, ok := elems.(rt.StreamCount); !ok {
-		err = errutil.Fmt("unknown text list %T", elems)
+		err = assign.Mismatch("unknown text list", l, elems)
 	} else {
 		ret = float64(l.Remaining())
 	}
@@ -106,7 +106,7 @@ func (it *rangeIt) GetNext(pv interface{}) (err error) {
 		err = stream.Exceeded
 	} else {
 		now, next := it.next, it.next+it.step
-		if e := assign.ToFloat(pv, float64(now)); e != nil {
+		if e := assign.FloatPtr(pv, float64(now)); e != nil {
 			err = e
 		} else {
 			it.next = next

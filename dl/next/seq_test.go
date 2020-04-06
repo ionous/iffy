@@ -89,13 +89,11 @@ func (m *seqTest) Random(inclusiveMin, exclusiveMax int) int {
 	return (exclusiveMax-inclusiveMin)/2 + inclusiveMin
 }
 
-func (m *seqTest) GetField(name, field string, pv interface{}) (err error) {
+func (m *seqTest) GetField(name, field string) (ret interface{}, err error) {
 	if field != object.Counter {
 		err = errutil.New("unknown field", field)
-	} else if iptr, ok := pv.(*int); !ok {
-		err = errutil.New("unknown vale", field)
 	} else {
-		(*iptr) = m.counters[name]
+		ret = m.counters[name]
 	}
 	return
 }

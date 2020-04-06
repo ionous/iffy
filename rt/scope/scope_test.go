@@ -1,6 +1,10 @@
 package scope
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/ionous/iffy/assign"
+)
 
 func TestScopeStack(t *testing.T) {
 	names := []string{"inner", "outer", "top"}
@@ -11,7 +15,7 @@ func TestScopeStack(t *testing.T) {
 	var stack ScopeStack
 
 	// push and pop scopes onto the stack
-	// we expect to here these counts back
+	// we expect to hear these counts back
 	counts := [][]int{
 		{-1, -1, -1},
 		{+0, -1, -1},
@@ -22,35 +26,42 @@ func TestScopeStack(t *testing.T) {
 		{-1, -1, -1},
 	}
 	step := 0
-	check := func() {
+	check := func(reason string) {
 		count := counts[step]
 		for i, name := range names {
 			var have int
-			switch e := stack.GetVariable(name, &have); e.(type) {
+			switch p, e := stack.GetVariable(name); e.(type) {
 			default:
-				t.Fatal(e)
+				t.Fatal("fatal", e)
 			case UnknownVariable:
+				// t.Log(reason, "loop", i, "asking for", name, "... unknown")
 				have = -1
 			case nil:
-				t.Log(name, "got", have)
-				break
+				if v, e := assign.ToInt(p); e != nil {
+					t.Fatal("fatal", e)
+				} else {
+					have = v
+					// t.Log(reason, "loop", i, name, "got", have)
+				}
 			}
+
+			//
 			if want := count[i]; want != have {
-				t.Fatal("step", step, name, "have:", have, "want:", want)
+				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
 			} else {
 				next := have + 1
 				switch e := stack.SetVariable(name, next); e.(type) {
 				default:
-					t.Fatal("step", step, name, "set failed", e)
+					t.Fatal("fatal", reason, "step", step, name, "set failed", e)
 				case UnknownVariable:
 					if have != -1 {
-						t.Fatal("step", step, name, "set failed", e)
+						t.Fatal("fatal", "step", step, name, "set failed", e)
 					}
 				case nil:
 					if have == -1 {
-						t.Fatal("step", step, name, "set unexpected success")
+						t.Fatal("fatal", reason, "step", step, name, "set unexpected success")
 					} else {
-						t.Log(name, "set", next)
+						t.Log(reason, name, "set", next)
 					}
 				}
 			}
@@ -58,15 +69,15 @@ func TestScopeStack(t *testing.T) {
 		step++
 
 	}
-	check()
+	check("startup")
 	for _, name := range names {
 		m := mocks[name]
 		stack.PushScope(m)
-		check()
+		check("pushed " + name)
 	}
-	for range names {
+	for _, name := range names {
 		stack.PopScope()
-		check()
+		check("popped " + name)
 	}
 
 	access := []int{5, 3, 1}
@@ -74,7 +85,7 @@ func TestScopeStack(t *testing.T) {
 		m := mocks[name]
 		cnt := access[i]
 		if m.gets != cnt || m.sets != cnt {
-			t.Fatal(name, "expected", cnt, "got", m.gets, m.sets)
+			t.Fatal("fatal", name, "expected", cnt, "got", m.gets, m.sets)
 		} else {
 			t.Log(name, "accessed", cnt, "times")
 		}
@@ -87,13 +98,12 @@ type mockScope struct {
 	val        int
 }
 
-func (k *mockScope) GetVariable(name string, pv interface{}) (err error) {
+func (k *mockScope) GetVariable(name string) (ret interface{}, err error) {
 	if name != k.name {
 		err = UnknownVariable(name)
 	} else {
 		k.gets++
-		pi := pv.(*int)
-		(*pi) = k.val
+		ret = k.val
 	}
 	return
 }

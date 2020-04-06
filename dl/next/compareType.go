@@ -15,22 +15,22 @@ type LessThan struct{}
 type GreaterOrEqual struct{}
 type LessOrEqual struct{}
 
-func (EqualTo) Compare() CompareType {
+func (*EqualTo) Compare() CompareType {
 	return Compare_EqualTo
 }
-func (NotEqualTo) Compare() CompareType {
+func (*NotEqualTo) Compare() CompareType {
 	return 0
 }
-func (GreaterThan) Compare() CompareType {
+func (*GreaterThan) Compare() CompareType {
 	return Compare_GreaterThan
 }
-func (LessThan) Compare() CompareType {
+func (*LessThan) Compare() CompareType {
 	return Compare_LessThan
 }
-func (GreaterOrEqual) Compare() CompareType {
+func (*GreaterOrEqual) Compare() CompareType {
 	return Compare_LessThan | Compare_EqualTo
 }
-func (LessOrEqual) Compare() CompareType {
+func (*LessOrEqual) Compare() CompareType {
 	return Compare_GreaterThan | Compare_EqualTo
 }
 

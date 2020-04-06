@@ -7,7 +7,7 @@ import (
 
 type NumListRules []NumListRule
 type TextListRules []TextListRule
-type ExecListRules []ExecuteRule
+type ExecRules []ExecuteRule
 
 // ListRule for any rule which can respond with multiple results.
 type ListRule struct {
@@ -30,13 +30,13 @@ type TextListRule struct {
 }
 
 // ExecuteListRule triggers a series of statements when its filters are satisfied.
-// It works in conjunction with ExecListRules.
+// It works in conjunction with ExecRules.
 type ExecuteRule struct {
 	ListRule
 	rt.Execute
 }
 
-func (r *ListRule) Apply(run rt.Runtime) (ret Flags, err error) {
+func (r *ListRule) ApplyByIndex(run rt.Runtime) (ret Flags, err error) {
 	if ok, e := rt.GetAllTrue(run, r.Filters); e != nil {
 		err = e
 	} else if !ok {
@@ -47,9 +47,9 @@ func (r *ListRule) Apply(run rt.Runtime) (ret Flags, err error) {
 	return
 }
 
-// Apply returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps NumListRules) Apply(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps[i].Apply(run)
+// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
+func (ps NumListRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
+	return ps[i].ApplyByIndex(run)
 }
 
 func (ps NumListRules) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
@@ -62,9 +62,9 @@ func (ps NumListRules) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err err
 	return
 }
 
-// Apply returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps TextListRules) Apply(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps[i].Apply(run)
+// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
+func (ps TextListRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
+	return ps[i].ApplyByIndex(run)
 }
 
 func (ps TextListRules) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
@@ -77,12 +77,12 @@ func (ps TextListRules) GetTextStream(run rt.Runtime) (ret rt.Iterator, err erro
 	return
 }
 
-// Apply returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps ExecListRules) Apply(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps[i].Apply(run)
+// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
+func (ps ExecRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
+	return ps[i].ApplyByIndex(run)
 }
 
-func (ps ExecListRules) Execute(run rt.Runtime) (ret bool, err error) {
+func (ps ExecRules) Execute(run rt.Runtime) (ret bool, err error) {
 	if inds, e := splitRules(run, ps, len(ps)); e != nil {
 		err = e
 	} else {

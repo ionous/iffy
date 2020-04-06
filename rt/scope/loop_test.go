@@ -1,6 +1,10 @@
 package scope
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/ionous/iffy/assign"
+)
 
 func TestLoop(t *testing.T) {
 	caps := [][]struct{ first, last bool }{
@@ -15,19 +19,28 @@ func TestLoop(t *testing.T) {
 			count := i + 1
 			atEnd := count == cnt
 			s := lf.NextScope(EmptyScope{}, !atEnd)
-			var fidx float64
-			var first, last bool
 
-			if e := s.GetVariable("index", &fidx); e != nil || fidx != float64(count) {
+			if p, e := s.GetVariable("index"); e != nil {
+				t.Fatal("loop", i, e)
+			} else if fidx, e := assign.ToFloat(p); e != nil || fidx != float64(count) {
 				t.Fatal("index error", fidx, "at", c, i, e)
-			} else if e := s.GetVariable("first", &first); e != nil || first != cap.first {
+			} else if fidx != float64(count) {
+				t.Fatal("loop", i, fidx, "!=", count)
+			} else if p, e := s.GetVariable("first"); e != nil {
+				t.Fatal(e)
+			} else if first, e := assign.ToBool(p); e != nil || first != cap.first {
 				t.Fatal("first error", first, "at", c, i, e)
-			} else if e := s.GetVariable("last", &last); e != nil || last != cap.last {
+			} else if p, e := s.GetVariable("last"); e != nil {
+				t.Fatal(e)
+			} else if last, e := assign.ToBool(p); e != nil || last != cap.last {
 				t.Fatal("last error", last, "at", c, i, e)
-			} else if _, ok := s.GetVariable("nothing", nil).(UnknownVariable); !ok {
-				t.Fatal("expected loop error")
 			} else {
-				t.Log("loop", i, "of", cnt, fidx, first, last)
+				_, e := s.GetVariable("nothing")
+				if _, ok := e.(UnknownVariable); !ok {
+					t.Fatal("expected loop error")
+				} else {
+					t.Log("loop", i, "of", cnt, fidx, first, last)
+				}
 			}
 		}
 	}

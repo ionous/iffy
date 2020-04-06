@@ -44,6 +44,7 @@ var Slots = map[string]Slot{
 
 var Runs = []composer.Specification{
 	(*check.Test)(nil),
+	(*next.Determine)(nil), // internal but needed for gob.
 
 	(*next.AllTrue)(nil),
 	(*next.AnyTrue)(nil),
@@ -108,10 +109,14 @@ var Runs = []composer.Specification{
 	(*next.SetFieldBool)(nil),
 	(*next.SetFieldNum)(nil),
 	(*next.SetFieldText)(nil),
+	(*next.SetFieldNumList)(nil),
+	(*next.SetFieldTextList)(nil),
 
 	(*next.SetVarBool)(nil),
 	(*next.SetVarNum)(nil),
-	(*next.SetVarText)(nil),
+	(*next.SetVarText)(nil)
+	(*next.SetVarNumList)(nil),
+	(*next.SetVarTextList)(nil),
 
 	(*next.IsEmpty)(nil),
 	(*next.Includes)(nil),

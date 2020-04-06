@@ -22,7 +22,7 @@ func TestAssignments(t *testing.T) {
 			expectsError, // string
 		} {
 			var res bool
-			if e := assign.ToValue(&res, inputs[i]); e != nil {
+			if e := assign.Value(&res, inputs[i]); e != nil {
 				if x != expectsError {
 					t.Fatal("unexpected error at", i, e)
 				}
@@ -42,7 +42,7 @@ func TestAssignments(t *testing.T) {
 			expectsError, // string:"hello"
 		} {
 			var res int
-			if e := assign.ToValue(&res, inputs[i]); e != nil {
+			if e := assign.Value(&res, inputs[i]); e != nil {
 				if x != expectsError {
 					t.Fatal("unexpected error at", i, e)
 				}
@@ -62,7 +62,7 @@ func TestAssignments(t *testing.T) {
 			expectsError, // string:"hello"
 		} {
 			var res int64
-			if e := assign.ToValue(&res, inputs[i]); e != nil {
+			if e := assign.Value(&res, inputs[i]); e != nil {
 				if x != expectsError {
 					t.Fatal("unexpected error at", i, e)
 				}
@@ -82,7 +82,7 @@ func TestAssignments(t *testing.T) {
 			expectsError, // string:"hello"
 		} {
 			var res float64
-			if e := assign.ToValue(&res, inputs[i]); e != nil {
+			if e := assign.Value(&res, inputs[i]); e != nil {
 				if x != expectsError {
 					t.Fatal("unexpected error at", i, e)
 				}
@@ -102,7 +102,7 @@ func TestAssignments(t *testing.T) {
 			"hello",      // string
 		} {
 			var res string
-			if e := assign.ToValue(&res, inputs[i]); e != nil {
+			if e := assign.Value(&res, inputs[i]); e != nil {
 				if x != expectsError {
 					t.Fatal("unexpected error at", i, e)
 				}
@@ -116,26 +116,26 @@ func TestAssignments(t *testing.T) {
 func TestAssignmentShortcuts(t *testing.T) {
 	t.Run("bool", func(t *testing.T) {
 		var v bool
-		if e := assign.ToBool(&v, v); e != nil {
+		if e := assign.BoolPtr(&v, v); e != nil {
 			t.Fatal("expected success", e)
-		} else if e := assign.ToBool(v, v); e == nil {
+		} else if e := assign.BoolPtr(v, v); e == nil {
 			t.Fatal("expected failure")
 		}
 
 	})
 	t.Run("float", func(t *testing.T) {
 		var v float64
-		if e := assign.ToFloat(&v, v); e != nil {
+		if e := assign.FloatPtr(&v, v); e != nil {
 			t.Fatal("expected success", e)
-		} else if e := assign.ToFloat(v, v); e == nil {
+		} else if e := assign.FloatPtr(v, v); e == nil {
 			t.Fatal("expected failure")
 		}
 	})
 	t.Run("string", func(t *testing.T) {
 		var v string
-		if e := assign.ToString(&v, v); e != nil {
+		if e := assign.StringPtr(&v, v); e != nil {
 			t.Fatal("expected success", e)
-		} else if e := assign.ToString(v, v); e == nil {
+		} else if e := assign.StringPtr(v, v); e == nil {
 			t.Fatal("expected failure")
 		}
 	})

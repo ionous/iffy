@@ -3,7 +3,6 @@ package next
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
 )
 
 // GetField a property value from an object by name.
@@ -21,47 +20,57 @@ func (*GetField) Compose() composer.Spec {
 }
 
 func (op *GetField) GetBool(run rt.Runtime) (ret bool, err error) {
-	err = op.GetValue(run, &ret)
+	if p, e := op.GetValue(run); e != nil {
+		err = e
+	} else {
+		ret, err = GetBool(run, p)
+	}
 	return
 }
 
 func (op *GetField) GetNumber(run rt.Runtime) (ret float64, err error) {
-	err = op.GetValue(run, &ret)
+	if p, e := op.GetValue(run); e != nil {
+		err = e
+	} else {
+		ret, err = GetNumber(run, p)
+	}
 	return
 }
 
 func (op *GetField) GetText(run rt.Runtime) (ret string, err error) {
-	err = op.GetValue(run, &ret)
+	if p, e := op.GetValue(run); e != nil {
+		err = e
+	} else {
+		ret, err = GetText(run, p)
+	}
 	return
 }
 
 func (op *GetField) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	var values []float64
-	if e := op.GetValue(run, &values); e != nil {
+	if p, e := op.GetValue(run); e != nil {
 		err = e
 	} else {
-		ret = stream.NewNumberList(values)
+		ret, err = GetNumbers(run, p)
 	}
 	return
 }
 
 func (op *GetField) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	var values []string
-	if e := op.GetValue(run, &values); e != nil {
+	if p, e := op.GetValue(run); e != nil {
 		err = e
 	} else {
-		ret = stream.NewTextList(values)
+		ret, err = GetTexts(run, p)
 	}
 	return
 }
 
-func (op *GetField) GetValue(run rt.Runtime, pv interface{}) (err error) {
+func (op *GetField) GetValue(run rt.Runtime) (ret interface{}, err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
 	} else {
-		err = run.GetField(obj, field, pv)
+		ret, err = run.GetField(obj, field)
 	}
 	return
 }

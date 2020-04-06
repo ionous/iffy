@@ -24,11 +24,21 @@ type SetFieldText struct {
 	Val rt.TextEval
 }
 
+type SetFieldNumList struct {
+	SetField
+	Vals rt.NumListEval
+}
+
+type SetFieldTextList struct {
+	SetField
+	Vals rt.TextListEval
+}
+
 // type SetFieldState struct {
 // 	Obj, State rt.TextEval
 // }
 
-func (op *SetField) SetValue(run rt.Runtime, v interface{}) (err error) {
+func (op *SetField) setPrim(run rt.Runtime, v interface{}) (err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
@@ -51,7 +61,7 @@ func (op *SetFieldBool) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.SetValue(run, val)
+		err = op.setPrim(run, val)
 	}
 	return
 }
@@ -68,7 +78,7 @@ func (op *SetFieldNum) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.SetValue(run, val)
+		err = op.setPrim(run, val)
 	}
 	return
 }
@@ -84,7 +94,40 @@ func (op *SetFieldText) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.SetValue(run, val)
+		err = op.setPrim(run, val)
+	}
+	return
+}
+
+func (*SetFieldNumList) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "set_field_num_list",
+		Group: "objects",
+		Desc:  "Set Number List Field: Sets the named field to the passed number list.",
+	}
+}
+
+func (op *SetFieldNumList) Execute(run rt.Runtime) (err error) {
+	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
+		err = e
+	} else {
+		err = op.setPrim(run, vals)
+	}
+	return
+}
+
+func (*SetFieldTextList) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "set_field_text_list",
+		Group: "objects",
+		Desc:  "Set Text List Field: Sets the named field to the passed text list."}
+}
+
+func (op *SetFieldTextList) Execute(run rt.Runtime) (err error) {
+	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
+		err = e
+	} else {
+		err = op.setPrim(run, vals)
 	}
 	return
 }
@@ -93,7 +136,7 @@ func (op *SetFieldText) Execute(run rt.Runtime) (err error) {
 // func (op *SetState) Execute(run rt.Runtime) (err error) {
 // 	if obj, e := op.Ref.GetObject(run); e != nil {
 // 		err = errutil.New("cant SetFieldState, because get owner", e)
-// 	} else if e := run.SetValue(obj, op.State, true); e != nil {
+// 	} else if e := run.setPrim(obj, op.State, true); e != nil {
 // 		err = errutil.New("cant SetFieldState, because property", e)
 // 	}
 // 	return

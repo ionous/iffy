@@ -55,7 +55,7 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 				err = e
 			} else {
 				ret = &readOnlyValue{"num", func(pv interface{}) error {
-					return assign.ToFloat(pv, num)
+					return assign.FloatPtr(pv, num)
 				}}
 			}
 			return
@@ -82,9 +82,7 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 			if e := it.GetNext(&txt); e != nil {
 				err = e
 			} else {
-				ret = &readOnlyValue{"text", func(pv interface{}) error {
-					return assign.ToString(pv, txt)
-				}}
+				ret = &readOnlyValue{"text", txt}
 			}
 			return
 		})
@@ -93,13 +91,13 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 }
 
 type readOnlyValue struct {
-	name    string
-	convert func(pv interface{}) error
+	name  string
+	value interface{}
 }
 
-func (h *readOnlyValue) GetVariable(n string, pv interface{}) (err error) {
+func (h *readOnlyValue) GetVariable(n string) (ret interface{}, err error) {
 	if n == h.name {
-		err = h.convert(pv)
+		ret = h.value
 	} else {
 		err = scope.UnknownVariable(n)
 	}

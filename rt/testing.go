@@ -5,7 +5,7 @@ import "io"
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
 
-func (Panic) GetField(target, field string, pv interface{}) error {
+func (Panic) GetField(target, field string) (interface{}, error) {
 	panic("Runtime panic")
 }
 func (Panic) SetField(target, field string, v interface{}) error {
@@ -20,7 +20,7 @@ func (Panic) PushWriter(io.Writer) {
 func (Panic) PopWriter() {
 	panic("Runtime panic")
 }
-func (Panic) GetVariable(name string, pv interface{}) error {
+func (Panic) GetVariable(name string) (interface{}, error) {
 	panic("Runtime panic")
 }
 func (Panic) SetVariable(name string, v interface{}) error {

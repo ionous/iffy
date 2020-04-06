@@ -3,7 +3,8 @@ package pattern
 import "github.com/ionous/iffy/rt"
 
 type listRule interface {
-	Apply(rt.Runtime, int) (ret Flags, err error)
+	// apply a rule from a list of rules by its index
+	ApplyByIndex(rt.Runtime, int) (ret Flags, err error)
 }
 
 // call apply on each list rule ( in reverse order )
@@ -14,7 +15,7 @@ func splitRules(run rt.Runtime, list listRule, cnt int) (ret []int, err error) {
 	a := make([]int, cnt)
 	//
 	for i := cnt - 1; i >= 0; i-- {
-		if flags, e := list.Apply(run, i); e != nil {
+		if flags, e := list.ApplyByIndex(run, i); e != nil {
 			err = e
 			break
 		} else if flags >= 0 {

@@ -1,100 +1,148 @@
 package assign
 
-import "github.com/ionous/errutil"
-
-// ToBool, a shortcut when the expected output type matches the input type.
-func ToBool(pv interface{}, b bool) (err error) {
-	if boolptr, ok := pv.(*bool); !ok {
-		err = errutil.Fmt("expected *bool, got %T", pv)
+// BoolPtr, a shortcut when the expected output type matches the input type.
+func BoolPtr(pv interface{}, b bool) (err error) {
+	if outptr, ok := pv.(*bool); !ok {
+		err = Mismatch("BoolPtr", outptr, pv)
 	} else {
-		(*boolptr) = b
+		(*outptr) = b
 	}
 	return
 }
 
-// ToFloat, a shortcut when the expected output type matches the input type.
-func ToFloat(pv interface{}, v float64) (err error) {
-	if floatptr, ok := pv.(*float64); !ok {
-		err = errutil.Fmt("expected *float64, got %T", pv)
+// FloatPtr, a shortcut when the expected output type matches the input type.
+func FloatPtr(pv interface{}, v float64) (err error) {
+	if outptr, ok := pv.(*float64); !ok {
+		err = Mismatch("FloatPtr", outptr, pv)
 	} else {
-		(*floatptr) = v
+		(*outptr) = v
 	}
 	return
 }
 
-// ToString, a shortcut when the expected output type matches the input type.
-func ToString(pv interface{}, str string) (err error) {
-	if strptr, ok := pv.(*string); !ok {
-		err = errutil.Fmt("expected *string, got %T", pv)
+// StringPtr, a shortcut when the expected output type matches the input type.
+func StringPtr(pv interface{}, str string) (err error) {
+	if outptr, ok := pv.(*string); !ok {
+		err = Mismatch("StringPtr", outptr, pv)
 	} else {
-		(*strptr) = str
+		(*outptr) = str
 	}
 	return
 }
 
-// ToValue writes any v into any pv, or at least tries to.
-func ToValue(pv interface{}, v interface{}) (err error) {
+// Value writes any i into any pv, or at least tries to.
+func Value(pv interface{}, i interface{}) (err error) {
 	switch out := pv.(type) {
 	case *bool:
-		switch v := v.(type) {
-		case nil:
-			*out = false
-		case bool:
+		if v, e := ToBool(i); e != nil {
+			err = e
+		} else {
 			*out = v
-		case int64: // particularly for sqlite, boolean values can be represented as 1/0
-			*out = v != 0
-		default:
-			err = errutil.Fmt("expected bool, got %T", v)
 		}
 	case *int:
-		switch v := v.(type) {
-		case nil:
-			*out = 0
-		case int:
-			*out = int(v)
-		case int64:
-			*out = int(v)
-		case float64:
-			*out = int(v)
-		default:
-			err = errutil.Fmt("expected int, got %T", v)
+		if v, e := ToInt(i); e != nil {
+			err = e
+		} else {
+			*out = v
 		}
 	case *int64:
-		switch v := v.(type) {
-		case nil:
-			*out = 0.0
-		case int:
-			*out = int64(v)
-		case int64:
-			*out = int64(v)
-		case float64:
-			*out = int64(v)
-		default:
-			err = errutil.Fmt("expected int64, got %T", v)
+		if v, e := ToInt64(i); e != nil {
+			err = e
+		} else {
+			*out = v
 		}
 	case *float64:
-		switch v := v.(type) {
-		case nil:
-			*out = 0.0
-		case int:
-			*out = float64(v)
-		case int64:
-			*out = float64(v)
-		case float64:
-			*out = float64(v)
-		default:
-			err = errutil.Fmt("expected float64, got %T", v)
+		if v, e := ToFloat(i); e != nil {
+			err = e
+		} else {
+			*out = v
 		}
 	case *string:
-		if v == nil {
-			*out = ""
-		} else if v, ok := v.(string); !ok {
-			err = errutil.Fmt("expected string, got %T", v)
+		if v, e := ToString(i); e != nil {
+			err = e
 		} else {
 			*out = v
 		}
 	default:
-		err = errutil.Fmt("unexpected output type, got %T", pv)
+		err = Mismatch("Value", pv, i)
+	}
+	return
+}
+
+// ToBool converts nil, int64, and bool values to bool.
+func ToBool(i interface{}) (ret bool, err error) {
+	switch i := i.(type) {
+	case nil:
+		ret = false
+	case bool:
+		ret = i
+	case int64: // particularly for sqlite, boolean values can be represented as 1/0
+		ret = i != 0
+	default:
+		err = Mismatch("ToBool", ret, i)
+	}
+	return
+}
+
+// ToInt converts nil and numeric values to int.
+func ToInt(i interface{}) (ret int, err error) {
+	switch i := i.(type) {
+	case nil:
+		ret = 0
+	case int:
+		ret = int(i)
+	case int64:
+		ret = int(i)
+	case float64:
+		ret = int(i)
+	default:
+		err = Mismatch("ToInt", ret, i)
+	}
+	return
+}
+
+// ToInt64 converts nil and numeric values to int.
+func ToInt64(i interface{}) (ret int64, err error) {
+	switch i := i.(type) {
+	case nil:
+		ret = 0.0
+	case int:
+		ret = int64(i)
+	case int64:
+		ret = int64(i)
+	case float64:
+		ret = int64(i)
+	default:
+		err = Mismatch("ToInt64", ret, i)
+	}
+	return
+}
+
+// ToFloat converts nil and numeric values to float.
+func ToFloat(i interface{}) (ret float64, err error) {
+	switch i := i.(type) {
+	case nil:
+		ret = 0.0
+	case int:
+		ret = float64(i)
+	case int64:
+		ret = float64(i)
+	case float64:
+		ret = float64(i)
+	default:
+		err = Mismatch("ToFloat", ret, i)
+	}
+	return
+}
+
+// ToString converts nil and string values to string.
+func ToString(i interface{}) (ret string, err error) {
+	if i == nil {
+		ret = ""
+	} else if i, ok := i.(string); !ok {
+		err = Mismatch("ToString", ret, i)
+	} else {
+		ret = i
 	}
 	return
 }
