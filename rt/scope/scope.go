@@ -13,7 +13,7 @@ func (EmptyScope) GetVariable(n string) (interface{}, error) {
 	return nil, UnknownVariable(n)
 }
 
-func (EmptyScope) SetVariable(n string, pv interface{}) error {
+func (EmptyScope) SetVariable(n string, v interface{}) error {
 	return UnknownVariable(n)
 }
 
