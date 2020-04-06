@@ -8,7 +8,7 @@ import (
   "testing"
 
   "github.com/ionous/iffy/dl/check"
-  "github.com/ionous/iffy/dl/next"
+  "github.com/ionous/iffy/dl/core"
   "github.com/ionous/iffy/ephemera/reader"
   "github.com/ionous/iffy/export"
   "github.com/ionous/iffy/tables"
@@ -80,13 +80,13 @@ func TestProcessProg(t *testing.T) {
 
 var sayTest = check.Test{
   TestName: "hello, goodbye",
-  Go: &next.Choose{
-    If: &next.Bool{true},
-    True: &next.Say{
-      Text: &next.Text{"hello"},
+  Go: &core.Choose{
+    If: &core.Bool{true},
+    True: &core.Say{
+      Text: &core.Text{"hello"},
     },
-    False: &next.Say{
-      Text: &next.Text{"goodbye"},
+    False: &core.Say{
+      Text: &core.Text{"goodbye"},
     },
   },
   Lines: "hello",

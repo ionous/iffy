@@ -1,4 +1,4 @@
-package next
+package core
 
 import (
 	"github.com/ionous/iffy/assign"

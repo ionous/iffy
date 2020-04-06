@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/assign"
-	"github.com/ionous/iffy/dl/next"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
@@ -16,32 +16,32 @@ func TestFactorial(t *testing.T) {
 	run := patternRuntime{patternMap: patternMap{
 		"factorial": pattern.NumberRules{
 			{
-				NumberEval: &next.ProductOf{
-					&next.GetVar{"num"},
-					&next.Determine{
+				NumberEval: &core.ProductOf{
+					&core.GetVar{"num"},
+					&core.Determine{
 						"factorial",
 						scope.Parameters{
-							"num": &next.DiffOf{
-								&next.GetVar{"num"},
-								&next.Number{1},
+							"num": &core.DiffOf{
+								&core.GetVar{"num"},
+								&core.Number{1},
 							},
 						},
 					},
 				},
 			}, {
 				Filters: []rt.BoolEval{
-					&next.CompareNum{
-						&next.GetVar{"num"},
-						&next.EqualTo{},
-						&next.Number{0},
+					&core.CompareNum{
+						&core.GetVar{"num"},
+						&core.EqualTo{},
+						&core.Number{0},
 					},
 				},
-				NumberEval: &next.Number{1},
+				NumberEval: &core.Number{1},
 			},
 		}}}
 	// determine the factorial of the number 3
-	det := next.Determine{"factorial", scope.Parameters{
-		"num": &next.Number{3},
+	det := core.Determine{"factorial", scope.Parameters{
+		"num": &core.Number{3},
 	}}
 	if v, e := rt.GetNumber(&run, &det); e != nil {
 		t.Fatal(e)

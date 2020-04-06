@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dl/next"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/rt"
@@ -26,8 +26,8 @@ func ExampleSayMe() {
 
 	// say 4 numbers
 	for i := 1; i <= 4; i++ {
-		det := next.Determine{"sayMe", scope.Parameters{
-			"num": &next.Number{float64(i)},
+		det := core.Determine{"sayMe", scope.Parameters{
+			"num": &core.Number{float64(i)},
 		}}
 		if text, e := rt.GetText(&run, &det); e != nil {
 			fmt.Println("Error:", e)
@@ -72,7 +72,7 @@ func (m *patternRuntime) GetField(name, field string) (ret interface{}, err erro
 }
 
 func SayIt(s string) rt.TextEval {
-	return &next.Text{s}
+	return &core.Text{s}
 }
 
 type matchNumber int

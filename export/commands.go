@@ -3,7 +3,7 @@ package export
 import (
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/dl/next"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -38,86 +38,86 @@ var Slots = map[string]Slot{
 		Desc: "Number List: Statements which return a list of numbers."},
 	"text_list_eval": {Type: (*rt.TextListEval)(nil),
 		Desc: "Text Lists: Statements which return a list of text."},
-	"compare_to": {Type: (*next.CompareTo)(nil),
+	"compare_to": {Type: (*core.CompareTo)(nil),
 		Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc."},
 }
 
 var Runs = []composer.Specification{
 	(*check.Test)(nil),
-	(*next.Determine)(nil), // internal but needed for gob.
+	(*core.Determine)(nil), // internal but needed for gob.
 
-	(*next.AllTrue)(nil),
-	(*next.AnyTrue)(nil),
+	(*core.AllTrue)(nil),
+	(*core.AnyTrue)(nil),
 
 	// FIX: Choose scalar/any?
-	(*next.Choose)(nil),
-	(*next.ChooseNum)(nil),
-	(*next.ChooseText)(nil),
+	(*core.Choose)(nil),
+	(*core.ChooseNum)(nil),
+	(*core.ChooseText)(nil),
 	// FIX: compare scalar?
-	(*next.CompareNum)(nil),
-	(*next.CompareText)(nil),
+	(*core.CompareNum)(nil),
+	(*core.CompareText)(nil),
 
-	(*next.DoNothing)(nil),
-	(*next.ForEachNum)(nil),
-	(*next.ForEachText)(nil),
+	(*core.DoNothing)(nil),
+	(*core.ForEachNum)(nil),
+	(*core.ForEachText)(nil),
 
-	(*next.GetField)(nil),
-	(*next.GetVar)(nil),
+	(*core.GetField)(nil),
+	(*core.GetVar)(nil),
 
-	(*next.Is)(nil),
-	(*next.IsNot)(nil),
+	(*core.Is)(nil),
+	(*core.IsNot)(nil),
 
-	(*next.Bool)(nil),
-	(*next.Number)(nil),
-	(*next.Text)(nil),
-	(*next.Numbers)(nil),
-	(*next.Texts)(nil),
+	(*core.Bool)(nil),
+	(*core.Number)(nil),
+	(*core.Text)(nil),
+	(*core.Numbers)(nil),
+	(*core.Texts)(nil),
 
-	(*next.SumOf)(nil),
-	(*next.DiffOf)(nil),
-	(*next.ProductOf)(nil),
-	(*next.QuotientOf)(nil),
-	(*next.RemainderOf)(nil),
+	(*core.SumOf)(nil),
+	(*core.DiffOf)(nil),
+	(*core.ProductOf)(nil),
+	(*core.QuotientOf)(nil),
+	(*core.RemainderOf)(nil),
 
-	(*next.Exists)(nil),
-	(*next.KindOf)(nil),
-	(*next.IsKindOf)(nil),
-	(*next.IsExactKindOf)(nil),
+	(*core.Exists)(nil),
+	(*core.KindOf)(nil),
+	(*core.IsKindOf)(nil),
+	(*core.IsExactKindOf)(nil),
 
-	(*next.PrintNum)(nil),
-	(*next.PrintNumWord)(nil),
+	(*core.PrintNum)(nil),
+	(*core.PrintNumWord)(nil),
 
 	// FIX: take "List" generically
-	(*next.LenOfNumbers)(nil),
-	(*next.LenOfTexts)(nil),
-	(*next.Range)(nil),
+	(*core.LenOfNumbers)(nil),
+	(*core.LenOfTexts)(nil),
+	(*core.Range)(nil),
 
 	// FIX: should take a speaker, and we should have a default speaker
-	(*next.Say)(nil),
-	(*next.Buffer)(nil),
-	(*next.Span)(nil),
-	(*next.Bracket)(nil),
-	(*next.Slash)(nil),
-	(*next.Commas)(nil),
+	(*core.Say)(nil),
+	(*core.Buffer)(nil),
+	(*core.Span)(nil),
+	(*core.Bracket)(nil),
+	(*core.Slash)(nil),
+	(*core.Commas)(nil),
 
-	(*next.CycleText)(nil),
-	(*next.ShuffleText)(nil),
-	(*next.StoppingText)(nil),
+	(*core.CycleText)(nil),
+	(*core.ShuffleText)(nil),
+	(*core.StoppingText)(nil),
 
 	// FIX: set any; with type picked during assembly
-	(*next.SetFieldBool)(nil),
-	(*next.SetFieldNum)(nil),
-	(*next.SetFieldText)(nil),
-	(*next.SetFieldNumList)(nil),
-	(*next.SetFieldTextList)(nil),
+	(*core.SetFieldBool)(nil),
+	(*core.SetFieldNum)(nil),
+	(*core.SetFieldText)(nil),
+	(*core.SetFieldNumList)(nil),
+	(*core.SetFieldTextList)(nil),
 
-	(*next.SetVarBool)(nil),
-	(*next.SetVarNum)(nil),
-	(*next.SetVarText)(nil)
-	(*next.SetVarNumList)(nil),
-	(*next.SetVarTextList)(nil),
+	(*core.SetVarBool)(nil),
+	(*core.SetVarNum)(nil),
+	(*core.SetVarText)(nil),
+	(*core.SetVarNumList)(nil),
+	(*core.SetVarTextList)(nil),
 
-	(*next.IsEmpty)(nil),
-	(*next.Includes)(nil),
-	(*next.Join)(nil),
+	(*core.IsEmpty)(nil),
+	(*core.Includes)(nil),
+	(*core.Join)(nil),
 }
