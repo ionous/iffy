@@ -5,22 +5,6 @@ function localLang(make) {
     make.run("story", "{+paragraph|ghost}");
     make.run("paragraph", "{+story_statement|ghost}");
     make.slot("story_statement");
-  });
-
-
-
-
-   make.group("Testing", function() {
-    make.run("test", "story_statement",
-      "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.");
-  });
-
-  make.group("Story Statements", function() {
-    make.run("story_statements", "{+story_statement}"); // old
-
-    make.run("story", "{+paragraph|ghost}");
-    make.run("paragraph", "{+story_statement|ghost}");
-    make.slot("story_statement");
     //
     make.run("noun_statement", "story_statement", "{:lede} {*tail} {?summary}",
              "Noun statement: Describes people, places, or things.");
@@ -43,6 +27,9 @@ function localLang(make) {
     make.run("common_noun", "{determiner} {common_name}");
     make.run("proper_noun", "{proper_name}");
 
+     make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
+
+
     // fix: think this should always be "are" never "is"
     make.run("kinds_of_thing", "story_statement",
              "{plural_kinds} are a kind of {singular_kind}.");
@@ -53,6 +40,26 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     make.str("common_name", `Common Name: A generalized name given to some specific item, place, or thing.
     Common names are usually not capitalized. For example, maybe: 'table', 'chair', or 'dog park'.`);
   });
+
+
+  make.group("Patterns", function() {
+     make.run("pattern_decl", "story_statement",
+       "The pattern {pattern_name|quote} determines {pattern_type}. {?pattern_variables_tail}",
+       `Declare a pattern: A pattern is a bundle of functions which can either change the game world or provide information about it.
+  Each function in a given pattern has "guards" which determine whether the function applies in a particular situtation.`
+     );
+
+    make.run("pattern_variables_decl", "story_statement",
+      "The pattern {pattern_name|quote} uses {+variable_decl|comma-and}.",
+       `Declare pattern variables: Storage for values used during the execution of a pattern.`);
+
+     make.run("pattern_variables_tail", "It uses {+variable_decl|comma-and}.",
+       `Pattern variables: Storage for values used during the execution of a pattern.`);
+
+     make.opt("pattern_type", "an {activity:pattern_activity} or a {value:variable_type}");
+     make.str("pattern_activity", "{activity}");
+     make.str("pattern_name");
+   });
 
   make.group("Relations", function() {
     make.run("noun_relation",  "{?are_being} {relation} {+noun|comma-and}");
@@ -70,12 +77,18 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
               "{plural_kinds} have {determiner} {property_phrase}.");
 
     make.str("singular_kind",
-      `Kind: Describes a type of similar objects.
+      `Kind: Describes a type of similar nouns.
 For example: an animal, a container, etc.`);
 
     make.str("plural_kinds",
-      `Kinds: The plural name of a type of similar objects.
+      `Kinds: The plural name of a type of similar nouns.
 For example: animals, containers, etc.`);
+
+  });
+
+  make.group("Variables", function() {
+    make.run("variable_decl", "{variable_type} ( called {variable_name|quote|default=result} )");
+    make.str("variable_name");
   });
 
   make.group("Traits", function() {
@@ -88,13 +101,13 @@ For example: animals, containers, etc.`);
   make.group("Properties", function() {
     // ex. The description of the nets is xxx
     make.run("noun_assignment", "story_statement",
-            // "The {property} of {+noun} is the {[text]:: %lines}",
-            "The {property} of {+noun} is {the text%lines|summary}",
+            // "The {property_name} of {+noun} is the {[text]:: %lines}",
+            "The {property_name} of {+noun} is {the text%lines|summary}",
             "Assign text. Gives a noun one or more lines of text.");
 
     make.opt("property_phrase", "{primitive_phrase} or {quality_phrase}");
 
-    make.run("optional_property", "called {property}");
+    make.run("optional_property", "called {property_name}");
 
     make.run("kinds_of_quality", "story_statement",
               "{qualities} are a kind of value.");
@@ -116,23 +129,15 @@ For example: animals, containers, etc.`);
     make.str("certainty",  "{usually}, {always}, {seldom}, or {never}",
              "Certainty: Whether an attribute applies to a kind of noun.");
 
-    make.str("property");
+    make.str("property_name");
   });
 
 
-  make.group("Helper Types", function() {
-    make.str("determiner", "{a}, {an}, {the}, or {other determiner%determiner}");
-    make.str("pronoun",  "{it}, {they}, or {pronoun}");
-    make.str("an", "{a} or {an}");
-    make.str("are_being",  "{are} or {is}");
-    make.str("are_an",  "{are}, {are a%area}, {are an%arean}, {is}, {is a%isa}, {is an%isan}");
-  });
 
   // primitive types
   make.group("Primitive Types", function() {
-
-    make.run("primitive_phrase", "{primitive_type} called {property}");
-    make.str("primitive_type", "some {text}, a {number}, a {boolean}, a {kind}");
+    make.run("primitive_phrase", "{primitive_type} called {property_name}");
+    make.str("primitive_type", "{a number%number}, {some text%text}, or {a true/false value%bool}");
     make.opt("primitive_value", "{text%boxed_text} or {number%boxed_number}");
 
     make.run("boxed_text", "{text}");
@@ -150,6 +155,19 @@ See also: lines.`);
 Paragraphs are a prime example. Generally lines are some piece of the story that will be displayed to the player.
 See also: text.`);
     make.num("number");
+  });
+
+ make.group("Helper Types", function() {
+    make.str("determiner", "{a}, {an}, {the}, or {other determiner%determiner}");
+    make.str("pronoun",  "{it}, {they}, or {pronoun}");
+    make.str("an", "{a} or {an}");
+    make.str("are_being",  "{are} or {is}");
+    make.str("are_an",  "{are}, {are a%area}, {are an%arean}, {is}, {is a%isa}, {is an%isan}");
+  });
+
+  make.group("Testing", function() {
+    make.run("test", "story_statement",
+      "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.");
   });
 }
 

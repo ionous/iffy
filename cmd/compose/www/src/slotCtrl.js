@@ -93,7 +93,7 @@ Vue.component('mk-slot-ctrl', {
           const typeName = this.labelTypes[choice];
           const childItem= Types.createItem(typeName);
           this.$root.setChild( node, childItem );
-          this.childNode= node.newKid( childItem, token );
+          this.childNode= node.newKid( childItem );
         }
       }
     },

@@ -60,6 +60,7 @@ class ItemField {
     const { value } = this;
     return (value == null) ||
           (Array.isArray(value) && !value.length);
+  }
   isOptional() {
     const { param } = this;
     return param && param.optional;
