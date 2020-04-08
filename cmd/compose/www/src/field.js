@@ -1,9 +1,19 @@
 // an item in the context of its parent.
+// fix: its not entirely clear why this is separate from Node
+// it is used as part of "Sibling" iterators, so those might need adjust.
 class ItemField {
-  // token the a field in parent which contains the item
   constructor(parentItem, token, tokenIndex) {
     this.parentItem= parentItem;
+    if (!parentItem) {
+      throw new Error("creating ItemField but no parent item specified");
+    }
+    // token is the location in parent which contains the item.
+    // note: that if the parent is a "slot" there is no token.
     this.token= token;
+    if (!token && this.parentType.uses === 'run') {
+      console.log(JSON.stringify(parentItem,0,2));
+      throw new Error("creating ItemField but no token in the parent item specified");
+    }
     if (tokenIndex !== undefined) {
       this._tokenIndex= tokenIndex;
     }
@@ -48,8 +58,8 @@ class ItemField {
   isEmpty() {
     // double equal for undefined.
     const { value } = this;
-    return (value == null) || (Array.isArray(value) && !value.length);
-  }
+    return (value == null) ||
+          (Array.isArray(value) && !value.length);
   isOptional() {
     const { param } = this;
     return param && param.optional;
@@ -81,7 +91,9 @@ class ItemField {
     return ret;
   }
   deleteMe() {
-    if (!this.token) {
+    // yuck. opt needs to see its value nil to trigger a view change.
+    // it might be nice if an empty run could be null, but its {} right now.
+    if (!this.token || this.parentType.uses === 'opt') {
       // no token implies a slat or slot
       this.parentItem.value= null;
     } else {
