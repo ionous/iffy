@@ -84,7 +84,7 @@ class Types {
   }
 
   static labelOf(t) {
-    const label= !t.desc ? t.name.replace('_', ' ')  /* friendlyish name */ :
+    const label= !t.desc ? t.name.replace(/[-_]/g, ' ')  /* friendlyish name */ :
           (typeof t.desc === 'string') ? t.desc :
           t.desc.label;
     return label;
@@ -111,6 +111,9 @@ class Types {
     }
     var ret;
     const type= allTypes.all[ typeName ];
+    if (!type ) {
+       throw new Error(`unknown type '${typeName}'`);
+    }
     const { uses } =  type;
     switch (uses) {
       case "run": {
@@ -133,9 +136,10 @@ class Types {
       case "slot":
       case "opt": {
         // note: "initially", if any, is: object { string type; object value; }
+        // FIX: "initially" wont work properly for opts.
+        // slots dont have a $TOKEN entry, but options do.
         const pair= Types._unpack(ctx);
         if (!pair) {
-          // ex. Item("story_statement", null)
           ret= allTypes.newItem(type.name, null);
         } else {
           const { type:slatType, value:slatValue } = pair;
@@ -146,7 +150,26 @@ class Types {
       case "str":
       case "txt": {
         // ex. Item("attribute", "testing")
-        const value= Types._unpack(ctx, "");
+        // determine default value
+        var defautValue= "";
+        const { tokens, params }= type.with;
+        if (tokens.length === 1) {
+          const t= tokens[0];
+          const param= params[t];
+          // FIX: no .... this is in the "run"... the container of the str.
+          // if (param.filterVals && ('default' in param.filterVals)) {
+          //   defaultValue= param.filterVals['default'];
+          // } else {
+              // if there's only one token, and that token isn't the "floating value" token....
+              if (param.value !== null) {
+                defautValue= t; // then we can use the token as our default value.
+              }
+          // }
+        }
+        const value= Types._unpack(ctx, defautValue);
+        // fix? .value for string elements *can* be null,
+        // but if they are things in autoText throw.
+        // apparently default String prop validation allows null.
         ret= allTypes.newItem(type.name, value);
       }
       break;
