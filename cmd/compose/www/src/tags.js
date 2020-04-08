@@ -20,6 +20,9 @@ class Char {
   filter() {
     return this.ch === "|";
   }
+  filterParam() {
+    return this.ch === "=";
+  }
   equals(other) {
     return this.ch === other;
   }
@@ -103,6 +106,11 @@ class TagBlock {
     const filters= this.block['filters'] || [];
     this.block['filters']= filters.concat(TagBlock.strip(str));
   }
+  addFilterVal(str, val) {
+    const vals= this.block['filterVals'] || {};
+    vals[str]= val;
+    this.block['filterVals']= vals;
+  }
   setLabel(str) {
     // out of this parse optional prefix and suffix
     const match= /(.*?)\[(.+?)\](.*)/.exec(str);
@@ -144,7 +152,7 @@ class TagBlock {
     // unpack to locals;
     // throws if arg is not set.
     const {
-      block:{ arg, target=null, label=null, prefix=null, suffix=null, filters=[] },
+      block:{ arg, target=null, label=null, prefix=null, suffix=null, filters=[], filterVals=null },
       occurs,
       options: { asValues=false, nullValue=false }
     } = this;
@@ -159,10 +167,11 @@ class TagBlock {
         // the asValue path allows dict to collapse to value
         targetValue:
         // rep only sets {repeats,optional} if one or both are true.
-        Object.assign({label: label || arg.replace("_", " ")},
+        Object.assign({label: label || arg.replace(/[-_]/g, ' ')},
                       {[targetKey]: targetValue},
                       occurs, // ex. repeat, optional
                       filters.length && {filters},
+                      filterVals && {filterVals},
                       prefix && {prefix},
                       suffix && {suffix});
     return {
@@ -208,18 +217,6 @@ class TagOutput {
   }
 };
 
-// --------------------------------------------------------------------
-// internal: tag parser states
-// easier, imo, to get pinpoint errors using a state machine rather than regex parsing.
-const TagStates = {
-  readingText: 0,
-  readingFirst: 1,
-  readingFormat: 2,
-  readingType: 3,
-  trailingArg: 4,
-  filter: 5,
-  done: 6
-};
 
 // --------------------------------------------------------------------
 class TagParser {
@@ -236,7 +233,7 @@ class TagParser {
     this.accum= new Accum();
     this.msg= new TagBlock(options);
     this.escaping= false;
-    this.state= TagStates.readingText;
+    this.state= this.readingText;
     this.out= new TagOutput();
   }
   end() {
@@ -246,87 +243,82 @@ class TagParser {
 
   onChar(c, next) {
     const char= new Char(c);
-    switch (this.state) {
-      // reading normal text, look for opening bracket
-      case TagStates.readingText:
-        if (char.opens()) {
-          this.out.writeText(this.accum.flush());
-          this.state= TagStates.readingFirst;
-        } else if (char.ends()) {
-          this.out.writeText(this.accum.flush());
-          this.state= TagStates.done;
-        } else {
-          this.accum.push(char);
-        }
-        break;
+    this.state(new Char(c), next);
+  }
 
-      // reading text directly after an open bracket
-      case TagStates.readingFirst:
-        if (!this.escaping && char.isSpecial() && char.equals(next)) {
-          this.escaping= true;
-        } else if (this.escaping) {
-          this.accum.push(char);
-          this.escaping= false;
-        } else if (char.labels()) {
-          // turns out we were reading a label.
-          // ex. {label%...}
-          this.msg.setLabel(this.accum.flush());
-          this.state= TagStates.readingArg;
-        } else if (this.msg.setOccurs(char)) {
-          if (!this.accum.length) {
-            // started with the occurrence operator?
-            // ex. {#arg}
-            this.state= TagStates.trailingArg;
-          } else {
-            // started with an arg.
-            // {arg#type}
-            this.msg.setArg(this.accum.flush());
-            this.state= TagStates.readingType;
-          }
-        } else {
-          this.readTail(char);
-        }
-        break;
+  readingDone() {
+    throw new Error("done");
+  }
 
-      // after reading a label, we are reading an arg.
-      case TagStates.readingArg:
-        if (this.msg.setOccurs(char)) {
+  // reading normal text, look for opening bracket
+  readingText(char) {
+      if (char.opens()) {
+        this.out.writeText(this.accum.flush());
+        this.state= this.readingFirst;
+      } else if (char.ends()) {
+        this.out.writeText(this.accum.flush());
+        this.state= this.readingDone;
+      } else {
+        this.accum.push(char);
+      }
+   }
+  // reading text directly after an open bracket
+  readingFirst(char, next) {
+      if (!this.escaping && char.isSpecial() && char.equals(next)) {
+        this.escaping= true;
+      } else if (this.escaping) {
+        this.accum.push(char);
+        this.escaping= false;
+      } else if (char.labels()) {
+        // turns out we were reading a label.
+        // ex. {label%...}
+        this.msg.setLabel(this.accum.flush());
+        this.state= this.readingArg;
+      } else if (this.msg.setOccurs(char)) {
+        if (!this.accum.length) {
+          // started with the occurrence operator?
+          // ex. {#arg}
+          this.state= this.readingTrailingArg;
+        } else {
+          // started with an arg.
+          // {arg#type}
           this.msg.setArg(this.accum.flush());
-          this.state= TagStates.readingType;
-        } else {
-          this.readTail(char);
+          this.state= this.readingType;
         }
-        break;
-
-      // explicit types end the block.
-      case TagStates.readingType:
-        this.readTail(char, "target");
-        break;
-
-      // we can have an arg closing the block if the occurrence operator appeared first.
-      case TagStates.trailingArg:
-        this.readTail(char);
-        break;
-
-      case TagStates.filter:
-        this.readFilter(char);
-        break;
-
-      default:
-        throw new Error("unexpected state");
+      } else {
+        this.helpReadingTail(char);
+      }
+  }
+  // after reading a label, we are reading an arg.
+  readingArg(char) {
+    if (this.msg.setOccurs(char)) {
+      this.msg.setArg(this.accum.flush());
+      this.state= this.readingType;
+    } else {
+      this.helpReadingTail(char);
     }
+  }
+
+  // explicit types end the block.
+  readingType(char) {
+    this.helpReadingTail(char, "target");
+  }
+
+  // we can have an arg closing the block if the occurrence operator appeared first.
+  readingTrailingArg(char)  {
+    this.helpReadingTail(char);
   }
 
   // read till the end of the tag, or till we encounter a filter
   // ex. ...}, or ...|
-  readTail(char, key="arg") {
+  helpReadingTail(char, key="arg") {
     if (char.closes()) {
       this.msg.setValue(key, this.accum.flush());
       this.out.writeMsg(this.msg);
-      this.state= TagStates.readingText;
+      this.state= this.readingText;
     } else if (char.filter()) {
       this.msg.setValue(key, this.accum.flush());
-      this.state= TagStates.filter;
+      this.state= this.readingFilter;
     } else if (char.isSpecial()) {
       throw new Error("unexpected character");
     } else if (char.ends()) {
@@ -338,13 +330,38 @@ class TagParser {
 
   // read till the end of the tag, accumulating filter text
   // ex. ...|filter|filter}
-  readFilter(char) {
+  readingFilter(char) {
     if (char.closes()) {
       this.msg.addFilter(this.accum.flush());
       this.out.writeMsg(this.msg);
-      this.state= TagStates.readingText;
+      this.state= this.readingText;
     } else if (char.filter()) {
       this.msg.addFilter(this.accum.flush());
+    } else if (char.filterParam()) {
+      const filter= this.accum.flush();
+      this.msg.addFilter(filter);
+      this.state= (newChar) => {
+        this.readingFilterVal(newChar, filter);
+      };
+    } else if (char.isSpecial()) {
+      throw new Error("unexpected character");
+    } else if (char.ends()) {
+      throw new Error("unexpected end");
+    } else {
+      this.accum.push(char);
+    }
+  }
+
+  // read till the end of the filter parameter
+  // ex. ...|filter:5|filter}
+  readingFilterVal(char, filter) {
+    if (char.closes()) {
+      this.msg.addFilterVal(filter, this.accum.flush());
+      this.out.writeMsg(this.msg);
+      this.state= this.readingText;
+    } else if (char.filter()) {
+      this.msg.addFilterVal(filter, this.accum.flush());
+      this.state= readingFilter;
     } else if (char.isSpecial()) {
       throw new Error("unexpected character");
     } else if (char.ends()) {

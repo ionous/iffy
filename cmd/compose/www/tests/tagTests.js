@@ -97,7 +97,21 @@ function testSomeStuff() {
       }
     }
   });
-   tagTest("{arg|fe|fi|folter}",{
+  tagTest("{arg|filter=val}",{
+    keys:["$ARG"],
+    args:{
+      "$ARG": {
+        label: "arg",
+        arg: "arg",
+        type: "arg",
+        filters: ["filter"],
+        filterVals: {
+          "filter":"val",
+        },
+      }
+    }
+  });
+  tagTest("{arg|fe|fi|folter}",{
     keys:["$ARG"],
     args:{
       "$ARG": {
@@ -124,7 +138,8 @@ function testSomeStuff() {
     args:{
       "$MULTILINE": {
         label: "description",
-        // change suffix to "extra" and ensure prefix is empty?
+        // fix? change prefix/suffix into just "extra", always used as a suffix?
+        // ( under the theory that the prefix can exist outside the tag )
         suffix: " is:",
         arg: "arg",
         type: "arg",
