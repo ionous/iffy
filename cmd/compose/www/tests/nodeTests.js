@@ -92,7 +92,7 @@ function nodeTests() {
                         },
                         "$KIND": {
                           "id": "td10",
-                          "type": "kind",
+                          "type": "singular_kind",
                           "value": "container"
                         }
                       }

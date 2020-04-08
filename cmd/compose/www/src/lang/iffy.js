@@ -1,5 +1,15 @@
-
 function localLang(make) {
+  make.group("Story Statements", function() {
+    make.run("story_statements", "{+story_statement}"); // old
+
+    make.run("story", "{+paragraph|ghost}");
+    make.run("paragraph", "{+story_statement|ghost}");
+    make.slot("story_statement");
+  });
+
+
+
+
    make.group("Testing", function() {
     make.run("test", "story_statement",
       "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.");
@@ -35,7 +45,7 @@ function localLang(make) {
 
     // fix: think this should always be "are" never "is"
     make.run("kinds_of_thing", "story_statement",
-             "{plural_name} {are_an} kind of {kind}.");
+             "{plural_kinds} are a kind of {singular_kind}.");
 
     make.str("proper_name", `Proper Name: A name given to some specific person, place, or thing.
 Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or 'Toronto'.`);
@@ -54,16 +64,18 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
   });
 
   make.group("Kinds", function() {
-    make.run("kind_of_noun", "{are_an} {*attribute|comma-and} {kind} {?noun_relation}");
+    make.run("kind_of_noun", "{are_an} {*attribute|comma-and} {singular_kind} {?noun_relation}");
 
-    // fix: shouldnt possess always be have
     make.run("kinds_possess_properties", "story_statement",
-              "{plural_name} {possess} {determiner} {property_phrase}.");
+              "{plural_kinds} have {determiner} {property_phrase}.");
 
-    make.str("possess",  "{have} or {has}");
+    make.str("singular_kind",
+      `Kind: Describes a type of similar objects.
+For example: an animal, a container, etc.`);
 
-    make.str("kind");
-    make.str("plural_name");
+    make.str("plural_kinds",
+      `Kinds: The plural name of a type of similar objects.
+For example: animals, containers, etc.`);
   });
 
   make.group("Traits", function() {
@@ -81,15 +93,14 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
             "Assign text. Gives a noun one or more lines of text.");
 
     make.opt("property_phrase", "{primitive_phrase} or {quality_phrase}");
-    make.run("primitive_phrase", "{primitive} called {property}");
+
     make.run("optional_property", "called {property}");
 
-    // fix: think this should always be "are" never "is"
     make.run("kinds_of_quality", "story_statement",
-              "{qualities} {are_an} kind of value.");
+              "{qualities} are a kind of value.");
 
     make.run("class_attributes", "story_statement",
-              "{plural_name} {attribute_phrase}");
+              "{plural_kinds} {attribute_phrase}");
 
     make.run("quality_attributes", "story_statement",
               "{qualities} {attribute_phrase}");
@@ -97,12 +108,9 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     make.run("attribute_phrase", "{are_either} {+attribute|comma-and}.");
 
     make.run("certainties", "story_statement",
-              "{plural_name} {are_being} {certainty} {attribute}.");
+              "{plural_kinds} {are_being} {certainty} {attribute}.");
 
     make.run("quality_phrase", "{quality} {?optional_property}");
-
-    make.run("boxed_text", "{text}");
-    make.run("boxed_number", "{number}");
 
     make.str("are_either", "{can be%canbe} {are either%either}");
     make.str("certainty",  "{usually}, {always}, {seldom}, or {never}",
@@ -110,6 +118,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
 
     make.str("property");
   });
+
 
   make.group("Helper Types", function() {
     make.str("determiner", "{a}, {an}, {the}, or {other determiner%determiner}");
@@ -121,7 +130,15 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
 
   // primitive types
   make.group("Primitive Types", function() {
-    make.opt("primitive", "{text%boxed_text} or {number%boxed_number}");
+
+    make.run("primitive_phrase", "{primitive_type} called {property}");
+    make.str("primitive_type", "some {text}, a {number}, a {boolean}, a {kind}");
+    make.opt("primitive_value", "{text%boxed_text} or {number%boxed_number}");
+
+    make.run("boxed_text", "{text}");
+    make.run("boxed_number", "{number}");
+    make.run("boxed_boolean", "{bool}");
+
     make.str("bool", "{true} or {false}");
     make.str("text", `A sequence of characters of any length, all on one line.
 Examples include letters, words, or short sentances.

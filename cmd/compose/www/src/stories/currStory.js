@@ -55,7 +55,7 @@ function getStory() {
                               },
                               "$KIND": {
                                 "id": "id11",
-                                "type": "kind",
+                                "type": "singular_kind",
                                 "value": "room"
                               }
                             }

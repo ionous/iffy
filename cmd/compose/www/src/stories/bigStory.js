@@ -57,7 +57,7 @@ function getStory() {
                               },
                               "$KIND": {
                                 "id": "id11",
-                                "type": "kind",
+                                "type": "singular_kind",
                                 "value": "room"
                               }
                             }
@@ -768,7 +768,7 @@ function getStory() {
                               },
                               "$KIND": {
                                 "id": "id-16f3603b109-14",
-                                "type": "kind",
+                                "type": "singular_kind",
                                 "value": "container"
                               },
                               "$ATTRIBUTE": [
@@ -1171,7 +1171,7 @@ function getStory() {
                               },
                               "$KIND": {
                                 "id": "id-16f3603b109-97",
-                                "type": "kind",
+                                "type": "singular_kind",
                                 "value": "container"
                               }
                             }
