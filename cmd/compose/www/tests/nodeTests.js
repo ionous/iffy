@@ -8,6 +8,7 @@ class Nodes {
       const state= new MutationState(node);
       return new Mutation(this.redux, state);
     }
+    // recursively create nodes from data.
     makeNodes( item, parent=null, fieldInParent= null ) {
       const node= new Node( item, parent, fieldInParent );
       this.all[item.id]= node;
