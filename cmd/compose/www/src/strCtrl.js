@@ -74,11 +74,11 @@ Vue.component('mk-str-ctrl', {
       const { tokens, params }= this.node.itemType.with;
       const filter= this.$root.filter(this.node);
       for (const token of tokens) {
-        const opt= params[token];
-        if (opt) {
+        const param= params[token];
+        if (param) {
           // for recapitulation ( where value is null )
           // use the empty string as the label.
-          const label= (opt.value !== null)? (opt.label || opt): "";
+          const label= (param.value !== null)? (param.label || param): "";
           lts[filter(label)]= token;
         }
       }

@@ -176,6 +176,7 @@ body {
 }
 
 .mk-slot-ctrl,
+.mk-num-ctrl,
 .mk-str-ctrl,
 .mk-txt-ctrl {
   position: relative;
@@ -204,6 +205,7 @@ body {
   border-radius: 3px;
   border-style: groove;
   padding: 5px;
+  min-width: 25ch; /* the default size is 174 px, then it gets smaller as you type. not sure why exactly. */
 }
 
 .mk-txt-edit__input {

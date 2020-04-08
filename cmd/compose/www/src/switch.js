@@ -31,6 +31,11 @@ Vue.component('mk-switch', {
   },
   template:
   `<v-switch :value="uses"
+    ><template #num
+      ><mk-num-ctrl
+          :node=node
+      ></mk-num-ctrl
+    ></template
     ><template #opt
       ><mk-opt-ctrl
           :node=node
