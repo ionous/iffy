@@ -43,11 +43,8 @@ const app= new Vue({
     setPrim(node, value) {
       redux.setPrim( node.item, value );
     },
-    setChild(node, typeName) {
-      console.log("setChild", typeName);
-      const childItem= Types.createItem(typeName);
+    setChild(node, childItem) {
       redux.setChild( node.item, childItem );
-      return node.newKid(childItem);
     },
     // ghosts provide trailing links for easily adding new content.
     // clicking a ghost expands into corresponding element.
@@ -84,6 +81,9 @@ const app= new Vue({
         }
       }
       return isAtStart? Filters.capitalize: Filters.none;
+    },
+    dumpStory() {
+       return JSON.stringify(this.story.item,0,2);
     }
   },
   data: {
@@ -92,3 +92,4 @@ const app= new Vue({
 });
 
 const shortcuts= new Shortcuts(redux);
+

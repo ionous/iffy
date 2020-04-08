@@ -89,8 +89,11 @@ Vue.component('mk-slot-ctrl', {
           const cmd= this.commandMap[choice];
           this.mutation.mutate( cmd );
         } else {
-          const typeName= this.labelTypes[choice];
-          this.childNode= this.$root.setChild( this.node, typeName );
+          const { node } = this;
+          const typeName = this.labelTypes[choice];
+          const childItem= Types.createItem(typeName);
+          this.$root.setChild( node, childItem );
+          this.childNode= node.newKid( childItem, token );
         }
       }
     },

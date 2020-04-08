@@ -6,8 +6,8 @@
 // fix? replace Node with an indexedDB based get item by id.
 class Node {
   constructor(item, parentNode, token) {
-    if (token && !typeof token == 'string') {
-      throw new Error(`unexpected token ${token}`)
+    if (parentNode && parentNode.itemType.uses === 'run' && (typeof token !== 'string')) {
+      throw new Error(`unexpected token '${token}'`)
     }
     this.item = item;  // Item
     this.parentNode = parentNode;  // Node
