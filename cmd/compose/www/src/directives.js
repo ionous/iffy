@@ -136,7 +136,7 @@ class Make {
         short= desc.substring(j+1).trimLeft();
       }
       ret= (label || long)? {
-        label: (label || name).toLowerCase(),
+        label: (label || name),
         short,
         long
       }: short;
