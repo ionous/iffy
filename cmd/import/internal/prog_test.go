@@ -44,7 +44,7 @@ func TestProcessProg(t *testing.T) {
     if e := json.Unmarshal([]byte(sayStory), &in); e != nil {
       t.Fatal("read json", e)
     } else {
-      r := NewParser(t.Name(), db, generators)
+      r := NewImporter(t.Name(), db, generators)
       //
       if e := r.parseItem(in); e != nil {
         t.Fatal(e)

@@ -14,12 +14,12 @@ func modelTemplate() string {
 		" */\n" +
 		"\n" +
 		"/* documentation for pieces of the model: kinds, nouns, fields, etc. */\n" +
-		"create table mdl_spec(type text, name text, spec string, primary key(type, name));\n" +
+		"create table mdl_spec(type text, name text, spec text, primary key(type, name));\n" +
 		"/* enumerated values used by kinds and nouns */\n" +
 		"create table mdl_aspect(aspect text, trait text, rank int, primary key(aspect, trait));\n" +
 		"/* a class of objects with shared characteristics */\n" +
 		"create table mdl_kind(kind text, path text, primary key(kind));\n" +
-		"/* properties of a kind */\n" +
+		"/* properties of a kind. type is a PRIM */\n" +
 		"create table mdl_field(kind text, field text, type text, primary key(kind, field));\n" +
 		"/* default values for the field of a kind ( or one of its descendant kinds ) */\n" +
 		"create table mdl_default(kind text, field text, value blob );\n" +

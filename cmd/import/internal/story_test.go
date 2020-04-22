@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
@@ -26,14 +25,9 @@ func TestImportStory(t *testing.T) {
 		} else if ok := in.Has(itemType, "story"); !ok {
 			t.Fatal("read story")
 		} else {
-			rec := ephemera.NewRecorder(t.Name(), db)
-			r := Parser{Recorder: rec,
-				table:      generators,
-				oneTime:    make(map[string]bool),
-				categories: make(map[string]CategoryEvent),
-			}
+			k := NewImporter(t.Name(), db, generators)
 			//
-			if e := r.parseItem(in); e != nil {
+			if e := k.parseItem(in); e != nil {
 				t.Fatal(e)
 			}
 			// if b, e := json.MarshalIndent(genq.Tables, "", "  "); e != nil {
@@ -384,7 +378,7 @@ func TestImportStory(t *testing.T) {
 //       "idNamedNoun": "cabin"
 //     }
 //   ],
-//   "eph_primitive": [
+//   "eph_field": [
 //     {
 //       "idNamedField": "nounType",
 //       "idNamedKind": "things",

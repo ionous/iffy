@@ -17,6 +17,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Import reads a json file (from the composer editor)
+// and creates a new sqlite database of "ephemera".
+// It uses package export's list of commands for parsing program statements.
 func main() {
 	var inFile, outFile string
 	flag.StringVar(&inFile, "in", "", "input file name (json)")

@@ -77,7 +77,7 @@ func (r *Recorder) NewPlural(plural, singluar Named) {
 
 // NewPrimitive property in the named kind.
 func (r *Recorder) NewPrimitive(primType string, kind, prop Named) {
-	r.cache.Must(eph_primitive, primType, kind, prop)
+	r.cache.Must(eph_field, primType, kind, prop)
 }
 
 // NewRelation defines a connection between a primary and secondary kind.
@@ -110,20 +110,42 @@ func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
 	r.cache.Must(eph_check, test, prog, expect)
 }
 
+// where patternType is one of tables.PRIM
+func (r *Recorder) NewPattern(pattern Named, patternType string) {
+	r.cache.Must(eph_pattern, pattern, patternType)
+}
+
+func (r *Recorder) NewPatternedEval(pattern, param Named, eval string) {
+	r.cache.Must(eph_pattern_eval, pattern, param, eval)
+}
+
+func (r *Recorder) NewPatternedKind(pattern, param, kind Named) {
+	r.cache.Must(eph_pattern_kind, pattern, param, kind)
+}
+
+//
+func (r *Recorder) NewPatternHandler(pattern Named, handler Prog) {
+	r.cache.Must(eph_filter, pattern, handler)
+}
+
 var eph_alias = tables.Insert("eph_alias", "idNamedAlias", "idNamedActual")
 var eph_aspect = tables.Insert("eph_aspect", "idNamedAspect")
 var eph_certainty = tables.Insert("eph_certainty", "certainty", "idNamedTrait", "idNamedKind")
 var eph_check = tables.Insert("eph_check", "idNamedTest", "idProg", "expect")
 var eph_default = tables.Insert("eph_default", "idNamedKind", "idNamedProp", "value")
+var eph_field = tables.Insert("eph_field", "primType", "idNamedKind", "idNamedField")
+var eph_filter = tables.Insert("eph_filter", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
 var eph_named = tables.Insert("eph_named", "name", "category", "idSource", "offset")
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")
+var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "patternType")
+var eph_pattern_eval = tables.Insert("eph_pattern_eval", "idNamedPattern", "idNamedParam", "evalType")
+var eph_pattern_kind = tables.Insert("eph_pattern_kind", "idNamedPattern", "idNamedParam", "idNamedKind")
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")
-var eph_primitive = tables.Insert("eph_primitive", "primType", "idNamedKind", "idNamedField")
+var eph_prog = tables.Insert("eph_prog", "idSource", "type", "prog")
 var eph_relation = tables.Insert("eph_relation", "idNamedRelation", "idNamedKind", "idNamedOtherKind", "cardinality")
 var eph_relative = tables.Insert("eph_relative", "idNamedHead", "idNamedStem", "idNamedDependent")
 var eph_source = tables.Insert("eph_source", "src")
 var eph_trait = tables.Insert("eph_trait", "idNamedTrait", "idNamedAspect", "rank")
 var eph_value = tables.Insert("eph_value", "idNamedNoun", "idNamedProp", "value")
 var eph_verb = tables.Insert("eph_verb", "idNamedStem", "idNamedRelation", "verb")
-var eph_prog = tables.Insert("eph_prog", "idSource", "type", "prog")

@@ -24,6 +24,7 @@ func QueryAll(db Query, q string, cb func() error, dest ...interface{}) (err err
 }
 
 // ScanAll writes each row to the 'dest' args and calls 'cb' for processing.
+// It closes rows before returning.
 func ScanAll(rows *sql.Rows, cb func() error, dest ...interface{}) (err error) {
 	for rows.Next() {
 		if e := rows.Scan(dest...); e != nil {

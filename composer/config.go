@@ -20,7 +20,7 @@ type Config struct {
 // DevConfig creates a reasonable(?) config based on the developer go path.
 func DevConfig(base string) *Config {
 	repo := "src/github.com/ionous/iffy/cmd"
-	var dir string
+	var dir string // echo $TMPDIR
 	if temp, e := ioutil.TempDir("", "iffy"); e != nil {
 		log.Fatal(e)
 	} else {

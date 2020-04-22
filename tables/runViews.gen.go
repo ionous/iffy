@@ -14,8 +14,8 @@ func runViewsTemplate() string {
 		"run_init as\n" +
 		"select * from (\n" +
 		"\t/* future: select *, -1 as tier \n" +
-		"\t\tfrom mdl_run */\n" +
-		"\tselect noun, field, value, 0 as tier\n" +
+		"\t\tfrom mdl_run to get existing runtime values */\n" +
+		"\tselect noun, field, value, 0 as tier /* tier is hierarchy depth, more derived is better */\n" +
 		"\t\tfrom mdl_start ms\n" +
 		"\tunion all \n" +
 		"\tselect noun, field, value, \n" +

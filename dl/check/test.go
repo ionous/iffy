@@ -23,7 +23,7 @@ type Test struct {
 func (*Test) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "test",
-		Spec:  "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {+go|ghost}.",
+		Spec:  "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {?go|ghost}.",
 		Group: "literals",
 		Desc:  "Bool Value: specify an explicit true or false value.",
 	}

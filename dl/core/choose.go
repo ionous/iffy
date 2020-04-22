@@ -27,7 +27,7 @@ type ChooseText struct {
 func (*Choose) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "choose",
-		Spec: "if {choose%if:bool_eval} then: {true*execute|ghost} else: {false*execute|ghost}",
+		Spec: "if {choose%if:bool_eval} then: {true?execute|ghost} else: {false?execute|ghost}",
 	}
 }
 

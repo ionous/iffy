@@ -19,7 +19,7 @@ const (
 )
 
 func ImportStory(src string, in reader.Map, db *sql.DB) error {
-	p := NewParser(src, db, generators)
+	p := NewImporter(src, db, generators)
 	return p.parseItem(in)
 }
 

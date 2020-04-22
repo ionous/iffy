@@ -53,7 +53,7 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 	// fix: probably want source line out of this too
 	if e := tables.QueryAll(db,
 		`select nk.name, nf.name, p.primType, a.path
-		from eph_primitive p join eph_named nk
+		from eph_field p join eph_named nk
 			on (p.idNamedKind = nk.rowid)
 		left join eph_named nf
 			on (p.idNamedField = nf.rowid)
@@ -97,7 +97,7 @@ func undeclaredAspects(db *sql.DB) (ret []string, err error) {
 	if e := tables.QueryAll(db,
 		`select name from
 			( select distinct n.name as name
-				from eph_primitive p, eph_named n
+				from eph_field p, eph_named n
 				where p.primType = 'aspect'
 				and p.idNamedField = n.rowid )
 		where name not in 
