@@ -110,20 +110,14 @@ func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
 	r.cache.Must(eph_check, test, prog, expect)
 }
 
-// where patternType is one of tables.PRIM
-func (r *Recorder) NewPattern(pattern Named, patternType string) {
-	r.cache.Must(eph_pattern, pattern, patternType)
+func (r *Recorder) NewPattern(pattern Named, patternType Named) {
+	r.cache.Must(eph_pattern, pattern, pattern, patternType)
 }
 
-func (r *Recorder) NewPatternedEval(pattern, param Named, eval string) {
-	r.cache.Must(eph_pattern_eval, pattern, param, eval)
+func (r *Recorder) NewPatternParam(pattern, param, paramType Named) {
+	r.cache.Must(eph_pattern, pattern, param, paramType)
 }
 
-func (r *Recorder) NewPatternedKind(pattern, param, kind Named) {
-	r.cache.Must(eph_pattern_kind, pattern, param, kind)
-}
-
-//
 func (r *Recorder) NewPatternHandler(pattern Named, handler Prog) {
 	r.cache.Must(eph_filter, pattern, handler)
 }
@@ -138,9 +132,7 @@ var eph_filter = tables.Insert("eph_filter", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
 var eph_named = tables.Insert("eph_named", "name", "category", "idSource", "offset")
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")
-var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "patternType")
-var eph_pattern_eval = tables.Insert("eph_pattern_eval", "idNamedPattern", "idNamedParam", "evalType")
-var eph_pattern_kind = tables.Insert("eph_pattern_kind", "idNamedPattern", "idNamedParam", "idNamedKind")
+var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType")
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")
 var eph_prog = tables.Insert("eph_prog", "idSource", "type", "prog")
 var eph_relation = tables.Insert("eph_relation", "idNamedRelation", "idNamedKind", "idNamedOtherKind", "cardinality")

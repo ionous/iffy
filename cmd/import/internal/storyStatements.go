@@ -155,6 +155,39 @@ func imp_noun_statement(k *Importer, r reader.Map) (err error) {
 	return
 }
 
+// Adds a NewPattern, and optionally some associated pattern parameters.
+// {name:pattern_name|quote} determines {type:pattern_type}.
+// {optvars?pattern_variables_tail}
+func imp_pattern_decl(k *Importer, r reader.Map) (err error) {
+	if m, e := k.expectSlat(r, "pattern_decl"); e != nil {
+		err = e
+	} else if pat, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
+		err = e
+	} else if typ, e := imp_pattern_type(k, m.MapOf("$TYPE")); e != nil {
+		err = e
+	} else {
+		k.NewPattern(pat, typ)
+		if tail := m.MapOf("$OPTVARS"); len(tail) > 0 {
+			err = imp_pattern_variables_tail(k, pat, tail)
+		}
+	}
+	return
+}
+
+// `Pattern variables: Storage for values used during the execution of a pattern.`)
+// {+variable_decl|comma-and}.",
+func imp_pattern_variables_tail(k *Importer, pat ephemera.Named, r reader.Map) (err error) {
+	return k.repeats(r.SliceOf("$VARIABLE_DECL"),
+		func(k *Importer, m reader.Map) (err error) {
+			if paramName, paramType, e := imp_variable_decl(k, m); e != nil {
+				err = e
+			} else {
+				k.NewPatternParam(pat, paramName, paramType)
+			}
+			return
+		})
+}
+
 // "The pattern {pattern_name|quote} uses {+variable_decl|comma-and}."
 func imp_pattern_variables_decl(k *Importer, r reader.Map) (err error) {
 	if m, e := k.expectSlat(r, "pattern_variables_decl"); e != nil {
@@ -162,18 +195,8 @@ func imp_pattern_variables_decl(k *Importer, r reader.Map) (err error) {
 	} else if pat, e := imp_pattern_name(k, m.MapOf("$PATTERN_NAME")); e != nil {
 		err = e
 	} else {
-		err = k.repeats(m.SliceOf("$VARIABLE_DECL"), func(k *Importer, m reader.Map) (err error) {
-			return imp_variable_decl(k, m,
-				func(param ephemera.Named, eval string) {
-					// fix? maybe itd be better to just manufacture some built in fake "kinds" for this.
-					// "numbers", "strings", "booleans", "programs".
-					k.NewPatternedEval(pat, param, eval)
-				},
-				func(param ephemera.Named, kind ephemera.Named) {
-					k.NewPatternedKind(pat, param, kind)
-				},
-			)
-		})
+		// reuse, works because they have the same $name.
+		err = imp_pattern_variables_tail(k, pat, m)
 	}
 	return
 }

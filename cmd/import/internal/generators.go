@@ -223,79 +223,70 @@ func imp_attribute_phrase(k *Importer, r reader.Map) error {
 }
 
 // "{type:variable_type} ( called {name:variable_name|quote} )"
-func imp_variable_decl(k *Importer, r reader.Map,
-	primDecl func(ephemera.Named, string),
-	objDecl func(ephemera.Named, ephemera.Named)) (err error) {
+func imp_variable_decl(k *Importer, r reader.Map) (retName, retType ephemera.Named, err error) {
 	if m, e := k.expectSlat(r, "variable_decl"); e != nil {
 		err = e
-	} else if name, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
+	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
+		err = e
+	} else if t, e := imp_variable_type(k, m.MapOf("$TYPE")); e != nil {
 		err = e
 	} else {
-		err = imp_variable_type(k, m.MapOf("$TYPE"),
-			func(eval string) { primDecl(name, eval) },
-			func(kind ephemera.Named) { objDecl(name, kind) })
+		retName, retType = n, t
 	}
 	return
 }
 
-func imp_pattern_type(k *Importer, r reader.Map) (ret string, err error) {
-	// err = k.expectOpt(m, "pattern_type", map[string]Parse{
-	// 	"$ACTIVITY": func(k *Importer, r reader.Map) (err error) {
-	// 		ret, err = imp_pattern_activity(k, m)
-	// 		return
-	// 	},
-	// 	"$VALUE": func(k *Importer, r reader.Map) (err error) {
-	// 		 err = imp_variable_type(k, m)
-	// 		return
-	// 	},
-	// })
-	err = Unimplemented
-	return
-}
-
-func imp_pattern_activity(k *Importer, r reader.Map) (ret string, err error) {
-	if e := k.expectConst(r, "pattern_activity", "$ACTIVITY"); e != nil {
-		err = e
-	} else {
-		ret = tables.EVAL_PROG
-	}
-	return
-}
-
-func imp_variable_type(k *Importer, r reader.Map,
-	prim func(string),
-	obj func(ephemera.Named)) (err error) {
-	return k.expectOpt(r, "variable_type", map[string]Parse{
-		"$PRIMITIVE": func(k *Importer, m reader.Map) (err error) {
-			if n, e := imp_primitve_type(k, m); e != nil {
-				err = e
-			} else {
-				prim(n)
-			}
+// "an {activity:pattern_activity} or a {value:variable_type}");
+func imp_pattern_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	err = k.expectOpt(r, "pattern_type", map[string]Parse{
+		"$ACTIVITY": func(k *Importer, m reader.Map) (err error) {
+			ret, err = imp_pattern_activity(k, m)
 			return
 		},
-		"$OBJECT": func(k *Importer, m reader.Map) (err error) {
-			if n, e := imp_object_type(k, m); e != nil {
-				err = e
-			} else {
-				obj(n)
-			}
+		"$VALUE": func(k *Importer, m reader.Map) (err error) {
+			ret, err = imp_variable_type(k, m)
 			return
 		},
 	})
+	return
+}
+
+// make.str("pattern_activity", "{activity}");
+// returns "prog" as the name of a type  ( eases the difference b/t user named kinds, and internally named types )
+func imp_pattern_activity(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	if e := k.expectConst(r, "pattern_activity", "$ACTIVITY"); e != nil {
+		err = e
+	} else {
+		ret = k.Named(tables.NAMED_TYPE, tables.EVAL_PROG, at(r))
+	}
+	return
+}
+
+func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	err = k.expectOpt(r, "variable_type", map[string]Parse{
+		"$PRIMITIVE": func(k *Importer, m reader.Map) (err error) {
+			ret, err = imp_primitive_type(k, m)
+			return
+		},
+		"$OBJECT": func(k *Importer, m reader.Map) (err error) {
+			ret, err = imp_object_type(k, m)
+			return
+		},
+	})
+	return
 }
 
 // "{a number%number}, {some text%text}, or {a true/false value%bool}"
 // returns one of the evalType(s)
-func imp_primitve_type(k *Importer, r reader.Map) (ret string, err error) {
-	if n, e := k.expectEnum(r, "primitive_type", map[string]interface{}{
-		"$NUMBER": tables.EVAL_DIGI,
-		"$TEXT":   tables.EVAL_TEXT,
+func imp_primitive_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	if evalType, e := k.expectEnum(r, "primitive_type", map[string]interface{}{
+		"$NUMBER": tables.EVAL_COMP,
+		"$TEXT":   tables.EVAL_EXPR,
 		"$BOOL":   tables.EVAL_BOOL,
 	}); e != nil {
 		err = e
 	} else {
-		ret = n.(string)
+		ret = k.Named(tables.NAMED_TYPE, evalType.(string), at(r))
 	}
 	return
 }
