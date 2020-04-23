@@ -274,22 +274,22 @@ function getStory() {
                               "$ATTRIBUTE": [
                                 {
                                   "id": "id-16f156a8166-20",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "closed"
                                 },
                                 {
                                   "id": "id-16f156a8166-22",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "transparent"
                                 },
                                 {
                                   "id": "id-16f156a8166-23",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "lockable"
                                 },
                                 {
                                   "id": "id-16f156a8166-24",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "locked"
                                 }
                               ]
@@ -349,7 +349,7 @@ function getStory() {
                               "$ATTRIBUTE": [
                                 {
                                   "id": "id-16f156a8166-34",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "scenery"
                                 }
                               ]
@@ -636,12 +636,12 @@ function getStory() {
                               "$ATTRIBUTE": [
                                 {
                                   "id": "id-16f165d636d-21",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "enterable"
                                 },
                                 {
                                   "id": "id-16f165d636d-23",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "scenery"
                                 }
                               ]
@@ -701,7 +701,7 @@ function getStory() {
                               "$ATTRIBUTE": [
                                 {
                                   "id": "id-16f165d636d-38",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "scenery"
                                 }
                               ]
@@ -774,12 +774,12 @@ function getStory() {
                               "$ATTRIBUTE": [
                                 {
                                   "id": "id-16f3603b109-16",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "openable"
                                 },
                                 {
                                   "id": "id-16f3603b109-17",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "closed"
                                 }
                               ]
@@ -1278,7 +1278,7 @@ function getStory() {
                               "$ATTRIBUTE": [
                                 {
                                   "id": "id-16f3603b109-132",
-                                  "type": "attribute",
+                                  "type": "trait",
                                   "value": "scenery"
                                 }
                               ]

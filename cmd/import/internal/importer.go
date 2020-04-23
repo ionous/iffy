@@ -3,13 +3,11 @@ package internal
 import (
 	"database/sql"
 	"encoding/gob"
-	"log"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/export"
-	"github.com/ionous/iffy/tables"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,26 +19,18 @@ type Parse func(*Importer, reader.Map) (err error)
 type CategoryEvent func(ephemera.Named)
 
 // Importer helps read Map(s) of unmarshalled json.
-// Its generators are *not* called automatically;
-// instead individual functions may choose to call parseItem on specific values,
-// and so on recursively.
 type Importer struct {
 	*ephemera.Recorder
-	namedGen   map[string]Parse
 	oneTime    map[string]bool
 	categories map[string]CategoryEvent // category
 	nouns      reader.NameList
-	currId     string
-	currType   string
-	parentItem reader.Map
 }
 
-func NewImporter(srcURI string, db *sql.DB, namedGen map[string]Parse) *Importer {
+func NewImporter(srcURI string, db *sql.DB) *Importer {
 	registerGob()
 	rec := ephemera.NewRecorder(srcURI, db)
 	return &Importer{
 		Recorder:   rec,
-		namedGen:   namedGen,
 		oneTime:    make(map[string]bool),
 		categories: make(map[string]CategoryEvent),
 	}
@@ -92,11 +82,10 @@ func (k *Importer) namedStr(m reader.Map, cat, key string) ephemera.Named {
 }
 
 func (k *Importer) namedType(m reader.Map, typeName string) (ret ephemera.Named, err error) {
-	if e := k.expectedType(m, typeName); e != nil {
+	if id, e := k.expectedType(m, typeName); e != nil {
 		err = e
 	} else {
-		id, str := m.StrOf(itemId), m.StrOf(itemValue)
-		ret = k.Named(typeName, str, id)
+		ret = k.Named(typeName, m.StrOf(itemValue), id)
 	}
 	return
 }
@@ -112,37 +101,9 @@ func (k *Importer) catStr(m reader.Map, cat string) ephemera.Named {
 	return named
 }
 
-// helper to process m["type"]
-func (k *Importer) parseItem(m reader.Map) (err error) {
-	if len(m) > 0 {
-		currId := m.StrOf(itemId)
-		currType := m.StrOf(itemType)
-		currValue := m.MapOf(itemValue)
-		log.Println("parseItem", currId, currType)
-		if fn, ok := k.namedGen[currType]; !ok {
-			err = wrongType("", currType, currId)
-		} else {
-			// record into current context
-			k.parentItem, k.currId, k.currType = m, currId, currType
-			// call parsing function
-			err = fn(k, currValue)
-		}
-	}
-	return
-}
-
-func (k *Importer) parseSlice(ms []interface{}) (err error) {
+func (k *Importer) repeats(ms []interface{}, cb Parse) (err error) {
 	for _, it := range ms {
-		if e := k.parseItem(reader.Box(it)); e != nil {
-			err = errutil.Append(err, e)
-		}
-	}
-	return
-}
-
-func (k *Importer) repeats(ms []interface{}, cb func(reader.Map) error) (err error) {
-	for _, it := range ms {
-		if e := cb(reader.Box(it)); e != nil {
+		if e := cb(k, reader.Box(it)); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
@@ -150,18 +111,18 @@ func (k *Importer) repeats(ms []interface{}, cb func(reader.Map) error) (err err
 }
 
 // we expect to see one, and only one, of the sub keys in the itemValue of m.
-func (k *Importer) expectOpt(m reader.Map, expectedType string, sub map[string]Parse) (err error) {
-	if currType := m.StrOf(itemType); currType != expectedType {
-		err = wrongType(expectedType, currType, at(m))
-	} else if currValue := m.MapOf(itemValue); len(currValue) != 1 {
-		err = wrongType(expectedType, currType, at(m))
+func (k *Importer) expectOpt(r reader.Map, expectedType string, sub map[string]Parse) (err error) {
+	if t := r.StrOf(itemType); t != expectedType {
+		err = wrongType(expectedType, t, at(r))
+	} else if m := r.MapOf(itemValue); len(m) != 1 {
+		err = wrongValue(t, m, at(r))
 	} else {
 		// only one in the list.
-		for i, v := range currValue {
-			if fn, ok := sub[i]; !ok {
-				err = wrongValue(expectedType, k, at(m))
-			} else {
-				err = fn(k, reader.Box(v))
+		for key, value := range m {
+			if fn, ok := sub[key]; !ok {
+				err = wrongValue(t, key, at(r))
+			} else if e := fn(k, reader.Box(value)); e != nil {
+				err = e
 			}
 			break
 		}
@@ -169,19 +130,54 @@ func (k *Importer) expectOpt(m reader.Map, expectedType string, sub map[string]P
 	return
 }
 
+// we expect to see one, and only one, of the sub keys in the itemValue of m.
+func (k *Importer) expectSlot(r reader.Map, expectedType string, sub map[string]Parse) (err error) {
+	if t := r.StrOf(itemType); t != expectedType {
+		err = wrongType(expectedType, t, at(r))
+	} else {
+		m := r.MapOf(itemValue)
+		t := m.StrOf(itemType)
+		if fn, ok := sub[t]; !ok {
+			err = wrongType(expectedType, t, at(r))
+		} else {
+			err = fn(k, m)
+		}
+	}
+	return
+}
+
+//
+func (k *Importer) expectEnum(
+	m reader.Map,
+	expectedType string,
+	sub map[string]interface{},
+) (ret interface{}, err error) {
+	if t := m.StrOf(itemType); t != expectedType {
+		err = wrongType(expectedType, t, at(m))
+	} else {
+		n := m.StrOf(itemValue)
+		if i, ok := sub[n]; !ok {
+			err = errutil.New("unexpected", expectedType, n)
+		} else {
+			ret = i
+		}
+	}
+	return
+}
+
 // expect a string constant
 func (k *Importer) expectConst(m reader.Map, expectedType, expectedValue string) (err error) {
-	if currType := m.StrOf(itemType); currType != expectedType {
-		err = wrongType(expectedType, currType, at(m))
-	} else if currValue := m.StrOf(itemValue); currValue != expectedValue {
-		err = wrongValue(currType, currValue, at(m))
+	if t := m.StrOf(itemType); t != expectedType {
+		err = wrongType(expectedType, t, at(m))
+	} else if v := m.StrOf(itemValue); v != expectedValue {
+		err = wrongValue(t, v, at(m))
 	}
 	return
 }
 
 // expect a map value
 func (k *Importer) expectSlat(m reader.Map, expectedType string) (ret reader.Map, err error) {
-	if e := k.expectedType(m, expectedType); e != nil {
+	if _, e := k.expectedType(m, expectedType); e != nil {
 		err = e
 	} else {
 		ret = m.MapOf(itemValue)
@@ -191,42 +187,32 @@ func (k *Importer) expectSlat(m reader.Map, expectedType string) (ret reader.Map
 
 // expect a string variable
 func (k *Importer) expectStr(m reader.Map, expectedType string) (ret string, err error) {
-	if currType := m.StrOf(itemType); currType != expectedType {
-		err = wrongType(expectedType, currType, at(m))
-	} else if currValue := m.StrOf(itemValue); len(currValue) == 0 {
-		err = wrongValue(currType, currValue, at(m))
+	if t := m.StrOf(itemType); t != expectedType {
+		err = wrongType(expectedType, t, at(m))
+	} else if v := m.StrOf(itemValue); len(v) == 0 {
+		err = wrongValue(t, v, at(m))
 	} else {
-		ret = currValue
+		ret = v
 	}
 	return
 }
 
 // expect a string variable
 func (k *Importer) expectName(m reader.Map, expectedType, cat string) (err error) {
-	if currType := m.StrOf(itemType); currType != expectedType {
-		err = wrongType(expectedType, currType, at(m))
-	} else if currValue := m.StrOf(itemValue); len(currValue) == 0 {
-		err = wrongValue(currType, currValue, at(m))
+	if t := m.StrOf(itemType); t != expectedType {
+		err = wrongType(expectedType, t, at(m))
+	} else if v := m.StrOf(itemValue); len(v) == 0 {
+		err = wrongValue(t, v, at(m))
 	}
 	return
 }
 
 // helper: check the type of the passed m map
-func (k *Importer) expectedType(m reader.Map, expectedType string) (err error) {
-	if currType := m.StrOf(itemType); currType != expectedType {
-		err = wrongType(expectedType, currType, at(m))
-	}
-	return
-}
-
-func parseAttrs(k *Importer, m reader.Map) (err error) {
-	defer k.on(tables.NAMED_TRAIT, func(trait ephemera.Named) {
-		for _, noun := range k.nouns.Named {
-			k.NewValue(noun, trait, true)
-		}
-	})()
-	for _, it := range m.SliceOf("$ATTRIBUTE") {
-		k.catStr(reader.Box(it), tables.NAMED_TRAIT)
+func (k *Importer) expectedType(m reader.Map, expectedType string) (ret string, err error) {
+	if t := m.StrOf(itemType); t != expectedType {
+		err = wrongType(expectedType, t, at(m))
+	} else {
+		ret = m.StrOf(itemId)
 	}
 	return
 }
@@ -240,9 +226,9 @@ func wrongType(wanted, got, at string) error {
 }
 
 func wrongValue(
-	currType string,
+	t string,
 	got interface{},
 	at string,
 ) error {
-	return errutil.New(currType, "has unexpected value", got, "at", at)
+	return errutil.New(t, "has unexpected value", got, "at", at)
 }

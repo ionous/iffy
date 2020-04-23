@@ -71,7 +71,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
   });
 
   make.group("Kinds", function() {
-    make.run("kind_of_noun", "{are_an} {*attribute|comma-and} {singular_kind} {?noun_relation}");
+    make.run("kind_of_noun", "{are_an} {*trait|comma-and} {singular_kind} {?noun_relation}");
 
     make.run("kinds_possess_properties", "story_statement",
               "{plural_kinds} have {determiner} {property_phrase}.");
@@ -87,15 +87,15 @@ For example: animals, containers, etc.`);
   });
 
   make.group("Variables", function() {
-    make.run("variable_decl", "{variable_type} ( called {variable_name|quote|default=result} )");
+    make.run("variable_decl", "{variable_type} ( called {variable_name|quote} )");
     make.str("variable_name");
   });
 
   make.group("Traits", function() {
-    make.run("noun_attrs", "{are_being} {+attribute|comma-and}");
+    make.run("noun_attrs", "{are_being} {+trait|comma-and}");
     make.str("quality");
     make.str("qualities");
-    make.str("attribute");
+    make.str("trait");
   });
 
   make.group("Properties", function() {
@@ -118,10 +118,10 @@ For example: animals, containers, etc.`);
     make.run("quality_attributes", "story_statement",
               "{qualities} {attribute_phrase}");
 
-    make.run("attribute_phrase", "{are_either} {+attribute|comma-and}.");
+    make.run("attribute_phrase", "{are_either} {+trait|comma-and}.");
 
     make.run("certainties", "story_statement",
-              "{plural_kinds} {are_being} {certainty} {attribute}.");
+              "{plural_kinds} {are_being} {certainty} {attribute:trait}.");
 
     make.run("quality_phrase", "{quality} {?optional_property}");
 

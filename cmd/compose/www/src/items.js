@@ -149,7 +149,7 @@ class Types {
       break;
       case "str":
       case "txt": {
-        // ex. Item("attribute", "testing")
+        // ex. Item("trait", "testing")
         // determine default value
         var defautValue= "";
         const { tokens, params }= type.with;

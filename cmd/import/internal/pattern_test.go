@@ -16,7 +16,7 @@ import (
 func TestXObjectType(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
-	if n, e := objectType(k, objectTypeData); e != nil {
+	if n, e := imp_object_type(k, objectTypeData); e != nil {
 		t.Fatal(e)
 	} else if n.String() != "animals" {
 		t.Fatal(n)
@@ -27,7 +27,7 @@ func TestXObjectType(t *testing.T) {
 func TestXVariableTypePrimitive(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
-	if e := variableType(k, variableTypeData,
+	if e := imp_variable_type(k, variableTypeData,
 		func(prim string) {
 			if prim != tables.EVAL_TEXT {
 				t.Fatal(prim)
@@ -42,7 +42,7 @@ func TestXVariableTypePrimitive(t *testing.T) {
 func TestXVariableDeclObject(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
-	if e := variableDecl(k, variableDeclData, nil,
+	if e := imp_variable_decl(k, variableDeclData, nil,
 		func(varName ephemera.Named, typeName ephemera.Named) {
 			if varName.String() != "pet" {
 				t.Fatal(varName)
@@ -57,7 +57,7 @@ func TestXVariableDeclObject(t *testing.T) {
 func TestXPatternVariablesDecl(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
-	if e := patternVariablesDecl(k, patternVariablesDeclData); e != nil {
+	if e := imp_pattern_variables_decl(k, imp_pattern_variables_declData); e != nil {
 		t.Fatal(e)
 	} else {
 		var b strings.Builder
@@ -92,7 +92,7 @@ func newTestImporter(t *testing.T) (ret *Importer, retDB *sql.DB) {
 		if e := tables.CreateEphemera(db); e != nil {
 			t.Fatal("create ephemera", e)
 		} else {
-			ret, retDB = NewImporter(t.Name(), db, nil), db
+			ret, retDB = NewImporter(t.Name(), db), db
 		}
 	}
 	return
@@ -107,7 +107,7 @@ func getPath(file string) (ret string, err error) {
 	return
 }
 
-var patternVariablesDeclData = map[string]interface{}{
+var imp_pattern_variables_declData = map[string]interface{}{
 	"id":   "id-1719a47c939-7",
 	"type": "pattern_variables_decl",
 	"value": map[string]interface{}{

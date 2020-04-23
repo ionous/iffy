@@ -24,18 +24,20 @@ var Blob = `{
                             "id": "id5",
                             "type": "noun",
                             "value": {
-                              "id": "id8",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id6",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id7",
-                                  "type": "common_name",
-                                  "value": "cabin"
+                              "$COMMON_NOUN": {
+                                "id": "id8",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id6",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id7",
+                                    "type": "common_name",
+                                    "value": "cabin"
+                                  }
                                 }
                               }
                             }
@@ -45,18 +47,20 @@ var Blob = `{
                           "id": "id8",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id9",
-                            "type": "kind_of_noun",
-                            "value": {
-                              "$ARE_AN": {
-                                "id": "id10",
-                                "type": "are_an",
-                                "value": "$ISA"
-                              },
-                              "$KIND": {
-                                "id": "id11",
-                                "type": "kind",
-                                "value": "room"
+                            "$KIND_OF_NOUN": {
+                              "id": "id9",
+                              "type": "kind_of_noun",
+                              "value": {
+                                "$ARE_AN": {
+                                  "id": "id10",
+                                  "type": "are_an",
+                                  "value": "$ISA"
+                                },
+                                "$KIND": {
+                                  "id": "id11",
+                                  "type": "kind",
+                                  "value": "room"
+                                }
                               }
                             }
                           }
@@ -100,18 +104,20 @@ var Blob = `{
                             "id": "id17",
                             "type": "noun",
                             "value": {
-                              "id": "id18",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id19",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id20",
-                                  "type": "common_name",
-                                  "value": "cabin"
+                              "$COMMON_NOUN": {
+                                "id": "id18",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id19",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id20",
+                                    "type": "common_name",
+                                    "value": "cabin"
+                                  }
                                 }
                               }
                             }
@@ -121,36 +127,40 @@ var Blob = `{
                           "id": "id21",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id22",
-                            "type": "noun_relation",
-                            "value": {
-                              "$RELATION": {
-                                "id": "id23",
-                                "type": "relation",
-                                "value": "contains"
-                              },
-                              "$NOUN": [
-                                {
-                                  "id": "id24",
-                                  "type": "noun",
-                                  "value": {
-                                    "id": "id25",
-                                    "type": "common_noun",
+                            "$NOUN_RELATION": {
+                              "id": "id22",
+                              "type": "noun_relation",
+                              "value": {
+                                "$RELATION": {
+                                  "id": "id23",
+                                  "type": "relation",
+                                  "value": "contains"
+                                },
+                                "$NOUN": [
+                                  {
+                                    "id": "id24",
+                                    "type": "noun",
                                     "value": {
-                                      "$DETERMINER": {
-                                        "id": "id26",
-                                        "type": "determiner",
-                                        "value": "$A"
-                                      },
-                                      "$COMMON_NAME": {
-                                        "id": "id27",
-                                        "type": "common_name",
-                                        "value": "glass case"
+                                      "$COMMON_NOUN": {
+                                        "id": "id25",
+                                        "type": "common_noun",
+                                        "value": {
+                                          "$DETERMINER": {
+                                            "id": "id26",
+                                            "type": "determiner",
+                                            "value": "$A"
+                                          },
+                                          "$COMMON_NAME": {
+                                            "id": "id27",
+                                            "type": "common_name",
+                                            "value": "glass case"
+                                          }
+                                        }
                                       }
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             }
                           }
                         }
@@ -176,18 +186,20 @@ var Blob = `{
                         "id": "id-16f156a8166-1",
                         "type": "noun",
                         "value": {
-                          "id": "id-16f156a8166-7",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f156a8166-5",
-                              "type": "determiner",
-                              "value": "$THE"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "id-16f156a8166-6",
-                              "type": "common_name",
-                              "value": "glass case"
+                          "$COMMON_NOUN": {
+                            "id": "id-16f156a8166-7",
+                            "type": "common_noun",
+                            "value": {
+                              "$DETERMINER": {
+                                "id": "id-16f156a8166-5",
+                                "type": "determiner",
+                                "value": "$THE"
+                              },
+                              "$COMMON_NAME": {
+                                "id": "id-16f156a8166-6",
+                                "type": "common_name",
+                                "value": "glass case"
+                              }
                             }
                           }
                         }
@@ -203,18 +215,20 @@ var Blob = `{
                         "id": "id-16f156a8166-3",
                         "type": "noun",
                         "value": {
-                          "id": "id-16f156a8166-10",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f156a8166-8",
-                              "type": "determiner",
-                              "value": "$A"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "id-16f156a8166-9",
-                              "type": "common_name",
-                              "value": "collection of fishing rods"
+                          "$COMMON_NOUN": {
+                            "id": "id-16f156a8166-10",
+                            "type": "common_noun",
+                            "value": {
+                              "$DETERMINER": {
+                                "id": "id-16f156a8166-8",
+                                "type": "determiner",
+                                "value": "$A"
+                              },
+                              "$COMMON_NAME": {
+                                "id": "id-16f156a8166-9",
+                                "type": "common_name",
+                                "value": "collection of fishing rods"
+                              }
                             }
                           }
                         }
@@ -239,18 +253,20 @@ var Blob = `{
                             "id": "id-16f156a8166-12",
                             "type": "noun",
                             "value": {
-                              "id": "id-16f156a8166-18",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-16",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-17",
-                                  "type": "common_name",
-                                  "value": "case"
+                              "$COMMON_NOUN": {
+                                "id": "id-16f156a8166-18",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-16f156a8166-16",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-16f156a8166-17",
+                                    "type": "common_name",
+                                    "value": "case"
+                                  }
                                 }
                               }
                             }
@@ -260,36 +276,38 @@ var Blob = `{
                           "id": "id-16f156a8166-13",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id-16f156a8166-21",
-                            "type": "noun_attrs",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f156a8166-19",
-                                "type": "are_being",
-                                "value": "$IS"
-                              },
-                              "$ATTRIBUTE": [
-                                {
-                                  "id": "id-16f156a8166-20",
-                                  "type": "attribute",
-                                  "value": "closed"
+                            "$NOUN_ATTRS": {
+                              "id": "id-16f156a8166-21",
+                              "type": "noun_attrs",
+                              "value": {
+                                "$ARE_BEING": {
+                                  "id": "id-16f156a8166-19",
+                                  "type": "are_being",
+                                  "value": "$IS"
                                 },
-                                {
-                                  "id": "id-16f156a8166-22",
-                                  "type": "attribute",
-                                  "value": "transparent"
-                                },
-                                {
-                                  "id": "id-16f156a8166-23",
-                                  "type": "attribute",
-                                  "value": "lockable"
-                                },
-                                {
-                                  "id": "id-16f156a8166-24",
-                                  "type": "attribute",
-                                  "value": "locked"
-                                }
-                              ]
+                                "$ATTRIBUTE": [
+                                  {
+                                    "id": "id-16f156a8166-20",
+                                    "type": "trait",
+                                    "value": "closed"
+                                  },
+                                  {
+                                    "id": "id-16f156a8166-22",
+                                    "type": "trait",
+                                    "value": "transparent"
+                                  },
+                                  {
+                                    "id": "id-16f156a8166-23",
+                                    "type": "trait",
+                                    "value": "lockable"
+                                  },
+                                  {
+                                    "id": "id-16f156a8166-24",
+                                    "type": "trait",
+                                    "value": "locked"
+                                  }
+                                ]
+                              }
                             }
                           }
                         }
@@ -314,18 +332,20 @@ var Blob = `{
                             "id": "id-16f156a8166-26",
                             "type": "noun",
                             "value": {
-                              "id": "id-16f156a8166-32",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-30",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-31",
-                                  "type": "common_name",
-                                  "value": "case"
+                              "$COMMON_NOUN": {
+                                "id": "id-16f156a8166-32",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-16f156a8166-30",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-16f156a8166-31",
+                                    "type": "common_name",
+                                    "value": "case"
+                                  }
                                 }
                               }
                             }
@@ -335,21 +355,23 @@ var Blob = `{
                           "id": "id-16f156a8166-27",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id-16f156a8166-35",
-                            "type": "noun_attrs",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f156a8166-33",
-                                "type": "are_being",
-                                "value": "$IS"
-                              },
-                              "$ATTRIBUTE": [
-                                {
-                                  "id": "id-16f156a8166-34",
-                                  "type": "attribute",
-                                  "value": "scenery"
-                                }
-                              ]
+                            "$NOUN_ATTRS": {
+                              "id": "id-16f156a8166-35",
+                              "type": "noun_attrs",
+                              "value": {
+                                "$ARE_BEING": {
+                                  "id": "id-16f156a8166-33",
+                                  "type": "are_being",
+                                  "value": "$IS"
+                                },
+                                "$ATTRIBUTE": [
+                                  {
+                                    "id": "id-16f156a8166-34",
+                                    "type": "trait",
+                                    "value": "scenery"
+                                  }
+                                ]
+                              }
                             }
                           }
                         }
@@ -374,18 +396,20 @@ var Blob = `{
                             "id": "id-16f156a8166-37",
                             "type": "noun",
                             "value": {
-                              "id": "id-16f156a8166-43",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-41",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-42",
-                                  "type": "common_name",
-                                  "value": "small silver key"
+                              "$COMMON_NOUN": {
+                                "id": "id-16f156a8166-43",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-16f156a8166-41",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-16f156a8166-42",
+                                    "type": "common_name",
+                                    "value": "small silver key"
+                                  }
                                 }
                               }
                             }
@@ -395,36 +419,40 @@ var Blob = `{
                           "id": "id-16f156a8166-38",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id-16f156a8166-55",
-                            "type": "noun_relation",
-                            "value": {
-                              "$RELATION": {
-                                "id": "id-16f156a8166-53",
-                                "type": "relation",
-                                "value": "unlocks"
-                              },
-                              "$NOUN": [
-                                {
-                                  "id": "id-16f156a8166-54",
-                                  "type": "noun",
-                                  "value": {
-                                    "id": "id-16f156a8166-58",
-                                    "type": "common_noun",
+                            "$NOUN_RELATION": {
+                              "id": "id-16f156a8166-55",
+                              "type": "noun_relation",
+                              "value": {
+                                "$RELATION": {
+                                  "id": "id-16f156a8166-53",
+                                  "type": "relation",
+                                  "value": "unlocks"
+                                },
+                                "$NOUN": [
+                                  {
+                                    "id": "id-16f156a8166-54",
+                                    "type": "noun",
                                     "value": {
-                                      "$DETERMINER": {
-                                        "id": "id-16f156a8166-56",
-                                        "type": "determiner",
-                                        "value": "$THE"
-                                      },
-                                      "$COMMON_NAME": {
-                                        "id": "id-16f156a8166-57",
-                                        "type": "common_name",
-                                        "value": "case"
+                                      "$COMMON_NOUN": {
+                                        "id": "id-16f156a8166-58",
+                                        "type": "common_noun",
+                                        "value": {
+                                          "$DETERMINER": {
+                                            "id": "id-16f156a8166-56",
+                                            "type": "determiner",
+                                            "value": "$THE"
+                                          },
+                                          "$COMMON_NAME": {
+                                            "id": "id-16f156a8166-57",
+                                            "type": "common_name",
+                                            "value": "case"
+                                          }
+                                        }
                                       }
                                     }
                                   }
-                                }
-                              ]
+                                ]
+                              }
                             }
                           }
                         }
@@ -449,18 +477,20 @@ var Blob = `{
                             "id": "id-16f156a8166-65",
                             "type": "noun",
                             "value": {
-                              "id": "id-16f156a8166-71",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-69",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-70",
-                                  "type": "common_name",
-                                  "value": "bench"
+                              "$COMMON_NOUN": {
+                                "id": "id-16f156a8166-71",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-16f156a8166-69",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-16f156a8166-70",
+                                    "type": "common_name",
+                                    "value": "bench"
+                                  }
                                 }
                               }
                             }
@@ -470,40 +500,44 @@ var Blob = `{
                           "id": "id-16f156a8166-66",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id-16f156a8166-74",
-                            "type": "noun_relation",
-                            "value": {
-                              "$RELATION": {
-                                "id": "id-16f156a8166-72",
-                                "type": "relation",
-                                "value": "in"
-                              },
-                              "$NOUN": [
-                                {
-                                  "id": "id-16f156a8166-73",
-                                  "type": "noun",
-                                  "value": {
-                                    "id": "id-16f156a8166-77",
-                                    "type": "common_noun",
+                            "$NOUN_RELATION": {
+                              "id": "id-16f156a8166-74",
+                              "type": "noun_relation",
+                              "value": {
+                                "$RELATION": {
+                                  "id": "id-16f156a8166-72",
+                                  "type": "relation",
+                                  "value": "in"
+                                },
+                                "$NOUN": [
+                                  {
+                                    "id": "id-16f156a8166-73",
+                                    "type": "noun",
                                     "value": {
-                                      "$DETERMINER": {
-                                        "id": "id-16f156a8166-75",
-                                        "type": "determiner",
-                                        "value": "$THE"
-                                      },
-                                      "$COMMON_NAME": {
-                                        "id": "id-16f156a8166-76",
-                                        "type": "common_name",
-                                        "value": "cabin"
+                                      "$COMMON_NOUN": {
+                                        "id": "id-16f156a8166-77",
+                                        "type": "common_noun",
+                                        "value": {
+                                          "$DETERMINER": {
+                                            "id": "id-16f156a8166-75",
+                                            "type": "determiner",
+                                            "value": "$THE"
+                                          },
+                                          "$COMMON_NAME": {
+                                            "id": "id-16f156a8166-76",
+                                            "type": "common_name",
+                                            "value": "cabin"
+                                          }
+                                        }
                                       }
                                     }
                                   }
+                                ],
+                                "$ARE_BEING": {
+                                  "id": "id-16f15d108e6-0",
+                                  "type": "are_being",
+                                  "value": "$IS"
                                 }
-                              ],
-                              "$ARE_BEING": {
-                                "id": "id-16f15d108e6-0",
-                                "type": "are_being",
-                                "value": "$IS"
                               }
                             }
                           }
@@ -530,18 +564,20 @@ var Blob = `{
                         "id": "id-16f165d636d-2",
                         "type": "noun",
                         "value": {
-                          "id": "id-16f165d636d-8",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f165d636d-6",
-                              "type": "determiner",
-                              "value": "$THE"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "id-16f165d636d-7",
-                              "type": "common_name",
-                              "value": "bench"
+                          "$COMMON_NOUN": {
+                            "id": "id-16f165d636d-8",
+                            "type": "common_noun",
+                            "value": {
+                              "$DETERMINER": {
+                                "id": "id-16f165d636d-6",
+                                "type": "determiner",
+                                "value": "$THE"
+                              },
+                              "$COMMON_NAME": {
+                                "id": "id-16f165d636d-7",
+                                "type": "common_name",
+                                "value": "bench"
+                              }
                             }
                           }
                         }
@@ -557,18 +593,20 @@ var Blob = `{
                         "id": "id-16f165d636d-4",
                         "type": "noun",
                         "value": {
-                          "id": "id-16f165d636d-11",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f165d636d-9",
-                              "type": "determiner",
-                              "value": "some"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "id-16f165d636d-10",
-                              "type": "common_name",
-                              "value": "blue vinyl cushions"
+                          "$COMMON_NOUN": {
+                            "id": "id-16f165d636d-11",
+                            "type": "common_noun",
+                            "value": {
+                              "$DETERMINER": {
+                                "id": "id-16f165d636d-9",
+                                "type": "determiner",
+                                "value": "some"
+                              },
+                              "$COMMON_NAME": {
+                                "id": "id-16f165d636d-10",
+                                "type": "common_name",
+                                "value": "blue vinyl cushions"
+                              }
                             }
                           }
                         }
@@ -593,18 +631,20 @@ var Blob = `{
                             "id": "id-16f165d636d-13",
                             "type": "noun",
                             "value": {
-                              "id": "id-16f165d636d-19",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f165d636d-17",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f165d636d-18",
-                                  "type": "common_name",
-                                  "value": "bench"
+                              "$COMMON_NOUN": {
+                                "id": "id-16f165d636d-19",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-16f165d636d-17",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-16f165d636d-18",
+                                    "type": "common_name",
+                                    "value": "bench"
+                                  }
                                 }
                               }
                             }
@@ -614,26 +654,28 @@ var Blob = `{
                           "id": "id-16f165d636d-14",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id-16f165d636d-22",
-                            "type": "noun_attrs",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f165d636d-20",
-                                "type": "are_being",
-                                "value": "$IS"
-                              },
-                              "$ATTRIBUTE": [
-                                {
-                                  "id": "id-16f165d636d-21",
-                                  "type": "attribute",
-                                  "value": "enterable"
+                            "$NOUN_ATTRS": {
+                              "id": "id-16f165d636d-22",
+                              "type": "noun_attrs",
+                              "value": {
+                                "$ARE_BEING": {
+                                  "id": "id-16f165d636d-20",
+                                  "type": "are_being",
+                                  "value": "$IS"
                                 },
-                                {
-                                  "id": "id-16f165d636d-23",
-                                  "type": "attribute",
-                                  "value": "scenery"
-                                }
-                              ]
+                                "$ATTRIBUTE": [
+                                  {
+                                    "id": "id-16f165d636d-21",
+                                    "type": "trait",
+                                    "value": "enterable"
+                                  },
+                                  {
+                                    "id": "id-16f165d636d-23",
+                                    "type": "trait",
+                                    "value": "scenery"
+                                  }
+                                ]
+                              }
                             }
                           }
                         }
@@ -658,18 +700,20 @@ var Blob = `{
                             "id": "id-16f165d636d-30",
                             "type": "noun",
                             "value": {
-                              "id": "id-16f165d636d-36",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f165d636d-34",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f165d636d-35",
-                                  "type": "common_name",
-                                  "value": "cushions"
+                              "$COMMON_NOUN": {
+                                "id": "id-16f165d636d-36",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-16f165d636d-34",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-16f165d636d-35",
+                                    "type": "common_name",
+                                    "value": "cushions"
+                                  }
                                 }
                               }
                             }
@@ -679,21 +723,23 @@ var Blob = `{
                           "id": "id-16f165d636d-31",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id-16f165d636d-39",
-                            "type": "noun_attrs",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f165d636d-37",
-                                "type": "are_being",
-                                "value": "$ARE"
-                              },
-                              "$ATTRIBUTE": [
-                                {
-                                  "id": "id-16f165d636d-38",
-                                  "type": "attribute",
-                                  "value": "scenery"
-                                }
-                              ]
+                              "$NOUN_ATTRS": {
+                              "id": "id-16f165d636d-39",
+                              "type": "noun_attrs",
+                              "value": {
+                                "$ARE_BEING": {
+                                  "id": "id-16f165d636d-37",
+                                  "type": "are_being",
+                                  "value": "$ARE"
+                                },
+                                "$ATTRIBUTE": [
+                                  {
+                                    "id": "id-16f165d636d-38",
+                                    "type": "trait",
+                                    "value": "scenery"
+                                  }
+                                ]
+                              }
                             }
                           }
                         }

@@ -25,9 +25,8 @@ func TestImportStory(t *testing.T) {
 		} else if ok := in.Has(itemType, "story"); !ok {
 			t.Fatal("read story")
 		} else {
-			k := NewImporter(t.Name(), db, generators)
-			//
-			if e := k.parseItem(in); e != nil {
+			k := NewImporter(t.Name(), db)
+			if e := imp_story(k, in); e != nil {
 				t.Fatal(e)
 			}
 			// if b, e := json.MarshalIndent(genq.Tables, "", "  "); e != nil {

@@ -38,7 +38,7 @@ function directiveTests() {
         }
       }
     });
-    test(make.run("attributes", "{one or more attributes%ATTR*attribute}",
+    test(make.run("attributes", "{one or more attributes%ATTR*trait}",
                   "a list of states describing a noun"), {
       name: "attributes",
       desc: "a list of states describing a noun",
@@ -48,23 +48,23 @@ function directiveTests() {
         params: {
           "$ATTR": {
             label: "one or more attributes",
-            type: "attribute",
+            type: "trait",
             optional: true,
             repeats: true
           }
         }
       }
     });
-    test(make.str("attribute",
+    test(make.str("trait",
       "a state describing a noun"), {
-      name: "attribute",
+      name: "trait",
       desc: "a state describing a noun",
       uses: "str",
       with: {
         tokens: ["$ATTRIBUTE"],
         params: {
           "$ATTRIBUTE": {
-            label: "attribute",
+            label: "trait",
             value: null,
           }
         }

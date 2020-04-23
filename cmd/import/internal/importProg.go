@@ -19,8 +19,8 @@ const (
 )
 
 func ImportStory(src string, in reader.Map, db *sql.DB) error {
-	p := NewImporter(src, db, generators)
-	return p.parseItem(in)
+	k := NewImporter(src, db)
+	return imp_story(k, in)
 }
 
 type typeMap map[string]composer.Specification
