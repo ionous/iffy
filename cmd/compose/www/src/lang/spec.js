@@ -130,7 +130,7 @@ const spec = [
     ],
     "name": "bool_value",
     "uses": "run",
-    "spec": "{bool:bool_eval}",
+    "spec": "{bool|quote}",
     "with": {
       "params": {
         "$BOOL": {
