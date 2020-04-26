@@ -43,8 +43,8 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
 
 
   make.group("Patterns", function() {
-     make.run("pattern_decl", "story_statement",
-       "The pattern {pattern_name|quote} determines {pattern_type}. {?pattern_variables_tail}",
+    make.run("pattern_decl", "story_statement",
+       "The pattern {name:pattern_name|quote} determines {type:pattern_type}. {optvars?pattern_variables_tail}",
        `Declare a pattern: A pattern is a bundle of functions which can either change the game world or provide information about it.
   Each function in a given pattern has "guards" which determine whether the function applies in a particular situtation.`
      );
@@ -53,13 +53,32 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
       "The pattern {pattern_name|quote} uses {+variable_decl|comma-and}.",
        `Declare pattern variables: Storage for values used during the execution of a pattern.`);
 
-     make.run("pattern_variables_tail", "It uses {+variable_decl|comma-and}.",
+    make.run("pattern_variables_tail", "It uses {+variable_decl|comma-and}.",
        `Pattern variables: Storage for values used during the execution of a pattern.`);
 
-     make.opt("pattern_type", "an {activity:pattern_activity} or a {value:variable_type}");
-     make.str("pattern_activity", "{activity}");
-     make.str("pattern_name");
-   });
+    make.opt("pattern_type", "an {activity:patterned_activity} or a {value:variable_type}");
+    make.str("patterned_activity", "{activity}");
+    make.str("pattern_name");
+
+    // pattern handler
+    // similar to pattern_type, but with statements hooks instead of type declarations
+    make.run("pattern_handler", "story_statement",
+      "To determine the pattern named {name:pattern_name} {when filters%filters+bool_eval} {handler:pattern_hook}",
+      "Pattern Handler: Actions to take when a pattern gets used."
+      );
+
+    make.opt("pattern_hook", "run an {activity%pattern_activity} or return a {result%pattern_return}");
+
+    // fix? pattern_activity and pattern_return both exist for the sake of appearance only.
+    make.run("pattern_activity", "run: {activity:execute}");
+    make.run("pattern_return", "return {result:pattern_result}");
+
+    make.opt("pattern_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
+
+    make.opt("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}");
+
+    make.run("object_func", "an object named {name%text_eval}");
+  });
 
   make.group("Relations", function() {
     make.run("noun_relation",  "{?are_being} {relation} {+noun|comma-and}");
@@ -87,8 +106,12 @@ For example: animals, containers, etc.`);
   });
 
   make.group("Variables", function() {
-    make.run("variable_decl", "{variable_type} ( called {variable_name|quote} )");
+    make.run("variable_decl", "{type:variable_type} ( called {name:variable_name|quote} )");
     make.str("variable_name");
+
+    make.opt("variable_type", "a {simple value%primitive:primitive_type} or an {object:object_type}");
+    make.run("object_type",  "{an} {kind of%kinds:plural_kinds} object");
+
   });
 
   make.group("Traits", function() {
