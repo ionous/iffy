@@ -43,7 +43,7 @@ class Make {
     } else {
       // for backwards compat with directiveTests; check that c had text before assigning tags
       const secondTags= TagParser.parse(c);
-      if (c && !Object.keys(secondTags.args).length) {
+      if (!d && c && !Object.keys(secondTags.args).length) {
         tags= firstTags;
         desc= c;
       } else {

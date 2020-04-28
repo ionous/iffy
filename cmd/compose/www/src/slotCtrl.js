@@ -32,7 +32,7 @@ Vue.component('mk-slot-ctrl', {
     labelTypes() {
       const ret= {};
       const { node }= this;
-
+      // get all of the slats that fit into this slot.
       const slats= Types.slats(this.slotType);
       if (slats) {
         for ( const type of slats ) {

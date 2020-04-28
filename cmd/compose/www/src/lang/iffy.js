@@ -63,7 +63,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     // pattern handler
     // similar to pattern_type, but with statements hooks instead of type declarations
     make.run("pattern_handler", "story_statement",
-      "To determine the pattern named {name:pattern_name} {when filters%filters+bool_eval} {handler:pattern_hook}",
+      "To determine the pattern {name:pattern_name|quote} when {filters%filters+bool_eval} {handler:pattern_hook}",
       "Pattern Handler: Actions to take when a pattern gets used."
       );
 
@@ -155,8 +155,6 @@ For example: animals, containers, etc.`);
     make.str("property_name");
   });
 
-
-
   // primitive types
   make.group("Primitive Types", function() {
     make.run("primitive_phrase", "{primitive_type} called {property_name}");
@@ -186,11 +184,6 @@ See also: text.`);
     make.str("an", "{a} or {an}");
     make.str("are_being",  "{are} or {is}");
     make.str("are_an",  "{are}, {are a%area}, {are an%arean}, {is}, {is a%isa}, {is an%isan}");
-  });
-
-  make.group("Testing", function() {
-    make.run("test", "story_statement",
-      "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.");
   });
 }
 

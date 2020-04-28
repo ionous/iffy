@@ -26,16 +26,6 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "Object Lists: Statements which return a list of existing objects.",
-    "name": "obj_list_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Objects: Statements which return an existing object.",
-    "name": "object_eval",
-    "uses": "slot"
-  },
-  {
     "desc": "Texts: Statements which return text.",
     "name": "text_eval",
     "uses": "slot"
@@ -94,7 +84,35 @@ const spec = [
     }
   },
   {
-    "desc": "Bool Value: specifies an explicit true/false value.",
+    "desc": "Greater Than or Equal To: The first value is larger than the second value.",
+    "group": [
+      "comparison"
+    ],
+    "name": "at_least",
+    "spec": "\u003e=",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "compare_to"
+      ]
+    }
+  },
+  {
+    "desc": "Less Than or Equal To: The first value is larger than the second value.",
+    "group": [
+      "comparison"
+    ],
+    "name": "at_most",
+    "spec": "\u003c=",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "compare_to"
+      ]
+    }
+  },
+  {
+    "desc": "Bool Value: specify an explicit true or false value.",
     "group": [
       "literals"
     ],
@@ -102,54 +120,63 @@ const spec = [
     "spec": "{bool|quote}",
     "uses": "run",
     "with": {
-      "params": {
-        "$BOOL": {
-          "label": "bool",
-          "type": "bool"
-        }
-      },
       "slots": [
         "bool_eval"
-      ],
-      "tokens": [
-        "bool value",
-        "$BOOL"
       ]
     }
   },
   {
-    "desc": "Branch: execute a single block of statements based on a boolean test.",
+    "desc": "Bracket text: Sandwiches text printed during a block and puts them inside parenthesis '()'.",
     "group": [
-      "exec"
+      "printing"
     ],
-    "name": "choose",
-    "spec": "if {choose%if:bool_eval} then: {true*execute|ghost} else: {false*execute|ghost}",
+    "name": "bracket_text",
     "uses": "run",
     "with": {
       "params": {
-        "$FALSE": {
-          "label": "false",
-          "repeats": true,
-          "type": "execute"
-        },
-        "$IF": {
-          "label": "if",
-          "type": "bool_eval"
-        },
-        "$TRUE": {
-          "label": "true",
-          "repeats": true,
+        "$BLOCK": {
+          "label": "block",
           "type": "execute"
         }
       },
       "slots": [
-        "execute"
+        "text_eval"
       ],
       "tokens": [
-        "choose",
-        "$IF",
-        "$TRUE",
-        "$FALSE"
+        "bracket",
+        "$BLOCK"
+      ]
+    }
+  },
+  {
+    "group": [
+      "printing"
+    ],
+    "name": "buffer_text",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$BLOCK": {
+          "label": "block",
+          "type": "execute"
+        }
+      },
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "buffer",
+        "$BLOCK"
+      ]
+    }
+  },
+  {
+    "name": "choose",
+    "spec": "if {choose%if:bool_eval} then: {true?execute|ghost} else: {false?execute|ghost}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "execute"
       ]
     }
   },
@@ -220,6 +247,52 @@ const spec = [
     }
   },
   {
+    "desc": "Kind Of: Friendly name of the object's class.",
+    "group": [
+      "objects"
+    ],
+    "name": "class_name",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        }
+      },
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "kind of",
+        "$OBJ"
+      ]
+    }
+  },
+  {
+    "desc": "List text: Separates words with commas, and 'and'.",
+    "group": [
+      "printing"
+    ],
+    "name": "comma_text",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$BLOCK": {
+          "label": "block",
+          "type": "execute"
+        }
+      },
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "commas",
+        "$BLOCK"
+      ]
+    }
+  },
+  {
     "desc": "Compare Numbers: True if eq,ne,gt,lt,ge,le two numbers.",
     "group": [
       "logic"
@@ -228,28 +301,8 @@ const spec = [
     "spec": "{a:number_eval} {is:compare_to} {b:number_eval}",
     "uses": "run",
     "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        },
-        "$IS": {
-          "label": "is",
-          "type": "compare_to"
-        }
-      },
       "slots": [
         "bool_eval"
-      ],
-      "tokens": [
-        "compare num",
-        "$A",
-        "$IS",
-        "$B"
       ]
     }
   },
@@ -259,30 +312,11 @@ const spec = [
       "logic"
     ],
     "name": "compare_text",
+    "spec": "{a:text_eval} {is:compare_to} {b:text_eval}",
     "uses": "run",
     "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "text_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "text_eval"
-        },
-        "$IS": {
-          "label": "is",
-          "type": "compare_to"
-        }
-      },
       "slots": [
         "bool_eval"
-      ],
-      "tokens": [
-        "compare text",
-        "$A",
-        "$IS",
-        "$B"
       ]
     }
   },
@@ -295,14 +329,14 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$ID": {
-          "label": "id",
-          "type": "text"
-        },
-        "$VALUES": {
-          "label": "values",
+        "$ELEMS": {
+          "label": "elems",
           "repeats": true,
           "type": "text_eval"
+        },
+        "$TGT": {
+          "label": "tgt",
+          "type": "text"
         }
       },
       "slots": [
@@ -310,8 +344,8 @@ const spec = [
       ],
       "tokens": [
         "cycle text",
-        "$ID",
-        "$VALUES"
+        "$TGT",
+        "$ELEMS"
       ]
     }
   },
@@ -321,27 +355,11 @@ const spec = [
       "math"
     ],
     "name": "diff_of",
+    "spec": "( {a:number_eval} - {b:number_eval} )",
     "uses": "run",
     "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        }
-      },
       "slots": [
         "number_eval"
-      ],
-      "tokens": [
-        "(",
-        "$A",
-        "-",
-        "$B",
-        ")"
       ]
     }
   },
@@ -363,30 +381,39 @@ const spec = [
     }
   },
   {
-    "desc": "Filter Object List: A list of objects which pass the evaluation.",
+    "desc": "Equal: Two values exactly match.",
+    "group": [
+      "comparison"
+    ],
+    "name": "equal",
+    "spec": "=",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "compare_to"
+      ]
+    }
+  },
+  {
+    "desc": "Exists: True if the named object exists.",
     "group": [
       "objects"
     ],
-    "name": "filter",
+    "name": "exists",
     "uses": "run",
     "with": {
       "params": {
-        "$ACCEPT": {
-          "label": "accept",
-          "type": "bool_eval"
-        },
-        "$LIST": {
-          "label": "list",
-          "type": "obj_list_eval"
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
         }
       },
       "slots": [
-        "obj_list_eval"
+        "bool_eval"
       ],
       "tokens": [
-        "filter",
-        "$LIST",
-        "$ACCEPT"
+        "exists",
+        "$OBJ"
       ]
     }
   },
@@ -401,12 +428,10 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
-          "repeats": true,
           "type": "execute"
         },
         "$GO": {
           "label": "go",
-          "repeats": true,
           "type": "execute"
         },
         "$IN": {
@@ -426,41 +451,6 @@ const spec = [
     }
   },
   {
-    "desc": "For Each Object: Loops over the passed list of objects, or runs the 'else' statement if empty.",
-    "group": [
-      "exec"
-    ],
-    "name": "for_each_obj",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$ELSE": {
-          "label": "else",
-          "repeats": true,
-          "type": "execute"
-        },
-        "$GO": {
-          "label": "go",
-          "repeats": true,
-          "type": "execute"
-        },
-        "$IN": {
-          "label": "in",
-          "type": "obj_list_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "for each obj",
-        "$IN",
-        "$GO",
-        "$ELSE"
-      ]
-    }
-  },
-  {
     "desc": "For Each Text: Loops over the passed list of text, or runs the 'else' statement if empty.",
     "group": [
       "exec"
@@ -471,12 +461,10 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
-          "repeats": true,
           "type": "execute"
         },
         "$GO": {
           "label": "go",
-          "repeats": true,
           "type": "execute"
         },
         "$IN": {
@@ -496,37 +484,52 @@ const spec = [
     }
   },
   {
-    "desc": "Get Property: Return the value of an object's property.",
+    "desc": "Get Field: Return the value of the named object property.",
     "group": [
       "objects"
     ],
-    "name": "get",
+    "name": "get_field",
+    "spec": "{the object%obj:text_eval}'s {field:text_eval}",
     "uses": "run",
     "with": {
-      "params": {
-        "$OBJ": {
-          "label": "obj",
-          "type": "object_eval"
-        },
-        "$PROP": {
-          "label": "prop",
-          "type": "text"
-        }
-      },
       "slots": [
         "bool_eval",
+        "num_list_eval",
         "number_eval",
         "text_eval",
-        "object_eval",
+        "text_list_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Get Variable: Return the value of the named variable.",
+    "group": [
+      "variables"
+    ],
+    "name": "get_var",
+    "spec": "the variable {name:text|quote}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval",
         "num_list_eval",
-        "text_list_eval",
-        "obj_list_eval"
-      ],
-      "tokens": [
-        "Get",
-        "$PROP",
-        "of",
-        "$OBJ"
+        "number_eval",
+        "text_eval",
+        "text_list_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Greater Than: The first value is larger than the second value.",
+    "group": [
+      "comparison"
+    ],
+    "name": "greater_than",
+    "spec": "\u003e",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "compare_to"
       ]
     }
   },
@@ -564,28 +567,11 @@ const spec = [
       "objects"
     ],
     "name": "is_class",
+    "spec": "Is $OBJ a kind of $CLASS",
     "uses": "run",
     "with": {
-      "params": {
-        "$CLASS": {
-          "label": "class",
-          "type": "text"
-        },
-        "$OBJ": {
-          "label": "obj",
-          "type": "object_eval"
-        }
-      },
       "slots": [
         "bool_eval"
-      ],
-      "tokens": [
-        "Is",
-        "$OBJ",
-        "a",
-        "kind",
-        "of",
-        "$CLASS"
       ]
     }
   },
@@ -621,22 +607,22 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$CLASS": {
-          "label": "class",
-          "type": "text"
+        "$KIND": {
+          "label": "kind",
+          "type": "text_eval"
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_eval"
+          "type": "text_eval"
         }
       },
       "slots": [
         "bool_eval"
       ],
       "tokens": [
-        "is exact class",
+        "is exact kind of",
         "$OBJ",
-        "$CLASS"
+        "$KIND"
       ]
     }
   },
@@ -649,8 +635,8 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$BOOL_EVAL": {
-          "label": "bool eval",
+        "$TEST": {
+          "label": "test",
           "type": "bool_eval"
         }
       },
@@ -659,7 +645,30 @@ const spec = [
       ],
       "tokens": [
         "is not",
-        "$BOOL_EVAL"
+        "$TEST"
+      ]
+    }
+  },
+  {
+    "desc": "Is True: Transparently returns the result of a boolean expression.",
+    "group": [
+      "logic"
+    ],
+    "name": "is_true",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$TEST": {
+          "label": "test",
+          "type": "bool_eval"
+        }
+      },
+      "slots": [
+        "bool_eval"
+      ],
+      "tokens": [
+        "is",
+        "$TEST"
       ]
     }
   },
@@ -672,9 +681,12 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$TEXT": {
-          "label": "text",
-          "repeats": true,
+        "$ELEMS": {
+          "label": "elems",
+          "type": "text_list_eval"
+        },
+        "$SEP": {
+          "label": "sep",
           "type": "text_eval"
         }
       },
@@ -683,68 +695,22 @@ const spec = [
       ],
       "tokens": [
         "join",
-        "$TEXT"
+        "$ELEMS",
+        "$SEP"
       ]
     }
   },
   {
-    "desc": "Length of Object List: Number of objects.",
+    "desc": "Less han: The first value is less than the second value.",
     "group": [
-      "objects"
+      "comparison"
     ],
-    "name": "len",
+    "name": "less_than",
+    "spec": "\u003c",
     "uses": "run",
     "with": {
-      "params": {
-        "$LIST": {
-          "label": "list",
-          "type": "obj_list_eval"
-        }
-      },
       "slots": [
-        "number_eval"
-      ],
-      "tokens": [
-        "len",
-        "$LIST"
-      ]
-    }
-  },
-  {
-    "desc": "List Up: Generates a list of objects.",
-    "group": [
-      "objects"
-    ],
-    "name": "list_up",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$ALLOW_DUPLICATES": {
-          "label": "allow duplicates",
-          "type": "bool"
-        },
-        "$MAX_OBJECTS": {
-          "label": "max objects",
-          "type": "number"
-        },
-        "$NEXT": {
-          "label": "next",
-          "type": "object_eval"
-        },
-        "$SOURCE": {
-          "label": "source",
-          "type": "object_eval"
-        }
-      },
-      "slots": [
-        "obj_list_eval"
-      ],
-      "tokens": [
-        "list up",
-        "$SOURCE",
-        "$NEXT",
-        "$ALLOW_DUPLICATES",
-        "$MAX_OBJECTS"
+        "compare_to"
       ]
     }
   },
@@ -757,18 +723,31 @@ const spec = [
     "spec": "{num:number}",
     "uses": "run",
     "with": {
+      "slots": [
+        "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Length of Number List: Determines the number of elements in a list of numbers.",
+    "group": [
+      "format"
+    ],
+    "name": "number_list_count",
+    "uses": "run",
+    "with": {
       "params": {
-        "$NUM": {
-          "label": "num",
-          "type": "number"
+        "$ELEMS": {
+          "label": "elems",
+          "type": "num_list_eval"
         }
       },
       "slots": [
         "number_eval"
       ],
       "tokens": [
-        "num value",
-        "$NUM"
+        "len of numbers",
+        "$ELEMS"
       ]
     }
   },
@@ -784,7 +763,7 @@ const spec = [
         "$VALUES": {
           "label": "values",
           "repeats": true,
-          "type": "float64"
+          "type": "number"
         }
       },
       "slots": [
@@ -797,104 +776,9 @@ const spec = [
     }
   },
   {
-    "desc": "Named Object: Searches through the scope for a matching name.",
+    "desc": "Num as text: Writes a number using numerals, eg. '1'.",
     "group": [
-      "objects"
-    ],
-    "name": "object_name",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        }
-      },
-      "slots": [
-        "object_eval"
-      ],
-      "tokens": [
-        "object name",
-        "$NAME"
-      ]
-    }
-  },
-  {
-    "desc": "Object List: Searches through the scope for matching names.",
-    "group": [
-      "objects"
-    ],
-    "name": "object_names",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAMES": {
-          "label": "names",
-          "repeats": true,
-          "type": "string"
-        }
-      },
-      "slots": [
-        "obj_list_eval"
-      ],
-      "tokens": [
-        "object names",
-        "$NAMES"
-      ]
-    }
-  },
-  {
-    "desc": "Pluralize: Creates plural text from the passed (presumably singular) text.",
-    "group": [
-      "format"
-    ],
-    "name": "pluralize",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$TEXT": {
-          "label": "text",
-          "type": "text_eval"
-        }
-      },
-      "slots": [
-        "text_eval"
-      ],
-      "tokens": [
-        "pluralize",
-        "$TEXT"
-      ]
-    }
-  },
-  {
-    "desc": "Say List: Writes words separated with commas, ending with an 'and'.",
-    "group": [
-      "format"
-    ],
-    "name": "print_list",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$BLOCK": {
-          "label": "block",
-          "repeats": true,
-          "type": "execute"
-        }
-      },
-      "slots": [
-        "execute",
-        "text_eval"
-      ],
-      "tokens": [
-        "print list",
-        "$BLOCK"
-      ]
-    }
-  },
-  {
-    "desc": "Say Number: Writes a number using numerals, eg. '1'.",
-    "group": [
-      "format"
+      "printing"
     ],
     "name": "print_num",
     "uses": "run",
@@ -906,7 +790,6 @@ const spec = [
         }
       },
       "slots": [
-        "execute",
         "text_eval"
       ],
       "tokens": [
@@ -916,27 +799,25 @@ const spec = [
     }
   },
   {
-    "desc": "Say Span: Writes text with spaces between words.",
+    "desc": "Num in words: Writes a number in plain english: eg. 'one'",
     "group": [
-      "format"
+      "printing"
     ],
-    "name": "print_span",
+    "name": "print_num_word",
     "uses": "run",
     "with": {
       "params": {
-        "$BLOCK": {
-          "label": "block",
-          "repeats": true,
-          "type": "execute"
+        "$NUM": {
+          "label": "num",
+          "type": "number_eval"
         }
       },
       "slots": [
-        "execute",
         "text_eval"
       ],
       "tokens": [
-        "print span",
-        "$BLOCK"
+        "print num word",
+        "$NUM"
       ]
     }
   },
@@ -946,27 +827,11 @@ const spec = [
       "math"
     ],
     "name": "product_of",
+    "spec": "( {a:number_eval} * {b:number_eval} )",
     "uses": "run",
     "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        }
-      },
       "slots": [
         "number_eval"
-      ],
-      "tokens": [
-        "(",
-        "$A",
-        "*",
-        "$B",
-        ")"
       ]
     }
   },
@@ -976,50 +841,34 @@ const spec = [
       "math"
     ],
     "name": "quotient_of",
+    "spec": "( {a:number_eval} / {b:number_eval} )",
     "uses": "run",
     "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        }
-      },
       "slots": [
         "number_eval"
-      ],
-      "tokens": [
-        "(",
-        "$A",
-        "/",
-        "$B",
-        ")"
       ]
     }
   },
   {
-    "desc": "Range of Numbers: Generates a series of numbers.",
+    "desc": "Range of numbers: Generates a series of numbers.",
     "group": [
       "flow"
     ],
-    "name": "range",
+    "name": "range_over",
     "uses": "run",
     "with": {
       "params": {
-        "$END": {
-          "label": "end",
-          "type": "number"
-        },
         "$START": {
           "label": "start",
-          "type": "number"
+          "type": "number_eval"
         },
         "$STEP": {
           "label": "step",
-          "type": "number"
+          "type": "number_eval"
+        },
+        "$STOP": {
+          "label": "stop",
+          "type": "number_eval"
         }
       },
       "slots": [
@@ -1028,64 +877,8 @@ const spec = [
       "tokens": [
         "range",
         "$START",
-        "$END",
+        "$STOP",
         "$STEP"
-      ]
-    }
-  },
-  {
-    "desc": "Related List: Returns a stream of objects related to the requested object.",
-    "group": [
-      "objects"
-    ],
-    "name": "related_list",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$OBJECT": {
-          "label": "object",
-          "type": "object_eval"
-        },
-        "$RELATION": {
-          "label": "relation",
-          "type": "text"
-        }
-      },
-      "slots": [
-        "obj_list_eval"
-      ],
-      "tokens": [
-        "related list",
-        "$RELATION",
-        "$OBJECT"
-      ]
-    }
-  },
-  {
-    "desc": "Is Relation Empty: Returns true if the requested object has no related objects.",
-    "group": [
-      "objects"
-    ],
-    "name": "relation_empty",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$OBJECT": {
-          "label": "object",
-          "type": "object_eval"
-        },
-        "$RELATION": {
-          "label": "relation",
-          "type": "text"
-        }
-      },
-      "slots": [
-        "bool_eval"
-      ],
-      "tokens": [
-        "relation empty",
-        "$RELATION",
-        "$OBJECT"
       ]
     }
   },
@@ -1095,59 +888,20 @@ const spec = [
       "math"
     ],
     "name": "remainder_of",
+    "spec": "( {a:number_eval} % {b:number_eval} )",
     "uses": "run",
     "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        }
-      },
       "slots": [
         "number_eval"
-      ],
-      "tokens": [
-        "(",
-        "$A",
-        "%",
-        "$B",
-        ")"
       ]
     }
   },
   {
-    "desc": "Reverse Object List: returns the listed objects, last first.",
+    "desc": "Say: print some bit of text to the player.",
     "group": [
-      "objects"
+      "printing"
     ],
-    "name": "reverse",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$LIST": {
-          "label": "list",
-          "type": "obj_list_eval"
-        }
-      },
-      "slots": [
-        "obj_list_eval"
-      ],
-      "tokens": [
-        "reverse",
-        "$LIST"
-      ]
-    }
-  },
-  {
-    "desc": "Say: writes a piece of text.",
-    "group": [
-      "format"
-    ],
-    "name": "say",
+    "name": "say_text",
     "uses": "run",
     "with": {
       "params": {
@@ -1166,21 +920,17 @@ const spec = [
     }
   },
   {
-    "desc": "Set Bool: Sets the named property to the passed boolean value.",
+    "desc": "Set Boolean Variable: Sets the named variable to the passed boolean value.",
     "group": [
-      "objects"
+      "variables"
     ],
-    "name": "set_bool",
+    "name": "set_bool_var",
     "uses": "run",
     "with": {
       "params": {
-        "$OBJ": {
-          "label": "obj",
-          "type": "object_eval"
-        },
-        "$PROP": {
-          "label": "prop",
-          "type": "text"
+        "$NAME": {
+          "label": "name",
+          "type": "text_eval"
         },
         "$VAL": {
           "label": "val",
@@ -1191,29 +941,61 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "set bool",
-        "$OBJ",
-        "$PROP",
+        "set var bool",
+        "$NAME",
         "$VAL"
       ]
     }
   },
   {
-    "desc": "Set Number: sets the named property to the passed number.",
+    "desc": "Set Boolean Field: Sets the named field to the passed boolean value.",
     "group": [
       "objects"
     ],
-    "name": "set_num",
+    "name": "set_field_bool",
     "uses": "run",
     "with": {
       "params": {
+        "$FIELD": {
+          "label": "field",
+          "type": "text_eval"
+        },
         "$OBJ": {
           "label": "obj",
-          "type": "object_eval"
+          "type": "text_eval"
         },
-        "$PROP": {
-          "label": "prop",
-          "type": "text"
+        "$VAL": {
+          "label": "val",
+          "type": "bool_eval"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "set field bool",
+        "$OBJ",
+        "$FIELD",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Set Number Field: Sets the named field to the passed number.",
+    "group": [
+      "objects"
+    ],
+    "name": "set_field_num",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$FIELD": {
+          "label": "field",
+          "type": "text_eval"
+        },
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
         },
         "$VAL": {
           "label": "val",
@@ -1224,90 +1006,62 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "set num",
+        "set field num",
         "$OBJ",
-        "$PROP",
+        "$FIELD",
         "$VAL"
       ]
     }
   },
   {
-    "desc": "Set Object: Sets the named property to the passed object ( reference. )",
+    "desc": "Set Number List Field: Sets the named field to the passed number list.",
     "group": [
       "objects"
     ],
-    "name": "set_obj",
+    "name": "set_field_num_list",
     "uses": "run",
     "with": {
       "params": {
+        "$FIELD": {
+          "label": "field",
+          "type": "text_eval"
+        },
         "$OBJ": {
           "label": "obj",
-          "type": "object_eval"
+          "type": "text_eval"
         },
-        "$PROP": {
-          "label": "prop",
-          "type": "text"
-        },
-        "$VAL": {
-          "label": "val",
-          "type": "object_eval"
+        "$VALS": {
+          "label": "vals",
+          "type": "num_list_eval"
         }
       },
       "slots": [
         "execute"
       ],
       "tokens": [
-        "set obj",
+        "set field num list",
         "$OBJ",
-        "$PROP",
-        "$VAL"
+        "$FIELD",
+        "$VALS"
       ]
     }
   },
   {
-    "desc": "Set State: Sets the object to the passed state.",
+    "desc": "Set Text Field: Sets the named field to the passed text value.",
     "group": [
       "objects"
     ],
-    "name": "set_state",
+    "name": "set_field_text",
     "uses": "run",
     "with": {
       "params": {
-        "$REF": {
-          "label": "ref",
-          "type": "object_eval"
+        "$FIELD": {
+          "label": "field",
+          "type": "text_eval"
         },
-        "$STATE": {
-          "label": "state",
-          "type": "text"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set state",
-        "$REF",
-        "$STATE"
-      ]
-    }
-  },
-  {
-    "desc": "Set Text: Sets the named property to the passed string.",
-    "group": [
-      "objects"
-    ],
-    "name": "set_text",
-    "uses": "run",
-    "with": {
-      "params": {
         "$OBJ": {
           "label": "obj",
-          "type": "object_eval"
-        },
-        "$PROP": {
-          "label": "prop",
-          "type": "text"
+          "type": "text_eval"
         },
         "$VAL": {
           "label": "val",
@@ -1318,9 +1072,154 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "set text",
+        "set field text",
         "$OBJ",
-        "$PROP",
+        "$FIELD",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Set Text List Field: Sets the named field to the passed text list.",
+    "group": [
+      "objects"
+    ],
+    "name": "set_field_text_list",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$FIELD": {
+          "label": "field",
+          "type": "text_eval"
+        },
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        },
+        "$VALS": {
+          "label": "vals",
+          "type": "text_list_eval"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "set field text list",
+        "$OBJ",
+        "$FIELD",
+        "$VALS"
+      ]
+    }
+  },
+  {
+    "desc": "Set Number List Variable: Sets the named variable to the passed number list.",
+    "group": [
+      "variables"
+    ],
+    "name": "set_num_list_var",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text_eval"
+        },
+        "$VALS": {
+          "label": "vals",
+          "type": "num_list_eval"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "set var num list",
+        "$NAME",
+        "$VALS"
+      ]
+    }
+  },
+  {
+    "desc": "Set Number Variable: Sets the named variable to the passed number.",
+    "group": [
+      "variables"
+    ],
+    "name": "set_num_var",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text_eval"
+        },
+        "$VAL": {
+          "label": "val",
+          "type": "number_eval"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "set var num",
+        "$NAME",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Set Text List Variable: Sets the named variable to the passed text list.",
+    "group": [
+      "variables"
+    ],
+    "name": "set_text_list_var",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text_eval"
+        },
+        "$VALS": {
+          "label": "vals",
+          "type": "text_list_eval"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "set var text list",
+        "$NAME",
+        "$VALS"
+      ]
+    }
+  },
+  {
+    "desc": "Set Text Variable: Sets the named variable to the passed piece of text.",
+    "group": [
+      "variables"
+    ],
+    "name": "set_text_var",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text_eval"
+        },
+        "$VAL": {
+          "label": "val",
+          "type": "text_eval"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "set var text",
+        "$NAME",
         "$VAL"
       ]
     }
@@ -1334,14 +1233,14 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$ID": {
-          "label": "id",
-          "type": "text"
-        },
-        "$VALUES": {
-          "label": "values",
+        "$ELEMS": {
+          "label": "elems",
           "repeats": true,
           "type": "text_eval"
+        },
+        "$TGT": {
+          "label": "tgt",
+          "type": "text"
         }
       },
       "slots": [
@@ -1349,8 +1248,54 @@ const spec = [
       ],
       "tokens": [
         "shuffle text",
-        "$ID",
-        "$VALUES"
+        "$TGT",
+        "$ELEMS"
+      ]
+    }
+  },
+  {
+    "desc": "Slash text: Separates words with left-leaning slashes '/'.",
+    "group": [
+      "printing"
+    ],
+    "name": "slash_text",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$BLOCK": {
+          "label": "block",
+          "type": "execute"
+        }
+      },
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "slash",
+        "$BLOCK"
+      ]
+    }
+  },
+  {
+    "desc": "Span Text: Writes text with spaces between words.",
+    "group": [
+      "printing"
+    ],
+    "name": "span_text",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$BLOCK": {
+          "label": "block",
+          "type": "execute"
+        }
+      },
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "span",
+        "$BLOCK"
       ]
     }
   },
@@ -1363,14 +1308,14 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$ID": {
-          "label": "id",
-          "type": "text"
-        },
-        "$VALUES": {
-          "label": "values",
+        "$ELEMS": {
+          "label": "elems",
           "repeats": true,
           "type": "text_eval"
+        },
+        "$TGT": {
+          "label": "tgt",
+          "type": "text"
         }
       },
       "slots": [
@@ -1378,8 +1323,8 @@ const spec = [
       ],
       "tokens": [
         "stopping text",
-        "$ID",
-        "$VALUES"
+        "$TGT",
+        "$ELEMS"
       ]
     }
   },
@@ -1389,32 +1334,53 @@ const spec = [
       "math"
     ],
     "name": "sum_of",
+    "spec": "( {a:number_eval} + {b:number_eval} )",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Test: Run some statements, and expect that their output matches a specific value.",
+    "group": [
+      "testing"
+    ],
+    "name": "test",
+    "spec": "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Length of Text List: Determines the number of text elements in a list.",
+    "group": [
+      "format"
+    ],
+    "name": "text_list_count",
     "uses": "run",
     "with": {
       "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
+        "$ELEMS": {
+          "label": "elems",
+          "type": "text_list_eval"
         }
       },
       "slots": [
         "number_eval"
       ],
       "tokens": [
-        "(",
-        "$A",
-        "+",
-        "$B",
-        ")"
+        "len of texts",
+        "$ELEMS"
       ]
     }
   },
   {
-    "desc": "Text Value: specifies a string value.",
+    "desc": "Text Value: specify one or more lines of text.",
     "group": [
       "literals"
     ],
@@ -1439,7 +1405,7 @@ const spec = [
         "$VALUES": {
           "label": "values",
           "repeats": true,
-          "type": "string"
+          "type": "text"
         }
       },
       "slots": [
@@ -1450,6 +1416,24 @@ const spec = [
         "$VALUES"
       ]
     }
+  },
+  {
+    "desc": "Not Equal To: Two values don't match exactly.",
+    "group": [
+      "comparison"
+    ],
+    "name": "unequal",
+    "spec": "\u003c\u003e",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "compare_to"
+      ]
+    }
+  },
+  {
+    "name": "comparison",
+    "uses": "group"
   },
   {
     "name": "cycle",
@@ -1484,7 +1468,19 @@ const spec = [
     "uses": "group"
   },
   {
+    "name": "printing",
+    "uses": "group"
+  },
+  {
     "name": "strings",
+    "uses": "group"
+  },
+  {
+    "name": "testing",
+    "uses": "group"
+  },
+  {
+    "name": "variables",
     "uses": "group"
   }
 ]
