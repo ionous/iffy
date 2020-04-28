@@ -13,18 +13,6 @@ type Slot struct {
 	Group string // display group(s)
 }
 
-// a work in progress for sure
-type Run struct {
-	Type  interface{} // nil instance, ex. (*core.CompareTo)(nil)
-	Group string      // display group(s)
-	Desc  string
-	Slots []string // FIX: really should always be based on implemented interface
-	//
-	Spec   string   // embedded pre-token string
-	Phrase string   // token string
-	Locals []string // FIX: names put into scope
-}
-
 var Slots = map[string]Slot{
 	"execute": {Type: (*rt.Execute)(nil),
 		Desc: "Execute: Run a series of statements."},
@@ -109,7 +97,7 @@ var Slats = []composer.Specification{
 	(*core.ShuffleText)(nil),
 	(*core.StoppingText)(nil),
 
-	// FIX: set any; with type picked during assembly
+	// FIX: set any; with the type picked during assembly
 	(*core.SetFieldBool)(nil),
 	(*core.SetFieldNum)(nil),
 	(*core.SetFieldText)(nil),
@@ -125,4 +113,10 @@ var Slats = []composer.Specification{
 	(*core.IsEmpty)(nil),
 	(*core.Includes)(nil),
 	(*core.Join)(nil),
+	(*core.EqualTo)(nil),
+	(*core.NotEqualTo)(nil),
+	(*core.GreaterThan)(nil),
+	(*core.LessThan)(nil),
+	(*core.GreaterOrEqual)(nil),
+	(*core.LessOrEqual)(nil),
 }

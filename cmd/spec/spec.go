@@ -25,6 +25,7 @@ import (
 // “slot”: eval slots, could either do this manually or generate.
 // “str”: handwaves. for enums.
 // “num”, “txt”: might? be useful for typedefs or triggered with tags.
+// go run spec.go > /Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/compose/www/src/lang/spec.js
 func main() {
 	var all []export.Dict
 	var slots []r.Type
@@ -89,7 +90,6 @@ func main() {
 				with["tokens"] = updateTokens(spec.Spec, tokens)
 			}
 			addDesc(out, spec.Desc)
-
 			groups.addGroup(out, spec.Group)
 			all = append(all, out)
 		}
