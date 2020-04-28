@@ -1,43 +1,8 @@
 /* generated using github.com/ionous/iffy/cmd/spec/spec.go */
 const spec = [
   {
-    "desc": "Execute: Run a series of statements.",
-    "name": "execute",
-    "uses": "slot"
-  },
-  {
     "desc": "Booleans: Statements which return true/false values.",
     "name": "bool_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Numbers: Statements which return a number.",
-    "name": "number_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Texts: Statements which return text.",
-    "name": "text_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Objects: Statements which return an existing object.",
-    "name": "object_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Number List: Statements which return a list of numbers.",
-    "name": "num_list_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Text Lists: Statements which return a list of text.",
-    "name": "text_list_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Object Lists: Statements which return a list of existing objects.",
-    "name": "obj_list_eval",
     "uses": "slot"
   },
   {
@@ -46,34 +11,39 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "Add Numbers: Add two numbers.",
-    "group": [
-      "math"
-    ],
-    "name": "sum_of",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        }
-      },
-      "slots": [
-        "number_eval"
-      ],
-      "tokens": [
-        "(",
-        "$A",
-        "+",
-        "$B",
-        ")"
-      ]
-    }
+    "desc": "Execute: Run a series of statements.",
+    "name": "execute",
+    "uses": "slot"
+  },
+  {
+    "desc": "Number List: Statements which return a list of numbers.",
+    "name": "num_list_eval",
+    "uses": "slot"
+  },
+  {
+    "desc": "Numbers: Statements which return a number.",
+    "name": "number_eval",
+    "uses": "slot"
+  },
+  {
+    "desc": "Object Lists: Statements which return a list of existing objects.",
+    "name": "obj_list_eval",
+    "uses": "slot"
+  },
+  {
+    "desc": "Objects: Statements which return an existing object.",
+    "name": "object_eval",
+    "uses": "slot"
+  },
+  {
+    "desc": "Texts: Statements which return text.",
+    "name": "text_eval",
+    "uses": "slot"
+  },
+  {
+    "desc": "Text Lists: Statements which return a list of text.",
+    "name": "text_list_eval",
+    "uses": "slot"
   },
   {
     "desc": "All True: returns true if all of the evaluations are true.",
@@ -129,8 +99,8 @@ const spec = [
       "literals"
     ],
     "name": "bool_value",
-    "uses": "run",
     "spec": "{bool|quote}",
+    "uses": "run",
     "with": {
       "params": {
         "$BOOL": {
@@ -153,8 +123,8 @@ const spec = [
       "exec"
     ],
     "name": "choose",
-    "uses": "run",
     "spec": "if {choose%if:bool_eval} then: {true*execute|ghost} else: {false*execute|ghost}",
+    "uses": "run",
     "with": {
       "params": {
         "$FALSE": {
@@ -217,39 +187,6 @@ const spec = [
     }
   },
   {
-    "desc": "Choose Object: Pick one of two objects based on a boolean test.",
-    "group": [
-      "objects"
-    ],
-    "name": "choose_obj",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$FALSE": {
-          "label": "false",
-          "type": "object_eval"
-        },
-        "$IF": {
-          "label": "if",
-          "type": "bool_eval"
-        },
-        "$TRUE": {
-          "label": "true",
-          "type": "object_eval"
-        }
-      },
-      "slots": [
-        "object_eval"
-      ],
-      "tokens": [
-        "choose obj",
-        "$IF",
-        "$TRUE",
-        "$FALSE"
-      ]
-    }
-  },
-  {
     "desc": "Choose Text: Pick one of two strings based on a boolean test.",
     "group": [
       "format"
@@ -288,6 +225,7 @@ const spec = [
       "logic"
     ],
     "name": "compare_num",
+    "spec": "{a:number_eval} {is:compare_to} {b:number_eval}",
     "uses": "run",
     "with": {
       "params": {
@@ -309,36 +247,6 @@ const spec = [
       ],
       "tokens": [
         "compare num",
-        "$A",
-        "$IS",
-        "$B"
-      ]
-    }
-  },
-  {
-    "desc": "Compare Objects",
-    "name": "compare_obj",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "object_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "object_eval"
-        },
-        "$IS": {
-          "label": "is",
-          "type": "compare_to"
-        }
-      },
-      "slots": [
-        "bool_eval"
-      ],
-      "tokens": [
-        "compare obj",
         "$A",
         "$IS",
         "$B"
@@ -408,11 +316,11 @@ const spec = [
     }
   },
   {
-    "desc": "Divide Numbers: Divide one number by another.",
+    "desc": "Subtract Numbers: Subtract two numbers.",
     "group": [
       "math"
     ],
-    "name": "quotient_of",
+    "name": "diff_of",
     "uses": "run",
     "with": {
       "params": {
@@ -431,7 +339,7 @@ const spec = [
       "tokens": [
         "(",
         "$A",
-        "/",
+        "-",
         "$B",
         ")"
       ]
@@ -841,71 +749,12 @@ const spec = [
     }
   },
   {
-    "desc": "Modulus Numbers: Divide one number by another, and return the remainder.",
-    "group": [
-      "math"
-    ],
-    "name": "remainder_of",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        }
-      },
-      "slots": [
-        "number_eval"
-      ],
-      "tokens": [
-        "(",
-        "$A",
-        "%",
-        "$B",
-        ")"
-      ]
-    }
-  },
-  {
-    "desc": "Multiply Numbers: Multiply two numbers.",
-    "group": [
-      "math"
-    ],
-    "name": "product_of",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$A": {
-          "label": "a",
-          "type": "number_eval"
-        },
-        "$B": {
-          "label": "b",
-          "type": "number_eval"
-        }
-      },
-      "slots": [
-        "number_eval"
-      ],
-      "tokens": [
-        "(",
-        "$A",
-        "*",
-        "$B",
-        ")"
-      ]
-    }
-  },
-  {
     "desc": "Number Value: Specify a particular number.",
     "group": [
       "literals"
     ],
     "name": "num_value",
+    "spec": "{num:number}",
     "uses": "run",
     "with": {
       "params": {
@@ -1092,6 +941,66 @@ const spec = [
     }
   },
   {
+    "desc": "Multiply Numbers: Multiply two numbers.",
+    "group": [
+      "math"
+    ],
+    "name": "product_of",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$A": {
+          "label": "a",
+          "type": "number_eval"
+        },
+        "$B": {
+          "label": "b",
+          "type": "number_eval"
+        }
+      },
+      "slots": [
+        "number_eval"
+      ],
+      "tokens": [
+        "(",
+        "$A",
+        "*",
+        "$B",
+        ")"
+      ]
+    }
+  },
+  {
+    "desc": "Divide Numbers: Divide one number by another.",
+    "group": [
+      "math"
+    ],
+    "name": "quotient_of",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$A": {
+          "label": "a",
+          "type": "number_eval"
+        },
+        "$B": {
+          "label": "b",
+          "type": "number_eval"
+        }
+      },
+      "slots": [
+        "number_eval"
+      ],
+      "tokens": [
+        "(",
+        "$A",
+        "/",
+        "$B",
+        ")"
+      ]
+    }
+  },
+  {
     "desc": "Range of Numbers: Generates a series of numbers.",
     "group": [
       "flow"
@@ -1177,6 +1086,36 @@ const spec = [
         "relation empty",
         "$RELATION",
         "$OBJECT"
+      ]
+    }
+  },
+  {
+    "desc": "Modulus Numbers: Divide one number by another, and return the remainder.",
+    "group": [
+      "math"
+    ],
+    "name": "remainder_of",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$A": {
+          "label": "a",
+          "type": "number_eval"
+        },
+        "$B": {
+          "label": "b",
+          "type": "number_eval"
+        }
+      },
+      "slots": [
+        "number_eval"
+      ],
+      "tokens": [
+        "(",
+        "$A",
+        "%",
+        "$B",
+        ")"
       ]
     }
   },
@@ -1445,11 +1384,11 @@ const spec = [
     }
   },
   {
-    "desc": "Subtract Numbers: Subtract two numbers.",
+    "desc": "Add Numbers: Add two numbers.",
     "group": [
       "math"
     ],
-    "name": "diff_of",
+    "name": "sum_of",
     "uses": "run",
     "with": {
       "params": {
@@ -1468,7 +1407,7 @@ const spec = [
       "tokens": [
         "(",
         "$A",
-        "-",
+        "+",
         "$B",
         ")"
       ]
@@ -1513,23 +1452,7 @@ const spec = [
     }
   },
   {
-    "name": "logic",
-    "uses": "group"
-  },
-  {
-    "name": "objects",
-    "uses": "group"
-  },
-  {
-    "name": "format",
-    "uses": "group"
-  },
-  {
-    "name": "math",
-    "uses": "group"
-  },
-  {
-    "name": "literals",
+    "name": "cycle",
     "uses": "group"
   },
   {
@@ -1537,15 +1460,31 @@ const spec = [
     "uses": "group"
   },
   {
-    "name": "cycle",
+    "name": "flow",
+    "uses": "group"
+  },
+  {
+    "name": "format",
+    "uses": "group"
+  },
+  {
+    "name": "literals",
+    "uses": "group"
+  },
+  {
+    "name": "logic",
+    "uses": "group"
+  },
+  {
+    "name": "math",
+    "uses": "group"
+  },
+  {
+    "name": "objects",
     "uses": "group"
   },
   {
     "name": "strings",
-    "uses": "group"
-  },
-  {
-    "name": "flow",
     "uses": "group"
   }
 ]
