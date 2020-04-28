@@ -34,7 +34,7 @@ func (k *returnScope) SetVariable(n string, v interface{}) (err error) {
 func (*Returns) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "returns",
-		Spec:  "Return var $1 {?using|ghost}",
+		Spec:  "Return the variable {name:text} {?using|ghost}",
 		Group: "variables",
 		Desc:  "Return: Return the value of the named variable computed during using.",
 	}

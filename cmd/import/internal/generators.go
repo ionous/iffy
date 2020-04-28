@@ -8,7 +8,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-var cmds = makeTypeMap(export.Runs)
+var cmds = makeTypeMap(export.Slats)
 
 // FIX -- keeping with the function parser model, swap these out to functions.
 // the top level function should match the top level of "story"

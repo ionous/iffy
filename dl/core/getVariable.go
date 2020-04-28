@@ -13,7 +13,7 @@ type GetVar struct {
 func (*GetVar) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "get_var",
-		Spec:  "Get var $1",
+		Spec:  "the variable {name:text|quote}",
 		Group: "variables",
 		Desc:  "Get Variable: Return the value of the named variable.",
 	}

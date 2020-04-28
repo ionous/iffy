@@ -78,9 +78,7 @@ var registeredGob = false
 
 func registerGob() {
 	if !registeredGob {
-		for _, cmd := range export.Runs {
-			gob.Register(cmd)
-		}
+		export.Register(gob.Register)
 		registeredGob = true
 	}
 }

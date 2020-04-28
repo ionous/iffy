@@ -57,6 +57,7 @@ func (*Number) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "num_value",
 		Group: "literals",
+		Spec:  "{num:number}",
 		Desc:  "Number Value: Specify a particular number.",
 	}
 }

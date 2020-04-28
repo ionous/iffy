@@ -42,10 +42,15 @@ var Slots = map[string]Slot{
 		Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc."},
 }
 
-var Runs = []composer.Specification{
-	(*check.Test)(nil),
-	(*core.Determine)(nil), // internal but needed for gob.
+func Register(reg func(value interface{})) {
+	for _, cmd := range Slats {
+		reg(cmd)
+	}
+}
 
+var Slats = []composer.Specification{
+	(*core.Determine)(nil), // internal but needed for gob.
+	(*check.Test)(nil),
 	(*core.AllTrue)(nil),
 	(*core.AnyTrue)(nil),
 

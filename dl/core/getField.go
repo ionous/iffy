@@ -12,8 +12,10 @@ type GetField struct {
 
 func (*GetField) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "get_field",
-		Spec:  "Get $2 of $1",
+		Name: "get_field",
+		// fix: should use determiner; that should be a hint... yeah?
+		// but if so... then doesnt GetFIeld need that determiner?
+		Spec:  "{the object%obj:text_eval}'s {field:text_eval}",
 		Group: "objects",
 		Desc:  "Get Field: Return the value of the named object property.",
 	}

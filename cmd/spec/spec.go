@@ -25,9 +25,7 @@ import (
 // “slot”: eval slots, could either do this manually or generate.
 // “str”: handwaves. for enums.
 // “num”, “txt”: might? be useful for typedefs or triggered with tags.
-//
 func main() {
-
 	var all []export.Dict
 	var slots []r.Type
 
@@ -36,61 +34,65 @@ func main() {
 	// slots that commands can fit into
 	for slotName, slot := range export.Slots {
 		spec := getSpec(slot.Type)
-		i := r.TypeOf(slot.Type).Elem()
-		//
-		slots = append(slots, i)
-		if len(spec.Name) == 0 {
-			spec.Name = slotName
+		if spec.Group != "internal" {
+			i := r.TypeOf(slot.Type).Elem()
+			//
+			slots = append(slots, i)
+			if len(spec.Name) == 0 {
+				spec.Name = slotName
+			}
+			if len(spec.Desc) == 0 {
+				spec.Desc = export.Prettify(slotName)
+			}
+			if len(spec.Group) == 0 {
+				spec.Group = slot.Group
+			}
+			out := export.Dict{
+				"name": spec.Name,
+				"desc": spec.Desc,
+				"uses": "slot",
+			}
+			addDesc(out, slot.Desc)
+			groups.addGroup(out, spec.Group)
+			all = append(all, out)
 		}
-		if len(spec.Desc) == 0 {
-			spec.Desc = export.Prettify(slotName)
-		}
-		if len(spec.Group) == 0 {
-			spec.Group = slot.Group
-		}
-		out := export.Dict{
-			"name": spec.Name,
-			"desc": spec.Desc,
-			"uses": "slot",
-		}
-		groups.addGroup(out, spec.Group)
-		addDesc(out, spec.Desc)
-		all = append(all, out)
 	}
 
-	for _, cmd := range export.Runs {
-		rtype := r.TypeOf(cmd).Elem()
+	for _, cmd := range export.Slats {
 		spec := cmd.Compose()
-		if len(spec.Name) == 0 {
-			panic(fmt.Sprintln("missing name for type", rtype.Name()))
-		}
-		//
-		slotNames := slotsOf(rtype, slots)
-		if len(slotNames) == 0 {
-			panic(fmt.Sprintln("missing slot for type", rtype.Name()))
-		}
-		sort.Strings(slotNames)
+		if spec.Group != "internal" {
+			rtype := r.TypeOf(cmd).Elem()
+			if len(spec.Name) == 0 {
+				panic(fmt.Sprintln("missing name for type", rtype.Name()))
+			}
+			//
+			slotNames := slotsOf(rtype, slots)
+			if len(slotNames) == 0 {
+				panic(fmt.Sprintln("missing slot for type", rtype.Name()))
+			}
+			sort.Strings(slotNames)
 
-		with := export.Dict{
-			"slots": slotNames,
-		}
-		out := export.Dict{
-			"name": spec.Name,
-			"uses": "run",
-			"with": with,
-		}
-		// missing spec, missing slots.
-		if len(spec.Spec) != 0 {
-			out["spec"] = spec.Spec
-		} else {
-			tokens, params := parse(rtype)
-			with["params"] = params
-			with["tokens"] = updateTokens(spec.Spec, tokens)
-		}
-		groups.addGroup(out, spec.Group)
-		addDesc(out, spec.Desc)
+			with := export.Dict{
+				"slots": slotNames,
+			}
+			out := export.Dict{
+				"name": spec.Name,
+				"uses": "run",
+				"with": with,
+			}
+			// missing spec, missing slots.
+			if len(spec.Spec) != 0 {
+				out["spec"] = spec.Spec
+			} else {
+				tokens, params := parse(rtype)
+				with["params"] = params
+				with["tokens"] = updateTokens(spec.Spec, tokens)
+			}
+			addDesc(out, spec.Desc)
 
-		all = append(all, out)
+			groups.addGroup(out, spec.Group)
+			all = append(all, out)
+		}
 	}
 
 	for groupName, _ := range groups {
@@ -101,9 +103,18 @@ func main() {
 		all = append(all, out)
 	}
 
-	sort.Slice(all, func(i, j int) bool {
-		return all[i]["uses"].(string) > all[j]["uses"].(string) &&
-			all[i]["name"].(string) < all[j]["name"].(string)
+	sort.Slice(all, func(i, j int) (ret bool) {
+		uses := strings.Compare(all[i]["uses"].(string), all[j]["uses"].(string))
+		switch uses {
+		case 0:
+			ret = all[i]["name"].(string) < all[j]["name"].(string)
+		case -1:
+			ret = false
+		case 1:
+			ret = true
+		}
+		return
+
 	})
 
 	if b, e := json.MarshalIndent(all, "", "  "); e != nil {
@@ -236,7 +247,7 @@ var reverseLookup map[r.Type]string
 func findTypeName(t r.Type) (ret string) {
 	if len(reverseLookup) == 0 {
 		reverseLookup = make(map[r.Type]string)
-		for _, cmd := range export.Runs {
+		for _, cmd := range export.Slats {
 			runType := r.TypeOf(cmd).Elem()
 			typeName := cmd.Compose().Name
 			reverseLookup[runType] = typeName

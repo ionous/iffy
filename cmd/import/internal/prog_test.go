@@ -22,7 +22,7 @@ func TestImportProg(t *testing.T) {
     t.Fatal(e)
   } else {
     var prog check.Test
-    cmds := makeTypeMap(export.Runs)
+    cmds := makeTypeMap(export.Slats)
     if e := readProg(&prog, in, cmds); e != nil {
       t.Fatal(e)
     } else if diff := pretty.Diff(sayTest, prog); len(diff) > 0 {

@@ -30,7 +30,7 @@ func (*SumOf) Compose() composer.Spec {
 		Name:  "sum_of",
 		Group: "math",
 		Desc:  "Add Numbers: Add two numbers.",
-		Spec:  "( $1 + $2 )",
+		Spec:  "( {a:number_eval} + {b:number_eval} )",
 	}
 }
 
@@ -47,7 +47,7 @@ func (*DiffOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "diff_of",
 		Group: "math",
-		Spec:  "( $1 - $2 )",
+		Spec:  "( {a:number_eval} - {b:number_eval} )",
 		Desc:  "Subtract Numbers: Subtract two numbers.",
 	}
 }
@@ -65,7 +65,7 @@ func (*ProductOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "product_of",
 		Group: "math",
-		Spec:  "( $1 * $2 )",
+		Spec:  "( {a:number_eval} * {b:number_eval} )",
 		Desc:  "Multiply Numbers: Multiply two numbers.",
 	}
 }
@@ -83,7 +83,7 @@ func (*QuotientOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "quotient_of",
 		Group: "math",
-		Spec:  "( $1 / $2 )",
+		Spec:  "( {a:number_eval} / {b:number_eval} )",
 		Desc:  "Divide Numbers: Divide one number by another.",
 	}
 }
@@ -103,7 +103,7 @@ func (*RemainderOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "remainder_of",
 		Group: "math",
-		Spec:  "( $1 % $2 )",
+		Spec:  "( {a:number_eval} % {b:number_eval} )",
 		Desc:  "Modulus Numbers: Divide one number by another, and return the remainder.",
 	}
 }

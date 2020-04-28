@@ -29,7 +29,7 @@ type LenOfTexts struct {
 
 func (*LenOfNumbers) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "len",
+		Name:  "number_list_count",
 		Group: "format",
 		Desc:  "Length of Number List: Determines the number of elements in a list of numbers.",
 	}
@@ -49,7 +49,7 @@ func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
 
 func (*LenOfTexts) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "len",
+		Name:  "text_list_count",
 		Group: "format",
 		Desc:  "Length of Text List: Determines the number of text elements in a list.",
 	}
