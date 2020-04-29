@@ -12,8 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"bitbucket.org/pkg/inflect"
-
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/ref/unique"
@@ -67,14 +65,9 @@ func main() {
 				panic(fmt.Sprintln("missing name for type", rtype.Name()))
 			}
 			//
-			slotNames := slotsOf(rtype, slots)
-			if len(slotNames) == 0 {
-				panic(fmt.Sprintln("missing slot for type", rtype.Name()))
-			}
-			sort.Strings(slotNames)
-
-			with := export.Dict{
-				"slots": slotNames,
+			with := make(export.Dict)
+			if slotNames := slotsOf(rtype, slots); len(slotNames) > 0 {
+				with["slots"] = slotNames
 			}
 			out := export.Dict{
 				"name": spec.Name,
@@ -235,9 +228,13 @@ func nameOfType(t r.Type) (typeName string, repeats bool) {
 	case r.String:
 		typeName = "text"
 	default:
-		// Array, Map, Ptr, Struct
-		// Uint, Uint8, Uint16, Uint32, Uint64
-		panic(fmt.Sprintln("unhandled type", t.Name(), kind.String()))
+		if kind == r.Ptr && t.Elem().Kind() == r.Struct {
+			typeName = findTypeName(t.Elem())
+		} else {
+			// Array, Map, Ptr, Struct
+			// Uint, Uint8, Uint16, Uint32, Uint64
+			panic(fmt.Sprintln("unhandled type", t.String()))
+		}
 	}
 	return
 }
@@ -261,9 +258,7 @@ func findTypeName(t r.Type) (ret string) {
 	if n, ok := reverseLookup[t]; ok {
 		ret = n
 	} else {
-		n := inflect.Underscore(t.Name())
-		println("falling back to name", n)
-		ret = n
+		panic(fmt.Sprintln("unknown type", t.String()))
 	}
 	return
 }

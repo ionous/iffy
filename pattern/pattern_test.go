@@ -28,7 +28,7 @@ func ExampleSayMe() {
 	for i := 1; i <= 4; i++ {
 		det := core.DetermineText{
 			&core.FromPattern{
-				"sayMe", core.Assignments{{
+				"sayMe", core.Parameters{{
 					"num",
 					&core.FromNum{
 						&core.Number{float64(i)},

@@ -28,6 +28,8 @@ var Slots = map[string]Slot{
 		Desc: "Text Lists: Statements which return a list of text."},
 	"compare_to": {Type: (*core.CompareTo)(nil),
 		Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc."},
+	"assignment": {Type: (*core.Assignment)(nil),
+		Desc: "Assignments: Helper used when setting variables."},
 }
 
 func Register(reg func(value interface{})) {
@@ -37,10 +39,25 @@ func Register(reg func(value interface{})) {
 }
 
 var Slats = []composer.Specification{
-	(*core.Determine)(nil), // internal but needed for gob.
 	(*check.Test)(nil),
 	(*core.AllTrue)(nil),
 	(*core.AnyTrue)(nil),
+
+	// Assign turns an Assignment a normal statement.
+	(*core.Assign)(nil),
+	(*core.FromBool)(nil),
+	(*core.FromNum)(nil),
+	(*core.FromText)(nil),
+	(*core.FromNumList)(nil),
+	(*core.FromTextList)(nil),
+
+	(*core.DetermineAct)(nil),
+	(*core.DetermineNum)(nil),
+	(*core.DetermineText)(nil),
+	(*core.DetermineBool)(nil),
+	(*core.DetermineNumList)(nil),
+	(*core.DetermineTextList)(nil),
+	(*core.Parameter)(nil),
 
 	// FIX: Choose scalar/any?
 	(*core.Choose)(nil),
@@ -103,12 +120,6 @@ var Slats = []composer.Specification{
 	(*core.SetFieldText)(nil),
 	(*core.SetFieldNumList)(nil),
 	(*core.SetFieldTextList)(nil),
-
-	(*core.SetVarBool)(nil),
-	(*core.SetVarNum)(nil),
-	(*core.SetVarText)(nil),
-	(*core.SetVarNumList)(nil),
-	(*core.SetVarTextList)(nil),
 
 	(*core.IsEmpty)(nil),
 	(*core.Includes)(nil),

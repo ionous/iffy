@@ -19,15 +19,15 @@ func TestFactorial(t *testing.T) {
 					&core.GetVar{"num"},
 					&core.DetermineNum{
 						&core.FromPattern{
-							"factorial", core.Assignments{{
+							"factorial", core.Parameters{{
 								"num", &core.FromNum{
 									&core.DiffOf{
 										&core.GetVar{"num"},
 										&core.Number{1},
 									},
 								},
-							},
 							}},
+						},
 					},
 				},
 			}, {
@@ -43,7 +43,7 @@ func TestFactorial(t *testing.T) {
 		}}}
 	// determine the factorial of the number 3
 	det := core.DetermineNum{
-		&core.FromPattern{"factorial", core.Assignments{{
+		&core.FromPattern{"factorial", core.Parameters{{
 			"num", &core.FromNum{
 				&core.Number{3},
 			}},

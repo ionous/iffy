@@ -84,7 +84,7 @@ class Types {
   }
 
   static labelOf(t) {
-    const label= !t.desc ? t.name.replace(/[-_]/g, ' ')  /* friendlyish name */ :
+    const label= !t.desc ? Filters.titlecase(t.name.replace(/[-_]/g, ' '))  /* friendlyish name */ :
           (typeof t.desc === 'string') ? t.desc :
           t.desc.label;
     return label;

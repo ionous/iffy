@@ -1,6 +1,11 @@
 /* generated using github.com/ionous/iffy/cmd/spec/spec.go */
 const spec = [
   {
+    "desc": "Assignments: Helper used when setting variables.",
+    "name": "assignment",
+    "uses": "slot"
+  },
+  {
     "desc": "Booleans: Statements which return true/false values.",
     "name": "bool_eval",
     "uses": "slot"
@@ -80,6 +85,135 @@ const spec = [
       "tokens": [
         "any true",
         "$TEST"
+      ]
+    }
+  },
+  {
+    "desc": "Assignment: Sets a variable to a value.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign",
+    "spec": "let {name} be {assignment}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "execute"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Boolean: Assigns the passed boolean value.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_bool",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "bool_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from bool",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Number: Assigns the passed number.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_num",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "number_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from num",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Number List: Assigns the passed number list.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_num_list",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VALS": {
+          "label": "vals",
+          "type": "num_list_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from num list",
+        "$VALS"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Text: Assigns the passed piece of text.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_text",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "text_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from text",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Text List: Assigns the passed text list.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_text_list",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VALS": {
+          "label": "vals",
+          "type": "text_list_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from text list",
+        "$VALS"
       ]
     }
   },
@@ -350,6 +484,174 @@ const spec = [
     }
   },
   {
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_act",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        },
+        "$PARAMETERS": {
+          "label": "parameters",
+          "repeats": true,
+          "type": "parameter"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "determine act",
+        "$NAME",
+        "$PARAMETERS"
+      ]
+    }
+  },
+  {
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_bool",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        },
+        "$PARAMETERS": {
+          "label": "parameters",
+          "repeats": true,
+          "type": "parameter"
+        }
+      },
+      "slots": [
+        "bool_eval"
+      ],
+      "tokens": [
+        "determine bool",
+        "$NAME",
+        "$PARAMETERS"
+      ]
+    }
+  },
+  {
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_num",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        },
+        "$PARAMETERS": {
+          "label": "parameters",
+          "repeats": true,
+          "type": "parameter"
+        }
+      },
+      "slots": [
+        "number_eval"
+      ],
+      "tokens": [
+        "determine num",
+        "$NAME",
+        "$PARAMETERS"
+      ]
+    }
+  },
+  {
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_num_list",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        },
+        "$PARAMETERS": {
+          "label": "parameters",
+          "repeats": true,
+          "type": "parameter"
+        }
+      },
+      "slots": [
+        "num_list_eval"
+      ],
+      "tokens": [
+        "determine num list",
+        "$NAME",
+        "$PARAMETERS"
+      ]
+    }
+  },
+  {
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_text",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        },
+        "$PARAMETERS": {
+          "label": "parameters",
+          "repeats": true,
+          "type": "parameter"
+        }
+      },
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "determine text",
+        "$NAME",
+        "$PARAMETERS"
+      ]
+    }
+  },
+  {
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_text_list",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        },
+        "$PARAMETERS": {
+          "label": "parameters",
+          "repeats": true,
+          "type": "parameter"
+        }
+      },
+      "slots": [
+        "text_list_eval"
+      ],
+      "tokens": [
+        "determine text list",
+        "$NAME",
+        "$PARAMETERS"
+      ]
+    }
+  },
+  {
     "desc": "Subtract Numbers: Subtract two numbers.",
     "group": [
       "math"
@@ -494,9 +796,9 @@ const spec = [
     "with": {
       "slots": [
         "bool_eval",
-        "num_list_eval",
         "number_eval",
         "text_eval",
+        "num_list_eval",
         "text_list_eval"
       ]
     }
@@ -512,9 +814,9 @@ const spec = [
     "with": {
       "slots": [
         "bool_eval",
-        "num_list_eval",
         "number_eval",
         "text_eval",
+        "num_list_eval",
         "text_list_eval"
       ]
     }
@@ -776,6 +1078,30 @@ const spec = [
     }
   },
   {
+    "group": [
+      "patterns"
+    ],
+    "name": "parameter",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        }
+      },
+      "tokens": [
+        "parameter",
+        "$NAME",
+        "$FROM"
+      ]
+    }
+  },
+  {
     "desc": "Num as text: Writes a number using numerals, eg. '1'.",
     "group": [
       "printing"
@@ -916,34 +1242,6 @@ const spec = [
       "tokens": [
         "say",
         "$TEXT"
-      ]
-    }
-  },
-  {
-    "desc": "Set Boolean Variable: Sets the named variable to the passed boolean value.",
-    "group": [
-      "variables"
-    ],
-    "name": "set_bool_var",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text_eval"
-        },
-        "$VAL": {
-          "label": "val",
-          "type": "bool_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set var bool",
-        "$NAME",
-        "$VAL"
       ]
     }
   },
@@ -1109,118 +1407,6 @@ const spec = [
         "$OBJ",
         "$FIELD",
         "$VALS"
-      ]
-    }
-  },
-  {
-    "desc": "Set Number List Variable: Sets the named variable to the passed number list.",
-    "group": [
-      "variables"
-    ],
-    "name": "set_num_list_var",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text_eval"
-        },
-        "$VALS": {
-          "label": "vals",
-          "type": "num_list_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set var num list",
-        "$NAME",
-        "$VALS"
-      ]
-    }
-  },
-  {
-    "desc": "Set Number Variable: Sets the named variable to the passed number.",
-    "group": [
-      "variables"
-    ],
-    "name": "set_num_var",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text_eval"
-        },
-        "$VAL": {
-          "label": "val",
-          "type": "number_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set var num",
-        "$NAME",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "Set Text List Variable: Sets the named variable to the passed text list.",
-    "group": [
-      "variables"
-    ],
-    "name": "set_text_list_var",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text_eval"
-        },
-        "$VALS": {
-          "label": "vals",
-          "type": "text_list_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set var text list",
-        "$NAME",
-        "$VALS"
-      ]
-    }
-  },
-  {
-    "desc": "Set Text Variable: Sets the named variable to the passed piece of text.",
-    "group": [
-      "variables"
-    ],
-    "name": "set_text_var",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text_eval"
-        },
-        "$VAL": {
-          "label": "val",
-          "type": "text_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set var text",
-        "$NAME",
-        "$VAL"
       ]
     }
   },
@@ -1465,6 +1651,10 @@ const spec = [
   },
   {
     "name": "objects",
+    "uses": "group"
+  },
+  {
+    "name": "patterns",
     "uses": "group"
   },
   {

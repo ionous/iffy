@@ -74,9 +74,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     make.run("pattern_return", "return {result:pattern_result}");
 
     make.opt("pattern_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
-
     make.opt("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}");
-
     make.run("object_func", "an object named {name%text_eval}");
   });
 
