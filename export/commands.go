@@ -113,6 +113,8 @@ var Slats = []composer.Specification{
 	(*core.IsEmpty)(nil),
 	(*core.Includes)(nil),
 	(*core.Join)(nil),
+
+	// comparison
 	(*core.EqualTo)(nil),
 	(*core.NotEqualTo)(nil),
 	(*core.GreaterThan)(nil),

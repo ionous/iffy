@@ -7,7 +7,6 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/scope"
 )
 
 // TestFactorial of the number 3 to verify pattern recursion works.
@@ -18,14 +17,17 @@ func TestFactorial(t *testing.T) {
 			{
 				NumberEval: &core.ProductOf{
 					&core.GetVar{"num"},
-					&core.Determine{
-						"factorial",
-						scope.Parameters{
-							"num": &core.DiffOf{
-								&core.GetVar{"num"},
-								&core.Number{1},
+					&core.DetermineNum{
+						&core.FromPattern{
+							"factorial", core.Assignments{{
+								"num", &core.FromNum{
+									&core.DiffOf{
+										&core.GetVar{"num"},
+										&core.Number{1},
+									},
+								},
 							},
-						},
+							}},
 					},
 				},
 			}, {
@@ -40,9 +42,13 @@ func TestFactorial(t *testing.T) {
 			},
 		}}}
 	// determine the factorial of the number 3
-	det := core.Determine{"factorial", scope.Parameters{
-		"num": &core.Number{3},
-	}}
+	det := core.DetermineNum{
+		&core.FromPattern{"factorial", core.Assignments{{
+			"num", &core.FromNum{
+				&core.Number{3},
+			}},
+		}},
+	}
 	if v, e := rt.GetNumber(&run, &det); e != nil {
 		t.Fatal(e)
 	} else if want := 3.0 * (2 * (1 * 1)); v != want {
