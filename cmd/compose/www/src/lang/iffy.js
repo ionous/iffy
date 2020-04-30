@@ -5,6 +5,8 @@ function localLang(make) {
     make.run("story", "{+paragraph|ghost}");
     make.run("paragraph", "{+story_statement|ghost}");
     make.slot("story_statement");
+
+    make.run("test_statement", "story_statement", "For the test {test name%name:text|quote}, {test type%test:testing}");
     //
     make.run("noun_statement", "story_statement", "{:lede} {*tail} {?summary}",
              "Noun statement: Describes people, places, or things.");
@@ -50,10 +52,10 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
      );
 
     make.run("pattern_variables_decl", "story_statement",
-      "The pattern {pattern_name|quote} uses {+variable_decl|comma-and}.",
+      "The pattern {pattern_name|quote} requires {+variable_decl|comma-and}.",
        `Declare pattern variables: Storage for values used during the execution of a pattern.`);
 
-    make.run("pattern_variables_tail", "It uses {+variable_decl|comma-and}.",
+    make.run("pattern_variables_tail", "It requires {+variable_decl|comma-and}.",
        `Pattern variables: Storage for values used during the execution of a pattern.`);
 
     make.opt("pattern_type", "an {activity:patterned_activity} or a {value:variable_type}");
@@ -63,9 +65,11 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     // pattern handler
     // similar to pattern_type, but with statements hooks instead of type declarations
     make.run("pattern_handler", "story_statement",
-      "To determine the pattern {name:pattern_name|quote} when {filters%filters+bool_eval} {handler:pattern_hook}",
+      "To determine the {name:pattern_name}{filters?pattern_filters}: {handler:pattern_hook}",
       "Pattern Handler: Actions to take when a pattern gets used."
       );
+
+    make.run("pattern_filters", " when {filter+bool_eval}");
 
     make.opt("pattern_hook", "run an {activity%pattern_activity} or return a {result%pattern_return}");
 
@@ -104,7 +108,7 @@ For example: animals, containers, etc.`);
   });
 
   make.group("Variables", function() {
-    make.run("variable_decl", "{type:variable_type} ( called {name:variable_name|quote} )");
+    make.run("variable_decl", "{type:variable_type} called {name:variable_name|quote}");
     make.str("variable_name");
 
     make.opt("variable_type", "a {simple value%primitive:primitive_type} or an {object:object_type}");
@@ -124,7 +128,7 @@ For example: animals, containers, etc.`);
     make.run("noun_assignment", "story_statement",
             // "The {property_name} of {+noun} is the {[text]:: %lines}",
             "The {property_name} of {+noun} is {the text%lines|summary}",
-            "Assign text. Gives a noun one or more lines of text.");
+            "Noun Assignment: Assign text. Gives a noun one or more lines of text.");
 
     make.opt("property_phrase", "{primitive_phrase} or {quality_phrase}");
 

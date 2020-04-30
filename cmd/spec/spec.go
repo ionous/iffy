@@ -17,12 +17,6 @@ import (
 	"github.com/ionous/iffy/ref/unique"
 )
 
-// spec types:
-// “run”: command structs
-// “opt”: would take some custom work to generate. ex. "{proper_noun} or {common_noun}"
-// “slot”: eval slots, could either do this manually or generate.
-// “str”: handwaves. for enums.
-// “num”, “txt”: might? be useful for typedefs or triggered with tags.
 // go run spec.go > /Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/compose/www/src/lang/spec.js
 func main() {
 	var all []export.Dict
@@ -159,6 +153,8 @@ func parse(t r.Type) ([]string, export.Dict) {
 
 var tokenPlaceholders = regexp.MustCompile(`^\$([0-9]+)$`)
 
+// i dont think this works right because it doesnt change the spec
+// i dont think? the composer is either.
 func updateTokens(phrase string, tokens []string) (ret []string) {
 	if len(phrase) == 0 {
 		ret = tokens

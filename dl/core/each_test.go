@@ -11,11 +11,13 @@ import (
 // ExampleIndex verifies the loop index property.
 func ExampleIndex() {
 	var run forTester
-	if e := rt.Run(&run, &ForEachText{
-		In: &Texts{oneTwoThree},
-		Go: &Say{&PrintNum{&GetVar{"index"}}},
-	},
-	); e != nil {
+	if e := rt.Run(&run, []rt.Execute{
+		&ForEachText{
+			In: &Texts{oneTwoThree},
+			Go: []rt.Execute{
+				&Say{&PrintNum{&GetVar{"index"}}}},
+		},
+	}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -24,21 +26,22 @@ func ExampleIndex() {
 
 func ExampleEndings() {
 	var run forTester
-	if e := rt.Run(&run,
-		&Say{&Commas{
+	if e := rt.Run(&run, []rt.Execute{
+		&Say{&Commas{[]rt.Execute{
 			&ForEachText{
 				In: &Texts{oneTwoThree},
-				Go: &Say{&ChooseText{
-					If:   &GetVar{"last"},
-					True: &Text{"last"},
-					False: &ChooseText{
-						If:    &GetVar{"first"},
-						True:  &Text{"first"},
-						False: &GetVar{"text"},
-					},
-				}},
-			},
-		}}); e != nil {
+				Go: []rt.Execute{
+					&Say{&ChooseText{
+						If:   &GetVar{"last"},
+						True: &Text{"last"},
+						False: &ChooseText{
+							If:    &GetVar{"first"},
+							True:  &Text{"first"},
+							False: &GetVar{"text"},
+						},
+					}}},
+			}},
+		}}}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:

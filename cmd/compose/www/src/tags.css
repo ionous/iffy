@@ -12,6 +12,7 @@
 }
 
 
+.mk-run-ctrl[data-tag="pattern_return"],
 .mk-run-ctrl__item--repeats[data-tag="execute"]  {
   display: block;
   list-style: none;

@@ -24,7 +24,7 @@ func imp_story_statement(k *Importer, r reader.Map) (err error) {
 		"pattern_variables_decl": imp_pattern_variables_decl,
 		"quality_attributes":     imp_quality_attributes,
 		"relative_to_noun":       imp_relative_to_noun,
-		"test":                   imp_test,
+		"test_statement":         imp_test_statement,
 	})
 }
 
@@ -246,13 +246,19 @@ func imp_relative_to_noun(k *Importer, r reader.Map) (err error) {
 	return
 }
 
-func imp_test(k *Importer, outer reader.Map) (err error) {
-	if m, e := k.expectSlat(outer, "test"); e != nil {
+func imp_test_statement(k *Importer, outer reader.Map) (err error) {
+	return k.expectSlot(outer, "testing", map[string]Parse{
+		"test_output": imp_test_output,
+	})
+}
+
+func imp_test_output(k *Importer, outer reader.Map) (err error) {
+	if m, e := k.expectSlat(outer, "test_output"); e != nil {
 		err = e
 	} else {
 		test := k.namedStr(m, tables.NAMED_TEST, "$TEST_NAME")
 		expect := k.getStr(m, "$LINES")
-		var prog check.Test
+		var prog check.TestOutput
 		if e := readProg(&prog, reader.Unbox(outer), cmds); e != nil {
 			err = e
 		} else {
@@ -261,8 +267,8 @@ func imp_test(k *Importer, outer reader.Map) (err error) {
 			if e := enc.Encode(prog); e != nil {
 				err = e
 			} else {
-				prog := k.NewProg("test", buf.Bytes())
-				k.NewTest(test, prog, expect)
+				pid := k.NewProg("test", buf.Bytes())
+				k.NewTest(test, pid, expect)
 			}
 		}
 	}

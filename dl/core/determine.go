@@ -10,8 +10,8 @@ import (
 
 // FromPattern helps runs a pattern
 type FromPattern struct {
-	Name       string       // i  guess a text eval here would be like a function pointer.
-	Parameters []*Parameter // FIX*spec would work if we were an interface
+	Name       string      // i  guess a text eval here would be like a function pointer.
+	Parameters *Parameters // for optional parameters ( and formatting )
 }
 
 type DetermineAct FromPattern
@@ -21,16 +21,27 @@ type DetermineBool FromPattern
 type DetermineNumList FromPattern
 type DetermineTextList FromPattern
 
-type Parameters []*Parameter
+type Parameters struct {
+	Params []*Parameter
+}
 
 type Parameter struct {
 	Name string
 	From Assignment
 }
 
+func (*Parameters) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "parameters",
+		Spec:  " when {parameters%params+parameter}",
+		Group: "patterns",
+	}
+}
+
 func (*Parameter) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "parameter",
+		Spec:  "its {name:text} is {from:assignment}",
 		Group: "patterns",
 	}
 }
@@ -42,11 +53,13 @@ func (op *FromPattern) Stitch(run rt.Runtime, fn func(p interface{}) error) (err
 		err = e
 	} else {
 		parms := make(scope.Parameters)
-		for _, a := range op.Parameters {
-			if e := a.From.Assign(run, func(i interface{}) (err error) {
-				return parms.SetVariable(a.Name, i)
-			}); e != nil {
-				err = errutil.Append(err, e)
+		if op.Parameters != nil {
+			for _, a := range op.Parameters.Params {
+				if e := a.From.Assign(run, func(i interface{}) (err error) {
+					return parms.SetVariable(a.Name, i)
+				}); e != nil {
+					err = errutil.Append(err, e)
+				}
 			}
 		}
 		if err == nil {
@@ -62,15 +75,18 @@ func (*DetermineAct) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_act",
 		Group: "patterns",
+		Desc:  "Determine an activity",
 	}
 }
 
 func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
 	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
-		if eval, ok := p.(rt.Execute); !ok {
+		// cast the pattern to an execute
+		// fix: this may require a []cast instead.
+		if exe, ok := p.(rt.Execute); !ok {
 			err = errutil.New("Pattern", op.Name, "not an activity")
 		} else {
-			err = rt.Run(run, eval)
+			err = exe.Execute(run)
 		}
 		return
 	})
@@ -80,7 +96,9 @@ func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
 func (*DetermineNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_num",
+		Spec:  "the {number pattern%name:text}{?parameters}",
 		Group: "patterns",
+		Desc:  "Determine a number",
 	}
 }
 
@@ -99,6 +117,7 @@ func (*DetermineText) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_text",
 		Group: "patterns",
+		Desc:  "Determine some text",
 	}
 }
 func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
@@ -116,6 +135,7 @@ func (*DetermineBool) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_bool",
 		Group: "patterns",
+		Desc:  "Determine a true/false value",
 	}
 }
 
@@ -135,8 +155,10 @@ func (*DetermineNumList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_num_list",
 		Group: "patterns",
+		Desc:  "Determine a list of numbers",
 	}
 }
+
 func (op *DetermineNumList) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
 	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.NumListEval); !ok {
@@ -153,6 +175,7 @@ func (*DetermineTextList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_text_list",
 		Group: "patterns",
+		Desc:  "Determine a list of text",
 	}
 }
 

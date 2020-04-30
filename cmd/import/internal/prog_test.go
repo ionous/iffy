@@ -11,6 +11,7 @@ import (
   "github.com/ionous/iffy/dl/core"
   "github.com/ionous/iffy/ephemera/reader"
   "github.com/ionous/iffy/export"
+  "github.com/ionous/iffy/rt"
   "github.com/ionous/iffy/tables"
   "github.com/kr/pretty"
 )
@@ -21,7 +22,7 @@ func TestImportProg(t *testing.T) {
   if e := json.Unmarshal([]byte(sayStory), &in); e != nil {
     t.Fatal(e)
   } else {
-    var prog check.Test
+    var prog check.TestOutput
     cmds := makeTypeMap(export.Slats)
     if e := readProg(&prog, in, cmds); e != nil {
       t.Fatal(e)
@@ -45,7 +46,7 @@ func TestProcessProg(t *testing.T) {
       t.Fatal("read json", e)
     } else {
       k := NewImporter(t.Name(), db)
-      if e := imp_test(k, in); e != nil {
+      if e := imp_test_output(k, in); e != nil {
         t.Fatal(e)
       } else {
         var testName string
@@ -62,7 +63,7 @@ func TestProcessProg(t *testing.T) {
           if e := db.QueryRow("select * from eph_prog").Scan(&id, &typeName, &prog); e != nil {
             t.Fatal(e)
           } else {
-            var res check.Test
+            var res check.TestOutput
             t.Log(id, typeName)
             dec := gob.NewDecoder(bytes.NewBuffer(prog))
             if e := dec.Decode(&res); e != nil {
@@ -77,32 +78,31 @@ func TestProcessProg(t *testing.T) {
   }
 }
 
-var sayTest = check.Test{
-  TestName: "hello, goodbye",
-  Go: &core.Choose{
-    If: &core.Bool{true},
-    True: &core.Say{
-      Text: &core.Text{"hello"},
-    },
-    False: &core.Say{
-      Text: &core.Text{"goodbye"},
-    },
-  },
-  Lines: "hello",
+var sayTest = check.TestOutput{
+  "hello", []rt.Execute{
+    &core.Choose{
+      If: &core.Bool{true},
+      True: []rt.Execute{&core.Say{
+        Text: &core.Text{"hello"},
+      }},
+      False: []rt.Execute{&core.Say{
+        Text: &core.Text{"goodbye"},
+      }},
+    }},
 }
 
 var sayStory = `{
     "id": "id-1709ef632af-3",
-    "type": "test",
+    "type": "test_output",
     "value": {
-        "$GO": {
+        "$GO": [{
             "id": "id-1709ef632af-1",
             "type": "execute",
             "value": {
                 "id": "id-1709ef632af-7",
                 "type": "choose",
                 "value": {
-                    "$FALSE": {
+                    "$FALSE": [{
                         "id": "id-1709ef632af-4",
                         "type": "execute",
                         "value": {
@@ -126,7 +126,7 @@ var sayStory = `{
                                 }
                             }
                         }
-                    },
+                    }],
                     "$IF": {
                         "id": "id-1709ef632af-5",
                         "type": "bool_eval",
@@ -142,7 +142,7 @@ var sayStory = `{
                             }
                         }
                     },
-                    "$TRUE": {
+                    "$TRUE": [{
                         "id": "id-1709ef632af-6",
                         "type": "execute",
                         "value": {
@@ -166,19 +166,14 @@ var sayStory = `{
                                 }
                             }
                         }
-                    }
+                    }]
                 }
             }
-        },
+        }],
         "$LINES": {
             "id": "id-1709ef632af-2",
             "type": "lines",
             "value": "hello"
-        },
-        "$TEST_NAME": {
-            "id": "id-1709ef632af-0",
-            "type": "text",
-            "value": "hello, goodbye"
         }
     }
 }`

@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/iffy/rt/print"
 )
 
-var helloThereWorld = rt.Block{
+var helloThereWorld = []rt.Execute{
 	&Say{&Text{"hello"}},
 	&Say{&Text{"there"}},
 	&Say{&Text{"world"}},

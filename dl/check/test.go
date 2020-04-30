@@ -9,38 +9,37 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-type Commands struct {
-	*Test
+// Testing interface as a slot for testing commands
+type Testing interface {
+	RunTest(rt.Runtime) error
 }
 
-// Test that the output of running 'Go' statements prints 'Lines'
-type Test struct {
-	TestName string
-	Go       rt.Execute
-	Lines    string
+// TestOutput that running statements prints 'Lines'
+type TestOutput struct {
+	Lines string
+	Go    []rt.Execute
 }
 
-func (*Test) Compose() composer.Spec {
+func (*TestOutput) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "test",
-		Spec:  "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.",
-		Group: "testing",
-		Desc:  "Test: Run some statements, and expect that their output matches a specific value.",
+		Name:  "test_out",
+		Spec:  "expect the text {lines|quote} when running: {activity%go+execute|ghost}",
+		Group: "tests",
+		Desc:  "Test Output: Run some statements, and expect that their output matches a specific value.",
 	}
 }
 
-// GetBool returns true if the test succeeded, otherwise it returns an error.
-func (op *Test) GetBool(run rt.Runtime) (okay bool, err error) {
+// RunTest returns an error on failure.
+func (op *TestOutput) RunTest(run rt.Runtime) (err error) {
 	var buf bytes.Buffer
 	if e := rt.WritersBlock(run, &buf, func() error {
-		return op.Go.Execute(run)
+		return rt.Run(run, op.Go)
 	}); e != nil {
-		err = errutil.New("Test", op.TestName, "encountered error:", e)
+		err = errutil.New("encountered error:", e)
 	} else if t := buf.String(); t != op.Lines {
-		err = errutil.New("Test", op.TestName, "expected:", op.Lines, "got:", t)
+		err = errutil.New("expected:", op.Lines, "got:", t)
 	} else {
-		log.Println("Test '"+op.TestName+"':", t)
-		okay = true
+		log.Println(t)
 	}
 	return
 }

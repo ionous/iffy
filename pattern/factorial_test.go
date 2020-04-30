@@ -18,16 +18,14 @@ func TestFactorial(t *testing.T) {
 				NumberEval: &core.ProductOf{
 					&core.GetVar{"num"},
 					&core.DetermineNum{
-						&core.FromPattern{
-							"factorial", core.Parameters{{
-								"num", &core.FromNum{
-									&core.DiffOf{
-										&core.GetVar{"num"},
-										&core.Number{1},
-									},
+						"factorial", &core.Parameters{[]*core.Parameter{{
+							"num", &core.FromNum{
+								&core.DiffOf{
+									&core.GetVar{"num"},
+									&core.Number{1},
 								},
-							}},
-						},
+							},
+						}}},
 					},
 				},
 			}, {
@@ -43,12 +41,11 @@ func TestFactorial(t *testing.T) {
 		}}}
 	// determine the factorial of the number 3
 	det := core.DetermineNum{
-		&core.FromPattern{"factorial", core.Parameters{{
+		"factorial", &core.Parameters{[]*core.Parameter{{
 			"num", &core.FromNum{
 				&core.Number{3},
 			}},
-		}},
-	}
+		}}}
 	if v, e := rt.GetNumber(&run, &det); e != nil {
 		t.Fatal(e)
 	} else if want := 3.0 * (2 * (1 * 1)); v != want {

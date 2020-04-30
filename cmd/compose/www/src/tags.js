@@ -217,7 +217,6 @@ class TagOutput {
   }
 };
 
-
 // --------------------------------------------------------------------
 class TagParser {
   static parse(msg, options) {

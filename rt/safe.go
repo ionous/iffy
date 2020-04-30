@@ -10,9 +10,11 @@ func (e MissingEval) Error() string { return string(e) }
 
 // Run executes the passed statement using the passed runtime;
 // does *not* error if the passed exec is nil.
-func Run(run Runtime, exec Execute) (err error) {
-	if exec != nil {
-		err = exec.Execute(run)
+func Run(run Runtime, exes []Execute) (err error) {
+	for _, exe := range exes {
+		if exe != nil {
+			err = exe.Execute(run)
+		}
 	}
 	return
 }

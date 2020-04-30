@@ -76,6 +76,7 @@ func (op *FromBool) Assign(run rt.Runtime, fn func(interface{}) error) (err erro
 func (*FromNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_num",
+		Spec:  "{val:number_eval}",
 		Group: "variables",
 		Desc:  "Assign Number: Assigns the passed number.",
 	}

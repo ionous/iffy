@@ -33,7 +33,7 @@ type TextListRule struct {
 // It works in conjunction with ExecRules.
 type ExecuteRule struct {
 	ListRule
-	rt.Execute
+	Go []rt.Execute
 }
 
 func (r *ListRule) ApplyByIndex(run rt.Runtime) (ret Flags, err error) {
@@ -87,8 +87,7 @@ func (ps ExecRules) Execute(run rt.Runtime) (ret bool, err error) {
 		err = e
 	} else {
 		for _, i := range inds {
-			exec := ps[i]
-			if e := (exec.Execute).Execute(run); e != nil {
+			if e := rt.Run(run, ps[i].Go); e != nil {
 				err = e
 				break
 			}

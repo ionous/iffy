@@ -31,6 +31,11 @@ const spec = [
     "uses": "slot"
   },
   {
+    "desc": "Testing: Run a series of tests.",
+    "name": "testing",
+    "uses": "slot"
+  },
+  {
     "desc": "Texts: Statements which return text.",
     "name": "text_eval",
     "uses": "slot"
@@ -131,20 +136,11 @@ const spec = [
       "variables"
     ],
     "name": "assign_num",
+    "spec": "{val:number_eval}",
     "uses": "run",
     "with": {
-      "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "number_eval"
-        }
-      },
       "slots": [
         "assignment"
-      ],
-      "tokens": [
-        "from num",
-        "$VAL"
       ]
     }
   },
@@ -268,8 +264,9 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$BLOCK": {
-          "label": "block",
+        "$GO": {
+          "label": "go",
+          "repeats": true,
           "type": "execute"
         }
       },
@@ -278,7 +275,7 @@ const spec = [
       ],
       "tokens": [
         "bracket",
-        "$BLOCK"
+        "$GO"
       ]
     }
   },
@@ -290,8 +287,9 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$BLOCK": {
-          "label": "block",
+        "$GO": {
+          "label": "go",
+          "repeats": true,
           "type": "execute"
         }
       },
@@ -300,7 +298,7 @@ const spec = [
       ],
       "tokens": [
         "buffer",
-        "$BLOCK"
+        "$GO"
       ]
     }
   },
@@ -412,8 +410,9 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$BLOCK": {
-          "label": "block",
+        "$GO": {
+          "label": "go",
+          "repeats": true,
           "type": "execute"
         }
       },
@@ -422,7 +421,7 @@ const spec = [
       ],
       "tokens": [
         "commas",
-        "$BLOCK"
+        "$GO"
       ]
     }
   },
@@ -484,6 +483,7 @@ const spec = [
     }
   },
   {
+    "desc": "Determine an activity",
     "group": [
       "patterns"
     ],
@@ -497,8 +497,7 @@ const spec = [
         },
         "$PARAMETERS": {
           "label": "parameters",
-          "repeats": true,
-          "type": "parameter"
+          "type": "parameters"
         }
       },
       "slots": [
@@ -512,6 +511,7 @@ const spec = [
     }
   },
   {
+    "desc": "Determine a true/false value",
     "group": [
       "patterns"
     ],
@@ -525,8 +525,7 @@ const spec = [
         },
         "$PARAMETERS": {
           "label": "parameters",
-          "repeats": true,
-          "type": "parameter"
+          "type": "parameters"
         }
       },
       "slots": [
@@ -540,34 +539,21 @@ const spec = [
     }
   },
   {
+    "desc": "Determine a number",
     "group": [
       "patterns"
     ],
     "name": "determine_num",
+    "spec": "the {number pattern%name:text}{?parameters}",
     "uses": "run",
     "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        },
-        "$PARAMETERS": {
-          "label": "parameters",
-          "repeats": true,
-          "type": "parameter"
-        }
-      },
       "slots": [
         "number_eval"
-      ],
-      "tokens": [
-        "determine num",
-        "$NAME",
-        "$PARAMETERS"
       ]
     }
   },
   {
+    "desc": "Determine a list of numbers",
     "group": [
       "patterns"
     ],
@@ -581,8 +567,7 @@ const spec = [
         },
         "$PARAMETERS": {
           "label": "parameters",
-          "repeats": true,
-          "type": "parameter"
+          "type": "parameters"
         }
       },
       "slots": [
@@ -596,6 +581,7 @@ const spec = [
     }
   },
   {
+    "desc": "Determine some text",
     "group": [
       "patterns"
     ],
@@ -609,8 +595,7 @@ const spec = [
         },
         "$PARAMETERS": {
           "label": "parameters",
-          "repeats": true,
-          "type": "parameter"
+          "type": "parameters"
         }
       },
       "slots": [
@@ -624,6 +609,7 @@ const spec = [
     }
   },
   {
+    "desc": "Determine a list of text",
     "group": [
       "patterns"
     ],
@@ -637,8 +623,7 @@ const spec = [
         },
         "$PARAMETERS": {
           "label": "parameters",
-          "repeats": true,
-          "type": "parameter"
+          "type": "parameters"
         }
       },
       "slots": [
@@ -730,10 +715,12 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
+          "repeats": true,
           "type": "execute"
         },
         "$GO": {
           "label": "go",
+          "repeats": true,
           "type": "execute"
         },
         "$IN": {
@@ -763,10 +750,12 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
+          "repeats": true,
           "type": "execute"
         },
         "$GO": {
           "label": "go",
+          "repeats": true,
           "type": "execute"
         },
         "$IN": {
@@ -795,10 +784,10 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "bool_eval",
         "number_eval",
-        "text_eval",
         "num_list_eval",
+        "bool_eval",
+        "text_eval",
         "text_list_eval"
       ]
     }
@@ -809,14 +798,14 @@ const spec = [
       "variables"
     ],
     "name": "get_var",
-    "spec": "the variable {name:text|quote}",
+    "spec": "{name:text}",
     "uses": "run",
     "with": {
       "slots": [
-        "bool_eval",
         "number_eval",
-        "text_eval",
         "num_list_eval",
+        "bool_eval",
+        "text_eval",
         "text_list_eval"
       ]
     }
@@ -1082,50 +1071,35 @@ const spec = [
       "patterns"
     ],
     "name": "parameter",
+    "spec": "its {name:text} is {from:assignment}",
     "uses": "run",
-    "with": {
-      "params": {
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        }
-      },
-      "tokens": [
-        "parameter",
-        "$NAME",
-        "$FROM"
-      ]
-    }
+    "with": {}
   },
   {
-    "desc": "Num as text: Writes a number using numerals, eg. '1'.",
+    "group": [
+      "patterns"
+    ],
+    "name": "parameters",
+    "spec": " when {parameters%params+parameter}",
+    "uses": "run",
+    "with": {}
+  },
+  {
+    "desc": "A number as text: Writes a number using numerals, eg. '1'.",
     "group": [
       "printing"
     ],
     "name": "print_num",
+    "spec": "as text {num:number_eval}",
     "uses": "run",
     "with": {
-      "params": {
-        "$NUM": {
-          "label": "num",
-          "type": "number_eval"
-        }
-      },
       "slots": [
         "text_eval"
-      ],
-      "tokens": [
-        "print num",
-        "$NUM"
       ]
     }
   },
   {
-    "desc": "Num in words: Writes a number in plain english: eg. 'one'",
+    "desc": "A number in words: Writes a number in plain english: eg. 'one'",
     "group": [
       "printing"
     ],
@@ -1448,8 +1422,9 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$BLOCK": {
-          "label": "block",
+        "$GO": {
+          "label": "go",
+          "repeats": true,
           "type": "execute"
         }
       },
@@ -1458,7 +1433,7 @@ const spec = [
       ],
       "tokens": [
         "slash",
-        "$BLOCK"
+        "$GO"
       ]
     }
   },
@@ -1471,8 +1446,9 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$BLOCK": {
-          "label": "block",
+        "$GO": {
+          "label": "go",
+          "repeats": true,
           "type": "execute"
         }
       },
@@ -1481,7 +1457,7 @@ const spec = [
       ],
       "tokens": [
         "span",
-        "$BLOCK"
+        "$GO"
       ]
     }
   },
@@ -1529,16 +1505,16 @@ const spec = [
     }
   },
   {
-    "desc": "Test: Run some statements, and expect that their output matches a specific value.",
+    "desc": "Test Output: Run some statements, and expect that their output matches a specific value.",
     "group": [
-      "testing"
+      "tests"
     ],
-    "name": "test",
-    "spec": "For the test {test_name:text|quote}, expect the output {lines|quote} when running: {go+execute|ghost}.",
+    "name": "test_out",
+    "spec": "expect the text {lines|quote} when running: {activity%go+execute|ghost}",
     "uses": "run",
     "with": {
       "slots": [
-        "bool_eval"
+        "testing"
       ]
     }
   },
@@ -1666,7 +1642,7 @@ const spec = [
     "uses": "group"
   },
   {
-    "name": "testing",
+    "name": "tests",
     "uses": "group"
   },
   {

@@ -43,16 +43,20 @@ func WalkProperties(rtype r.Type, fn PropertyFunc) (done bool) {
 }
 
 func walkProperties(rtype r.Type, base []int, fn PropertyFunc) (done bool) {
-	for i := 0; i < rtype.NumField(); i++ {
-		field := rtype.Field(i)
-		if IsPublic(field) {
-			path := append(base, i)
-			if !IsEmbedded(field) {
-				if fn(&field, path) {
+	if rtype.Kind() != r.Struct {
+		panic(rtype.String() + " not a struct")
+	} else {
+		for i := 0; i < rtype.NumField(); i++ {
+			field := rtype.Field(i)
+			if IsPublic(field) {
+				path := append(base, i)
+				if !IsEmbedded(field) {
+					if fn(&field, path) {
+						break
+					}
+				} else if walkProperties(field.Type, path, fn) {
 					break
 				}
-			} else if walkProperties(field.Type, path, fn) {
-				break
 			}
 		}
 	}

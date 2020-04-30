@@ -30,6 +30,8 @@ var Slots = map[string]Slot{
 		Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc."},
 	"assignment": {Type: (*core.Assignment)(nil),
 		Desc: "Assignments: Helper used when setting variables."},
+	"testing": {Type: (*check.Testing)(nil),
+		Desc: "Testing: Run a series of tests."},
 }
 
 func Register(reg func(value interface{})) {
@@ -39,7 +41,8 @@ func Register(reg func(value interface{})) {
 }
 
 var Slats = []composer.Specification{
-	(*check.Test)(nil),
+	(*check.TestOutput)(nil),
+	//
 	(*core.AllTrue)(nil),
 	(*core.AnyTrue)(nil),
 
@@ -57,6 +60,7 @@ var Slats = []composer.Specification{
 	(*core.DetermineBool)(nil),
 	(*core.DetermineNumList)(nil),
 	(*core.DetermineTextList)(nil),
+	(*core.Parameters)(nil),
 	(*core.Parameter)(nil),
 
 	// FIX: Choose scalar/any?

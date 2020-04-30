@@ -27,15 +27,13 @@ func ExampleSayMe() {
 	// say 4 numbers
 	for i := 1; i <= 4; i++ {
 		det := core.DetermineText{
-			&core.FromPattern{
-				"sayMe", core.Parameters{{
-					"num",
-					&core.FromNum{
-						&core.Number{float64(i)},
-					},
+			"sayMe", &core.Parameters{[]*core.Parameter{{
+				"num",
+				&core.FromNum{
+					&core.Number{float64(i)},
 				},
-				},
-			}}
+			}}},
+		}
 		if text, e := rt.GetText(&run, &det); e != nil {
 			fmt.Println("Error:", e)
 			break

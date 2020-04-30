@@ -22,7 +22,8 @@ type PrintNumWord struct {
 func (*PrintNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "print_num",
-		Desc:  "Num as text: Writes a number using numerals, eg. '1'.",
+		Spec:  "as text {num:number_eval}",
+		Desc:  "A number as text: Writes a number using numerals, eg. '1'.",
 		Group: "printing",
 	}
 }
@@ -42,7 +43,7 @@ func (p *PrintNum) GetText(run rt.Runtime) (ret string, err error) {
 func (*PrintNumWord) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "print_num_word",
-		Desc:  "Num in words: Writes a number in plain english: eg. 'one'",
+		Desc:  "A number in words: Writes a number in plain english: eg. 'one'",
 		Group: "printing",
 	}
 }

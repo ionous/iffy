@@ -15,7 +15,7 @@ type DoNothing struct{}
 // If the list is empty, it executes an alternative block of statements.
 type ForEachNum struct {
 	In       rt.NumListEval
-	Go, Else rt.Execute
+	Go, Else []rt.Execute
 }
 
 // ForEachText visits values in a text list.
@@ -23,7 +23,7 @@ type ForEachNum struct {
 // If the list is empty, it executes an alternative block of statements.
 type ForEachText struct {
 	In       rt.TextListEval
-	Go, Else rt.Execute
+	Go, Else []rt.Execute
 }
 
 func (*DoNothing) Compose() composer.Spec {
@@ -104,9 +104,14 @@ func (h *readOnlyValue) GetVariable(n string) (ret interface{}, err error) {
 	return
 }
 
-func loop(run rt.Runtime, it interface{ HasNext() bool }, Go, Else rt.Execute, next func() (scope.ReadOnly, error)) (err error) {
+func loop(
+	run rt.Runtime,
+	it interface{ HasNext() bool },
+	Go, Else []rt.Execute,
+	next func() (scope.ReadOnly, error),
+) (err error) {
 	if !it.HasNext() {
-		if e := Else.Execute(run); e != nil {
+		if e := rt.Run(run, Else); e != nil {
 			err = e
 		}
 	} else {

@@ -9,7 +9,7 @@ import (
 // Returns allows a local variable to be used as an output.
 type Returns struct {
 	Name  string
-	Using rt.Execute
+	Using []rt.Execute
 }
 
 type returnScope struct {

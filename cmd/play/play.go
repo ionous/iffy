@@ -12,7 +12,6 @@ import (
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/qna"
-	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -43,7 +42,7 @@ func playFile(inFile string) (err error) {
 			on (pg.rowid = ck.idProg)
 		order by ck.name`,
 			func() (err error) {
-				var res check.Test
+				var res check.TestOutput
 				dec := gob.NewDecoder(bytes.NewBuffer(prog))
 				if e := dec.Decode(&res); e != nil {
 					log.Println(e)
@@ -58,12 +57,11 @@ func playFile(inFile string) (err error) {
 	return
 }
 
-func runTest(prog rt.BoolEval) (err error) {
-	run := qna.NewRuntime(nil)
-	if ok, e := rt.GetBool(run, prog); e != nil {
+func runTest(prog check.Testing) (err error) {
+	if e := prog.RunTest(qna.NewRuntime(nil)); e != nil {
 		err = e
-	} else if !ok {
-		err = errutil.New("unexpected failure", prog)
+	} else if e != nil {
+		err = errutil.New("unexpected failure", prog, e)
 	}
 	return
 }
