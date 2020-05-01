@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"bitbucket.org/pkg/inflect"
+	"github.com/ionous/inflect"
 )
 
 type Dict map[string]interface{}

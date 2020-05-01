@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"bitbucket.org/pkg/inflect"
+	"github.com/ionous/inflect"
 )
 
 var Articles = []string{"the", "a", "an", "our", "some"}
