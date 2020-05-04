@@ -28,7 +28,7 @@ func TestVariableTypePrimitive(t *testing.T) {
 	defer db.Close()
 	if varType, e := imp_variable_type(k, _variable_type); e != nil {
 		t.Fatal(e)
-	} else if varType.String() != tables.EVAL_EXPR {
+	} else if varType.String() != "text_eval" {
 		t.Fatal(varType)
 	}
 }
@@ -73,7 +73,7 @@ func TestPrimitiveType(t *testing.T) {
 	defer db.Close()
 	if typ, e := imp_primitive_type(k, _primitive_type); e != nil {
 		t.Fatal(e)
-	} else if typ.String() != "bool" {
+	} else if typ.String() != "bool_eval" {
 		t.Fatal(typ)
 	}
 }
@@ -83,7 +83,7 @@ func TestPatternType_Activity(t *testing.T) {
 	defer db.Close()
 	if typ, e := imp_pattern_type(k, _pattern_type_activity); e != nil {
 		t.Fatal(e)
-	} else if typ.String() != "prog" {
+	} else if typ.String() != "execute" {
 		t.Fatal(typ)
 	}
 }
@@ -93,7 +93,7 @@ func TestPatternType_Primitive(t *testing.T) {
 	defer db.Close()
 	if typ, e := imp_pattern_type(k, _pattern_type_primitive); e != nil {
 		t.Fatal(e)
-	} else if typ.String() != "bool" {
+	} else if typ.String() != "bool_eval" {
 		t.Fatal(typ)
 	}
 }
@@ -119,7 +119,7 @@ func TestPatternDecl(t *testing.T) {
 		tables.WriteCsv(db, &buf, "select * from eph_pattern", 3)
 		if diff := pretty.Diff(buf.String(), lines(
 			"corral,pattern_name", // 1
-			"prog,type",           // 2
+			"execute,type",        // 2
 			"1,1,2",
 		)); len(diff) > 0 {
 			t.Fatal("mismatch", diff)

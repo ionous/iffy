@@ -110,7 +110,7 @@ func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
 	r.cache.Must(eph_check, test, prog, expect)
 }
 
-func (r *Recorder) NewPattern(pattern Named, patternType Named) {
+func (r *Recorder) NewPatternType(pattern Named, patternType Named) {
 	r.cache.Must(eph_pattern, pattern, pattern, patternType)
 }
 

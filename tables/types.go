@@ -11,14 +11,6 @@ const (
 	PRIM_TRAIT  = "trait"  // string
 )
 
-// evalType
-const (
-	EVAL_EXPR = "expr" // string
-	EVAL_COMP = "comp" // number
-	EVAL_BOOL = "bool" // boolean
-	EVAL_PROG = "prog" // text expression
-)
-
 // named category
 // FIX -- make these match the names in the file and things are much cleaner
 const (

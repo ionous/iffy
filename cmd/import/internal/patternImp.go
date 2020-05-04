@@ -33,7 +33,7 @@ func imp_patterned_activity(k *Importer, r reader.Map) (ret ephemera.Named, err 
 	if e := k.expectConst(r, "patterned_activity", "$ACTIVITY"); e != nil {
 		err = e
 	} else {
-		ret = k.Named(tables.NAMED_TYPE, tables.EVAL_PROG, at(r))
+		ret = k.Named(tables.NAMED_TYPE, "execute", at(r))
 	}
 	return
 }

@@ -113,12 +113,13 @@ func imp_kinds_of_thing(k *Importer, r reader.Map) (err error) {
 func imp_kinds_possess_properties(k *Importer, r reader.Map) (err error) {
 	if m, e := k.expectSlat(r, "kinds_possess_properties"); e != nil {
 		err = e
-	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
+	} else if _, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
+		err = e
+	} else if _, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
 		err = e
 	} else {
-		prop := k.namedStr(m, tables.NAMED_KIND, "$PROPERTY")
-		primType := k.getStr(m, "$PRIMITIVE_TYPE")
-		k.NewPrimitive(primType, kind, prop)
+		// opt.property_phrase missing
+		err = Unimplemented
 	}
 	return
 }
@@ -152,7 +153,7 @@ func imp_noun_statement(k *Importer, r reader.Map) (err error) {
 	return
 }
 
-// Adds a NewPattern, and optionally some associated pattern parameters.
+// Adds a NewPatternType, and optionally some associated pattern parameters.
 // {name:pattern_name|quote} determines {type:pattern_type}.
 // {optvars?pattern_variables_tail}
 func imp_pattern_decl(k *Importer, r reader.Map) (err error) {
@@ -163,7 +164,7 @@ func imp_pattern_decl(k *Importer, r reader.Map) (err error) {
 	} else if typ, e := imp_pattern_type(k, m.MapOf("$TYPE")); e != nil {
 		err = e
 	} else {
-		k.NewPattern(pat, typ)
+		k.NewPatternType(pat, typ)
 		if tail := m.MapOf("$OPTVARS"); len(tail) > 0 {
 			err = imp_pattern_variables_tail(k, pat, tail)
 		}
@@ -243,18 +244,20 @@ func imp_relative_to_noun(k *Importer, r reader.Map) (err error) {
 	return
 }
 
-func imp_test_statement(k *Importer, outer reader.Map) (err error) {
-	return k.expectSlot(outer, "testing", map[string]Parse{
+func imp_test_statement(k *Importer, r reader.Map) (err error) {
+	return k.expectSlot(r, "testing", map[string]Parse{
 		"test_output": imp_test_output,
 	})
 }
 
-func imp_test_output(k *Importer, outer reader.Map) (err error) {
-	if m, e := k.expectSlat(outer, "test_output"); e != nil {
+func imp_test_output(k *Importer, r reader.Map) (err error) {
+	outer := r
+	if m, e := k.expectSlat(r, "test_output"); e != nil {
+		err = e
+	} else if expect, e := imp_lines(k, m.MapOf("$LINES")); e != nil {
 		err = e
 	} else {
 		test := k.namedStr(m, tables.NAMED_TEST, "$TEST_NAME")
-		expect := k.getStr(m, "$LINES")
 		var prog check.TestOutput
 		if e := ReadProg(&prog, reader.Unbox(outer), cmds); e != nil {
 			err = e
@@ -265,4 +268,8 @@ func imp_test_output(k *Importer, outer reader.Map) (err error) {
 		}
 	}
 	return
+}
+
+func imp_lines(k *Importer, r reader.Map) (ret string, err error) {
+	return k.expectStr(r, "lines")
 }

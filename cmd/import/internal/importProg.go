@@ -2,6 +2,7 @@ package internal
 
 import (
 	"database/sql"
+	"fmt"
 	r "reflect"
 
 	"github.com/ionous/errutil"
@@ -25,6 +26,18 @@ func ImportStory(src string, in reader.Map, db *sql.DB) error {
 
 type typeMap map[string]composer.Specification
 
+type importCallback func(interface{}) error
+
+var importCallbacks = make(map[string]importCallback)
+
+func RegisterCallback(c composer.Specification, cb importCallback) {
+	if spec := c.Compose(); len(spec.Name) == 0 {
+		panic(fmt.Sprintln("missing name for type", c))
+	} else {
+		importCallbacks[spec.Name] = cb
+	}
+}
+
 func makeTypeMap(runs []composer.Specification) typeMap {
 	m := make(typeMap)
 	for _, cmd := range runs {
@@ -38,27 +51,34 @@ func makeTypeMap(runs []composer.Specification) typeMap {
 }
 
 // read in-memory json into go-lang structs
-func ReadProg(targetPtr interface{}, inData export.Dict, types typeMap) (err error) {
-	out := r.ValueOf(targetPtr).Elem()
-	return unmarshall(out, inData, types)
+func ReadProg(targetPtr interface{}, inData export.Dict, types typeMap) error {
+	outPtr := r.ValueOf(targetPtr)
+	return unmarshall(outPtr, inData, types)
 }
 
 func ImportSlot(targetType interface{}, inData export.Dict, types typeMap) (ret interface{}, err error) {
 	slotType := r.TypeOf(targetType).Elem()
-	if v, e := importSlot(inData, slotType, types); e != nil {
+	if newPtr, e := importSlot(inData, slotType, types); e != nil {
 		err = e
 	} else {
-		ret = v.Interface()
+		ret = newPtr.Interface()
 	}
 	return
 }
 
-func unmarshall(out r.Value, inData export.Dict, types typeMap) (err error) {
+func unmarshall(outPtr r.Value, inData export.Dict, types typeMap) (err error) {
 	if inVal, ok := inData[itemValue].(map[string]interface{}); !ok {
 		err = errutil.New("unexpected value in data", inData)
-	} else if e := unmarshallFields(out, inVal, types); e != nil {
-		id, _ := inData[itemId].(string)
-		err = errutil.Append(errutil.New("unmarshall", id, "error(s):"), e)
+	} else if e := unmarshallFields(outPtr.Elem(), inVal, types); e != nil {
+		at, _ := inData[itemId].(string)
+		err = errutil.Append(errutil.New("unmarshall", at, "error(s):"), e)
+	} else {
+		// notify import code that a particular type has been parsed.
+		typeName, _ := inData[itemType].(string)
+		if cb, ok := importCallbacks[typeName]; ok {
+			loaded := outPtr.Interface()
+			err = cb(loaded)
+		}
 	}
 	return
 }
@@ -204,15 +224,15 @@ func importSlot(slot export.Dict, slotType r.Type, types typeMap) (ret r.Value, 
 	if cmd, ok := types[typeName]; !ok {
 		err = errutil.New("unknown type", typeName, slot)
 	} else {
-		rtype := r.TypeOf(cmd)
+		rtype := r.TypeOf(cmd) // commands are pointers to things
 		if !rtype.AssignableTo(slotType) {
 			err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
 		} else {
-			v := r.New(rtype.Elem())
-			if e := unmarshall(v.Elem(), slot, types); e != nil {
+			newPtr := r.New(rtype.Elem()) // we want to new the concrete element; which gives us a new pointer.
+			if e := unmarshall(newPtr, slot, types); e != nil {
 				err = e
 			} else {
-				ret = v
+				ret = newPtr // we want to return
 			}
 		}
 	}

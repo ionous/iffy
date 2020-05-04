@@ -10,7 +10,7 @@ import (
 
 // FromPattern helps runs a pattern
 type FromPattern struct {
-	Name       string      // i  guess a text eval here would be like a function pointer.
+	Name       string      // i guess a text eval here would be like a function pointer.
 	Parameters *Parameters // for optional parameters ( and formatting )
 }
 
@@ -41,7 +41,7 @@ func (*Parameters) Compose() composer.Spec {
 func (*Parameter) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "parameter",
-		Spec:  "its {name:text} is {from:assignment}",
+		Spec:  "its {name:variable_name} is {from:assignment}",
 		Group: "patterns",
 	}
 }
@@ -96,7 +96,7 @@ func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
 func (*DetermineNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_num",
-		Spec:  "the {number pattern%name:text}{?parameters}",
+		Spec:  "the {number pattern%name:pattern_name}{?parameters}",
 		Group: "patterns",
 		Desc:  "Determine a number",
 	}
@@ -113,13 +113,16 @@ func (op *DetermineNum) GetNumber(run rt.Runtime) (ret float64, err error) {
 	})
 	return
 }
+
 func (*DetermineText) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_text",
+		Spec:  "the {text pattern%name:pattern_name}{?parameters}",
 		Group: "patterns",
 		Desc:  "Determine some text",
 	}
 }
+
 func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
 	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.TextEval); !ok {
@@ -131,9 +134,11 @@ func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
 	})
 	return
 }
+
 func (*DetermineBool) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_bool",
+		Spec:  "the {true/false pattern%name:pattern_name}{?parameters}",
 		Group: "patterns",
 		Desc:  "Determine a true/false value",
 	}
@@ -154,6 +159,7 @@ func (op *DetermineBool) GetBool(run rt.Runtime) (ret bool, err error) {
 func (*DetermineNumList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_num_list",
+		Spec:  "the {number list pattern%name:pattern_name}{?parameters}",
 		Group: "patterns",
 		Desc:  "Determine a list of numbers",
 	}
@@ -174,6 +180,7 @@ func (op *DetermineNumList) GetNumberStream(run rt.Runtime) (ret rt.Iterator, er
 func (*DetermineTextList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_text_list",
+		Spec:  "the {text list pattern%name:pattern_name}{?parameters}",
 		Group: "patterns",
 		Desc:  "Determine a list of text",
 	}

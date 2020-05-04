@@ -127,9 +127,11 @@ func imp_noun(k *Importer, r reader.Map) (err error) {
 func imp_common_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := k.expectSlat(r, "common_noun"); e != nil {
 		err = e
+	} else if det, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
+		err = e
 	} else {
 		id := r.StrOf(itemId)
-		det := k.getStr(m, "$DETERMINER")
+
 		noun := k.namedStr(m, tables.NAMED_NOUN, "$COMMON_NAME")
 		k.nouns.Add(noun)
 		// set common nounType to true ( implicitly defined by "noun" )
@@ -147,6 +149,10 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 		}
 	}
 	return
+}
+
+func imp_determiner(k *Importer, r reader.Map) (ret string, err error) {
+	return k.expectStr(r, "determiner")
 }
 
 // run: "{proper_name}"
@@ -254,9 +260,9 @@ func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error
 // returns one of the evalType(s)
 func imp_primitive_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	if evalType, e := k.expectEnum(r, "primitive_type", map[string]interface{}{
-		"$NUMBER": tables.EVAL_COMP,
-		"$TEXT":   tables.EVAL_EXPR,
-		"$BOOL":   tables.EVAL_BOOL,
+		"$NUMBER": "number_eval",
+		"$TEXT":   "text_eval",
+		"$BOOL":   "bool_eval",
 	}); e != nil {
 		err = e
 	} else {

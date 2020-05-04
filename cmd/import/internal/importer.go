@@ -69,11 +69,6 @@ func (k *Importer) once(s string) (ret bool) {
 	return
 }
 
-// return m[key]["value"] as a string
-func (*Importer) getStr(m reader.Map, param string) string {
-	return m.MapOf(param).StrOf(itemValue)
-}
-
 // return { m[key] } as a new Named entry
 // named elements are considered unique within their category
 func (k *Importer) namedStr(m reader.Map, cat, key string) ephemera.Named {
@@ -217,16 +212,6 @@ func (k *Importer) expectStr(m reader.Map, expectedType string) (ret string, err
 		err = wrongValue(t, v, at(m))
 	} else {
 		ret = v
-	}
-	return
-}
-
-// expect a string variable
-func (k *Importer) expectName(m reader.Map, expectedType, cat string) (err error) {
-	if t := m.StrOf(itemType); t != expectedType {
-		err = wrongType(expectedType, t, at(m))
-	} else if v := m.StrOf(itemValue); len(v) == 0 {
-		err = wrongValue(t, v, at(m))
 	}
 	return
 }
