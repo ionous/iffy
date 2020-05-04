@@ -1,8 +1,6 @@
 package lang
 
 import (
-	"fmt"
-	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -20,9 +18,15 @@ func TestStripArticle(t *testing.T) {
 
 	for _, p := range p {
 		a, b := SliceArticle(p.src)
-		require.Equal(t, p.text, b, fmt.Sprintf("text: '%s'", p.src))
-		require.Equal(t, p.article, a, fmt.Sprintf("text: '%s'", p.src))
+		if p.text != b {
+			t.Fatalf("text: '%s'", p.src)
+		}
+		if p.article != a {
+			t.Fatalf("text: '%s'", p.src)
+		}
 	}
 
-	require.EqualValues(t, "article", StripArticle("the article"))
+	if "article" != StripArticle("the article") {
+		t.Fatal("article")
+	}
 }

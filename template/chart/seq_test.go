@@ -1,21 +1,38 @@
 package chart
 
 import (
-	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestSeq(t *testing.T) {
-	assert, x := testify.New(t), true
-	x = x && assert.NoError(testSeq(t, "", "")) // arguments are optional.
-	x = x && assert.NoError(testSeq(t, "a", "a"))
-	x = x && assert.NoError(testSeq(t, "x+y", "x y ADD"))
-	x = x && assert.NoError(testSeq(t, "x  +  y  ", "x y ADD"))
-	x = x && assert.NoError(testSeq(t, "(x+y)*z", "x y ADD z MUL"))
-	x = x && assert.NoError(testSeq(t, "( x + y ) * ( z ) ", "x y ADD z MUL"))
-	x = x && assert.NoError(testSeq(t, "(5+6)*(7+8)", "5 6 ADD 7 8 ADD MUL"))
-	x = x && assert.Error(testSeq(t, "() ", ignoreResult))
-	x = x && assert.Error(testSeq(t, "( x + y ) * () ", ignoreResult))
+	if e := testSeq(t, "", ""); e != nil {
+		// arguments are optional.
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "a", "a"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "x+y", "x y ADD"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "x  +  y  ", "x y ADD"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "(x+y)*z", "x y ADD z MUL"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "( x + y ) * ( z ) ", "x y ADD z MUL"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "(5+6)*(7+8)", "5 6 ADD 7 8 ADD MUL"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "() ", ignoreResult); e == nil {
+		t.Fatal(e)
+	}
+	if e := testSeq(t, "( x + y ) * () ", ignoreResult); e == nil {
+		t.Fatal(e)
+	}
 }
 
 func testSeq(t *testing.T, str, want string) error {

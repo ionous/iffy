@@ -1,20 +1,29 @@
 package chart
 
 import (
-	testify "github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestQuotes(t *testing.T) {
-	assert, x := testify.New(t), true
-	x = x && assert.NoError(testQ(t, "'singles'", "singles"))
-	x = x && assert.NoError(testQ(t, `"doubles"`, "doubles"))
-	x = x && assert.NoError(testQ(t, "'escape\"'", "escape\""))
-	x = x && assert.NoError(testQ(t, `"\\"`, "\\"))
-	x = x && assert.NoError(testQ(t, string([]rune{'"', '\\', 'a', '"'}),
-		"\a"))
-	x = x && assert.Error(testQ(t, string([]rune{'"', '\\', 'g', '"'}),
-		ignoreResult))
+	if e, x := testQ(t, "'singles'", "singles"); e != nil {
+		t.Fatal(e, x)
+	}
+	if e, x := testQ(t, `"doubles"`, "doubles"); e != nil {
+		t.Fatal(e, x)
+	}
+	if e, x := testQ(t, "'escape\"'", "escape\""); e != nil {
+		t.Fatal(e, x)
+	}
+	if e, x := testQ(t, `"\\"`, "\\"); e != nil {
+		t.Fatal(e, x)
+	}
+	if e, x := testQ(t, string([]rune{'"', '\\', 'a', '"'}), "\a"); e != nil {
+		t.Fatal(e, x)
+	}
+	if e, _ := testQ(t, string([]rune{'"', '\\', 'g', '"'}),
+		ignoreResult); e == nil {
+		t.Fatal(e)
+	}
 }
 
 func testQ(t *testing.T, str, want string) (err error, ret interface{}) {

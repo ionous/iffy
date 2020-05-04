@@ -1,10 +1,11 @@
 package parser_test
 
 import (
-	. "github.com/ionous/iffy/parser"
-	testify "github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	. "github.com/ionous/iffy/parser"
+	testify "github.com/stretchr/testify/assert"
 )
 
 func TestWord(t *testing.T) {
@@ -38,7 +39,6 @@ func TestVariousOf(t *testing.T) {
 	t.Run("any", func(t *testing.T) {
 		wordList := words("beep", "blox")
 		t.Run("match", func(t *testing.T) {
-
 			if res, e := match("Beep", &AnyOf{wordList}); testify.NoError(t, e) {
 				testify.EqualValues(t,
 					ResolvedWord{"Beep"}, res)

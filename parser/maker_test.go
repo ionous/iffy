@@ -1,23 +1,28 @@
 package parser_test
 
 import (
-	"github.com/ionous/sliceOf"
-	testify "github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/ionous/sliceOf"
+	"github.com/kr/pretty"
 )
 
 func TestPhraseMaker(t *testing.T) {
-	assert := testify.New(t)
-	assert.EqualValues(sliceOf.String("look"), Phrases("look"))
-	assert.EqualValues(sliceOf.String("look", "l"), Phrases("look/l"))
-
-	assert.EqualValues([]string{
+	if diff := pretty.Diff(sliceOf.String("look"), Phrases("look")); len(diff) > 0 {
+		t.Fatal(diff)
+	}
+	if diff := pretty.Diff(sliceOf.String("look", "l"), Phrases("look/l")); len(diff) > 0 {
+		t.Fatal(diff)
+	}
+	if diff := pretty.Diff([]string{
 		"look inside something", "look inside wicked",
 		"look in something", "look in wicked",
 		"l inside something", "l inside wicked",
 		"l in something", "l in wicked"},
-		Phrases("look/l inside/in something/wicked"))
+		Phrases("look/l inside/in something/wicked")); len(diff) > 0 {
+		t.Fatal(diff)
+	}
 }
 
 // generate permutations from inform-like slash phrases

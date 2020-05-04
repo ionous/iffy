@@ -1,43 +1,47 @@
 package ident
 
 import (
-	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
 func TestIds(t *testing.T) {
-	assert := assert.New(t)
-	dc := NameOf("DerivedClass")
-	assert.Equal("$derivedClass", dc)
+	testEqual(t, "$derivedClass", NameOf("DerivedClass"))
 }
 
 func TestIdBasics(t *testing.T) {
 	titleCase := NameOf("TitleCase")
-	assert.Equal(t, "$titleCase", titleCase, "TitleCase to camelCase")
-	assert.Equal(t, "$twoWords", NameOf("two words"), "two words to join")
-	assert.Equal(t, "$wordDash", NameOf("word-dash"), "dashes split")
-	assert.Equal(t, "$apostrophes", NameOf("apostrophe's"), "apostrophes vanish")
-	assert.Empty(t, NameOf(""), "empty is as empty does")
-	assert.Equal(t, NameOf("786abc123def"), NameOf("786-abc 123 def"))
+	testEqual(t, "$titleCase", titleCase, "TitleCase to camelCase")
+	testEqual(t, "$twoWords", NameOf("two words"), "two words to join")
+	testEqual(t, "$wordDash", NameOf("word-dash"), "dashes split")
+	testEqual(t, "$apostrophes", NameOf("apostrophe's"), "apostrophes vanish")
+	testEqual(t, NameOf(""), "", "empty is as empty does")
+	testEqual(t, NameOf("786abc123def"), NameOf("786-abc 123 def"))
 }
 
 func TestIdNameOfs(t *testing.T) {
-	assert.EqualValues(t, "$apples", NameOf("apples"))
-	assert.EqualValues(t, "$apples", NameOf("Apples"))
+	testEqual(t, "$apples", NameOf("apples"))
+	testEqual(t, "$apples", NameOf("Apples"))
 
-	assert.EqualValues(t, "$appleTurnover", NameOf("apple turnover"))
-	assert.EqualValues(t, "$appleTurnover", NameOf("Apple Turnover"))
-	assert.EqualValues(t, "$appleTurnover", NameOf("Apple turnover"))
-	assert.EqualValues(t, "$appleTurnover", NameOf("APPLE TURNOVER"))
-	assert.EqualValues(t, "$appleTurnover", NameOf("apple-turnover"))
+	testEqual(t, "$appleTurnover", NameOf("apple turnover"))
+	testEqual(t, "$appleTurnover", NameOf("Apple Turnover"))
+	testEqual(t, "$appleTurnover", NameOf("Apple turnover"))
+	testEqual(t, "$appleTurnover", NameOf("APPLE TURNOVER"))
+	testEqual(t, "$appleTurnover", NameOf("apple-turnover"))
 
-	assert.EqualValues(t, "$pascalCase", NameOf("PascalCase"))
-	assert.EqualValues(t, "$camelCase", NameOf("camelCase"))
+	testEqual(t, "$pascalCase", NameOf("PascalCase"))
+	testEqual(t, "$camelCase", NameOf("camelCase"))
 
-	assert.EqualValues(t, "$somethingLikeThis", NameOf("something-like-this"))
-	assert.EqualValues(t, "$allcaps", NameOf("ALLCAPS"))
+	testEqual(t, "$somethingLikeThis", NameOf("something-like-this"))
+	testEqual(t, "$allcaps", NameOf("ALLCAPS"))
 
-	assert.EqualValues(t, "$whaTaboutThis", NameOf("whaTAboutThis"))
+	testEqual(t, "$whaTaboutThis", NameOf("whaTAboutThis"))
+}
+
+func testEqual(t *testing.T, one, two string, extra ...string) {
+	if one != two {
+		t.Fatal(one, two, strings.Join(extra, " "))
+	}
 }
 
 // TestRecycle to ensure ids generated from ids match.
@@ -54,6 +58,6 @@ func TestRecycle(t *testing.T) {
 	for _, src := range src {
 		id := NameOf(src)
 		recycledId := NameOf(id)
-		assert.Equal(t, id, recycledId)
+		testEqual(t, id, recycledId)
 	}
 }

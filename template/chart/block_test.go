@@ -1,56 +1,104 @@
 package chart
 
 import (
-	"github.com/ionous/errutil"
-	testify "github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/ionous/errutil"
 )
 
 func TestBlocks(t *testing.T) {
-	assert, x := testify.New(t), true
-	x = x && assert.NoError(testBlock(t, "", ""))
-	x = x && assert.NoError(testBlock(t, "abc", "abc"))
-	x = x && assert.NoError(testBlock(t, "{}", "{}"))
+	if e := testBlock(t, "", ""); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "abc", "abc"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{}", "{}"); e != nil {
+		t.Fatal(e)
+	}
 	// mixed: front, end
-	x = x && assert.NoError(testBlock(t, "abc{}", "abc{}"))
-	x = x && assert.NoError(testBlock(t, "{}abc", "{}abc"))
-	x = x && assert.NoError(testBlock(t, "{}{}", "{}{}"))
+	if e := testBlock(t, "abc{}", "abc{}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{}abc", "{}abc"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{}{}", "{}{}"); e != nil {
+		t.Fatal(e)
+	}
 	// long
-	x = x && assert.NoError(testBlock(t, "abc{}d{}efg{}z", "abc{}d{}efg{}z"))
+	if e := testBlock(t, "abc{}d{}efg{}z", "abc{}d{}efg{}z"); e != nil {
+		t.Fatal(e)
+	}
 }
 
 func TestKeys(t *testing.T) {
-	assert, x := testify.New(t), true
-	x = x && assert.NoError(testBlock(t, "{key}", "{key:}"))
-	x = x && assert.NoError(testBlock(t, "{ key }", "{key:}"))
-	x = x && assert.Error(testBlock(t, "{1}", ignoreResult))
-	x = x && assert.Error(testBlock(t, "{key1}", ignoreResult))
+	if e := testBlock(t, "{key}", "{key:}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{ key }", "{key:}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{1}", ignoreResult); e == nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{key1}", ignoreResult); e == nil {
+		t.Fatal(e)
+	}
 }
 
 func TestTrim(t *testing.T) {
-	assert, x := testify.New(t), true
-	x = x && assert.NoError(testBlock(t, "{~~}", "{}"))
-	x = x && assert.NoError(testBlock(t, "    {~~}    ", "{}"))
+	if e := testBlock(t, "{~~}", "{}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "    {~~}    ", "{}"); e != nil {
+		t.Fatal(e)
+	}
 
-	x = x && assert.NoError(testBlock(t, "abc{~ }", "abc{}"))
-	x = x && assert.NoError(testBlock(t, "abc   {~ }", "abc{}"))
+	if e := testBlock(t, "abc{~ }", "abc{}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "abc   {~ }", "abc{}"); e != nil {
+		t.Fatal(e)
+	}
 
-	x = x && assert.NoError(testBlock(t, "{ ~}abc", "{}abc"))
-	x = x && assert.NoError(testBlock(t, "{ ~}    abc", "{}abc"))
+	if e := testBlock(t, "{ ~}abc", "{}abc"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{ ~}    abc", "{}abc"); e != nil {
+		t.Fatal(e)
+	}
 
-	x = x && assert.NoError(testBlock(t, "{ ~}{~ }", "{}{}"))
-	x = x && assert.NoError(testBlock(t, "{ ~}  {~ }", "{}{}"))
-	x = x && assert.NoError(testBlock(t, "abc {  }  d {   } efg  {  }z", "abc {}  d {} efg  {}z"))
-	x = x && assert.NoError(testBlock(t, "abc {~ }  d {~ ~} efg  {~ }z", "abc{}  d{}efg{}z"))
+	if e := testBlock(t, "{ ~}{~ }", "{}{}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "{ ~}  {~ }", "{}{}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "abc {  }  d {   } efg  {  }z", "abc {}  d {} efg  {}z"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "abc {~ }  d {~ ~} efg  {~ }z", "abc{}  d{}efg{}z"); e != nil {
+		t.Fatal(e)
+	}
 }
 
 func TestKeyTrim(t *testing.T) {
-	assert, x := testify.New(t), true
-	x = x && assert.NoError(testBlock(t, "  {~key}", "{key:}"))
-	x = x && assert.NoError(testBlock(t, "  { key}", "  {key:}"))
-	x = x && assert.NoError(testBlock(t, "  {~key~}  ", "{key:}"))
-	x = x && assert.NoError(testBlock(t, "  {key~}  ", "  {key:}"))
-	x = x && assert.NoError(testBlock(t, "  {key}  ", "  {key:}  "))
+	if e := testBlock(t, "  {~key}", "{key:}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "  { key}", "  {key:}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "  {~key~}  ", "{key:}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "  {key~}  ", "  {key:}"); e != nil {
+		t.Fatal(e)
+	}
+	if e := testBlock(t, "  {key}  ", "  {key:}  "); e != nil {
+		t.Fatal(e)
+	}
 }
 
 func testBlock(t *testing.T, str string, want string) (err error) {
