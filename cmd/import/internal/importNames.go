@@ -5,11 +5,6 @@ import (
 	"github.com/ionous/iffy/ephemera/reader"
 )
 
-// make.str("pattern_name");
-func imp_pattern_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return k.namedType(r, "pattern_name")
-}
-
 // make.str("variable_name");
 func imp_variable_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	return k.namedType(r, "variable_name")

@@ -119,7 +119,7 @@ func (r *Recorder) NewPatternParam(pattern, param, paramType Named) {
 }
 
 func (r *Recorder) NewPatternHandler(pattern Named, handler Prog) {
-	r.cache.Must(eph_filter, pattern, handler)
+	r.cache.Must(eph_rule, pattern, handler)
 }
 
 var eph_alias = tables.Insert("eph_alias", "idNamedAlias", "idNamedActual")
@@ -128,7 +128,7 @@ var eph_certainty = tables.Insert("eph_certainty", "certainty", "idNamedTrait", 
 var eph_check = tables.Insert("eph_check", "idNamedTest", "idProg", "expect")
 var eph_default = tables.Insert("eph_default", "idNamedKind", "idNamedProp", "value")
 var eph_field = tables.Insert("eph_field", "primType", "idNamedKind", "idNamedField")
-var eph_filter = tables.Insert("eph_filter", "idNamedPattern", "idProg")
+var eph_rule = tables.Insert("eph_rule", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
 var eph_named = tables.Insert("eph_named", "name", "category", "idSource", "offset")
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")

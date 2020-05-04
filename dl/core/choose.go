@@ -41,7 +41,7 @@ func (op *Choose) Execute(run rt.Runtime) (err error) {
 		} else {
 			next = op.False
 		}
-		err = rt.Run(run, next)
+		err = rt.RunAll(run, next)
 	}
 	return
 }

@@ -8,7 +8,7 @@ type BoolRules []BoolRule
 // BoolRule responds with a true/false result when its filters are satisfied.
 // It works in conjunction with BoolRules.
 type BoolRule struct {
-	Filters Filters
+	Filter rt.BoolEval
 	rt.BoolEval
 }
 
@@ -18,7 +18,7 @@ type NumberRules []NumberRule
 // NumberRule responds with a single number when its filters are satisfied.
 // It works in conjunction with NumberRules.
 type NumberRule struct {
-	Filters Filters
+	Filter rt.BoolEval
 	rt.NumberEval
 }
 
@@ -28,7 +28,7 @@ type TextRules []TextRule
 // TextRule responds with a bit of text when its filters are satisfied.
 // It works in conjunction with TextRules.
 type TextRule struct {
-	Filters Filters
+	Filter rt.BoolEval
 	rt.TextEval
 }
 
@@ -36,7 +36,7 @@ type TextRule struct {
 func (ps BoolRules) GetBool(run rt.Runtime) (ret bool, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
-		if matched, e := rt.GetAllTrue(run, p.Filters); e != nil {
+		if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
 			err = e
 			break
 		} else if matched {
@@ -51,7 +51,7 @@ func (ps BoolRules) GetBool(run rt.Runtime) (ret bool, err error) {
 func (ps NumberRules) GetNumber(run rt.Runtime) (ret float64, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
-		if matched, e := rt.GetAllTrue(run, p.Filters); e != nil {
+		if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
 			err = e
 			break
 		} else if matched {
@@ -66,7 +66,7 @@ func (ps NumberRules) GetNumber(run rt.Runtime) (ret float64, err error) {
 func (ps TextRules) GetText(run rt.Runtime) (ret string, err error) {
 	for i, cnt := 0, len(ps); i < cnt; i++ {
 		p := ps[cnt-i-1]
-		if matched, e := rt.GetAllTrue(run, p.Filters); e != nil {
+		if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
 			err = e
 			break
 		} else if matched {

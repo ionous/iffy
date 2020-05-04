@@ -202,11 +202,11 @@ function getStory() {
                     "type": "pattern_name",
                     "value": "factorial"
                   },
-                  "$HANDLER": {
+                  "$HOOK": {
                     "id": "id-171ccf3429f-15",
                     "type": "pattern_hook",
                     "value": {
-                      "$PATTERN_RETURN": {
+                      "$RESULT": {
                         "id": "id-171ccf3429f-20",
                         "type": "pattern_return",
                         "value": {
@@ -313,11 +313,11 @@ function getStory() {
                     "type": "pattern_name",
                     "value": "factorial"
                   },
-                  "$HANDLER": {
+                  "$HOOK": {
                     "id": "id-171ccf3429f-37",
                     "type": "pattern_hook",
                     "value": {
-                      "$PATTERN_RETURN": {
+                      "$RESULT": {
                         "id": "id-171ccf3429f-42",
                         "type": "pattern_return",
                         "value": {

@@ -11,7 +11,7 @@ type ExecRules []ExecuteRule
 
 // ListRule for any rule which can respond with multiple results.
 type ListRule struct {
-	Filters Filters
+	Filter rt.BoolEval
 	Flags
 }
 
@@ -37,7 +37,7 @@ type ExecuteRule struct {
 }
 
 func (r *ListRule) ApplyByIndex(run rt.Runtime) (ret Flags, err error) {
-	if ok, e := rt.GetAllTrue(run, r.Filters); e != nil {
+	if ok, e := rt.GetOptionalBool(run, r.Filter, true); e != nil {
 		err = e
 	} else if !ok {
 		ret = -1
@@ -77,6 +77,10 @@ func (ps TextListRules) GetTextStream(run rt.Runtime) (ret rt.Iterator, err erro
 	return
 }
 
+func (ps ExecuteRule) Execute(run rt.Runtime) error {
+	return rt.RunAll(run, ps.Go)
+}
+
 // ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
 func (ps ExecRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
 	return ps[i].ApplyByIndex(run)
@@ -87,7 +91,7 @@ func (ps ExecRules) Execute(run rt.Runtime) (ret bool, err error) {
 		err = e
 	} else {
 		for _, i := range inds {
-			if e := rt.Run(run, ps[i].Go); e != nil {
+			if e := rt.RunAll(run, ps[i].Go); e != nil {
 				err = e
 				break
 			}

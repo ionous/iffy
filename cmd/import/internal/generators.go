@@ -236,32 +236,6 @@ func imp_variable_decl(k *Importer, r reader.Map) (retName, retType ephemera.Nam
 	return
 }
 
-// "an {activity:pattern_activity} or a {value:variable_type}");
-func imp_pattern_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	err = k.expectOpt(r, "pattern_type", map[string]Parse{
-		"$ACTIVITY": func(k *Importer, m reader.Map) (err error) {
-			ret, err = imp_pattern_activity(k, m)
-			return
-		},
-		"$VALUE": func(k *Importer, m reader.Map) (err error) {
-			ret, err = imp_variable_type(k, m)
-			return
-		},
-	})
-	return
-}
-
-// make.str("pattern_activity", "{activity}");
-// returns "prog" as the name of a type  ( eases the difference b/t user named kinds, and internally named types )
-func imp_pattern_activity(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	if e := k.expectConst(r, "pattern_activity", "$ACTIVITY"); e != nil {
-		err = e
-	} else {
-		ret = k.Named(tables.NAMED_TYPE, tables.EVAL_PROG, at(r))
-	}
-	return
-}
-
 func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	err = k.expectOpt(r, "variable_type", map[string]Parse{
 		"$PRIMITIVE": func(k *Importer, m reader.Map) (err error) {

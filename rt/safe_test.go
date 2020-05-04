@@ -4,8 +4,14 @@ import "testing"
 
 func TestSafety(t *testing.T) {
 	var run Panic
-	switch e := Run(&run, nil); e.(type) {
+	switch e := RunAll(&run, nil); e.(type) {
 	case nil:
+		t.Log("okay nothing run")
+	default:
+		t.Fatal(e)
+	}
+	switch e := RunOne(&run, nil); e.(type) {
+	case MissingEval:
 		t.Log("okay", e)
 	default:
 		t.Fatal(e)

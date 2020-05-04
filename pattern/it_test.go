@@ -14,7 +14,7 @@ func TestTextIteration(t *testing.T) {
 		{ListRule{Flags: Infix}, Text("1")},
 		{ListRule{Flags: Postfix}, Text("2")},
 		{ListRule{Flags: Prefix}, Text("3")},
-		{ListRule{Filters: Skip}, Text("0")},
+		{ListRule{Filter: Skip}, Text("0")},
 		{ListRule{Flags: Postfix}, Text("4")},
 	}
 	if inds, e := splitRules(nil, ps, len(ps)); e != nil {
@@ -62,7 +62,7 @@ func TestTextIteration(t *testing.T) {
 func TestNumIteration(t *testing.T) {
 	ps := NumListRules{
 		{ListRule{Flags: Infix}, Number(1)},
-		{ListRule{Filters: Skip}, Number(88)},
+		{ListRule{Filter: Skip}, Number(88)},
 		{ListRule{Flags: Postfix}, Number(2)},
 		{ListRule{Flags: Prefix}, Number(3)},
 		{ListRule{Flags: Postfix}, Number(4)},
@@ -113,4 +113,4 @@ func (b Bool) GetBool(rt.Runtime) (bool, error) {
 	return bool(b), nil
 }
 
-var Skip = Filters{Bool(false)}
+var Skip = Bool(false)

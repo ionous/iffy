@@ -1,9 +1,6 @@
 package internal
 
 import (
-	"bytes"
-	"encoding/gob"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/ephemera"
@@ -259,17 +256,12 @@ func imp_test_output(k *Importer, outer reader.Map) (err error) {
 		test := k.namedStr(m, tables.NAMED_TEST, "$TEST_NAME")
 		expect := k.getStr(m, "$LINES")
 		var prog check.TestOutput
-		if e := readProg(&prog, reader.Unbox(outer), cmds); e != nil {
+		if e := ReadProg(&prog, reader.Unbox(outer), cmds); e != nil {
+			err = e
+		} else if p, e := k.newProg("test", prog); e != nil {
 			err = e
 		} else {
-			var buf bytes.Buffer
-			enc := gob.NewEncoder(&buf)
-			if e := enc.Encode(prog); e != nil {
-				err = e
-			} else {
-				pid := k.NewProg("test", buf.Bytes())
-				k.NewTest(test, pid, expect)
-			}
+			k.NewTest(test, p, expect)
 		}
 	}
 	return

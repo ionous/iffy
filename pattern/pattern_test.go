@@ -18,10 +18,10 @@ func ExampleSayMe() {
 	run := patternRuntime{patternMap: patternMap{
 		"sayMe": pattern.TextRules{
 			{nil, SayIt("Not between 1 and 3")},
-			{MatchNumber(3), SayIt("San!")},
-			{MatchNumber(3), SayIt("Three!")},
-			{MatchNumber(2), SayIt("Two!")},
-			{MatchNumber(1), SayIt("One!")},
+			{matchNumber(3), SayIt("San!")},
+			{matchNumber(3), SayIt("Three!")},
+			{matchNumber(2), SayIt("Two!")},
+			{matchNumber(1), SayIt("One!")},
 		}}}
 
 	// say 4 numbers
@@ -81,10 +81,6 @@ func SayIt(s string) rt.TextEval {
 }
 
 type matchNumber int
-
-func MatchNumber(n int) pattern.Filters {
-	return pattern.Filters{matchNumber(n)}
-}
 
 func (m matchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
 	if v, e := run.GetVariable("num"); e != nil {

@@ -10,11 +10,25 @@ func (e MissingEval) Error() string { return string(e) }
 
 // Run executes the passed statement using the passed runtime;
 // does *not* error if the passed exec is nil.
-func Run(run Runtime, exes []Execute) (err error) {
+func RunAll(run Runtime, exes []Execute) (err error) {
 	for _, exe := range exes {
 		if exe != nil {
-			err = exe.Execute(run)
+			if e := exe.Execute(run); e != nil {
+				err = e
+				break
+			}
 		}
+	}
+	return
+}
+
+// Run executes the passed statement using the passed runtime;
+// does *not* error if the passed exec is nil.
+func RunOne(run Runtime, exe Execute) (err error) {
+	if exe == nil {
+		err = MissingEval("empty execute")
+	} else {
+		err = exe.Execute(run)
 	}
 	return
 }
@@ -56,6 +70,16 @@ func GetText(run Runtime, eval TextEval) (ret string, err error) {
 		err = MissingEval("empty text eval")
 	} else {
 		ret, err = eval.GetText(run)
+	}
+	return
+}
+
+// GetOptionalBool runs the optionally specified eval.
+func GetOptionalBool(run Runtime, eval BoolEval, fallback bool) (ret bool, err error) {
+	if eval == nil {
+		ret = fallback
+	} else {
+		ret, err = eval.GetBool(run)
 	}
 	return
 }

@@ -111,7 +111,7 @@ func loop(
 	next func() (scope.ReadOnly, error),
 ) (err error) {
 	if !it.HasNext() {
-		if e := rt.Run(run, Else); e != nil {
+		if e := rt.RunAll(run, Else); e != nil {
 			err = e
 		}
 	} else {

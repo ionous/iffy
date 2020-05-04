@@ -12,7 +12,7 @@ import (
 )
 
 // import an object type description
-func TestImpObjectType(t *testing.T) {
+func TestObjectType(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if n, e := imp_object_type(k, _object_type); e != nil {
@@ -23,7 +23,7 @@ func TestImpObjectType(t *testing.T) {
 }
 
 // import a variable type description
-func TestImpVariableTypePrimitive(t *testing.T) {
+func TestVariableTypePrimitive(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if varType, e := imp_variable_type(k, _variable_type); e != nil {
@@ -34,7 +34,7 @@ func TestImpVariableTypePrimitive(t *testing.T) {
 }
 
 // import a variable declaration
-func TestImpVariableDeclObject(t *testing.T) {
+func TestVariableDeclObject(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if varName, typeName, e := imp_variable_decl(k, _variable_decl); e != nil {
@@ -46,7 +46,7 @@ func TestImpVariableDeclObject(t *testing.T) {
 	}
 }
 
-func TestImpPatternVariablesDecl(t *testing.T) {
+func TestPatternVariablesDecl(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if e := imp_pattern_variables_decl(k, _pattern_variables_decl); e != nil {
@@ -68,7 +68,7 @@ func TestImpPatternVariablesDecl(t *testing.T) {
 	}
 }
 
-func TestImpPrimitiveType(t *testing.T) {
+func TestPrimitiveType(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if typ, e := imp_primitive_type(k, _primitive_type); e != nil {
@@ -78,7 +78,7 @@ func TestImpPrimitiveType(t *testing.T) {
 	}
 }
 
-func TestImpPatternType_Activity(t *testing.T) {
+func TestPatternType_Activity(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if typ, e := imp_pattern_type(k, _pattern_type_activity); e != nil {
@@ -88,7 +88,7 @@ func TestImpPatternType_Activity(t *testing.T) {
 	}
 }
 
-func TestImpPatternType_Primitive(t *testing.T) {
+func TestPatternType_Primitive(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if typ, e := imp_pattern_type(k, _pattern_type_primitive); e != nil {
@@ -98,7 +98,7 @@ func TestImpPatternType_Primitive(t *testing.T) {
 	}
 }
 
-func TestImpPatternName(t *testing.T) {
+func TestPatternName(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if n, e := imp_pattern_name(k, _pattern_name); e != nil {
@@ -108,7 +108,7 @@ func TestImpPatternName(t *testing.T) {
 	}
 }
 
-func TestImpPatternDecl(t *testing.T) {
+func TestPatternDecl(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
 	if e := imp_pattern_decl(k, _pattern_decl); e != nil {
@@ -160,7 +160,6 @@ func getPath(file string) (ret string, err error) {
 }
 
 var _pattern_decl = map[string]interface{}{
-	"id":   "id-171a4d90ca7-5",
 	"type": "pattern_decl",
 	"value": map[string]interface{}{
 		"$NAME": _pattern_name,
@@ -169,29 +168,24 @@ var _pattern_decl = map[string]interface{}{
 }
 
 var _pattern_name = map[string]interface{}{
-	"id":    "id-171a4d90ca7-3",
 	"type":  "pattern_name",
 	"value": "corral",
 }
 
 var _pattern_type_activity = map[string]interface{}{
-	"id":   "id-171a4d90ca7-4",
 	"type": "pattern_type",
 	"value": map[string]interface{}{
 		"$ACTIVITY": map[string]interface{}{
-			"id":    "id-171a4d90ca7-6",
-			"type":  "pattern_activity",
+			"type":  "patterned_activity",
 			"value": "$ACTIVITY",
 		},
 	},
 }
 
 var _pattern_type_primitive = map[string]interface{}{
-	"id":   "id-171a8ba0566-4",
 	"type": "pattern_type",
 	"value": map[string]interface{}{
 		"$VALUE": map[string]interface{}{
-			"id":   "id-171a8ba0566-6",
 			"type": "variable_type",
 			"value": map[string]interface{}{
 				"$PRIMITIVE": _primitive_type,
@@ -201,17 +195,14 @@ var _pattern_type_primitive = map[string]interface{}{
 }
 
 var _primitive_type = map[string]interface{}{
-	"id":    "id-171a8ba0566-7",
 	"type":  "primitive_type",
 	"value": "$BOOL",
 }
 
 var _pattern_variables_decl = map[string]interface{}{
-	"id":   "id-1719a47c939-7",
 	"type": "pattern_variables_decl",
 	"value": map[string]interface{}{
 		"$PATTERN_NAME": map[string]interface{}{
-			"id":    "id-1719a47c939-3",
 			"type":  "pattern_name",
 			"value": "corral",
 		},
@@ -222,18 +213,15 @@ var _pattern_variables_decl = map[string]interface{}{
 }
 
 var _variable_decl = map[string]interface{}{
-	"id":   "id-1719a47c939-11",
 	"type": "variable_decl",
 	"value": map[string]interface{}{
 		"$TYPE": map[string]interface{}{
-			"id":   "id-1719a47c939-9",
 			"type": "variable_type",
 			"value": map[string]interface{}{
 				"$OBJECT": _object_type,
 			},
 		},
 		"$NAME": map[string]interface{}{
-			"id":    "id-1719a47c939-10",
 			"type":  "variable_name",
 			"value": "pet",
 		},
@@ -241,11 +229,9 @@ var _variable_decl = map[string]interface{}{
 }
 
 var _variable_type = map[string]interface{}{
-	"id":   "id-1719a47c939-4",
 	"type": "variable_type",
 	"value": map[string]interface{}{
 		"$PRIMITIVE": map[string]interface{}{
-			"id":    "id-1719a47c939-8",
 			"type":  "primitive_type",
 			"value": "$TEXT",
 		},
@@ -253,16 +239,13 @@ var _variable_type = map[string]interface{}{
 }
 
 var _object_type = map[string]interface{}{
-	"id":   "id-1719a47c939-14",
 	"type": "object_type",
 	"value": map[string]interface{}{
 		"$AN": map[string]interface{}{
-			"id":    "id-1719a47c939-12",
 			"type":  "an",
 			"value": "$AN",
 		},
 		"$KINDS": map[string]interface{}{
-			"id":    "id-1719a47c939-13",
 			"type":  "plural_kinds",
 			"value": "animals",
 		},

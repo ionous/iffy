@@ -29,12 +29,10 @@ func TestFactorial(t *testing.T) {
 					},
 				},
 			}, {
-				Filters: []rt.BoolEval{
-					&core.CompareNum{
-						&core.GetVar{"num"},
-						&core.EqualTo{},
-						&core.Number{0},
-					},
+				Filter: &core.CompareNum{
+					&core.GetVar{"num"},
+					&core.EqualTo{},
+					&core.Number{0},
 				},
 				NumberEval: &core.Number{1},
 			},

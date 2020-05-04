@@ -33,7 +33,7 @@ func (*TestOutput) Compose() composer.Spec {
 func (op *TestOutput) RunTest(run rt.Runtime) (err error) {
 	var buf bytes.Buffer
 	if e := rt.WritersBlock(run, &buf, func() error {
-		return rt.Run(run, op.Go)
+		return rt.RunAll(run, op.Go)
 	}); e != nil {
 		err = errutil.New("encountered error:", e)
 	} else if t := buf.String(); t != op.Lines {

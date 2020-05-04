@@ -43,7 +43,7 @@ func (*Returns) Compose() composer.Spec {
 func (op *Returns) run(run rt.Runtime, cb func(interface{}) error) (err error) {
 	k := returnScope{name: op.Name}
 	run.PushScope(&k)
-	if e := rt.Run(run, op.Using); e != nil {
+	if e := rt.RunAll(run, op.Using); e != nil {
 		err = e
 	} else {
 		err = cb(k.v)

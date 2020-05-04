@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/gob"
 
@@ -140,6 +141,31 @@ func (k *Importer) expectSlot(r reader.Map, expectedType string, sub map[string]
 		} else {
 			err = fn(k, m)
 		}
+	}
+	return
+}
+
+//
+func (k *Importer) expectProg(r reader.Map, slotType string) (ret interface{}, err error) {
+	if slot, ok := export.Slots[slotType]; !ok {
+		err = errutil.New("unknown slot", slotType, at(r))
+	} else if m, e := k.expectSlat(r, slotType); e != nil {
+		err = e
+	} else if v, e := ImportSlot(slot.Type, reader.Unbox(m), cmds); e != nil {
+		err = e
+	} else {
+		ret = v
+	}
+	return
+}
+
+func (k *Importer) newProg(t string, i interface{}) (ret ephemera.Prog, err error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if e := enc.Encode(i); e != nil {
+		err = e
+	} else {
+		ret = k.NewProg(t, buf.Bytes())
 	}
 	return
 }

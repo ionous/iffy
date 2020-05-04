@@ -38,28 +38,36 @@ func makeTypeMap(runs []composer.Specification) typeMap {
 }
 
 // read in-memory json into go-lang structs
-func readProg(targetPtr interface{}, inData export.Dict, types typeMap) (err error) {
+func ReadProg(targetPtr interface{}, inData export.Dict, types typeMap) (err error) {
 	out := r.ValueOf(targetPtr).Elem()
-	return Unmarshall(out, inData, types)
+	return unmarshall(out, inData, types)
 }
 
-func Unmarshall(out r.Value, inData export.Dict, types typeMap) (err error) {
-	if inVal, ok := inData[itemValue].(map[string]interface{}); !ok {
-		err = errutil.New("unexpected value in data", inData)
-	} else if e := unmarshall(out, inVal, types); e != nil {
-		id, _ := inData[itemId].(string)
-		err = errutil.Append(errutil.New("Unmarshall", id, "error(s):"), e)
+func ImportSlot(targetType interface{}, inData export.Dict, types typeMap) (ret interface{}, err error) {
+	slotType := r.TypeOf(targetType).Elem()
+	if v, e := importSlot(inData, slotType, types); e != nil {
+		err = e
+	} else {
+		ret = v.Interface()
 	}
 	return
 }
 
-func unmarshall(out r.Value, in export.Dict, types typeMap) (err error) {
-	var processed []string
+func unmarshall(out r.Value, inData export.Dict, types typeMap) (err error) {
+	if inVal, ok := inData[itemValue].(map[string]interface{}); !ok {
+		err = errutil.New("unexpected value in data", inData)
+	} else if e := unmarshallFields(out, inVal, types); e != nil {
+		id, _ := inData[itemId].(string)
+		err = errutil.Append(errutil.New("unmarshall", id, "error(s):"), e)
+	}
+	return
+}
 
+func unmarshallFields(out r.Value, in export.Dict, types typeMap) (err error) {
+	var processed []string
 	unique.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
 		token := export.Tokenize(f)
 		processed = append(processed, token)
-
 		// value for the field not found? that's okay.
 		// note: values of run-fields are always going to be an "item" or an array of items
 		if inVal, ok := in[token]; ok {
@@ -190,6 +198,7 @@ func unpack(inVal interface{}, setter func(interface{}) error) (err error) {
 	return
 }
 
+// returns a ptr r.Value
 func importSlot(slot export.Dict, slotType r.Type, types typeMap) (ret r.Value, err error) {
 	typeName, _ := slot[itemType].(string)
 	if cmd, ok := types[typeName]; !ok {
@@ -200,7 +209,7 @@ func importSlot(slot export.Dict, slotType r.Type, types typeMap) (ret r.Value, 
 			err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
 		} else {
 			v := r.New(rtype.Elem())
-			if e := Unmarshall(v.Elem(), slot, types); e != nil {
+			if e := unmarshall(v.Elem(), slot, types); e != nil {
 				err = e
 			} else {
 				ret = v

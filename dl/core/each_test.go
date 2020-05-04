@@ -11,7 +11,7 @@ import (
 // ExampleIndex verifies the loop index property.
 func ExampleIndex() {
 	var run forTester
-	if e := rt.Run(&run, []rt.Execute{
+	if e := rt.RunAll(&run, []rt.Execute{
 		&ForEachText{
 			In: &Texts{oneTwoThree},
 			Go: []rt.Execute{
@@ -26,7 +26,7 @@ func ExampleIndex() {
 
 func ExampleEndings() {
 	var run forTester
-	if e := rt.Run(&run, []rt.Execute{
+	if e := rt.RunAll(&run, []rt.Execute{
 		&Say{&Commas{[]rt.Execute{
 			&ForEachText{
 				In: &Texts{oneTwoThree},
