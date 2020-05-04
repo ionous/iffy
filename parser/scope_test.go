@@ -1,7 +1,7 @@
 package parser_test
 
 import (
-	"bitbucket.org/pkg/inflect"
+	"github.com/ionous/inflect"
 	"github.com/ionous/iffy/ident"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
