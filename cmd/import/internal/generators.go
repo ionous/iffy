@@ -86,9 +86,10 @@ func imp_noun_relation(k *Importer, r reader.Map) (err error) {
 	// unexpected type  wanted noun_relation at
 	if m, e := reader.Slat(r, "noun_relation"); e != nil {
 		err = e
+	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
+		err = e
 	} else {
 		// fix? parse are_being
-		relation := k.namedStr(m, tables.NAMED_VERB, "$RELATION")
 		leadingNouns := k.nouns.Swap(nil)
 		if e := reader.Repeats(m.SliceOf("$NOUN"), k.bind(imp_noun)); e != nil {
 			err = e
@@ -129,17 +130,16 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else if det, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
 		err = e
+	} else if noun, e := imp_common_name(k, m.MapOf("$COMMON_NAME")); e != nil {
+		err = e
 	} else {
-		id := r.StrOf(reader.ItemId)
-
-		noun := k.namedStr(m, tables.NAMED_NOUN, "$COMMON_NAME")
 		k.nouns.Add(noun)
 		// set common nounType to true ( implicitly defined by "noun" )
-		nounType := k.Named(tables.NAMED_TRAIT, "common", id)
+		nounType := k.Named(tables.NAMED_TRAIT, "common", reader.At(r))
 		k.NewValue(noun, nounType, true)
 		//
 		if det[0] != '$' {
-			article := k.Named(tables.NAMED_FIELD, "indefinite article", id)
+			article := k.Named(tables.NAMED_FIELD, "indefinite article", reader.At(r))
 			k.NewValue(noun, article, det)
 			if once := "common_noun"; k.once(once) {
 				indefinite := k.Named(tables.NAMED_FIELD, "indefinite article", once)
@@ -160,31 +160,46 @@ func imp_determiner(k *Importer, r reader.Map) (ret string, err error) {
 func imp_proper_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Slat(r, "proper_noun"); e != nil {
 		err = e
+	} else if noun, e := imp_proper_name(k, m.MapOf("$PROPER_NAME")); e != nil {
+		err = e
 	} else {
-		id := r.StrOf(reader.ItemId)
-		noun := k.namedStr(m, tables.NAMED_NOUN, "$PROPER_NAME")
 		k.nouns.Add(noun)
 		// set proper nounType to true ( implicitly defined by "noun" )
-		nounType := k.Named(tables.NAMED_TRAIT, "proper", id)
+		nounType := k.Named(tables.NAMED_TRAIT, "proper", reader.At(m))
 		k.NewValue(noun, nounType, true)
 	}
-	return nil
+	return
 }
 
-// run: "{are_an} {*attribute} {kind} {?noun_relation}"
+// run: "{are_an} {*attribute:*trait} {kind:singular_kind} {?noun_relation}"
 // ex. "(the box) is a closed container on the beach"
 func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Slat(r, "kind_of_noun"); e != nil {
 		err = e
+	} else if kind, e := imp_singular_kind(k, m.MapOf("$KIND")); e != nil {
+		err = e
 	} else {
-		kind := k.namedStr(m, tables.NAMED_KIND, "$KIND")
-		for _, noun := range k.nouns.Named {
-			k.NewNoun(noun, kind)
-		}
-		if e := imp_noun_attrs(k, m); e != nil {
+		var traits []ephemera.Named
+		if e := reader.Repeats(m.SliceOf("$ATTRIBUTE"), func(el reader.Map) (err error) {
+			if trait, e := imp_trait(k, el); e != nil {
+				err = e
+			} else {
+				traits = append(traits, trait)
+			}
+			return
+		}); e != nil {
 			err = e
-		} else if v := m.MapOf("$NOUN_RELATION"); len(v) != 0 {
-			err = imp_noun_relation(k, v)
+		} else {
+			// we collect the nouns, but delay processing them till now.
+			for _, noun := range k.nouns.Named {
+				k.NewNoun(noun, kind)
+				for _, trait := range traits {
+					k.NewValue(noun, trait, true) // the value of the trait for the noun is true
+				}
+			}
+			if v := m.MapOf("$NOUN_RELATION"); len(v) != 0 {
+				err = imp_noun_relation(k, v)
+			}
 		}
 	}
 	return
@@ -194,38 +209,48 @@ func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 func imp_summary(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Slat(r, "summary"); e != nil {
 		err = e
+	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
+		err = e
 	} else {
-		id := r.StrOf(reader.ItemId)
 		// declare the existence of the field "appearance"
 		if once := "summary"; k.once(once) {
 			things := k.Named(tables.NAMED_KIND, "things", once)
 			appear := k.Named(tables.NAMED_FIELD, "appearance", once)
 			k.NewPrimitive(tables.PRIM_EXPR, things, appear)
 		}
-		prop := k.Named(tables.NAMED_FIELD, "appearance", id)
+		prop := k.Named(tables.NAMED_FIELD, "appearance", reader.At(m))
 		noun := k.nouns.Last()
-		val := k.namedStr(m, tables.PRIM_EXPR, "$LINES")
-		k.NewValue(noun, prop, val)
+		k.NewValue(noun, prop, lines)
 	}
 	return
 }
 
-// run: "{are_being} {+attribute}"
+// run: "{are_being} {+attribute:trait}"
 // ex. "(the box) is closed"
 func imp_noun_attrs(k *Importer, r reader.Map) (err error) {
-	defer k.on(tables.NAMED_TRAIT, func(trait ephemera.Named) {
-		for _, noun := range k.nouns.Named {
-			k.NewValue(noun, trait, true)
+	return reader.Repeats(r.SliceOf("$ATTRIBUTE"), func(el reader.Map) (err error) {
+		if trait, e := imp_trait(k, el); e != nil {
+			err = e
+		} else {
+			for _, noun := range k.nouns.Named {
+				k.NewValue(noun, trait, true) // the value of the trait for the noun is true
+			}
 		}
-	})()
-	for _, it := range r.SliceOf("$ATTRIBUTE") {
-		k.catStr(reader.Box(it), tables.NAMED_TRAIT)
-	}
-	return
+		return
+	})
 }
 
-func imp_attribute_phrase(k *Importer, r reader.Map) error {
-	return imp_noun_attrs(k, r)
+// fix... part of class attributes
+func imp_attribute_phrase(k *Importer, r reader.Map) (ret []ephemera.Named, err error) {
+	err = reader.Repeats(r.SliceOf("$ATTRIBUTE"), func(el reader.Map) (err error) {
+		if trait, e := imp_trait(k, el); e != nil {
+			err = e
+		} else {
+			ret = append(ret, trait)
+		}
+		return
+	})
+	return
 }
 
 // "{type:variable_type} ( called {name:variable_name|quote} )"
@@ -244,7 +269,7 @@ func imp_variable_decl(k *Importer, r reader.Map) (retName, retType ephemera.Nam
 
 func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	err = reader.Option(r, "variable_type", reader.ReadMaps{
-		"$PRIMITIVE": func( m reader.Map) (err error) {
+		"$PRIMITIVE": func(m reader.Map) (err error) {
 			ret, err = imp_primitive_type(k, m)
 			return
 		},

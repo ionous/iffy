@@ -9,7 +9,12 @@ import (
 
 // make.str("pattern_name");
 func imp_pattern_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return k.namedType(r, "pattern_name")
+	if str, e := reader.String(r, "pattern_name"); e != nil {
+		err = e
+	} else {
+		ret = k.Named("pattern_name", str, reader.At(r))
+	}
+	return
 }
 
 // "an {activity:patterned_activity} or a {value:variable_type}");

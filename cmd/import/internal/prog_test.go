@@ -35,7 +35,7 @@ func TestProcessProg(t *testing.T) {
   } else {
     defer db.Close()
     k := NewImporter(t.Name(), db)
-    if e := imp_test_output(k, sayStory); e != nil {
+    if e := imp_test_output(k, k.Named(t.Name(), "test", ""), sayStory); e != nil {
       t.Fatal(e)
     } else {
       var testName string

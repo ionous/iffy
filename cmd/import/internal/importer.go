@@ -22,18 +22,16 @@ type CategoryEvent func(ephemera.Named)
 // Importer helps read Map(s) of unmarshalled json.
 type Importer struct {
 	*ephemera.Recorder
-	oneTime    map[string]bool
-	categories map[string]CategoryEvent // category
-	nouns      reader.NameList
+	oneTime map[string]bool
+	nouns   nounList
 }
 
 func NewImporter(srcURI string, db *sql.DB) *Importer {
 	registerGob()
 	rec := ephemera.NewRecorder(srcURI, db)
 	return &Importer{
-		Recorder:   rec,
-		oneTime:    make(map[string]bool),
-		categories: make(map[string]CategoryEvent),
+		Recorder: rec,
+		oneTime:  make(map[string]bool),
 	}
 }
 
@@ -46,20 +44,6 @@ func registerGob() {
 	}
 }
 
-// listen for "events" of parsing the passed category.
-// return deferred removal
-func (k *Importer) on(cat string, handler CategoryEvent) func() {
-	was := k.categories[cat]
-	k.categories[cat] = handler
-	return func() {
-		if was != nil {
-			k.categories[cat] = was
-		} else {
-			delete(k.categories, cat)
-		}
-	}
-}
-
 // return true if m is the first time once has been called with the specified string.
 func (k *Importer) once(s string) (ret bool) {
 	if !k.oneTime[s] {
@@ -67,32 +51,6 @@ func (k *Importer) once(s string) (ret bool) {
 		ret = true
 	}
 	return
-}
-
-// return { m[key] } as a new Named entry
-// named elements are considered unique within their category
-func (k *Importer) namedStr(m reader.Map, cat, key string) ephemera.Named {
-	return k.catStr(m.MapOf(key), cat)
-}
-
-func (k *Importer) namedType(m reader.Map, typeName string) (ret ephemera.Named, err error) {
-	if id, e := reader.Type(m, typeName); e != nil {
-		err = e
-	} else {
-		ret = k.Named(typeName, m.StrOf(reader.ItemValue), id)
-	}
-	return
-}
-
-// helper to read a value of type string ( and interpret it as a Named value of category cat ).
-// triggers a callback for .on() events of the passed category.
-func (k *Importer) catStr(m reader.Map, cat string) ephemera.Named {
-	id, str := m.StrOf(reader.ItemId), m.StrOf(reader.ItemValue)
-	named := k.Named(cat, str, id)
-	if h, ok := k.categories[cat]; ok {
-		h(named)
-	}
-	return named
 }
 
 func (k *Importer) bind(cb Parse) reader.ReadMap {

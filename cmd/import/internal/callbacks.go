@@ -33,9 +33,11 @@ func fromPattern(k *Importer, r reader.Map, typeName, evalType string) (ret *cor
 		err = e
 	} else if ps, e := imp_parameters(k, pid, m.MapOf("parameters")); e != nil {
 		err = e
+	} else if n, e := importName(k, m, evalType, tables.NAMED_TYPE); e != nil {
+		err = e
 	} else {
-		// fix: object type names will need adaption of some sort ... k.namedType(r, "plural_kinds")
-		k.NewPatternType(pid, k.Named(tables.NAMED_TYPE, evalType, reader.At(r)))
+		// fix: object type names will need adaption of some sort re plural_kinds
+		k.NewPatternType(pid, n)
 		ret = &core.FromPattern{pid.String(), ps}
 	}
 	return

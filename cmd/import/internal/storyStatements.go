@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
@@ -32,7 +31,7 @@ func imp_certainties(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else if certainty, e := imp_certainty(k, m.MapOf("$CERTAINTY")); e != nil {
 		err = e
-	} else if trait, e := imp_trait(k, m.MapOf("$ATTRIBUTE")); e != nil {
+	} else if trait, e := imp_trait(k, m.MapOf("$TRAIT")); e != nil {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
@@ -63,20 +62,13 @@ func imp_class_attributes(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
+	} else if traits, e := imp_attribute_phrase(k, m.MapOf("$ATTRIBUTE_PHRASE")); e != nil {
+		err = e
 	} else {
-		//
-		var traits []ephemera.Named
-		defer k.on(tables.NAMED_TRAIT, func(trait ephemera.Named) {
-			traits = append(traits, trait)
-		})()
-		if e := imp_attribute_phrase(k, m.MapOf("$ATTRIBUTE_PHRASE")); e != nil {
-			err = e
-		} else {
-			// create an implied aspect named after the first trait
-			// fix? maybe we should include the columns of named in the returned struct so we can pick out the source better.
-			aspect := k.Named(tables.NAMED_ASPECT, traits[0].String(), m.StrOf(reader.ItemId))
-			k.NewPrimitive(tables.PRIM_ASPECT, kind, aspect)
-		}
+		// create an implied aspect named after the first trait
+		// fix? maybe we should include the columns of named in the returned struct so we can pick out the source better.
+		aspect := k.Named(tables.NAMED_ASPECT, traits[0].String(), m.StrOf(reader.ItemId))
+		k.NewPrimitive(tables.PRIM_ASPECT, kind, aspect)
 	}
 	return
 }
@@ -86,9 +78,8 @@ func imp_class_attributes(k *Importer, r reader.Map) (err error) {
 func imp_kinds_of_quality(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Slat(r, "kinds_of_quality"); e != nil {
 		err = e
-	} else {
-		aspect := k.namedStr(m, tables.NAMED_ASPECT, "$QUALITY")
-		k.NewAspect(aspect)
+	} else if _, e := imp_qualities(k, m.MapOf("$QUALITIES")); e != nil {
+		err = e
 	}
 	return
 }
@@ -100,8 +91,9 @@ func imp_kinds_of_thing(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
+	} else if parent, e := imp_singular_kind(k, m.MapOf("$KIND")); e != nil {
+		err = e
 	} else {
-		parent := k.namedStr(m, tables.NAMED_KIND, "$KIND")
 		k.NewKind(kind, parent)
 	}
 	return
@@ -129,13 +121,16 @@ func imp_kinds_possess_properties(k *Importer, r reader.Map) (err error) {
 func imp_noun_assignment(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Slat(r, "noun_assignment"); e != nil {
 		err = e
+	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
+		err = e
+	} else if prop, e := imp_property(k, m.MapOf("$PROPERTY")); e != nil {
+		err = e
+	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.bind(imp_noun)); e != nil {
+		err = e
 	} else {
-		val := k.namedStr(m, tables.PRIM_EXPR, "$LINES")
-		prop := k.namedStr(m, tables.NAMED_FIELD, "$PROPERTY")
-		defer k.on(tables.NAMED_NOUN, func(noun ephemera.Named) {
-			k.NewValue(noun, prop, val)
-		})()
-		err = reader.Repeats(m.SliceOf("$NOUN"), k.bind(imp_noun))
+		for _, noun := range k.nouns.Named {
+			k.NewValue(noun, prop, lines)
+		}
 	}
 	return
 }
@@ -204,16 +199,23 @@ func imp_pattern_variables_decl(k *Importer, r reader.Map) (err error) {
 func imp_quality_attributes(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Slat(r, "quality_attributes"); e != nil {
 		err = e
+	} else if aspect, e := imp_qualities(k, r.MapOf("$QUALITIES")); e != nil {
+		err = e
+	} else if traits, e := imp_attribute_phrase(k, m.MapOf("$ATTRIBUTE_PHRASE")); e != nil {
+		err = e
 	} else {
-		aspect := k.namedStr(m, tables.NAMED_ASPECT, "$QUALITIES")
-		rank := 0
-		defer k.on(tables.NAMED_TRAIT, func(trait ephemera.Named) {
+		for rank, trait := range traits {
 			k.NewTrait(trait, aspect, rank)
-			rank += 1
-		})()
-		if e := imp_attribute_phrase(k, m.MapOf("$ATTRIBUTE_PHRASE")); e != nil {
-			err = e
 		}
+	}
+	return
+}
+
+func imp_qualities(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	if n, e := reader.String(r.MapOf("$QUALITIES"), "qualities"); e != nil {
+		err = e
+	} else {
+		ret = k.Named(tables.NAMED_ASPECT, n, reader.At(r))
 	}
 	return
 }
@@ -223,20 +225,19 @@ func imp_quality_attributes(k *Importer, r reader.Map) (err error) {
 func imp_relative_to_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Slat(r, "relative_to_noun"); e != nil {
 		err = e
+	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
+		err = e
+	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.bind(imp_noun)); e != nil {
+		err = e
 	} else {
-		relation := k.namedStr(m, tables.NAMED_VERB, "$RELATION")
-		if e := reader.Repeats(m.SliceOf("$NOUN"), k.bind(imp_noun)); e != nil {
-			err = errutil.Append(err, e)
+		leadingNouns := k.nouns.Swap(nil)
+		if e := reader.Repeats(m.SliceOf("$NOUN1"), k.bind(imp_noun)); e != nil {
+			err = e
 		} else {
-			leadingNouns := k.nouns.Swap(nil)
-			if e := reader.Repeats(m.SliceOf("$NOUN1"), k.bind(imp_noun)); e != nil {
-				err = e
-			} else {
-				trailingNouns := k.nouns.Swap(leadingNouns)
-				for _, a := range leadingNouns {
-					for _, b := range trailingNouns {
-						k.NewRelative(a, relation, b)
-					}
+			trailingNouns := k.nouns.Swap(leadingNouns)
+			for _, a := range leadingNouns {
+				for _, b := range trailingNouns {
+					k.NewRelative(a, relation, b)
 				}
 			}
 		}
@@ -245,27 +246,30 @@ func imp_relative_to_noun(k *Importer, r reader.Map) (err error) {
 }
 
 func imp_test_statement(k *Importer, r reader.Map) (err error) {
-	return reader.Slot(r, "testing", reader.ReadMaps{
-		"test_output": k.bind(imp_test_output),
-	})
+	if n, e := imp_test_name(k, r.MapOf("name")); e != nil {
+		err = e
+	} else {
+		err = reader.Slot(r, "testing", reader.ReadMaps{
+			"test_output": func(m reader.Map) error {
+				return imp_test_output(k, n, m)
+			},
+		})
+	}
+	return
 }
 
-func imp_test_output(k *Importer, r reader.Map) (err error) {
-	outer := r
+func imp_test_output(k *Importer, test ephemera.Named, r reader.Map) (err error) {
+	var prog check.TestOutput
 	if m, e := reader.Slat(r, "test_output"); e != nil {
 		err = e
 	} else if expect, e := imp_lines(k, m.MapOf("$LINES")); e != nil {
 		err = e
+	} else if e := ReadProg(&prog, reader.Unbox(r), cmds); e != nil {
+		err = e
+	} else if p, e := k.newProg("test", prog); e != nil {
+		err = e
 	} else {
-		test := k.namedStr(m, tables.NAMED_TEST, "$TEST_NAME")
-		var prog check.TestOutput
-		if e := ReadProg(&prog, reader.Unbox(outer), cmds); e != nil {
-			err = e
-		} else if p, e := k.newProg("test", prog); e != nil {
-			err = e
-		} else {
-			k.NewTest(test, p, expect)
-		}
+		k.NewTest(test, p, expect)
 	}
 	return
 }
