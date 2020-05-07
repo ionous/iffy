@@ -31,7 +31,6 @@ function localLang(make) {
 
      make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 
-
     // fix: think this should always be "are" never "is"
     make.run("kinds_of_thing", "story_statement",
              "{plural_kinds} are a kind of {singular_kind}.");
@@ -92,7 +91,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
   });
 
   make.group("Kinds", function() {
-    make.run("kind_of_noun", "{are_an} {*trait|comma-and} {singular_kind} {?noun_relation}");
+    make.run("kind_of_noun", "{are_an} {attribute:*trait|comma-and} {kind:singular_kind} {?noun_relation}");
 
     make.run("kinds_possess_properties", "story_statement",
               "{plural_kinds} have {determiner} {property_phrase}.");
@@ -117,7 +116,7 @@ For example: animals, containers, etc.`);
   });
 
   make.group("Traits", function() {
-    make.run("noun_attrs", "{are_being} {+trait|comma-and}");
+    make.run("noun_attrs", "{are_being} {attribute:+trait|comma-and}");
     make.str("quality");
     make.str("qualities");
     make.str("trait");
@@ -143,10 +142,10 @@ For example: animals, containers, etc.`);
     make.run("quality_attributes", "story_statement",
               "{qualities} {attribute_phrase}");
 
-    make.run("attribute_phrase", "{are_either} {+trait|comma-and}.");
+    make.run("attribute_phrase", "{are_either} {attribute:+trait|comma-and}.");
 
     make.run("certainties", "story_statement",
-              "{plural_kinds} {are_being} {certainty} {attribute:trait}.");
+              "{plural_kinds} {are_being} {certainty} {trait}.");
 
     make.run("quality_phrase", "{quality} {?optional_property}");
 

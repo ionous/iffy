@@ -57,7 +57,7 @@ function getStory() {
                                           "value": {
                                             "$NAME": {
                                               "id": "id-171c8ccc9f6-13",
-                                              "type": "text",
+                                              "type": "pattern_name",
                                               "value": "factorial"
                                             },
                                             "$PARAMETERS": {
@@ -96,7 +96,7 @@ function getStory() {
                                                       },
                                                       "$NAME": {
                                                         "id": "id-171c8ccc9f6-16",
-                                                        "type": "text",
+                                                        "type": "variable_name",
                                                         "value": "num"
                                                       }
                                                     }
