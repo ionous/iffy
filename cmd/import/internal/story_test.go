@@ -22,7 +22,7 @@ func TestImportStory(t *testing.T) {
 		var in reader.Map
 		if e := json.Unmarshal([]byte(debug.Blob), &in); e != nil {
 			t.Fatal("read json", e)
-		} else if ok := in.Has(itemType, "story"); !ok {
+		} else if ok := in.Has(reader.ItemType, "story"); !ok {
 			t.Fatal("read story")
 		} else {
 			k := NewImporter(t.Name(), db)

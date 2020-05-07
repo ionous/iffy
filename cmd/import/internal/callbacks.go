@@ -27,7 +27,7 @@ func imp_determine_num(k *Importer, m reader.Map) (ret interface{}, err error) {
 }
 
 func fromPattern(k *Importer, r reader.Map, typeName, evalType string) (ret *core.FromPattern, err error) {
-	if m, e := k.expectSlat(r, typeName); e != nil {
+	if m, e := reader.Slat(r, typeName); e != nil {
 		err = e
 	} else if pid, e := fromPatternName(k, m.MapOf("$NAME"), typeName); e != nil {
 		err = e
@@ -35,20 +35,20 @@ func fromPattern(k *Importer, r reader.Map, typeName, evalType string) (ret *cor
 		err = e
 	} else {
 		// fix: object type names will need adaption of some sort ... k.namedType(r, "plural_kinds")
-		k.NewPatternType(pid, k.Named(tables.NAMED_TYPE, evalType, at(r)))
+		k.NewPatternType(pid, k.Named(tables.NAMED_TYPE, evalType, reader.At(r)))
 		ret = &core.FromPattern{pid.String(), ps}
 	}
 	return
 }
 
 func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Parameters, err error) {
-	if m, e := k.expectSlat(r, "parameters"); e != nil {
+	if m, e := reader.Slat(r, "parameters"); e != nil {
 		err = e
 	} else {
 		var ps []*core.Parameter
 		// record the referenced parameters: names, types, pairings
-		if e := k.repeats(m.SliceOf("$PARAMS"),
-			func(k *Importer, m reader.Map) (err error) {
+		if e := reader.Repeats(m.SliceOf("$PARAMS"),
+			func(m reader.Map) (err error) {
 				if p, e := imp_parameter(k, pid, m); e != nil {
 					err = e
 				} else {
@@ -65,7 +65,7 @@ func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Pa
 }
 
 func imp_parameter(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Parameter, err error) {
-	if m, e := k.expectSlat(r, "parameter"); e != nil {
+	if m, e := reader.Slat(r, "parameter"); e != nil {
 		err = e
 	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
@@ -74,7 +74,7 @@ func imp_parameter(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Par
 	} else if evalType, e := assignmentType(a); e != nil {
 		err = e
 	} else {
-		k.NewPatternParam(pid, n, k.Named(tables.NAMED_TYPE, evalType, at(m)))
+		k.NewPatternParam(pid, n, k.Named(tables.NAMED_TYPE, evalType, reader.At(m)))
 		ret = &core.Parameter{Name: n.String(), From: a}
 	}
 	return
@@ -111,15 +111,15 @@ func imp_assignment(k *Importer, m reader.Map) (ret core.Assignment, err error) 
 }
 
 func imp_text(k *Importer, m reader.Map) (ret string, err error) {
-	return k.expectStr(m, "text")
+	return reader.String(m, "text")
 }
 
 // similar to imp_pattern_name, only we change the underlying type to indicate it's a reference.
 func fromPatternName(k *Importer, m reader.Map, typeName string) (ret ephemera.Named, err error) {
-	if id, e := k.expectedType(m, "pattern_name"); e != nil {
+	if id, e := reader.Type(m, "pattern_name"); e != nil {
 		err = e
 	} else {
-		ret = k.Named(typeName, m.StrOf(itemValue), id)
+		ret = k.Named(typeName, m.StrOf(reader.ItemValue), id)
 	}
 	return
 }

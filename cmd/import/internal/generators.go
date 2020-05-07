@@ -17,30 +17,30 @@ var cmds = makeTypeMap(export.Slats)
 // story is a bunch of paragraphs
 //make.run("story", "{+paragraph|ghost}");
 func imp_story(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "story"); e != nil {
+	if m, e := reader.Slat(r, "story"); e != nil {
 		err = e
 	} else {
-		err = k.repeats(m.SliceOf("$PARAGRAPH"), imp_paragraph)
+		err = reader.Repeats(m.SliceOf("$PARAGRAPH"), k.bind(imp_paragraph))
 	}
 	return
 }
 
 // paragraph is a bunch of statements
 func imp_paragraph(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "paragraph"); e != nil {
+	if m, e := reader.Slat(r, "paragraph"); e != nil {
 		err = e
 	} else {
 		k.nouns.Swap(nil)
-		err = k.repeats(m.SliceOf("$STORY_STATEMENT"), imp_story_statement)
+		err = reader.Repeats(m.SliceOf("$STORY_STATEMENT"), k.bind(imp_story_statement))
 	}
 	return
 }
 
 // run: "{+names} {noun_phrase}."
 func imp_lede(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "lede"); e != nil {
+	if m, e := reader.Slat(r, "lede"); e != nil {
 		err = e
-	} else if e := k.repeats(m.SliceOf("$NOUN"), imp_noun); e != nil {
+	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.bind(imp_noun)); e != nil {
 		err = e
 	} else if e := imp_noun_phrase(k, m.MapOf("$NOUN_PHRASE")); e != nil {
 		err = e
@@ -50,7 +50,7 @@ func imp_lede(k *Importer, r reader.Map) (err error) {
 
 // run: "{pronoun} {noun_phrase}."
 func imp_tail(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "tail"); e != nil {
+	if m, e := reader.Slat(r, "tail"); e != nil {
 		err = e
 	} else if e := imp_pronoun(k, m.MapOf("$PRONOUN")); e != nil {
 		err = e
@@ -62,7 +62,7 @@ func imp_tail(k *Importer, r reader.Map) (err error) {
 
 // make.str("pronoun",  "{it}, {they}, or {pronoun}");
 func imp_pronoun(k *Importer, r reader.Map) (err error) {
-	if _, e := k.expectStr(r, "pronoun"); e != nil {
+	if _, e := reader.String(r, "pronoun"); e != nil {
 		err = e
 	} else {
 		// FIX: this can indicate plurality
@@ -72,10 +72,10 @@ func imp_pronoun(k *Importer, r reader.Map) (err error) {
 
 // opt: "{kind_of_noun}, {noun_attrs}, or {noun_relation}"
 func imp_noun_phrase(k *Importer, r reader.Map) (err error) {
-	return k.expectOpt(r, "noun_phrase", map[string]Parse{
-		"$KIND_OF_NOUN":  imp_kind_of_noun,
-		"$NOUN_ATTRS":    imp_noun_attrs,
-		"$NOUN_RELATION": imp_noun_relation,
+	return reader.Option(r, "noun_phrase", reader.ReadMaps{
+		"$KIND_OF_NOUN":  k.bind(imp_kind_of_noun),
+		"$NOUN_ATTRS":    k.bind(imp_noun_attrs),
+		"$NOUN_RELATION": k.bind(imp_noun_relation),
 	})
 }
 
@@ -84,13 +84,13 @@ func imp_noun_phrase(k *Importer, r reader.Map) (err error) {
 // ex. (Hector and Maria) are suspicious of (Santa and Santana).
 func imp_noun_relation(k *Importer, r reader.Map) (err error) {
 	// unexpected type  wanted noun_relation at
-	if m, e := k.expectSlat(r, "noun_relation"); e != nil {
+	if m, e := reader.Slat(r, "noun_relation"); e != nil {
 		err = e
 	} else {
 		// fix? parse are_being
 		relation := k.namedStr(m, tables.NAMED_VERB, "$RELATION")
 		leadingNouns := k.nouns.Swap(nil)
-		if e := k.repeats(m.SliceOf("$NOUN"), imp_noun); e != nil {
+		if e := reader.Repeats(m.SliceOf("$NOUN"), k.bind(imp_noun)); e != nil {
 			err = e
 		} else {
 			trailingNouns := k.nouns.Swap(leadingNouns)
@@ -117,20 +117,20 @@ func imp_noun(k *Importer, r reader.Map) (err error) {
 		k.NewTrait(common, nounType, 0)
 		k.NewTrait(proper, nounType, 1)
 	}
-	return k.expectOpt(r, "noun", map[string]Parse{
-		"$PROPER_NOUN": imp_proper_noun,
-		"$COMMON_NOUN": imp_common_noun,
+	return reader.Option(r, "noun", reader.ReadMaps{
+		"$PROPER_NOUN": k.bind(imp_proper_noun),
+		"$COMMON_NOUN": k.bind(imp_common_noun),
 	})
 }
 
 // run: "{determiner} {common_name}"
 func imp_common_noun(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "common_noun"); e != nil {
+	if m, e := reader.Slat(r, "common_noun"); e != nil {
 		err = e
 	} else if det, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
 		err = e
 	} else {
-		id := r.StrOf(itemId)
+		id := r.StrOf(reader.ItemId)
 
 		noun := k.namedStr(m, tables.NAMED_NOUN, "$COMMON_NAME")
 		k.nouns.Add(noun)
@@ -152,16 +152,16 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 }
 
 func imp_determiner(k *Importer, r reader.Map) (ret string, err error) {
-	return k.expectStr(r, "determiner")
+	return reader.String(r, "determiner")
 }
 
 // run: "{proper_name}"
 // common / proper setting
 func imp_proper_noun(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "proper_noun"); e != nil {
+	if m, e := reader.Slat(r, "proper_noun"); e != nil {
 		err = e
 	} else {
-		id := r.StrOf(itemId)
+		id := r.StrOf(reader.ItemId)
 		noun := k.namedStr(m, tables.NAMED_NOUN, "$PROPER_NAME")
 		k.nouns.Add(noun)
 		// set proper nounType to true ( implicitly defined by "noun" )
@@ -174,7 +174,7 @@ func imp_proper_noun(k *Importer, r reader.Map) (err error) {
 // run: "{are_an} {*attribute} {kind} {?noun_relation}"
 // ex. "(the box) is a closed container on the beach"
 func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "kind_of_noun"); e != nil {
+	if m, e := reader.Slat(r, "kind_of_noun"); e != nil {
 		err = e
 	} else {
 		kind := k.namedStr(m, tables.NAMED_KIND, "$KIND")
@@ -192,10 +192,10 @@ func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 
 // run: "{The [summary] is:: %lines}"
 func imp_summary(k *Importer, r reader.Map) (err error) {
-	if m, e := k.expectSlat(r, "summary"); e != nil {
+	if m, e := reader.Slat(r, "summary"); e != nil {
 		err = e
 	} else {
-		id := r.StrOf(itemId)
+		id := r.StrOf(reader.ItemId)
 		// declare the existence of the field "appearance"
 		if once := "summary"; k.once(once) {
 			things := k.Named(tables.NAMED_KIND, "things", once)
@@ -230,7 +230,7 @@ func imp_attribute_phrase(k *Importer, r reader.Map) error {
 
 // "{type:variable_type} ( called {name:variable_name|quote} )"
 func imp_variable_decl(k *Importer, r reader.Map) (retName, retType ephemera.Named, err error) {
-	if m, e := k.expectSlat(r, "variable_decl"); e != nil {
+	if m, e := reader.Slat(r, "variable_decl"); e != nil {
 		err = e
 	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
@@ -243,12 +243,12 @@ func imp_variable_decl(k *Importer, r reader.Map) (retName, retType ephemera.Nam
 }
 
 func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	err = k.expectOpt(r, "variable_type", map[string]Parse{
-		"$PRIMITIVE": func(k *Importer, m reader.Map) (err error) {
+	err = reader.Option(r, "variable_type", reader.ReadMaps{
+		"$PRIMITIVE": func( m reader.Map) (err error) {
 			ret, err = imp_primitive_type(k, m)
 			return
 		},
-		"$OBJECT": func(k *Importer, m reader.Map) (err error) {
+		"$OBJECT": func(m reader.Map) (err error) {
 			ret, err = imp_object_type(k, m)
 			return
 		},
@@ -259,14 +259,14 @@ func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error
 // "{a number%number}, {some text%text}, or {a true/false value%bool}"
 // returns one of the evalType(s)
 func imp_primitive_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	if evalType, e := k.expectEnum(r, "primitive_type", map[string]interface{}{
+	if evalType, e := reader.Enum(r, "primitive_type", reader.Map{
 		"$NUMBER": "number_eval",
 		"$TEXT":   "text_eval",
 		"$BOOL":   "bool_eval",
 	}); e != nil {
 		err = e
 	} else {
-		ret = k.Named(tables.NAMED_TYPE, evalType.(string), at(r))
+		ret = k.Named(tables.NAMED_TYPE, evalType.(string), reader.At(r))
 	}
 	return
 }
@@ -274,7 +274,7 @@ func imp_primitive_type(k *Importer, r reader.Map) (ret ephemera.Named, err erro
 // "{an} {kind of%kinds:plural_kinds} object"
 // returns the name of "plural_kinds"
 func imp_object_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	if m, e := k.expectSlat(r, "object_type"); e != nil {
+	if m, e := reader.Slat(r, "object_type"); e != nil {
 		err = e
 	} else {
 		ret, err = imp_plural_kinds(k, m.MapOf("$KINDS"))

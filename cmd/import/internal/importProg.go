@@ -13,11 +13,6 @@ import (
 )
 
 // -----------------------------------
-const (
-	itemId    = "id"
-	itemType  = "type"
-	itemValue = "value"
-)
 
 func ImportStory(src string, in reader.Map, db *sql.DB) error {
 	k := NewImporter(src, db)
@@ -67,14 +62,14 @@ func ImportSlot(targetType interface{}, inData export.Dict, types typeMap) (ret 
 }
 
 func unmarshall(outPtr r.Value, inData export.Dict, types typeMap) (err error) {
-	if inVal, ok := inData[itemValue].(map[string]interface{}); !ok {
+	if inVal, ok := inData[reader.ItemValue].(map[string]interface{}); !ok {
 		err = errutil.New("unexpected value in data", inData)
 	} else if e := unmarshallFields(outPtr.Elem(), inVal, types); e != nil {
-		at, _ := inData[itemId].(string)
+		at, _ := inData[reader.ItemId].(string)
 		err = errutil.Append(errutil.New("unmarshall", at, "error(s):"), e)
 	} else {
 		// notify import code that a particular type has been parsed.
-		typeName, _ := inData[itemType].(string)
+		typeName, _ := inData[reader.ItemType].(string)
 		if cb, ok := importCallbacks[typeName]; ok {
 			loaded := outPtr.Interface()
 			err = cb(loaded)
@@ -211,8 +206,8 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 func unpack(inVal interface{}, setter func(interface{}) error) (err error) {
 	if item, ok := inVal.(map[string]interface{}); !ok {
 		err = errutil.New("expected an item, got:", inVal)
-	} else if e := setter(item[itemValue]); e != nil {
-		id, _ := item[itemId].(string)
+	} else if e := setter(item[reader.ItemValue]); e != nil {
+		id, _ := item[reader.ItemId].(string)
 		err = errutil.New("couldnt unpack", id, e)
 	}
 	return
@@ -220,7 +215,7 @@ func unpack(inVal interface{}, setter func(interface{}) error) (err error) {
 
 // returns a ptr r.Value
 func importSlot(slot export.Dict, slotType r.Type, types typeMap) (ret r.Value, err error) {
-	typeName, _ := slot[itemType].(string)
+	typeName, _ := slot[reader.ItemType].(string)
 	if cmd, ok := types[typeName]; !ok {
 		err = errutil.New("unknown type", typeName, slot)
 	} else {
