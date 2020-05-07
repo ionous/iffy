@@ -12,7 +12,7 @@ func importName(k *Importer, r reader.Map, readType, storeType string) (ret ephe
 	if str, e := reader.String(r, readType); e != nil {
 		err = e
 	} else {
-		ret = k.Named(storeType, str, reader.At(r))
+		ret = k.eph.Named(storeType, str, reader.At(r))
 	}
 	return
 }

@@ -13,30 +13,40 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type Parse func(*Importer, reader.Map) (err error)
-
 // fix: queue could handle this. stack an event queue.
 // maybe then we could stack "last noun" in there?
 type CategoryEvent func(ephemera.Named)
 
-// Importer helps read Map(s) of unmarshalled json.
+type imperativeHandler func(Importer, reader.Map) (ret interface{}, err error)
+type CommandMap map[string]imperativeHandler
+
+// Importer helps read json.
 type Importer struct {
-	*ephemera.Recorder
+	eph *ephemera.Recorder
+	// sometimes the importer needs to define a singleton like type or instance
 	oneTime map[string]bool
-	nouns   nounList
+	// a list of recently referenced nouns
+	// helps simplify some aspects of importing
+	nouns nounList
+	// some commands can add information to the world model
+	// ( ex. variable references, type casting, etc. )
+	// those need special handling by the importer.
+	commands CommandMap
 }
 
-func NewImporter(srcURI string, db *sql.DB) *Importer {
+func NewImporter(srcURI string, db *sql.DB, cmds CommandMap) *Importer {
 	registerGob()
 	rec := ephemera.NewRecorder(srcURI, db)
 	return &Importer{
-		Recorder: rec,
+		eph:      rec,
 		oneTime:  make(map[string]bool),
+		commands: cmds,
 	}
 }
 
 var registeredGob = false
 
+// register imperative commands exposed by the exporter
 func registerGob() {
 	if !registeredGob {
 		export.Register(gob.Register)
@@ -53,7 +63,8 @@ func (k *Importer) once(s string) (ret bool) {
 	return
 }
 
-func (k *Importer) bind(cb Parse) reader.ReadMap {
+// adapt an importer friendly function to the ephemera reader callback
+func (k *Importer) bind(cb func(*Importer, reader.Map) (err error)) reader.ReadMap {
 	return func(m reader.Map) error {
 		return cb(k, m)
 	}
@@ -79,7 +90,7 @@ func (k *Importer) newProg(t string, i interface{}) (ret ephemera.Prog, err erro
 	if e := enc.Encode(i); e != nil {
 		err = e
 	} else {
-		ret = k.NewProg(t, buf.Bytes())
+		ret = k.eph.NewProg(t, buf.Bytes())
 	}
 	return
 }

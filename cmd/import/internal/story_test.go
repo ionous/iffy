@@ -25,7 +25,7 @@ func TestImportStory(t *testing.T) {
 		} else if ok := in.Has(reader.ItemType, "story"); !ok {
 			t.Fatal("read story")
 		} else {
-			k := NewImporter(t.Name(), db)
+			k := NewImporter(t.Name(), db, nil)
 			if e := imp_story(k, in); e != nil {
 				t.Fatal(e)
 			}

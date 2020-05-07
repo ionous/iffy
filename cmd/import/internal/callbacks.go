@@ -37,7 +37,7 @@ func fromPattern(k *Importer, r reader.Map, typeName, evalType string) (ret *cor
 		err = e
 	} else {
 		// fix: object type names will need adaption of some sort re plural_kinds
-		k.NewPatternType(pid, n)
+		k.eph.NewPatternType(pid, n)
 		ret = &core.FromPattern{pid.String(), ps}
 	}
 	return
@@ -76,7 +76,7 @@ func imp_parameter(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Par
 	} else if evalType, e := assignmentType(a); e != nil {
 		err = e
 	} else {
-		k.NewPatternParam(pid, n, k.Named(tables.NAMED_TYPE, evalType, reader.At(m)))
+		k.eph.NewPatternParam(pid, n, k.eph.Named(tables.NAMED_TYPE, evalType, reader.At(m)))
 		ret = &core.Parameter{Name: n.String(), From: a}
 	}
 	return
@@ -121,7 +121,7 @@ func fromPatternName(k *Importer, m reader.Map, typeName string) (ret ephemera.N
 	if id, e := reader.Type(m, "pattern_name"); e != nil {
 		err = e
 	} else {
-		ret = k.Named(typeName, m.StrOf(reader.ItemValue), id)
+		ret = k.eph.Named(typeName, m.StrOf(reader.ItemValue), id)
 	}
 	return
 }

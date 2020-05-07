@@ -144,7 +144,7 @@ func newTestImporter(t *testing.T) (ret *Importer, retDB *sql.DB) {
 		if e := tables.CreateEphemera(db); e != nil {
 			t.Fatal("create ephemera", e)
 		} else {
-			ret, retDB = NewImporter(t.Name(), db), db
+			ret, retDB = NewImporter(t.Name(), db, nil), db
 		}
 	}
 	return

@@ -15,7 +15,7 @@ import (
 // -----------------------------------
 
 func ImportStory(src string, in reader.Map, db *sql.DB) error {
-	k := NewImporter(src, db)
+	k := NewImporter(src, db, nil)
 	return imp_story(k, in)
 }
 

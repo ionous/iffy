@@ -98,7 +98,7 @@ func imp_noun_relation(k *Importer, r reader.Map) (err error) {
 			//
 			for _, n := range leadingNouns {
 				for _, d := range trailingNouns {
-					k.NewRelative(n, relation, d)
+					k.eph.NewRelative(n, relation, d)
 				}
 			}
 		}
@@ -110,13 +110,13 @@ func imp_noun_relation(k *Importer, r reader.Map) (err error) {
 func imp_noun(k *Importer, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.once(once) {
-		things := k.Named(tables.NAMED_KIND, "things", once)
-		nounType := k.Named(tables.NAMED_ASPECT, "nounType", once)
-		common := k.Named(tables.NAMED_TRAIT, "common", once)
-		proper := k.Named(tables.NAMED_TRAIT, "proper", once)
-		k.NewPrimitive(tables.PRIM_ASPECT, things, nounType)
-		k.NewTrait(common, nounType, 0)
-		k.NewTrait(proper, nounType, 1)
+		things := k.eph.Named(tables.NAMED_KIND, "things", once)
+		nounType := k.eph.Named(tables.NAMED_ASPECT, "nounType", once)
+		common := k.eph.Named(tables.NAMED_TRAIT, "common", once)
+		proper := k.eph.Named(tables.NAMED_TRAIT, "proper", once)
+		k.eph.NewPrimitive(tables.PRIM_ASPECT, things, nounType)
+		k.eph.NewTrait(common, nounType, 0)
+		k.eph.NewTrait(proper, nounType, 1)
 	}
 	return reader.Option(r, "noun", reader.ReadMaps{
 		"$PROPER_NOUN": k.bind(imp_proper_noun),
@@ -135,16 +135,16 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 	} else {
 		k.nouns.Add(noun)
 		// set common nounType to true ( implicitly defined by "noun" )
-		nounType := k.Named(tables.NAMED_TRAIT, "common", reader.At(r))
-		k.NewValue(noun, nounType, true)
+		nounType := k.eph.Named(tables.NAMED_TRAIT, "common", reader.At(r))
+		k.eph.NewValue(noun, nounType, true)
 		//
 		if det[0] != '$' {
-			article := k.Named(tables.NAMED_FIELD, "indefinite article", reader.At(r))
-			k.NewValue(noun, article, det)
+			article := k.eph.Named(tables.NAMED_FIELD, "indefinite article", reader.At(r))
+			k.eph.NewValue(noun, article, det)
 			if once := "common_noun"; k.once(once) {
-				indefinite := k.Named(tables.NAMED_FIELD, "indefinite article", once)
-				things := k.Named(tables.NAMED_KIND, "things", once)
-				k.NewPrimitive(tables.PRIM_TEXT, things, indefinite)
+				indefinite := k.eph.Named(tables.NAMED_FIELD, "indefinite article", once)
+				things := k.eph.Named(tables.NAMED_KIND, "things", once)
+				k.eph.NewPrimitive(tables.PRIM_TEXT, things, indefinite)
 			}
 		}
 	}
@@ -165,8 +165,8 @@ func imp_proper_noun(k *Importer, r reader.Map) (err error) {
 	} else {
 		k.nouns.Add(noun)
 		// set proper nounType to true ( implicitly defined by "noun" )
-		nounType := k.Named(tables.NAMED_TRAIT, "proper", reader.At(m))
-		k.NewValue(noun, nounType, true)
+		nounType := k.eph.Named(tables.NAMED_TRAIT, "proper", reader.At(m))
+		k.eph.NewValue(noun, nounType, true)
 	}
 	return
 }
@@ -192,9 +192,9 @@ func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 		} else {
 			// we collect the nouns, but delay processing them till now.
 			for _, noun := range k.nouns.Named {
-				k.NewNoun(noun, kind)
+				k.eph.NewNoun(noun, kind)
 				for _, trait := range traits {
-					k.NewValue(noun, trait, true) // the value of the trait for the noun is true
+					k.eph.NewValue(noun, trait, true) // the value of the trait for the noun is true
 				}
 			}
 			if v := m.MapOf("$NOUN_RELATION"); len(v) != 0 {
@@ -214,13 +214,13 @@ func imp_summary(k *Importer, r reader.Map) (err error) {
 	} else {
 		// declare the existence of the field "appearance"
 		if once := "summary"; k.once(once) {
-			things := k.Named(tables.NAMED_KIND, "things", once)
-			appear := k.Named(tables.NAMED_FIELD, "appearance", once)
-			k.NewPrimitive(tables.PRIM_EXPR, things, appear)
+			things := k.eph.Named(tables.NAMED_KIND, "things", once)
+			appear := k.eph.Named(tables.NAMED_FIELD, "appearance", once)
+			k.eph.NewPrimitive(tables.PRIM_EXPR, things, appear)
 		}
-		prop := k.Named(tables.NAMED_FIELD, "appearance", reader.At(m))
+		prop := k.eph.Named(tables.NAMED_FIELD, "appearance", reader.At(m))
 		noun := k.nouns.Last()
-		k.NewValue(noun, prop, lines)
+		k.eph.NewValue(noun, prop, lines)
 	}
 	return
 }
@@ -233,7 +233,7 @@ func imp_noun_attrs(k *Importer, r reader.Map) (err error) {
 			err = e
 		} else {
 			for _, noun := range k.nouns.Named {
-				k.NewValue(noun, trait, true) // the value of the trait for the noun is true
+				k.eph.NewValue(noun, trait, true) // the value of the trait for the noun is true
 			}
 		}
 		return
@@ -291,7 +291,7 @@ func imp_primitive_type(k *Importer, r reader.Map) (ret ephemera.Named, err erro
 	}); e != nil {
 		err = e
 	} else {
-		ret = k.Named(tables.NAMED_TYPE, evalType.(string), reader.At(r))
+		ret = k.eph.Named(tables.NAMED_TYPE, evalType.(string), reader.At(r))
 	}
 	return
 }

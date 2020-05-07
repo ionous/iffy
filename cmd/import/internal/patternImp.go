@@ -12,7 +12,7 @@ func imp_pattern_name(k *Importer, r reader.Map) (ret ephemera.Named, err error)
 	if str, e := reader.String(r, "pattern_name"); e != nil {
 		err = e
 	} else {
-		ret = k.Named("pattern_name", str, reader.At(r))
+		ret = k.eph.Named("pattern_name", str, reader.At(r))
 	}
 	return
 }
@@ -38,7 +38,7 @@ func imp_patterned_activity(k *Importer, r reader.Map) (ret ephemera.Named, err 
 	if e := reader.Const(r, "patterned_activity", "$ACTIVITY"); e != nil {
 		err = e
 	} else {
-		ret = k.Named(tables.NAMED_TYPE, "execute", reader.At(r))
+		ret = k.eph.Named(tables.NAMED_TYPE, "execute", reader.At(r))
 	}
 	return
 }
@@ -59,7 +59,7 @@ func imp_pattern_handler(k *Importer, r reader.Map) (err error) {
 			if prog, e := k.newProg(rule.name, rule.distill()); e != nil {
 				err = e
 			} else {
-				k.NewPatternHandler(n, prog)
+				k.eph.NewPatternHandler(n, prog)
 			}
 		}
 	}

@@ -36,7 +36,7 @@ func imp_certainties(k *Importer, r reader.Map) (err error) {
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
 	} else {
-		k.NewCertainty(certainty, trait, kind)
+		k.eph.NewCertainty(certainty, trait, kind)
 	}
 	return
 }
@@ -67,8 +67,8 @@ func imp_class_attributes(k *Importer, r reader.Map) (err error) {
 	} else {
 		// create an implied aspect named after the first trait
 		// fix? maybe we should include the columns of named in the returned struct so we can pick out the source better.
-		aspect := k.Named(tables.NAMED_ASPECT, traits[0].String(), m.StrOf(reader.ItemId))
-		k.NewPrimitive(tables.PRIM_ASPECT, kind, aspect)
+		aspect := k.eph.Named(tables.NAMED_ASPECT, traits[0].String(), m.StrOf(reader.ItemId))
+		k.eph.NewPrimitive(tables.PRIM_ASPECT, kind, aspect)
 	}
 	return
 }
@@ -94,7 +94,7 @@ func imp_kinds_of_thing(k *Importer, r reader.Map) (err error) {
 	} else if parent, e := imp_singular_kind(k, m.MapOf("$KIND")); e != nil {
 		err = e
 	} else {
-		k.NewKind(kind, parent)
+		k.eph.NewKind(kind, parent)
 	}
 	return
 }
@@ -129,7 +129,7 @@ func imp_noun_assignment(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else {
 		for _, noun := range k.nouns.Named {
-			k.NewValue(noun, prop, lines)
+			k.eph.NewValue(noun, prop, lines)
 		}
 	}
 	return
@@ -159,7 +159,7 @@ func imp_pattern_decl(k *Importer, r reader.Map) (err error) {
 	} else if typ, e := imp_pattern_type(k, m.MapOf("$TYPE")); e != nil {
 		err = e
 	} else {
-		k.NewPatternType(pat, typ)
+		k.eph.NewPatternType(pat, typ)
 		if tail := m.MapOf("$OPTVARS"); len(tail) > 0 {
 			err = imp_pattern_variables_tail(k, pat, tail)
 		}
@@ -175,7 +175,7 @@ func imp_pattern_variables_tail(k *Importer, pat ephemera.Named, r reader.Map) (
 			if paramName, paramType, e := imp_variable_decl(k, m); e != nil {
 				err = e
 			} else {
-				k.NewPatternParam(pat, paramName, paramType)
+				k.eph.NewPatternParam(pat, paramName, paramType)
 			}
 			return
 		})
@@ -205,7 +205,7 @@ func imp_quality_attributes(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else {
 		for rank, trait := range traits {
-			k.NewTrait(trait, aspect, rank)
+			k.eph.NewTrait(trait, aspect, rank)
 		}
 	}
 	return
@@ -215,7 +215,7 @@ func imp_qualities(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	if n, e := reader.String(r.MapOf("$QUALITIES"), "qualities"); e != nil {
 		err = e
 	} else {
-		ret = k.Named(tables.NAMED_ASPECT, n, reader.At(r))
+		ret = k.eph.Named(tables.NAMED_ASPECT, n, reader.At(r))
 	}
 	return
 }
@@ -237,7 +237,7 @@ func imp_relative_to_noun(k *Importer, r reader.Map) (err error) {
 			trailingNouns := k.nouns.Swap(leadingNouns)
 			for _, a := range leadingNouns {
 				for _, b := range trailingNouns {
-					k.NewRelative(a, relation, b)
+					k.eph.NewRelative(a, relation, b)
 				}
 			}
 		}
@@ -269,7 +269,7 @@ func imp_test_output(k *Importer, test ephemera.Named, r reader.Map) (err error)
 	} else if p, e := k.newProg("test", prog); e != nil {
 		err = e
 	} else {
-		k.NewTest(test, p, expect)
+		k.eph.NewTest(test, p, expect)
 	}
 	return
 }
