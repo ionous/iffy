@@ -10,11 +10,6 @@ func Box(i interface{}) Map {
 	return i.(map[string]interface{})
 }
 
-// Unbox returns the generic map underlying "m".
-func Unbox(m Map) map[string]interface{} {
-	return m
-}
-
 // StrOf the value at the passed key as a string.
 func (m Map) StrOf(key string) (ret string) {
 	if v, ok := m[key]; ok {

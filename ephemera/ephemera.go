@@ -21,7 +21,7 @@ func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 // category is likely one of kind, noun, aspect, attribute, property, relation, alias
 // names are not unique, one name can be many types.
 // ofs depends on the source, might be item.id$parameter
-func (r *Recorder) Named(category, name, ofs string) (ret Named) {
+func (r *Recorder) NewName(category, name, ofs string) (ret Named) {
 	namedId := r.cache.Must(eph_named, name, category, r.srcId, ofs)
 	return Named{namedId, name}
 }

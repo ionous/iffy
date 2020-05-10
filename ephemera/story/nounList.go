@@ -1,25 +1,29 @@
-package internal
+package story
 
 import "github.com/ionous/iffy/ephemera"
 
+// a list of recently referenced nouns
+// helps simplify some aspects of importing
+var storyNouns nounList
+
 type nounList struct {
-	Named []ephemera.Named
+	names []ephemera.Named
 }
 
 func (n *nounList) Add(name ephemera.Named) {
-	n.Named = append(n.Named, name)
+	n.names = append(n.names, name)
 }
 
 // return the most recently specified noun, or blank if none.
 func (n *nounList) Last() (ret ephemera.Named) {
-	if cnt := len(n.Named); cnt > 0 {
-		ret = n.Named[cnt-1]
+	if cnt := len(n.names); cnt > 0 {
+		ret = n.names[cnt-1]
 	}
 	return
 }
 
 func (n *nounList) Swap(v []ephemera.Named) []ephemera.Named {
-	prev := n.Named
-	n.Named = v
+	prev := n.names
+	n.names = v
 	return prev
 }

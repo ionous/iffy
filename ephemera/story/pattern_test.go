@@ -1,7 +1,6 @@
-package internal
+package story
 
 import (
-	"database/sql"
 	"os/user"
 	"path"
 	"strings"
@@ -127,27 +126,6 @@ func TestPatternDecl(t *testing.T) {
 			t.Log("ok")
 		}
 	}
-}
-
-func lines(s ...string) string {
-	return strings.Join(s, "\n") + "\n"
-}
-
-func newTestImporter(t *testing.T) (ret *Importer, retDB *sql.DB) {
-	const path = "file:test.db?cache=shared&mode=memory"
-	// if path, e := getPath(t.Name() + ".db"); e != nil {
-	// 	t.Fatal(e)
-	// } else
-	if db, e := sql.Open("sqlite3", path); e != nil {
-		t.Fatal("db open", e)
-	} else {
-		if e := tables.CreateEphemera(db); e != nil {
-			t.Fatal("create ephemera", e)
-		} else {
-			ret, retDB = NewImporter(t.Name(), db, nil), db
-		}
-	}
-	return
 }
 
 func getPath(file string) (ret string, err error) {

@@ -1,8 +1,6 @@
-package internal
+package decode
 
 import (
-	"database/sql"
-	"fmt"
 	r "reflect"
 
 	"github.com/ionous/errutil"
@@ -12,73 +10,65 @@ import (
 	"github.com/ionous/iffy/ref/unique"
 )
 
-// -----------------------------------
+// ReadRet is similar to reader.ReadMap, except it returns a value.
+type ReadRet func(reader.Map) (interface{}, error)
 
-func ImportStory(src string, in reader.Map, db *sql.DB) error {
-	k := NewImporter(src, db, nil)
-	return imp_story(k, in)
+// Decoder reads programs from json.
+type Decoder struct {
+	cmds map[string]ReadRet
 }
 
-type typeMap map[string]composer.Specification
+func NewDecoder() *Decoder {
+	return &Decoder{make(map[string]ReadRet)}
+}
 
-type importCallback func(interface{}) error
-
-var importCallbacks = make(map[string]importCallback)
-
-func RegisterCallback(c composer.Specification, cb importCallback) {
-	if spec := c.Compose(); len(spec.Name) == 0 {
-		panic(fmt.Sprintln("missing name for type", c))
+// AddCallback registers a command parser.
+func (dec *Decoder) AddCallback(cmd composer.Specification, cb ReadRet) {
+	if spec := cmd.Compose(); len(spec.Name) == 0 {
+		panic(errutil.Fmt("missing name for spec %T", cmd))
 	} else {
-		importCallbacks[spec.Name] = cb
+		dec.cmds[spec.Name] = cb
 	}
 }
 
-func makeTypeMap(runs []composer.Specification) typeMap {
-	m := make(typeMap)
-	for _, cmd := range runs {
-		if n := cmd.Compose().Name; len(n) == 0 {
-			panic(errutil.Fmt("missing name for spec %T", cmd))
+// AddDefaultCallbacks registers default command parsers.
+func (dec *Decoder) AddDefaultCallbacks(slats []composer.Specification) {
+	for _, slat := range slats {
+		spec := slat.Compose()
+		elem := r.TypeOf(slat).Elem()
+		dec.cmds[spec.Name] = func(m reader.Map) (ret interface{}, err error) {
+			return dec.readNew(m, elem)
+		}
+	}
+}
+
+// ReadProg attempts to parse the passed json data as a golang program.
+func (dec *Decoder) ReadProg(m reader.Map) (ret interface{}, err error) {
+	itemValue, itemType := m.MapOf(reader.ItemValue), m.StrOf(reader.ItemType)
+	if fn, ok := dec.cmds[itemType]; !ok {
+		err = errutil.Fmt("unknown type %q", itemType)
+	} else {
+		ret, err = fn(itemValue)
+	}
+	return
+}
+
+// m is the contents of slotType is a concrete command ( not a ptr to a command )
+func (dec *Decoder) readNew(m reader.Map, slotType r.Type) (ret interface{}, err error) {
+	if slotType.Kind() != r.Struct {
+		panic("expected a struct")
+	} else {
+		ptr := r.New(slotType)
+		if e := dec.readFields(ptr.Elem(), m); e != nil {
+			err = e
 		} else {
-			m[n] = cmd
-		}
-	}
-	return m
-}
-
-// read in-memory json into go-lang structs
-func ReadProg(targetPtr interface{}, inData export.Dict, types typeMap) error {
-	outPtr := r.ValueOf(targetPtr)
-	return unmarshall(outPtr, inData, types)
-}
-
-func ImportSlot(targetType interface{}, inData export.Dict, types typeMap) (ret interface{}, err error) {
-	slotType := r.TypeOf(targetType).Elem()
-	if newPtr, e := importSlot(inData, slotType, types); e != nil {
-		err = e
-	} else {
-		ret = newPtr.Interface()
-	}
-	return
-}
-
-func unmarshall(outPtr r.Value, inData export.Dict, types typeMap) (err error) {
-	if inVal, ok := inData[reader.ItemValue].(map[string]interface{}); !ok {
-		err = errutil.New("unexpected value in data", inData)
-	} else if e := unmarshallFields(outPtr.Elem(), inVal, types); e != nil {
-		at, _ := inData[reader.ItemId].(string)
-		err = errutil.Append(errutil.New("unmarshall", at, "error(s):"), e)
-	} else {
-		// notify import code that a particular type has been parsed.
-		typeName, _ := inData[reader.ItemType].(string)
-		if cb, ok := importCallbacks[typeName]; ok {
-			loaded := outPtr.Interface()
-			err = cb(loaded)
+			ret = ptr.Interface()
 		}
 	}
 	return
 }
 
-func unmarshallFields(out r.Value, in export.Dict, types typeMap) (err error) {
+func (dec *Decoder) readFields(out r.Value, in reader.Map) (err error) {
 	var processed []string
 	unique.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
 		token := export.Tokenize(f)
@@ -87,8 +77,8 @@ func unmarshallFields(out r.Value, in export.Dict, types typeMap) (err error) {
 		// note: values of run-fields are always going to be an "item" or an array of items
 		if inVal, ok := in[token]; ok {
 			outAt := out.FieldByIndex(path)
-			if e := importValue(outAt, inVal, types); e != nil {
-				e := errutil.New("error processing field", f.Name, e)
+			if e := dec.importValue(outAt, inVal); e != nil {
+				e := errutil.New("error processing field", out.Type().String(), f.Name, e)
 				err = errutil.Append(err, e)
 			}
 		}
@@ -105,20 +95,38 @@ func unmarshallFields(out r.Value, in export.Dict, types typeMap) (err error) {
 			}
 		}
 		if !found {
-			e := errutil.New("unprocessed value", token)
+			e := errutil.Fmt("unprocessed value %q", token)
 			err = errutil.Append(err, e)
 		}
 	}
 	return
 }
 
-func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
+// returns a ptr r.Value
+func (dec *Decoder) importSlot(m reader.Map, slotType r.Type) (ret r.Value, err error) {
+	itemValue, itemType := m.MapOf(reader.ItemValue), m.StrOf(reader.ItemType)
+	if cmdImport, ok := dec.cmds[itemType]; !ok {
+		err = errutil.New("unknown type", itemType, reader.At(m))
+	} else if cmd, e := cmdImport(itemValue); e != nil {
+		err = e
+	} else {
+		rval := r.ValueOf(cmd)
+		if rtype := rval.Type(); !rtype.AssignableTo(slotType) {
+			err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
+		} else {
+			ret = rval
+		}
+	}
+	return
+}
+
+func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 	switch outType := outAt.Type(); outType.Kind() {
 	case r.Float32, r.Float64:
 		err = unpack(inVal, func(v interface{}) (err error) {
 			// float64, for JSON numbers
 			if n, ok := v.(float64); !ok {
-				err = errutil.New("expected a number")
+				err = errutil.Fmt("expected a number, have %T", v)
 			} else {
 				outAt.SetFloat(n)
 
@@ -164,7 +172,7 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
 				err = errutil.New("value not a slot")
-			} else if v, e := importSlot(slot, outAt.Type(), types); e != nil {
+			} else if v, e := dec.importSlot(slot, outAt.Type()); e != nil {
 				err = e
 			} else {
 				outAt.Set(v)
@@ -183,9 +191,9 @@ func importValue(outAt r.Value, inVal interface{}, types typeMap) (err error) {
 					for _, item := range items {
 						if e := unpack(item, func(v interface{}) (err error) {
 							// map[string]interface{}, for JSON objects
-							if slot, ok := v.(map[string]interface{}); !ok {
-								err = errutil.New("value not a slot")
-							} else if v, e := importSlot(slot, elType, types); e != nil {
+							if itemData, ok := v.(map[string]interface{}); !ok {
+								err = errutil.Fmt("item data not a slot %T", itemData)
+							} else if v, e := dec.importSlot(itemData, elType); e != nil {
 								err = e
 							} else {
 								slice = r.Append(slice, v)
@@ -209,27 +217,6 @@ func unpack(inVal interface{}, setter func(interface{}) error) (err error) {
 	} else if e := setter(item[reader.ItemValue]); e != nil {
 		id, _ := item[reader.ItemId].(string)
 		err = errutil.New("couldnt unpack", id, e)
-	}
-	return
-}
-
-// returns a ptr r.Value
-func importSlot(slot export.Dict, slotType r.Type, types typeMap) (ret r.Value, err error) {
-	typeName, _ := slot[reader.ItemType].(string)
-	if cmd, ok := types[typeName]; !ok {
-		err = errutil.New("unknown type", typeName, slot)
-	} else {
-		rtype := r.TypeOf(cmd) // commands are pointers to things
-		if !rtype.AssignableTo(slotType) {
-			err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
-		} else {
-			newPtr := r.New(rtype.Elem()) // we want to new the concrete element; which gives us a new pointer.
-			if e := unmarshall(newPtr, slot, types); e != nil {
-				err = e
-			} else {
-				ret = newPtr // we want to return
-			}
-		}
 	}
 	return
 }

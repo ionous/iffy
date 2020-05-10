@@ -1,4 +1,4 @@
-package internal
+package story
 
 import (
 	"strings"
@@ -12,7 +12,7 @@ import (
 
 // import an object type description
 func TestObjectFunc(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestDecoder(t)
 	defer db.Close()
 	if rule, e := imp_object_func(k, _object_func); e != nil {
 		t.Fatal(e)
@@ -24,7 +24,7 @@ func TestObjectFunc(t *testing.T) {
 }
 
 func TestPatternActivity(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestDecoder(t)
 	defer db.Close()
 	if rule, e := imp_pattern_activity(k, _pattern_activity); e != nil {
 		t.Fatal(e)
@@ -39,7 +39,8 @@ func TestPatternActivity(t *testing.T) {
 }
 
 func TestPatternHandler(t *testing.T) {
-	k, db := newTestImporter(t)
+	registerGob()
+	k, db := newTestDecoder(t)
 	defer db.Close()
 	if e := imp_pattern_handler(k, _pattern_handler); e != nil {
 		t.Fatal(e)

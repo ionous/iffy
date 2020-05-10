@@ -1,4 +1,4 @@
-package internal
+package story
 
 import (
 	"github.com/ionous/iffy/dl/core"

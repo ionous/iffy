@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/cmd/import/internal"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/tables"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -49,7 +49,7 @@ func distill(outFile, inFile string) (err error) {
 		defer outDB.Close()
 		if e := tables.CreateEphemera(outDB); e != nil {
 			err = errutil.New("couldn't create tables", outFile, e)
-		} else if e := internal.ImportStory(inFile, inData, outDB); e != nil {
+		} else if e := story.ImportStory(inFile, inData, outDB); e != nil {
 			err = errutil.New("couldn't import story", e)
 		}
 	}

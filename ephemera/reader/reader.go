@@ -1,6 +1,8 @@
 package reader
 
-import "github.com/ionous/errutil"
+import (
+	"github.com/ionous/errutil"
+)
 
 const (
 	ItemId    = "id"
@@ -54,10 +56,9 @@ func Slat(m Map, expectedType string) (ret Map, err error) {
 }
 
 func Slot(r Map, expectedType string, slots ReadMaps) (err error) {
-	if t := r.StrOf(ItemType); t != expectedType {
-		err = BadType(expectedType, t, At(r))
+	if m, e := Slat(r, expectedType); e != nil {
+		err = e
 	} else {
-		m := r.MapOf(ItemValue)
 		t := m.StrOf(ItemType)
 		if fn, ok := slots[t]; !ok {
 			err = BadType(expectedType, t, At(r))

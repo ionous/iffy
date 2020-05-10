@@ -16,10 +16,10 @@ func addTraits(rec *ephemera.Recorder, pairs []pair) (err error) {
 	for _, p := range pairs {
 		var aspect, trait ephemera.Named
 		if len(p.key) > 0 {
-			aspect = rec.Named(tables.NAMED_ASPECT, p.key, "key")
+			aspect = rec.NewName(tables.NAMED_ASPECT, p.key, "key")
 		}
 		if len(p.value) > 0 {
-			trait = rec.Named(tables.NAMED_TRAIT, p.value, "value")
+			trait = rec.NewName(tables.NAMED_TRAIT, p.value, "value")
 		}
 		if aspect.IsValid() && trait.IsValid() {
 			rec.NewAspect(aspect)
