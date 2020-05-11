@@ -2,6 +2,7 @@ package story
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/imp"
@@ -9,17 +10,69 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-func imp_determine_num(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
-	if from, e := fromPattern(k, m, "determine_num", "number_eval"); e != nil {
+func imp_determine_act(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+	var from core.DetermineAct
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "execute"); e != nil {
 		err = e
 	} else {
-		ret = (*core.DetermineNum)(from)
+		ret = &from
+	}
+	return
+}
+func imp_determine_num(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+	var from core.DetermineNum
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "number_eval"); e != nil {
+		err = e
+	} else {
+		ret = &from
+	}
+	return
+}
+func imp_determine_text(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+	var from core.DetermineText
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "text_eval"); e != nil {
+		err = e
+	} else {
+		ret = &from
+	}
+	return
+}
+func imp_determine_bool(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+	var from core.DetermineBool
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "bool_eval"); e != nil {
+		err = e
+	} else {
+		ret = &from
+	}
+	return
+}
+func imp_determine_num_list(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+	var from core.DetermineNumList
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "num_list_eval"); e != nil {
+		err = e
+	} else {
+		ret = &from
+	}
+	return
+}
+func imp_determine_text_list(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+	var from core.DetermineTextList
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "text_list_eval"); e != nil {
+		err = e
+	} else {
+		ret = &from
 	}
 	return
 }
 
-func fromPattern(k *imp.Porter, r reader.Map, typeName, evalType string) (ret *core.FromPattern, err error) {
-	if m, e := reader.Unpack(r, typeName); e != nil {
+// from and spec are the same object, but go-type unpacking from interfaces isnt always easy.
+func fromPattern(k *imp.Porter,
+	m reader.Map,
+	spec composer.Specification,
+	from *core.FromPattern,
+	evalType string) (err error) {
+	typeName := spec.Compose().Name
+	if m, e := reader.Unpack(m, typeName); e != nil {
 		err = e
 	} else if pid, e := fromPatternName(k, m.MapOf("$NAME"), typeName); e != nil {
 		err = e
@@ -29,7 +82,9 @@ func fromPattern(k *imp.Porter, r reader.Map, typeName, evalType string) (ret *c
 		n := k.NewName(tables.NAMED_TYPE, evalType, reader.At(m))
 		// fix: object type names will need adaption of some sort re plural_kinds
 		k.NewPatternType(pid, n)
-		ret = &core.FromPattern{pid.String(), ps}
+		// assign results
+		from.Name = pid.String()
+		from.Parameters = ps
 	}
 	return
 }

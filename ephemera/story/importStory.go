@@ -23,7 +23,12 @@ func ImportStory(src string, m reader.Map, db *sql.DB) (err error) {
 		//
 		dec.AddDefaultCallbacks(export.Slats)
 		dec.AddCallbacks([]decode.Override{
+			{(*core.DetermineAct)(nil), k.BindRet(imp_determine_act)},
 			{(*core.DetermineNum)(nil), k.BindRet(imp_determine_num)},
+			{(*core.DetermineText)(nil), k.BindRet(imp_determine_text)},
+			{(*core.DetermineBool)(nil), k.BindRet(imp_determine_bool)},
+			{(*core.DetermineNumList)(nil), k.BindRet(imp_determine_num_list)},
+			{(*core.DetermineTextList)(nil), k.BindRet(imp_determine_text_list)},
 		})
 		//
 		err = imp_story(k, m)
