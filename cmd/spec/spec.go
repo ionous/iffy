@@ -25,17 +25,17 @@ func main() {
 	groups := make(Groups)
 
 	// slots that commands can fit into
-	for slotName, slot := range export.Slots {
+	for _, slot := range export.Slots {
 		spec := getSpec(slot.Type)
 		if spec.Group != "internal" {
 			i := r.TypeOf(slot.Type).Elem()
 			//
 			slots = append(slots, i)
 			if len(spec.Name) == 0 {
-				spec.Name = slotName
+				spec.Name = slot.Name
 			}
 			if len(spec.Desc) == 0 {
-				spec.Desc = export.Prettify(slotName)
+				spec.Desc = export.Prettify(slot.Name)
 			}
 			if len(spec.Group) == 0 {
 				spec.Group = slot.Group
@@ -245,9 +245,9 @@ func findTypeName(t r.Type) (ret string) {
 			typeName := cmd.Compose().Name
 			reverseLookup[runType] = typeName
 		}
-		for typeName, slot := range export.Slots {
+		for _, slot := range export.Slots {
 			t := r.TypeOf(slot.Type).Elem()
-			reverseLookup[t] = typeName
+			reverseLookup[t] = slot.Name
 		}
 	}
 

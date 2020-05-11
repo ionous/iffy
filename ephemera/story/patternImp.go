@@ -48,9 +48,11 @@ func imp_patterned_activity(k *imp.Porter, r reader.Map) (ret ephemera.Named, er
 func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_handler"); e != nil {
 		err = e
-	} else if n, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
+	} else if pid, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else if rule, e := imp_pattern_hook(k, m.MapOf("$HOOK")); e != nil {
+		err = e
+	} else if evalType, e := slotName(rule.rule); e != nil {
 		err = e
 	} else {
 		if v := m.MapOf("$FILTERS"); len(v) != 0 {
@@ -60,7 +62,8 @@ func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
 			if prog, e := k.NewProg(rule.name, rule.distill()); e != nil {
 				err = e
 			} else {
-				k.NewPatternHandler(n, prog)
+				k.NewPatternType(pid, k.NewName(tables.NAMED_TYPE, evalType, reader.At(m)))
+				k.NewPatternHandler(pid, prog)
 			}
 		}
 	}

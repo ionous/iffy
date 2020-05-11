@@ -8,31 +8,49 @@ import (
 )
 
 type Slot struct {
+	Name  string
 	Type  interface{} // nil instance, ex. (*core.CompareTo)(nil)
 	Desc  string
 	Group string // display group(s)
 }
 
-var Slots = map[string]Slot{
-	"execute": {Type: (*rt.Execute)(nil),
-		Desc: "Execute: Run a series of statements."},
-	"bool_eval": {Type: (*rt.BoolEval)(nil),
-		Desc: "Booleans: Statements which return true/false values."},
-	"number_eval": {Type: (*rt.NumberEval)(nil),
-		Desc: "Numbers: Statements which return a number."},
-	"text_eval": {Type: (*rt.TextEval)(nil),
-		Desc: "Texts: Statements which return text."},
-	"num_list_eval": {Type: (*rt.NumListEval)(nil),
-		Desc: "Number List: Statements which return a list of numbers."},
-	"text_list_eval": {Type: (*rt.TextListEval)(nil),
-		Desc: "Text Lists: Statements which return a list of text."},
-	"compare_to": {Type: (*core.CompareTo)(nil),
-		Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc."},
-	"assignment": {Type: (*core.Assignment)(nil),
-		Desc: "Assignments: Helper used when setting variables."},
-	"testing": {Type: (*check.Testing)(nil),
-		Desc: "Testing: Run a series of tests."},
-}
+var Slots = []Slot{{
+	Name: "execute",
+	Type: (*rt.Execute)(nil),
+	Desc: "Execute: Run a series of statements.",
+}, {
+	Name: "bool_eval",
+	Type: (*rt.BoolEval)(nil),
+	Desc: "Booleans: Statements which return true/false values.",
+}, {
+	Name: "number_eval",
+	Type: (*rt.NumberEval)(nil),
+	Desc: "Numbers: Statements which return a number.",
+}, {
+	Name: "text_eval",
+	Type: (*rt.TextEval)(nil),
+	Desc: "Texts: Statements which return text.",
+}, {
+	Name: "num_list_eval",
+	Type: (*rt.NumListEval)(nil),
+	Desc: "Number List: Statements which return a list of numbers.",
+}, {
+	Name: "text_list_eval",
+	Type: (*rt.TextListEval)(nil),
+	Desc: "Text Lists: Statements which return a list of text.",
+}, {
+	Name: "compare_to",
+	Type: (*core.CompareTo)(nil),
+	Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc.",
+}, {
+	Name: "assignment",
+	Type: (*core.Assignment)(nil),
+	Desc: "Assignments: Helper used when setting variables.",
+}, {
+	Name: "testing",
+	Type: (*check.Testing)(nil),
+	Desc: "Testing: Run a series of tests.",
+}}
 
 func Register(reg func(value interface{})) {
 	for _, cmd := range Slats {

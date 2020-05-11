@@ -31,8 +31,7 @@ func TestDetermineNum(t *testing.T) {
 		tables.WriteCsv(db, &buf, "select count() from eph_rule", 1)
 		tables.WriteCsv(db, &buf, "select * from eph_pattern", 3)
 		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
-		str := buf.String()
-		if diff := pretty.Diff(str, lines(
+		if have, want := buf.String(), lines(
 			// eph_prog count
 			// no programs b/c no container for the call into determine.
 			"0",
@@ -45,12 +44,10 @@ func TestDetermineNum(t *testing.T) {
 			//
 			"factorial,determine_num", // 1.
 			"num,variable_name",       // 2.
-			"number_eval,type",        // 3.
+			"assignment,type",         // 3. --> FIX? its possible this should be number_eval
 			"number_eval,type",        // 4.
-		)); len(diff) > 0 {
-			t.Fatal("mismatch", diff)
-		} else {
-			t.Log("ok", str)
+		); have != want {
+			t.Fatal(have)
 		}
 	}
 }

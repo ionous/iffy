@@ -28,19 +28,33 @@ func newTestDecoder(t *testing.T) (ret *imp.Porter, retDB *sql.DB) {
 }
 
 func newTestImporterDecoder(t *testing.T, dec *decode.Decoder) (ret *imp.Porter, retDB *sql.DB) {
-	const path = "file:test.db?cache=shared&mode=memory"
-	// if path, e := getPath(t.Name() + ".db"); e != nil {
-	// 	t.Fatal(e)
-	// } else
-	if db, e := sql.Open("sqlite3", path); e != nil {
-		t.Fatal("db open", e)
+	db := newTestDB(t, memory)
+	if e := tables.CreateEphemera(db); e != nil {
+		t.Fatal("create ephemera", e)
 	} else {
-		if e := tables.CreateEphemera(db); e != nil {
-			t.Fatal("create ephemera", e)
-		} else {
-			ret = imp.NewImporterDecoder(t.Name(), db, dec)
-			retDB = db
-		}
+		ret = imp.NewImporterDecoder(t.Name(), db, dec)
+		retDB = db
+	}
+	return
+}
+
+const memory = "file:test.db?cache=shared&mode=memory"
+
+// if path is nil, it will use a file db.
+func newTestDB(t *testing.T, path string) (ret *sql.DB) {
+	var source string
+	if len(path) > 0 {
+		source = path
+	} else if p, e := getPath(t.Name() + ".db"); e != nil {
+		t.Fatal(e)
+	} else {
+		source = p
+	}
+
+	if db, e := sql.Open("sqlite3", source); e != nil {
+		t.Fatal(e)
+	} else {
+		ret = db
 	}
 	return
 }

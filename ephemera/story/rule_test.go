@@ -50,17 +50,18 @@ func TestPatternHandler(t *testing.T) {
 		tables.WriteCsv(db, &buf, "select type from eph_prog", 1)
 		// example, pattern_name
 		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
-		// 0 -- we dont have the pattern definition, just the rules
+		// 1 pattern handler reference
 		tables.WriteCsv(db, &buf, "select count() from eph_pattern", 1)
 		// 1, 1 - the first name, the first program are used to make the rule
 		tables.WriteCsv(db, &buf, "select idNamedPattern, idProg from eph_rule", 2)
-		if diff := pretty.Diff(buf.String(), lines(
+		if have, want := buf.String(), lines(
 			"exec_rule",
 			"example,pattern_name",
-			"0",
+			"execute,type",
+			"1",
 			"1,1",
-		)); len(diff) > 0 {
-			t.Fatal(diff)
+		); have != want {
+			t.Fatal(have)
 		}
 	}
 }

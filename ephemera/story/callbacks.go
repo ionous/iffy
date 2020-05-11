@@ -12,7 +12,7 @@ import (
 
 func imp_determine_act(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineAct
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "execute"); e != nil {
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -21,7 +21,7 @@ func imp_determine_act(k *imp.Porter, m reader.Map) (ret interface{}, err error)
 }
 func imp_determine_num(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineNum
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "number_eval"); e != nil {
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -30,7 +30,7 @@ func imp_determine_num(k *imp.Porter, m reader.Map) (ret interface{}, err error)
 }
 func imp_determine_text(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineText
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "text_eval"); e != nil {
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -39,7 +39,7 @@ func imp_determine_text(k *imp.Porter, m reader.Map) (ret interface{}, err error
 }
 func imp_determine_bool(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineBool
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "bool_eval"); e != nil {
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -48,7 +48,7 @@ func imp_determine_bool(k *imp.Porter, m reader.Map) (ret interface{}, err error
 }
 func imp_determine_num_list(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineNumList
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "num_list_eval"); e != nil {
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -57,7 +57,7 @@ func imp_determine_num_list(k *imp.Porter, m reader.Map) (ret interface{}, err e
 }
 func imp_determine_text_list(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineTextList
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from), "text_list_eval"); e != nil {
+	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -69,19 +69,20 @@ func imp_determine_text_list(k *imp.Porter, m reader.Map) (ret interface{}, err 
 func fromPattern(k *imp.Porter,
 	m reader.Map,
 	spec composer.Specification,
-	from *core.FromPattern,
-	evalType string) (err error) {
+	from *core.FromPattern) (err error) {
 	typeName := spec.Compose().Name
-	if m, e := reader.Unpack(m, typeName); e != nil {
+	if evalType, e := slotName(spec); e != nil {
+		err = e
+	} else if m, e := reader.Unpack(m, typeName); e != nil {
 		err = e
 	} else if pid, e := fromPatternName(k, m.MapOf("$NAME"), typeName); e != nil {
 		err = e
 	} else if ps, e := imp_parameters(k, pid, m.MapOf("$PARAMETERS")); e != nil {
 		err = e
 	} else {
-		n := k.NewName(tables.NAMED_TYPE, evalType, reader.At(m))
+		typ := k.NewName(tables.NAMED_TYPE, evalType, reader.At(m))
 		// fix: object type names will need adaption of some sort re plural_kinds
-		k.NewPatternType(pid, n)
+		k.NewPatternType(pid, typ)
 		// assign results
 		from.Name = pid.String()
 		from.Parameters = ps
@@ -119,30 +120,11 @@ func imp_parameter(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.P
 		err = e
 	} else if a, e := imp_assignment(k, m.MapOf("$FROM")); e != nil {
 		err = e
-	} else if evalType, e := assignmentType(a); e != nil {
-		err = e
+	} else if slotName, e := slotName(a); e != nil {
+		err = e // ^ its possible this should be the type that the assignment contains.
 	} else {
-		k.NewPatternParam(pid, n, k.NewName(tables.NAMED_TYPE, evalType, reader.At(m)))
+		k.NewPatternParam(pid, n, k.NewName(tables.NAMED_TYPE, slotName, reader.At(m)))
 		ret = &core.Parameter{Name: n.String(), From: a}
-	}
-	return
-}
-
-// return the evaluation type name underlying the parameter assignment
-func assignmentType(a core.Assignment) (ret string, err error) {
-	switch a.(type) {
-	case *core.FromBool:
-		ret = "bool_eval"
-	case *core.FromNum:
-		ret = "number_eval"
-	case *core.FromText:
-		ret = "text_eval"
-	case *core.FromNumList:
-		ret = "num_list_eval"
-	case *core.FromTextList:
-		ret = "text_list_eval"
-	default:
-		err = errutil.Fmt("unknown parameter type %T", a)
 	}
 	return
 }
