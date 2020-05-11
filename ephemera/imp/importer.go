@@ -48,9 +48,16 @@ func (k *Porter) Bind(cb func(*Porter, reader.Map) (err error)) reader.ReadMap {
 	}
 }
 
+// adapt an importer friendly function to the ephemera reader callback
+func (k *Porter) BindRet(cb func(*Porter, reader.Map) (ret interface{}, err error)) decode.ReadRet {
+	return func(m reader.Map) (interface{}, error) {
+		return cb(k, m)
+	}
+}
+
 // read the passed map as if it contained a slot. ex bool_eval, etc.
 func (k *Porter) DecodeSlot(m reader.Map, slotType string) (ret interface{}, err error) {
-	if m, e := reader.Slat(m, slotType); e != nil {
+	if m, e := reader.Unpack(m, slotType); e != nil {
 		err = e // reuses: "slat" to unpack the contained map.
 	} else {
 		ret, err = k.DecodeAny(m)

@@ -16,18 +16,19 @@ func imp_story_statement(k *imp.Porter, r reader.Map) (err error) {
 		"kinds_possess_properties": k.Bind(imp_kinds_possess_properties),
 		"noun_assignment":          k.Bind(imp_noun_assignment),
 		"noun_statement":           k.Bind(imp_noun_statement),
-		// "pattern_decl":             k.Bind(imp_pattern_decl),
-		"pattern_variables_decl": k.Bind(imp_pattern_variables_decl),
-		"quality_attributes":     k.Bind(imp_quality_attributes),
-		"relative_to_noun":       k.Bind(imp_relative_to_noun),
-		"test_statement":         k.Bind(imp_test_statement),
+		"pattern_decl":             k.Bind(imp_pattern_decl),
+		"pattern_variables_decl":   k.Bind(imp_pattern_variables_decl),
+		"quality_attributes":       k.Bind(imp_quality_attributes),
+		"relative_to_noun":         k.Bind(imp_relative_to_noun),
+		"test_statement":           k.Bind(imp_test_statement),
+		"pattern_handler":          k.Bind(imp_pattern_handler),
 	})
 }
 
 //"{plural_kinds} {are_being} {certainty} {trait}.");
 // horses are usually fast.
 func imp_certainties(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "certainties"); e != nil {
+	if m, e := reader.Unpack(r, "certainties"); e != nil {
 		err = e
 	} else if certainty, e := imp_certainty(k, m.MapOf("$CERTAINTY")); e != nil {
 		err = e
@@ -58,7 +59,7 @@ func imp_certainty(k *imp.Porter, r reader.Map) (ret string, err error) {
 // "{plural_kinds} {attribute_phrase}"
 // ex. animals are fast or slow.
 func imp_class_attributes(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "class_attributes"); e != nil {
+	if m, e := reader.Unpack(r, "class_attributes"); e != nil {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
@@ -76,7 +77,7 @@ func imp_class_attributes(k *imp.Porter, r reader.Map) (err error) {
 // "{qualities} {are_an} kind of value."
 // ex. colors are a kind of value
 func imp_kinds_of_quality(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "kinds_of_quality"); e != nil {
+	if m, e := reader.Unpack(r, "kinds_of_quality"); e != nil {
 		err = e
 	} else if _, e := imp_qualities(k, m.MapOf("$QUALITIES")); e != nil {
 		err = e
@@ -87,7 +88,7 @@ func imp_kinds_of_quality(k *imp.Porter, r reader.Map) (err error) {
 // "{plural_kinds} {are_an} kind of {kind}."
 // ex. "cats are a kind of animal"
 func imp_kinds_of_thing(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "kinds_of_thing"); e != nil {
+	if m, e := reader.Unpack(r, "kinds_of_thing"); e != nil {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
@@ -103,7 +104,7 @@ func imp_kinds_of_thing(k *imp.Porter, r reader.Map) (err error) {
 // ex. cats have some text called breed.
 // ex. horses have an aspect called speed.
 func imp_kinds_possess_properties(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "kinds_possess_properties"); e != nil {
+	if m, e := reader.Unpack(r, "kinds_possess_properties"); e != nil {
 		err = e
 	} else if _, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
@@ -119,7 +120,7 @@ func imp_kinds_possess_properties(k *imp.Porter, r reader.Map) (err error) {
 // run "The {property} of {+noun} is the {[text]:: %lines}"
 // ex. The description of the nets is xxx
 func imp_noun_assignment(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "noun_assignment"); e != nil {
+	if m, e := reader.Unpack(r, "noun_assignment"); e != nil {
 		err = e
 	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
 		err = e
@@ -136,7 +137,7 @@ func imp_noun_assignment(k *imp.Porter, r reader.Map) (err error) {
 }
 
 func imp_noun_statement(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "noun_statement"); e != nil {
+	if m, e := reader.Unpack(r, "noun_statement"); e != nil {
 		err = e
 	} else if e := imp_lede(k, m.MapOf("$LEDE")); e != nil {
 		err = e
@@ -152,7 +153,7 @@ func imp_noun_statement(k *imp.Porter, r reader.Map) (err error) {
 // {name:pattern_name|quote} determines {type:pattern_type}.
 // {optvars?pattern_variables_tail}
 func imp_pattern_decl(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "pattern_decl"); e != nil {
+	if m, e := reader.Unpack(r, "pattern_decl"); e != nil {
 		err = e
 	} else if pat, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
@@ -183,7 +184,7 @@ func imp_pattern_variables_tail(k *imp.Porter, pat ephemera.Named, r reader.Map)
 
 // "The pattern {pattern_name|quote} uses {+variable_decl|comma-and}."
 func imp_pattern_variables_decl(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "pattern_variables_decl"); e != nil {
+	if m, e := reader.Unpack(r, "pattern_variables_decl"); e != nil {
 		err = e
 	} else if pat, e := imp_pattern_name(k, m.MapOf("$PATTERN_NAME")); e != nil {
 		err = e
@@ -197,7 +198,7 @@ func imp_pattern_variables_decl(k *imp.Porter, r reader.Map) (err error) {
 // "{qualities} {attribute_phrase}"
 // (the) colors are red, blue, or green.
 func imp_quality_attributes(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "quality_attributes"); e != nil {
+	if m, e := reader.Unpack(r, "quality_attributes"); e != nil {
 		err = e
 	} else if aspect, e := imp_qualities(k, r.MapOf("$QUALITIES")); e != nil {
 		err = e
@@ -223,7 +224,7 @@ func imp_qualities(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) 
 // "{relation} {+noun} {are_being} {+noun}."
 // ex. On the beach are shells.
 func imp_relative_to_noun(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "relative_to_noun"); e != nil {
+	if m, e := reader.Unpack(r, "relative_to_noun"); e != nil {
 		err = e
 	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
 		err = e

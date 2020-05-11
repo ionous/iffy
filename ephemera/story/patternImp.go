@@ -46,7 +46,7 @@ func imp_patterned_activity(k *imp.Porter, r reader.Map) (ret ephemera.Named, er
 
 // make.run("pattern_handler", {name:pattern_name}{filters?pattern_filters}: {hook:pattern_hook}
 func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "pattern_handler"); e != nil {
+	if m, e := reader.Unpack(r, "pattern_handler"); e != nil {
 		err = e
 	} else if n, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
@@ -69,7 +69,7 @@ func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
 
 //run("pattern_filters", " when {filter+bool_eval}"
 func imp_pattern_filters(k *imp.Porter, rule *ruleBuilder, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "pattern_filters"); e != nil {
+	if m, e := reader.Unpack(r, "pattern_filters"); e != nil {
 		err = e
 	} else {
 		err = reader.Repeats(m.SliceOf("$FILTER"),
@@ -93,7 +93,7 @@ func imp_pattern_hook(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err error)
 			return
 		},
 		"$RESULT": func(m reader.Map) (err error) {
-			ret, err = imp_object_func(k, m)
+			ret, err = imp_pattern_return(k, m)
 			return
 		},
 	})
@@ -103,10 +103,10 @@ func imp_pattern_hook(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err error)
 // run("pattern_return", "return {result:pattern_result}");
 // note: this slat exists for composer formatting reasons only...
 func imp_pattern_return(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err error) {
-	if m, e := reader.Slat(r, "pattern_return"); e != nil {
+	if m, e := reader.Unpack(r, "pattern_return"); e != nil {
 		err = e
 	} else {
-		ret, err = imp_pattern_result(k, m)
+		ret, err = imp_pattern_result(k, m.MapOf("$RESULT"))
 	}
 	return
 }
@@ -160,7 +160,7 @@ func imp_primitive_func(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err erro
 // run("pattern_activity", "run: {activity%go+execute|ghost}");
 func imp_pattern_activity(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err error) {
 	var exes []rt.Execute
-	if m, e := reader.Slat(r, "pattern_activity"); e != nil {
+	if m, e := reader.Unpack(r, "pattern_activity"); e != nil {
 		err = e
 	} else if e := reader.Repeats(m.SliceOf("$GO"),
 		func(m reader.Map) (err error) {
@@ -180,7 +180,7 @@ func imp_pattern_activity(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err er
 
 // run("object_func", "an object named {name%text_eval}");
 func imp_object_func(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err error) {
-	if m, e := reader.Slat(r, "object_func"); e != nil {
+	if m, e := reader.Unpack(r, "object_func"); e != nil {
 		err = e
 	} else if i, e := k.DecodeSlot(m, "text_eval"); e != nil {
 		err = e

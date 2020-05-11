@@ -19,7 +19,7 @@ func imp_determine_num(k *imp.Porter, m reader.Map) (ret interface{}, err error)
 }
 
 func fromPattern(k *imp.Porter, r reader.Map, typeName, evalType string) (ret *core.FromPattern, err error) {
-	if m, e := reader.Slat(r, typeName); e != nil {
+	if m, e := reader.Unpack(r, typeName); e != nil {
 		err = e
 	} else if pid, e := fromPatternName(k, m.MapOf("$NAME"), typeName); e != nil {
 		err = e
@@ -35,7 +35,7 @@ func fromPattern(k *imp.Porter, r reader.Map, typeName, evalType string) (ret *c
 }
 
 func imp_parameters(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.Parameters, err error) {
-	if m, e := reader.Slat(r, "parameters"); e != nil {
+	if m, e := reader.Unpack(r, "parameters"); e != nil {
 		err = e
 	} else {
 		var ps []*core.Parameter
@@ -58,7 +58,7 @@ func imp_parameters(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.
 }
 
 func imp_parameter(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.Parameter, err error) {
-	if m, e := reader.Slat(r, "parameter"); e != nil {
+	if m, e := reader.Unpack(r, "parameter"); e != nil {
 		err = e
 	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
 		err = e

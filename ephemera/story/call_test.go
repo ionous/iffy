@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
@@ -20,7 +21,7 @@ func TestDetermineNum(t *testing.T) {
 		}}}
 	k, db := newTestDecoder(t)
 	defer db.Close()
-	if rule, e := imp_determine_num(k, _determine_num); e != nil {
+	if rule, e := imp_determine_num(k, debug.FactorialDetermineNum); e != nil {
 		t.Fatal(e)
 	} else if diff := pretty.Diff(rule, &expect); len(diff) != 0 {
 		t.Fatal(diff)
@@ -52,40 +53,4 @@ func TestDetermineNum(t *testing.T) {
 			t.Log("ok", str)
 		}
 	}
-}
-
-// determine num of factorial where num = 3
-var _determine_num = map[string]interface{}{
-	"type": "determine_num",
-	"value": map[string]interface{}{
-		"$NAME": map[string]interface{}{
-			"type":  "pattern_name",
-			"value": "factorial",
-		},
-		"$PARAMETERS": map[string]interface{}{
-			"type": "parameters",
-			"value": map[string]interface{}{
-				"$PARAMS": []interface{}{
-					map[string]interface{}{
-						"type": "parameter",
-						"value": map[string]interface{}{
-							"$FROM": map[string]interface{}{
-								"type": "assignment",
-								"value": map[string]interface{}{
-									"type": "assign_num",
-									"value": map[string]interface{}{
-										"$VAL": map[string]interface{}{
-											"type": "number_eval",
-											"value": map[string]interface{}{
-												"type": "num_value",
-												"value": map[string]interface{}{
-													"$NUM": map[string]interface{}{
-														"type":  "number",
-														"value": 3.0, // json numbers are float64
-													}}}}}},
-							},
-							"$NAME": map[string]interface{}{
-								"type":  "variable_name",
-								"value": "num",
-							}}}}}}},
 }

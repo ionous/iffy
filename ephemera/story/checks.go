@@ -7,10 +7,12 @@ import (
 )
 
 func imp_test_statement(k *imp.Porter, r reader.Map) (err error) {
-	if n, e := imp_test_name(k, r.MapOf("name")); e != nil {
+	if m, e := reader.Unpack(r, "test_statement"); e != nil {
+		err = e
+	} else if n, e := imp_test_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else {
-		err = reader.Slot(r, "testing", reader.ReadMaps{
+		err = reader.Slot(m.MapOf("$TEST"), "testing", reader.ReadMaps{
 			"test_output": func(m reader.Map) error {
 				return imp_test_output(k, n, m)
 			},
@@ -20,7 +22,7 @@ func imp_test_statement(k *imp.Porter, r reader.Map) (err error) {
 }
 
 func imp_test_output(k *imp.Porter, test ephemera.Named, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "test_output"); e != nil {
+	if m, e := reader.Unpack(r, "test_output"); e != nil {
 		err = e
 	} else if expect, e := imp_lines(k, m.MapOf("$LINES")); e != nil {
 		err = e

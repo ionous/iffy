@@ -13,13 +13,26 @@ import (
 // ReadRet is similar to reader.ReadMap, except it returns a value.
 type ReadRet func(reader.Map) (interface{}, error)
 
+type Override struct {
+	Spec     composer.Specification
+	Callback ReadRet
+}
+
 // Decoder reads programs from json.
 type Decoder struct {
 	cmds map[string]ReadRet
 }
 
 func NewDecoder() *Decoder {
-	return &Decoder{make(map[string]ReadRet)}
+	dec := &Decoder{make(map[string]ReadRet)}
+	return dec
+}
+
+func (dec *Decoder) AddCallbacks(overrides []Override) {
+	for _, n := range overrides {
+		dec.AddCallback(n.Spec, n.Callback)
+	}
+
 }
 
 // AddCallback registers a command parser.
@@ -44,7 +57,7 @@ func (dec *Decoder) AddDefaultCallbacks(slats []composer.Specification) {
 
 // ReadProg attempts to parse the passed json data as a golang program.
 func (dec *Decoder) ReadProg(m reader.Map) (ret interface{}, err error) {
-	itemValue, itemType := m.MapOf(reader.ItemValue), m.StrOf(reader.ItemType)
+	itemValue, itemType := m, m.StrOf(reader.ItemType)
 	if fn, ok := dec.cmds[itemType]; !ok {
 		err = errutil.Fmt("unknown type %q", itemType)
 	} else {
@@ -59,7 +72,7 @@ func (dec *Decoder) readNew(m reader.Map, slotType r.Type) (ret interface{}, err
 		panic("expected a struct")
 	} else {
 		ptr := r.New(slotType)
-		if e := dec.readFields(ptr.Elem(), m); e != nil {
+		if e := dec.readFields(ptr.Elem(), m.MapOf(reader.ItemValue)); e != nil {
 			err = e
 		} else {
 			ret = ptr.Interface()
@@ -104,7 +117,7 @@ func (dec *Decoder) readFields(out r.Value, in reader.Map) (err error) {
 
 // returns a ptr r.Value
 func (dec *Decoder) importSlot(m reader.Map, slotType r.Type) (ret r.Value, err error) {
-	itemValue, itemType := m.MapOf(reader.ItemValue), m.StrOf(reader.ItemType)
+	itemValue, itemType := m, m.StrOf(reader.ItemType)
 	if cmdImport, ok := dec.cmds[itemType]; !ok {
 		err = errutil.New("unknown type", itemType, reader.At(m))
 	} else if cmd, e := cmdImport(itemValue); e != nil {
@@ -168,6 +181,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		})
 
 	case r.Interface:
+		// note: this skips over the slot itself ( ex execute )
 		if e := unpack(inVal, func(v interface{}) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
@@ -189,6 +203,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 				elType := outType.Elem()
 				if slice := outAt; len(items) > 0 {
 					for _, item := range items {
+						// note: this skips over the slot itself ( ex execute )
 						if e := unpack(item, func(v interface{}) (err error) {
 							// map[string]interface{}, for JSON objects
 							if itemData, ok := v.(map[string]interface{}); !ok {

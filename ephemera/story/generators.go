@@ -15,7 +15,7 @@ import (
 // story is a bunch of paragraphs
 //make.run("story", "{+paragraph|ghost}");
 func imp_story(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "story"); e != nil {
+	if m, e := reader.Unpack(r, "story"); e != nil {
 		err = e
 	} else {
 		err = reader.Repeats(m.SliceOf("$PARAGRAPH"), k.Bind(imp_paragraph))
@@ -25,7 +25,7 @@ func imp_story(k *imp.Porter, r reader.Map) (err error) {
 
 // paragraph is a bunch of statements
 func imp_paragraph(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "paragraph"); e != nil {
+	if m, e := reader.Unpack(r, "paragraph"); e != nil {
 		err = e
 	} else {
 		storyNouns.Swap(nil)
@@ -36,7 +36,7 @@ func imp_paragraph(k *imp.Porter, r reader.Map) (err error) {
 
 // run: "{+names} {noun_phrase}."
 func imp_lede(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "lede"); e != nil {
+	if m, e := reader.Unpack(r, "lede"); e != nil {
 		err = e
 	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun)); e != nil {
 		err = e
@@ -48,7 +48,7 @@ func imp_lede(k *imp.Porter, r reader.Map) (err error) {
 
 // run: "{pronoun} {noun_phrase}."
 func imp_tail(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "tail"); e != nil {
+	if m, e := reader.Unpack(r, "tail"); e != nil {
 		err = e
 	} else if e := imp_pronoun(k, m.MapOf("$PRONOUN")); e != nil {
 		err = e
@@ -82,7 +82,7 @@ func imp_noun_phrase(k *imp.Porter, r reader.Map) (err error) {
 // ex. (Hector and Maria) are suspicious of (Santa and Santana).
 func imp_noun_relation(k *imp.Porter, r reader.Map) (err error) {
 	// unexpected type  wanted noun_relation at
-	if m, e := reader.Slat(r, "noun_relation"); e != nil {
+	if m, e := reader.Unpack(r, "noun_relation"); e != nil {
 		err = e
 	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
 		err = e
@@ -124,7 +124,7 @@ func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 
 // run: "{determiner} {common_name}"
 func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "common_noun"); e != nil {
+	if m, e := reader.Unpack(r, "common_noun"); e != nil {
 		err = e
 	} else if det, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
 		err = e
@@ -156,7 +156,7 @@ func imp_determiner(k *imp.Porter, r reader.Map) (ret string, err error) {
 // run: "{proper_name}"
 // common / proper setting
 func imp_proper_noun(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "proper_noun"); e != nil {
+	if m, e := reader.Unpack(r, "proper_noun"); e != nil {
 		err = e
 	} else if noun, e := imp_proper_name(k, m.MapOf("$PROPER_NAME")); e != nil {
 		err = e
@@ -172,7 +172,7 @@ func imp_proper_noun(k *imp.Porter, r reader.Map) (err error) {
 // run: "{are_an} {*attribute:*trait} {kind:singular_kind} {?noun_relation}"
 // ex. "(the box) is a closed container on the beach"
 func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "kind_of_noun"); e != nil {
+	if m, e := reader.Unpack(r, "kind_of_noun"); e != nil {
 		err = e
 	} else if kind, e := imp_singular_kind(k, m.MapOf("$KIND")); e != nil {
 		err = e
@@ -205,7 +205,7 @@ func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
 
 // run: "{The [summary] is:: %lines}"
 func imp_summary(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Slat(r, "summary"); e != nil {
+	if m, e := reader.Unpack(r, "summary"); e != nil {
 		err = e
 	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
 		err = e
@@ -253,7 +253,7 @@ func imp_attribute_phrase(k *imp.Porter, r reader.Map) (ret []ephemera.Named, er
 
 // "{type:variable_type} ( called {name:variable_name|quote} )"
 func imp_variable_decl(k *imp.Porter, r reader.Map) (retName, retType ephemera.Named, err error) {
-	if m, e := reader.Slat(r, "variable_decl"); e != nil {
+	if m, e := reader.Unpack(r, "variable_decl"); e != nil {
 		err = e
 	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
@@ -297,7 +297,7 @@ func imp_primitive_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err er
 // "{an} {kind of%kinds:plural_kinds} object"
 // returns the name of "plural_kinds"
 func imp_object_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
-	if m, e := reader.Slat(r, "object_type"); e != nil {
+	if m, e := reader.Unpack(r, "object_type"); e != nil {
 		err = e
 	} else {
 		ret, err = imp_plural_kinds(k, m.MapOf("$KINDS"))

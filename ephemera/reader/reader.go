@@ -46,7 +46,7 @@ func Type(m Map, expectedType string) (ret string, err error) {
 }
 
 // expect a map value
-func Slat(m Map, expectedType string) (ret Map, err error) {
+func Unpack(m Map, expectedType string) (ret Map, err error) {
 	if _, e := Type(m, expectedType); e != nil {
 		err = e
 	} else {
@@ -56,12 +56,12 @@ func Slat(m Map, expectedType string) (ret Map, err error) {
 }
 
 func Slot(r Map, expectedType string, slots ReadMaps) (err error) {
-	if m, e := Slat(r, expectedType); e != nil {
+	if m, e := Unpack(r, expectedType); e != nil {
 		err = e
 	} else {
 		t := m.StrOf(ItemType)
 		if fn, ok := slots[t]; !ok {
-			err = BadType(expectedType, t, At(r))
+			err = errutil.Fmt("unhandled type %q for slot %q at %v", t, expectedType, At(r))
 		} else {
 			err = fn(m)
 		}
