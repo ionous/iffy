@@ -2,7 +2,26 @@
 
 package types
 
-import "fmt"
+import "strconv"
+
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[MUL-80]
+	_ = x[QUO-81]
+	_ = x[REM-82]
+	_ = x[ADD-67]
+	_ = x[SUB-68]
+	_ = x[EQL-53]
+	_ = x[NEQ-54]
+	_ = x[LSS-55]
+	_ = x[LEQ-56]
+	_ = x[GTR-57]
+	_ = x[GEQ-58]
+	_ = x[LAND-43]
+	_ = x[LOR-28]
+}
 
 const (
 	_Operator_name_0 = "LOR"
@@ -13,8 +32,6 @@ const (
 )
 
 var (
-	_Operator_index_0 = [...]uint8{0, 3}
-	_Operator_index_1 = [...]uint8{0, 4}
 	_Operator_index_2 = [...]uint8{0, 3, 6, 9, 12, 15, 18}
 	_Operator_index_3 = [...]uint8{0, 3, 6}
 	_Operator_index_4 = [...]uint8{0, 3, 6, 9}
@@ -36,6 +53,6 @@ func (i Operator) String() string {
 		i -= 80
 		return _Operator_name_4[_Operator_index_4[i]:_Operator_index_4[i+1]]
 	default:
-		return fmt.Sprintf("Operator(%d)", i)
+		return "Operator(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
 }

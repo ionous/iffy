@@ -2,7 +2,19 @@
 
 package types
 
-import "fmt"
+import "strconv"
+
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[Span-0]
+	_ = x[Stopping-1]
+	_ = x[Shuffle-2]
+	_ = x[Cycle-3]
+	_ = x[IfStatement-4]
+	_ = x[UnlessStatement-5]
+}
 
 const _BuiltinType_name = "SpanStoppingShuffleCycleIfStatementUnlessStatement"
 
@@ -10,7 +22,7 @@ var _BuiltinType_index = [...]uint8{0, 4, 12, 19, 24, 35, 50}
 
 func (i BuiltinType) String() string {
 	if i < 0 || i >= BuiltinType(len(_BuiltinType_index)-1) {
-		return fmt.Sprintf("BuiltinType(%d)", i)
+		return "BuiltinType(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
 	return _BuiltinType_name[_BuiltinType_index[i]:_BuiltinType_index[i+1]]
 }

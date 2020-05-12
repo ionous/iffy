@@ -2,7 +2,16 @@
 
 package pattern
 
-import "fmt"
+import "strconv"
+
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[Infix-0]
+	_ = x[Prefix-1]
+	_ = x[Postfix-2]
+}
 
 const _Flags_name = "InfixPrefixPostfix"
 
@@ -10,7 +19,7 @@ var _Flags_index = [...]uint8{0, 5, 11, 18}
 
 func (i Flags) String() string {
 	if i < 0 || i >= Flags(len(_Flags_index)-1) {
-		return fmt.Sprintf("Flags(%d)", i)
+		return "Flags(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
 	return _Flags_name[_Flags_index[i]:_Flags_index[i+1]]
 }
