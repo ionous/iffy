@@ -42,8 +42,7 @@ func modelTemplate() string {
 		" * still need to determine if \"sources\" should be listed in model ( for debugging )\n" +
 		" */ \n" +
 		"create table mdl_check( name text, idProg int, expect text );\n" +
-		"/** \n" +
-		" */\n" +
+		"/* pattern name and reference to program */\n" +
 		"create table mdl_rule( pattern text, idProg int );"
 	return tmpl
 }

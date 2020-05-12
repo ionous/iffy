@@ -108,10 +108,10 @@ func imp_noun_relation(k *imp.Porter, r reader.Map) (err error) {
 func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
-		things := k.NewName(tables.NAMED_KIND, "things", once)
-		nounType := k.NewName(tables.NAMED_ASPECT, "nounType", once)
-		common := k.NewName(tables.NAMED_TRAIT, "common", once)
-		proper := k.NewName(tables.NAMED_TRAIT, "proper", once)
+		things := k.NewName("things", tables.NAMED_KIND, once)
+		nounType := k.NewName("nounType", tables.NAMED_ASPECT, once)
+		common := k.NewName("common", tables.NAMED_TRAIT, once)
+		proper := k.NewName("proper", tables.NAMED_TRAIT, once)
 		k.NewPrimitive(tables.PRIM_ASPECT, things, nounType)
 		k.NewTrait(common, nounType, 0)
 		k.NewTrait(proper, nounType, 1)
@@ -133,15 +133,15 @@ func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
 	} else {
 		storyNouns.Add(noun)
 		// set common nounType to true ( implicitly defined by "noun" )
-		nounType := k.NewName(tables.NAMED_TRAIT, "common", reader.At(r))
+		nounType := k.NewName("common", tables.NAMED_TRAIT, reader.At(r))
 		k.NewValue(noun, nounType, true)
 		//
 		if det[0] != '$' {
-			article := k.NewName(tables.NAMED_FIELD, "indefinite article", reader.At(r))
+			article := k.NewName("indefinite article", tables.NAMED_FIELD, reader.At(r))
 			k.NewValue(noun, article, det)
 			if once := "common_noun"; k.Once(once) {
-				indefinite := k.NewName(tables.NAMED_FIELD, "indefinite article", once)
-				things := k.NewName(tables.NAMED_KIND, "things", once)
+				indefinite := k.NewName("indefinite article", tables.NAMED_FIELD, once)
+				things := k.NewName("things", tables.NAMED_KIND, once)
 				k.NewPrimitive(tables.PRIM_TEXT, things, indefinite)
 			}
 		}
@@ -163,7 +163,7 @@ func imp_proper_noun(k *imp.Porter, r reader.Map) (err error) {
 	} else {
 		storyNouns.Add(noun)
 		// set proper nounType to true ( implicitly defined by "noun" )
-		nounType := k.NewName(tables.NAMED_TRAIT, "proper", reader.At(m))
+		nounType := k.NewName("proper", tables.NAMED_TRAIT, reader.At(m))
 		k.NewValue(noun, nounType, true)
 	}
 	return
@@ -212,11 +212,11 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 	} else {
 		// declare the existence of the field "appearance"
 		if once := "summary"; k.Once(once) {
-			things := k.NewName(tables.NAMED_KIND, "things", once)
-			appear := k.NewName(tables.NAMED_FIELD, "appearance", once)
+			things := k.NewName("things", tables.NAMED_KIND, once)
+			appear := k.NewName("appearance", tables.NAMED_FIELD, once)
 			k.NewPrimitive(tables.PRIM_EXPR, things, appear)
 		}
-		prop := k.NewName(tables.NAMED_FIELD, "appearance", reader.At(m))
+		prop := k.NewName("appearance", tables.NAMED_FIELD, reader.At(m))
 		noun := storyNouns.Last()
 		k.NewValue(noun, prop, lines)
 	}
@@ -289,7 +289,7 @@ func imp_primitive_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err er
 	}); e != nil {
 		err = e
 	} else {
-		ret = k.NewName(tables.NAMED_TYPE, evalType.(string), reader.At(r))
+		ret = k.NewName(evalType.(string), tables.NAMED_TYPE, reader.At(r))
 	}
 	return
 }

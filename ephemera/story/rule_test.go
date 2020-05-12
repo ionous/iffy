@@ -38,7 +38,7 @@ func TestPatternActivity(t *testing.T) {
 	}
 }
 
-func TestPatternHandler(t *testing.T) {
+func TestPatternRule(t *testing.T) {
 	registerGob()
 	k, db := newTestDecoder(t)
 	defer db.Close()

@@ -2,14 +2,14 @@
  */
 create temp view 
 asm_pattern as 
-	select pk.name, nk.name, tk.name
-from eph_pattern pat
-left join eph_named pk
-	on (pat.idNamedPattern = pk.rowid)
-left join eph_named nk
-	on (pat.idNamedParam = nk.rowid)
-left join eph_named tk
-	on (pat.idNamedType = tk.rowid);
+	select pn.name, kn.name, tn.name
+from eph_pattern ep
+left join eph_named pn
+	on (ep.idNamedPattern = pn.rowid)
+left join eph_named kn
+	on (ep.idNamedParam = kn.rowid)
+left join eph_named tn
+	on (ep.idNamedType = tn.rowid);
 
 /* resolve test ephemera to strings
  */

@@ -15,8 +15,8 @@ import (
 // write some primitives
 func writeFields(rec *ephemera.Recorder, kfps []kfp) (err error) {
 	for _, p := range kfps {
-		kind := rec.NewName(tables.NAMED_KIND, p.kind, "test")
-		field := rec.NewName(tables.NAMED_FIELD, p.field, "test")
+		kind := rec.NewName(p.kind, tables.NAMED_KIND, "test")
+		field := rec.NewName(p.field, tables.NAMED_FIELD, "test")
 		rec.NewPrimitive(p.fieldType, kind, field)
 	}
 	return
@@ -25,7 +25,7 @@ func writeFields(rec *ephemera.Recorder, kfps []kfp) (err error) {
 // name some fields that arent otherwise referenced
 func writeMissing(rec *ephemera.Recorder, missing []string) (err error) {
 	for _, m := range missing {
-		rec.NewName(tables.NAMED_FIELD, m, "test")
+		rec.NewName(m, tables.NAMED_FIELD, "test")
 	}
 	return
 }

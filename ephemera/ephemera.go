@@ -21,7 +21,7 @@ func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 // category is likely one of kind, noun, aspect, attribute, property, relation, alias
 // names are not unique, one name can be many types.
 // ofs depends on the source, might be item.id$parameter
-func (r *Recorder) NewName(category, name, ofs string) (ret Named) {
+func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
 	namedId := r.cache.Must(eph_named, name, category, r.srcId, ofs)
 	return Named{namedId, name}
 }
@@ -110,15 +110,15 @@ func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
 	r.cache.Must(eph_check, test, prog, expect)
 }
 
-func (r *Recorder) NewPatternType(pattern Named, patternType Named) {
-	r.cache.Must(eph_pattern, pattern, pattern, patternType)
+func (r *Recorder) NewPatternRef(pattern, param, patternType Named) {
+	r.cache.Must(eph_pattern, pattern, param, patternType, false)
 }
 
-func (r *Recorder) NewPatternParam(pattern, param, paramType Named) {
-	r.cache.Must(eph_pattern, pattern, param, paramType)
+func (r *Recorder) NewPatternDecl(pattern, param, patternType Named) {
+	r.cache.Must(eph_pattern, pattern, param, patternType, true)
 }
 
-func (r *Recorder) NewPatternHandler(pattern Named, handler Prog) {
+func (r *Recorder) NewPatternRule(pattern Named, handler Prog) {
 	r.cache.Must(eph_rule, pattern, handler)
 }
 
@@ -132,7 +132,7 @@ var eph_rule = tables.Insert("eph_rule", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
 var eph_named = tables.Insert("eph_named", "name", "category", "idSource", "offset")
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")
-var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType")
+var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType", "decl")
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")
 var eph_prog = tables.Insert("eph_prog", "idSource", "type", "prog")
 var eph_relation = tables.Insert("eph_relation", "idNamedRelation", "idNamedKind", "idNamedOtherKind", "cardinality")

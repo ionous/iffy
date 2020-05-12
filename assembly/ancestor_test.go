@@ -28,8 +28,8 @@ func TestAncestors(t *testing.T) {
 			"M", "J",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.NewName(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			ancestor := rec.NewName(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
+			ancestor := rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
 			rec.NewKind(kid, ancestor)
 		}
 		//
@@ -82,8 +82,8 @@ func TestAncestorCycle(t *testing.T) {
 			"T", "P",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.NewName(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			parent := rec.NewName(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
+			parent := rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
 			rec.NewKind(kid, parent)
 		}
 		//
@@ -113,8 +113,8 @@ func TestAncestorConflict(t *testing.T) {
 			"K", "Q",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.NewName(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			parent := rec.NewName(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
+			parent := rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
 			rec.NewKind(kid, parent)
 		}
 		//

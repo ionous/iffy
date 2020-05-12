@@ -13,7 +13,7 @@ func imp_pattern_name(k *imp.Porter, r reader.Map) (ret ephemera.Named, err erro
 	if str, e := reader.String(r, "pattern_name"); e != nil {
 		err = e
 	} else {
-		ret = k.NewName("pattern_name", str, reader.At(r))
+		ret = k.NewName(str, "pattern_name", reader.At(r))
 	}
 	return
 }
@@ -39,7 +39,7 @@ func imp_patterned_activity(k *imp.Porter, r reader.Map) (ret ephemera.Named, er
 	if e := reader.Const(r, "patterned_activity", "$ACTIVITY"); e != nil {
 		err = e
 	} else {
-		ret = k.NewName(tables.NAMED_TYPE, "execute", reader.At(r))
+		ret = k.NewName("execute", tables.NAMED_TYPE, reader.At(r))
 	}
 	return
 }
@@ -48,7 +48,7 @@ func imp_patterned_activity(k *imp.Porter, r reader.Map) (ret ephemera.Named, er
 func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_handler"); e != nil {
 		err = e
-	} else if pid, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
+	} else if patternName, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else if rule, e := imp_pattern_hook(k, m.MapOf("$HOOK")); e != nil {
 		err = e
@@ -59,11 +59,12 @@ func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
 			err = imp_pattern_filters(k, rule, v)
 		}
 		if err == nil {
-			if prog, e := k.NewProg(rule.name, rule.distill()); e != nil {
+			if patternProg, e := k.NewProg(rule.name, rule.distill()); e != nil {
 				err = e
 			} else {
-				k.NewPatternType(pid, k.NewName(tables.NAMED_TYPE, evalType, reader.At(m)))
-				k.NewPatternHandler(pid, prog)
+				patternType := k.NewName(evalType, tables.NAMED_TYPE, reader.At(m))
+				k.NewPatternDecl(patternName, patternName, patternType)
+				k.NewPatternRule(patternName, patternProg)
 			}
 		}
 	}

@@ -131,8 +131,8 @@ func matchValues(db *sql.DB, want []TargetValue) (err error) {
 // prop: k, f, v
 func addValues(rec *ephemera.Recorder, vals []TargetValue) (err error) {
 	for _, v := range vals {
-		noun := rec.NewName(tables.NAMED_NOUN, v.Target, "test")
-		prop := rec.NewName(tables.NAMED_PROPERTY, v.Field, "test")
+		noun := rec.NewName(v.Target, tables.NAMED_NOUN, "test")
+		prop := rec.NewName(v.Field, tables.NAMED_PROPERTY, "test")
 		value := v.Value
 		rec.NewValue(noun, prop, value)
 	}

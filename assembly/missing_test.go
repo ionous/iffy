@@ -22,8 +22,8 @@ func TestMissingKinds(t *testing.T) {
 			"P", "R",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.NewName(tables.NAMED_KIND, pairs[i], strconv.Itoa(i))
-			parent := rec.NewName(tables.NAMED_KIND, pairs[i+1], strconv.Itoa(i+1))
+			kid := rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
+			parent := rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
 			rec.NewKind(kid, parent)
 		}
 		// add the kinds
@@ -62,14 +62,14 @@ func TestMissingAspects(t *testing.T) {
 		defer t.Close()
 		db, rec := t.db, t.rec
 		//
-		parent := rec.NewName(tables.NAMED_KIND, "K", "container")
+		parent := rec.NewName("K", tables.NAMED_KIND, "container")
 		for i, aspect := range []string{
 			// known, unknown
 			"A", "F",
 			"C", "D",
 			"E", "B",
 		} {
-			a := rec.NewName(tables.NAMED_ASPECT, aspect, "test")
+			a := rec.NewName(aspect, tables.NAMED_ASPECT, "test")
 			if known := i&1 == 0; known {
 				rec.NewAspect(a)
 			}

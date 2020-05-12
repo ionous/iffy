@@ -80,9 +80,9 @@ func fromPattern(k *imp.Porter,
 	} else if ps, e := imp_parameters(k, pid, m.MapOf("$PARAMETERS")); e != nil {
 		err = e
 	} else {
-		typ := k.NewName(tables.NAMED_TYPE, evalType, reader.At(m))
 		// fix: object type names will need adaption of some sort re plural_kinds
-		k.NewPatternType(pid, typ)
+		typ := k.NewName(evalType, tables.NAMED_TYPE, reader.At(m))
+		k.NewPatternRef(pid, pid, typ)
 		// assign results
 		from.Name = pid.String()
 		from.Parameters = ps
@@ -113,18 +113,19 @@ func imp_parameters(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.
 	return
 }
 
-func imp_parameter(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.Parameter, err error) {
+func imp_parameter(k *imp.Porter, patternName ephemera.Named, r reader.Map) (ret *core.Parameter, err error) {
 	if m, e := reader.Unpack(r, "parameter"); e != nil {
 		err = e
-	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
+	} else if paramName, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else if a, e := imp_assignment(k, m.MapOf("$FROM")); e != nil {
 		err = e
 	} else if slotName, e := slotName(a); e != nil {
 		err = e // ^ its possible this should be the type that the assignment contains.
 	} else {
-		k.NewPatternParam(pid, n, k.NewName(tables.NAMED_TYPE, slotName, reader.At(m)))
-		ret = &core.Parameter{Name: n.String(), From: a}
+		paramType := k.NewName(slotName, tables.NAMED_TYPE, reader.At(m))
+		k.NewPatternRef(patternName, paramName, paramType)
+		ret = &core.Parameter{Name: paramName.String(), From: a}
 	}
 	return
 }
@@ -149,7 +150,7 @@ func fromPatternName(k *imp.Porter, m reader.Map, typeName string) (ret ephemera
 	if id, e := reader.Type(m, "pattern_name"); e != nil {
 		err = e
 	} else {
-		ret = k.NewName(typeName, m.StrOf(reader.ItemValue), id)
+		ret = k.NewName(m.StrOf(reader.ItemValue), typeName, id)
 	}
 	return
 }

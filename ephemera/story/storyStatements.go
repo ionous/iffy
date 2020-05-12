@@ -68,7 +68,7 @@ func imp_class_attributes(k *imp.Porter, r reader.Map) (err error) {
 	} else {
 		// create an implied aspect named after the first trait
 		// fix? maybe we should include the columns of named in the returned struct so we can pick out the source better.
-		aspect := k.NewName(tables.NAMED_ASPECT, traits[0].String(), m.StrOf(reader.ItemId))
+		aspect := k.NewName(traits[0].String(), tables.NAMED_ASPECT, m.StrOf(reader.ItemId))
 		k.NewPrimitive(tables.PRIM_ASPECT, kind, aspect)
 	}
 	return
@@ -155,14 +155,14 @@ func imp_noun_statement(k *imp.Porter, r reader.Map) (err error) {
 func imp_pattern_decl(k *imp.Porter, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_decl"); e != nil {
 		err = e
-	} else if pat, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
+	} else if patternName, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
-	} else if typ, e := imp_pattern_type(k, m.MapOf("$TYPE")); e != nil {
+	} else if patternType, e := imp_pattern_type(k, m.MapOf("$TYPE")); e != nil {
 		err = e
 	} else {
-		k.NewPatternType(pat, typ)
+		k.NewPatternDecl(patternName, patternName, patternType)
 		if tail := m.MapOf("$OPTVARS"); len(tail) > 0 {
-			err = imp_pattern_variables_tail(k, pat, tail)
+			err = imp_pattern_variables_tail(k, patternName, tail)
 		}
 	}
 	return
@@ -170,13 +170,13 @@ func imp_pattern_decl(k *imp.Porter, r reader.Map) (err error) {
 
 // `Pattern variables: Storage for values used during the execution of a pattern.`)
 // {+variable_decl|comma-and}.",
-func imp_pattern_variables_tail(k *imp.Porter, pat ephemera.Named, r reader.Map) (err error) {
+func imp_pattern_variables_tail(k *imp.Porter, patternName ephemera.Named, r reader.Map) (err error) {
 	return reader.Repeats(r.SliceOf("$VARIABLE_DECL"),
 		func(m reader.Map) (err error) {
 			if paramName, paramType, e := imp_variable_decl(k, m); e != nil {
 				err = e
 			} else {
-				k.NewPatternParam(pat, paramName, paramType)
+				k.NewPatternDecl(patternName, paramName, paramType)
 			}
 			return
 		})
@@ -186,11 +186,11 @@ func imp_pattern_variables_tail(k *imp.Porter, pat ephemera.Named, r reader.Map)
 func imp_pattern_variables_decl(k *imp.Porter, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_variables_decl"); e != nil {
 		err = e
-	} else if pat, e := imp_pattern_name(k, m.MapOf("$PATTERN_NAME")); e != nil {
+	} else if patternName, e := imp_pattern_name(k, m.MapOf("$PATTERN_NAME")); e != nil {
 		err = e
 	} else {
 		// reuse, works because they have the same $name.
-		err = imp_pattern_variables_tail(k, pat, m)
+		err = imp_pattern_variables_tail(k, patternName, m)
 	}
 	return
 }
@@ -216,7 +216,7 @@ func imp_qualities(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) 
 	if n, e := reader.String(r.MapOf("$QUALITIES"), "qualities"); e != nil {
 		err = e
 	} else {
-		ret = k.NewName(tables.NAMED_ASPECT, n, reader.At(r))
+		ret = k.NewName(n, tables.NAMED_ASPECT, reader.At(r))
 	}
 	return
 }

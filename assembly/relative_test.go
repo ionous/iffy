@@ -241,9 +241,9 @@ func addRelatives(rec *ephemera.Recorder, els [][3]string) (err error) {
 
 // add ephemera
 func addRelative(rec *ephemera.Recorder, noun, stem, otherNoun string) (err error) {
-	name := rec.NewName(tables.NAMED_NOUN, noun, "test")
-	namedStem := rec.NewName(tables.NAMED_VERB, stem, "test")
-	otherName := rec.NewName(tables.NAMED_NOUN, otherNoun, "test")
+	name := rec.NewName(noun, tables.NAMED_NOUN, "test")
+	namedStem := rec.NewName(stem, tables.NAMED_VERB, "test")
+	otherName := rec.NewName(otherNoun, tables.NAMED_NOUN, "test")
 	rec.NewRelative(name, namedStem, otherName)
 	return
 }

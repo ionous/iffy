@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/tables"
-	"github.com/kr/pretty"
 )
 
 // import an object type description
@@ -51,14 +50,14 @@ func TestPatternVariablesDecl(t *testing.T) {
 	} else {
 		var buf strings.Builder
 		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
-		tables.WriteCsv(db, &buf, "select * from eph_pattern", 3)
-		if diff := pretty.Diff(buf.String(), lines(
+		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
+		if have, want := buf.String(), lines(
 			"corral,pattern_name",  // 1
 			"pet,variable_name",    // 2
 			"animals,plural_kinds", // 3
-			"1,2,3",
-		)); len(diff) > 0 {
-			t.Fatal("mismatch", diff)
+			"1,2,3,1",              // NewPatternDecl
+		); have != want {
+			t.Fatal("mismatch", have)
 		} else {
 			t.Log("ok")
 		}
@@ -113,13 +112,13 @@ func TestPatternDecl(t *testing.T) {
 	} else {
 		var buf strings.Builder
 		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
-		tables.WriteCsv(db, &buf, "select * from eph_pattern", 3)
-		if diff := pretty.Diff(buf.String(), lines(
+		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
+		if have, want := buf.String(), lines(
 			"corral,pattern_name", // 1
 			"execute,type",        // 2
-			"1,1,2",
-		)); len(diff) > 0 {
-			t.Fatal("mismatch", diff)
+			"1,1,2,1",             // NewPatternDecl
+		); have != want {
+			t.Fatal("mismatch", have)
 		} else {
 			t.Log("ok")
 		}

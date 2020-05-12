@@ -13,7 +13,7 @@ func importName(k *imp.Porter, r reader.Map, readType, storeType string) (ret ep
 	if str, e := reader.String(r, readType); e != nil {
 		err = e
 	} else {
-		ret = k.NewName(storeType, str, reader.At(r))
+		ret = k.NewName(str, storeType, reader.At(r))
 	}
 	return
 }

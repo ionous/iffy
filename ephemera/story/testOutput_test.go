@@ -14,7 +14,7 @@ import (
 func TestProcessProg(t *testing.T) {
 	k, db := newTestDecoder(t)
 	defer db.Close()
-	if e := imp_test_output(k, k.NewName(t.Name(), "test", ""), debug.SayStory); e != nil {
+	if e := imp_test_output(k, k.NewName("test", t.Name(), ""), debug.SayStory); e != nil {
 		t.Fatal(e)
 	} else {
 		var testName string

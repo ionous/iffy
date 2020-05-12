@@ -70,8 +70,8 @@ type modeledNoun struct {
 
 func addNouns(rec *ephemera.Recorder, els []pair) (err error) {
 	for _, el := range els {
-		n := rec.NewName(tables.NAMED_NOUN, el.key, "test")
-		k := rec.NewName(tables.NAMED_KIND, el.value, "test")
+		n := rec.NewName(el.key, tables.NAMED_NOUN, "test")
+		k := rec.NewName(el.value, tables.NAMED_KIND, "test")
 		rec.NewNoun(n, k)
 	}
 	return
