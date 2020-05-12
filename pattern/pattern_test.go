@@ -17,11 +17,11 @@ func ExampleSayMe() {
 	// rules are run in reverse order.
 	run := patternRuntime{patternMap: patternMap{
 		"sayMe": pattern.TextRules{
-			{nil, SayIt("Not between 1 and 3")},
-			{matchNumber(3), SayIt("San!")},
-			{matchNumber(3), SayIt("Three!")},
-			{matchNumber(2), SayIt("Two!")},
-			{matchNumber(1), SayIt("One!")},
+			{nil, SayIt("Not between 1 and 3.")},
+			{MatchNumber(3), SayIt("San!")},
+			{MatchNumber(3), SayIt("Three!")},
+			{MatchNumber(2), SayIt("Two!")},
+			{MatchNumber(1), SayIt("One!")},
 		}}}
 
 	// say 4 numbers
@@ -46,7 +46,7 @@ func ExampleSayMe() {
 	// sayMe 1 = "One!"
 	// sayMe 2 = "Two!"
 	// sayMe 3 = "Three!"
-	// sayMe 4 = "Not between 1 and 3"
+	// sayMe 4 = "Not between 1 and 3."
 }
 
 type baseRuntime struct {
@@ -64,7 +64,7 @@ type patternMap map[string]interface{}
 // we just want to test we can invoke a pattern successfully.
 func (m *patternRuntime) GetField(name, field string) (ret interface{}, err error) {
 	switch field {
-	case object.Pattern:
+	case object.TextRule, object.NumberRule:
 		if p, ok := m.patternMap[name]; ok {
 			ret = p
 		} else {
@@ -80,9 +80,9 @@ func SayIt(s string) rt.TextEval {
 	return &core.Text{s}
 }
 
-type matchNumber int
+type MatchNumber int
 
-func (m matchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
+func (m MatchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
 	if v, e := run.GetVariable("num"); e != nil {
 		err = e
 	} else {

@@ -48,8 +48,8 @@ func (*Parameter) Compose() composer.Spec {
 
 // Stitch find the pattern, builds the scope, and executes the passed callback to generate a result.
 // Its an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
-func (op *FromPattern) Stitch(run rt.Runtime, fn func(p interface{}) error) (err error) {
-	if p, e := run.GetField(op.Name, object.Pattern); e != nil {
+func (op *FromPattern) Stitch(run rt.Runtime, field string, fn func(p interface{}) error) (err error) {
+	if p, e := run.GetField(op.Name, field); e != nil {
 		err = e
 	} else {
 		parms := make(scope.Parameters)
@@ -80,7 +80,7 @@ func (*DetermineAct) Compose() composer.Spec {
 }
 
 func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
-	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
+	err = (*FromPattern)(op).Stitch(run, object.ExecuteRule, func(p interface{}) (err error) {
 		// cast the pattern to an execute
 		// fix: this may require a []cast instead.
 		if exe, ok := p.(rt.Execute); !ok {
@@ -103,7 +103,7 @@ func (*DetermineNum) Compose() composer.Spec {
 }
 
 func (op *DetermineNum) GetNumber(run rt.Runtime) (ret float64, err error) {
-	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
+	err = (*FromPattern)(op).Stitch(run, object.NumberRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.NumberEval); !ok {
 			err = errutil.New("Pattern", op.Name, "not a number")
 		} else {
@@ -124,7 +124,7 @@ func (*DetermineText) Compose() composer.Spec {
 }
 
 func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
-	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
+	err = (*FromPattern)(op).Stitch(run, object.TextRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.TextEval); !ok {
 			err = errutil.New("Pattern", op.Name, "not text")
 		} else {
@@ -145,7 +145,7 @@ func (*DetermineBool) Compose() composer.Spec {
 }
 
 func (op *DetermineBool) GetBool(run rt.Runtime) (ret bool, err error) {
-	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
+	err = (*FromPattern)(op).Stitch(run, object.BoolRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.BoolEval); !ok {
 			err = errutil.New("Pattern", op.Name, "not a boolean")
 		} else {
@@ -166,7 +166,7 @@ func (*DetermineNumList) Compose() composer.Spec {
 }
 
 func (op *DetermineNumList) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
+	err = (*FromPattern)(op).Stitch(run, object.NumListRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.NumListEval); !ok {
 			err = errutil.New("Pattern", op.Name, "not a boolean")
 		} else {
@@ -187,7 +187,7 @@ func (*DetermineTextList) Compose() composer.Spec {
 }
 
 func (op *DetermineTextList) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	err = (*FromPattern)(op).Stitch(run, func(p interface{}) (err error) {
+	err = (*FromPattern)(op).Stitch(run, object.TextListRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.TextListEval); !ok {
 			err = errutil.New("Pattern", op.Name, "not a boolean")
 		} else {

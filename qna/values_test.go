@@ -1,9 +1,6 @@
 package qna
 
 import (
-	"database/sql"
-	"os/user"
-	"path"
 	"testing"
 
 	"github.com/ionous/iffy/assembly"
@@ -12,34 +9,10 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-const memory = "file:test.db?cache=shared&mode=memory"
-
-func getPath(file string) (ret string, err error) {
-	if user, e := user.Current(); e != nil {
-		err = e
-	} else {
-		ret = path.Join(user.HomeDir, file)
-	}
-	return
-}
-
-func sqlFile(t *testing.T, path string) (ret string, err error) {
-	if len(path) > 0 {
-		ret = path
-	} else if p, e := getPath(t.Name() + ".db"); e != nil {
-		err = e
-	} else {
-		ret = p
-	}
-	return
-}
-
 func TestGetFieldValues(t *testing.T) {
-	if source, e := sqlFile(t, memory); e != nil {
-		t.Fatal(e)
-	} else if db, e := sql.Open("sqlite3", source); e != nil {
-		t.Fatal(e)
-	} else if e := tables.CreateModel(db); e != nil {
+	db := newTestDB(t, memory)
+	defer db.Close()
+	if e := tables.CreateModel(db); e != nil {
 		t.Fatal(e)
 	} else if e := tables.CreateRunViews(db); e != nil {
 		t.Fatal(e)

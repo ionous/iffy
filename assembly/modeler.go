@@ -98,6 +98,15 @@ func (m *Modeler) WriteVerb(relation, verb string) error {
 	return e
 }
 
+func (m *Modeler) WriteRule(name string, prog int64) error {
+	_, e := m.cache.Exec(mdl_rule, name, prog)
+	return e
+}
+
+func (m *Modeler) WriteProg(typeName string, bytes []byte) (int64, error) {
+	return m.cache.Exec(mdl_prog, typeName, bytes)
+}
+
 var mdl_spec = tables.Insert("mdl_spec", "type", "name", "spec")
 var mdl_aspect = tables.Insert("mdl_aspect", "aspect", "trait", "rank")
 var mdl_kind = tables.Insert("mdl_kind", "kind", "path")
@@ -108,3 +117,5 @@ var mdl_noun = tables.Insert("mdl_noun", "noun", "kind")
 var mdl_name = tables.Insert("mdl_name", "noun", "name", "rank")
 var mdl_pair = tables.Insert("mdl_pair", "noun", "relation", "otherNoun")
 var mdl_start = tables.Insert("mdl_start", "noun", "field", "value")
+var mdl_prog = tables.Insert("mdl_prog", "type", "bytes")
+var mdl_rule = tables.Insert("mdl_rule", "pattern", "idProg")

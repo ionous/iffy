@@ -16,24 +16,42 @@ type ListRule struct {
 }
 
 // NumListRule responds with a stream of numbers when its filters are satisfied.
-// It works in conjunction with NumListRules.
 type NumListRule struct {
 	ListRule
 	rt.NumListEval
 }
 
 // TextListRule responds with a stream of text when its filters are satisfied.
-// It works in conjunction with TextListRules.
 type TextListRule struct {
 	ListRule
 	rt.TextListEval
 }
 
 // ExecuteListRule triggers a series of statements when its filters are satisfied.
-// It works in conjunction with ExecRules.
 type ExecuteRule struct {
 	ListRule
 	Go []rt.Execute
+}
+
+func (*NumListRule) RuleDesc() RuleDesc {
+	return RuleDesc{
+		"num_list_rule",
+		(*NumListRules)(nil),
+	}
+}
+
+func (*TextListRule) RuleDesc() RuleDesc {
+	return RuleDesc{
+		"text_list_rule",
+		(*TextListRules)(nil),
+	}
+}
+
+func (*ExecuteRule) RuleDesc() RuleDesc {
+	return RuleDesc{
+		"execute_rule",
+		(*ExecRules)(nil),
+	}
 }
 
 func (r *ListRule) ApplyByIndex(run rt.Runtime) (ret Flags, err error) {

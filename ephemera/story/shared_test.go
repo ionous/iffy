@@ -2,6 +2,8 @@ package story
 
 import (
 	"database/sql"
+	"os/user"
+	"path"
 	"strings"
 	"testing"
 
@@ -41,16 +43,16 @@ func newTestImporterDecoder(t *testing.T, dec *decode.Decoder) (ret *imp.Porter,
 const memory = "file:test.db?cache=shared&mode=memory"
 
 // if path is nil, it will use a file db.
-func newTestDB(t *testing.T, path string) (ret *sql.DB) {
+func newTestDB(t *testing.T, where string) (ret *sql.DB) {
 	var source string
-	if len(path) > 0 {
-		source = path
-	} else if p, e := getPath(t.Name() + ".db"); e != nil {
+	if len(where) > 0 {
+		source = where
+	} else if user, e := user.Current(); e != nil {
 		t.Fatal(e)
 	} else {
-		source = p
+		source = path.Join(user.HomeDir, t.Name()+".db")
 	}
-
+	//
 	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {

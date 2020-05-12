@@ -52,6 +52,7 @@ var Slots = []Slot{{
 	Desc: "Testing: Run a series of tests.",
 }}
 
+// Register exported commands used by the data language
 func Register(reg func(value interface{})) {
 	for _, cmd := range Slats {
 		reg(cmd)

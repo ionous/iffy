@@ -11,6 +11,19 @@ package tables
 func assemblyTemplate() string {
 	var tmpl = "/* resolve test ephemera to strings\n" +
 		" */\n" +
+		"create temp view \n" +
+		"asm_pattern as \n" +
+		"\tselect pk.name, nk.name, tk.name\n" +
+		"from eph_pattern pat\n" +
+		"left join eph_named pk\n" +
+		"\ton (pat.idNamedPattern = pk.rowid)\n" +
+		"left join eph_named nk\n" +
+		"\ton (pat.idNamedParam = nk.rowid)\n" +
+		"left join eph_named tk\n" +
+		"\ton (pat.idNamedType = tk.rowid);\n" +
+		"\n" +
+		"/* resolve test ephemera to strings\n" +
+		" */\n" +
 		"create temp view\n" +
 		"asm_check as\n" +
 		"\tselect nk.name as name, idProg, expect \n" +

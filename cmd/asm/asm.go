@@ -63,7 +63,7 @@ func assemble(outFile, inFile string) (err error) {
 				err = e
 			} else if e := assembly.DetermineAspects(w, db); e != nil {
 				err = e
-			} else if _, e := db.Exec("insert into mdl_prog select * from eph_prog;" +
+			} else if _, e := db.Exec("insert into mdl_prog select type, bytes from eph_prog;" +
 				"insert into mdl_check select * from asm_check"); e != nil {
 				err = e
 			}

@@ -1,8 +1,6 @@
 package story
 
 import (
-	"os/user"
-	"path"
 	"strings"
 	"testing"
 
@@ -126,15 +124,6 @@ func TestPatternDecl(t *testing.T) {
 			t.Log("ok")
 		}
 	}
-}
-
-func getPath(file string) (ret string, err error) {
-	if user, e := user.Current(); e != nil {
-		err = e
-	} else {
-		ret = path.Join(user.HomeDir, file)
-	}
-	return
 }
 
 var _pattern_decl = map[string]interface{}{

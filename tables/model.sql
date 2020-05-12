@@ -23,10 +23,13 @@ create table mdl_name(noun text, name text, rank int);
 create table mdl_pair(noun text, relation text, otherNoun text);
 /* initial values for various noun properties. these change over the course of a game. */
 create table mdl_start(noun text, field text, value blob);
-/* stored programs, a work in progress */ 
-create table mdl_prog( idSource int, type text, bytes blob );
+/* stored programs, a work in progress,
+   mdl_prog is copied from eph_prog */ 
+create table mdl_prog( type text, bytes blob );
 /* stored tests, a work in progress 
  * tbd: should named test be turned back into text?
  * still need to determine if "sources" should be listed in model ( for debugging )
  */ 
 create table mdl_check( name text, idProg int, expect text );
+/* pattern name and reference to program */
+create table mdl_rule( pattern text, idProg int );

@@ -1,4 +1,6 @@
 /* runtime views */
+
+/* the initial values of noun fields */
 create temp view
 run_init as
 select * from (

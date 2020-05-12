@@ -34,12 +34,16 @@ func modelTemplate() string {
 		"create table mdl_pair(noun text, relation text, otherNoun text);\n" +
 		"/* initial values for various noun properties. these change over the course of a game. */\n" +
 		"create table mdl_start(noun text, field text, value blob);\n" +
-		"/* stored programs, a work in progress */ \n" +
-		"create table mdl_prog( idSource int, type text, bytes blob );\n" +
+		"/* stored programs, a work in progress,\n" +
+		"   mdl_prog is copied from eph_prog */ \n" +
+		"create table mdl_prog( type text, bytes blob );\n" +
 		"/* stored tests, a work in progress \n" +
 		" * tbd: should named test be turned back into text?\n" +
 		" * still need to determine if \"sources\" should be listed in model ( for debugging )\n" +
 		" */ \n" +
-		"create table mdl_check( name text, idProg int, expect text );"
+		"create table mdl_check( name text, idProg int, expect text );\n" +
+		"/** \n" +
+		" */\n" +
+		"create table mdl_rule( pattern text, idProg int );"
 	return tmpl
 }

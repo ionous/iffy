@@ -28,7 +28,7 @@ func imp_test_output(k *imp.Porter, test ephemera.Named, r reader.Map) (err erro
 		err = e
 	} else if prog, e := k.DecodeAny(r); e != nil {
 		err = e
-	} else if p, e := k.NewProg("test", prog); e != nil {
+	} else if p, e := k.NewProg("test_output", prog); e != nil {
 		err = e
 	} else {
 		k.NewTest(test, p, expect)

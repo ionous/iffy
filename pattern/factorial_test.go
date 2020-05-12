@@ -13,37 +13,34 @@ import (
 func TestFactorial(t *testing.T) {
 	// rules are run in reverse order.
 	run := patternRuntime{patternMap: patternMap{
-		"factorial": pattern.NumberRules{
-			{
-				NumberEval: &core.ProductOf{
-					&core.GetVar{"num"},
-					&core.DetermineNum{
-						"factorial", &core.Parameters{[]*core.Parameter{{
-							"num", &core.FromNum{
-								&core.DiffOf{
-									&core.GetVar{"num"},
-									&core.Number{1},
-								},
+		"factorial": pattern.NumberRules{{
+			NumberEval: &core.ProductOf{
+				&core.GetVar{"num"},
+				&core.DetermineNum{
+					"factorial", &core.Parameters{[]*core.Parameter{{
+						"num", &core.FromNum{
+							&core.DiffOf{
+								&core.GetVar{"num"},
+								&core.Number{1},
 							},
-						}}},
-					},
-				},
-			}, {
-				Filter: &core.CompareNum{
-					&core.GetVar{"num"},
-					&core.EqualTo{},
-					&core.Number{0},
-				},
-				NumberEval: &core.Number{1},
+						},
+					}}}}},
+		}, {
+			Filter: &core.CompareNum{
+				&core.GetVar{"num"},
+				&core.EqualTo{},
+				&core.Number{0},
 			},
-		}}}
+			NumberEval: &core.Number{1},
+		}}},
+	}
 	// determine the factorial of the number 3
 	det := core.DetermineNum{
 		"factorial", &core.Parameters{[]*core.Parameter{{
 			"num", &core.FromNum{
 				&core.Number{3},
-			}},
-		}}}
+			}}}},
+	}
 	if v, e := rt.GetNumber(&run, &det); e != nil {
 		t.Fatal(e)
 	} else if want := 3.0 * (2 * (1 * 1)); v != want {

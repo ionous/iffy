@@ -9,8 +9,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-// test calling a pattern
-// note: the pattern is undefined.
+// read the factorial test story
 func TestFactorialStory(t *testing.T) {
 	errutil.Panic = true
 	db := newTestDB(t, memory)

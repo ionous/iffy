@@ -10,6 +10,8 @@ package tables
 // That string should be parsed by the functions of the golang's template package.
 func runViewsTemplate() string {
 	var tmpl = "/* runtime views */\n" +
+		"\n" +
+		"/* the initial values of noun fields */\n" +
 		"create temp view\n" +
 		"run_init as\n" +
 		"select * from (\n" +

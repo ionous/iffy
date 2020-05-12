@@ -36,63 +36,69 @@ func NewObjectValues(db *sql.DB) *Fields {
 	return &Fields{make(mapType), tables.NewCache(db)}
 }
 
-// other possibilities as needed:
-// get aspect,
-// get trait, -- possibly we make these explicit iffy commands initially, then select the correct command based on type.
-// get class,
+// SetField to the passed value.
+// fix, future: verify type?
+func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
+	key := keyType{obj, field}
+	n.pairs[key] = v
+	return
+}
 
-// GetValue sets the value of the passed pointer to the value of the named property.
+// GetField sets the value of the passed pointer to the value of the named property.
 func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 	key := keyType{obj, field}
 	if v, ok := n.pairs[key]; ok {
 		ret = v
 	} else {
-		var permissive bool
-		tgt := mapTarget{key: key, pairs: n.pairs}
-		var rows tables.RowScanner
 		switch field {
 		case object.Kind:
-			rows = n.db.QueryRow("select kind from mdl_noun where noun=?",
-				obj)
+			ret, err = n.cacheField(key, "select kind from mdl_noun where noun=?", obj)
+
 		case object.Kinds:
-			rows = n.db.QueryRow(
+			ret, err = n.cacheField(key,
 				`select kind || ( case path when '' then ('') else ("," || path) end ) as path
 				from mdl_noun mn 
 				join mdl_kind mk 
 					using (kind)
-				where noun=?`,
-				obj)
+				where noun=?`, obj)
+
 		case object.Exists:
-			rows = n.db.QueryRow("select count() from mdl_noun where noun=?",
-				obj)
+			ret, err = n.cacheField(key, "select count() from mdl_noun where noun=?", obj)
+
+		case object.BoolRule, object.NumberRule, object.TextRule,
+			object.ExecuteRule, object.NumListRule, object.TextListRule:
+			ret, err = n.cacheRules(key, obj, field[1:])
+
 		default:
 			// FIX? needs more work to determine if the field really exists
 			// ex. possibly a union query of class field with a nil value
-			permissive = true
-			rows = n.db.QueryRow("select value from run_init where noun=? and field=? order by tier limit 1",
-				obj, field)
-		}
-		if e := rows.Scan(&tgt); e == nil {
-			ret = tgt.value
-			//
-		} else if e == sql.ErrNoRows {
-			if !permissive {
-				err = errutil.New("field not found", obj, field)
+			if v, e := n.cacheField(key, `select value 
+				from run_init 
+				where noun=? and field=? 
+				order by tier limit 1`,
+				obj, field); e == nil {
+				ret = v
+			} else if _, ok := e.(fieldNotFound); !ok {
+				err = e
 			} else {
 				n.pairs[key] = nil
 				ret = nil
 			}
-		} else {
-			err = e
 		}
 	}
 	return
 }
 
-// SetField to the passed value.
-func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
-	key := keyType{obj, field}
-	n.pairs[key] = v
+func (n *Fields) cacheField(key keyType, q string, args ...interface{}) (ret interface{}, err error) {
+	tgt := mapTarget{key: key, pairs: n.pairs}
+	switch e := n.db.QueryRow(q, args...).Scan(&tgt); e {
+	case nil:
+		ret = tgt.value
+	case sql.ErrNoRows:
+		err = fieldNotFound{key.owner, key.member}
+	default:
+		err = e
+	}
 	return
 }
 
