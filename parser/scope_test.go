@@ -1,13 +1,13 @@
 package parser_test
 
 import (
-	"github.com/ionous/inflect"
-	"github.com/ionous/iffy/ident"
-	. "github.com/ionous/iffy/parser"
-	"github.com/ionous/sliceOf"
-	testify "github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/ionous/iffy/ident"
+	. "github.com/ionous/iffy/parser"
+	"github.com/ionous/inflect"
+	"github.com/ionous/sliceOf"
 )
 
 // MyObject provides an example ( for testing ) of mapping an "Noun" to a NounInstance.
@@ -95,7 +95,6 @@ func MatchAny(n string, l []string) (okay bool) {
 }
 
 func TestScope(t *testing.T) {
-	assert := testify.New(t)
 	ctx := MyScope{
 		&MyObject{Id: ident.IdOf("a"), Names: sliceOf.String("unique")},
 		//
@@ -119,38 +118,47 @@ func TestScope(t *testing.T) {
 			Classes: strings.Fields("class"),
 		},
 	}
-	if res, e := matching(ctx, "unique"); assert.NoError(e) {
-		assert.EqualValues(ResolvedObject{
-			NounInstance: ctx.Get('a'),
-			Words:        sliceOf.String("unique"),
-		}, res)
+	if res, e := matching(ctx, "unique"); e != nil {
+		t.Fatal("error", e)
+	} else if obj, ok := res.(ResolvedObject); !ok {
+		t.Fatalf("%T", res)
+	} else if obj.NounInstance != ctx.Get('a') {
+		t.Fatal("mismatched", obj.NounInstance)
+	} else if got, want := strings.Join(obj.Words, ","), "unique"; got != want {
+		t.Fatal(got)
 	}
 
-	if res, e := matching(ctx, "exact match"); assert.NoError(e) {
-		assert.EqualValues(ResolvedObject{
-			NounInstance: ctx.Get('c'),
-			Words:        sliceOf.String("exact", "match"),
-		}, res)
+	if res, e := matching(ctx, "exact match"); e != nil {
+		t.Fatal("error", e)
+	} else if obj, ok := res.(ResolvedObject); !ok {
+		t.Fatalf("%T", res)
+	} else if obj.NounInstance != ctx.Get('c') {
+		t.Fatal("mismatched", obj.NounInstance)
+	} else if got, want := strings.Join(obj.Words, ","), "exact,match"; got != want {
+		t.Fatal(got)
 	}
 
-	if res, e := matchingFilter(ctx, "filter", "attr", "class"); assert.NoError(e) {
-		assert.EqualValues(ResolvedObject{
-			NounInstance: ctx.Get('f'),
-			Words:        sliceOf.String("filter"),
-		}, res)
+	if res, e := matchingFilter(ctx, "filter", "attr", "class"); e != nil {
+		t.Fatal("error", e)
+	} else if obj, ok := res.(ResolvedObject); !ok {
+		t.Fatalf("%T", res)
+	} else if obj.NounInstance != ctx.Get('f') {
+		t.Fatal("mismatched", obj.NounInstance)
+	} else if got, want := strings.Join(obj.Words, ","), "filter"; got != want {
+		t.Fatal(got)
 	}
 
-	if res, e := matching(ctx, "inexact"); assert.Error(e) {
-		assert.Nil(res)
-		assert.EqualValues(AmbiguousObject{
-			Nouns: ctx.Many('d', 'e'),
-			// Words: sliceOf.String("inexact"),
-			Depth: 1,
-		}, e)
+	if res, e := matching(ctx, "inexact"); e == nil || res != nil {
+		t.Fatal("expected error", e, res)
+	} else if got, want := e.Error(), (AmbiguousObject{
+		Nouns: ctx.Many('d', 'e'),
+		Depth: 1,
+	}).Error(); got != want {
+		t.Fatal(got)
 	}
 
-	if res, e := matching(ctx, "nothing"); assert.Error(e) {
-		assert.Nil(res)
+	if res, e := matching(ctx, "nothing"); e == nil || res != nil {
+		t.Fatal("expected error", e, res)
 	}
 }
 

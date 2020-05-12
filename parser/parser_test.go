@@ -1,12 +1,12 @@
 package parser_test
 
 import (
+	"strings"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
 	. "github.com/ionous/iffy/parser"
 	"github.com/kr/pretty"
-	testify "github.com/stretchr/testify/assert"
-	"strings"
 )
 
 func anyOf(s ...Scanner) (ret Scanner) {
@@ -184,10 +184,9 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 		} else {
 			nouns := StringIds(g.Nouns)
 			objs := list.Objects()
-			if !testify.ObjectsAreEqual(nouns, objs) {
-				err = errutil.New("expected nouns (",
-					strings.Join(IdStrings(nouns), ","), ") got (",
-					strings.Join(IdStrings(objs), ","), ")")
+			if want, have := strings.Join(IdStrings(nouns), ","),
+				strings.Join(IdStrings(objs), ","); want != have {
+				err = errutil.Fmt("expected nouns %q got %q", want, have)
 			} else {
 				log.Logf("matched %v", in)
 			}
