@@ -9,6 +9,7 @@ import (
 )
 
 // FIX: some sort of reverse lookup instead?
+// ex. see findTypeName... maybe share via exports?
 func slotName(i interface{}) (ret string, err error) {
 	itype := r.TypeOf(i)
 	found := false

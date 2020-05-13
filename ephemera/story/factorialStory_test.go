@@ -4,14 +4,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/tables"
 )
 
 // read the factorial test story
 func TestFactorialStory(t *testing.T) {
-	errutil.Panic = true
 	db := newTestDB(t, memory)
 	defer db.Close()
 	if e := ImportStory(t.Name(), debug.FactorialStory, db); e != nil {
@@ -27,9 +25,8 @@ func TestFactorialStory(t *testing.T) {
 			"1", // eph_check -- 1 unit test
 			"2", // eph_rule -- 2 rules
 			"3", // e@h_prog -- 1 test program, 2 rules
-			"5", // eph_pattern specifies types - 1 pattern, 1 parameter, 1 call, 2 rules
+			"6", // eph_pattern specifies types - 1 pattern, 1 parameter, 1 call, 2 rules
 			// eph_named
-			"assignment,type",         //--> FIX? its possible this should be number_eval
 			"factorial,test",          // name of the test
 			"factorial,determine_num", // we called the named pattern
 			"factorial,pattern_name",  // we declared the named pattern

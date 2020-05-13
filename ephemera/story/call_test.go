@@ -44,7 +44,7 @@ func TestDetermineNum(t *testing.T) {
 			//
 			"factorial,determine_num", // 1.
 			"num,variable_name",       // 2.
-			"assignment,type",         // 3. --> FIX? its possible this should be number_eval
+			"number_eval,type",        // 3.
 			"number_eval,type",        // 4.
 		); have != want {
 			t.Fatal(have)

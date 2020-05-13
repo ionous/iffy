@@ -63,7 +63,7 @@ func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
 				err = e
 			} else {
 				patternType := k.NewName(evalType, tables.NAMED_TYPE, reader.At(m))
-				k.NewPatternDecl(patternName, patternName, patternType)
+				k.NewPatternRef(patternName, patternName, patternType)
 				k.NewPatternRule(patternName, patternProg)
 			}
 		}

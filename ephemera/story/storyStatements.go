@@ -149,7 +149,7 @@ func imp_noun_statement(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-// Adds a NewPatternType, and optionally some associated pattern parameters.
+// Adds a new pattern declaration and optionally some associated pattern parameters.
 // {name:pattern_name|quote} determines {type:pattern_type}.
 // {optvars?pattern_variables_tail}
 func imp_pattern_decl(k *imp.Porter, r reader.Map) (err error) {
@@ -171,6 +171,15 @@ func imp_pattern_decl(k *imp.Porter, r reader.Map) (err error) {
 // `Pattern variables: Storage for values used during the execution of a pattern.`)
 // {+variable_decl|comma-and}.",
 func imp_pattern_variables_tail(k *imp.Porter, patternName ephemera.Named, r reader.Map) (err error) {
+	if m, e := reader.Unpack(r, "pattern_variables_tail"); e != nil {
+		err = e
+	} else {
+		err = rep_variable_decl(k, patternName, m)
+	}
+	return
+}
+
+func rep_variable_decl(k *imp.Porter, patternName ephemera.Named, r reader.Map) error {
 	return reader.Repeats(r.SliceOf("$VARIABLE_DECL"),
 		func(m reader.Map) (err error) {
 			if paramName, paramType, e := imp_variable_decl(k, m); e != nil {
@@ -189,8 +198,7 @@ func imp_pattern_variables_decl(k *imp.Porter, r reader.Map) (err error) {
 	} else if patternName, e := imp_pattern_name(k, m.MapOf("$PATTERN_NAME")); e != nil {
 		err = e
 	} else {
-		// reuse, works because they have the same $name.
-		err = imp_pattern_variables_tail(k, patternName, m)
+		err = rep_variable_decl(k, patternName, m)
 	}
 	return
 }

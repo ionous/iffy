@@ -8,11 +8,12 @@ import (
 // Assignment helps limit variable and parameter assignment to particular contexts
 type Assignment interface {
 	Assign(rt.Runtime, func(interface{}) error) error
+	GetEval() interface{} // fix? for import so we can determine the eval type
 }
 
 // Assign turns an Assignment a normal statement.
 type Assign struct {
-	Name string // text eval, or string?
+	Name string // name of variable or parameter we are assigning to.
 	From Assignment
 }
 
@@ -73,6 +74,10 @@ func (op *FromBool) Assign(run rt.Runtime, fn func(interface{}) error) (err erro
 	return
 }
 
+func (op *FromBool) GetEval() interface{} {
+	return op.Val
+}
+
 func (*FromNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_num",
@@ -89,6 +94,10 @@ func (op *FromNum) Assign(run rt.Runtime, fn func(interface{}) error) (err error
 		err = fn(val)
 	}
 	return
+}
+
+func (op *FromNum) GetEval() interface{} {
+	return op.Val
 }
 
 func (*FromText) Compose() composer.Spec {
@@ -108,6 +117,10 @@ func (op *FromText) Assign(run rt.Runtime, fn func(interface{}) error) (err erro
 	return
 }
 
+func (op *FromText) GetEval() interface{} {
+	return op.Val
+}
+
 func (*FromNumList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_num_list",
@@ -125,6 +138,10 @@ func (op *FromNumList) Assign(run rt.Runtime, fn func(interface{}) error) (err e
 	return
 }
 
+func (op *FromNumList) GetEval() interface{} {
+	return op.Vals
+}
+
 func (*FromTextList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_text_list",
@@ -140,4 +157,8 @@ func (op *FromTextList) Assign(run rt.Runtime, fn func(interface{}) error) (err 
 		err = fn(vals)
 	}
 	return
+}
+
+func (op *FromTextList) GetEval() interface{} {
+	return op.Vals
 }
