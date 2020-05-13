@@ -8,16 +8,6 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-// make.str("pattern_name");
-func imp_pattern_name(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
-	if str, e := reader.String(r, "pattern_name"); e != nil {
-		err = e
-	} else {
-		ret = k.NewName(str, "pattern_name", reader.At(r))
-	}
-	return
-}
-
 // "an {activity:patterned_activity} or a {value:variable_type}");
 func imp_pattern_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
 	err = reader.Option(r, "pattern_type", reader.ReadMaps{
@@ -52,18 +42,14 @@ func imp_pattern_handler(k *imp.Porter, r reader.Map) (err error) {
 		err = e
 	} else if rule, e := imp_pattern_hook(k, m.MapOf("$HOOK")); e != nil {
 		err = e
-	} else if evalType, e := slotName(rule.rule); e != nil {
-		err = e
 	} else {
 		if v := m.MapOf("$FILTERS"); len(v) != 0 {
 			err = imp_pattern_filters(k, rule, v)
 		}
 		if err == nil {
-			if patternProg, e := k.NewProg(rule.name, rule.distill()); e != nil {
+			if patternProg, e := k.NewProg(rule.typeName(), rule.buildRule()); e != nil {
 				err = e
 			} else {
-				patternType := k.NewName(evalType, tables.NAMED_TYPE, reader.At(m))
-				k.NewPatternRef(patternName, patternName, patternType)
 				k.NewPatternRule(patternName, patternProg)
 			}
 		}

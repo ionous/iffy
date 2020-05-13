@@ -28,6 +28,7 @@ func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
 
 type Prog struct{ Named }
 
+// fix: this should probably take "ofs" just like NewName does.
 func (r *Recorder) NewProg(rootType string, blob []byte) (ret Prog) {
 	id := r.cache.Must(eph_prog, r.srcId, rootType, blob)
 	ret = Prog{Named{id, rootType}}
@@ -110,12 +111,14 @@ func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
 	r.cache.Must(eph_check, test, prog, expect)
 }
 
-func (r *Recorder) NewPatternRef(pattern, param, patternType Named) {
-	r.cache.Must(eph_pattern, pattern, param, patternType, false)
-}
-
+// declare a pattern or pattern parameter
 func (r *Recorder) NewPatternDecl(pattern, param, patternType Named) {
 	r.cache.Must(eph_pattern, pattern, param, patternType, true)
+}
+
+//
+func (r *Recorder) NewPatternRef(pattern, param, patternType Named) {
+	r.cache.Must(eph_pattern, pattern, param, patternType, false)
 }
 
 func (r *Recorder) NewPatternRule(pattern Named, handler Prog) {

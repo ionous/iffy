@@ -2,7 +2,7 @@
  */
 create temp view 
 asm_pattern as 
-	select pn.name, kn.name, tn.name, pn.decl
+	select pn.name as pattern, kn.name as param, tn.name as type, ep.decl
 from eph_pattern ep
 left join eph_named pn
 	on (ep.idNamedPattern = pn.rowid)

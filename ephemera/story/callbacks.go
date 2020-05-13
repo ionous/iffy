@@ -65,6 +65,7 @@ func imp_determine_text_list(k *imp.Porter, m reader.Map) (ret interface{}, err 
 	return
 }
 
+// used by "determine_num", etc.
 // from and spec are the same object, but go-type unpacking from interfaces isnt always easy.
 func fromPattern(k *imp.Porter,
 	m reader.Map,
@@ -75,7 +76,7 @@ func fromPattern(k *imp.Porter,
 		err = e
 	} else if m, e := reader.Unpack(m, typeName); e != nil {
 		err = e
-	} else if patternName, e := fromPatternName(k, m.MapOf("$NAME"), typeName); e != nil {
+	} else if patternName, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else if ps, e := imp_parameters(k, patternName, m.MapOf("$PARAMETERS")); e != nil {
 		err = e
@@ -143,14 +144,4 @@ func imp_assignment(k *imp.Porter, m reader.Map) (ret core.Assignment, err error
 
 func imp_text(k *imp.Porter, m reader.Map) (ret string, err error) {
 	return reader.String(m, "text")
-}
-
-// similar to imp_pattern_name, only we change the underlying type to indicate it's a reference.
-func fromPatternName(k *imp.Porter, m reader.Map, typeName string) (ret ephemera.Named, err error) {
-	if id, e := reader.Type(m, "pattern_name"); e != nil {
-		err = e
-	} else {
-		ret = k.NewName(m.StrOf(reader.ItemValue), typeName, id)
-	}
-	return
 }

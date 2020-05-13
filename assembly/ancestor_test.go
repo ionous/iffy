@@ -37,8 +37,8 @@ func TestAncestors(t *testing.T) {
 		if e := kinds.AddAncestorsOf(db, "T"); e != nil {
 			t.Fatal(e)
 		}
-		for k, n := range kinds.cache {
-			t.Log(k, ":", n.GetAncestors())
+		for name, kind := range kinds.cache {
+			t.Log(name, ":", kind.GetAncestors())
 		}
 		// verify our original expectations
 		for i := 0; i < len(pairs); i += 2 {
@@ -49,7 +49,7 @@ func TestAncestors(t *testing.T) {
 			}
 		}
 		// verify our expected tree
-		for k, v := range map[string]string{
+		for name, v := range map[string]string{
 			// kind, ancestors
 			"T": "",
 			"Q": "T",
@@ -59,8 +59,8 @@ func TestAncestors(t *testing.T) {
 			"L": "P,J,Q,T",
 			"M": "L,P,J,Q,T",
 		} {
-			k := kinds.Get(k)
-			if a := k.GetAncestors(); a != v {
+			kind := kinds.Get(name)
+			if a := kind.GetAncestors(); a != v {
 				t.Fatal("expected", v, "have", a)
 			}
 		}
@@ -120,8 +120,8 @@ func TestAncestorConflict(t *testing.T) {
 		//
 		kinds := &cachedKinds{}
 		if e := kinds.AddAncestorsOf(db, "T"); e == nil {
-			for k, n := range kinds.cache {
-				t.Log(k, ":", n.GetAncestors())
+			for name, kind := range kinds.cache {
+				t.Log(name, ":", kind.GetAncestors())
 			}
 			t.Fatal("expected error")
 		} else {

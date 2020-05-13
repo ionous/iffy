@@ -16,7 +16,7 @@ func TestObjectFunc(t *testing.T) {
 	defer db.Close()
 	if rule, e := imp_object_func(k, _object_func); e != nil {
 		t.Fatal(e)
-	} else if text, e := rt.GetText(nil, rule.distill().(rt.TextEval)); e != nil {
+	} else if text, e := rt.GetText(nil, rule.buildRule().(rt.TextEval)); e != nil {
 		t.Fatal(e)
 	} else if text != "hello" {
 		t.Fatal(text)
@@ -30,7 +30,7 @@ func TestPatternActivity(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		var run testRuntime
-		if e := rt.RunOne(&run, rule.distill().(rt.Execute)); e != nil {
+		if e := rt.RunOne(&run, rule.buildRule().(rt.Execute)); e != nil {
 			t.Fatal(e)
 		} else if diff := pretty.Diff(run.out.Lines(), []string{"hello", "hello"}); len(diff) > 0 {
 			t.Fatal(diff)
@@ -58,7 +58,7 @@ func TestPatternRule(t *testing.T) {
 			"exec_rule",
 			"example,pattern_name",
 			"execute,type",
-			"1",
+			"0", // eph_pattern -- rules are recorded via eph_prog,
 			"1,1",
 		); have != want {
 			t.Fatal(have)

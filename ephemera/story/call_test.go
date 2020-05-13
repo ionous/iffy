@@ -42,10 +42,10 @@ func TestDetermineNum(t *testing.T) {
 			"1,2,3,0", // from NewPatternRef -> "determine num" takes a parameter that is from a number eval
 			"1,1,4,0", // from NewPatternRef -> "determine num" indicates factorial returns a number eval
 			//
-			"factorial,determine_num", // 1.
-			"num,variable_name",       // 2.
-			"number_eval,type",        // 3.
-			"number_eval,type",        // 4.
+			"factorial,pattern_name", // 1.
+			"num,variable_name",      // 2.
+			"number_eval,type",       // 3.
+			"number_eval,type",       // 4.
 		); have != want {
 			t.Fatal(have)
 		}

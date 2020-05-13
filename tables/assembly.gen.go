@@ -13,7 +13,7 @@ func assemblyTemplate() string {
 		" */\n" +
 		"create temp view \n" +
 		"asm_pattern as \n" +
-		"\tselect pn.name, kn.name, tn.name\n" +
+		"\tselect pn.name as pattern, kn.name as param, tn.name as type, ep.decl\n" +
 		"from eph_pattern ep\n" +
 		"left join eph_named pn\n" +
 		"\ton (ep.idNamedPattern = pn.rowid)\n" +

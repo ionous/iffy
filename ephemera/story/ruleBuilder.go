@@ -7,17 +7,20 @@ import (
 )
 
 type ruleBuilder struct {
-	name      string // ex. NumberRule
-	rule      interface{}
+	rule      pattern.Rule
 	filterPtr *rt.BoolEval
 	filters   []rt.BoolEval
+}
+
+func (rb *ruleBuilder) typeName() string {
+	return rb.rule.RuleDesc().Name
 }
 
 func (rb *ruleBuilder) addFilter(eval rt.BoolEval) {
 	rb.filters = append(rb.filters, eval)
 }
 
-func (rb *ruleBuilder) distill() interface{} {
+func (rb *ruleBuilder) buildRule() interface{} {
 	// build the filters
 	var w rt.BoolEval
 	switch cnt := len(rb.filters); cnt {
@@ -38,25 +41,25 @@ func (rb *ruleBuilder) distill() interface{} {
 
 func newBoolRule(i rt.BoolEval) *ruleBuilder {
 	ptr := &pattern.BoolRule{BoolEval: i}
-	return &ruleBuilder{"bool_rule", ptr, &ptr.Filter, nil}
+	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }
 func newNumberRule(i rt.NumberEval) *ruleBuilder {
 	ptr := &pattern.NumberRule{NumberEval: i}
-	return &ruleBuilder{"number_rule", ptr, &ptr.Filter, nil}
+	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }
 func newTextRule(i rt.TextEval) *ruleBuilder {
 	ptr := &pattern.TextRule{TextEval: i}
-	return &ruleBuilder{"text_rule", ptr, &ptr.Filter, nil}
+	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }
 func newExecuteRule(exes []rt.Execute) *ruleBuilder {
 	ptr := &pattern.ExecuteRule{Go: exes}
-	return &ruleBuilder{"exec_rule", ptr, &ptr.Filter, nil}
+	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }
 func newTextListRule(i rt.TextListEval) *ruleBuilder {
 	ptr := &pattern.TextListRule{TextListEval: i}
-	return &ruleBuilder{"text_list_rule", ptr, &ptr.Filter, nil}
+	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }
 func newNumListRule(i rt.NumListEval) *ruleBuilder {
 	ptr := &pattern.NumListRule{NumListEval: i}
-	return &ruleBuilder{"num_list_rule", ptr, &ptr.Filter, nil}
+	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }

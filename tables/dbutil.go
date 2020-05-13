@@ -12,6 +12,17 @@ type Query interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 
+func Must(db *sql.DB, q string, args ...interface{}) (ret int64) {
+	if res, e := db.Exec(q, args...); e != nil {
+		panic(e)
+	} else if id, e := res.LastInsertId(); e != nil {
+		panic(e)
+	} else {
+		ret = id
+	}
+	return
+}
+
 // QueryAll queries the db ( or statement cache ) for one or more rows.
 // For each row, it writes the row to the 'dest' args and calls 'cb' for processing.
 func QueryAll(db Query, q string, cb func() error, dest ...interface{}) (err error) {

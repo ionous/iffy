@@ -57,3 +57,8 @@ func imp_property(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
 func imp_test_name(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
 	return importName(k, r, "text", "test")
 }
+
+// make.str("pattern_name");
+func imp_pattern_name(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
+	return importName(k, r, "pattern_name", "")
+}
