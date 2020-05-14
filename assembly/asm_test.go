@@ -62,10 +62,6 @@ type assemblyTest struct {
 	modeler *Modeler
 }
 
-func (t *assemblyTest) Close() {
-	t.db.Close()
-}
-
 type kfp struct{ kind, field, fieldType string }
 type pair struct{ key, value string }
 

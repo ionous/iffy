@@ -13,11 +13,11 @@ import (
 
 // TestNounFormation to verify we can successfully assemble nouns from ephemera
 func TestNounFormation(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
@@ -79,11 +79,11 @@ func addNouns(rec *ephemera.Recorder, els []pair) (err error) {
 
 // TestNounLcaSucess to verify we can successfully determine the lowest common ancestor of nouns.
 func TestNounLcaSucess(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
@@ -114,11 +114,11 @@ func TestNounLcaSucess(t *testing.T) {
 
 // TestNounLcaFailure to verify a mismatched noun hierarchy generates an error.
 func TestNounLcaFailure(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
@@ -142,11 +142,11 @@ func TestNounLcaFailure(t *testing.T) {
 
 // TestNounParts to verify a single noun generates multi part names
 func TestNounParts(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},

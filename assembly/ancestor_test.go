@@ -9,11 +9,11 @@ import (
 
 // TestAncestors verifies valid parent-child ephemera can generate a valid ancestry table.
 func TestAncestors(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec := t.db, t.rec
+		defer asm.db.Close()
+		db, rec := asm.db, asm.rec
 		//
 		pairs := []string{
 			// kind, ancestor
@@ -70,11 +70,11 @@ func TestAncestors(t *testing.T) {
 // TestAncestorCycle verifies cycles in parent-child ephemera generate errors.
 // ex. P inherits from T; T inherits from P.
 func TestAncestorCycle(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec := t.db, t.rec
+		defer asm.db.Close()
+		db, rec := asm.db, asm.rec
 		//
 		pairs := []string{
 			// kind, ancestor
@@ -99,11 +99,11 @@ func TestAncestorCycle(t *testing.T) {
 // TestAncestorConflict verifies conflicting parent ephemera (multiple inheritance) generates an error.
 // ex. P,Q inherits from T; K inherits from P and Q.
 func TestAncestorConflict(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec := t.db, t.rec
+		defer asm.db.Close()
+		db, rec := asm.db, asm.rec
 		//
 		pairs := []string{
 			// kind, ancestor

@@ -10,11 +10,11 @@ import (
 
 // TestMissingKinds to verify the kinds mentioned in parent-child ephemera exist.
 func TestMissingKinds(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		// kind, ancestor
 		pairs := []string{
 			"P", "T",
@@ -56,11 +56,11 @@ func TestMissingKinds(t *testing.T) {
 
 // TestMissingAspects detects fields labeled as aspects which are missing from the aspects ephemera.
 func TestMissingAspects(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec := t.db, t.rec
+		defer asm.db.Close()
+		db, rec := asm.db, asm.rec
 		//
 		parent := rec.NewName("K", tables.NAMED_KIND, "container")
 		for i, aspect := range []string{
@@ -87,24 +87,24 @@ func TestMissingAspects(t *testing.T) {
 }
 
 func TestMissingField(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := writeMissing(t.rec, []string{
+		} else if e := writeMissing(asm.rec, []string{
 			"z",
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(t.modeler, t.db); e != nil {
+		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else {
 			var missing []string
-			if e := MissingFields(t.db, func(n string) (err error) {
+			if e := MissingFields(asm.db, func(n string) (err error) {
 				missing = append(missing, n)
 				return
 			}); e != nil {
@@ -121,18 +121,18 @@ func TestMissingField(t *testing.T) {
 
 // xTestMissingUnknownField missing properties ( kind, field pair doesn't exist in model )
 func xTestMissingUnknownField(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(t.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.modeler, []TargetValue{
 			{"T", "d", tables.PRIM_DIGI},
 			{"T", "t", tables.PRIM_TEXT},
 			{"T", "t2", tables.PRIM_TEXT},
@@ -140,7 +140,7 @@ func xTestMissingUnknownField(t *testing.T) {
 			{"C", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addDefaults(t.rec, []triplet{
+		} else if e := addDefaults(asm.rec, []triplet{
 			{"T", "t", "some text"},
 			{"P", "t2", "other text"},
 			{"C", "c", "c text"},
@@ -151,7 +151,7 @@ func xTestMissingUnknownField(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			var got []pair
-			if e := MissingDefaults(t.db, func(k, f string) (err error) {
+			if e := MissingDefaults(asm.db, func(k, f string) (err error) {
 				got = append(got, pair{k, f})
 				return
 			}); e != nil {

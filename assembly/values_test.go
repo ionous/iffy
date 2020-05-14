@@ -13,38 +13,38 @@ import (
 
 // TestInitialFieldAssignment to verify initial values for fields can be assigned to instances.
 func TestInitialFieldAssignment(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		defer asm.db.Close()
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"M", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(t.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.modeler, []TargetValue{
 			{"K", "t", tables.PRIM_TEXT},
 			{"L", "d", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestNouns(t.modeler, []TargetField{
+		} else if e := AddTestNouns(asm.modeler, []TargetField{
 			{"apple", "K"},
 			{"pear", "L"},
 			{"toy boat", "M"},
 			{"boat", "M"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(t.rec, []TargetValue{
+		} else if e := addValues(asm.rec, []TargetValue{
 			{"apple", "t", "some text"},
 			{"pear", "d", 123},
 			{"toy", "d", 321},
 			{"boat", "t", "more text"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := determineInitialFields(t.modeler, t.db); e != nil {
+		} else if e := determineInitialFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchValues(t.db, []TargetValue{
+		} else if e := matchValues(asm.db, []TargetValue{
 			{"apple", "t", "some text"},
 			{"boat", "t", "more text"},
 			{"pear", "d", int64(123)}, // int64, re: go's default scanner.
@@ -57,44 +57,44 @@ func TestInitialFieldAssignment(t *testing.T) {
 
 // TestInitialTraitAssignments to verify default traits can be assigned to kinds.
 func TestInitialTraitAssignment(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"M", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(t.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.modeler, []TargetValue{
 			{"K", "A", tables.PRIM_ASPECT},
 			{"L", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestTraits(t.modeler, []TargetField{
+		} else if e := AddTestTraits(asm.modeler, []TargetField{
 			{"A", "w"}, {"A", "x"}, {"A", "y"},
 			{"B", "z"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestNouns(t.modeler, []TargetField{
+		} else if e := AddTestNouns(asm.modeler, []TargetField{
 			{"apple", "K"},
 			{"pear", "L"},
 			{"toy boat", "M"},
 			{"boat", "M"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(t.rec, []TargetValue{
+		} else if e := addValues(asm.rec, []TargetValue{
 			{"apple", "A", "y"},
 			{"pear", "x", true},
 			{"toy", "w", true},
 			{"boat", "z", true},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineValues(t.modeler, t.db); e != nil {
+		} else if e := DetermineValues(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchValues(t.db, []TargetValue{
+		} else if e := matchValues(asm.db, []TargetValue{
 			{"apple", "A", "y"},
 			{"boat", "B", "z"},
 			{"pear", "A", "x"},

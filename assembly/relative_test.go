@@ -14,7 +14,7 @@ import (
 // todo: check the wrong nouns using a verb, using the wrong verb, etc.
 // todo: ensure that the same stem can be used in multiple relations ( so long as the kinds differ, ex. in room, vs in box. )
 func TestRelativeFormation(t *testing.T) {
-	if t, e := newRelativesTest(t, memory, [][3]string{
+	if asm, e := newRelativesTest(t, memory, [][3]string{
 		{"a", "v1", "a"},
 		{"b", "v1", "c"},
 		{"c", "v1", "b"},
@@ -51,10 +51,10 @@ func TestRelativeFormation(t *testing.T) {
 		t.Fatal(e)
 		return
 	} else {
-		defer t.Close()
-		if e := DetermineRelatives(t.db); e != nil {
+		defer asm.db.Close()
+		if e := DetermineRelatives(asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchRelatives(t.db, [][3]string{
+		} else if e := matchRelatives(asm.db, [][3]string{
 			{"Rel1", "a", "a"},
 			{"Rel1", "b", "c"},
 			{"Rel1", "e", "z"},
@@ -111,16 +111,16 @@ func matchRelatives(db *sql.DB, want [][3]string) (err error) {
 
 func TestOneToOneViolations(t *testing.T) {
 	test := func(add, want [][3]string) (err error) {
-		if t, e := newRelativesTest(t, memory, add); e != nil {
+		if asm, e := newRelativesTest(t, memory, add); e != nil {
 			err = e
 		} else {
-			defer t.Close()
-			if e := DetermineRelatives(t.db); e != nil {
+			defer asm.db.Close()
+			if e := DetermineRelatives(asm.db); e != nil {
 				err = e
 			} else {
 				var have [][3]string
 				var got [3]string
-				if e := tables.QueryAll(t.db,
+				if e := tables.QueryAll(asm.db,
 					`select distinct coalesce(noun, ''), 
 									 coalesce(stem, ''), 
 									 coalesce(otherNoun, '')
@@ -178,16 +178,16 @@ func TestOneToOneViolations(t *testing.T) {
 
 func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *assemblyTest, err error) {
 	ret = &assemblyTest{T: t}
-	if t, e := newAssemblyTest(t, path); e != nil {
+	if asm, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"N", "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestNouns(t.modeler, []TargetField{
+		} else if e := AddTestNouns(asm.modeler, []TargetField{
 			{"a", "K"},
 			{"b", "K"},
 			{"c", "K"},
@@ -199,7 +199,7 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			{"z", "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestRelations(t.modeler, [][4]string{
+		} else if e := AddTestRelations(asm.modeler, [][4]string{
 			// relation, kind, cardinality, otherKind
 			{"Rel1", "K", tables.ONE_TO_ONE, "K"},
 			{"Rel1x", "K", tables.ONE_TO_MANY, "K"},
@@ -207,7 +207,7 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			{"Relxx", "K", tables.MANY_TO_MANY, "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestVerbs(t.modeler, [][2]string{
+		} else if e := AddTestVerbs(asm.modeler, [][2]string{
 			// rel, verb
 			{"Rel1", "v1"},
 			{"Rel1x", "v1x"},
@@ -215,14 +215,14 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			{"Relxx", "vx"},
 		}); e != nil {
 			err = e
-		} else if e := addRelatives(t.rec, relatives); e != nil {
+		} else if e := addRelatives(asm.rec, relatives); e != nil {
 			err = e
 		}
 		//
 		if err != nil {
-			t.Close()
+			asm.db.Close()
 		} else {
-			ret = t
+			ret = asm
 		}
 	}
 	return

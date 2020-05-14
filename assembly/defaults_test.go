@@ -13,19 +13,19 @@ import (
 
 // TestDefaultFieldAssigment to verify default values can be assigned to kinds.
 func TestDefaultFieldAssigment(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"D", "K"},
 			{"C", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(t.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.modeler, []TargetValue{
 			{"K", "d", tables.PRIM_DIGI},
 			{"K", "t", tables.PRIM_TEXT},
 			{"K", "t2", tables.PRIM_TEXT},
@@ -34,7 +34,7 @@ func TestDefaultFieldAssigment(t *testing.T) {
 			{"C", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addDefaults(t.rec, []triplet{
+		} else if e := addDefaults(asm.rec, []triplet{
 			{"K", "t", "some text"},
 			{"L", "t", "override text"},
 			{"L", "t2", "other text"},
@@ -44,9 +44,9 @@ func TestDefaultFieldAssigment(t *testing.T) {
 			{"C", "d", 123},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineDefaults(t.modeler, t.db); e != nil {
+		} else if e := DetermineDefaults(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchDefaults(t.db, []triplet{
+		} else if e := matchDefaults(asm.db, []triplet{
 			{"C", "c", "c text"},
 			{"C", "d", int64(123)}, // re: int64 -- default scanner uses https://golang.org/pkg/database/sql/#Scanner
 			{"D", "x", "x in d"},
@@ -62,7 +62,7 @@ func TestDefaultFieldAssigment(t *testing.T) {
 
 // TestDefaultTraitAssignment to verify default traits can be assigned to kinds.
 func TestDefaultTraitAssignment(t *testing.T) {
-	if t, e := newDefaultsTest(t, memory, []triplet{
+	if asm, e := newDefaultsTest(t, memory, []triplet{
 		{"K", "x", true},
 		{"L", "y", true},
 		{"L", "z", true},
@@ -73,10 +73,10 @@ func TestDefaultTraitAssignment(t *testing.T) {
 	}); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		if e := DetermineDefaults(t.modeler, t.db); e != nil {
+		defer asm.db.Close()
+		if e := DetermineDefaults(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchDefaults(t.db, []triplet{
+		} else if e := matchDefaults(asm.db, []triplet{
 			{"K", "A", "x"},
 			{"L", "A", "y"},
 			{"L", "B", "z"},
@@ -90,7 +90,7 @@ func TestDefaultTraitAssignment(t *testing.T) {
 
 // TestDefaultDuplicates to verify that duplicate default specifications are okay
 func TestDefaultDuplicates(t *testing.T) {
-	if t, e := newDefaultsTest(t, memory, []triplet{
+	if asm, e := newDefaultsTest(t, memory, []triplet{
 		{"K", "t", "text"},
 		{"K", "t", "text"},
 		{"L", "t", "text"},
@@ -106,8 +106,8 @@ func TestDefaultDuplicates(t *testing.T) {
 	}); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		if e := DetermineDefaults(t.modeler, t.db); e != nil {
+		defer asm.db.Close()
+		if e := DetermineDefaults(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -116,11 +116,11 @@ func TestDefaultDuplicates(t *testing.T) {
 // TestDefaultConflict to verify that conflicting values for the same default are not okay
 func TestDefaultConflict(t *testing.T) {
 	testConflict := func(t *testing.T, vals []triplet) (err error) {
-		if t, e := newDefaultsTest(t, memory, vals); e != nil {
+		if asm, e := newDefaultsTest(t, memory, vals); e != nil {
 			t.Fatal(e)
 		} else {
-			defer t.Close()
-			if e := DetermineDefaults(t.modeler, t.db); e == nil {
+			defer asm.db.Close()
+			if e := DetermineDefaults(asm.modeler, asm.db); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)
@@ -163,11 +163,11 @@ func TestDefaultBadValue(t *testing.T) {
 	//- for now, we only allow text and number [ text and digi ]
 	// - later we could add ambiguity for conversion [ 4 -> "4" ]
 	testInvalid := func(t *testing.T, vals []triplet) (err error) {
-		if t, e := newDefaultsTest(t, memory, vals); e != nil {
+		if asm, e := newDefaultsTest(t, memory, vals); e != nil {
 			err = e
 		} else {
-			defer t.Close()
-			if e := DetermineDefaults(t.modeler, t.db); e == nil {
+			defer asm.db.Close()
+			if e := DetermineDefaults(asm.modeler, asm.db); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)
@@ -251,16 +251,16 @@ func addDefaults(rec *ephemera.Recorder, defaults []triplet) (err error) {
 
 func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemblyTest, err error) {
 	ret = &assemblyTest{T: t}
-	if t, e := newAssemblyTest(t, path); e != nil {
+	if asm, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"N", "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestFields(t.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.modeler, []TargetValue{
 			{"K", "d", tables.PRIM_DIGI},
 			{"K", "t", tables.PRIM_TEXT},
 			{"K", "A", tables.PRIM_ASPECT},
@@ -268,18 +268,18 @@ func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemb
 			{"N", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			err = e
-		} else if e := AddTestTraits(t.modeler, []TargetField{
+		} else if e := AddTestTraits(asm.modeler, []TargetField{
 			{"A", "w"}, {"A", "x"}, {"A", "y"},
 			{"B", "z"},
 		}); e != nil {
 			err = e
-		} else if e := addDefaults(t.rec, defaults); e != nil {
+		} else if e := addDefaults(asm.rec, defaults); e != nil {
 			err = e
 		}
 		if err != nil {
-			t.Close()
+			asm.db.Close()
 		} else {
-			ret = t
+			ret = asm
 		}
 	}
 	return

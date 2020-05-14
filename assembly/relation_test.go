@@ -14,11 +14,11 @@ import (
 // TestVerbMismatches verifies that we can collapse multiple relation-verb pairs so long as the verb-stem pair match
 // while ensuring the same stem cannot be used in multiple relations.
 func TestVerbMismatches(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal("error creating test", e)
 	} else {
-		defer t.Close()
-		m := t.modeler
+		defer asm.db.Close()
+		m := asm.modeler
 		//
 		if e := m.WriteVerb("R", "contains"); e != nil {
 			t.Fatal(e)
@@ -73,11 +73,11 @@ func matchRelations(db *sql.DB, want []dbrel) (err error) {
 
 // TestRelationCreation to verify it's possible to build relations
 func TestRelationCreation(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
@@ -107,11 +107,11 @@ func TestRelationCreation(t *testing.T) {
 
 // TestRelationCardinality detects conflicting cardinalities
 func TestRelationCardinality(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"P", ""},
@@ -132,11 +132,11 @@ func TestRelationCardinality(t *testing.T) {
 
 // TestRelationLca
 func TestRelationLcaSuccess(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},
@@ -163,11 +163,11 @@ func TestRelationLcaSuccess(t *testing.T) {
 
 // TestRelationLcaFailure to verify a mismatched relation hierarchy generates an error.
 func TestRelationLcaFailure(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		db, rec, m := t.db, t.rec, t.modeler
+		defer asm.db.Close()
+		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
 		if e := AddTestHierarchy(m, []TargetField{
 			{"T", ""},

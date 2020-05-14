@@ -52,12 +52,12 @@ func matchTraits(db *sql.DB, want []expectedTrait) (err error) {
 
 // TestTraits to verify that aspects/traits in ephemera can become part of the model.
 func TestTraits(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := addTraits(t.rec,
+		if e := addTraits(asm.rec,
 			[]pair{
 				{"A", "x"},
 				{"A", "y"},
@@ -65,19 +65,19 @@ func TestTraits(t *testing.T) {
 				{"B", "z"},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(t.modeler, t.db); e != nil {
+		} else if e := DetermineAspects(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchTraits(t.db, []expectedTrait{
+		} else if e := matchTraits(asm.db, []expectedTrait{
 			{"A", "x", 0},
 			{"A", "y", 0},
 			{"B", "z", 0},
 		}); e != nil {
 			t.Fatal("matchTraits:", e)
-		} else if e := MissingAspects(t.db, func(a string) error {
+		} else if e := MissingAspects(asm.db, func(a string) error {
 			return errutil.New("missing aspect", a)
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := MissingTraits(t.db, func(t string) error {
+		} else if e := MissingTraits(asm.db, func(t string) error {
 			return errutil.New("missing trait", t)
 		}); e != nil {
 			t.Fatal(e)
@@ -87,18 +87,18 @@ func TestTraits(t *testing.T) {
 
 // TestTraitConflicts
 func TestTraitConflicts(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := addTraits(t.rec, []pair{
+		if e := addTraits(asm.rec, []pair{
 			{"A", "x"},
 			{"C", "z"},
 			{"B", "x"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(t.modeler, t.db); e == nil {
+		} else if e := DetermineAspects(asm.modeler, asm.db); e == nil {
 			t.Fatal("expected an error")
 		} else {
 			t.Log("okay:", e)
@@ -107,21 +107,21 @@ func TestTraitConflicts(t *testing.T) {
 }
 
 func TestTraitMissingAspect(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := addTraits(t.rec, []pair{
+		if e := addTraits(asm.rec, []pair{
 			{"A", "x"},
 			{"Z", ""},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(t.modeler, t.db); e != nil {
+		} else if e := DetermineAspects(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else {
 			var aspects []string
-			if e := MissingAspects(t.db, func(a string) (err error) {
+			if e := MissingAspects(asm.db, func(a string) (err error) {
 				aspects = append(aspects, a)
 				return
 			}); e != nil {
@@ -136,22 +136,22 @@ func TestTraitMissingAspect(t *testing.T) {
 }
 
 func TestTraitMissingTraits(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := addTraits(t.rec, []pair{
+		if e := addTraits(asm.rec, []pair{
 			{"A", "x"},
 			{"", "y"},
 			{"", "z"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(t.modeler, t.db); e != nil {
+		} else if e := DetermineAspects(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else {
 			var traits []string
-			if e := MissingTraits(t.db, func(a string) (err error) {
+			if e := MissingTraits(asm.db, func(a string) (err error) {
 				traits = append(traits, a)
 				return
 			}); e != nil {

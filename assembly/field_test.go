@@ -49,26 +49,26 @@ func matchProperties(db *sql.DB, want []kfp) (err error) {
 }
 
 func TestFields(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := writeFields(t.rec, []kfp{
+		} else if e := writeFields(asm.rec, []kfp{
 			{"P", "a", tables.PRIM_TEXT},
 			{"Q", "b", tables.PRIM_TEXT},
 			{"T", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(t.modeler, t.db); e != nil {
+		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchProperties(t.db, []kfp{
+		} else if e := matchProperties(asm.db, []kfp{
 			{"P", "a", tables.PRIM_TEXT},
 			{"Q", "b", tables.PRIM_TEXT},
 			{"T", "c", tables.PRIM_TEXT},
@@ -79,25 +79,25 @@ func TestFields(t *testing.T) {
 }
 
 func TestFieldLca(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
+		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := writeFields(t.rec, []kfp{
+		} else if e := writeFields(asm.rec, []kfp{
 			{"P", "a", tables.PRIM_TEXT},
 			{"Q", "a", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(t.modeler, t.db); e != nil {
+		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
-		} else if e := matchProperties(t.db, []kfp{
+		} else if e := matchProperties(asm.db, []kfp{
 			{"T", "a", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
@@ -108,20 +108,20 @@ func TestFieldLca(t *testing.T) {
 // TestFieldTypeMismatch verifies that ephemera with conflicting primitive types generates an error
 // ex. T.a:text, T.a:digi
 func TestFieldTypeMismatch(t *testing.T) {
-	if t, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
-		defer t.Close()
-		if e := AddTestHierarchy(t.modeler, []TargetField{
+		defer asm.db.Close()
+		if e := AddTestHierarchy(asm.modeler, []TargetField{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := writeFields(t.rec, []kfp{
+		} else if e := writeFields(asm.rec, []kfp{
 			{"T", "a", tables.PRIM_TEXT},
 			{"T", "a", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(t.modeler, t.db); e != nil {
+		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
 			t.Log("okay:", e)
 		} else {
 			t.Fatal("expected error")
