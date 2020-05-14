@@ -12,7 +12,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/assembly"
 	"github.com/ionous/iffy/tables"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {

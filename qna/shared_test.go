@@ -5,8 +5,6 @@ import (
 	"os/user"
 	"path"
 	"testing"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 const memory = "file:test.db?cache=shared&mode=memory"

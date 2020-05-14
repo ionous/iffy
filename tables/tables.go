@@ -3,7 +3,7 @@ package tables
 import (
 	"database/sql"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" // queries are specific to sqlite, so force the sqlite driver.
 )
 
 //go:generate templify -p tables -o ephemera.gen.go ephemera.sql

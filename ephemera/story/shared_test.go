@@ -11,8 +11,6 @@ import (
 	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/tables"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func lines(s ...string) string {
