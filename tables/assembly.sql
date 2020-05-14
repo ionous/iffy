@@ -13,6 +13,31 @@ left join eph_named tn
 
 /* resolve test ephemera to strings
  */
+create temp view 
+asm_rule as 
+	select rn.name as pattern, type, prog
+from eph_rule er
+left join eph_named rn
+	on (er.idNamedPattern = rn.rowid)
+left join eph_prog ep
+	on (er.idProg = ep.rowid);
+
+/* patterns and rules with similar names and possibly different types
+ */
+create temp view 
+asm_rule_match as 
+	select pattern, ap.type pt, ar.type rt, prog,
+	replace(ap.type, '_eval', '') =
+	replace(ar.type, '_rule', '') as matched
+from asm_rule ar 
+join asm_pattern ap 
+using (pattern)
+where ap.decl = 1 
+and ap.pattern = ap.param
+and ap.pattern = ar.pattern;
+
+/* resolve test ephemera to strings
+ */
 create temp view
 asm_check as
 	select nk.name as name, idProg, expect 

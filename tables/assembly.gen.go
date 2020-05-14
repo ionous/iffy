@@ -24,6 +24,31 @@ func assemblyTemplate() string {
 		"\n" +
 		"/* resolve test ephemera to strings\n" +
 		" */\n" +
+		"create temp view \n" +
+		"asm_rule as \n" +
+		"\tselect rn.name as pattern, type, prog\n" +
+		"from eph_rule er\n" +
+		"left join eph_named rn\n" +
+		"\ton (er.idNamedPattern = rn.rowid)\n" +
+		"left join eph_prog ep\n" +
+		"\ton (er.idProg = ep.rowid);\n" +
+		"\n" +
+		"/* patterns and rules with similar names and possibly different types\n" +
+		" */\n" +
+		"create temp view \n" +
+		"asm_rule_match as \n" +
+		"\tselect pattern, ap.type pt, ar.type rt, prog,\n" +
+		"\treplace(ap.type, '_eval', '') =\n" +
+		"\treplace(ar.type, '_rule', '')  as matched\n" +
+		"from asm_rule ar \n" +
+		"join asm_pattern ap \n" +
+		"using (pattern)\n" +
+		"where ap.decl = 1 \n" +
+		"and ap.pattern = ap.param\n" +
+		"and ap.pattern = ar.pattern;\n" +
+		"\n" +
+		"/* resolve test ephemera to strings\n" +
+		" */\n" +
 		"create temp view\n" +
 		"asm_check as\n" +
 		"\tselect nk.name as name, idProg, expect \n" +
