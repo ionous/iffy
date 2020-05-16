@@ -7,7 +7,6 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/export"
-	"github.com/ionous/iffy/ref/unique"
 )
 
 // ReadRet is similar to reader.ReadMap, except it returns a value.
@@ -83,7 +82,7 @@ func (dec *Decoder) readNew(m reader.Map, slotType r.Type) (ret interface{}, err
 
 func (dec *Decoder) readFields(out r.Value, in reader.Map) (err error) {
 	var processed []string
-	unique.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
+	export.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
 		token := export.Tokenize(f)
 		processed = append(processed, token)
 		// value for the field not found? that's okay.

@@ -14,7 +14,6 @@ import (
 
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/export"
-	"github.com/ionous/iffy/ref/unique"
 )
 
 // go run spec.go > /Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/compose/www/src/lang/spec.js
@@ -132,7 +131,7 @@ func parse(t r.Type) ([]string, export.Dict) {
 	// keyed by token
 	params := make(export.Dict)
 
-	unique.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
+	export.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
 		prettyField := export.Prettify(f.Name)
 		key := export.Tokenize(f)
 		typeName, repeats := nameOfType(f.Type)
