@@ -92,7 +92,7 @@ func TestInitialTraitAssignment(t *testing.T) {
 			{"boat", "z", true},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineValues(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleValues(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchValues(asm.db, []TargetValue{
 			{"apple", "A", "y"},

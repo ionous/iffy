@@ -44,7 +44,7 @@ func (store *nounStore) write(m *Modeler) (err error) {
 	return
 }
 
-func DetermineNouns(m *Modeler, db *sql.DB) (err error) {
+func AssembleNouns(m *Modeler, db *sql.DB) (err error) {
 	var store nounStore
 	var curr, last nounInfo
 	if e := tables.QueryAll(db,

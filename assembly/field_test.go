@@ -66,7 +66,7 @@ func TestFields(t *testing.T) {
 			{"T", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchProperties(asm.db, []kfp{
 			{"P", "a", tables.PRIM_TEXT},
@@ -95,7 +95,7 @@ func TestFieldLca(t *testing.T) {
 			{"Q", "a", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchProperties(asm.db, []kfp{
 			{"T", "a", tables.PRIM_TEXT},
@@ -121,7 +121,7 @@ func TestFieldTypeMismatch(t *testing.T) {
 			{"T", "a", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleFields(asm.modeler, asm.db); e != nil {
 			t.Log("okay:", e)
 		} else {
 			t.Fatal("expected error")

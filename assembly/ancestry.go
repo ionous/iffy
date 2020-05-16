@@ -15,7 +15,7 @@ import (
 // . singular kinds ( the definition of kinds should always use plural names )
 // . kinds containing punctuation ( especially "," since that used for the expanded hierarchy )
 // . misspellings, near spellings
-func DetermineAncestry(m *Modeler, db *sql.DB, k string) (err error) {
+func AssembleAncestry(m *Modeler, db *sql.DB, k string) (err error) {
 	kinds := &cachedKinds{} // collect all kinds
 	if e := kinds.AddAncestorsOf(db, k); e != nil {
 		// for k, n := range kinds.cache {

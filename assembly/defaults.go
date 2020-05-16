@@ -12,7 +12,7 @@ import (
 // . missing properties ( kind, field pair doesn't exist in model )
 // o certainties: usually, seldom, never, always.
 // o misspellings, near spellings ( ex. for missing fields )
-func DetermineDefaults(m *Modeler, db *sql.DB) (err error) {
+func AssembleDefaults(m *Modeler, db *sql.DB) (err error) {
 	if e := determineDefaultFields(m, db); e != nil {
 		err = e
 	} else if e := determineDefaultTraits(m, db); e != nil {

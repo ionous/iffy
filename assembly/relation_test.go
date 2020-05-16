@@ -93,7 +93,7 @@ func TestRelationCreation(t *testing.T) {
 				{"H", "P", "P", tables.ONE_TO_MANY},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(m, db); e != nil {
+		} else if e := AssembleRelations(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelations(db, []dbrel{
 			{"G", "P", "Q", tables.MANY_TO_ONE},
@@ -122,7 +122,7 @@ func TestRelationCardinality(t *testing.T) {
 			{"R", "P", "P", tables.MANY_TO_ONE},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(m, db); e == nil {
+		} else if e := AssembleRelations(m, db); e == nil {
 			t.Fatal("expected error")
 		} else {
 			t.Log("okay:", e)
@@ -151,7 +151,7 @@ func TestRelationLcaSuccess(t *testing.T) {
 			{"R", "C", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(m, db); e != nil {
+		} else if e := AssembleRelations(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelations(db, []dbrel{
 			{"R", "P", "T", tables.ONE_TO_MANY},
@@ -181,7 +181,7 @@ func TestRelationLcaFailure(t *testing.T) {
 			{"R", "C", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineRelations(m, db); e == nil {
+		} else if e := AssembleRelations(m, db); e == nil {
 			t.Fatal("expected error")
 		} else {
 			t.Log("okay:", e)

@@ -7,6 +7,17 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
+func AssemblePatterns(m *Modeler, db *sql.DB) (err error) {
+	if e := checkPatternSetup(db); e != nil {
+		err = e
+	} else if e := checkRuleSetup(db); e != nil {
+		err = e
+	} else if e := copyRules(db); e != nil {
+		err = e
+	}
+	return
+}
+
 func checkPatternSetup(db *sql.DB) (err error) {
 	var now, last patternInfo
 	var declaredReturn string

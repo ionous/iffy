@@ -44,7 +44,7 @@ func TestDefaultFieldAssigment(t *testing.T) {
 			{"C", "d", 123},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineDefaults(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleDefaults(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchDefaults(asm.db, []triplet{
 			{"C", "c", "c text"},
@@ -74,7 +74,7 @@ func TestDefaultTraitAssignment(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := DetermineDefaults(asm.modeler, asm.db); e != nil {
+		if e := AssembleDefaults(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchDefaults(asm.db, []triplet{
 			{"K", "A", "x"},
@@ -107,7 +107,7 @@ func TestDefaultDuplicates(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := DetermineDefaults(asm.modeler, asm.db); e != nil {
+		if e := AssembleDefaults(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -120,7 +120,7 @@ func TestDefaultConflict(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			defer asm.db.Close()
-			if e := DetermineDefaults(asm.modeler, asm.db); e == nil {
+			if e := AssembleDefaults(asm.modeler, asm.db); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)
@@ -167,7 +167,7 @@ func TestDefaultBadValue(t *testing.T) {
 			err = e
 		} else {
 			defer asm.db.Close()
-			if e := DetermineDefaults(asm.modeler, asm.db); e == nil {
+			if e := AssembleDefaults(asm.modeler, asm.db); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)

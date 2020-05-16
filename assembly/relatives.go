@@ -3,7 +3,7 @@ package assembly
 import "database/sql"
 
 // goal: build tables of noun, relation, otherNoun
-func DetermineRelatives(db *sql.DB) error {
+func AssembleRelatives(m *Modeler, db *sql.DB) error {
 	_, e := db.Exec(`
 insert into mdl_pair( noun, relation, otherNoun )
 select distinct noun, relation, otherNoun from (

@@ -52,7 +52,7 @@ func TestRelativeFormation(t *testing.T) {
 		return
 	} else {
 		defer asm.db.Close()
-		if e := DetermineRelatives(asm.db); e != nil {
+		if e := AssembleRelatives(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelatives(asm.db, [][3]string{
 			{"Rel1", "a", "a"},
@@ -115,7 +115,7 @@ func TestOneToOneViolations(t *testing.T) {
 			err = e
 		} else {
 			defer asm.db.Close()
-			if e := DetermineRelatives(asm.db); e != nil {
+			if e := AssembleRelatives(asm.modeler, asm.db); e != nil {
 				err = e
 			} else {
 				var have [][3]string

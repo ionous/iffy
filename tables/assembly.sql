@@ -15,7 +15,7 @@ left join eph_named tn
  */
 create temp view 
 asm_rule as 
-	select rn.name as pattern, type, prog
+	select rn.name as pattern, type, prog, idProg
 from eph_rule er
 left join eph_named rn
 	on (er.idNamedPattern = rn.rowid)

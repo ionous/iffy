@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
+// reads mdl_field, mdl_kind
 func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
 	var store valueStore
 	var curr, last valueInfo

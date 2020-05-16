@@ -29,7 +29,7 @@ func TestNounFormation(t *testing.T) {
 			{"toy boat", "T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(m, db); e != nil {
+		} else if e := AssembleNouns(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(db, []modeledNoun{
 			{"apple", "T", 0},
@@ -100,7 +100,7 @@ func TestNounLcaSucess(t *testing.T) {
 			{"bandanna", "C"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(m, db); e != nil {
+		} else if e := AssembleNouns(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(db, []modeledNoun{
 			{"apple", "P", 0},
@@ -132,7 +132,7 @@ func TestNounLcaFailure(t *testing.T) {
 			{"apple", "D"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(m, db); e == nil {
+		} else if e := AssembleNouns(m, db); e == nil {
 			t.Fatal("expected failure")
 		} else {
 			t.Log("okay:", e)
@@ -156,7 +156,7 @@ func TestNounParts(t *testing.T) {
 			{"collection of words", "T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineNouns(m, db); e != nil {
+		} else if e := AssembleNouns(m, db); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(db, []modeledNoun{
 			{"collection of words", "T", 0},

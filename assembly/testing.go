@@ -46,7 +46,7 @@ func AddTestFields(m *Modeler, targetValues []TargetValue) (err error) {
 // write aspect, trait pairs using Target and Field
 func AddTestTraits(m *Modeler, keyValues []TargetField) (err error) {
 	for _, tv := range keyValues {
-		// rank is not set yet, see DetermineAspects
+		// rank is not set yet, see AssembleAspects
 		if e := m.WriteTrait(tv.Target, tv.Field, 0); e != nil {
 			err = errutil.Append(err, e)
 		}

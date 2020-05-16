@@ -1,243 +1,49 @@
 package assembly
 
 import (
-	"database/sql"
-	"strconv"
+	"strings"
 	"testing"
 
-	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 )
 
-func TestPatternCheck(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
-		t.Fatal(e)
-	} else {
-		defer asm.db.Close()
-		// okay.
-		t.Run("normal", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "num", "number_eval", "0",
-				"pat", "", "number_eval", "0",
-				"pat", "", "number_eval", "1",
-				"pat", "num", "number_eval", "1",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Fatal(e)
-			} else {
-				t.Log("ok", "normal pattern pattern usage")
-			}
-
-		})
-
-		// okay.
-		t.Run("multi", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"num", "", "number_eval", "1",
-				"txt", "", "text_eval", "1",
-				"exe", "", "execute", "1",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Fatal(e)
-			} else {
-				t.Log("ok", "three completely different pattern decls")
-			}
-		})
-
-		// never declared return
-		t.Run("missing return", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "num", "number_eval", "0",
-				"pat", "num", "number_eval", "1",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Fatal("expected never declared return")
-			}
-		})
-
-		// referenced an undeclared arg
-		t.Run("undeclared arg", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1",
-				"pat", "num", "number_eval", "0",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Fatal("expected undeclared arg")
-			}
-		})
-
-		// referenced an undeclared pattern
-		t.Run("undeclared pattern", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "0",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Fatal("expected undeclared pat")
-			}
-		})
-		cleanPatterns(asm.db)
-
-		// arg mismatch
-		t.Run("arg mismatch", func(t *testing.T) {
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1",
-				"pat", "num", "number_eval", "1",
-				"pat", "num", "text_eval", "1",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Fatal("expected type mismatch")
-			}
-		})
-
-		// return mismatch
-		t.Run("return mismatch", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1",
-				"pat", "", "text_eval", "1",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Fatal("expected type mismatch")
-			}
-		})
-		// variable and pattern names in the same pattern shouldnt match
-		t.Run("unique variables", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "pat", "number_eval", "1",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Fatal("expected name conflict")
-			}
-		})
-		t.Run("reused names", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "text_eval", "1",
-				"pat", "bat", "number_eval", "1",
-				//
-				"bat", "", "text_eval", "1",
-				"bat", "pat", "number_eval", "1",
-			)
-			if e := checkPatternSetup(asm.db); e != nil {
-				t.Fatal(e)
-			} else {
-				t.Log("ok", "variable and pattern names can be reused")
-			}
-		})
-	}
-}
-
-// check that the pattern type matches the rule
-func TestRuleCheck(t *testing.T) {
+// assemble patterns and rules into the model rules and programs.
+// doesnt check for consistency -- that's up to pattern and rule checking currently.
+func TestRuleAsm(t *testing.T) {
 	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
 		t.Run("normal", func(t *testing.T) {
 			cleanPatterns(asm.db)
+			// name, param, type, decl
 			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1")
+				"pat", "", "number_eval", "true",
+				"put", "", "text_eval", "true")
 			addEphRule(asm.rec,
-				"pat", "number_rule", "some text")
-			if e := checkRuleSetup(asm.db); e != nil {
+				"pat", "number_rule", "some number",
+				"put", "text_rule", "other text",
+				"pat", "number_rule", "other number",
+			)
+
+			if e := copyRules(asm.db); e != nil {
 				t.Fatal(e)
 			} else {
-				t.Log("ok")
-			}
-		})
-		t.Run("multi", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"num", "", "number_eval", "1",
-				"txt", "", "text_eval", "1",
-				"exe", "", "execute", "0",
-			)
-			addEphRule(asm.rec,
-				"num", "number_rule", "some text",
-				"txt", "text_rule", "some text",
-			)
-			if e := checkRuleSetup(asm.db); e != nil {
-				t.Fatal(e)
-			} else {
-				t.Log("ok")
-			}
-		})
-		//
-		t.Run("missing rules", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1")
-			if e := checkRuleSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Error("expected missing rule")
-			}
-		})
-		t.Run("mismatched rule type", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1")
-			addEphRule(asm.rec,
-				"pat", "text_eval", "some text")
-			if e := checkRuleSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Error("expected mismatched rule")
+
+				var buf strings.Builder
+				tables.WriteCsv(asm.db, &buf, "select count() from mdl_rule", 1)
+				if have, want := buf.String(), lines(
+					"3",
+				); have != want {
+					t.Fatal(have)
+				} else {
+					t.Log("ok")
+				}
 			}
 		})
 	}
 }
 
-func cleanPatterns(db *sql.DB) {
-	tables.Must(db, "delete from eph_pattern")
-	tables.Must(db, "delete from eph_rule")
-}
-
-// adds rows of 4 values to the database of test ephemera
-func addEphPattern(rec *ephemera.Recorder, els ...string) {
-	for i := 0; i < len(els); i += 4 {
-		pat := rec.NewName(els[i+0], tables.NAMED_PATTERN, strconv.Itoa(i))
-		arg := pat
-		if n := els[i+1]; len(n) > 0 {
-			arg = rec.NewName(els[i+1], tables.NAMED_VARIABLE, strconv.Itoa(i))
-		}
-		typ := rec.NewName(els[i+2], tables.NAMED_TYPE, strconv.Itoa(i))
-
-		if dec, _ := strconv.ParseBool(els[i+3]); dec {
-			rec.NewPatternDecl(pat, arg, typ)
-		} else {
-			rec.NewPatternRef(pat, arg, typ)
-		}
-	}
-}
-
-// adds rows of 3 values ( name, type, text ) to the database of test ephemera
-// we dont use actual "programs" here -- just strings as bytes
-func addEphRule(rec *ephemera.Recorder, els ...string) {
-	for i := 0; i < len(els); i += 3 {
-		pat := els[i+0]
-		typ := els[i+1]
-		txt := els[i+2]
-		rec.NewPatternRule(
-			rec.NewName(pat, tables.NAMED_PATTERN, strconv.Itoa(i)),
-			rec.NewProg(typ, []byte(txt)))
-	}
+func lines(s ...string) string {
+	return strings.Join(s, "\n") + "\n"
 }

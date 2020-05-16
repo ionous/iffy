@@ -42,7 +42,7 @@ func (store *relStore) write(m *Modeler) (err error) {
 // out, mdl_rel: R, K(lca), Q(lca), cardinality
 // fix? right now the coalesce allows missing kinds through,
 // the behavior otherwise is Scan error on column index 5, and not particularly helpful
-func DetermineRelations(m *Modeler, db *sql.DB) (err error) {
+func AssembleRelations(m *Modeler, db *sql.DB) (err error) {
 	var store relStore
 	var curr, last relInfo
 	// we select by R, sorted by R, C, K, Q

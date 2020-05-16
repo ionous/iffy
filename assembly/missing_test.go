@@ -100,7 +100,7 @@ func TestMissingField(t *testing.T) {
 			"z",
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineFields(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else {
 			var missing []string

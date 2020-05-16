@@ -16,7 +16,7 @@ import (
 // . contradiction in type ( alt: runtime can fit into property by type )
 // . missing properties ( named but not specified )
 // o misspellings, near spellings ( ex. for missing fields )
-func DetermineFields(m *Modeler, db *sql.DB) (err error) {
+func AssembleFields(m *Modeler, db *sql.DB) (err error) {
 	// select primitive aspects which arent named in aspects
 	// the primitive field's name is the aspect name
 	var out pendingFields

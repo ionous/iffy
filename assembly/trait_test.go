@@ -65,7 +65,7 @@ func TestTraits(t *testing.T) {
 				{"B", "z"},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleAspects(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchTraits(asm.db, []expectedTrait{
 			{"A", "x", 0},
@@ -98,7 +98,7 @@ func TestTraitConflicts(t *testing.T) {
 			{"B", "x"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(asm.modeler, asm.db); e == nil {
+		} else if e := AssembleAspects(asm.modeler, asm.db); e == nil {
 			t.Fatal("expected an error")
 		} else {
 			t.Log("okay:", e)
@@ -117,7 +117,7 @@ func TestTraitMissingAspect(t *testing.T) {
 			{"Z", ""},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleAspects(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else {
 			var aspects []string
@@ -147,7 +147,7 @@ func TestTraitMissingTraits(t *testing.T) {
 			{"", "z"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := DetermineAspects(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleAspects(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else {
 			var traits []string

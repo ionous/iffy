@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
+// reads mdl_kind, mdl_field, mdl_noun
 func determineInitialFields(m *Modeler, db *sql.DB) (err error) {
 	var store valueStore
 	var curr, last valueInfo

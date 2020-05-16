@@ -14,7 +14,7 @@ import (
 // . missing traits ( named but not specified )
 // . missing aspects ( named but not specified )
 // o misspellings, near spellings ( ex. for missing traits )
-func DetermineAspects(m *Modeler, db *sql.DB) (err error) {
+func AssembleAspects(m *Modeler, db *sql.DB) (err error) {
 	var curr, last aspectInfo
 	var traits []aspectInfo // cant read and write to the db simultaneously
 	if e := tables.QueryAll(db, `select nt.name, na.name

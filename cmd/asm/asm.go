@@ -53,29 +53,8 @@ func assemble(outFile, inFile string) (err error) {
 			return
 		}(); e != nil {
 			err = errutil.New("error attaching", e, inFile)
-		} else {
-			w := assembly.NewModeler(db)
-
-			if e := assembly.DetermineAncestry(w, db, "things"); e != nil {
-				err = e
-			} else if e := assembly.DetermineFields(w, db); e != nil {
-				err = e
-			} else if e := assembly.DetermineAspects(w, db); e != nil {
-				err = e
-			} else if _, e := db.Exec("insert into mdl_prog select type, bytes from eph_prog;" +
-				"insert into mdl_check select * from asm_check"); e != nil {
-				err = e
-			}
-			// [-] adds relations between kinds
-			// [-] creates instances
-			// [-] sets instance properties
-			// [-] relates instances
-			// [] makes action handlers
-			// [] makes event listeners
-			// [] computes aliases
-			// [] sets up printed name property
-			// - backtracing to source:
-			// ex. each "important" table entry gets an separate entry pointing back to original source
+		} else if e := assembly.AssembleModel(db); e != nil {
+			err = errutil.New("error assembling", e, inFile)
 		}
 	}
 	return
