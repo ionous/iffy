@@ -48,7 +48,7 @@ func distill(outFile, inFile string) (err error) {
 		defer outDB.Close()
 		if e := tables.CreateEphemera(outDB); e != nil {
 			err = errutil.New("couldn't create tables", outFile, e)
-		} else if e := story.ImportStory(inFile, inData, outDB); e != nil {
+		} else if e := story.ImportStory(inFile, outDB, inData); e != nil {
 			err = errutil.New("couldn't import story", e)
 		}
 	}

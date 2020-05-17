@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
 	"encoding/gob"
 	"flag"
@@ -9,10 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/qna"
-	"github.com/ionous/iffy/tables"
 )
 
 func main() {
@@ -35,34 +32,7 @@ func checkFile(inFile string) (err error) {
 		err = errutil.New("couldn't create output file", inFile, e)
 	} else {
 		defer db.Close()
-		var prog []byte
-		if e := tables.QueryAll(db,
-			`select pg.bytes
-		from mdl_check as ck
-		join mdl_prog pg
-			on (pg.rowid = ck.idProg)
-		order by ck.name`,
-			func() (err error) {
-				var res check.Testing
-				dec := gob.NewDecoder(bytes.NewBuffer(prog))
-				if e := dec.Decode(&res); e != nil {
-					log.Println(e)
-				} else if e := runTest(res); e != nil {
-					log.Println(e)
-				}
-				return
-			}, &prog); e != nil {
-			err = e
-		}
-	}
-	return
-}
-
-func runTest(prog check.Testing) (err error) {
-	if e := prog.RunTest(qna.NewRuntime(nil)); e != nil {
-		err = e
-	} else if e != nil {
-		err = errutil.New("unexpected failure", prog, e)
+		err = qna.CheckAll(db)
 	}
 	return
 }

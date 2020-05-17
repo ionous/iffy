@@ -31,12 +31,12 @@ func TestProcessProg(t *testing.T) {
 			if e := db.QueryRow("select * from eph_prog").Scan(&id, &typeName, &prog); e != nil {
 				t.Fatal(e)
 			} else {
-				var res check.TestOutput
+				var res check.Testing
 				t.Log(id, typeName)
 				dec := gob.NewDecoder(bytes.NewBuffer(prog))
 				if e := dec.Decode(&res); e != nil {
 					t.Fatal(e)
-				} else if diff := pretty.Diff(debug.SayTest, res); len(diff) > 0 {
+				} else if diff := pretty.Diff(&debug.SayTest, res); len(diff) > 0 {
 					t.Fatal(diff)
 				}
 			}

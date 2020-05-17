@@ -53,7 +53,7 @@ func assemble(outFile, inFile string) (err error) {
 			return
 		}(); e != nil {
 			err = errutil.New("error attaching", e, inFile)
-		} else if e := assembly.AssembleModel(db); e != nil {
+		} else if e := assembly.AssembleStory(db, "things"); e != nil {
 			err = errutil.New("error assembling", e, inFile)
 		}
 	}

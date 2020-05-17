@@ -2,7 +2,7 @@ package assembly
 
 import "database/sql"
 
-func AssembleModel(db *sql.DB) (err error) {
+func AssembleStory(db *sql.DB, baseKind string) (err error) {
 	// [-] adds relations between kinds
 	// [-] creates instances
 	// [-] sets instance properties
@@ -15,7 +15,7 @@ func AssembleModel(db *sql.DB) (err error) {
 	// ex. each "important" table entry gets an separate entry pointing back to original source
 	//
 	m := NewModeler(db)
-	if e := AssembleAncestry(m, db, "things"); e != nil {
+	if e := AssembleAncestry(m, db, baseKind); e != nil {
 		err = e
 	} else if e := AssembleAspects(m, db); e != nil {
 		err = e
@@ -33,7 +33,7 @@ func AssembleModel(db *sql.DB) (err error) {
 		err = e
 	} else if e := AssemblePatterns(m, db); e != nil {
 		err = e
-	} else if _, e := db.Exec("insert into mdl_prog select type, bytes from eph_prog;" +
+	} else if _, e := db.Exec("insert into mdl_prog select type, prog as bytes from eph_prog;" +
 		"insert into mdl_check select * from asm_check"); e != nil {
 		err = e
 	}

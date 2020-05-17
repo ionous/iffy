@@ -39,7 +39,7 @@ func (op *TestOutput) RunTest(run rt.Runtime) (err error) {
 	} else if t := buf.String(); t != op.Lines {
 		err = errutil.New("expected:", op.Lines, "got:", t)
 	} else {
-		log.Println(t)
+		log.Println("ok:", t)
 	}
 	return
 }

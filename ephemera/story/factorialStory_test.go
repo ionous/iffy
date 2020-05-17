@@ -12,7 +12,9 @@ import (
 func TestFactorialStory(t *testing.T) {
 	db := newTestDB(t, memory)
 	defer db.Close()
-	if e := ImportStory(t.Name(), debug.FactorialStory, db); e != nil {
+	if e := tables.CreateEphemera(db); e != nil {
+		t.Fatal("create tables", e)
+	} else if e := ImportStory(t.Name(), db, debug.FactorialStory); e != nil {
 		t.Fatal("import", e)
 	} else {
 		var buf strings.Builder

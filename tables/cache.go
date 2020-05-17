@@ -1,6 +1,10 @@
 package tables
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/ionous/errutil"
+)
 
 // Cache mimics the sql.Stmt api, creating the Stmt objects on demand.
 type Cache struct {
@@ -77,7 +81,9 @@ func (c *Cache) QueryRow(q string, args ...interface{}) (ret RowScanner) {
 }
 
 func (c *Cache) prep(q string) (ret *sql.Stmt, err error) {
-	if stmt := c.cache[q]; stmt != nil {
+	if c.db == nil {
+		err = errutil.New("cache not initialized")
+	} else if stmt := c.cache[q]; stmt != nil {
 		ret = stmt
 	} else if stmt, e := c.db.Prepare(q); e != nil {
 		err = e
