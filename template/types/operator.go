@@ -1,6 +1,6 @@
 package types
 
-// Operator represents built-in binary functions.
+// Operator, built-in binary functions (arity of two).
 type Operator int
 
 //go:generate stringer -type=Operator

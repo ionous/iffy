@@ -6,6 +6,7 @@ import (
 
 // Function element of an Expression.
 // Examples of function(s) are mathematical and boolean operators, if,else blocks, iffy commands, etc.
+// See package iffy/template/types for specific functions.
 type Function interface {
 	// Arity the number of required function arguments;
 	// Should be a constant number for each function instance.
@@ -15,7 +16,7 @@ type Function interface {
 	Precedence() int
 }
 
-// Expression provides a series of post fix functions:
+// Expression provides a series of postfix functions:
 // even primitive values are represented here as zero-arity functions returning the value in question.
 type Expression []Function
 

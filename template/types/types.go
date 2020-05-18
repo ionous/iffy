@@ -10,28 +10,26 @@ type Argument interface {
 	arg()
 }
 
-// Quote text as a postfix function.
+// Quote, a zero-arity function returning a string.
 type Quote string
 
-// Number as a postfix function.
+// Number, a zero-arity function returning a number.
 type Number float64
 
-// Bool as a postfix function.
+// Bool, a zero-arity function returning a true/false value.
 type Bool bool
 
-// Reference refers to an object property by name.
-// note: there are potentially two ways of representing references:
-// a function with "dynamic" arity, each field a parameter;
-// a function with 0 arity, and the object is an array of fields.
-// choosing the array method for now.
+// Reference, a zero-arity function containing the path to an object property.
 type Reference []string
 
+// Command, a dynamic-arity function referring to some externally defined command.
 type Command struct {
 	CommandName  string
 	CommandArity int
 }
 
-// Builtin
+// Builtin, a dynamic-arity function referring to one of a small set predefined commands.
+// See also: BuiltinType.
 type Builtin struct {
 	Type           BuiltinType
 	ParameterCount int
