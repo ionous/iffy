@@ -12,7 +12,7 @@ const spec = [
   },
   {
     "desc": "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc.",
-    "name": "compare_to",
+    "name": "comparator",
     "uses": "slot"
   },
   {
@@ -223,7 +223,7 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "compare_to"
+        "comparator"
       ]
     }
   },
@@ -237,7 +237,7 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "compare_to"
+        "comparator"
       ]
     }
   },
@@ -431,7 +431,7 @@ const spec = [
       "logic"
     ],
     "name": "compare_num",
-    "spec": "{a:number_eval} {is:compare_to} {b:number_eval}",
+    "spec": "{a:number_eval} {is:comparator} {b:number_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -445,7 +445,7 @@ const spec = [
       "logic"
     ],
     "name": "compare_text",
-    "spec": "{a:text_eval} {is:compare_to} {b:text_eval}",
+    "spec": "{a:text_eval} {is:comparator} {b:text_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -516,25 +516,11 @@ const spec = [
       "patterns"
     ],
     "name": "determine_bool",
+    "spec": "the {true/false pattern%name:pattern_name}{?parameters}",
     "uses": "run",
     "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        },
-        "$PARAMETERS": {
-          "label": "parameters",
-          "type": "parameters"
-        }
-      },
       "slots": [
         "bool_eval"
-      ],
-      "tokens": [
-        "determine bool",
-        "$NAME",
-        "$PARAMETERS"
       ]
     }
   },
@@ -544,7 +530,7 @@ const spec = [
       "patterns"
     ],
     "name": "determine_num",
-    "spec": "the {number pattern%name:text}{?parameters}",
+    "spec": "the {number pattern%name:pattern_name}{?parameters}",
     "uses": "run",
     "with": {
       "slots": [
@@ -558,25 +544,11 @@ const spec = [
       "patterns"
     ],
     "name": "determine_num_list",
+    "spec": "the {number list pattern%name:pattern_name}{?parameters}",
     "uses": "run",
     "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        },
-        "$PARAMETERS": {
-          "label": "parameters",
-          "type": "parameters"
-        }
-      },
       "slots": [
         "num_list_eval"
-      ],
-      "tokens": [
-        "determine num list",
-        "$NAME",
-        "$PARAMETERS"
       ]
     }
   },
@@ -586,25 +558,11 @@ const spec = [
       "patterns"
     ],
     "name": "determine_text",
+    "spec": "the {text pattern%name:pattern_name}{?parameters}",
     "uses": "run",
     "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        },
-        "$PARAMETERS": {
-          "label": "parameters",
-          "type": "parameters"
-        }
-      },
       "slots": [
         "text_eval"
-      ],
-      "tokens": [
-        "determine text",
-        "$NAME",
-        "$PARAMETERS"
       ]
     }
   },
@@ -614,25 +572,11 @@ const spec = [
       "patterns"
     ],
     "name": "determine_text_list",
+    "spec": "the {text list pattern%name:pattern_name}{?parameters}",
     "uses": "run",
     "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        },
-        "$PARAMETERS": {
-          "label": "parameters",
-          "type": "parameters"
-        }
-      },
       "slots": [
         "text_list_eval"
-      ],
-      "tokens": [
-        "determine text list",
-        "$NAME",
-        "$PARAMETERS"
       ]
     }
   },
@@ -677,7 +621,7 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "compare_to"
+        "comparator"
       ]
     }
   },
@@ -784,10 +728,10 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "number_eval",
-        "num_list_eval",
         "bool_eval",
+        "number_eval",
         "text_eval",
+        "num_list_eval",
         "text_list_eval"
       ]
     }
@@ -798,14 +742,14 @@ const spec = [
       "variables"
     ],
     "name": "get_var",
-    "spec": "{name:text}",
+    "spec": "the {name:text|quote}",
     "uses": "run",
     "with": {
       "slots": [
-        "number_eval",
-        "num_list_eval",
         "bool_eval",
+        "number_eval",
         "text_eval",
+        "num_list_eval",
         "text_list_eval"
       ]
     }
@@ -820,7 +764,7 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "compare_to"
+        "comparator"
       ]
     }
   },
@@ -992,7 +936,7 @@ const spec = [
     }
   },
   {
-    "desc": "Less han: The first value is less than the second value.",
+    "desc": "Less Than: The first value is less than the second value.",
     "group": [
       "comparison"
     ],
@@ -1001,7 +945,7 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "compare_to"
+        "comparator"
       ]
     }
   },
@@ -1071,7 +1015,7 @@ const spec = [
       "patterns"
     ],
     "name": "parameter",
-    "spec": "its {name:text} is {from:assignment}",
+    "spec": "its {name:variable_name} is {from:assignment}",
     "uses": "run",
     "with": {}
   },
@@ -1509,7 +1453,7 @@ const spec = [
     "group": [
       "tests"
     ],
-    "name": "test_out",
+    "name": "test_output",
     "spec": "expect the text {lines|quote} when running: {activity%go+execute|ghost}",
     "uses": "run",
     "with": {
@@ -1589,7 +1533,7 @@ const spec = [
     "uses": "run",
     "with": {
       "slots": [
-        "compare_to"
+        "comparator"
       ]
     }
   },

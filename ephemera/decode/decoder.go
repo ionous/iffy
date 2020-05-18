@@ -141,7 +141,6 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 				err = errutil.Fmt("expected a number, have %T", v)
 			} else {
 				outAt.SetFloat(n)
-
 			}
 			return
 		})
@@ -161,7 +160,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		err = unpack(inVal, func(v interface{}) (err error) {
 			// string, for JSON strings
 			if str, ok := v.(string); !ok {
-				err = errutil.New("expected a number")
+				err = errutil.New("expected a string")
 			} else {
 				outAt.SetBool(str == "$TRUE") // only need to set true: false is the zero value.
 			}
@@ -172,7 +171,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		err = unpack(inVal, func(v interface{}) (err error) {
 			// string, for JSON strings
 			if str, ok := v.(string); !ok {
-				err = errutil.New("expected a number")
+				err = errutil.New("expected a string")
 			} else {
 				outAt.SetString(str)
 			}

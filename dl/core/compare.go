@@ -8,13 +8,13 @@ import (
 
 type CompareNum struct {
 	A  rt.NumberEval
-	Is CompareTo
+	Is Comparator
 	B  rt.NumberEval
 }
 
 type CompareText struct {
 	A  rt.TextEval
-	Is CompareTo
+	Is Comparator
 	B  rt.TextEval
 }
 
@@ -22,7 +22,7 @@ func (*CompareNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "compare_num",
 		Group: "logic",
-		Spec:  "{a:number_eval} {is:compare_to} {b:number_eval}",
+		Spec:  "{a:number_eval} {is:comparator} {b:number_eval}",
 		Desc:  "Compare Numbers: True if eq,ne,gt,lt,ge,le two numbers.",
 	}
 }
@@ -51,7 +51,7 @@ func (*CompareText) Compose() composer.Spec {
 		Name:  "compare_text",
 		Group: "logic",
 		Desc:  "Compare Text: True if eq,ne,gt,lt,ge,le two strings ( lexical. )",
-		Spec:  "{a:text_eval} {is:compare_to} {b:text_eval}",
+		Spec:  "{a:text_eval} {is:comparator} {b:text_eval}",
 	}
 }
 

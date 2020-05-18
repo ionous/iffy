@@ -178,7 +178,7 @@ var FactorialZero = map[string]interface{}{
 												"value": "num",
 											}}}},
 								"$IS": map[string]interface{}{
-									"type": "compare_to",
+									"type": "comparator",
 									"value": map[string]interface{}{
 										"type":  "equal",
 										"value": map[string]interface{}{},

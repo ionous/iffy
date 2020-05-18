@@ -9,7 +9,7 @@ import (
 
 type Slot struct {
 	Name  string
-	Type  interface{} // nil instance, ex. (*core.CompareTo)(nil)
+	Type  interface{} // nil instance, ex. (*core.Comparator)(nil)
 	Desc  string
 	Group string // display group(s)
 }
@@ -39,8 +39,8 @@ var Slots = []Slot{{
 	Type: (*rt.TextListEval)(nil),
 	Desc: "Text Lists: Statements which return a list of text.",
 }, {
-	Name: "compare_to",
-	Type: (*core.CompareTo)(nil),
+	Name: "comparator",
+	Type: (*core.Comparator)(nil),
 	Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc.",
 }, {
 	Name: "assignment",

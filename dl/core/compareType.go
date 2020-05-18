@@ -4,9 +4,9 @@ import "github.com/ionous/iffy/dl/composer"
 
 type CompareType int
 
-// CompareTo generates comparison flags.
+// Comparator generates comparison flags.
 // FIX: a combo-box of enumeration options should be possible.
-type CompareTo interface {
+type Comparator interface {
 	Compare() CompareType
 }
 
@@ -75,7 +75,7 @@ func (*LessThan) Compose() composer.Spec {
 		Name:  "less_than",
 		Spec:  "<",
 		Group: "comparison",
-		Desc:  "Less han: The first value is less than the second value.",
+		Desc:  "Less Than: The first value is less than the second value.",
 	}
 }
 

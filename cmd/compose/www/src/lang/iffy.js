@@ -45,10 +45,12 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
 
   make.group("Patterns", function() {
     make.run("pattern_decl", "story_statement",
-       "The pattern {name:pattern_name|quote} determines {type:pattern_type}. {optvars?pattern_variables_tail}",
+       "The pattern {name:pattern_name|quote} determines {type:pattern_type}. {optvars?pattern_variables_tail} {about?comments}",
        `Declare a pattern: A pattern is a bundle of functions which can either change the game world or provide information about it.
   Each function in a given pattern has "guards" which determine whether the function applies in a particular situtation.`
      );
+
+    make.run("comments", "{lines|quote}");
 
     make.run("pattern_variables_decl", "story_statement",
       "The pattern {pattern_name|quote} requires {+variable_decl|comma-and}.",
@@ -91,7 +93,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
   });
 
   make.group("Kinds", function() {
-    make.run("kind_of_noun", "{are_an} {attribute:*trait|comma-and} {kind:singular_kind} {?noun_relation}");
+    make.run("kind_of_noun", "{are_an} {attribute*trait|comma-and} {kind:singular_kind} {?noun_relation}");
 
     make.run("kinds_possess_properties", "story_statement",
               "{plural_kinds} have {determiner} {property_phrase}.");
@@ -116,7 +118,7 @@ For example: animals, containers, etc.`);
   });
 
   make.group("Traits", function() {
-    make.run("noun_attrs", "{are_being} {attribute:+trait|comma-and}");
+    make.run("noun_attrs", "{are_being} {attribute+trait|comma-and}");
     make.str("quality");
     make.str("qualities");
     make.str("trait");
@@ -142,7 +144,7 @@ For example: animals, containers, etc.`);
     make.run("quality_attributes", "story_statement",
               "{qualities} {attribute_phrase}");
 
-    make.run("attribute_phrase", "{are_either} {attribute:+trait|comma-and}.");
+    make.run("attribute_phrase", "{are_either} {attribute+trait|comma-and}.");
 
     make.run("certainties", "story_statement",
               "{plural_kinds} {are_being} {certainty} {trait}.");
