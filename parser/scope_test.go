@@ -22,30 +22,30 @@ func (m *MyObject) String() string {
 	return m.Id.Name
 }
 
-type MyScope []*MyObject
+type MyBounds []*MyObject
 
-func (m MyScope) Get(r rune) NounInstance {
+func (m MyBounds) Get(r rune) NounInstance {
 	return MyAdapter{m[r-'a']}
 }
 
-func (m MyScope) Many(rs ...rune) (ret []NounInstance) {
+func (m MyBounds) Many(rs ...rune) (ret []NounInstance) {
 	for _, r := range rs {
 		ret = append(ret, m.Get(r))
 	}
 	return
 }
 
-func (m MyScope) GetPlayerScope(string) (Scope, error) {
+func (m MyBounds) GetPlayerBounds(string) (Bounds, error) {
 	return m, nil
 }
-func (m MyScope) GetObjectScope(ident.Id) (Scope, error) {
+func (m MyBounds) GetObjectBounds(ident.Id) (Bounds, error) {
 	return m, nil
 }
-func (m MyScope) IsPlural(word string) bool {
+func (m MyBounds) IsPlural(word string) bool {
 	return word != inflect.Singularize(word)
 }
 
-func (m MyScope) SearchScope(v NounVisitor) (ret bool) {
+func (m MyBounds) SearchBounds(v NounVisitor) (ret bool) {
 	n := MyAdapter{}
 	for _, k := range m {
 		n.MyObject = k
@@ -94,8 +94,8 @@ func MatchAny(n string, l []string) (okay bool) {
 	return
 }
 
-func TestScope(t *testing.T) {
-	ctx := MyScope{
+func TestBounds(t *testing.T) {
+	ctx := MyBounds{
 		&MyObject{Id: ident.IdOf("a"), Names: sliceOf.String("unique")},
 		//
 		&MyObject{Id: ident.IdOf("b"), Names: strings.Fields("exact")},
@@ -165,10 +165,10 @@ func TestScope(t *testing.T) {
 func matching(ctx Context, phrase string) (ret Result, err error) {
 	match := &Noun{}
 	words := strings.Fields(phrase)
-	if scope, e := ctx.GetPlayerScope(""); e != nil {
+	if bounds, e := ctx.GetPlayerBounds(""); e != nil {
 		err = e
 	} else {
-		ret, err = match.Scan(ctx, scope, Cursor{Words: words})
+		ret, err = match.Scan(ctx, bounds, Cursor{Words: words})
 	}
 	return
 }
@@ -176,10 +176,10 @@ func matching(ctx Context, phrase string) (ret Result, err error) {
 func matchingFilter(ctx Context, phrase, attr, class string) (ret Result, err error) {
 	match := &Noun{Filters{&HasAttr{attr}, &HasClass{class}}}
 	words := strings.Fields(phrase)
-	if scope, e := ctx.GetPlayerScope(""); e != nil {
+	if bounds, e := ctx.GetPlayerBounds(""); e != nil {
 		err = e
 	} else {
-		ret, err = match.Scan(ctx, scope, Cursor{Words: words})
+		ret, err = match.Scan(ctx, bounds, Cursor{Words: words})
 	}
 	return
 }

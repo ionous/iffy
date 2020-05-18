@@ -66,8 +66,8 @@ func makeObject(s ...string) *MyObject {
 	return &MyObject{Id: id, Names: names, Classes: s}
 }
 
-var ctx = func() (ret MyScope) {
-	ret = MyScope{
+var ctx = func() (ret MyBounds) {
+	ret = MyBounds{
 		makeObject("something"),
 		makeObject("red apple", "apples"),
 		makeObject("crab apple", "apples"),
@@ -138,9 +138,9 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 		err = errutil.New("expected some goals")
 	} else {
 		goal, goals := goals[0], goals[1:]
-		if scope, e := ctx.GetPlayerScope(""); e != nil {
+		if bounds, e := ctx.GetPlayerBounds(""); e != nil {
 			err = e
-		} else if res, e := match.Scan(ctx, scope, Cursor{Words: in}); e != nil {
+		} else if res, e := match.Scan(ctx, bounds, Cursor{Words: in}); e != nil {
 			// on error:
 			switch g := goal.(type) {
 			case *ErrorGoal:

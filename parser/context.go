@@ -7,20 +7,20 @@ import (
 type Context interface {
 	Plurals
 	// ex. "held", for objects held by the player.
-	GetPlayerScope(string) (Scope, error)
+	GetPlayerBounds(string) (Bounds, error)
 	// ex. take from a container
-	GetObjectScope(ident.Id) (Scope, error)
+	GetObjectBounds(ident.Id) (Bounds, error)
 }
 
 type Plurals interface {
 	IsPlural(word string) bool
 }
 
-// Scope encapsulates some set of objects.
+// Bounds encapsulates some set of objects.
 // note: we use a visitor to support map traversal without copying keys if need be.
-type Scope interface {
-	// SearchScope should visit every object in the set defined by the scope by calling the passed function. If the visitor function returns true, the search should terminate and return a true value; otherwise the search should return false.
-	SearchScope(NounVisitor) bool
+type Bounds interface {
+	// SearchBounds should visit every object in the set defined by the bounds by calling the passed function. If the visitor function returns true, the search should terminate and return a true value; otherwise the search should return false.
+	SearchBounds(NounVisitor) bool
 }
 
 type NounVisitor func(NounInstance) bool

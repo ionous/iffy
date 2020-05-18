@@ -1,11 +1,12 @@
 package parser_test
 
 import (
+	"testing"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ident"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
-	"testing"
 )
 
 var dropGrammar = allOf(Words("drop"), anyOf(
@@ -13,15 +14,15 @@ var dropGrammar = allOf(Words("drop"), anyOf(
 ))
 
 type MyContext struct {
-	MyScope // world
-	Player  map[string]Scope
-	Other   map[ident.Id]Scope
+	MyBounds // world
+	Player   map[string]Bounds
+	Other    map[ident.Id]Bounds
 	Log
 }
 
-func (m MyContext) GetPlayerScope(n string) (ret Scope, err error) {
+func (m MyContext) GetPlayerBounds(n string) (ret Bounds, err error) {
 	if s, ok := m.Player[n]; ok {
-		m.Log.Log("asking for scope", n, len(s.(MyScope)))
+		m.Log.Log("asking for bounds", n, len(s.(MyBounds)))
 		ret = s
 	} else {
 		ret = m
@@ -29,31 +30,31 @@ func (m MyContext) GetPlayerScope(n string) (ret Scope, err error) {
 	return
 }
 
-func (m MyContext) GetObjectScope(n ident.Id) (ret Scope, err error) {
+func (m MyContext) GetObjectBounds(n ident.Id) (ret Bounds, err error) {
 	if s, ok := m.Other[n]; ok {
-		m.Log.Log("asking for scope", n, len(s.(MyScope)))
+		m.Log.Log("asking for bounds", n, len(s.(MyBounds)))
 		ret = s
 	} else {
-		err = errutil.New("unknown scope", n)
+		err = errutil.New("unknown bounds", n)
 	}
 	return
 }
 
 func TestFocus(t *testing.T) {
 	grammar := dropGrammar
-	scope := MyScope{
+	bounds := MyBounds{
 		makeObject("red apple", "apples"),
 		makeObject("apple cart", "carts"),
 		makeObject("red cart", "carts"),
 	}
-	invScope := MyScope{
+	invBounds := MyBounds{
 		makeObject("torch", "devices"),
 		makeObject("crab apple", "apples"),
 	}
 	ctx := MyContext{
-		Log:     t,
-		MyScope: scope,
-		Player:  map[string]Scope{"held": invScope},
+		Log:      t,
+		MyBounds: bounds,
+		Player:   map[string]Bounds{"held": invBounds},
 	}
 
 	t.Run("drop one", func(t *testing.T) {

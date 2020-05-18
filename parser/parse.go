@@ -5,7 +5,7 @@ package parser
 type Scanner interface {
 	// Scan for results.
 	// note: by design, cursor may be out of range when scan is called.
-	Scan(Context, Scope, Cursor) (Result, error)
+	Scan(Context, Bounds, Cursor) (Result, error)
 }
 
 type Cursor struct {

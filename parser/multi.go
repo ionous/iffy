@@ -13,7 +13,7 @@ type Multi struct {
 var AllPhrase = "all/each/every/both/everything"
 var allScanner Scanner
 
-func (try *Multi) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
+func (try *Multi) Scan(ctx Context, bounds Bounds, cs Cursor) (ret Result, err error) {
 	if word := cs.CurrentWord(); len(word) == 0 {
 		err = MissingObject{Depth(cs.Pos)}
 	} else {
@@ -21,11 +21,11 @@ func (try *Multi) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err err
 			allScanner = Words(AllPhrase)
 		}
 		var all bool
-		if _, e := allScanner.Scan(ctx, scope, cs); e == nil {
+		if _, e := allScanner.Scan(ctx, bounds, cs); e == nil {
 			cs, all = cs.Skip(1), true
 		}
 		r := &RankAll{Context: ctx, Filters: try.Filters}
-		if !RankNouns(scope, cs, r) {
+		if !RankNouns(bounds, cs, r) {
 			err = errutil.New("unexpected error")
 		} else if !all && len(r.Plurals) == 0 {
 			// we didnt have "all" and we didnt have plurals,

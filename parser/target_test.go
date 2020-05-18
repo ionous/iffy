@@ -1,10 +1,11 @@
 package parser_test
 
 import (
+	"testing"
+
 	"github.com/ionous/iffy/ident"
 	. "github.com/ionous/iffy/parser"
 	"github.com/ionous/sliceOf"
-	"testing"
 )
 
 var takeGrammar = allOf(
@@ -15,23 +16,23 @@ var takeGrammar = allOf(
 
 func TestTarget(t *testing.T) {
 	grammar := takeGrammar
-	scope := MyScope{
+	bounds := MyBounds{
 		makeObject("green apple", "apples"),
 		makeObject("apple cart", "carts"),
 		makeObject("red cart", "carts"),
 	}
-	appleCart := MyScope{
+	appleCart := MyBounds{
 		makeObject("crab apple", "apples"),
 		makeObject("red apple", "apples"),
 	}
-	redCart := MyScope{
+	redCart := MyBounds{
 		makeObject("yellow apple", "apples"),
 	}
 	//
 	ctx := MyContext{
-		Log:     t,
-		MyScope: scope,
-		Other: map[ident.Id]Scope{
+		Log:      t,
+		MyBounds: bounds,
+		Other: map[ident.Id]Bounds{
 			ident.IdOf("apple-cart"): appleCart,
 			ident.IdOf("red-cart"):   redCart},
 	}

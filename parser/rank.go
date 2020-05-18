@@ -5,9 +5,9 @@ type RankNoun interface {
 	RankNoun(Cursor, NounInstance) bool
 }
 
-// RankNouns visits each noun in a scope, calling RankNoun
-func RankNouns(scope Scope, cs Cursor, r RankNoun) bool {
-	return !scope.SearchScope(func(n NounInstance) bool {
+// RankNouns visits each noun in a bounds, calling RankNoun
+func RankNouns(bounds Bounds, cs Cursor, r RankNoun) bool {
+	return !bounds.SearchBounds(func(n NounInstance) bool {
 		return !r.RankNoun(cs, n)
 	})
 }

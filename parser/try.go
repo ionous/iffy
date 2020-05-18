@@ -1,8 +1,9 @@
 package parser
 
 import (
-	"github.com/ionous/errutil"
 	"strings"
+
+	"github.com/ionous/errutil"
 )
 
 // // Series matches any set of words.
@@ -27,7 +28,7 @@ type Word struct {
 	Word string
 }
 
-func (w *Word) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
+func (w *Word) Scan(ctx Context, bounds Bounds, cs Cursor) (ret Result, err error) {
 	if word := cs.CurrentWord(); len(word) == 0 {
 		err = Underflow{Depth(cs.Pos)}
 	} else if !strings.EqualFold(word, w.Word) {
@@ -44,13 +45,13 @@ type AnyOf struct {
 }
 
 // Scan implements Scanner.
-func (m *AnyOf) Scan(ctx Context, scope Scope, cs Cursor) (ret Result, err error) {
+func (m *AnyOf) Scan(ctx Context, bounds Bounds, cs Cursor) (ret Result, err error) {
 	if cnt := len(m.Match); cnt == 0 {
 		err = errutil.New("no rules specified for any of")
 	} else {
 		i, errorDepth := 0, -1 // keep the most informative error
 		for ; i < cnt; i++ {
-			if res, e := m.Match[i].Scan(ctx, scope, cs); e == nil {
+			if res, e := m.Match[i].Scan(ctx, bounds, cs); e == nil {
 				ret, err = res, nil
 				break
 			} else if d := DepthOf(e); d > errorDepth {
@@ -67,18 +68,18 @@ type AllOf struct {
 	Match []Scanner
 }
 
-func (m *AllOf) Scan(ctx Context, scope Scope, cs Cursor) (Result, error) {
-	return m.scan(ctx, scope, cs)
+func (m *AllOf) Scan(ctx Context, bounds Bounds, cs Cursor) (Result, error) {
+	return m.scan(ctx, bounds, cs)
 }
 
-func (m *AllOf) scan(ctx Context, scope Scope, cs Cursor) (ret *ResultList, err error) {
+func (m *AllOf) scan(ctx Context, bounds Bounds, cs Cursor) (ret *ResultList, err error) {
 	var rl ResultList
 	if cnt := len(m.Match); cnt == 0 {
 		err = errutil.New("no rules specified for all of")
 	} else {
 		var i int
 		for ; i < cnt; i++ {
-			if res, e := m.Match[i].Scan(ctx, scope, cs); e != nil {
+			if res, e := m.Match[i].Scan(ctx, bounds, cs); e != nil {
 				err = e
 				break
 			} else {
