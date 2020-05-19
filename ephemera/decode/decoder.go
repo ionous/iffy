@@ -31,7 +31,6 @@ func (dec *Decoder) AddCallbacks(overrides []Override) {
 	for _, n := range overrides {
 		dec.AddCallback(n.Spec, n.Callback)
 	}
-
 }
 
 // AddCallback registers a command parser.

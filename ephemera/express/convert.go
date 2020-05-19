@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
@@ -35,8 +36,13 @@ func (c *converter) convert(xs template.Expression) (err error) {
 	}
 	return
 }
-func (c *converter) buildCommand(cmd interface{}, arity int) (err error) {
-	if args, e := c.stack.pop(arity); e != nil {
+
+func (c *converter) buildOne(cmd interface{}) {
+	c.stack.push(r.ValueOf(cmd))
+}
+
+func (c *converter) buildTwo(cmd interface{}) (err error) {
+	if args, e := c.stack.pop(2); e != nil {
 		err = e
 	} else {
 		ptr := r.ValueOf(cmd)
@@ -47,19 +53,6 @@ func (c *converter) buildCommand(cmd interface{}, arity int) (err error) {
 		}
 	}
 	return
-}
-
-func (c *converter) buildBinary(cmd interface{}) (err error) {
-	return c.buildCommand(cmd, 2)
-}
-
-var typeNumEval = r.TypeOf((*rt.NumberEval)(nil)).Elem()
-var typeTextEval = r.TypeOf((*rt.TextEval)(nil)).Elem()
-var compareNum = r.TypeOf((*core.CompareNum)(nil)).Elem()
-var compareText = r.TypeOf((*core.CompareText)(nil)).Elem()
-
-func implements(a, b r.Value, t r.Type) bool {
-	return a.Type().Implements(t) && b.Type().Implements(t)
 }
 
 // fix? this is where a Scalar value could come in handy.
@@ -90,33 +83,80 @@ func (c *converter) buildCompare(cmp core.Comparator) (err error) {
 	return
 }
 
-func (c *converter) buildCmd(cmd interface{}) {
-	c.stack.push(r.ValueOf(cmd))
+// build an command named in the export Slat
+// names in templates are currently "mixedCase" rather than "underscore_case".
+func (c *converter) buildExport(name string, arity int) (err error) {
+	if a, ok := exportsCache.get(name); !ok {
+		err = errutil.New("unknown command", name, arity)
+	} else if args, e := c.stack.pop(arity); e != nil {
+		err = e
+	} else {
+		rtype := r.TypeOf(a).Elem()
+		ptr := r.New(rtype)
+		if e := assignProps(ptr.Elem(), args); e != nil {
+			err = e
+		} else {
+			c.stack.push(ptr)
+		}
+	}
+	return
 }
 
-// convert the passed function into iffy commands.
+// convert the passed postfix template function into iffy commands.
 func (c *converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
 	case types.Quote:
 		txt := fn.Value()
-		c.buildCmd(&core.Text{txt})
+		c.buildOne(&core.Text{txt})
 
 	case types.Number:
 		num := fn.Value()
-		c.buildCmd(&core.Number{num})
+		c.buildOne(&core.Number{num})
+
+	case types.Bool:
+		b := fn.Value()
+		c.buildOne(&core.Bool{b})
+
+	case types.Command: // see decode
+		err = c.buildExport(fn.CommandName, fn.CommandArity)
+
+	case types.Reference:
+		// fields are an array of strings a.b.c
+		if fields := fn.Value(); len(fields) == 0 {
+			err = errutil.New("empty reference")
+		} else {
+			// build a chain of GetFields
+			// to start: we either want the object named "text"
+			// or, we want the object name that's stored in the local variable called "text"
+			var op rt.TextEval
+			if name := fields[0]; lang.IsCapitalized(name) {
+				// fix: this should add ephemera that there's an object of name
+				op = &core.Text{name}
+			} else {
+				// fix: can this add ephemera that there's a local of name?
+				op = &core.GetVar{name}
+			}
+			// a.b: from the named object a, we want its field b
+			// a.b.c: after getting the object name in field b, get that object's field c
+			for _, field := range fields[1:] {
+				op = &core.GetField{op, &core.Text{field}}
+			}
+			// the whole chain becomes a single "function"
+			c.buildOne(op)
+		}
 
 	case types.Operator:
 		switch fn {
 		case types.MUL:
-			err = c.buildBinary(&core.ProductOf{})
+			err = c.buildTwo(&core.ProductOf{})
 		case types.QUO:
-			err = c.buildBinary(&core.QuotientOf{})
+			err = c.buildTwo(&core.QuotientOf{})
 		case types.REM:
-			err = c.buildBinary(&core.RemainderOf{})
+			err = c.buildTwo(&core.RemainderOf{})
 		case types.ADD:
-			err = c.buildBinary(&core.SumOf{})
+			err = c.buildTwo(&core.SumOf{})
 		case types.SUB:
-			err = c.buildBinary(&core.DiffOf{})
+			err = c.buildTwo(&core.DiffOf{})
 
 		case types.EQL:
 			err = c.buildCompare(&core.EqualTo{})
@@ -132,12 +172,13 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 			err = c.buildCompare(&core.GreaterOrEqual{})
 
 		case types.LAND:
-			err = c.buildBinary(&core.AllTrue{})
+			err = c.buildTwo(&core.AllTrue{})
 		case types.LOR:
-			err = c.buildBinary(&core.AnyTrue{})
+			err = c.buildTwo(&core.AnyTrue{})
 		default:
 			err = errutil.Fmt("unknown operator %s", fn)
 		}
+
 	default:
 		err = errutil.Fmt("unknown function %T", fn)
 	}

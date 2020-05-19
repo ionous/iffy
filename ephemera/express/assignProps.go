@@ -8,20 +8,38 @@ import (
 )
 
 func assignProps(out r.Value, args []r.Value) (err error) {
-	export.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
+	outType := out.Type()
+	export.WalkProperties(outType, func(f *r.StructField, path []int) (done bool) {
 		if len(args) <= 0 {
 			done = true
 		} else {
-			var arg r.Value
-			arg, args = args[0], args[1:]
-			outAt := out.FieldByIndex(path)
-			if argType := arg.Type(); !argType.AssignableTo(outAt.Type()) {
-				err = errutil.New("cant assign %s to %q", argType.String(), f.Name)
+			field := out.FieldByIndex(path)
+			if f.Type.Kind() != r.Slice {
+				arg := args[0]
+				if argType := arg.Type(); !argType.AssignableTo(f.Type) {
+					err = errutil.Fmt("cant assign %s to field %s{ %s %s }",
+						argType, outType, f.Name, f.Type)
+				} else {
+					field.Set(arg)
+					args = args[1:] // pop
+				}
 			} else {
-				outAt.Set(arg)
+				// when assigning to a slice, eat as many elements as possible.
+				// it makes having slices as the last element of a command a good idea.
+				slice, elType := field, f.Type.Elem()
+				for len(args) > 0 {
+					arg := args[0]
+					if argType := arg.Type(); !argType.AssignableTo(elType) {
+						break
+					} else {
+						slice = r.Append(slice, arg)
+						args = args[1:] // pop
+					}
+				}
+				field.Set(slice)
 			}
 		}
-		return err != nil
+		return err != nil // returns "done" when there is an error.
 	})
 	if err == nil && len(args) > 0 {
 		err = errutil.New("unable to consume all args")
