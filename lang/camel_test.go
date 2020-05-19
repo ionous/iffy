@@ -24,6 +24,7 @@ func ExampleCamelize() {
 		"WasPascalCase",
 		"wasCamelCase",
 		"something-like-this",
+		"something_like_that",
 		// rando
 		"whaTAboutThis",
 		//fatih
@@ -66,6 +67,7 @@ func ExampleCamelize() {
 	// "WasPascalCase" => "wasPascalCase"
 	// "wasCamelCase" => "wasCamelCase"
 	// "something-like-this" => "somethingLikeThis"
+	// "something_like_that" => "somethingLikeThat"
 	// "whaTAboutThis" => "whaTaboutThis"
 	// "" => ""
 	// "lowercase" => "lowercase"

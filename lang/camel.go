@@ -6,7 +6,7 @@ import (
 	"unicode"
 )
 
-// differs from lang.
+//
 func Camelize(name string) (ret string) {
 	type word int
 	const (
