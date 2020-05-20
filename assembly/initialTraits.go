@@ -8,7 +8,7 @@ import (
 )
 
 // reads mdl_aspect, mdl_noun, mdl_kind, mdl_field
-func determineInitialTraits(m *Modeler, db *sql.DB) (err error) {
+func assembleInitialTraits(m *Modeler, db *sql.DB) (err error) {
 	var store traitStore
 	var curr, last traitInfo
 	if e := tables.QueryAll(db,

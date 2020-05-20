@@ -14,8 +14,29 @@ func AssemblePatterns(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else if e := copyRules(db); e != nil {
 		err = e
+	} else if e := copyPatterns(db); e != nil {
+		err = e
 	}
 	return
+}
+
+// fix: this probably needs work to get parameter ordering sensible
+func copyPatterns(db *sql.DB) error {
+	// problem: assumes
+	_, e := db.Exec(
+		`insert into mdl_pat 
+		select pattern, param, type, 
+		(case param  
+		when pattern then 0
+		else (select 1+count() 
+				from asm_pattern_decl cp 
+				where ap.pattern= cp.pattern 
+				and cp.pattern != cp.param 
+				and ap.ogid > cp.ogid)
+		end) idx
+		from asm_pattern_decl ap
+		order by pattern, idx`)
+	return e
 }
 
 func checkPatternSetup(db *sql.DB) (err error) {
@@ -42,7 +63,7 @@ func checkPatternSetup(db *sql.DB) (err error) {
 	} else {
 		// search for other conflicts
 		if e := tables.QueryAll(db,
-			`select distinct * from asm_pattern
+			`select distinct pattern, param, type, decl from asm_pattern
 			order by pattern, param, type, decl desc`,
 			func() error {
 				e := now.compare(&last, &declaredReturn)

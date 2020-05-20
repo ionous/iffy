@@ -13,7 +13,11 @@ func assemblyTemplate() string {
 		" */\n" +
 		"create temp view \n" +
 		"asm_pattern as \n" +
-		"\tselect pn.name as pattern, kn.name as param, tn.name as type, ep.decl\n" +
+		"\tselect pn.name as pattern, \n" +
+		"\tkn.name as param, \n" +
+		"\ttn.name as type, \n" +
+		"\tep.decl, \n" +
+		"\tep.rowid as ogid\n" +
 		"from eph_pattern ep\n" +
 		"left join eph_named pn\n" +
 		"\ton (ep.idNamedPattern = pn.rowid)\n" +
@@ -21,6 +25,12 @@ func assemblyTemplate() string {
 		"\ton (ep.idNamedParam = kn.rowid)\n" +
 		"left join eph_named tn\n" +
 		"\ton (ep.idNamedType = tn.rowid);\n" +
+		"\n" +
+		"create temp view \n" +
+		"asm_pattern_decl as \n" +
+		"\tselect  pattern, param, type, ogid from asm_pattern \n" +
+		"\twhere decl = 1 \n" +
+		"\tgroup by pattern, param;\n" +
 		"\n" +
 		"/* resolve test ephemera to strings\n" +
 		" */\n" +

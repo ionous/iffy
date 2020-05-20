@@ -9,7 +9,7 @@ import (
 )
 
 // reads mdl_kind, mdl_field, mdl_noun
-func determineInitialFields(m *Modeler, db *sql.DB) (err error) {
+func assembleInitialFields(m *Modeler, db *sql.DB) (err error) {
 	var store valueStore
 	var curr, last valueInfo
 	if e := tables.QueryAll(db,

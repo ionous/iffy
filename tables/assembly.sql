@@ -2,7 +2,11 @@
  */
 create temp view 
 asm_pattern as 
-	select pn.name as pattern, kn.name as param, tn.name as type, ep.decl
+	select pn.name as pattern, 
+	kn.name as param, 
+	tn.name as type, 
+	ep.decl, 
+	ep.rowid as ogid
 from eph_pattern ep
 left join eph_named pn
 	on (ep.idNamedPattern = pn.rowid)
@@ -10,6 +14,14 @@ left join eph_named kn
 	on (ep.idNamedParam = kn.rowid)
 left join eph_named tn
 	on (ep.idNamedType = tn.rowid);
+
+create temp view 
+asm_pattern_decl as 
+	select pattern, param, type, ogid 
+	from asm_pattern 
+	where decl = 1 
+	group by pattern, param
+	order by ogid;
 
 /* resolve test ephemera to strings
  */

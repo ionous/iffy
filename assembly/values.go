@@ -13,9 +13,9 @@ import (
 // o certainties: usually, seldom, never, always.
 // o misspellings, near spellings ( ex. for missing fields )
 func AssembleValues(m *Modeler, db *sql.DB) (err error) {
-	if e := determineInitialFields(m, db); e != nil {
+	if e := assembleInitialFields(m, db); e != nil {
 		err = e
-	} else if e := determineInitialTraits(m, db); e != nil {
+	} else if e := assembleInitialTraits(m, db); e != nil {
 		err = e
 	}
 	return

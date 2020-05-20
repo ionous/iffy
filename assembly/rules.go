@@ -9,7 +9,7 @@ import (
 
 func copyRules(db *sql.DB) error {
 	_, e := db.Exec(
-		`insert into mdl_rule select pattern, idProg from asm_rule ar`)
+		`insert into mdl_rule select pattern, idProg from asm_rule`)
 	return e
 }
 

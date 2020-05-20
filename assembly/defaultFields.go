@@ -10,7 +10,7 @@ import (
 )
 
 // reads mdl_field, mdl_kind
-func determineDefaultFields(m *Modeler, db *sql.DB) (err error) {
+func assembleDefaultFields(m *Modeler, db *sql.DB) (err error) {
 	var store valueStore
 	var curr, last valueInfo
 	if e := tables.QueryAll(db,

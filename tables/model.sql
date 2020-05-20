@@ -31,5 +31,7 @@ create table mdl_prog( type text, bytes blob );
  * still need to determine if "sources" should be listed in model ( for debugging )
  */ 
 create table mdl_check( name text, idProg int, expect text );
+/* pattern name and parameter ordering */
+create table mdl_pat( pattern text, param text, type text, idx int );
 /* pattern name and reference to program */
 create table mdl_rule( pattern text, idProg int );

@@ -9,7 +9,7 @@ import (
 )
 
 // reads mdl_aspect, mdl_field, mdl_kind
-func determineDefaultTraits(m *Modeler, db *sql.DB) (err error) {
+func assembleDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 	var store traitStore
 	var curr, last traitInfo
 	if e := tables.QueryAll(db,

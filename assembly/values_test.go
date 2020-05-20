@@ -42,7 +42,7 @@ func TestInitialFieldAssignment(t *testing.T) {
 			{"boat", "t", "more text"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := determineInitialFields(asm.modeler, asm.db); e != nil {
+		} else if e := assembleInitialFields(asm.modeler, asm.db); e != nil {
 			t.Fatal(e)
 		} else if e := matchValues(asm.db, []TargetValue{
 			{"apple", "t", "some text"},
