@@ -53,7 +53,7 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 	} else {
 		switch field {
 		case object.Kind:
-			ret, err = n.cacheField(key, "select kind from mdl_noun where noun=?", obj)
+			ret, err = n.cacheField(key, `select kind from mdl_noun where noun=?`, obj)
 
 		case object.Kinds:
 			ret, err = n.cacheField(key,
@@ -64,7 +64,7 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 				where noun=?`, obj)
 
 		case object.Exists:
-			ret, err = n.cacheField(key, "select count() from mdl_noun where noun=?", obj)
+			ret, err = n.cacheField(key, `select count() from mdl_noun where noun=?`, obj)
 
 		case object.BoolRule, object.NumberRule, object.TextRule,
 			object.ExecuteRule, object.NumListRule, object.TextListRule:
@@ -90,22 +90,25 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 	return
 }
 
-func (n *Fields) GetFieldByIndex(obj string, index int) (ret interface{}, err error) {
-	// first, lookup the parameter name
-	xlate := "$" + strconv.Itoa(index)
-	key := keyType{obj, xlate}
-	// we use the cache to keep $(index) -> param name.
-	val, ok := n.pairs[key]
-	if !ok {
-		val, err = n.cacheField(key,
-			`select param from mdl_pat where pattern=? and index=?`,
-			obj, index)
-	}
-	if err == nil {
-		if field, ok := val.(string); !ok {
-			err = fieldNotFound{key.owner, key.member}
-		} else {
-			ret, err = n.GetField(obj, field)
+func (n *Fields) GetFieldByIndex(obj string, idx int) (ret interface{}, err error) {
+	if idx <= 0 {
+		err = errutil.New("GetFieldByIndex out of range", idx)
+	} else {
+		// first, lookup the parameter name
+		key := keyType{obj, "$" + strconv.Itoa(idx)}
+		// we use the cache to keep $(idx) -> param name.
+		val, ok := n.pairs[key]
+		if !ok {
+			val, err = n.cacheField(key,
+				`select param from mdl_pat where pattern=? and idx=?`,
+				obj, idx)
+		}
+		if err == nil {
+			if field, ok := val.(string); !ok {
+				err = fieldNotFound{key.owner, key.member}
+			} else {
+				ret, err = n.GetField(obj, field)
+			}
 		}
 	}
 	return

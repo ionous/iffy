@@ -78,7 +78,7 @@ func (store *valueStore) writeDefaultFields(m *Modeler) (err error) {
 
 func (store *valueStore) writeInitialFields(m *Modeler) (err error) {
 	for _, n := range store.list {
-		if e := m.WriteValue(n.target, n.field, n.value); e != nil {
+		if e := m.WriteStart(n.target, n.field, n.value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

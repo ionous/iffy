@@ -57,7 +57,7 @@ func AddTestTraits(m *Modeler, keyValues []TargetField) (err error) {
 // write some noun, field, value triplets
 func AddTestStarts(m *Modeler, targetValues []TargetValue) (err error) {
 	for _, tv := range targetValues {
-		if e := m.WriteValue(tv.Target, tv.Field, tv.Value); e != nil {
+		if e := m.WriteStart(tv.Target, tv.Field, tv.Value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

@@ -95,6 +95,7 @@ func WriteRule(m *assembly.Modeler, name string, rule pattern.Rule) (err error) 
 	return
 
 }
+
 func WriteProg(m *assembly.Modeler, typeName string, prog interface{}) (ret int64, err error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)

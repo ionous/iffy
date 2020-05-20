@@ -70,19 +70,33 @@ func (m *Modeler) WriteNounWithNames(noun, kind string) (err error) {
 	return
 }
 
+func (m *Modeler) WritePat(name, paramName, paramType string, idx int64) error {
+	_, e := m.cache.Exec(mdl_pat, name, paramName, paramType, idx)
+	return e
+}
+
+func (m *Modeler) WriteProg(typeName string, bytes []byte) (int64, error) {
+	return m.cache.Exec(mdl_prog, typeName, bytes)
+}
+
 func (m *Modeler) WriteRelation(relation, kind, cardinality, otherKind string) error {
 	_, e := m.cache.Exec(mdl_rel, relation, kind, cardinality, otherKind)
 	return e
 }
 
-func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
-	_, e := m.cache.Exec(mdl_aspect, aspect, trait, rank)
+func (m *Modeler) WriteRule(name string, prog int64) error {
+	_, e := m.cache.Exec(mdl_rule, name, prog)
 	return e
 }
 
-// WriteValue: store the initial value of an instance's field used at start of play.
-func (m *Modeler) WriteValue(noun, field string, value interface{}) error {
+// WriteStart: store the initial value of an instance's field used at start of play.
+func (m *Modeler) WriteStart(noun, field string, value interface{}) error {
 	_, e := m.cache.Exec(mdl_start, noun, field, value)
+	return e
+}
+
+func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
+	_, e := m.cache.Exec(mdl_aspect, aspect, trait, rank)
 	return e
 }
 
@@ -98,15 +112,6 @@ func (m *Modeler) WriteVerb(relation, verb string) error {
 	return e
 }
 
-func (m *Modeler) WriteRule(name string, prog int64) error {
-	_, e := m.cache.Exec(mdl_rule, name, prog)
-	return e
-}
-
-func (m *Modeler) WriteProg(typeName string, bytes []byte) (int64, error) {
-	return m.cache.Exec(mdl_prog, typeName, bytes)
-}
-
 var mdl_spec = tables.Insert("mdl_spec", "type", "name", "spec")
 var mdl_aspect = tables.Insert("mdl_aspect", "aspect", "trait", "rank")
 var mdl_kind = tables.Insert("mdl_kind", "kind", "path")
@@ -119,3 +124,4 @@ var mdl_pair = tables.Insert("mdl_pair", "noun", "relation", "otherNoun")
 var mdl_start = tables.Insert("mdl_start", "noun", "field", "value")
 var mdl_prog = tables.Insert("mdl_prog", "type", "bytes")
 var mdl_rule = tables.Insert("mdl_rule", "pattern", "idProg")
+var mdl_pat = tables.Insert("mdl_pat", "pattern", "param", "type", "idx")

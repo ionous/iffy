@@ -86,7 +86,7 @@ func (store *traitStore) writeDefaultTraits(m *Modeler) (err error) {
 
 func (store *traitStore) writeInitialTraits(m *Modeler) (err error) {
 	for _, n := range store.list {
-		if e := m.WriteValue(n.target, n.aspect, n.trait); e != nil {
+		if e := m.WriteStart(n.target, n.aspect, n.trait); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
