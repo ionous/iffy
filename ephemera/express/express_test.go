@@ -31,16 +31,12 @@ func TestExpressions(t *testing.T) {
 		{"bool", "false", False},
 		{"T cmp", "'a' < 'b'",
 			&core.CompareText{
-				T("a"),
-				&core.LessThan{},
-				T("b"),
+				T("a"), &core.LessThan{}, T("b"),
 			},
 		},
 		{"num cmp", "7 >= 8",
 			&core.CompareNum{
-				N(7),
-				&core.GreaterOrEqual{},
-				N(8),
+				N(7), &core.GreaterOrEqual{}, N(8),
 			},
 		},
 		{"math", "(5+6)*(1+2)",
@@ -127,6 +123,25 @@ func TestTemplates(t *testing.T) {
 					T("a"), T("b"), T("c"),
 				},
 			}},
+		},
+		{"if", "{if 7=7}boop{else}beep{end}",
+			&core.ChooseText{
+				If: &core.CompareNum{
+					N(7), &core.EqualTo{}, N(7),
+				},
+				True:  T("boop"),
+				False: T("beep"),
+			},
+		},
+		{"unless", "{unless 7=7}boop{otherwise}beep{end}",
+			&core.ChooseText{
+				If: &core.IsNot{
+					&core.CompareNum{
+						N(7), &core.EqualTo{}, N(7),
+					}},
+				True:  T("boop"),
+				False: T("beep"),
+			},
 		},
 	}
 	var c Converter

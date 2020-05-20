@@ -49,7 +49,11 @@ func (c *Converter) buildOne(cmd interface{}) {
 }
 
 func (c *Converter) buildTwo(cmd interface{}) (err error) {
-	if args, e := c.stack.pop(2); e != nil {
+	return c.buildCommand(cmd, 2)
+}
+
+func (c *Converter) buildCommand(cmd interface{}, arity int) (err error) {
+	if args, e := c.stack.pop(arity); e != nil {
 		err = e
 	} else {
 		ptr := r.ValueOf(cmd)
@@ -134,6 +138,21 @@ func (c *Converter) buildExport(name string, arity int) (err error) {
 	return
 }
 
+func (c *Converter) buildUnless(cmd interface{}, arity int) (err error) {
+	if args, e := c.stack.pop(arity); e != nil {
+		err = e
+	} else if len(args) > 0 {
+		if a, ok := args[0].Interface().(rt.BoolEval); !ok {
+			err = errutil.New("argument is not a bool")
+		} else {
+			args[0] = r.ValueOf(&core.IsNot{a}) // rewrite the arg.
+			c.stack.push(args...)               //
+			err = c.buildCommand(cmd, arity)
+		}
+	}
+	return
+}
+
 // convert the passed postfix template function into iffy commands.
 func (c *Converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
@@ -179,6 +198,17 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 
 	case types.Builtin:
 		switch k := fn.Type; k {
+		case types.IfStatement:
+			// it would be nice if this could be choose text or choose number based on context
+			// choose scalar might simplify things....
+			err = c.buildCommand(&core.ChooseText{}, fn.ParameterCount)
+
+		case types.UnlessStatement:
+			err = c.buildUnless(&core.ChooseText{}, fn.ParameterCount)
+
+		// case types.Span:
+		// 	err = c.buildCommand(&core.Join{}, fn.ParameterCount)
+
 		case types.Stopping:
 			var seq core.StoppingText
 			err = c.buildSequence(&seq, &seq.Sequence, fn.ParameterCount)
