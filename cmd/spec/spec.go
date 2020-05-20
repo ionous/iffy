@@ -14,6 +14,7 @@ import (
 
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/export"
+	"github.com/ionous/iffy/export/tag"
 )
 
 // go run spec.go > /Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/compose/www/src/lang/spec.js
@@ -132,19 +133,22 @@ func parse(t r.Type) ([]string, export.Dict) {
 	params := make(export.Dict)
 
 	export.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
-		prettyField := export.Prettify(f.Name)
-		key := export.Tokenize(f)
-		typeName, repeats := nameOfType(f.Type)
-		tokens = append(tokens, key)
-		m := export.Dict{
-			"label": prettyField,
-			"type":  typeName,
-			// optional: tdb
+		tags := tag.ReadTag(f.Tag)
+		if _, ok := tags.Find("internal"); !ok {
+			prettyField := export.Prettify(f.Name)
+			key := export.Tokenize(f)
+			typeName, repeats := nameOfType(f.Type)
+			tokens = append(tokens, key)
+			m := export.Dict{
+				"label": prettyField,
+				"type":  typeName,
+				// optional: tdb
+			}
+			if repeats {
+				m["repeats"] = true
+			}
+			params[key] = m
 		}
-		if repeats {
-			m["repeats"] = true
-		}
-		params[key] = m
 		return
 	})
 	return tokens, params

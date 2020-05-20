@@ -462,14 +462,10 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$ELEMS": {
-          "label": "elems",
+        "$PARTS": {
+          "label": "parts",
           "repeats": true,
           "type": "text_eval"
-        },
-        "$TGT": {
-          "label": "tgt",
-          "type": "text"
         }
       },
       "slots": [
@@ -477,8 +473,7 @@ const spec = [
       ],
       "tokens": [
         "cycle text",
-        "$TGT",
-        "$ELEMS"
+        "$PARTS"
       ]
     }
   },
@@ -1337,14 +1332,10 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$ELEMS": {
-          "label": "elems",
+        "$PARTS": {
+          "label": "parts",
           "repeats": true,
           "type": "text_eval"
-        },
-        "$TGT": {
-          "label": "tgt",
-          "type": "text"
         }
       },
       "slots": [
@@ -1352,8 +1343,7 @@ const spec = [
       ],
       "tokens": [
         "shuffle text",
-        "$TGT",
-        "$ELEMS"
+        "$PARTS"
       ]
     }
   },
@@ -1414,14 +1404,10 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$ELEMS": {
-          "label": "elems",
+        "$PARTS": {
+          "label": "parts",
           "repeats": true,
           "type": "text_eval"
-        },
-        "$TGT": {
-          "label": "tgt",
-          "type": "text"
         }
       },
       "slots": [
@@ -1429,8 +1415,7 @@ const spec = [
       ],
       "tokens": [
         "stopping text",
-        "$TGT",
-        "$ELEMS"
+        "$PARTS"
       ]
     }
   },

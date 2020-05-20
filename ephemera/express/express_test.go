@@ -9,19 +9,19 @@ import (
 	"github.com/kr/pretty"
 )
 
-// test the operators and quotes
-func TestOperators(t *testing.T) {
+func T(s string) rt.TextEval {
+	return &core.Text{s}
+}
+func N(n float64) rt.NumberEval {
+	return &core.Number{n}
+}
 
-	T := func(s string) rt.TextEval {
-		return &core.Text{s}
-	}
-	N := func(n float64) rt.NumberEval {
-		return &core.Number{n}
-	}
-	True := &core.Bool{true}
-	False := &core.Bool{false}
-	//
-	tests := []struct {
+var True = &core.Bool{true}
+var False = &core.Bool{false}
+
+// test the operators and quotes
+func TestExpressions(t *testing.T) {
+	expressions := []struct {
 		name string
 		str  string
 		want interface{}
@@ -50,8 +50,7 @@ func TestOperators(t *testing.T) {
 			},
 		},
 		// isNot requires command parsing
-		{"logic",
-			"true and (false or {isNot: true})",
+		{"logic", "true and (false or {isNot: true})",
 			&core.AllTrue{[]rt.BoolEval{
 				True,
 				&core.AnyTrue{[]rt.BoolEval{
@@ -83,7 +82,7 @@ func TestOperators(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, test := range expressions {
 		if xs, e := template.ParseExpression(test.str); e != nil {
 			t.Fatal(test.name, e)
 		} else if got, e := Convert(xs); e != nil {
@@ -94,6 +93,53 @@ func TestOperators(t *testing.T) {
 			t.Log("ok:", test.name, pretty.Sprint(got))
 		}
 
+	}
+
+}
+
+// test the operators and quotes
+func TestTemplates(t *testing.T) {
+	templates := []struct {
+		name string
+		str  string
+		want interface{}
+	}{
+		{"cycle", "{cycle}a{or}b{or}c{end}",
+			&core.CycleText{Sequence: core.Sequence{
+				Seq: "autoexp1",
+				Parts: []rt.TextEval{
+					T("a"), T("b"), T("c"),
+				},
+			}},
+		},
+		{"once", "{once}a{or}b{or}c{end}",
+			&core.StoppingText{Sequence: core.Sequence{
+				Seq: "autoexp2",
+				Parts: []rt.TextEval{
+					T("a"), T("b"), T("c"),
+				},
+			}},
+		},
+		{"shuffle", "{shuffle}a{or}b{or}c{end}",
+			&core.ShuffleText{Sequence: core.Sequence{
+				Seq: "autoexp3",
+				Parts: []rt.TextEval{
+					T("a"), T("b"), T("c"),
+				},
+			}},
+		},
+	}
+	var c Converter
+	for _, test := range templates {
+		if xs, e := template.Parse(test.str); e != nil {
+			t.Fatal(test.name, e)
+		} else if got, e := c.Convert(xs); e != nil {
+			t.Fatal(test.name, e)
+		} else if diff := pretty.Diff(got, test.want); len(diff) > 0 {
+			t.Fatal("failed:", test.name, pretty.Sprint(got))
+		} else {
+			t.Log("ok:", test.name, pretty.Sprint(got))
+		}
 	}
 
 }

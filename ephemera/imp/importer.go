@@ -15,8 +15,9 @@ import (
 type Porter struct {
 	*ephemera.Recorder
 	// sometimes the importer needs to define a singleton like type or instance
-	oneTime map[string]bool
-	decoder *decode.Decoder
+	oneTime     map[string]bool
+	decoder     *decode.Decoder
+	AutoCounter int // helper for making auto variables.
 }
 
 func NewImporter(srcURI string, db *sql.DB) *Porter {

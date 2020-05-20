@@ -2,6 +2,7 @@ package express
 
 import (
 	r "reflect"
+	"strconv"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
@@ -14,7 +15,17 @@ import (
 
 // Express converts a postfix expression into iffy commands.
 func Convert(xs template.Expression) (ret interface{}, err error) {
-	c := converter{}
+	c := Converter{}
+	return c.Convert(xs)
+}
+
+type Converter struct {
+	stack rstack // the stack is empty initially, and we fill it with converted commands
+	// ( to be used later by other commands )
+	AutoCounter int
+}
+
+func (c *Converter) Convert(xs template.Expression) (ret interface{}, err error) {
 	if e := c.convert(xs); e != nil {
 		err = e
 	} else {
@@ -23,11 +34,7 @@ func Convert(xs template.Expression) (ret interface{}, err error) {
 	return
 }
 
-type converter struct {
-	stack rstack
-}
-
-func (c *converter) convert(xs template.Expression) (err error) {
+func (c *Converter) convert(xs template.Expression) (err error) {
 	for _, fn := range xs {
 		if e := c.addFunction(fn); e != nil {
 			err = e
@@ -37,11 +44,11 @@ func (c *converter) convert(xs template.Expression) (err error) {
 	return
 }
 
-func (c *converter) buildOne(cmd interface{}) {
+func (c *Converter) buildOne(cmd interface{}) {
 	c.stack.push(r.ValueOf(cmd))
 }
 
-func (c *converter) buildTwo(cmd interface{}) (err error) {
+func (c *Converter) buildTwo(cmd interface{}) (err error) {
 	if args, e := c.stack.pop(2); e != nil {
 		err = e
 	} else {
@@ -56,7 +63,7 @@ func (c *converter) buildTwo(cmd interface{}) (err error) {
 }
 
 // fix? this is where a Scalar value could come in handy.
-func (c *converter) buildCompare(cmp core.Comparator) (err error) {
+func (c *Converter) buildCompare(cmp core.Comparator) (err error) {
 	if args, e := c.stack.pop(2); e != nil {
 		err = e
 	} else {
@@ -78,14 +85,39 @@ func (c *converter) buildCompare(cmp core.Comparator) (err error) {
 				c.stack.push(ptr)
 			}
 		}
+	}
+	return
+}
 
+func (c *Converter) buildSequence(cmd rt.TextEval, seq *core.Sequence, count int) (err error) {
+	if args, e := c.stack.pop(count); e != nil {
+		err = e
+	} else {
+		var parts []rt.TextEval
+		for i, a := range args {
+			if text, ok := a.Interface().(rt.TextEval); !ok {
+				err = errutil.Fmt("couldn't convert sequence part %d to text", i)
+				break
+			} else {
+				parts = append(parts, text)
+			}
+		}
+		if err == nil {
+			c.AutoCounter++
+			counter := "autoexp" + strconv.Itoa(c.AutoCounter)
+			// seq is part of cmd
+			seq.Parts = parts
+			seq.Seq = counter
+			// after filling out the cmd, we push it for later processing
+			c.buildOne(cmd)
+		}
 	}
 	return
 }
 
 // build an command named in the export Slat
 // names in templates are currently "mixedCase" rather than "underscore_case".
-func (c *converter) buildExport(name string, arity int) (err error) {
+func (c *Converter) buildExport(name string, arity int) (err error) {
 	if a, ok := exportsCache.get(name); !ok {
 		err = errutil.New("unknown command", name, arity)
 	} else if args, e := c.stack.pop(arity); e != nil {
@@ -103,7 +135,7 @@ func (c *converter) buildExport(name string, arity int) (err error) {
 }
 
 // convert the passed postfix template function into iffy commands.
-func (c *converter) addFunction(fn postfix.Function) (err error) {
+func (c *Converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
 	case types.Quote:
 		txt := fn.Value()
@@ -143,6 +175,19 @@ func (c *converter) addFunction(fn postfix.Function) (err error) {
 			}
 			// the whole chain becomes a single "function"
 			c.buildOne(op)
+		}
+
+	case types.Builtin:
+		switch k := fn.Type; k {
+		case types.Stopping:
+			var seq core.StoppingText
+			err = c.buildSequence(&seq, &seq.Sequence, fn.ParameterCount)
+		case types.Shuffle:
+			var seq core.ShuffleText
+			err = c.buildSequence(&seq, &seq.Sequence, fn.ParameterCount)
+		case types.Cycle:
+			var seq core.CycleText
+			err = c.buildSequence(&seq, &seq.Sequence, fn.ParameterCount)
 		}
 
 	case types.Operator:
