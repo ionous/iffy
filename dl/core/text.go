@@ -22,8 +22,8 @@ type Includes struct {
 
 // Join combines multiple pieces of text.
 type Join struct {
-	Elems rt.TextListEval
 	Sep   rt.TextEval
+	Parts rt.TextListEval
 }
 
 func (*IsEmpty) Compose() composer.Spec {
@@ -73,7 +73,7 @@ func (*Join) Compose() composer.Spec {
 func (op *Join) GetText(run rt.Runtime) (ret string, err error) {
 	if sep, e := rt.GetOptionalText(run, op.Sep, ""); e != nil {
 		err = e
-	} else if it, e := rt.GetTextStream(run, op.Elems); e != nil {
+	} else if it, e := rt.GetTextStream(run, op.Parts); e != nil {
 		err = e
 	} else {
 		var buf bytes.Buffer

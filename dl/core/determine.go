@@ -10,7 +10,7 @@ import (
 
 // FromPattern helps runs a pattern
 type FromPattern struct {
-	Name       string      // i guess a text eval here would be like a function pointer.
+	Name       string      // pattern name, i guess a text eval here would be like a function pointer.
 	Parameters *Parameters // for optional parameters ( and formatting )
 }
 
@@ -26,7 +26,7 @@ type Parameters struct {
 }
 
 type Parameter struct {
-	Name string
+	Name string // parameter name
 	From Assignment
 }
 
@@ -52,11 +52,12 @@ func (op *FromPattern) Stitch(run rt.Runtime, field string, fn func(p interface{
 	if p, e := run.GetField(op.Name, field); e != nil {
 		err = e
 	} else {
+		// bake the parameters down
 		parms := make(scope.Parameters)
 		if op.Parameters != nil {
-			for _, a := range op.Parameters.Params {
-				if e := a.From.Assign(run, func(i interface{}) (err error) {
-					return parms.SetVariable(a.Name, i)
+			for _, param := range op.Parameters.Params {
+				if e := param.From.Assign(run, func(i interface{}) (err error) {
+					return parms.SetVariable(param.Name, i)
 				}); e != nil {
 					err = errutil.Append(err, e)
 				}

@@ -2,6 +2,7 @@ package qna
 
 import (
 	"database/sql"
+	"strconv"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
@@ -47,8 +48,8 @@ func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 // GetField sets the value of the passed pointer to the value of the named property.
 func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 	key := keyType{obj, field}
-	if v, ok := n.pairs[key]; ok {
-		ret = v
+	if val, ok := n.pairs[key]; ok {
+		ret = val
 	} else {
 		switch field {
 		case object.Kind:
@@ -84,6 +85,27 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 				n.pairs[key] = nil
 				ret = nil
 			}
+		}
+	}
+	return
+}
+
+func (n *Fields) GetFieldByIndex(obj string, index int) (ret interface{}, err error) {
+	// first, lookup the parameter name
+	xlate := "$" + strconv.Itoa(index)
+	key := keyType{obj, xlate}
+	// we use the cache to keep $(index) -> param name.
+	val, ok := n.pairs[key]
+	if !ok {
+		val, err = n.cacheField(key,
+			`select param from mdl_pat where pattern=? and index=?`,
+			obj, index)
+	}
+	if err == nil {
+		if field, ok := val.(string); !ok {
+			err = fieldNotFound{key.owner, key.member}
+		} else {
+			ret, err = n.GetField(obj, field)
 		}
 	}
 	return
