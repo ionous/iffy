@@ -123,7 +123,7 @@ func (c *Converter) buildSequence(cmd rt.TextEval, seq *core.Sequence, count int
 // names in templates are currently "mixedCase" rather than "underscore_case".
 func (c *Converter) buildExport(name string, arity int) (err error) {
 	if a, ok := exportsCache.get(name); !ok {
-		err = errutil.New("unknown command", name, arity)
+		err = c.buildPattern(name, arity)
 	} else if args, e := c.stack.pop(arity); e != nil {
 		err = e
 	} else {
@@ -134,6 +134,50 @@ func (c *Converter) buildExport(name string, arity int) (err error) {
 		} else {
 			c.stack.push(ptr)
 		}
+	}
+	return
+}
+
+func (c *Converter) buildPattern(name string, arity int) (err error) {
+	if args, e := c.stack.pop(arity); e != nil {
+		err = e
+	} else {
+		var ps core.Parameters
+		for i, arg := range args {
+			if newa, e := newAssignment(arg); e != nil {
+				err = errutil.Append(e)
+			} else {
+				newp := &core.Parameter{
+					Name: "$" + strconv.Itoa(i+1),
+					From: newa,
+				}
+				ps.Params = append(ps.Params, newp)
+			}
+		}
+		if err == nil {
+			c.buildOne(&core.DetermineText{
+				Pattern:    name,
+				Parameters: &ps,
+			})
+		}
+	}
+	return
+}
+
+func newAssignment(arg r.Value) (ret core.Assignment, err error) {
+	switch arg := arg.Interface().(type) {
+	case rt.BoolEval:
+		ret = &core.FromBool{arg}
+	case rt.NumberEval:
+		ret = &core.FromNum{arg}
+	case rt.TextEval:
+		ret = &core.FromText{arg}
+	case rt.NumListEval:
+		ret = &core.FromNumList{arg}
+	case rt.TextListEval:
+		ret = &core.FromTextList{arg}
+	default:
+		err = errutil.Fmt("unknown pattern parameter type %T", arg)
 	}
 	return
 }
@@ -202,12 +246,8 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 			// it would be nice if this could be choose text or choose number based on context
 			// choose scalar might simplify things....
 			err = c.buildCommand(&core.ChooseText{}, fn.ParameterCount)
-
 		case types.UnlessStatement:
 			err = c.buildUnless(&core.ChooseText{}, fn.ParameterCount)
-
-		// case types.Span:
-		// 	err = c.buildCommand(&core.Join{}, fn.ParameterCount)
 
 		case types.Stopping:
 			var seq core.StoppingText
@@ -218,6 +258,10 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 		case types.Cycle:
 			var seq core.CycleText
 			err = c.buildSequence(&seq, &seq.Sequence, fn.ParameterCount)
+
+		default:
+			// fix? span is supposed to join text sections.... but there were no tests or examples in the og code.
+			err = errutil.New("unhandled builtin", k.String())
 		}
 
 	case types.Operator:

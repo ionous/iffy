@@ -3,7 +3,6 @@ package pattern_test
 import (
 	"testing"
 
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/rt"
@@ -44,7 +43,7 @@ func TestFactorial(t *testing.T) {
 	if v, e := rt.GetNumber(&run, &det); e != nil {
 		t.Fatal(e)
 	} else if want := 3.0 * (2 * (1 * 1)); v != want {
-		t.Fatal(assign.Mismatch(t.Name(), want, v))
+		t.Fatal("mismatch: expected:", want, "have:", v)
 	} else {
 		t.Log("factorial okay", v)
 	}

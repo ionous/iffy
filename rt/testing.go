@@ -5,7 +5,7 @@ import "io"
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
 
-func (Panic) GetFieldByIndex(target, field string) (interface{}, error) {
+func (Panic) GetFieldByIndex(target string, idx int) (string, error) {
 	panic("Runtime panic")
 }
 func (Panic) GetField(target, field string) (interface{}, error) {

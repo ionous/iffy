@@ -76,7 +76,7 @@ func fromPattern(k *imp.Porter,
 		err = e
 	} else if m, e := reader.Unpack(m, typeName); e != nil {
 		err = e
-	} else if patternName, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
+	} else if patternName, e := imp_pattern_name(k, m.MapOf("$PATTERN")); e != nil {
 		err = e
 	} else if ps, e := imp_parameters(k, patternName, m.MapOf("$PARAMETERS")); e != nil {
 		err = e
@@ -85,7 +85,7 @@ func fromPattern(k *imp.Porter,
 		patternType := k.NewName(evalType, tables.NAMED_TYPE, reader.At(m))
 		k.NewPatternRef(patternName, patternName, patternType)
 		// assign results
-		from.Name = patternName.String()
+		from.Pattern = patternName.String()
 		from.Parameters = ps
 	}
 	return

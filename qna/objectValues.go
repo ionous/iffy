@@ -90,7 +90,7 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 	return
 }
 
-func (n *Fields) GetFieldByIndex(obj string, idx int) (ret interface{}, err error) {
+func (n *Fields) GetFieldByIndex(obj string, idx int) (ret string, err error) {
 	if idx <= 0 {
 		err = errutil.New("GetFieldByIndex out of range", idx)
 	} else {
@@ -103,12 +103,10 @@ func (n *Fields) GetFieldByIndex(obj string, idx int) (ret interface{}, err erro
 				`select param from mdl_pat where pattern=? and idx=?`,
 				obj, idx)
 		}
-		if err == nil {
-			if field, ok := val.(string); !ok {
-				err = fieldNotFound{key.owner, key.member}
-			} else {
-				ret, err = n.GetField(obj, field)
-			}
+		if field, ok := val.(string); !ok {
+			err = fieldNotFound{key.owner, key.member}
+		} else {
+			ret = field
 		}
 	}
 	return

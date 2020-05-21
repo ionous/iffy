@@ -55,7 +55,7 @@ function getStory() {
                                           "id": "id-171c8ccc9f6-14",
                                           "type": "determine_num",
                                           "value": {
-                                            "$NAME": {
+                                            "$PATTERN": {
                                               "id": "id-171c8ccc9f6-13",
                                               "type": "pattern_name",
                                               "value": "factorial"

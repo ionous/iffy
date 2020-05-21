@@ -26,6 +26,8 @@ type VariableStack interface {
 type Fields interface {
 	GetField(target, field string) (interface{}, error)
 	SetField(target, field string, v interface{}) error
+	// returns the name of the indexed field
+	GetFieldByIndex(taget string, index int) (string, error)
 }
 
 // Ancestors customizes the parent-child event hierarchy.

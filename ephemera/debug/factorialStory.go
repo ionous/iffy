@@ -63,7 +63,7 @@ var FactorialTestStatement = map[string]interface{}{
 var FactorialDetermineNum = map[string]interface{}{
 	"type": "determine_num",
 	"value": map[string]interface{}{
-		"$NAME": map[string]interface{}{
+		"$PATTERN": map[string]interface{}{
 			"type":  "pattern_name",
 			"value": "factorial",
 		},

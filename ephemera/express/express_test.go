@@ -19,7 +19,7 @@ func N(n float64) rt.NumberEval {
 var True = &core.Bool{true}
 var False = &core.Bool{false}
 
-// test the operators and quotes
+// test single expressions.
 func TestExpressions(t *testing.T) {
 	expressions := []struct {
 		name string
@@ -93,7 +93,7 @@ func TestExpressions(t *testing.T) {
 
 }
 
-// test the operators and quotes
+// test full templates
 func TestTemplates(t *testing.T) {
 	templates := []struct {
 		name string
@@ -142,6 +142,21 @@ func TestTemplates(t *testing.T) {
 				True:  T("boop"),
 				False: T("beep"),
 			},
+		},
+		{"pipe", "{15|printNum!}",
+			&core.PrintNum{
+				Num: &core.Number{15},
+			},
+		},
+		{"text pattern", "{'world'|hello!}",
+			&core.DetermineText{
+				Pattern: "hello",
+				Parameters: &core.Parameters{[]*core.Parameter{
+					&core.Parameter{
+						Name: "$1",
+						From: &core.FromText{
+							Val: T("world"),
+						}}}}},
 		},
 	}
 	var c Converter

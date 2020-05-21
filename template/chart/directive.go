@@ -2,6 +2,7 @@ package chart
 
 import (
 	"bytes"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/template/postfix"
 	"github.com/ionous/iffy/template/types"
@@ -15,7 +16,7 @@ type Directive struct {
 }
 
 func UnknownDirective(v Directive) error {
-	return errutil.Fmt("unknown key '%s'", v.Key)
+	return errutil.Fmt("unknown directive '%s'", v.Key)
 }
 
 func UnexpectedExpression(v Directive) (err error) {

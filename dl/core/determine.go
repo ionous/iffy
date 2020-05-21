@@ -1,6 +1,8 @@
 package core
 
 import (
+	"strconv"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
@@ -10,7 +12,7 @@ import (
 
 // FromPattern helps runs a pattern
 type FromPattern struct {
-	Name       string      // pattern name, i guess a text eval here would be like a function pointer.
+	Pattern    string      // pattern name, i guess a text eval here would be like a function pointer.
 	Parameters *Parameters // for optional parameters ( and formatting )
 }
 
@@ -48,16 +50,24 @@ func (*Parameter) Compose() composer.Spec {
 
 // Stitch find the pattern, builds the scope, and executes the passed callback to generate a result.
 // Its an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
-func (op *FromPattern) Stitch(run rt.Runtime, field string, fn func(p interface{}) error) (err error) {
-	if p, e := run.GetField(op.Name, field); e != nil {
+func (op *FromPattern) Stitch(run rt.Runtime, patType string, fn func(p interface{}) error) (err error) {
+	// find the pattern (p):
+	patName := op.Pattern
+	if pat, e := run.GetField(patName, patType); e != nil {
 		err = e
 	} else {
 		// bake the parameters down
 		parms := make(scope.Parameters)
 		if op.Parameters != nil {
+			// read from each argument
 			for _, param := range op.Parameters.Params {
 				if e := param.From.Assign(run, func(i interface{}) (err error) {
-					return parms.SetVariable(param.Name, i)
+					if n, e := unpack(run, patName, param.Name); e != nil {
+						err = e
+					} else {
+						err = parms.SetVariable(n, i)
+					}
+					return
 				}); e != nil {
 					err = errutil.Append(err, e)
 				}
@@ -65,9 +75,21 @@ func (op *FromPattern) Stitch(run rt.Runtime, field string, fn func(p interface{
 		}
 		if err == nil {
 			run.PushScope(&parms)
-			err = fn(p)
+			err = fn(pat)
 			run.PopScope()
 		}
+	}
+	return
+}
+
+// change a param name ( which could be an index ) into a valid param name
+func unpack(run rt.Runtime, pattern, param string) (ret string, err error) {
+	if usesIndex := len(param) > 1 && param[:1] == "$"; !usesIndex {
+		ret = param
+	} else if idx, e := strconv.Atoi(param); e != nil {
+		err = e
+	} else {
+		ret, err = run.GetFieldByIndex(pattern, idx)
 	}
 	return
 }
@@ -85,7 +107,7 @@ func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
 		// cast the pattern to an execute
 		// fix: this may require a []cast instead.
 		if exe, ok := p.(rt.Execute); !ok {
-			err = errutil.New("Pattern", op.Name, "not an activity")
+			err = errutil.New("Pattern", op.Pattern, "not an activity")
 		} else {
 			err = exe.Execute(run)
 		}
@@ -106,7 +128,7 @@ func (*DetermineNum) Compose() composer.Spec {
 func (op *DetermineNum) GetNumber(run rt.Runtime) (ret float64, err error) {
 	err = (*FromPattern)(op).Stitch(run, object.NumberRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.NumberEval); !ok {
-			err = errutil.New("Pattern", op.Name, "not a number")
+			err = errutil.New("Pattern", op.Pattern, "not a number")
 		} else {
 			ret, err = rt.GetNumber(run, eval)
 		}
@@ -127,7 +149,7 @@ func (*DetermineText) Compose() composer.Spec {
 func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
 	err = (*FromPattern)(op).Stitch(run, object.TextRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.TextEval); !ok {
-			err = errutil.New("Pattern", op.Name, "not text")
+			err = errutil.New("Pattern", op.Pattern, "not text")
 		} else {
 			ret, err = rt.GetText(run, eval)
 		}
@@ -148,7 +170,7 @@ func (*DetermineBool) Compose() composer.Spec {
 func (op *DetermineBool) GetBool(run rt.Runtime) (ret bool, err error) {
 	err = (*FromPattern)(op).Stitch(run, object.BoolRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.BoolEval); !ok {
-			err = errutil.New("Pattern", op.Name, "not a boolean")
+			err = errutil.New("Pattern", op.Pattern, "not a boolean")
 		} else {
 			ret, err = rt.GetBool(run, eval)
 		}
@@ -169,7 +191,7 @@ func (*DetermineNumList) Compose() composer.Spec {
 func (op *DetermineNumList) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
 	err = (*FromPattern)(op).Stitch(run, object.NumListRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.NumListEval); !ok {
-			err = errutil.New("Pattern", op.Name, "not a boolean")
+			err = errutil.New("Pattern", op.Pattern, "not a boolean")
 		} else {
 			ret, err = rt.GetNumberStream(run, eval)
 		}
@@ -190,7 +212,7 @@ func (*DetermineTextList) Compose() composer.Spec {
 func (op *DetermineTextList) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
 	err = (*FromPattern)(op).Stitch(run, object.TextListRule, func(p interface{}) (err error) {
 		if eval, ok := p.(rt.TextListEval); !ok {
-			err = errutil.New("Pattern", op.Name, "not a boolean")
+			err = errutil.New("Pattern", op.Pattern, "not a boolean")
 		} else {
 			ret, err = rt.GetTextStream(run, eval)
 		}

@@ -39,12 +39,10 @@ func TestPatternFields(t *testing.T) {
 		t.Fatal(e)
 	} else if v != "default" {
 		t.Fatal("mismatch", v)
-	} else if p, e := run.GetFieldByIndex("pat", 1); e != nil {
+	} else if field, e := run.GetFieldByIndex("pat", 1); e != nil {
 		t.Fatal(e)
-	} else if v, e := core.GetText(run, p); e != nil {
+	} else if field != "param" {
 		t.Fatal(e)
-	} else if v != "default" {
-		t.Fatal("mismatch", v)
 	} else if pairs := run.Fields.pairs; len(pairs) != 2 {
 		t.Fatal("unexpected cached values", pairs)
 	} else if val := pairs[keyType{"pat", "param"}]; val != "default" {
