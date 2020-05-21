@@ -23,7 +23,7 @@ type Includes struct {
 // Join combines multiple pieces of text.
 type Join struct {
 	Sep   rt.TextEval
-	Parts rt.TextListEval
+	Parts []rt.TextEval // fix? this should probably? be text list eveal
 }
 
 func (*IsEmpty) Compose() composer.Spec {
@@ -73,20 +73,17 @@ func (*Join) Compose() composer.Spec {
 func (op *Join) GetText(run rt.Runtime) (ret string, err error) {
 	if sep, e := rt.GetOptionalText(run, op.Sep, ""); e != nil {
 		err = e
-	} else if it, e := rt.GetTextStream(run, op.Parts); e != nil {
-		err = e
 	} else {
 		var buf bytes.Buffer
-		for it.HasNext() {
-			var txt string
-			if e := it.GetNext(&txt); e != nil {
+		for _, txt := range op.Parts {
+			if str, e := rt.GetText(run, txt); e != nil {
 				err = e
 				break
 			} else {
 				if buf.Len() > 0 {
 					buf.WriteString(sep)
 				}
-				buf.WriteString(txt)
+				buf.WriteString(str)
 			}
 		}
 		if err == nil {
@@ -95,3 +92,27 @@ func (op *Join) GetText(run rt.Runtime) (ret string, err error) {
 	}
 	return
 }
+
+// if sep, e := rt.GetOptionalText(run, op.Sep, ""); e != nil {
+// 	err = e
+// } else if it, e := rt.GetTextStream(run, op.Parts); e != nil {
+// 	err = e
+// } else {
+// 	var buf bytes.Buffer
+// 	for it.HasNext() {
+// 		var txt string
+// 		if e := it.GetNext(&txt); e != nil {
+// 			err = e
+// 			break
+// 		} else {
+// 			if buf.Len() > 0 {
+// 				buf.WriteString(sep)
+// 			}
+// 			buf.WriteString(txt)
+// 		}
+// 	}
+// 	if err == nil {
+// 		ret = buf.String()
+// 	}
+// }
+// return

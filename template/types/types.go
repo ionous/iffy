@@ -40,8 +40,7 @@ type BuiltinType int
 //go:generate stringer -type=BuiltinType
 const (
 	// Joins several expressions into a single result.
-	// Usually, each individual expression reduces to a string,
-	// and span then concatenates those strings.
+	// For example, if multiple strings live side by side
 	Span BuiltinType = iota
 	// sequences holds a set of potentially repeating text.
 	Stopping

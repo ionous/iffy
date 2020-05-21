@@ -3,6 +3,7 @@ package express
 import (
 	"testing"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
@@ -95,81 +96,96 @@ func TestExpressions(t *testing.T) {
 
 // test full templates
 func TestTemplates(t *testing.T) {
-	templates := []struct {
-		name string
-		str  string
-		want interface{}
-	}{
-		{"cycle", "{cycle}a{or}b{or}c{end}",
-			&core.CycleText{Sequence: core.Sequence{
-				Seq: "autoexp1",
-				Parts: []rt.TextEval{
-					T("a"), T("b"), T("c"),
-				},
-			}},
-		},
-		{"once", "{once}a{or}b{or}c{end}",
-			&core.StoppingText{Sequence: core.Sequence{
-				Seq: "autoexp2",
-				Parts: []rt.TextEval{
-					T("a"), T("b"), T("c"),
-				},
-			}},
-		},
-		{"shuffle", "{shuffle}a{or}b{or}c{end}",
-			&core.ShuffleText{Sequence: core.Sequence{
-				Seq: "autoexp3",
-				Parts: []rt.TextEval{
-					T("a"), T("b"), T("c"),
-				},
-			}},
-		},
-		{"if", "{if 7=7}boop{else}beep{end}",
-			&core.ChooseText{
-				If: &core.CompareNum{
-					N(7), &core.EqualTo{}, N(7),
-				},
-				True:  T("boop"),
-				False: T("beep"),
-			},
-		},
-		{"unless", "{unless 7=7}boop{otherwise}beep{end}",
-			&core.ChooseText{
-				If: &core.IsNot{
-					&core.CompareNum{
-						N(7), &core.EqualTo{}, N(7),
-					}},
-				True:  T("boop"),
-				False: T("beep"),
-			},
-		},
-		{"pipe", "{15|printNum!}",
-			&core.PrintNum{
-				Num: &core.Number{15},
-			},
-		},
-		{"text pattern", "{'world'|hello!}",
-			&core.DetermineText{
-				Pattern: "hello",
-				Parameters: &core.Parameters{[]*core.Parameter{
-					&core.Parameter{
-						Name: "$1",
-						From: &core.FromText{
-							Val: T("world"),
-						}}}}},
-		},
-	}
 	var c Converter
-	for _, test := range templates {
-		if xs, e := template.Parse(test.str); e != nil {
-			t.Fatal(test.name, e)
-		} else if got, e := c.Convert(xs); e != nil {
-			t.Fatal(test.name, e)
-		} else if diff := pretty.Diff(got, test.want); len(diff) > 0 {
-			t.Fatal("failed:", test.name, pretty.Sprint(got))
-		} else {
-			t.Log("ok:", test.name, pretty.Sprint(got))
-		}
-	}
 
+	test := func(str string, want interface{}) (err error) {
+		if xs, e := template.Parse(str); e != nil {
+			err = e
+		} else if got, e := c.Convert(xs); e != nil {
+			err = errutil.New(e, xs)
+		} else if diff := pretty.Diff(got, want); len(diff) > 0 {
+			err = errutil.New("mismatch:", pretty.Sprint(got))
+		}
+		return
+	}
+	if e := test("{cycle}a{or}b{or}c{end}",
+		&core.CycleText{Sequence: core.Sequence{
+			Seq: "autoexp1",
+			Parts: []rt.TextEval{
+				T("a"), T("b"), T("c"),
+			},
+		}}); e != nil {
+		t.Fatal(e)
+	}
+	if e := test("{once}a{or}b{or}c{end}",
+		&core.StoppingText{Sequence: core.Sequence{
+			Seq: "autoexp2",
+			Parts: []rt.TextEval{
+				T("a"), T("b"), T("c"),
+			},
+		}}); e != nil {
+		t.Fatal(e)
+	}
+	if e := test("{shuffle}a{or}b{or}c{end}",
+		&core.ShuffleText{Sequence: core.Sequence{
+			Seq: "autoexp3",
+			Parts: []rt.TextEval{
+				T("a"), T("b"), T("c"),
+			},
+		}}); e != nil {
+		t.Fatal(e)
+	}
+	if e := test("{if 7=7}boop{else}beep{end}",
+		&core.ChooseText{
+			If: &core.CompareNum{
+				N(7), &core.EqualTo{}, N(7),
+			},
+			True:  T("boop"),
+			False: T("beep"),
+		}); e != nil {
+		t.Fatal(e)
+	}
+	if e := test("{unless 7=7}boop{otherwise}beep{end}",
+		&core.ChooseText{
+			If: &core.IsNot{
+				&core.CompareNum{
+					N(7), &core.EqualTo{}, N(7),
+				}},
+			True:  T("boop"),
+			False: T("beep"),
+		}); e != nil {
+		t.Fatal(e)
+	}
+	if e := test("{15|printNum!}",
+		&core.PrintNum{
+			Num: &core.Number{15},
+		}); e != nil {
+		t.Fatal(e)
+	}
+	if e := test("{15|printNum!} {if 7=7}boop{end}",
+		&core.Join{
+			Parts: []rt.TextEval{
+				&core.PrintNum{N(15)},
+				T(" "),
+				&core.ChooseText{
+					If: &core.CompareNum{
+						N(7), &core.EqualTo{}, N(7),
+					},
+					True: T("boop"),
+				},
+			},
+		}); e != nil {
+		t.Fatal(e)
+	}
+	if e := test("{'world'|hello!}",
+		&core.DetermineText{
+			Pattern: "hello",
+			Parameters: &core.Parameters{[]*core.Parameter{
+				&core.Parameter{
+					Name: "$1",
+					From: &core.FromText{
+						Val: T("world"),
+					}}}}}); e != nil {
+		t.Fatal(e)
+	}
 }

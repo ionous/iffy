@@ -197,6 +197,26 @@ func (c *Converter) buildUnless(cmd interface{}, arity int) (err error) {
 	return
 }
 
+func (c *Converter) buildSpan(arity int) (err error) {
+	if args, e := c.stack.pop(arity); e != nil {
+		err = e
+	} else {
+		var txts []rt.TextEval
+		for _, el := range args {
+			if txt, ok := el.Interface().(rt.TextEval); !ok {
+				e := errutil.New("argument is not a text eval")
+				err = errutil.Append(err, e)
+			} else {
+				txts = append(txts, txt)
+			}
+		}
+		if err == nil {
+			c.buildOne(&core.Join{Parts: txts})
+		}
+	}
+	return
+}
+
 // convert the passed postfix template function into iffy commands.
 func (c *Converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
@@ -258,6 +278,8 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 		case types.Cycle:
 			var seq core.CycleText
 			err = c.buildSequence(&seq, &seq.Sequence, fn.ParameterCount)
+		case types.Span:
+			err = c.buildSpan(fn.ParameterCount)
 
 		default:
 			// fix? span is supposed to join text sections.... but there were no tests or examples in the og code.
