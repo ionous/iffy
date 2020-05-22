@@ -8,9 +8,9 @@ import (
 )
 
 func TestFields(t *testing.T) {
-	// fieldFails(t, "a.")
-	// fieldFails(t, "b")
-	// fieldFails(t, "")
+	fieldFails(t, "a.")
+	fieldFails(t, "b")
+	fieldFails(t, "")
 	fieldSucceeds(t, ".a")
 	fieldSucceeds(t, ".a.b")
 	fieldSucceeds(t, ".a.b1.c2")
