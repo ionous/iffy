@@ -33,12 +33,16 @@ func TestText(t *testing.T) {
 
 	t.Run("join", func(t *testing.T) {
 		testTrue(t, &run, &CompareText{
-			&Join{Parts: &Texts{oneTwoThree}},
+			&Join{Parts: []rt.TextEval{
+				&Text{"one"}, &Text{"two"}, &Text{"three"},
+			}},
 			&EqualTo{},
 			&Text{"onetwothree"},
 		})
 		testTrue(t, &run, &CompareText{
-			&Join{&Text{" "}, &Texts{oneTwoThree}},
+			&Join{&Text{" "}, []rt.TextEval{
+				&Text{"one"}, &Text{"two"}, &Text{"three"},
+			}},
 			&EqualTo{},
 			&Text{"one two three"},
 		})
