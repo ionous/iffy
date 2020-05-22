@@ -10,6 +10,7 @@ import (
 
 // Directive containing the parsed content of a types.
 // Both or either of the key and the expression can be empty.
+// ex. {elsif b = 5}
 type Directive struct {
 	Key string
 	postfix.Expression

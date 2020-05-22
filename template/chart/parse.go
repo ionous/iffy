@@ -20,9 +20,9 @@ type endpointError struct {
 	last State
 }
 
-func (e endpointError) Error() string {
-	return errutil.Fmt("parsing `%s` ended in %T at %q(%d)",
-		e.str, e.last, e.str[e.end-1], e.end).Error()
+func (e endpointError) Error() (ret string) {
+	return errutil.Fmt("parsing `%s` ended in %T(%s) at %q(%d)",
+		e.str, e.last, e.last.StateName(), e.str[e.end-1], e.end).Error()
 }
 
 // if the state machine ends before the string is empty

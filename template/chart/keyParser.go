@@ -6,6 +6,10 @@ type KeyParser struct {
 	exp   ExpressionState
 }
 
+func (p *KeyParser) StateName() string {
+	return "keys"
+}
+
 // NewRune starts on the first letter of the key.
 func (p *KeyParser) NewRune(r rune) (ret State) {
 	if isLetter(r) {

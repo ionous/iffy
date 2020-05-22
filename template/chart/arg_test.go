@@ -44,7 +44,7 @@ func testArgs(t *testing.T, str, want string, a int) (err error) {
 }
 
 func TestArgExpression(t *testing.T) {
-	if e := testArgx(t, "a {1+2}", "a 1 2 ADD"); e != nil {
+	if e := testArgx(t, ".a {1+2}", "a 1 2 ADD"); e != nil {
 		t.Fatal(e)
 	}
 	if e := testArgx(t, "{(5+6)*(7+8)}", "5 6 ADD 7 8 ADD MUL"); e != nil {

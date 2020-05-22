@@ -6,10 +6,11 @@ import (
 
 func TestCall(t *testing.T) {
 	f := &AnyFactory{}
-	if e := testCall(t, f, "fun!", "FUN/0"); e != nil {
+
+	if e := testCall(t, f, "call: .a .b", "a b CALL/2"); e != nil {
 		t.Fatal(e)
 	}
-	if e := testCall(t, f, "call: a b", "a b CALL/2"); e != nil {
+	if e := testCall(t, f, "fun!", "FUN/0"); e != nil {
 		t.Fatal(e)
 	}
 	if e := testCall(t, f, "quest?", "QUEST/0"); e != nil {
@@ -22,10 +23,10 @@ func TestCallSubdir(t *testing.T) {
 	if e := testCall(t, f, "call: {5+6}", "5 6 ADD CALL/1"); e != nil {
 		t.Fatal(e)
 	}
-	if e := testCall(t, f, "call: {a!} b", "A/0 b CALL/2"); e != nil {
+	if e := testCall(t, f, "call: {a!} .b", "A/0 b CALL/2"); e != nil {
 		t.Fatal(e)
 	}
-	if e := testCall(t, f, "call: a {1+2}", "a 1 2 ADD CALL/2"); e != nil {
+	if e := testCall(t, f, "call: .a {1+2}", "a 1 2 ADD CALL/2"); e != nil {
 		t.Fatal(e)
 	}
 }

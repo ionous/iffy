@@ -18,13 +18,17 @@ func MakeArgParser(f ExpressionStateFactory) ArgParser {
 	return ArgParser{factory: f}
 }
 
+func (p *ArgParser) StateName() string {
+	return "arg parser"
+}
+
 // GetArguments returns both the expression, and the number of separated arguments.
-func (p ArgParser) GetArguments() (postfix.Expression, int, error) {
+func (p *ArgParser) GetArguments() (postfix.Expression, int, error) {
 	return p.out, p.cnt, p.err
 }
 
 // GetExpression see also GetArguments.
-func (p ArgParser) GetExpression() (postfix.Expression, error) {
+func (p *ArgParser) GetExpression() (postfix.Expression, error) {
 	return p.out, p.err
 }
 
@@ -37,7 +41,7 @@ func (p *ArgParser) NewRune(r rune) State {
 	} else {
 		sub = new(SubdirParser)
 	}
-	return ParseChain(r, sub, Statement(func(r rune) (ret State) {
+	return ParseChain(r, sub, Statement("continuing args", func(r rune) (ret State) {
 		if exp, e := sub.GetExpression(); e != nil {
 			p.err = e
 		} else if len(exp) > 0 {

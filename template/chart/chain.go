@@ -18,6 +18,10 @@ type ChainParser struct {
 	next, last State
 }
 
+func (p *ChainParser) StateName() string {
+	return "chain parser ('" + p.next.StateName() + "' '" + p.last.StateName() + "')"
+}
+
 // NewRune tries the first state, and any of its returned states; then switches to the last state.
 func (p *ChainParser) NewRune(r rune) (ret State) {
 	if next := p.next.NewRune(r); next != nil {
@@ -27,24 +31,3 @@ func (p *ChainParser) NewRune(r rune) (ret State) {
 	}
 	return
 }
-
-// MakeParallel region; run all of the passed states until they all return nil.
-func MakeParallel(rs ...State) State {
-	return SelfStatement(func(self SelfStatement, r rune) (ret State) {
-		var cnt int
-		for _, s := range rs {
-			if next := s.NewRune(r); next != nil {
-				rs[cnt] = next
-				cnt++
-			}
-		}
-		if cnt > 0 {
-			rs = rs[:cnt]
-			ret = self
-		}
-		return
-	})
-}
-
-// for the very next rune returns nil ( unhandled )
-var Terminal = Statement(func(rune) State { return nil })

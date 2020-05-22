@@ -1,9 +1,10 @@
 package chart
 
 import (
+	"sort"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/template/types"
-	"sort"
 )
 
 // OperatorParser reads a binary operator.
@@ -12,8 +13,12 @@ type OperatorParser struct {
 	ofs  int    // search offset with our operator list
 }
 
+func (p *OperatorParser) StateName() string {
+	return "operators"
+}
+
 // GetOperator representing the result of parsing, can be -1 if nothing was matched.
-func (p OperatorParser) GetOperator() (ret types.Operator, err error) {
+func (p *OperatorParser) GetOperator() (ret types.Operator, err error) {
 	if len(p.next) == 0 {
 		ret = types.Operator(-1)
 	} else {

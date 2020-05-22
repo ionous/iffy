@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ionous/errutil"
+	"github.com/kr/pretty"
 )
 
 func TestFailures(t *testing.T) {
@@ -25,8 +26,8 @@ func TestChart(t *testing.T) {
 			t.Fatal(e)
 		}
 		// our tricky case: a single word is a key.
-		if e := testChart(t, "hello {player}",
-			`hello {player:}`); e == nil {
+		if e := testChart(t, "hello {.player}",
+			`"hello " player Span/2`); e != nil {
 			t.Fatal(e)
 		}
 		if e := testChart(t, `{player!}`,
@@ -128,7 +129,9 @@ func TestChart(t *testing.T) {
 		// test mismatched keywords
 		if e := testChart(t, "{cycle}a{or}{if boop?}{or}beep{end}{end}",
 			ignoreResult); e == nil {
-			t.Fatal(e)
+			t.Fatal("expected error")
+		} else {
+			t.Log("ok:", e)
 		}
 	})
 }
@@ -138,7 +141,7 @@ func testChart(t *testing.T, str, want string) (err error) {
 	if ds, e := Parse(str); e != nil {
 		err = e
 	} else if got := ds.String(); want == ignoreResult || got == want {
-		t.Log("got", got)
+		t.Log("got", got, pretty.Sprint(ds))
 	} else {
 		err = mismatched(want, got)
 	}

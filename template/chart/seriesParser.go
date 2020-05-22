@@ -11,6 +11,10 @@ type SeriesParser struct {
 	out postfix.Shunt
 }
 
+func (p *SeriesParser) StateName() string {
+	return "series"
+}
+
 // NewRune starts on the first character of an operand or opening sub-phrase.
 func (p *SeriesParser) NewRune(r rune) State {
 	return p.operand(r)
@@ -31,15 +35,15 @@ func (p *SeriesParser) operand(r rune) (ret State) {
 	switch {
 	case isOpenParen(r):
 		p.out.BeginSubExpression()
-		ret = MakeChain(spaces, Statement(p.operand))
+		ret = MakeChain(spaces, Statement("sub expression", p.operand))
 	default:
 		var a SubdirParser
-		ret = ParseChain(r, &a, Statement(func(r rune) (ret State) {
+		ret = ParseChain(r, &a, Statement("after sub series", func(r rune) (ret State) {
 			if exp, e := a.GetExpression(); e != nil {
 				p.err = e
 			} else if len(exp) > 0 {
 				p.out.AddExpression(exp)
-				ret = ParseChain(r, spaces, Statement(p.operator))
+				ret = ParseChain(r, spaces, Statement("operator", p.operator))
 			}
 			return
 		}))
@@ -52,18 +56,18 @@ func (p *SeriesParser) operand(r rune) (ret State) {
 // a pipe floats upward.
 func (p *SeriesParser) operator(r rune) (ret State) {
 	var b OperatorParser
-	return ParseChain(r, &b, Statement(func(r rune) (ret State) {
+	return ParseChain(r, &b, Statement("after series op", func(r rune) (ret State) {
 		switch {
 		case isCloseParen(r):
 			p.out.EndSubExpression()
-			ret = MakeChain(spaces, Statement(p.operator))
+			ret = MakeChain(spaces, Statement("closing", p.operator))
 		default:
-			ret = ParseChain(r, &b, Statement(func(r rune) (ret State) {
+			ret = ParseChain(r, &b, Statement("continuing series", func(r rune) (ret State) {
 				if op, e := b.GetOperator(); e != nil {
 					p.err = e
 				} else if op != types.Operator(-1) {
 					p.out.AddFunction(op)
-					ret = ParseChain(r, spaces, Statement(p.operand))
+					ret = ParseChain(r, spaces, Statement("next operand", p.operand))
 				}
 				return
 			}))

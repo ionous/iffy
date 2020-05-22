@@ -17,21 +17,25 @@ func MakeCallParser(a int, f ExpressionStateFactory) CallParser {
 	return CallParser{arity: a, argFactory: f}
 }
 
-func (p CallParser) GetExpression() (ret postfix.Expression, err error) {
+func (p *CallParser) StateName() string {
+	return "call parser"
+}
+
+func (p *CallParser) GetExpression() (ret postfix.Expression, err error) {
 	return p.out, p.err
 }
 
 // NewRune starts with the first character past the bar.
 func (p *CallParser) NewRune(r rune) State {
 	var id IdentParser
-	return ParseChain(r, spaces, MakeChain(&id, Statement(func(r rune) (ret State) {
+	return ParseChain(r, spaces, MakeChain(&id, Statement("after call", func(r rune) (ret State) {
 		// read a function: an identifier which ends with a separator.
 		// We dont fail if we dont end with a separator --
 		// the assumption is that it might be an id
-		if n := id.GetName(); len(n) > 0 && isSeparator(r) {
+		if n := id.Identifier(); len(n) > 0 && isSeparator(r) {
 			args := ArgParser{factory: p.argFactory}
 			// use MakeChain to skip the separator itself
-			ret = MakeChain(spaces, MakeChain(&args, StateExit(func() {
+			ret = MakeChain(spaces, MakeChain(&args, StateExit("call", func() {
 				if args, arity, e := args.GetArguments(); e != nil {
 					p.err = e
 				} else {

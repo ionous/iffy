@@ -65,3 +65,7 @@ func isPipe(r rune) bool {
 func isTrim(r rune) bool {
 	return r == '~'
 }
+
+func isDot(r rune) bool {
+	return r == '.'
+}

@@ -1,8 +1,11 @@
 package chart
 
 import (
-	"github.com/ionous/errutil"
 	"strconv"
+
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/template/postfix"
+	"github.com/ionous/iffy/template/types"
 )
 
 type FloatMode int
@@ -15,6 +18,7 @@ const (
 	Float64
 )
 
+// implements OperandState.
 type NumParser struct {
 	runes  Runes
 	mode   FloatMode
@@ -30,7 +34,19 @@ func (n negate) mul(f float64) float64 {
 	return f
 }
 
-func (p NumParser) GetValue() (ret float64, err error) {
+func (*NumParser) StateName() string {
+	return "num parser"
+}
+func (p *NumParser) GetOperand() (ret postfix.Function, err error) {
+	if n, e := p.GetValue(); e != nil {
+		err = e
+	} else {
+		ret = types.Number(n)
+	}
+	return
+}
+
+func (p *NumParser) GetValue() (ret float64, err error) {
 	s := p.runes.String()
 	switch p.mode {
 	case Int10:
@@ -69,25 +85,25 @@ func (p *NumParser) NewRune(r rune) (ret State) {
 		p.negate = true
 		fallthrough
 	case r == '+':
-		ret = Statement(func(r rune) (ret State) {
+		ret = Statement("after lead plus", func(r rune) (ret State) {
 			if isNumber(r) {
 				p.mode = Int10
-				ret = p.runes.Accept(r, Statement(p.leadingDigit))
+				ret = p.runes.Accept(r, Statement("num plus", p.leadingDigit))
 			}
 			return
 		})
 	case r == '0':
 		// 0 can standalone; but, it might be followed by a hex qualifier.
 		p.mode = Int10
-		ret = p.runes.Accept(r, Statement(func(r rune) (ret State) {
+		ret = p.runes.Accept(r, Statement("hex check", func(r rune) (ret State) {
 			// https://golang.org/ref/spec#hex_literal
 			switch {
 			case r == 'x' || r == 'X':
 				p.mode = Pending
-				ret = p.runes.Accept(r, Statement(func(r rune) (ret State) {
+				ret = p.runes.Accept(r, Statement("hex parse", func(r rune) (ret State) {
 					if isHex(r) {
 						p.mode = Int16
-						ret = p.runes.Accept(r, Statement(p.hexDigits))
+						ret = p.runes.Accept(r, Statement("num hex", p.hexDigits))
 					}
 					return
 				}))
@@ -102,7 +118,7 @@ func (p *NumParser) NewRune(r rune) (ret State) {
 	case isNumber(r):
 		// https://golang.org/ref/spec#float_lit
 		p.mode = Int10
-		ret = p.runes.Accept(r, Statement(p.leadingDigit))
+		ret = p.runes.Accept(r, Statement("num digits", p.leadingDigit))
 	}
 	return
 }
@@ -112,13 +128,13 @@ func (p *NumParser) NewRune(r rune) (ret State) {
 func (p *NumParser) leadingDigit(r rune) (ret State) {
 	switch {
 	case isNumber(r):
-		ret = p.runes.Accept(r, Statement(p.leadingDigit))
+		ret = p.runes.Accept(r, Statement("leading dig", p.leadingDigit))
 	case r == '.':
 		p.mode = Pending
-		ret = p.runes.Accept(r, Statement(func(r rune) (ret State) {
+		ret = p.runes.Accept(r, Statement("decimal", func(r rune) (ret State) {
 			if isNumber(r) {
 				p.mode = Float64
-				ret = p.runes.Accept(r, Statement(p.leadingDigit))
+				ret = p.runes.Accept(r, Statement("decimal digits", p.leadingDigit))
 			} else {
 				ret = p.tryExponent(r) // delegate to exponent checking,,,
 			}
@@ -136,16 +152,16 @@ func (p *NumParser) tryExponent(r rune) (ret State) {
 	switch {
 	case r == 'e' || r == 'E':
 		p.mode = Pending
-		ret = p.runes.Accept(r, Statement(func(r rune) (ret State) {
+		ret = p.runes.Accept(r, Statement("exp", func(r rune) (ret State) {
 			switch {
 			case isNumber(r):
 				p.mode = Float64
-				ret = p.runes.Accept(r, Statement(p.decimals))
+				ret = p.runes.Accept(r, Statement("exp decimal", p.decimals))
 			case r == '+' || r == '-':
-				ret = p.runes.Accept(r, Statement(func(r rune) (ret State) {
+				ret = p.runes.Accept(r, Statement("exp power", func(r rune) (ret State) {
 					if isNumber(r) {
 						p.mode = Float64
-						ret = p.runes.Accept(r, Statement(p.decimals))
+						ret = p.runes.Accept(r, Statement("exp num", p.decimals))
 					}
 					return
 				}))
@@ -159,7 +175,7 @@ func (p *NumParser) tryExponent(r rune) (ret State) {
 // a chain of decimal digits 0-9
 func (p *NumParser) decimals(r rune) (ret State) {
 	if isNumber(r) {
-		ret = p.runes.Accept(r, Statement(p.decimals))
+		ret = p.runes.Accept(r, Statement("decimals", p.decimals))
 	}
 	return
 }
@@ -167,7 +183,7 @@ func (p *NumParser) decimals(r rune) (ret State) {
 // a chain of hex digits 0-9, a-f
 func (p *NumParser) hexDigits(r rune) (ret State) {
 	if isHex(r) {
-		ret = p.runes.Accept(r, Statement(p.hexDigits))
+		ret = p.runes.Accept(r, Statement("hexDigits", p.hexDigits))
 	}
 	return
 }

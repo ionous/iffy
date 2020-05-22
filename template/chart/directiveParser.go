@@ -5,6 +5,8 @@ import (
 	"github.com/ionous/iffy/template/postfix"
 )
 
+// ExpressionStateFactory is used for testing with mocks.
+// when no factory is specified, the pipe or subdirective parser is used depending on context.
 type ExpressionStateFactory interface {
 	NewExpressionState() ExpressionState
 }
@@ -22,6 +24,10 @@ type DirectiveParser struct {
 	err     error
 }
 
+func (p *DirectiveParser) StateName() string {
+	return "directive parser"
+}
+
 func (p *DirectiveParser) GetDirective() (Directive, error) {
 	return p.out, p.err
 }
@@ -31,15 +37,15 @@ func (p *DirectiveParser) NewRune(r rune) State {
 	keyp := KeyParser{exp: p.newExpressionParser()}
 	expp := p.newExpressionParser()
 	//
-	para := MakeParallel(
-		MakeChain(expp, StateExit(func() {
+	para := MakeParallel("key or expression",
+		MakeChain(expp, StateExit("expression", func() {
 			if exp, e := expp.GetExpression(); e != nil {
 				p.err = errutil.Append(p.err, e)
 			} else if len(exp) > 0 {
 				p.out = Directive{Expression: exp} // last match wins
 			}
 		})),
-		MakeChain(&keyp, StateExit(func() {
+		MakeChain(&keyp, StateExit("key", func() {
 			if d, e := keyp.GetDirective(); e != nil {
 				p.err = errutil.Append(p.err, e)
 			} else {
