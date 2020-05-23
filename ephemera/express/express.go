@@ -20,7 +20,7 @@ func Convert(xs template.Expression) (ret interface{}, err error) {
 }
 
 type Converter struct {
-	stack rstack // the stack is empty initially, and we fill it with converted commands
+	stack cmdStack // the stack is empty initially, and we fill it with converted commands
 	// ( to be used later by other commands )
 	AutoCounter int
 }
@@ -28,8 +28,12 @@ type Converter struct {
 func (c *Converter) Convert(xs template.Expression) (ret interface{}, err error) {
 	if e := c.convert(xs); e != nil {
 		err = e
+	} else if op, e := c.stack.flush(); e != nil {
+		err = e
+	} else if on, ok := op.(objectName); ok {
+		ret = on.getPrintedName()
 	} else {
-		ret, err = c.stack.flush()
+		ret = op
 	}
 	return
 }
@@ -203,11 +207,14 @@ func (c *Converter) buildSpan(arity int) (err error) {
 	} else {
 		var txts []rt.TextEval
 		for _, el := range args {
-			if txt, ok := el.Interface().(rt.TextEval); !ok {
-				e := errutil.New("argument is not a text eval")
+			switch el := el.Interface().(type) {
+			case objectName:
+				txts = append(txts, el.getPrintedName())
+			case rt.TextEval:
+				txts = append(txts, el)
+			default:
+				e := errutil.New("argument %T is not a text eval", el)
 				err = errutil.Append(err, e)
-			} else {
-				txts = append(txts, txt)
 			}
 		}
 		if err == nil {
@@ -251,13 +258,17 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 				// fix: can this add ephemera that there's a local of name?
 				op = &core.GetVar{name}
 			}
-			// a.b: from the named object a, we want its field b
-			// a.b.c: after getting the object name in field b, get that object's field c
+			// .a.b: from the named object a, we want its field b
+			// .a.b.c: after getting the object name in field b, get that object's field c
 			for _, field := range fields[1:] {
 				op = &core.GetField{op, &core.Text{field}}
 			}
 			// the whole chain becomes a single "function"
-			c.buildOne(op)
+			if len(fields) == 1 {
+				c.buildOne(objectName{op})
+			} else {
+				c.buildOne(op)
+			}
 		}
 
 	case types.Builtin:

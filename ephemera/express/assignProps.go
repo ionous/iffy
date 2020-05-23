@@ -29,6 +29,9 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 				slice, elType := field, f.Type.Elem()
 				for len(args) > 0 {
 					arg := args[0]
+					if on, ok := arg.Interface().(objectName); ok {
+						arg = r.ValueOf(on.getTextName())
+					}
 					if argType := arg.Type(); !argType.AssignableTo(elType) {
 						break
 					} else {

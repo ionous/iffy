@@ -12,5 +12,5 @@ type mismatch struct {
 }
 
 func (m mismatch) Error() string {
-	return errutil.Fmt("while %s expected %T, it has %T", m.Name, m.Want, m.Have).Error()
+	return errutil.Sprintf("while %s expected %T, it has %T", m.Name, m.Want, m.Have)
 }

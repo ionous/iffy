@@ -1,8 +1,6 @@
 package parser
 
-import (
-	"fmt"
-)
+import "github.com/ionous/errutil"
 
 type ErrorDepth interface {
 	ErrorDepth() int
@@ -55,13 +53,13 @@ func (d Depth) ErrorDepth() int {
 }
 
 func (a AmbiguousObject) Error() string {
-	return fmt.Sprint("couldnt determine object", a.Nouns)
+	return errutil.Sprint("couldnt determine object", a.Nouns)
 }
 func (a MismatchedWord) Error() string {
-	return fmt.Sprintf("mismatched word %s != %s at %d", a.Have, a.Want, a.Depth)
+	return errutil.Sprintf("mismatched word %s != %s at %d", a.Have, a.Want, a.Depth)
 }
 func (a MissingObject) Error() string {
-	return fmt.Sprintf("missing an object at %d", a.Depth)
+	return errutil.Sprintf("missing an object at %d", a.Depth)
 }
 func (NoSuchObjects) Error() string {
 	return "you cant see any such things"

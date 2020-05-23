@@ -6,8 +6,8 @@ import (
 
 // Shunt-ing yard ( dijkstra ) to convert an infix function stream to a postfix function list.
 // The key differences to the traditional algorithm are:
-//  * Tokens are replaced by Functions; operands are zero-arity functions ( presumably functions which return the value of the operand. )
-//  * We use one yard for each sub-expression rather than making parentheses a token or function in the stream symbols.
+//  * Tokens are replaced by Functions; operands are zero-arity functions ( which return the value of the operand. )
+//  * Uses a separate yard for each sub-expression ( rather than making parentheses an element in the symbol stream. )
 type Shunt struct {
 	out       Expression
 	yards     Yards
