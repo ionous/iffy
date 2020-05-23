@@ -7,9 +7,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ionous/iffy"
+	"github.com/ionous/iffy/dl/check"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/imp"
-	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -22,8 +24,11 @@ func newTestImporter(t *testing.T) (ret *imp.Porter, retDB *sql.DB) {
 }
 
 func newTestDecoder(t *testing.T) (ret *imp.Porter, retDB *sql.DB) {
+	iffy.RegisterGobs()
+	//
 	dec := decode.NewDecoder()
-	dec.AddDefaultCallbacks(export.Slats)
+	dec.AddDefaultCallbacks(core.Slats)
+	dec.AddDefaultCallbacks(check.Slats)
 	return newTestImporterDecoder(t, dec)
 }
 

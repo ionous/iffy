@@ -1,12 +1,5 @@
 package pattern
 
-// Register pattern rules ( which are saved as program in the model database, etc. )
-func Register(reg func(value interface{})) {
-	for _, cmd := range Rules {
-		reg(cmd)
-	}
-}
-
 // Rule associates a filter with an eval.
 // Only when the rule's filter matches, the eval is... evaluated.
 // Rules are usually combined into rule sets.

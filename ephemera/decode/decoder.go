@@ -13,7 +13,7 @@ import (
 type ReadRet func(reader.Map) (interface{}, error)
 
 type Override struct {
-	Spec     composer.Specification
+	Spec     composer.Slat
 	Callback ReadRet
 }
 
@@ -34,7 +34,7 @@ func (dec *Decoder) AddCallbacks(overrides []Override) {
 }
 
 // AddCallback registers a command parser.
-func (dec *Decoder) AddCallback(cmd composer.Specification, cb ReadRet) {
+func (dec *Decoder) AddCallback(cmd composer.Slat, cb ReadRet) {
 	if spec := cmd.Compose(); len(spec.Name) == 0 {
 		panic(errutil.Fmt("missing name for spec %T", cmd))
 	} else {
@@ -43,7 +43,7 @@ func (dec *Decoder) AddCallback(cmd composer.Specification, cb ReadRet) {
 }
 
 // AddDefaultCallbacks registers default command parsers.
-func (dec *Decoder) AddDefaultCallbacks(slats []composer.Specification) {
+func (dec *Decoder) AddDefaultCallbacks(slats []composer.Slat) {
 	for _, slat := range slats {
 		spec := slat.Compose()
 		elem := r.TypeOf(slat).Elem()

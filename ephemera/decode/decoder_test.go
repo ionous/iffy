@@ -3,8 +3,9 @@ package decode
 import (
   "testing"
 
+  "github.com/ionous/iffy/dl/check"
+  "github.com/ionous/iffy/dl/core"
   "github.com/ionous/iffy/ephemera/debug"
-  "github.com/ionous/iffy/export"
   "github.com/kr/pretty"
 )
 
@@ -12,7 +13,8 @@ import (
 func TestDecode(t *testing.T) {
   dec := NewDecoder()
   // register creation functions for all the slats.
-  dec.AddDefaultCallbacks(export.Slats)
+  dec.AddDefaultCallbacks(core.Slats)
+  dec.AddDefaultCallbacks(check.Slats)
   // read say story data
   if prog, e := dec.ReadProg(debug.SayStory); e != nil {
     t.Fatal(e)

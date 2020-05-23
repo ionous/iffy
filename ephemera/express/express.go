@@ -126,7 +126,7 @@ func (c *Converter) buildSequence(cmd rt.TextEval, seq *core.Sequence, count int
 // build an command named in the export Slat
 // names in templates are currently "mixedCase" rather than "underscore_case".
 func (c *Converter) buildExport(name string, arity int) (err error) {
-	if a, ok := exportsCache.get(name); !ok {
+	if a, ok := coreCache.get(name); !ok {
 		err = c.buildPattern(name, arity)
 	} else if args, e := c.stack.pop(arity); e != nil {
 		err = e

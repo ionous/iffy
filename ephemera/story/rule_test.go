@@ -39,7 +39,6 @@ func TestPatternActivity(t *testing.T) {
 }
 
 func TestPatternRule(t *testing.T) {
-	registerGob()
 	k, db := newTestDecoder(t)
 	defer db.Close()
 	if e := imp_pattern_handler(k, _pattern_handler); e != nil {

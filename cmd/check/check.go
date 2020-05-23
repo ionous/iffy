@@ -2,13 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"encoding/gob"
 	"flag"
 	"log"
 	"path/filepath"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/export"
+	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/qna"
 )
 
@@ -38,16 +37,5 @@ func checkFile(inFile string) (err error) {
 }
 
 func init() {
-	registerGob()
-}
-
-// duplicated in import/internal --
-// where should t live?
-var registeredGob = false
-
-func registerGob() {
-	if !registeredGob {
-		export.Register(gob.Register)
-		registeredGob = true
-	}
+	iffy.RegisterGobs()
 }

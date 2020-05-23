@@ -69,7 +69,7 @@ func imp_determine_text_list(k *imp.Porter, m reader.Map) (ret interface{}, err 
 // from and spec are the same object, but go-type unpacking from interfaces isnt always easy.
 func fromPattern(k *imp.Porter,
 	m reader.Map,
-	spec composer.Specification,
+	spec composer.Slat,
 	from *core.FromPattern) (err error) {
 	typeName := spec.Compose().Name
 	if evalType, e := slotName(spec); e != nil {

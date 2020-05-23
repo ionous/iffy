@@ -486,13 +486,13 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        },
         "$PARAMETERS": {
           "label": "parameters",
           "type": "parameters"
+        },
+        "$PATTERN": {
+          "label": "pattern",
+          "type": "text"
         }
       },
       "slots": [
@@ -500,7 +500,7 @@ const spec = [
       ],
       "tokens": [
         "determine act",
-        "$NAME",
+        "$PATTERN",
         "$PARAMETERS"
       ]
     }
@@ -911,9 +911,10 @@ const spec = [
     "uses": "run",
     "with": {
       "params": {
-        "$ELEMS": {
-          "label": "elems",
-          "type": "text_list_eval"
+        "$PARTS": {
+          "label": "parts",
+          "repeats": true,
+          "type": "text_eval"
         },
         "$SEP": {
           "label": "sep",
@@ -925,8 +926,8 @@ const spec = [
       ],
       "tokens": [
         "join",
-        "$ELEMS",
-        "$SEP"
+        "$SEP",
+        "$PARTS"
       ]
     }
   },
@@ -1132,6 +1133,20 @@ const spec = [
     "with": {
       "slots": [
         "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Render Template: Parse text using iffy templates. See: https://github.com/ionous/iffy/wiki/Templates",
+    "group": [
+      "format"
+    ],
+    "name": "render_template",
+    "spec": "the template {lines%template:lines|quote}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
       ]
     }
   },

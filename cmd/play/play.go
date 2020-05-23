@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/check"
-	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/tables"
 )
@@ -67,16 +67,5 @@ func runTest(prog check.Testing) (err error) {
 }
 
 func init() {
-	registerGob()
-}
-
-// duplicated in import/internal --
-// where should t live?
-var registeredGob = false
-
-func registerGob() {
-	if !registeredGob {
-		export.Register(gob.Register)
-		registeredGob = true
-	}
+	iffy.RegisterGobs()
 }

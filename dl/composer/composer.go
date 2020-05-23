@@ -5,6 +5,13 @@ type Spec struct {
 	Locals                  []string
 }
 
-type Specification interface {
+type Slat interface {
 	Compose() Spec
+}
+
+type Slot struct {
+	Name  string
+	Type  interface{} // nil instance, ex. (*core.Comparator)(nil)
+	Desc  string
+	Group string // display group(s)
 }

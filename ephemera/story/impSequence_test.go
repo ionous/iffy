@@ -9,7 +9,6 @@ import (
 )
 
 func TestImportSequence(t *testing.T) {
-	registerGob()
 	k, db := newTestDecoder(t)
 	defer db.Close()
 	if cmd, e := imp_cycle_text(k, _cycle_text); e != nil {
