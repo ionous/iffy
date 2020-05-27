@@ -53,7 +53,7 @@ func AssembleNouns(m *Modeler, db *sql.DB) (err error) {
 			on (n.idNamedNoun = nn.rowid)
 		left join eph_named nk
 			on (n.idNamedKind = nk.rowid)
-		left join mdl_kind ak
+		join mdl_kind ak
 			on (ak.kind = nk.name)
 		order by nn.name, nk.name
 		`, func() (err error) {
