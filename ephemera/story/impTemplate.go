@@ -12,7 +12,7 @@ import (
 func imp_render_template(k *imp.Porter, r reader.Map) (ret interface{}, err error) {
 	if m, e := reader.Unpack(r, "render_template"); e != nil {
 		err = e
-	} else if str, e := imp_lines(k, m.MapOf("$EXPRESSION")); e != nil {
+	} else if str, e := imp_lines(k, m.MapOf("$TEMPLATE")); e != nil {
 		err = e
 	} else if xs, e := template.Parse(str); e != nil {
 		err = e

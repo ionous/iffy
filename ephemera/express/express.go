@@ -170,6 +170,8 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 
 func newAssignment(arg r.Value) (ret core.Assignment, err error) {
 	switch arg := arg.Interface().(type) {
+	case objectName:
+		ret = &core.FromText{arg.getTextName()}
 	case rt.BoolEval:
 		ret = &core.FromBool{arg}
 	case rt.NumberEval:

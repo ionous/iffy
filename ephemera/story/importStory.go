@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
+	"github.com/ionous/iffy/ephemera/express"
 	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 )
@@ -27,10 +28,12 @@ func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
 		{(*core.DetermineBool)(nil), k.BindRet(imp_determine_bool)},
 		{(*core.DetermineNumList)(nil), k.BindRet(imp_determine_num_list)},
 		{(*core.DetermineTextList)(nil), k.BindRet(imp_determine_text_list)},
-
+		//
 		{(*core.CycleText)(nil), k.BindRet(imp_cycle_text)},
 		{(*core.ShuffleText)(nil), k.BindRet(imp_shuffle_text)},
 		{(*core.StoppingText)(nil), k.BindRet(imp_stopping_text)},
+		//
+		{(*express.Render)(nil), k.BindRet(imp_render_template)},
 	})
 	//
 	return imp_story(k, m)

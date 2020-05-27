@@ -5,7 +5,8 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// used for converting requests
+// used for converting requests for objects into automatic printing of an object's name
+// ex. {.lantern}
 type objectName struct {
 	name rt.TextEval
 }
