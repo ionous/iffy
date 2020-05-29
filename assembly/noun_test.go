@@ -43,26 +43,26 @@ func TestNounFormation(t *testing.T) {
 		}
 	})
 	// wip:
-	// t.Run("failure", func(t *testing.T) {
-	// 	if asm, e := newAssemblyTest(t, memory); e != nil {
-	// 		t.Fatal(e)
-	// 	} else {
-	// 		defer asm.db.Close()
-	// 		if e := AddTestHierarchy(asm.assembler, []TargetField{
-	// 			{"T", ""},
-	// 		}); e != nil {
-	// 			t.Fatal(e)
-	// 		} else if e := addNouns(asm.rec, []pair{
-	// 			{"bad apple", "B"},
-	// 		}); e != nil {
-	// 			t.Fatal(e)
-	// 		} else if e := AssembleNouns(asm.assembler); e = nil {
-	// 			t.Fatal("expected error")
-	// 		} else if e := matchNouns(asm.db, nil); e != nil {
-	// 			t.Fatal(e)
-	// 		}
-	// 	}
-	// })
+	t.Run("failure", func(t *testing.T) {
+		if asm, e := newAssemblyTest(t, memory); e != nil {
+			t.Fatal(e)
+		} else {
+			defer asm.db.Close()
+			if e := AddTestHierarchy(asm.assembler, []TargetField{
+				{"T", ""},
+			}); e != nil {
+				t.Fatal(e)
+			} else if e := addNouns(asm.rec, []pair{
+				{"bad apple", "B"},
+			}); e != nil {
+				t.Fatal(e)
+			} else if e := AssembleNouns(asm.assembler); e == nil {
+				t.Fatal("expected error")
+			} else {
+				t.Log("ok, error:", e)
+			}
+		}
+	})
 }
 
 func collectNouns(db *sql.DB) (ret []modeledNoun, err error) {
