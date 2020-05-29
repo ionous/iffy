@@ -71,7 +71,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 func (*IsKindOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "is_class",
-		Spec:  "Is $OBJ a kind of $CLASS",
+		Spec:  "Is {noun%obj} a kind of {kind:singular_kind}",
 		Group: "objects",
 		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",
 	}
