@@ -33,8 +33,9 @@ func AssembleStory(db *sql.DB, baseKind string, reporter IssueReport) (err error
 		err = e
 	} else if e := AssemblePatterns(asm); e != nil || asm.IssueCount > 0 {
 		err = e
-	} else if _, e := db.Exec("insert into mdl_prog select type, prog as bytes from eph_prog;" +
-		"insert into mdl_check select * from asm_check"); e != nil {
+	} else if _, e := db.Exec(
+		`insert into mdl_prog select type, prog as bytes from eph_prog;
+		insert into mdl_check select * from asm_check`); e != nil {
 		err = e
 	}
 	return

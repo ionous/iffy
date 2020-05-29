@@ -37,7 +37,7 @@ func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 		}
 	}
 	if err == nil {
-		if db, e := sql.Open("iffy_asm", source); e != nil {
+		if db, e := sql.Open(SqlCustomDriver, source); e != nil {
 			err = errutil.New(e, "for", source)
 		} else if e := tables.CreateEphemera(db); e != nil {
 			err = errutil.New(e, "for", source)
