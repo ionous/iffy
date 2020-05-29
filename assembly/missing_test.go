@@ -28,7 +28,7 @@ func TestMissingKinds(t *testing.T) {
 		if e := AssembleAncestry(asm.assembler, "T"); e == nil {
 			t.Fatal("expected error")
 		} else if !containsOnly(asm.dilemmas, `missing kind: "R"`) {
-			t.Fatal(e)
+			t.Fatal(asm.dilemmas)
 		} else {
 			t.Log("ok:", e)
 		}
@@ -83,7 +83,7 @@ func TestMissingField(t *testing.T) {
 		} else if e := AssembleFields(asm.assembler); e == nil {
 			t.Fatal("expected error")
 		} else if !containsOnly(asm.dilemmas, `missing field: "z"`) {
-			t.Fatal(e)
+			t.Fatal(asm.dilemmas)
 		} else {
 			t.Log("ok:", e)
 		}
