@@ -142,7 +142,6 @@ func TestTraitMissingTraits(t *testing.T) {
 			t.Fatal(asm.dilemmas)
 		} else {
 			t.Log("ok:", e)
-
 		}
 	}
 }

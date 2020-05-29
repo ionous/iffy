@@ -13,6 +13,7 @@ import (
 // - mdl_kind: kind, path
 // - eph_noun: noun, kind
 // - eph_name: for nouns.
+//
 func AssembleNouns(asm *Assembler) (err error) {
 	var store nounStore
 	var curr, last nounInfo
@@ -42,7 +43,13 @@ func AssembleNouns(asm *Assembler) (err error) {
 		err = e
 	} else {
 		last.flush(&store)
-		err = store.writeNouns(asm)
+		if e := store.writeNouns(asm); e != nil {
+			err = e
+		} else if e := reportMissingNouns(asm); e != nil {
+			err = e
+		} else if asm.IssueCount > 0 {
+			err = errutil.Fmt("Assembly has %d outstanding issues", asm.IssueCount)
+		}
 	}
 	return
 }

@@ -26,7 +26,6 @@ func TestNounFormation(t *testing.T) {
 				{"apple", "T"},
 				{"pear", "T"},
 				{"toy boat", "T"},
-				{"bad apple", "B"},
 			}); e != nil {
 				t.Fatal(e)
 			} else if e := AssembleNouns(asm.assembler); e != nil {
@@ -42,7 +41,6 @@ func TestNounFormation(t *testing.T) {
 			}
 		}
 	})
-	// wip:
 	t.Run("failure", func(t *testing.T) {
 		if asm, e := newAssemblyTest(t, memory); e != nil {
 			t.Fatal(e)
@@ -58,8 +56,8 @@ func TestNounFormation(t *testing.T) {
 				t.Fatal(e)
 			} else if e := AssembleNouns(asm.assembler); e == nil {
 				t.Fatal("expected error")
-			} else {
-				t.Log("ok, error:", e)
+			} else if !containsOnly(asm.dilemmas, `missing noun: "bad apple"`) {
+				t.Fatal(asm.dilemmas)
 			}
 		}
 	})
