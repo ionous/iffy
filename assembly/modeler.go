@@ -5,53 +5,72 @@ import (
 	"strings"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 	"github.com/reiver/go-porterstemmer"
 )
+
+type IssueReport func(pos reader.Position, msg string)
 
 func cat(str ...string) string {
 	return strings.Join(str, " ")
 }
 
-func NewModeler(db *sql.DB) *Modeler {
-	return &Modeler{tables.NewCache(db)}
+func NewAssembler(db *sql.DB) *Assembler {
+	reportNothing := func(reader.Position, string) {}
+	return NewAssemblerReporter(db, reportNothing)
 }
 
-type Modeler struct {
-	cache *tables.Cache
+func NewAssemblerReporter(db *sql.DB, report IssueReport) *Assembler {
+	return &Assembler{tables.NewCache(db), report, 0}
+}
+
+type Assembler struct {
+	cache      *tables.Cache
+	issueFn    IssueReport
+	IssueCount int
+}
+
+func (m *Assembler) reportIssue(src, ofs, msg string) {
+	pos := reader.Position{Source: src, Offset: ofs}
+	m.issueFn(pos, msg)
+	m.IssueCount++
+}
+func (m *Assembler) reportIssuef(src, ofs, fmt string, args ...interface{}) {
+	m.reportIssue(src, ofs, errutil.Sprintf(fmt, args...))
 }
 
 // write kind and comma separated ancestors
-func (m *Modeler) WriteAncestor(kind, path string) (err error) {
+func (m *Assembler) WriteAncestor(kind, path string) (err error) {
 	_, e := m.cache.Exec(mdl_kind, kind, path)
 	return e
 }
 
-func (m *Modeler) WriteField(kind, field, fieldType string) error {
+func (m *Assembler) WriteField(kind, field, fieldType string) error {
 	_, e := m.cache.Exec(mdl_field, kind, field, fieldType)
 	return e
 }
 
 // WriteDefault: if no specific value has been assigned to the an instance of the idModelField's kind,
 // the passed default value will be used for that instance's kind.
-func (m *Modeler) WriteDefault(kind, field string, value interface{}) error {
+func (m *Assembler) WriteDefault(kind, field string, value interface{}) error {
 	_, e := m.cache.Exec(mdl_default, kind, field, value)
 	return e
 }
 
-func (m *Modeler) WriteNoun(noun, kind string) error {
+func (m *Assembler) WriteNoun(noun, kind string) error {
 	_, e := m.cache.Exec(mdl_noun, noun, kind)
 	return e
 }
 
 // WriteName for noun
-func (m *Modeler) WriteName(noun, name string, rank int) error {
+func (m *Assembler) WriteName(noun, name string, rank int) error {
 	_, e := m.cache.Exec(mdl_name, noun, name, rank)
 	return e
 }
 
 // WriteNounWithNames
-func (m *Modeler) WriteNounWithNames(noun, kind string) (err error) {
+func (m *Assembler) WriteNounWithNames(noun, kind string) (err error) {
 	if e := m.WriteNoun(noun, kind); e != nil {
 		err = errutil.Append(err, e)
 	} else if e := m.WriteName(noun, noun, 0); e != nil {
@@ -70,37 +89,37 @@ func (m *Modeler) WriteNounWithNames(noun, kind string) (err error) {
 	return
 }
 
-func (m *Modeler) WritePat(name, paramName, paramType string, idx int64) error {
+func (m *Assembler) WritePat(name, paramName, paramType string, idx int64) error {
 	_, e := m.cache.Exec(mdl_pat, name, paramName, paramType, idx)
 	return e
 }
 
-func (m *Modeler) WriteProg(typeName string, bytes []byte) (int64, error) {
+func (m *Assembler) WriteProg(typeName string, bytes []byte) (int64, error) {
 	return m.cache.Exec(mdl_prog, typeName, bytes)
 }
 
-func (m *Modeler) WriteRelation(relation, kind, cardinality, otherKind string) error {
+func (m *Assembler) WriteRelation(relation, kind, cardinality, otherKind string) error {
 	_, e := m.cache.Exec(mdl_rel, relation, kind, cardinality, otherKind)
 	return e
 }
 
-func (m *Modeler) WriteRule(name string, prog int64) error {
+func (m *Assembler) WriteRule(name string, prog int64) error {
 	_, e := m.cache.Exec(mdl_rule, name, prog)
 	return e
 }
 
 // WriteStart: store the initial value of an instance's field used at start of play.
-func (m *Modeler) WriteStart(noun, field string, value interface{}) error {
+func (m *Assembler) WriteStart(noun, field string, value interface{}) error {
 	_, e := m.cache.Exec(mdl_start, noun, field, value)
 	return e
 }
 
-func (m *Modeler) WriteTrait(aspect, trait string, rank int) error {
+func (m *Assembler) WriteTrait(aspect, trait string, rank int) error {
 	_, e := m.cache.Exec(mdl_aspect, aspect, trait, rank)
 	return e
 }
 
-func (m *Modeler) WriteVerb(relation, verb string) error {
+func (m *Assembler) WriteVerb(relation, verb string) error {
 	const asm_verb = `insert into asm_verb(relation, stem)
 				select ?1, ?2
 				where not exists (

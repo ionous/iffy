@@ -12,7 +12,7 @@ type TargetValue struct {
 }
 
 // create some fake model hierarchy using Target and Field
-func AddTestHierarchy(m *Modeler, keyValues []TargetField) (err error) {
+func AddTestHierarchy(m *Assembler, keyValues []TargetField) (err error) {
 	for _, tv := range keyValues {
 		if e := m.WriteAncestor(tv.Target, tv.Field); e != nil {
 			err = errutil.Append(err, e)
@@ -23,7 +23,7 @@ func AddTestHierarchy(m *Modeler, keyValues []TargetField) (err error) {
 
 // mdl_noun:  kind, ret id noun
 // mdl_name: noun, name, rank
-func AddTestNouns(m *Modeler, els []TargetField) (err error) {
+func AddTestNouns(m *Assembler, els []TargetField) (err error) {
 	for _, tv := range els {
 		noun, kind := tv.Target, tv.Field
 		if e := m.WriteNounWithNames(noun, kind); e != nil {
@@ -34,7 +34,7 @@ func AddTestNouns(m *Modeler, els []TargetField) (err error) {
 }
 
 // create some fake model hierarchy using Value as the field type
-func AddTestFields(m *Modeler, targetValues []TargetValue) (err error) {
+func AddTestFields(m *Assembler, targetValues []TargetValue) (err error) {
 	for _, tv := range targetValues {
 		if e := m.WriteField(tv.Target, tv.Field, tv.Value.(string)); e != nil {
 			err = errutil.Append(err, e)
@@ -44,7 +44,7 @@ func AddTestFields(m *Modeler, targetValues []TargetValue) (err error) {
 }
 
 // write aspect, trait pairs using Target and Field
-func AddTestTraits(m *Modeler, keyValues []TargetField) (err error) {
+func AddTestTraits(m *Assembler, keyValues []TargetField) (err error) {
 	for _, tv := range keyValues {
 		// rank is not set yet, see AssembleAspects
 		if e := m.WriteTrait(tv.Target, tv.Field, 0); e != nil {
@@ -55,7 +55,7 @@ func AddTestTraits(m *Modeler, keyValues []TargetField) (err error) {
 }
 
 // write some noun, field, value triplets
-func AddTestStarts(m *Modeler, targetValues []TargetValue) (err error) {
+func AddTestStarts(m *Assembler, targetValues []TargetValue) (err error) {
 	for _, tv := range targetValues {
 		if e := m.WriteStart(tv.Target, tv.Field, tv.Value); e != nil {
 			err = errutil.Append(err, e)
@@ -65,7 +65,7 @@ func AddTestStarts(m *Modeler, targetValues []TargetValue) (err error) {
 }
 
 // AddTestDefaults writes some kind, field, value triplets
-func AddTestDefaults(m *Modeler, targetValues []TargetValue) (err error) {
+func AddTestDefaults(m *Assembler, targetValues []TargetValue) (err error) {
 	for _, tv := range targetValues {
 		if e := m.WriteDefault(tv.Target, tv.Field, tv.Value); e != nil {
 			err = errutil.Append(err, e)
@@ -75,7 +75,7 @@ func AddTestDefaults(m *Modeler, targetValues []TargetValue) (err error) {
 }
 
 // add modeled data: relation, kind, cardinality, otherKind
-func AddTestRelations(m *Modeler, relations [][4]string) (err error) {
+func AddTestRelations(m *Assembler, relations [][4]string) (err error) {
 	for _, el := range relations {
 		relation, kind, cardinality, otherKind := el[0], el[1], el[2], el[3]
 		if e := m.WriteRelation(relation, kind, cardinality, otherKind); e != nil {
@@ -85,7 +85,7 @@ func AddTestRelations(m *Modeler, relations [][4]string) (err error) {
 	return
 }
 
-func AddTestVerbs(m *Modeler, relationStem [][2]string) (err error) {
+func AddTestVerbs(m *Assembler, relationStem [][2]string) (err error) {
 	for _, el := range relationStem {
 		rel, verb := el[0], el[1]
 		if e := m.WriteVerb(rel, verb); e != nil {

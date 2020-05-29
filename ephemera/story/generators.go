@@ -112,9 +112,10 @@ func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 		nounType := k.NewName("nounType", tables.NAMED_ASPECT, once)
 		common := k.NewName("common", tables.NAMED_TRAIT, once)
 		proper := k.NewName("proper", tables.NAMED_TRAIT, once)
-		k.NewPrimitive(tables.PRIM_ASPECT, things, nounType)
+		k.NewAspect(nounType)
 		k.NewTrait(common, nounType, 0)
 		k.NewTrait(proper, nounType, 1)
+		k.NewPrimitive(things, nounType, tables.PRIM_ASPECT)
 	}
 	return reader.Option(r, "noun", reader.ReadMaps{
 		"$PROPER_NOUN": k.Bind(imp_proper_noun),
@@ -142,7 +143,7 @@ func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
 			if once := "common_noun"; k.Once(once) {
 				indefinite := k.NewName("indefinite article", tables.NAMED_FIELD, once)
 				things := k.NewName("things", tables.NAMED_KIND, once)
-				k.NewPrimitive(tables.PRIM_TEXT, things, indefinite)
+				k.NewPrimitive(things, indefinite, tables.PRIM_TEXT)
 			}
 		}
 	}
@@ -214,7 +215,7 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 		if once := "summary"; k.Once(once) {
 			things := k.NewName("things", tables.NAMED_KIND, once)
 			appear := k.NewName("appearance", tables.NAMED_FIELD, once)
-			k.NewPrimitive(tables.PRIM_EXPR, things, appear)
+			k.NewPrimitive(things, appear, tables.PRIM_EXPR)
 		}
 		prop := k.NewName("appearance", tables.NAMED_FIELD, reader.At(m))
 		noun := storyNouns.Last()

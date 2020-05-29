@@ -1,7 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
 	"reflect"
 
 	"github.com/ionous/errutil"
@@ -9,10 +8,10 @@ import (
 )
 
 // reads mdl_kind, mdl_field, mdl_noun
-func assembleInitialFields(m *Modeler, db *sql.DB) (err error) {
+func assembleInitialFields(asm *Assembler) (err error) {
 	var store valueStore
 	var curr, last valueInfo
-	if e := tables.QueryAll(db,
+	if e := tables.QueryAll(asm.cache.DB(),
 		`select asm.noun, mf.field, mf.type, asm.value
 			from asm_noun as asm
 		join mdl_field mf
@@ -43,7 +42,7 @@ func assembleInitialFields(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		store.add(last)
-		err = store.writeInitialFields(m)
+		err = store.writeInitialFields(asm)
 	}
 	return
 }

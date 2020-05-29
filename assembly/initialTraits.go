@@ -1,17 +1,15 @@
 package assembly
 
 import (
-	"database/sql"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/tables"
 )
 
 // reads mdl_aspect, mdl_noun, mdl_kind, mdl_field
-func assembleInitialTraits(m *Modeler, db *sql.DB) (err error) {
+func assembleInitialTraits(asm *Assembler) (err error) {
 	var store traitStore
 	var curr, last traitInfo
-	if e := tables.QueryAll(db,
+	if e := tables.QueryAll(asm.cache.DB(),
 		// normalize aspect and trait requests
 		`select asm.noun, mt.aspect, mt.trait, 
 		 	ifnull(nullif(asm.value, mt.trait), 1)
@@ -50,7 +48,7 @@ func assembleInitialTraits(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		store.add(last)
-		err = store.writeInitialTraits(m)
+		err = store.writeInitialTraits(asm)
 	}
 	return
 }

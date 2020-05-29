@@ -1,8 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/tables"
 )
@@ -14,10 +12,10 @@ import (
 // . missing traits ( named but not specified )
 // . missing aspects ( named but not specified )
 // o misspellings, near spellings ( ex. for missing traits )
-func AssembleAspects(m *Modeler, db *sql.DB) (err error) {
+func AssembleAspects(asm *Assembler) (err error) {
 	var curr, last aspectInfo
 	var traits []aspectInfo // cant read and write to the db simultaneously
-	if e := tables.QueryAll(db, `select nt.name, na.name
+	if e := tables.QueryAll(asm.cache.DB(), `select nt.name, na.name
 	from eph_trait t join eph_named nt
 		on (t.idNamedTrait = nt.rowid)
 	left join eph_named na
@@ -37,8 +35,19 @@ func AssembleAspects(m *Modeler, db *sql.DB) (err error) {
 	} else {
 		for _, t := range traits {
 			// rank is not set yet.
-			if e := m.WriteTrait(t.Aspect, t.Trait, 0); e != nil {
+			if e := asm.WriteTrait(t.Aspect, t.Trait, 0); e != nil {
 				err = errutil.Append(err, e)
+			}
+		}
+		if err == nil {
+			if e := reportMissingAspects(asm); e != nil {
+				err = e
+			} else if asm.IssueCount > 0 {
+				err = errutil.Fmt("Assembly has %d outstanding issues", asm.IssueCount)
+			} else if e := reportMissingTraits(asm); e != nil {
+				err = e
+			} else if asm.IssueCount > 0 {
+				err = errutil.Fmt("Assembly has %d outstanding issues", asm.IssueCount)
 			}
 		}
 	}

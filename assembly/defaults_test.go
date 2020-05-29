@@ -18,14 +18,14 @@ func TestDefaultFieldAssigment(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"D", "K"},
 			{"C", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(asm.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.assembler, []TargetValue{
 			{"K", "d", tables.PRIM_DIGI},
 			{"K", "t", tables.PRIM_TEXT},
 			{"K", "t2", tables.PRIM_TEXT},
@@ -44,7 +44,7 @@ func TestDefaultFieldAssigment(t *testing.T) {
 			{"C", "d", 123},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleDefaults(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleDefaults(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchDefaults(asm.db, []triplet{
 			{"C", "c", "c text"},
@@ -74,7 +74,7 @@ func TestDefaultTraitAssignment(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := AssembleDefaults(asm.modeler, asm.db); e != nil {
+		if e := AssembleDefaults(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchDefaults(asm.db, []triplet{
 			{"K", "A", "x"},
@@ -107,7 +107,7 @@ func TestDefaultDuplicates(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := AssembleDefaults(asm.modeler, asm.db); e != nil {
+		if e := AssembleDefaults(asm.assembler); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -120,7 +120,7 @@ func TestDefaultConflict(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			defer asm.db.Close()
-			if e := AssembleDefaults(asm.modeler, asm.db); e == nil {
+			if e := AssembleDefaults(asm.assembler); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)
@@ -167,7 +167,7 @@ func TestDefaultBadValue(t *testing.T) {
 			err = e
 		} else {
 			defer asm.db.Close()
-			if e := AssembleDefaults(asm.modeler, asm.db); e == nil {
+			if e := AssembleDefaults(asm.assembler); e == nil {
 				err = errutil.New("expected error")
 			} else {
 				t.Log("okay:", e)
@@ -254,13 +254,13 @@ func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemb
 	if asm, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"N", "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestFields(asm.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.assembler, []TargetValue{
 			{"K", "d", tables.PRIM_DIGI},
 			{"K", "t", tables.PRIM_TEXT},
 			{"K", "A", tables.PRIM_ASPECT},
@@ -268,7 +268,7 @@ func newDefaultsTest(t *testing.T, path string, defaults []triplet) (ret *assemb
 			{"N", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			err = e
-		} else if e := AddTestTraits(asm.modeler, []TargetField{
+		} else if e := AddTestTraits(asm.assembler, []TargetField{
 			{"A", "w"}, {"A", "x"}, {"A", "y"},
 			{"B", "z"},
 		}); e != nil {

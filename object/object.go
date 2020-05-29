@@ -2,7 +2,7 @@ package object
 
 const Exists = "$exists"   // whether a name refers to a declared game object
 const Kind = "$kind"       // type of a game object
-const Kinds = "$kinds"     // hierarchy of a game object
+const Kinds = "$kinds"     // hierarchy of a game object ( a path )
 const Counter = "$counter" // sequence counter
 
 // originally these were just "pattern"

@@ -17,18 +17,18 @@ func TestInitialFieldAssignment(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"M", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(asm.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.assembler, []TargetValue{
 			{"K", "t", tables.PRIM_TEXT},
 			{"L", "d", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestNouns(asm.modeler, []TargetField{
+		} else if e := AddTestNouns(asm.assembler, []TargetField{
 			{"apple", "K"},
 			{"pear", "L"},
 			{"toy boat", "M"},
@@ -42,7 +42,7 @@ func TestInitialFieldAssignment(t *testing.T) {
 			{"boat", "t", "more text"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := assembleInitialFields(asm.modeler, asm.db); e != nil {
+		} else if e := assembleInitialFields(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchValues(asm.db, []TargetValue{
 			{"apple", "t", "some text"},
@@ -62,23 +62,23 @@ func TestInitialTraitAssignment(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"M", "L,K"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(asm.modeler, []TargetValue{
+		} else if e := AddTestFields(asm.assembler, []TargetValue{
 			{"K", "A", tables.PRIM_ASPECT},
 			{"L", "B", tables.PRIM_ASPECT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestTraits(asm.modeler, []TargetField{
+		} else if e := AddTestTraits(asm.assembler, []TargetField{
 			{"A", "w"}, {"A", "x"}, {"A", "y"},
 			{"B", "z"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestNouns(asm.modeler, []TargetField{
+		} else if e := AddTestNouns(asm.assembler, []TargetField{
 			{"apple", "K"},
 			{"pear", "L"},
 			{"toy boat", "M"},
@@ -92,7 +92,7 @@ func TestInitialTraitAssignment(t *testing.T) {
 			{"boat", "z", true},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleValues(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleValues(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchValues(asm.db, []TargetValue{
 			{"apple", "A", "y"},

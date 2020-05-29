@@ -3,6 +3,7 @@ package assembly
 import (
 	"database/sql"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kr/pretty"
@@ -65,7 +66,7 @@ func TestTraits(t *testing.T) {
 				{"B", "z"},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleAspects(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleAspects(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchTraits(asm.db, []expectedTrait{
 			{"A", "x", 0},
@@ -73,14 +74,6 @@ func TestTraits(t *testing.T) {
 			{"B", "z", 0},
 		}); e != nil {
 			t.Fatal("matchTraits:", e)
-		} else if e := MissingAspects(asm.db, func(a string) error {
-			return errutil.New("missing aspect", a)
-		}); e != nil {
-			t.Fatal(e)
-		} else if e := MissingTraits(asm.db, func(t string) error {
-			return errutil.New("missing trait", t)
-		}); e != nil {
-			t.Fatal(e)
 		}
 	}
 }
@@ -98,7 +91,7 @@ func TestTraitConflicts(t *testing.T) {
 			{"B", "x"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleAspects(asm.modeler, asm.db); e == nil {
+		} else if e := AssembleAspects(asm.assembler); e == nil {
 			t.Fatal("expected an error")
 		} else {
 			t.Log("okay:", e)
@@ -117,20 +110,14 @@ func TestTraitMissingAspect(t *testing.T) {
 			{"Z", ""},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleAspects(asm.modeler, asm.db); e != nil {
-			t.Fatal(e)
+		} else if e := AssembleAspects(asm.assembler); e == nil {
+			t.Fatal("expected error")
+		} else if asm.dilemmas.Len() != 1 ||
+			!strings.Contains((*asm.dilemmas)[0].Msg, `missing aspect: "Z"`) {
+			t.Fatal(asm.dilemmas)
 		} else {
-			var aspects []string
-			if e := MissingAspects(asm.db, func(a string) (err error) {
-				aspects = append(aspects, a)
-				return
-			}); e != nil {
-				t.Fatal(e)
-			} else if !reflect.DeepEqual(aspects, []string{"Z"}) {
-				t.Fatal("mismatch", aspects)
-			} else {
-				t.Log("okay, missing", aspects)
-			}
+			t.Log("ok:", e)
+
 		}
 	}
 }
@@ -147,20 +134,43 @@ func TestTraitMissingTraits(t *testing.T) {
 			{"", "z"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleAspects(asm.modeler, asm.db); e != nil {
-			t.Fatal(e)
+		} else if e := AssembleAspects(asm.assembler); e == nil {
+			t.Fatal("expected error")
+		} else if !containsOnly(asm.dilemmas,
+			`missing trait: "y"`,
+			`missing trait: "z"`) {
+			t.Fatal(asm.dilemmas)
 		} else {
-			var traits []string
-			if e := MissingTraits(asm.db, func(a string) (err error) {
-				traits = append(traits, a)
-				return
-			}); e != nil {
-				t.Fatal(e)
-			} else if !reflect.DeepEqual(traits, []string{"y", "z"}) {
-				t.Fatal("mismatch", traits)
-			} else {
-				t.Log("okay, missing:", traits)
-			}
+			t.Log("ok:", e)
+
 		}
 	}
+}
+
+func containsOnly(ds *Dilemmas, msg ...string) bool {
+	return ds.Len() == len(msg) && containsMessages(ds, msg...)
+}
+
+func containsMessages(ds *Dilemmas, msg ...string) (ret bool) {
+	for _, d := range *ds {
+		foundAt := -1
+		for i, str := range msg {
+			if strings.Contains(d.Msg, str) {
+				foundAt = i
+				break
+			}
+		}
+		if foundAt >= 0 {
+			if end := len(msg) - 1; end == 0 {
+				ret = true
+				break
+			} else {
+				// cut w/o preserving order
+				msg[foundAt] = msg[end]
+				msg = msg[:end]
+			}
+		}
+
+	}
+	return
 }

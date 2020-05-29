@@ -52,7 +52,7 @@ func TestRelativeFormation(t *testing.T) {
 		return
 	} else {
 		defer asm.db.Close()
-		if e := AssembleRelatives(asm.modeler, asm.db); e != nil {
+		if e := AssembleRelatives(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchRelatives(asm.db, [][3]string{
 			{"Rel1", "a", "a"},
@@ -115,7 +115,7 @@ func TestOneToOneViolations(t *testing.T) {
 			err = e
 		} else {
 			defer asm.db.Close()
-			if e := AssembleRelatives(asm.modeler, asm.db); e != nil {
+			if e := AssembleRelatives(asm.assembler); e != nil {
 				err = e
 			} else {
 				var have [][3]string
@@ -181,13 +181,13 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 	if asm, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"K", ""},
 			{"L", "K"},
 			{"N", "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestNouns(asm.modeler, []TargetField{
+		} else if e := AddTestNouns(asm.assembler, []TargetField{
 			{"a", "K"},
 			{"b", "K"},
 			{"c", "K"},
@@ -199,7 +199,7 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			{"z", "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestRelations(asm.modeler, [][4]string{
+		} else if e := AddTestRelations(asm.assembler, [][4]string{
 			// relation, kind, cardinality, otherKind
 			{"Rel1", "K", tables.ONE_TO_ONE, "K"},
 			{"Rel1x", "K", tables.ONE_TO_MANY, "K"},
@@ -207,7 +207,7 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 			{"Relxx", "K", tables.MANY_TO_MANY, "K"},
 		}); e != nil {
 			err = e
-		} else if e := AddTestVerbs(asm.modeler, [][2]string{
+		} else if e := AddTestVerbs(asm.assembler, [][2]string{
 			// rel, verb
 			{"Rel1", "v1"},
 			{"Rel1x", "v1x"},

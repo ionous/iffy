@@ -69,7 +69,7 @@ func imp_class_attributes(k *imp.Porter, r reader.Map) (err error) {
 		// create an implied aspect named after the first trait
 		// fix? maybe we should include the columns of named in the returned struct so we can pick out the source better.
 		aspect := k.NewName(traits[0].String(), tables.NAMED_ASPECT, m.StrOf(reader.ItemId))
-		k.NewPrimitive(tables.PRIM_ASPECT, kind, aspect)
+		k.NewPrimitive(kind, aspect, tables.PRIM_ASPECT)
 	}
 	return
 }

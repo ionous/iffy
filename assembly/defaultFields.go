@@ -1,7 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
 	"fmt"
 	"reflect"
 
@@ -10,10 +9,10 @@ import (
 )
 
 // reads mdl_field, mdl_kind
-func assembleDefaultFields(m *Modeler, db *sql.DB) (err error) {
+func assembleDefaultFields(asm *Assembler) (err error) {
 	var store valueStore
 	var curr, last valueInfo
-	if e := tables.QueryAll(db,
+	if e := tables.QueryAll(asm.cache.DB(),
 		`select asm.kind, mf.field, mf.type, asm.value
  			from asm_default as asm
  		join mdl_field mf
@@ -43,7 +42,7 @@ func assembleDefaultFields(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		store.add(last)
-		err = store.writeDefaultFields(m)
+		err = store.writeDefaultFields(asm)
 	}
 	return
 }
@@ -67,18 +66,18 @@ func (store *valueStore) add(n valueInfo) {
 	}
 }
 
-func (store *valueStore) writeDefaultFields(m *Modeler) (err error) {
+func (store *valueStore) writeDefaultFields(asm *Assembler) (err error) {
 	for _, n := range store.list {
-		if e := m.WriteDefault(n.target, n.field, n.value); e != nil {
+		if e := asm.WriteDefault(n.target, n.field, n.value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
 	return
 }
 
-func (store *valueStore) writeInitialFields(m *Modeler) (err error) {
+func (store *valueStore) writeInitialFields(asm *Assembler) (err error) {
 	for _, n := range store.list {
-		if e := m.WriteStart(n.target, n.field, n.value); e != nil {
+		if e := asm.WriteStart(n.target, n.field, n.value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

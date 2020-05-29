@@ -1,8 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/tables"
 )
@@ -32,7 +30,7 @@ type nounStore struct {
 	list []nounInfo
 }
 
-func (store *nounStore) write(m *Modeler) (err error) {
+func (store *nounStore) write(m *Assembler) (err error) {
 	for _, p := range store.list {
 		if !p.kind.valid {
 			e := errutil.New("couldnt determine valid lowest common ancestor")
@@ -44,10 +42,10 @@ func (store *nounStore) write(m *Modeler) (err error) {
 	return
 }
 
-func AssembleNouns(m *Modeler, db *sql.DB) (err error) {
+func AssembleNouns(asm *Assembler) (err error) {
 	var store nounStore
 	var curr, last nounInfo
-	if e := tables.QueryAll(db,
+	if e := tables.QueryAll(asm.cache.DB(),
 		`select nn.name, nk.name, coalesce(ak.path, "")
 		from eph_noun n join eph_named nn
 			on (n.idNamedNoun = nn.rowid)
@@ -73,7 +71,7 @@ func AssembleNouns(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		last.flush(&store)
-		err = store.write(m)
+		err = store.write(asm)
 	}
 	return
 }

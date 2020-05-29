@@ -1,7 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/ionous/errutil"
@@ -9,10 +8,10 @@ import (
 )
 
 // reads mdl_aspect, mdl_field, mdl_kind
-func assembleDefaultTraits(m *Modeler, db *sql.DB) (err error) {
+func assembleDefaultTraits(asm *Assembler) (err error) {
 	var store traitStore
 	var curr, last traitInfo
-	if e := tables.QueryAll(db,
+	if e := tables.QueryAll(asm.cache.DB(),
 		// normalize aspect and trait requests
 		// we have to do traits and aspects at the same time because
 		// they talk about the same pool of values, and could generate conflicts.
@@ -51,7 +50,7 @@ func assembleDefaultTraits(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		store.add(last)
-		err = store.writeDefaultTraits(m)
+		err = store.writeDefaultTraits(asm)
 	}
 	return
 }
@@ -75,7 +74,7 @@ func (store *traitStore) add(n traitInfo) {
 	}
 }
 
-func (store *traitStore) writeDefaultTraits(m *Modeler) (err error) {
+func (store *traitStore) writeDefaultTraits(m *Assembler) (err error) {
 	for _, n := range store.list {
 		if e := m.WriteDefault(n.target, n.aspect, n.trait); e != nil {
 			err = errutil.Append(err, e)
@@ -84,7 +83,7 @@ func (store *traitStore) writeDefaultTraits(m *Modeler) (err error) {
 	return
 }
 
-func (store *traitStore) writeInitialTraits(m *Modeler) (err error) {
+func (store *traitStore) writeInitialTraits(m *Assembler) (err error) {
 	for _, n := range store.list {
 		if e := m.WriteStart(n.target, n.aspect, n.trait); e != nil {
 			err = errutil.Append(err, e)

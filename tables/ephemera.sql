@@ -22,7 +22,10 @@ create table eph_field( primType text, idNamedKind int, idNamedField int );
 create table eph_relation( idNamedRelation int, idNamedKind int, idNamedOtherKind int, cardinality text check (cardinality in ('one_one','one_any','any_one','any_any')));
 /* connection between two object instances */	
 create table eph_relative( idNamedHead int, idNamedStem int, idNamedDependent int );
-/* uri, file name or other identification for the origin of the various ephemera recorded in the db. */
+/* uri, file name or other identification for the origin of the various ephemera recorded in the db. 
+while its not particularly useful to have a one column primitive data type column
+someday, this might contain source modification times or other useful info.
+*/
 create table eph_source( src text );
 /* only one trait from a given aspect can be true for a noun at a time. */	
 create table eph_trait( idNamedTrait int, idNamedAspect int, rank int );

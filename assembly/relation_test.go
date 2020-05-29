@@ -18,7 +18,7 @@ func TestVerbMismatches(t *testing.T) {
 		t.Fatal("error creating test", e)
 	} else {
 		defer asm.db.Close()
-		m := asm.modeler
+		m := asm.assembler
 		//
 		if e := m.WriteVerb("R", "contains"); e != nil {
 			t.Fatal(e)
@@ -77,25 +77,24 @@ func TestRelationCreation(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
-		if e := AddTestHierarchy(m, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := addRelations(
-			rec, []dbrel{
+			asm.rec, []dbrel{
 				{"R", "P", "Q", tables.ONE_TO_MANY},
 				{"G", "P", "Q", tables.MANY_TO_ONE},
 				{"G", "P", "Q", tables.MANY_TO_ONE},
 				{"H", "P", "P", tables.ONE_TO_MANY},
 			}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleRelations(m, db); e != nil {
+		} else if e := AssembleRelations(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchRelations(db, []dbrel{
+		} else if e := matchRelations(asm.db, []dbrel{
 			{"G", "P", "Q", tables.MANY_TO_ONE},
 			{"H", "P", "P", tables.ONE_TO_MANY},
 			{"R", "P", "Q", tables.ONE_TO_MANY},
@@ -111,18 +110,17 @@ func TestRelationCardinality(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
-		if e := AddTestHierarchy(m, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"P", ""},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(rec, []dbrel{
+		} else if e := addRelations(asm.rec, []dbrel{
 			{"R", "P", "P", tables.ONE_TO_MANY},
 			{"R", "P", "P", tables.MANY_TO_ONE},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleRelations(m, db); e == nil {
+		} else if e := AssembleRelations(asm.assembler); e == nil {
 			t.Fatal("expected error")
 		} else {
 			t.Log("okay:", e)
@@ -136,24 +134,23 @@ func TestRelationLcaSuccess(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
-		if e := AddTestHierarchy(m, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
 			{"D", "P,T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(rec, []dbrel{
+		} else if e := addRelations(asm.rec, []dbrel{
 			{"R", "P", "T", tables.ONE_TO_MANY},
 			{"R", "D", "T", tables.ONE_TO_MANY},
 			{"R", "C", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleRelations(m, db); e != nil {
+		} else if e := AssembleRelations(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchRelations(db, []dbrel{
+		} else if e := matchRelations(asm.db, []dbrel{
 			{"R", "P", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
@@ -167,21 +164,20 @@ func TestRelationLcaFailure(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		db, rec, m := asm.db, asm.rec, asm.modeler
 		//
-		if e := AddTestHierarchy(m, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"C", "P,T"},
 			{"D", "P,T"},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(rec, []dbrel{
+		} else if e := addRelations(asm.rec, []dbrel{
 			{"R", "D", "T", tables.ONE_TO_MANY},
 			{"R", "C", "T", tables.ONE_TO_MANY},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleRelations(m, db); e == nil {
+		} else if e := AssembleRelations(asm.assembler); e == nil {
 			t.Fatal("expected error")
 		} else {
 			t.Log("okay:", e)

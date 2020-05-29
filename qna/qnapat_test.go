@@ -40,7 +40,7 @@ func TestSayMe(t *testing.T) {
 	if e := tables.CreateModel(db); e != nil {
 		t.Fatal(e)
 	}
-	m := assembly.NewModeler(db)
+	m := assembly.NewAssembler(db)
 	if e := WriteRules(m, "sayMe", pattern.TextRules{
 		{nil, SayIt("Not between 1 and 3.")},
 		{MatchNumber(3), SayIt("San!")},
@@ -75,7 +75,7 @@ func TestSayMe(t *testing.T) {
 	}
 }
 
-func WriteRules(m *assembly.Modeler, name string, rules pattern.TextRules) (err error) {
+func WriteRules(m *assembly.Assembler, name string, rules pattern.TextRules) (err error) {
 	for _, rl := range rules {
 		if e := WriteRule(m, name, rl); e != nil {
 			err = e
@@ -85,7 +85,7 @@ func WriteRules(m *assembly.Modeler, name string, rules pattern.TextRules) (err 
 	return
 }
 
-func WriteRule(m *assembly.Modeler, name string, rule pattern.Rule) (err error) {
+func WriteRule(m *assembly.Assembler, name string, rule pattern.Rule) (err error) {
 	d := rule.RuleDesc()
 	if pid, e := WriteProg(m, d.Name, rule); e != nil {
 		err = e
@@ -96,7 +96,7 @@ func WriteRule(m *assembly.Modeler, name string, rule pattern.Rule) (err error) 
 
 }
 
-func WriteProg(m *assembly.Modeler, typeName string, prog interface{}) (ret int64, err error) {
+func WriteProg(m *assembly.Assembler, typeName string, prog interface{}) (ret int64, err error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	if e := enc.Encode(prog); e != nil {

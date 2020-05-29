@@ -17,7 +17,7 @@ func writeFields(rec *ephemera.Recorder, kfps []kfp) (err error) {
 	for _, p := range kfps {
 		kind := rec.NewName(p.kind, tables.NAMED_KIND, "test")
 		field := rec.NewName(p.field, tables.NAMED_FIELD, "test")
-		rec.NewPrimitive(p.fieldType, kind, field)
+		rec.NewPrimitive(kind, field, p.fieldType)
 	}
 	return
 }
@@ -54,7 +54,7 @@ func TestFields(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
@@ -66,7 +66,7 @@ func TestFields(t *testing.T) {
 			{"T", "c", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleFields(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleFields(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchProperties(asm.db, []kfp{
 			{"P", "a", tables.PRIM_TEXT},
@@ -84,7 +84,7 @@ func TestFieldLca(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"T", ""},
 			{"P", "T"},
 			{"Q", "T"},
@@ -95,8 +95,9 @@ func TestFieldLca(t *testing.T) {
 			{"Q", "a", tables.PRIM_TEXT},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleFields(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleFields(asm.assembler); e != nil {
 			t.Fatal(e)
+
 		} else if e := matchProperties(asm.db, []kfp{
 			{"T", "a", tables.PRIM_TEXT},
 		}); e != nil {
@@ -112,7 +113,7 @@ func TestFieldTypeMismatch(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := AddTestHierarchy(asm.modeler, []TargetField{
+		if e := AddTestHierarchy(asm.assembler, []TargetField{
 			{"T", ""},
 		}); e != nil {
 			t.Fatal(e)
@@ -121,7 +122,7 @@ func TestFieldTypeMismatch(t *testing.T) {
 			{"T", "a", tables.PRIM_DIGI},
 		}); e != nil {
 			t.Fatal(e)
-		} else if e := AssembleFields(asm.modeler, asm.db); e != nil {
+		} else if e := AssembleFields(asm.assembler); e != nil {
 			t.Log("okay:", e)
 		} else {
 			t.Fatal("expected error")

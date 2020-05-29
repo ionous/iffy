@@ -1,8 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/lang"
 )
@@ -15,13 +13,9 @@ import (
 // . singular kinds ( the definition of kinds should always use plural names )
 // . kinds containing punctuation ( especially "," since that used for the expanded hierarchy )
 // . misspellings, near spellings
-func AssembleAncestry(m *Modeler, db *sql.DB, k string) (err error) {
+func AssembleAncestry(asm *Assembler, k string) (err error) {
 	kinds := &cachedKinds{} // collect all kinds
-	if e := kinds.AddAncestorsOf(db, k); e != nil {
-		// for k, n := range kinds.cache {
-		// 	t.Log(k, ":", n.GetAncestors())
-		// }
-		// t.Fatal(e)
+	if e := kinds.AddAncestorsOf(asm.cache.DB(), k); e != nil {
 		err = errutil.New("couldn't determine ancestry")
 	} else {
 		// write ancestors
@@ -30,13 +24,20 @@ func AssembleAncestry(m *Modeler, db *sql.DB, k string) (err error) {
 			if lang.ContainsPunct(k) {
 				e := errutil.New("kind shouldn't contain punctuation", k)
 				err = errutil.Append(err, e)
-			} else if !lang.IsPlural(k) {
+			} else if len(k) > 1 && !lang.IsPlural(k) {
 				e := errutil.New("kind expected a plural name", k)
 				err = errutil.Append(err, e)
-			} else if e := m.WriteAncestor(k, v.GetAncestors()); e != nil {
+			} else if e := asm.WriteAncestor(k, v.GetAncestors()); e != nil {
 				// fix? do we want to store kinds as all "uppercase"
 				// fix? future? mispellings? ( or leave that to a spellcheck in the html doc )
 				err = errutil.Append(err, e)
+			}
+		}
+		if err == nil {
+			if e := reportMissingKinds(asm); e != nil {
+				err = e
+			} else if asm.IssueCount > 0 {
+				err = errutil.Fmt("Assembly has %d outstanding issues", asm.IssueCount)
 			}
 		}
 	}

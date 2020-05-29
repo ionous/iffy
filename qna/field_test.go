@@ -25,7 +25,7 @@ func TestPatternFields(t *testing.T) {
 	} else if e := tables.CreateRunViews(db); e != nil {
 		t.Fatal(e)
 	}
-	m := assembly.NewModeler(db)
+	m := assembly.NewAssembler(db)
 	if e := m.WritePat("pat", "param", "text_eval", 1); e != nil {
 		t.Fatal(e)
 	} else if e := m.WriteStart("pat", "param", "default"); e != nil {

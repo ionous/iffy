@@ -16,16 +16,21 @@ import (
 // . contradiction in type ( alt: runtime can fit into property by type )
 // . missing properties ( named but not specified )
 // o misspellings, near spellings ( ex. for missing fields )
-func AssembleFields(m *Modeler, db *sql.DB) (err error) {
+func AssembleFields(asm *Assembler) (err error) {
 	// select primitive aspects which arent named in aspects
 	// the primitive field's name is the aspect name
 	var out pendingFields
+	db := asm.cache.DB()
 	if missingAspects, e := undeclaredAspects(db); e != nil {
 		err = e
 	} else if e := out.determineFields(db, missingAspects); e != nil {
 		err = e
-	} else {
-		err = out.write(m)
+	} else if e := out.writeFields(asm); e != nil {
+		err = e
+	} else if e := reportMissingFields(asm); e != nil {
+		err = e
+	} else if asm.IssueCount > 0 {
+		err = errutil.Fmt("Assembly has %d outstanding issues", asm.IssueCount)
 	}
 	return
 }
@@ -38,7 +43,7 @@ type pendingFields struct {
 	list []pendingField
 }
 
-func (out *pendingFields) write(m *Modeler) (err error) {
+func (out *pendingFields) writeFields(m *Assembler) (err error) {
 	for _, f := range out.list {
 		if e := m.WriteField(f.target, f.field, f.fieldType); e != nil {
 			err = errutil.Append(err, e)
@@ -91,6 +96,7 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 	return
 }
 
+// fix: can this be changed to a report? ( re: reportMissingAspects )
 func undeclaredAspects(db *sql.DB) (ret []string, err error) {
 	var str string
 	var aspects []string

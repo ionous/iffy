@@ -31,6 +31,10 @@ func NewCache(db *sql.DB) *Cache {
 	return &Cache{db, make(map[string]*sql.Stmt)}
 }
 
+func (c *Cache) DB() *sql.DB {
+	return c.db
+}
+
 func (c *Cache) Close() {
 	for _, v := range c.cache {
 		v.Close()

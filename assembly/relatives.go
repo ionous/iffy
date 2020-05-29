@@ -1,10 +1,8 @@
 package assembly
 
-import "database/sql"
-
 // goal: build tables of noun, relation, otherNoun
-func AssembleRelatives(m *Modeler, db *sql.DB) error {
-	_, e := db.Exec(`
+func AssembleRelatives(asm *Assembler) error {
+	_, e := asm.cache.DB().Exec(`
 insert into mdl_pair( noun, relation, otherNoun )
 select distinct noun, relation, otherNoun from (
 	select *, row_number() over n1 as n1, row_number() over n2 as n2

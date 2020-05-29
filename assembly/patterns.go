@@ -7,7 +7,8 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-func AssemblePatterns(m *Modeler, db *sql.DB) (err error) {
+func AssemblePatterns(asm *Assembler) (err error) {
+	db := asm.cache.DB()
 	if e := checkPatternSetup(db); e != nil {
 		err = e
 	} else if e := checkRuleSetup(db); e != nil {

@@ -1,9 +1,5 @@
 package assembly
 
-import (
-	"database/sql"
-)
-
 // goal: build table of mdl_start(noun, field, value) for instances.
 // considerations:
 // . property's actual kind ( default specified against a derived type )
@@ -12,10 +8,10 @@ import (
 // . missing properties ( kind, field pair doesn't exist in model )
 // o certainties: usually, seldom, never, always.
 // o misspellings, near spellings ( ex. for missing fields )
-func AssembleValues(m *Modeler, db *sql.DB) (err error) {
-	if e := assembleInitialFields(m, db); e != nil {
+func AssembleValues(asm *Assembler) (err error) {
+	if e := assembleInitialFields(asm); e != nil {
 		err = e
-	} else if e := assembleInitialTraits(m, db); e != nil {
+	} else if e := assembleInitialTraits(asm); e != nil {
 		err = e
 	}
 	return

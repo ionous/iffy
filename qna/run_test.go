@@ -27,12 +27,15 @@ func TestFullFactorial(t *testing.T) {
 }
 
 func testAll(inFile string, db *sql.DB, m reader.Map) (err error) {
+	var ds assembly.Dilemmas
 	if e := tables.CreateAll(db); e != nil {
 		err = errutil.New("couldn't create tables", e)
 	} else if e := story.ImportStory(inFile, db, m); e != nil {
 		err = errutil.New("couldn't import story", e)
-	} else if e := assembly.AssembleStory(db, "things"); e != nil {
+	} else if e := assembly.AssembleStory(db, "things", ds.Add); e != nil {
 		err = errutil.New("couldnt assemble story", e)
+	} else if len(ds) > 0 {
+		err = errutil.New("issues assembling", ds.Err())
 	} else if e := CheckAll(db); e != nil {
 		err = e
 	}

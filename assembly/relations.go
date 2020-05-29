@@ -1,8 +1,6 @@
 package assembly
 
 import (
-	"database/sql"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/tables"
 )
@@ -25,7 +23,7 @@ type relStore struct {
 	list []relInfo
 }
 
-func (store *relStore) write(m *Modeler) (err error) {
+func (store *relStore) write(m *Assembler) (err error) {
 	for _, p := range store.list {
 		if !p.kind.valid || !p.otherKind.valid {
 			e := errutil.New("couldnt determine valid lowest common ancestor")
@@ -42,14 +40,14 @@ func (store *relStore) write(m *Modeler) (err error) {
 // out, mdl_rel: R, K(lca), Q(lca), cardinality
 // fix? right now the coalesce allows missing kinds through,
 // the behavior otherwise is Scan error on column index 5, and not particularly helpful
-func AssembleRelations(m *Modeler, db *sql.DB) (err error) {
+func AssembleRelations(asm *Assembler) (err error) {
 	var store relStore
 	var curr, last relInfo
 	// we select by R, sorted by R, C, K, Q
 	// when C differs, we error.
 	// when K differs, we Lca K.
 	// when Q differs, we Lca Q.
-	if e := tables.QueryAll(db,
+	if e := tables.QueryAll(asm.cache.DB(),
 		`select
 			nr.name,
 			r.cardinality,
@@ -91,7 +89,7 @@ func AssembleRelations(m *Modeler, db *sql.DB) (err error) {
 		err = e
 	} else {
 		last.flush(&store)
-		err = store.write(m)
+		err = store.write(asm)
 	}
 	return
 }

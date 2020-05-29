@@ -4,9 +4,12 @@ import (
 	"database/sql"
 	"os/user"
 	"path"
+	"strings"
 	"testing"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -22,33 +25,39 @@ func getPath(file string) (ret string, err error) {
 const memory = "file:test.db?cache=shared&mode=memory"
 
 func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
-	ret = &assemblyTest{T: t}
 	var source string
 	if len(path) > 0 {
 		source = path
-	} else if p, e := getPath(t.Name() + ".db"); e != nil {
-		err = e
 	} else {
-		source = p
+		base := strings.Replace(t.Name(), "/", ".", -1) + ".db"
+		if p, e := getPath(base); e != nil {
+			err = errutil.New(e, "for", base)
+		} else {
+			source = p
+		}
 	}
-	//
 	if err == nil {
 		if db, e := sql.Open("sqlite3", source); e != nil {
-			err = e
+			err = errutil.New(e, "for", source)
 		} else if e := tables.CreateEphemera(db); e != nil {
-			err = e
+			err = errutil.New(e, "for", source)
 		} else if e := tables.CreateAssembly(db); e != nil {
-			err = e
+			err = errutil.New(e, "for", source)
 		} else if e := tables.CreateModel(db); e != nil {
-			err = e
+			err = errutil.New(e, "for", source)
 		} else {
+			ds := new(Dilemmas)
 			rec := ephemera.NewRecorder(t.Name(), db)
-			mdl := NewModeler(db)
+			mdl := NewAssemblerReporter(db, func(pos reader.Position, msg string) {
+				t.Log("report:", pos, msg)
+				ds.Add(pos, msg)
+			})
 			ret = &assemblyTest{
-				T:       t,
-				db:      db,
-				rec:     rec,
-				modeler: mdl,
+				T:         t,
+				db:        db,
+				rec:       rec,
+				assembler: mdl,
+				dilemmas:  ds,
 			}
 		}
 	}
@@ -57,9 +66,10 @@ func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 
 type assemblyTest struct {
 	*testing.T
-	db      *sql.DB
-	rec     *ephemera.Recorder
-	modeler *Modeler
+	db        *sql.DB
+	rec       *ephemera.Recorder
+	assembler *Assembler
+	dilemmas  *Dilemmas
 }
 
 type kfp struct{ kind, field, fieldType string }

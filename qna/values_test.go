@@ -17,7 +17,7 @@ func TestGetFieldValues(t *testing.T) {
 	} else if e := tables.CreateRunViews(db); e != nil {
 		t.Fatal(e)
 	} else {
-		m := assembly.NewModeler(db)
+		m := assembly.NewAssembler(db)
 		pathsOfKind := []assembly.TargetField{
 			{"K", ""},
 			{"A", "K"},
