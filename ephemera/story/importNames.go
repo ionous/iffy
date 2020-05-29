@@ -27,7 +27,7 @@ func imp_plural_kinds(k *imp.Porter, r reader.Map) (ret ephemera.Named, err erro
 }
 
 func imp_singular_kind(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "singular_kind", "kind")
+	return importName(k, r, "singular_kind", "")
 }
 
 func imp_trait(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {

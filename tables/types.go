@@ -17,7 +17,8 @@ const (
 	NAMED_ASPECT    = "aspect"
 	NAMED_CERTAINTY = "certainty"
 	NAMED_FIELD     = "field"
-	NAMED_KIND      = "kind"
+	NAMED_KIND      = "singular_kind"
+	NAMED_KINDS     = "kind"
 	NAMED_PROPERTY  = "prop" // field, trait, or aspect
 	NAMED_NOUN      = "noun"
 	NAMED_PATTERN   = "pattern_name"

@@ -45,8 +45,8 @@ type dbrel struct {
 func addRelations(rec *ephemera.Recorder, els []dbrel) (err error) {
 	for _, el := range els {
 		r := rec.NewName(el.r, tables.NAMED_RELATION, "test")
-		k := rec.NewName(el.k, tables.NAMED_KIND, "test")
-		q := rec.NewName(el.q, tables.NAMED_KIND, "test")
+		k := rec.NewName(el.k, tables.NAMED_KINDS, "test")
+		q := rec.NewName(el.q, tables.NAMED_KINDS, "test")
 		c := el.c
 		rec.NewRelation(r, k, q, c)
 	}

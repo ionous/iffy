@@ -21,8 +21,8 @@ func TestMissingKinds(t *testing.T) {
 			"P", "R",
 		}
 		for i := 0; i < len(pairs); i += 2 {
-			kid := asm.rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
-			parent := asm.rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
+			kid := asm.rec.NewName(pairs[i], tables.NAMED_KINDS, strconv.Itoa(i))
+			parent := asm.rec.NewName(pairs[i+1], tables.NAMED_KINDS, strconv.Itoa(i+1))
 			asm.rec.NewKind(kid, parent)
 		}
 		if e := AssembleAncestry(asm.assembler, "T"); e == nil {
@@ -42,7 +42,7 @@ func TestMissingAspects(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		parent := asm.rec.NewName("K", tables.NAMED_KIND, "container")
+		parent := asm.rec.NewName("K", tables.NAMED_KINDS, "container")
 		for i, aspect := range []string{
 			// known, unknown
 			"A", "F",

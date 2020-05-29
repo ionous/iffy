@@ -28,9 +28,11 @@ func assemblyTemplate() string {
 		"\n" +
 		"create temp view \n" +
 		"asm_pattern_decl as \n" +
-		"\tselect  pattern, param, type, ogid from asm_pattern \n" +
+		"\tselect pattern, param, type, ogid \n" +
+		"\tfrom asm_pattern \n" +
 		"\twhere decl = 1 \n" +
-		"\tgroup by pattern, param;\n" +
+		"\tgroup by pattern, param\n" +
+		"\torder by ogid;\n" +
 		"\n" +
 		"/* resolve test ephemera to strings\n" +
 		" */\n" +

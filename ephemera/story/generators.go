@@ -108,7 +108,7 @@ func imp_noun_relation(k *imp.Porter, r reader.Map) (err error) {
 func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
-		things := k.NewName("things", tables.NAMED_KIND, once)
+		things := k.NewName("things", tables.NAMED_KINDS, once)
 		nounType := k.NewName("nounType", tables.NAMED_ASPECT, once)
 		common := k.NewName("common", tables.NAMED_TRAIT, once)
 		proper := k.NewName("proper", tables.NAMED_TRAIT, once)
@@ -142,7 +142,7 @@ func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
 			k.NewValue(noun, article, det)
 			if once := "common_noun"; k.Once(once) {
 				indefinite := k.NewName("indefinite article", tables.NAMED_FIELD, once)
-				things := k.NewName("things", tables.NAMED_KIND, once)
+				things := k.NewName("things", tables.NAMED_KINDS, once)
 				k.NewPrimitive(things, indefinite, tables.PRIM_TEXT)
 			}
 		}
@@ -213,7 +213,7 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 	} else {
 		// declare the existence of the field "appearance"
 		if once := "summary"; k.Once(once) {
-			things := k.NewName("things", tables.NAMED_KIND, once)
+			things := k.NewName("things", tables.NAMED_KINDS, once)
 			appear := k.NewName("appearance", tables.NAMED_FIELD, once)
 			k.NewPrimitive(things, appear, tables.PRIM_EXPR)
 		}

@@ -33,7 +33,7 @@ func assemble(outFile, inFile string) (err error) {
 		err = e
 	} else if e := os.Remove(outFile); e != nil && !os.IsNotExist(e) {
 		err = errutil.New("couldn't clean output file", outFile, e)
-	} else if db, e := sql.Open("sqlite3", outFile); e != nil {
+	} else if db, e := sql.Open("iffy_asm", outFile); e != nil {
 		err = errutil.New("couldn't create output file", outFile, e)
 	} else {
 		defer db.Close()

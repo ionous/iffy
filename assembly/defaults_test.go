@@ -242,7 +242,7 @@ func matchDefaults(db *sql.DB, want []triplet) (err error) {
 // write ephemera describing some initial values
 func addDefaults(rec *ephemera.Recorder, defaults []triplet) (err error) {
 	for _, el := range defaults {
-		namedKind := rec.NewName(el.target, tables.NAMED_KIND, "test")
+		namedKind := rec.NewName(el.target, tables.NAMED_KINDS, "test")
 		namedField := rec.NewName(el.prop, tables.NAMED_PROPERTY, "test")
 		rec.NewDefault(namedKind, namedField, el.value)
 	}

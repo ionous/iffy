@@ -33,7 +33,10 @@ func ephemeraTemplate() string {
 		"create table eph_relation( idNamedRelation int, idNamedKind int, idNamedOtherKind int, cardinality text check (cardinality in ('one_one','one_any','any_one','any_any')));\n" +
 		"/* connection between two object instances */\t\n" +
 		"create table eph_relative( idNamedHead int, idNamedStem int, idNamedDependent int );\n" +
-		"/* uri, file name or other identification for the origin of the various ephemera recorded in the db. */\n" +
+		"/* uri, file name or other identification for the origin of the various ephemera recorded in the db. \n" +
+		"while its not particularly useful to have a one column primitive data type column\n" +
+		"someday, this might contain source modification times or other useful info.\n" +
+		"*/\n" +
 		"create table eph_source( src text );\n" +
 		"/* only one trait from a given aspect can be true for a noun at a time. */\t\n" +
 		"create table eph_trait( idNamedTrait int, idNamedAspect int, rank int );\n" +

@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -13,8 +14,6 @@ func TestAncestors(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		db, rec := asm.db, asm.rec
-		//
 		pairs := []string{
 			// kind, ancestor
 			"P", "T",
@@ -27,14 +26,9 @@ func TestAncestors(t *testing.T) {
 			"P", "J",
 			"M", "J",
 		}
-		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
-			ancestor := rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
-			rec.NewKind(kid, ancestor)
-		}
-		//
-		kinds := &cachedKinds{}
-		if e := kinds.AddAncestorsOf(db, "T"); e != nil {
+		addKinds(asm.rec, pairs)
+		var kinds cachedKinds
+		if e := kinds.AddAncestorsOf(asm.db, "T"); e != nil {
 			t.Fatal(e)
 		}
 		for name, kind := range kinds.cache {
@@ -74,21 +68,14 @@ func TestAncestorCycle(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		db, rec := asm.db, asm.rec
-		//
-		pairs := []string{
+		addKinds(asm.rec, []string{
 			// kind, ancestor
 			"P", "T",
 			"T", "P",
-		}
-		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
-			parent := rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
-			rec.NewKind(kid, parent)
-		}
+		})
 		//
-		kinds := &cachedKinds{}
-		if e := kinds.AddAncestorsOf(db, "T"); e == nil {
+		var kinds cachedKinds
+		if e := kinds.AddAncestorsOf(asm.db, "T"); e == nil {
 			t.Fatal("expected error")
 		} else {
 			t.Log("okay:", e)
@@ -103,23 +90,16 @@ func TestAncestorConflict(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		db, rec := asm.db, asm.rec
 		//
-		pairs := []string{
+		addKinds(asm.rec, []string{
 			// kind, ancestor
 			"P", "T",
 			"Q", "T",
 			"K", "P",
 			"K", "Q",
-		}
-		for i := 0; i < len(pairs); i += 2 {
-			kid := rec.NewName(pairs[i], tables.NAMED_KIND, strconv.Itoa(i))
-			parent := rec.NewName(pairs[i+1], tables.NAMED_KIND, strconv.Itoa(i+1))
-			rec.NewKind(kid, parent)
-		}
-		//
-		kinds := &cachedKinds{}
-		if e := kinds.AddAncestorsOf(db, "T"); e == nil {
+		})
+		var kinds cachedKinds
+		if e := kinds.AddAncestorsOf(asm.db, "T"); e == nil {
 			for name, kind := range kinds.cache {
 				t.Log(name, ":", kind.GetAncestors())
 			}
@@ -127,5 +107,13 @@ func TestAncestorConflict(t *testing.T) {
 		} else {
 			t.Log("okay:", e)
 		}
+	}
+}
+
+func addKinds(rec *ephemera.Recorder, pairs []string) {
+	for i := 0; i < len(pairs); i += 2 {
+		kid := rec.NewName(pairs[i], tables.NAMED_KINDS, strconv.Itoa(i))
+		ancestor := rec.NewName(pairs[i+1], tables.NAMED_KINDS, strconv.Itoa(i+1))
+		rec.NewKind(kid, ancestor)
 	}
 }
