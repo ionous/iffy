@@ -33,7 +33,7 @@ func newTestDecoder(t *testing.T) (ret *imp.Porter, retDB *sql.DB) {
 }
 
 func newTestImporterDecoder(t *testing.T, dec *decode.Decoder) (ret *imp.Porter, retDB *sql.DB) {
-	db := newTestDB(t, memory)
+	db := newImportDB(t, memory)
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create ephemera", e)
 	} else {
@@ -46,7 +46,7 @@ func newTestImporterDecoder(t *testing.T, dec *decode.Decoder) (ret *imp.Porter,
 const memory = "file:test.db?cache=shared&mode=memory"
 
 // if path is nil, it will use a file db.
-func newTestDB(t *testing.T, where string) (ret *sql.DB) {
+func newImportDB(t *testing.T, where string) (ret *sql.DB) {
 	var source string
 	if len(where) > 0 {
 		source = where

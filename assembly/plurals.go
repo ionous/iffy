@@ -9,7 +9,7 @@ import (
 
 const SqlCustomDriver = "iffy_asm"
 
-// requires using sql.Open()
+// requires using sql.Open(SqlCustomDriver)
 func init() {
 	// since we have to have app code for assembling plurals,
 	// might as well use an extension to simplify the processing.

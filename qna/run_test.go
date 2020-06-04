@@ -15,7 +15,7 @@ import (
 // no idea where this test should live...
 // complete, manual, end to end test of factorial pattern.
 func TestFullFactorial(t *testing.T) {
-	db := newTestDB(t, memory)
+	db := newQnaDB(t, memory)
 	defer db.Close()
 
 	//import factorialStory, assemble and run.

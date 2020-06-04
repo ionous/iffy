@@ -16,7 +16,7 @@ func TestPatternFields(t *testing.T) {
 	gob.Register((*core.Text)(nil))
 	gob.Register((*MatchNumber)(nil))
 
-	db := newTestDB(t, memory)
+	db := newQnaDB(t, memory)
 	defer db.Close()
 	if e := tables.CreateModel(db); e != nil {
 		t.Fatal(e)

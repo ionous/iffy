@@ -10,7 +10,7 @@ import (
 )
 
 func TestImportStory(t *testing.T) {
-	db := newTestDB(t, memory)
+	db := newImportDB(t, memory)
 	defer db.Close()
 	//
 	var in reader.Map

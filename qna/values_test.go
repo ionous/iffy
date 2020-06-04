@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetFieldValues(t *testing.T) {
-	db := newTestDB(t, memory)
+	db := newQnaDB(t, memory)
 	defer db.Close()
 	if e := tables.CreateModel(db); e != nil {
 		t.Fatal(e)

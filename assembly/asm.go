@@ -15,7 +15,9 @@ func AssembleStory(db *sql.DB, baseKind string, reporter IssueReport) (err error
 	// ex. each "important" table entry gets an separate entry pointing back to original source
 	//
 	asm := NewAssemblerReporter(db, reporter)
-	if e := AssembleAncestry(asm, baseKind); e != nil || asm.IssueCount > 0 {
+	if e := AssemblePlurals(asm); e != nil || asm.IssueCount > 0 {
+		err = e
+	} else if e := AssembleAncestry(asm, baseKind); e != nil || asm.IssueCount > 0 {
 		err = e
 	} else if e := AssembleAspects(asm); e != nil || asm.IssueCount > 0 {
 		err = e
