@@ -8,10 +8,19 @@ import (
 
 // MissingKinds reports named kinds which don't have a defined ancestry.
 // Returns error only on critical errors.
-func reportMissingKinds(asm *Assembler) error {
-	return reportMissing(asm, "kind",
+func reportMissingKinds(asm *Assembler) (err error) {
+	if e := reportMissing(asm, "kind",
 		`select 1 from mdl_kind mk 
-			where name= mk.kind`)
+			where name= mk.kind`); e != nil {
+		err = e
+	} else if e := reportMissing(asm, "singular_kind",
+		`select 1 from mdl_kind mk 
+		join mdl_plural mp 
+			on (mp.one = name)
+		where mp.many= mk.kind`); e != nil {
+		err = e
+	}
+	return
 }
 
 // fix? what about alternative names ( aliases and partial names ) in the story text?

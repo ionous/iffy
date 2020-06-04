@@ -61,14 +61,29 @@ func (r *Recorder) NewDefault(kind, field Named, value interface{}) {
 	r.cache.Must(eph_default, kind, field, value)
 }
 
-// NewKind connects a kind to its parent kind.
+// NewKind connects a kind (plural) to its parent kind (singular).
+// cats are a kind of animal.
 func (r *Recorder) NewKind(kind, parent Named) {
 	r.cache.Must(eph_kind, kind, parent)
 }
 
-// NewNoun connects a noun to its kind.
+// NewNoun connects a noun to its kind (singular).
 func (r *Recorder) NewNoun(noun, kind Named) {
 	r.cache.Must(eph_noun, noun, kind)
+}
+
+// declare a pattern or pattern parameter
+func (r *Recorder) NewPatternDecl(pattern, param, patternType Named) {
+	r.cache.Must(eph_pattern, pattern, param, patternType, true)
+}
+
+//
+func (r *Recorder) NewPatternRef(pattern, param, patternType Named) {
+	r.cache.Must(eph_pattern, pattern, param, patternType, false)
+}
+
+func (r *Recorder) NewPatternRule(pattern Named, handler Prog) {
+	r.cache.Must(eph_rule, pattern, handler)
 }
 
 // NewPlural maps the plural form of a name to its singular form.
@@ -91,6 +106,10 @@ func (r *Recorder) NewRelative(primary, stem, secondary Named) {
 	r.cache.Must(eph_relative, primary, stem, secondary)
 }
 
+func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
+	r.cache.Must(eph_check, test, prog, expect)
+}
+
 // NewTrait records a member of an aspect and its order ( rank. )
 func (r *Recorder) NewTrait(trait, aspect Named, rank int) {
 	r.cache.Must(eph_trait, trait, aspect, rank)
@@ -105,24 +124,6 @@ func (r *Recorder) NewValue(noun, prop Named, value interface{}) {
 // NewRelative connects two specific nouns using a verb.
 func (r *Recorder) NewVerb(stem, relation Named, verb string) {
 	r.cache.Must(eph_verb, stem, relation, verb)
-}
-
-func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
-	r.cache.Must(eph_check, test, prog, expect)
-}
-
-// declare a pattern or pattern parameter
-func (r *Recorder) NewPatternDecl(pattern, param, patternType Named) {
-	r.cache.Must(eph_pattern, pattern, param, patternType, true)
-}
-
-//
-func (r *Recorder) NewPatternRef(pattern, param, patternType Named) {
-	r.cache.Must(eph_pattern, pattern, param, patternType, false)
-}
-
-func (r *Recorder) NewPatternRule(pattern Named, handler Prog) {
-	r.cache.Must(eph_rule, pattern, handler)
 }
 
 var eph_alias = tables.Insert("eph_alias", "idNamedAlias", "idNamedActual")

@@ -14,8 +14,8 @@ import (
 // . kinds containing punctuation ( especially "," since that used for the expanded hierarchy )
 // . misspellings, near spellings
 func AssembleAncestry(asm *Assembler, k string) (err error) {
-	kinds := &cachedKinds{} // collect all kinds
-	if e := kinds.AddAncestorsOf(asm.cache.DB(), k); e != nil {
+	var kinds cachedKinds // collect all kinds
+	if e := kinds.AddDescendentsOf(asm.cache.DB(), k); e != nil {
 		err = errutil.New("couldn't determine ancestry")
 	} else {
 		// write ancestors
@@ -23,9 +23,6 @@ func AssembleAncestry(asm *Assembler, k string) (err error) {
 			// validate k
 			if lang.ContainsPunct(k) {
 				e := errutil.New("kind shouldn't contain punctuation", k)
-				err = errutil.Append(err, e)
-			} else if len(k) > 1 && !lang.IsPlural(k) {
-				e := errutil.New("kind expected a plural name", k)
 				err = errutil.Append(err, e)
 			} else if e := asm.WriteAncestor(k, v.GetAncestors()); e != nil {
 				// fix? do we want to store kinds as all "uppercase"

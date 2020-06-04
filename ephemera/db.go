@@ -8,16 +8,10 @@ import (
 
 // KidsOf the passed ancestor as specified in the Kinds table.
 // note: this is raw user data, there may be ambiguities or conflicts in the pairings.
-func KidsOf(db *sql.DB, ancestor string, cb func(kid string)) (err error) {
-	// query the child names of the parent named p
+func KidsOf(db *sql.DB, pluralAncestor string, cb func(kid string)) (err error) {
+	// ex. from cats are a kind of animal, extract "cats" when looking for "animals"
 	if siblings, e := db.Query(
-		`select distinct n.name as kid 
-			from eph_named n,( select idNamedKind
-				from eph_kind,( select rowid as parentId 
-				    from eph_named n
-				    where n.name = ? )
-				where idNamedParent = parentId )
-			where n.rowid = idNamedKind`, ancestor); e != nil {
+		`select distinct kid from asm_ancestry where parent = ?`, pluralAncestor); e != nil {
 		err = e
 	} else {
 		var kid string

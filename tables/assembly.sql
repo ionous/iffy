@@ -23,6 +23,30 @@ asm_pattern_decl as
 	group by pattern, param
 	order by ogid;
 
+/**
+ * using plurals table, convert singular named kinds to plural kinds
+ */
+create temp view 
+asm_kind as 
+	select mp.many as pluralName, en.idSource, en.offset, en.rowid as singularId 
+	from eph_named en 
+	join mdl_plural mp 
+		on (mp.one= en.name)
+	where (en.category = 'singular_kind');
+	
+
+/* resolve (and normalize) eph_kind ephemera to plural strings
+ */
+create temp view 
+asm_ancestry as
+select ap.pluralName as parent, nk.name as kid 
+from eph_kind ek
+join asm_kind ap 
+	on (ap.singularId = ek.idNamedParent)
+left join eph_named nk
+where nk.rowid = ek.idNamedKind;
+
+
 /* resolve test ephemera to strings
  */
 create temp view 

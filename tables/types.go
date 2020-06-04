@@ -11,7 +11,7 @@ const (
 	PRIM_TRAIT  = "trait"  // string
 )
 
-// named category
+// eph_named category
 // FIX -- make these match the names in the file and things are much cleaner
 const (
 	NAMED_ASPECT    = "aspect"

@@ -10,6 +10,9 @@ function localLang(make) {
     //
     make.run("noun_statement", "story_statement", "{:lede} {*tail} {?summary}",
              "Noun statement: Describes people, places, or things.");
+
+    make.run("comment", "story_statement", "Note: {comment%lines}",
+      "Comment: Information about the story not used by the story.")
   });
 
   make.group("Nouns", function() {

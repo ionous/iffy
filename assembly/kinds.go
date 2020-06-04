@@ -45,16 +45,16 @@ type cachedKinds struct {
 // helper for cached kinds
 type cacheMap map[string]*cachedKind
 
-// Get a cachedKind of n
-func (c *cachedKinds) Get(n string) (ret *cachedKind) {
-	if el, ok := c.cache[n]; ok {
+// Get a cachedKind of pluralName
+func (c *cachedKinds) Get(pluralName string) (ret *cachedKind) {
+	if el, ok := c.cache[pluralName]; ok {
 		ret = el
 	} else {
 		if c.cache == nil {
 			c.cache = make(cacheMap)
 		}
-		el := &cachedKind{name: n}
-		c.cache[n] = el
+		el := &cachedKind{name: pluralName}
+		c.cache[pluralName] = el
 		ret = el
 	}
 	return
@@ -62,10 +62,10 @@ func (c *cachedKinds) Get(n string) (ret *cachedKind) {
 
 // work backwards from k to ensure a defined root.
 // fix? revisit? is there a more db friendly way to do this?
-func (c *cachedKinds) AddAncestorsOf(db *sql.DB, k string) (err error) {
-	search := []*cachedKind{c.Get(k)}
+func (c *cachedKinds) AddDescendentsOf(db *sql.DB, pluralKind string) (err error) {
 	pairs := make([]*cachedKind, 0)
 	//
+	search := []*cachedKind{c.Get(pluralKind)}
 	for len(search) > 0 {
 		var req *cachedKind
 		last := len(search) - 1

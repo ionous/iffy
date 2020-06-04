@@ -94,6 +94,11 @@ func (m *Assembler) WritePat(name, paramName, paramType string, idx int64) error
 	return e
 }
 
+func (m *Assembler) WritePlural(one, many string) error {
+	_, e := m.cache.Exec(mdl_plural, one, many)
+	return e
+}
+
 func (m *Assembler) WriteProg(typeName string, bytes []byte) (int64, error) {
 	return m.cache.Exec(mdl_prog, typeName, bytes)
 }
@@ -139,6 +144,7 @@ var mdl_name = tables.Insert("mdl_name", "noun", "name", "rank")
 var mdl_noun = tables.Insert("mdl_noun", "noun", "kind")
 var mdl_pair = tables.Insert("mdl_pair", "noun", "relation", "otherNoun")
 var mdl_pat = tables.Insert("mdl_pat", "pattern", "param", "type", "idx")
+var mdl_plural = tables.Insert("mdl_plural", "one", "many")
 var mdl_prog = tables.Insert("mdl_prog", "type", "bytes")
 var mdl_rel = tables.Insert("mdl_rel", "relation", "kind", "cardinality", "otherKind")
 var mdl_rule = tables.Insert("mdl_rule", "pattern", "idProg")

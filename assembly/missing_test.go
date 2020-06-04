@@ -2,7 +2,6 @@ package assembly
 
 import (
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/ionous/iffy/tables"
@@ -14,20 +13,16 @@ func TestMissingKinds(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		// kind, ancestor
-		pairs := []string{
+		addKinds(asm, []string{
+			// kid, ancestor
+			"T", "",
 			"P", "T",
 			"Q", "T",
 			"P", "R",
-		}
-		for i := 0; i < len(pairs); i += 2 {
-			kid := asm.rec.NewName(pairs[i], tables.NAMED_KINDS, strconv.Itoa(i))
-			parent := asm.rec.NewName(pairs[i+1], tables.NAMED_KINDS, strconv.Itoa(i+1))
-			asm.rec.NewKind(kid, parent)
-		}
-		if e := AssembleAncestry(asm.assembler, "T"); e == nil {
+		})
+		if e := AssembleAncestry(asm.assembler, "Ts"); e == nil {
 			t.Fatal("expected error")
-		} else if !containsOnly(asm.dilemmas, `missing kind: "R"`) {
+		} else if !containsOnly(asm.dilemmas, `missing singular_kind: "R"`) {
 			t.Fatal(asm.dilemmas)
 		} else {
 			t.Log("ok:", e)
