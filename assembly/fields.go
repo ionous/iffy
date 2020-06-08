@@ -72,8 +72,8 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 			// we're at a new field, so write the old one.
 			if last.Field != curr.Field {
 				curr.updateHierarchy()
-				if curr.Type == tables.PRIM_ASPECT && sort.SearchStrings(missingAspects, curr.Field) >= 0 {
-					err = errutil.New("unknown aspect declared as field of kind", curr.Field, curr.Kind)
+				if curr.Type == tables.PRIM_ASPECT && hasString(missingAspects, curr.Field) {
+					err = errutil.Fmt("unknown aspect declared as field %q of kind %q", curr.Field, curr.Kind)
 				} else {
 					last.Flush(out)
 					last = curr
@@ -97,6 +97,11 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 		last.Flush(out)
 	}
 	return
+}
+
+func hasString(sorted []string, key string) bool {
+	i := sort.SearchStrings(sorted, key)
+	return i >= 0 && i < len(sorted) && sorted[i] == key
 }
 
 // fix: can this be changed to a report? ( re: reportMissingAspects )
