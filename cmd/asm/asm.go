@@ -57,8 +57,10 @@ func assemble(outFile, inFile string) (err error) {
 			var ds assembly.Dilemmas
 			if e := assembly.AssembleStory(db, "things", ds.Add); e != nil {
 				err = errutil.New("error assembling", e, inFile)
-			} else if len(ds) > 0 {
-				err = errutil.New("issues assembling", ds.Err())
+			}
+			if len(ds) > 0 {
+				e := errutil.New("issues assembling", ds.Err())
+				err = errutil.Append(err, e)
 			}
 		}
 	}

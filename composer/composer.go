@@ -100,33 +100,54 @@ func tempTest(ctx context.Context, cfg *Config, in io.Reader) (err error) {
 		if e := ensureFile(inFile, d); e != nil {
 			log.Println(tab, "Save error", e)
 			err = e
-		} else {
-			// note: for now, these read from CombinedOutput to grab any log/println traces...
-			log.Println("Importing", inFile+"...")
-			ephFile := path.Join(cfg.Documents, hashed, "ephemera.db")
-			if imported, e := exec.CommandContext(ctx, cfg.Import, "-in", inFile, "-out", ephFile).CombinedOutput(); e != nil {
-				log.Println(tab, "Import error", cfg.Import, exitError(e))
-				err = e
-			} else {
-				logBytes(imported)
-				log.Println("Assembling", inFile+"...")
-				inFile, playFile := ephFile, path.Join(cfg.Documents, hashed, "play.db")
-				if assembled, e := exec.CommandContext(ctx, cfg.Assemble, "-in", inFile, "-out", playFile).CombinedOutput(); e != nil {
-					log.Println(tab, "Assembly error", cfg.Assemble, exitError(e))
-					err = e
-				} else {
-					logBytes(assembled)
-					log.Println("Checking", playFile+"...")
-					if checked, e := exec.CommandContext(ctx, cfg.Check, "-in", playFile).CombinedOutput(); e != nil {
-						log.Println(tab, "Check error", cfg.Check, exitError(e))
-						err = e
-					} else {
-						logBytes(checked)
-					}
-				}
-			}
+		} else if ephFile, e := runImport(ctx, cfg, inFile, hashed); e != nil {
+			log.Println(tab, "Import error", cfg.Import, exitError(e))
+			err = e
+		} else if playFile, e := runAsm(ctx, cfg, ephFile, hashed); e != nil {
+			log.Println(tab, "Assembly error", cfg.Assemble, exitError(e))
+			err = e
+		} else if e := runCheck(ctx, cfg, playFile); e != nil {
+			log.Println(tab, "Check error", cfg.Check, exitError(e))
+			err = e
 		}
 	}
+	return
+}
+
+// note: for now, these read from CombinedOutput to grab any log/println traces...
+func runImport(ctx context.Context, cfg *Config, inFile, hashed string) (ret string, err error) {
+	log.Println("Importing", inFile+"...")
+	ephFile := path.Join(cfg.Documents, hashed, "ephemera.db")
+	imported, e := exec.CommandContext(ctx, cfg.Import, "-in", inFile, "-out", ephFile).CombinedOutput()
+	if e != nil {
+		err = e
+	} else {
+		ret = ephFile
+	}
+	logBytes(imported)
+	return
+}
+
+func runAsm(ctx context.Context, cfg *Config, ephFile, hashed string) (ret string, err error) {
+	log.Println("Assembling", ephFile+"...")
+	inFile, playFile := ephFile, path.Join(cfg.Documents, hashed, "play.db")
+	assembled, e := exec.CommandContext(ctx, cfg.Assemble, "-in", inFile, "-out", playFile).CombinedOutput()
+	if e != nil {
+		err = e
+	} else {
+		ret = playFile
+	}
+	logBytes(assembled)
+	return
+
+}
+func runCheck(ctx context.Context, cfg *Config, playFile string) (err error) {
+	log.Println("Checking", playFile+"...")
+	checked, e := exec.CommandContext(ctx, cfg.Check, "-in", playFile).CombinedOutput()
+	if e != nil {
+		err = e
+	}
+	logBytes(checked)
 	return
 }
 
