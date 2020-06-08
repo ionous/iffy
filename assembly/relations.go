@@ -50,20 +50,21 @@ func AssembleRelations(asm *Assembler) (err error) {
 	if e := tables.QueryAll(asm.cache.DB(),
 		`select
 			nr.name,
-			r.cardinality,
+			er.cardinality,
 			nk.name, coalesce(ak.path, ""),
 			nq.name, coalesce(aq.path, "")
-		from eph_relation r join eph_named nr
-			on (r.idNamedRelation = nr.rowid)
+		from eph_relation er 
+		join eph_named nr
+			on (er.idNamedRelation = nr.rowid)
 		left join eph_named nk
-			on (r.idNamedKind = nk.rowid)
+			on (er.idNamedKind = nk.rowid)
 		left join eph_named nq
-			on (r.idNamedOtherkind = nq.rowid)
+			on (er.idNamedOtherkind = nq.rowid)
 		left join mdl_kind ak
 			on (ak.kind = nk.name)
 		left join mdl_kind aq
 			on (aq.kind = nq.name)
-		order by nr.name, r.cardinality, nk.name, nq.name
+		order by nr.name, er.cardinality, nk.name, nq.name
 		`, func() (err error) {
 			// when R differs, write to the output.
 			if last.relation != curr.relation {

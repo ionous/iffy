@@ -10,7 +10,7 @@ import (
 // ex. -dir /Users/ionous/Documents/Iffy
 func main() {
 	var dir string
-	flag.StringVar(&dir, "dir", "", "directory for iffy files.")
+	flag.StringVar(&dir, "dir", "", "directory for processing iffy files.")
 	flag.Parse()
 	//
 	cfg := composer.DevConfig(build.Default.GOPATH)

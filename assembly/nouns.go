@@ -18,11 +18,14 @@ func AssembleNouns(asm *Assembler) (err error) {
 	var store nounStore
 	var curr, last nounInfo
 	if e := tables.QueryAll(asm.cache.DB(),
+		// note: nk is known to refer to kinds b/c it comes from eph_noun.idNamedKind
+		// therefore, we dont have to filter where category=kind(s).
 		`select nn.name, nk.name, coalesce(ak.path, "")
-		from eph_noun n join eph_named nn
-			on (n.idNamedNoun = nn.rowid)
+		from eph_noun en 
+		join eph_named nn
+			on (en.idNamedNoun = nn.rowid)
 		left join eph_named nk
-			on (n.idNamedKind = nk.rowid)
+			on (en.idNamedKind = nk.rowid)
 		join mdl_kind ak
 			on (ak.kind = nk.name)
 		order by nn.name, nk.name

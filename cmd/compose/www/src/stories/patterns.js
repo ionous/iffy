@@ -166,7 +166,7 @@ function getStory() {
                                   "$COMMON_NAME": {
                                     "id": "id-1724419eaa5-59",
                                     "type": "common_name",
-                                    "value": "Example Thing"
+                                    "value": "example"
                                   }
                                 }
                               }
@@ -218,7 +218,7 @@ function getStory() {
                     "$NAME": {
                       "id": "id-1724419eaa5-28",
                       "type": "text",
-                      "value": "x"
+                      "value": "test name of kind"
                     },
                     "$TEST": {
                       "id": "id-1724419eaa5-29",
@@ -250,7 +250,7 @@ function getStory() {
                                         "$TEMPLATE": {
                                           "id": "id-1724419eaa5-67",
                                           "type": "lines",
-                                          "value": "{.ExampleThing}"
+                                          "value": "{.example}"
                                         }
                                       }
                                     }

@@ -57,8 +57,11 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 	var curr, last fieldInfo
 	// fix: probably want source line out of this too
 	if e := tables.QueryAll(db,
+		// note: nk is known to refer to kinds b/c it comes from eph_field idNamedKind
+		// therefore, we dont have to filter where category=kind(s).
 		`select nk.name, nf.name, p.primType, a.path
-		from eph_field p join eph_named nk
+		from eph_field p 
+		join eph_named nk
 			on (p.idNamedKind = nk.rowid)
 		left join eph_named nf
 			on (p.idNamedField = nf.rowid)

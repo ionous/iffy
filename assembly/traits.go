@@ -15,22 +15,24 @@ import (
 func AssembleAspects(asm *Assembler) (err error) {
 	var curr, last aspectInfo
 	var traits []aspectInfo // cant read and write to the db simultaneously
-	if e := tables.QueryAll(asm.cache.DB(), `select nt.name, na.name
-	from eph_trait t join eph_named nt
+	if e := tables.QueryAll(asm.cache.DB(),
+		`select nt.name, na.name
+	from eph_trait t 
+	join eph_named nt
 		on (t.idNamedTrait = nt.rowid)
 	left join eph_named na
 		on (t.idNamedAspect = na.rowid)
 	order by nt.name, na.name`, func() (err error) {
-		switch traitsMatch, aspectsMatch := last.Trait == curr.Trait, last.Aspect == curr.Aspect; {
-		case traitsMatch && !aspectsMatch:
-			err = errutil.New("same trait different aspect", curr.Trait, curr.Aspect, last.Aspect)
+			switch traitsMatch, aspectsMatch := last.Trait == curr.Trait, last.Aspect == curr.Aspect; {
+			case traitsMatch && !aspectsMatch:
+				err = errutil.New("same trait different aspect", curr.Trait, curr.Aspect, last.Aspect)
 
-		case !traitsMatch:
-			traits = append(traits, curr)
-			last = curr
-		}
-		return
-	}, &curr.Trait, &curr.Aspect); e != nil {
+			case !traitsMatch:
+				traits = append(traits, curr)
+				last = curr
+			}
+			return
+		}, &curr.Trait, &curr.Aspect); e != nil {
 		err = e
 	} else {
 		for _, t := range traits {
