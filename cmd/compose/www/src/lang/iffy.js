@@ -35,7 +35,7 @@ function localLang(make) {
      make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 
     // fix: think this should always be "are" never "is"
-    make.run("kinds_of_thing", "story_statement",
+    make.run("kind_of_noun", "story_statement",
              "{plural_kinds} are a kind of {singular_kind}.");
 
     make.str("proper_name", `Proper Name: A name given to some specific person, place, or thing.

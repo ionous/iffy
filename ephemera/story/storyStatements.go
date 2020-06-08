@@ -12,7 +12,7 @@ func imp_story_statement(k *imp.Porter, r reader.Map) (err error) {
 		"certainties":              k.Bind(imp_certainties),
 		"class_attributes":         k.Bind(imp_class_attributes),
 		"kinds_of_quality":         k.Bind(imp_kinds_of_quality),
-		"kinds_of_thing":           k.Bind(imp_kinds_of_thing),
+		"kind_of_noun":             k.Bind(imp_kind_of_noun),
 		"kinds_possess_properties": k.Bind(imp_kinds_possess_properties),
 		"noun_assignment":          k.Bind(imp_noun_assignment),
 		"noun_statement":           k.Bind(imp_noun_statement),
@@ -87,8 +87,8 @@ func imp_kinds_of_quality(k *imp.Porter, r reader.Map) (err error) {
 
 // "{plural_kinds} {are_an} kind of {kind}."
 // ex. "cats are a kind of animal"
-func imp_kinds_of_thing(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "kinds_of_thing"); e != nil {
+func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
+	if m, e := reader.Unpack(r, "kind_of_noun"); e != nil {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
