@@ -8,7 +8,7 @@ import (
 // goal:
 // . expanded hierarchy stored per kind ( kind | comma-separated-ancestors )
 // considerations:
-// . contradictory ancestors and cycles ( T->K->T )
+// . contradictory ancestors and cycles ( Ts->Ks->Ts )
 // . kinds without a defined hierarchy ( ie. named, but not in kinds table )
 // . singular kinds ( the definition of kinds should always use plural names )
 // . kinds containing punctuation ( especially "," since that used for the expanded hierarchy )

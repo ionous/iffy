@@ -13,14 +13,16 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-func addTraits(rec *ephemera.Recorder, pairs []pair) (err error) {
-	for _, p := range pairs {
+func addTraits(rec *ephemera.Recorder, pairs []string) (err error) {
+	els := pairs
+	for i, cnt := 0, len(els); i < cnt; i += 2 {
+		key, value := els[i], els[i+1]
 		var aspect, trait ephemera.Named
-		if len(p.key) > 0 {
-			aspect = rec.NewName(p.key, tables.NAMED_ASPECT, "key")
+		if len(key) > 0 {
+			aspect = rec.NewName(key, tables.NAMED_ASPECT, "key")
 		}
-		if len(p.value) > 0 {
-			trait = rec.NewName(p.value, tables.NAMED_TRAIT, "value")
+		if len(value) > 0 {
+			trait = rec.NewName(value, tables.NAMED_TRAIT, "value")
 		}
 		if aspect.IsValid() && trait.IsValid() {
 			rec.NewAspect(aspect)
@@ -58,13 +60,12 @@ func TestTraits(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := addTraits(asm.rec,
-			[]pair{
-				{"A", "x"},
-				{"A", "y"},
-				{"B", "z"},
-				{"B", "z"},
-			}); e != nil {
+		if e := addTraits(asm.rec, []string{
+			"A", "x",
+			"A", "y",
+			"B", "z",
+			"B", "z",
+		}); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleAspects(asm.assembler); e != nil {
 			t.Fatal(e)
@@ -85,10 +86,10 @@ func TestTraitConflicts(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := addTraits(asm.rec, []pair{
-			{"A", "x"},
-			{"C", "z"},
-			{"B", "x"},
+		if e := addTraits(asm.rec, []string{
+			"A", "x",
+			"C", "z",
+			"B", "x",
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleAspects(asm.assembler); e == nil {
@@ -105,9 +106,9 @@ func TestTraitMissingAspect(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := addTraits(asm.rec, []pair{
-			{"A", "x"},
-			{"Z", ""},
+		if e := addTraits(asm.rec, []string{
+			"A", "x",
+			"Z", "",
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleAspects(asm.assembler); e == nil {
@@ -128,10 +129,10 @@ func TestTraitMissingTraits(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := addTraits(asm.rec, []pair{
-			{"A", "x"},
-			{"", "y"},
-			{"", "z"},
+		if e := addTraits(asm.rec, []string{
+			"A", "x",
+			"", "y",
+			"", "z",
 		}); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleAspects(asm.assembler); e == nil {

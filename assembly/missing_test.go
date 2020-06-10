@@ -13,13 +13,12 @@ func TestMissingKinds(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		addKinds(asm, []string{
-			// kid, ancestor
+		addKinds(asm, // kid, ancestor
 			"T", "",
 			"P", "T",
 			"Q", "T",
 			"P", "R",
-		})
+		)
 		if e := AssembleAncestry(asm.assembler, "Ts"); e == nil {
 			t.Fatal("expected error")
 		} else if !containsOnly(asm.dilemmas, `missing singular_kind: "R"`) {
@@ -37,7 +36,7 @@ func TestMissingAspects(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		parent := asm.rec.NewName("K", tables.NAMED_KINDS, "container")
+		parent := asm.rec.NewName("Ks", tables.NAMED_KINDS, "container")
 		for i, aspect := range []string{
 			// known, unknown
 			"A", "F",
@@ -67,13 +66,13 @@ func TestMissingField(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := writeMissing(asm.rec, []string{
+		} else if e := writeMissing(asm.rec,
 			"z",
-		}); e != nil {
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleFields(asm.assembler); e == nil {
 			t.Fatal("expected error")
@@ -92,40 +91,40 @@ func TestMissingField(t *testing.T) {
 // 	} else {
 // 		defer asm.db.Close()
 // 		//
-// 		if e := AddTestHierarchy(asm.assembler, []TargetField{
-// 			{"T", ""},
-// 			{"P", "T"},
-// 			{"C", "P,T"},
-// 		}); e != nil {
+// 		if e := AddTestHierarchy(asm.assembler,
+// 			"Ts", "",
+// 			"Ps", "Ts",
+// 			"Cs", "Ps,Ts",
+// 		); e != nil {
 // 			t.Fatal(e)
-// 		} else if e := AddTestFields(asm.assembler, []TargetValue{
-// 			{"T", "d", tables.PRIM_DIGI},
-// 			{"T", "t", tables.PRIM_TEXT},
-// 			{"T", "t2", tables.PRIM_TEXT},
-// 			{"P", "p", tables.PRIM_TEXT},
-// 			{"C", "c", tables.PRIM_TEXT},
-// 		}); e != nil {
+// 		} else if e := AddTestFields(asm.assembler,
+// 			"Ts", "d", tables.PRIM_DIGI,
+// 			"Ts", "t", tables.PRIM_TEXT,
+// 			"Ts", "t2", tables.PRIM_TEXT,
+// 			"Ps", "p", tables.PRIM_TEXT,
+// 			"Cs", "c", tables.PRIM_TEXT,
+// 		); e != nil {
 // 			t.Fatal(e)
-// 		} else if e := addDefaults(asm.rec, []triplet{
-// 			{"T", "t", "some text"},
-// 			{"P", "t2", "other text"},
-// 			{"C", "c", "c text"},
-// 			{"P", "c", "invalid"}, // this pair doesnt exist
-// 			{"T", "p", "invalid"}, // this pair doesnt exist
-// 			{"C", "d", 123},
+// 		} else if e := addDefaults(asm.rec,
+// 			"T", "t", "some text",
+// 			"P", "t2", "other text",
+// 			"C", "c", "c text",
+// 			"P", "c", "invalid", // this pair doesnt exist
+// 			"T", "p", "invalid", // this pair doesnt exist
+// 			"C", "d", 123,
 // 		}); e != nil {
 // 			t.Fatal(e)
 // 		} else {
-// 			var got []pair
+// 			var got []interface{}
 // 			if e := MissingDefaults(asm.db, func(k, f string) (err error) {
-// 				got = append(got, pair{k, f})
+// 				got = append(got, k, f)
 // 				return
-// 			}); e != nil {
+// 			); e != nil {
 // 				t.Fatal(e)
-// 			} else if !reflect.DeepEqual(got, []pair{
-// 				{"P", "c"},
-// 				{"T", "p"},
-// 			}) {
+// 			} else if !reflect.DeepEqual(got,
+// 				"P", "c",
+// 				"T", "p",
+// 			) {
 // 				t.Fatal("mismatched", got)
 // 			}
 // 		}

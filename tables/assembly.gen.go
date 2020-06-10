@@ -35,28 +35,26 @@ func assemblyTemplate() string {
 		"\torder by ogid;\n" +
 		"\n" +
 		"/**\n" +
-		" * using plurals table, convert singular named kinds to plural kinds\n" +
+		" * using plurals table, convert singular named kinds to plural kinds.\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_kind as \n" +
-		"\tselect mp.many as pluralName, en.idSource, en.offset, en.rowid as singularId \n" +
+		"\tselect mp.many as name, en.idSource, en.offset, en.rowid as singularId \n" +
 		"\tfrom eph_named en \n" +
 		"\tjoin mdl_plural mp \n" +
 		"\t\ton (mp.one= en.name)\n" +
 		"\twhere (en.category = 'singular_kind');\n" +
-		"\t\n" +
 		"\n" +
-		"/* resolve (and normalize) eph_kind ephemera to plural strings\n" +
+		"/* resolve (and normalize) eph_kind ephemera to plural strings.\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_ancestry as\n" +
-		"select ap.pluralName as parent, nk.name as kid \n" +
+		"select ak.name as parent, nk.name as kid \n" +
 		"from eph_kind ek\n" +
-		"join asm_kind ap \n" +
-		"\ton (ap.singularId = ek.idNamedParent)\n" +
+		"join asm_kind ak\n" +
+		"\ton (ak.singularId = ek.idNamedParent)\n" +
 		"left join eph_named nk\n" +
 		"where nk.rowid = ek.idNamedKind;\n" +
-		"\n" +
 		"\n" +
 		"/* resolve test ephemera to strings\n" +
 		" */\n" +

@@ -14,73 +14,73 @@ import (
 // todo: check the wrong nouns using a verb, using the wrong verb, etc.
 // todo: ensure that the same stem can be used in multiple relations ( so long as the kinds differ, ex. in room, vs in box. )
 func TestRelativeFormation(t *testing.T) {
-	if asm, e := newRelativesTest(t, memory, [][3]string{
-		{"a", "v1", "a"},
-		{"b", "v1", "c"},
-		{"c", "v1", "b"},
-		{"z", "v1", "e"},
-		{"b", "v1", "d"},
-		{"c", "v1", "a"},
-		{"z", "v1", "f"},
+	if asm, e := newRelativesTest(t, memory,
+		"a", "v1", "a",
+		"b", "v1", "c",
+		"c", "v1", "b",
+		"z", "v1", "e",
+		"b", "v1", "d",
+		"c", "v1", "a",
+		"z", "v1", "f",
 		//
-		{"z", "v1x", "f"},
-		{"c", "v1x", "a"},
-		{"b", "v1x", "e"},
-		{"c", "v1x", "c"},
-		{"c", "v1x", "b"},
-		{"z", "v1x", "d"},
-		{"z", "v1x", "f"},
+		"z", "v1x", "f",
+		"c", "v1x", "a",
+		"b", "v1x", "e",
+		"c", "v1x", "c",
+		"c", "v1x", "b",
+		"z", "v1x", "d",
+		"z", "v1x", "f",
 		//
-		{"z", "vx1", "b"},
-		{"f", "vx1", "f"},
-		{"l", "vx1", "b"},
-		{"b", "vx1", "a"},
-		{"d", "vx1", "b"},
-		{"c", "vx1", "d"},
-		{"f", "vx1", "f"},
-		{"e", "vx1", "f"},
+		"z", "vx1", "b",
+		"f", "vx1", "f",
+		"l", "vx1", "b",
+		"b", "vx1", "a",
+		"d", "vx1", "b",
+		"c", "vx1", "d",
+		"f", "vx1", "f",
+		"e", "vx1", "f",
 		//
-		{"a", "vx", "a"},
-		{"e", "vx", "d"},
-		{"a", "vx", "b"},
-		{"a", "vx", "c"},
-		{"f", "vx", "d"},
-		{"l", "vx", "d"},
-		{"a", "vx", "b"},
-	}); e != nil {
+		"a", "vx", "a",
+		"e", "vx", "d",
+		"a", "vx", "b",
+		"a", "vx", "c",
+		"f", "vx", "d",
+		"l", "vx", "d",
+		"a", "vx", "b",
+	); e != nil {
 		t.Fatal(e)
 		return
 	} else {
 		defer asm.db.Close()
 		if e := AssembleRelatives(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchRelatives(asm.db, [][3]string{
-			{"Rel1", "a", "a"},
-			{"Rel1", "b", "c"},
-			{"Rel1", "e", "z"},
+		} else if e := matchRelatives(asm.db,
+			"Rel1", "a", "a",
+			"Rel1", "b", "c",
+			"Rel1", "e", "z",
 			//
-			{"Rel1x", "b", "e"},
-			{"Rel1x", "c", "a"},
-			{"Rel1x", "c", "b"},
-			{"Rel1x", "c", "c"},
-			{"Rel1x", "z", "d"},
-			{"Rel1x", "z", "f"},
+			"Rel1x", "b", "e",
+			"Rel1x", "c", "a",
+			"Rel1x", "c", "b",
+			"Rel1x", "c", "c",
+			"Rel1x", "z", "d",
+			"Rel1x", "z", "f",
 			//
-			{"Relx1", "b", "a"},
-			{"Relx1", "c", "d"},
-			{"Relx1", "d", "b"},
-			{"Relx1", "e", "f"},
-			{"Relx1", "f", "f"},
-			{"Relx1", "l", "b"},
-			{"Relx1", "z", "b"},
+			"Relx1", "b", "a",
+			"Relx1", "c", "d",
+			"Relx1", "d", "b",
+			"Relx1", "e", "f",
+			"Relx1", "f", "f",
+			"Relx1", "l", "b",
+			"Relx1", "z", "b",
 			//
-			{"Relxx", "a", "a"},
-			{"Relxx", "a", "b"},
-			{"Relxx", "a", "c"},
-			{"Relxx", "e", "d"},
-			{"Relxx", "f", "d"},
-			{"Relxx", "l", "d"},
-		}); e != nil {
+			"Relxx", "a", "a",
+			"Relxx", "a", "b",
+			"Relxx", "a", "c",
+			"Relxx", "e", "d",
+			"Relxx", "f", "d",
+			"Relxx", "l", "d",
+		); e != nil {
 			t.Fatal(e)
 		} else {
 			t.Log("okay")
@@ -88,18 +88,18 @@ func TestRelativeFormation(t *testing.T) {
 	}
 }
 
-func matchRelatives(db *sql.DB, want [][3]string) (err error) {
-	var curr [3]string
-	var have [][3]string
+func matchRelatives(db *sql.DB, want ...string) (err error) {
+	var have []string
+	var a, b, c string
 	if e := tables.QueryAll(db,
 		`select relation, noun, otherNoun
 			from mdl_pair
 			order by relation, noun, otherNoun`,
 		func() (err error) {
-			have = append(have, curr)
+			have = append(have, a, b, c)
 			return
 		},
-		&curr[0], &curr[1], &curr[2]); e != nil {
+		&a, &b, &c); e != nil {
 		err = e
 	} else if !reflect.DeepEqual(have, want) {
 		err = errutil.New("mismatch",
@@ -110,26 +110,26 @@ func matchRelatives(db *sql.DB, want [][3]string) (err error) {
 }
 
 func TestOneToOneViolations(t *testing.T) {
-	test := func(add, want [][3]string) (err error) {
-		if asm, e := newRelativesTest(t, memory, add); e != nil {
+	test := func(add, want []string) (err error) {
+		if asm, e := newRelativesTest(t, memory, add...); e != nil {
 			err = e
 		} else {
 			defer asm.db.Close()
 			if e := AssembleRelatives(asm.assembler); e != nil {
 				err = e
 			} else {
-				var have [][3]string
-				var got [3]string
+				var a, b, c string
+				var have []string
 				if e := tables.QueryAll(asm.db,
 					`select distinct coalesce(noun, ''), 
 									 coalesce(stem, ''), 
 									 coalesce(otherNoun, '')
 					from asm_mismatch`,
 					func() (err error) {
-						have = append(have, got)
+						have = append(have, a, b, c)
 						return
 					},
-					&got[0], &got[1], &got[2]); e != nil {
+					&a, &b, &c); e != nil {
 					err = e
 				} else if !reflect.DeepEqual(have, want) {
 					e := errutil.New("mismatch",
@@ -141,81 +141,79 @@ func TestOneToOneViolations(t *testing.T) {
 		}
 		return
 	}
-	if e := test([][3]string{
-		{"a", "v1", "a"},
-		{"a", "v1", "b"},
-		{"a", "v1", "c"},
-		{"d", "v1", "a"},
-		//
-	}, [][3]string{
-		{"a", "v1", "b"},
-		{"a", "v1", "c"},
-		{"a", "v1", "d"}, // nouns are sorted
-		//
+	if e := test([]string{
+		"a", "v1", "a",
+		"a", "v1", "b",
+		"a", "v1", "c",
+		"d", "v1", "a",
+	}, []string{
+		"a", "v1", "b",
+		"a", "v1", "c",
+		"a", "v1", "d", // nouns are sorted
 	}); e != nil {
 		t.Fatal(e)
 	}
-	if e := test([][3]string{
-		{"z", "v1x", "f"},
-		{"c", "v1x", "f"},
-		{"z", "v1x", "a"},
-	}, [][3]string{
-		{"c", "v1x", "f"},
+	if e := test([]string{
+		"z", "v1x", "f",
+		"c", "v1x", "f",
+		"z", "v1x", "a",
+	}, []string{
+		"c", "v1x", "f",
 	}); e != nil {
 		t.Fatal(e)
 	}
-	if e := test([][3]string{
-		{"f", "v1x", "c"},
-		{"b", "v1x", "c"},
-		{"b", "v1x", "d"},
-	}, [][3]string{
-		{"b", "v1x", "c"},
+	if e := test([]string{
+		"f", "v1x", "c",
+		"b", "v1x", "c",
+		"b", "v1x", "d",
+	}, []string{
+		"b", "v1x", "c",
 	}); e != nil {
 		t.Fatal(e)
 	}
 
 }
 
-func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *assemblyTest, err error) {
+func newRelativesTest(t *testing.T, path string, relatives ...string) (ret *assemblyTest, err error) {
 	ret = &assemblyTest{T: t}
 	if asm, e := newAssemblyTest(t, path); e != nil {
 		err = e
 	} else {
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"K", ""},
-			{"L", "K"},
-			{"N", "K"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ks", "",
+			"Ls", "Ks",
+			"Ns", "Ks",
+		); e != nil {
 			err = e
-		} else if e := AddTestNouns(asm.assembler, []TargetField{
-			{"a", "K"},
-			{"b", "K"},
-			{"c", "K"},
-			{"d", "K"},
-			{"e", "K"},
-			{"f", "K"},
-			{"l", "L"},
-			{"n", "N"},
-			{"z", "K"},
-		}); e != nil {
+		} else if e := AddTestNouns(asm.assembler,
+			"a", "Ks",
+			"b", "Ks",
+			"c", "Ks",
+			"d", "Ks",
+			"e", "Ks",
+			"f", "Ks",
+			"l", "Ls",
+			"n", "Ns",
+			"z", "Ks",
+		); e != nil {
 			err = e
-		} else if e := AddTestRelations(asm.assembler, [][4]string{
+		} else if e := AddTestRelations(asm.assembler,
 			// relation, kind, cardinality, otherKind
-			{"Rel1", "K", tables.ONE_TO_ONE, "K"},
-			{"Rel1x", "K", tables.ONE_TO_MANY, "K"},
-			{"Relx1", "K", tables.MANY_TO_ONE, "K"},
-			{"Relxx", "K", tables.MANY_TO_MANY, "K"},
-		}); e != nil {
+			"Rel1", "Ks", tables.ONE_TO_ONE, "Ks",
+			"Rel1x", "Ks", tables.ONE_TO_MANY, "Ks",
+			"Relx1", "Ks", tables.MANY_TO_ONE, "Ks",
+			"Relxx", "Ks", tables.MANY_TO_MANY, "Ks",
+		); e != nil {
 			err = e
-		} else if e := AddTestVerbs(asm.assembler, [][2]string{
+		} else if e := AddTestVerbs(asm.assembler,
 			// rel, verb
-			{"Rel1", "v1"},
-			{"Rel1x", "v1x"},
-			{"Relx1", "vx1"},
-			{"Relxx", "vx"},
-		}); e != nil {
+			"Rel1", "v1",
+			"Rel1x", "v1x",
+			"Relx1", "vx1",
+			"Relxx", "vx",
+		); e != nil {
 			err = e
-		} else if e := addRelatives(asm.rec, relatives); e != nil {
+		} else if e := addRelatives(asm.rec, relatives...); e != nil {
 			err = e
 		}
 		//
@@ -229,9 +227,9 @@ func newRelativesTest(t *testing.T, path string, relatives [][3]string) (ret *as
 }
 
 // add noun, stem, otherNoun ephemera
-func addRelatives(rec *ephemera.Recorder, els [][3]string) (err error) {
-	for _, el := range els {
-		noun, stem, otherNoun := el[0], el[1], el[2]
+func addRelatives(rec *ephemera.Recorder, els ...string) (err error) {
+	for i, cnt := 0, len(els); i < cnt; i += 3 {
+		noun, stem, otherNoun := els[i], els[i+1], els[i+2]
 		if e := addRelative(rec, noun, stem, otherNoun); e != nil {
 			err = errutil.Append(err, e)
 		}

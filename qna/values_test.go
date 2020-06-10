@@ -18,46 +18,46 @@ func TestGetFieldValues(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		m := assembly.NewAssembler(db)
-		pathsOfKind := []assembly.TargetField{
-			{"K", ""},
-			{"A", "K"},
-			{"L", "K"},
-			{"F", "L,K"},
+		pathsOfKind := []string{
+			"Ks", "",
+			"As", "Ks",
+			"Ls", "Ks",
+			"Fs", "Ls,Ks",
 		}
-		kindsOfNoun := []assembly.TargetField{
-			{"apple", "K"},
-			{"duck", "A"},
-			{"toy boat", "L"},
-			{"boat", "F"},
+		kindsOfNoun := []string{
+			"apple", "Ks",
+			"duck", "As",
+			"toy boat", "Ls",
+			"boat", "Fs",
 		}
-		pathsOfNoun := []assembly.TargetField{
-			{"apple", "K"},
-			{"duck", "A,K"},
-			{"toy boat", "L,K"},
-			{"boat", "F,L,K"},
+		pathsOfNoun := []string{
+			"apple", "Ks",
+			"duck", "As,Ks",
+			"toy boat", "Ls,Ks",
+			"boat", "Fs,Ls,Ks",
 		}
-		if e := assembly.AddTestHierarchy(m, pathsOfKind); e != nil {
+		if e := assembly.AddTestHierarchy(m, pathsOfKind...); e != nil {
 			t.Fatal(e)
-		} else if e := assembly.AddTestFields(m, []assembly.TargetValue{
-			{"K", "d", tables.PRIM_DIGI},
-			{"K", "t", tables.PRIM_TEXT},
-		}); e != nil {
+		} else if e := assembly.AddTestFields(m,
+			"Ks", "d", tables.PRIM_DIGI,
+			"Ks", "t", tables.PRIM_TEXT,
+		); e != nil {
 			t.Fatal(e)
-		} else if e := assembly.AddTestNouns(m, kindsOfNoun); e != nil {
+		} else if e := assembly.AddTestNouns(m, kindsOfNoun...); e != nil {
 			t.Fatal(e)
-		} else if e := assembly.AddTestStarts(m, []assembly.TargetValue{
-			{"apple", "d", 5},
-			{"duck", "d", 1},
-			{"toy boat", "t", "boboat"},
-			{"boat", "t", "xyzzy"},
-		}); e != nil {
+		} else if e := assembly.AddTestStarts(m,
+			"apple", "d", 5,
+			"duck", "d", 1,
+			"toy boat", "t", "boboat",
+			"boat", "t", "xyzzy",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := assembly.AddTestDefaults(m, []assembly.TargetValue{
-			{"K", "d", 42},
-			{"A", "t", "chippo"},
-			{"L", "t", "weazy"},
-			{"F", "d", 13},
-		}); e != nil {
+		} else if e := assembly.AddTestDefaults(m,
+			"Ks", "d", 42,
+			"As", "t", "chippo",
+			"Ls", "t", "weazy",
+			"Fs", "d", 13,
+		); e != nil {
 			t.Fatal(e)
 		} else {
 			numValues := []struct {
@@ -105,15 +105,15 @@ func TestGetFieldValues(t *testing.T) {
 			})
 			// ensure queries for kinds work
 			t.Run("object kind", func(t *testing.T) {
-				for _, v := range kindsOfNoun {
-					for i := 0; i < 2; i++ {
-						if p, e := q.GetField(v.Target, object.Kind); e != nil {
-							t.Fatal(e)
-						} else if kind, e := assign.ToString(p); e != nil {
-							t.Fatal("assign", e)
-						} else if kind != v.Field {
-							t.Fatal("mismatch", v.Target, "got:", kind, "expected:", v.Field)
-						}
+				els := kindsOfNoun
+				for i, cnt := 0, len(els); i < cnt; i += 2 {
+					tgt, field := els[i], els[i+1]
+					if p, e := q.GetField(tgt, object.Kind); e != nil {
+						t.Fatal(e)
+					} else if kind, e := assign.ToString(p); e != nil {
+						t.Fatal("assign", e)
+					} else if kind != field {
+						t.Fatal("mismatch", tgt, "got:", kind, "expected:", field)
 					}
 				}
 				if k, e := q.GetField("speedboat", object.Kind); e == nil {
@@ -122,15 +122,15 @@ func TestGetFieldValues(t *testing.T) {
 			})
 			// ensure queries for paths work
 			t.Run("object kinds", func(t *testing.T) {
-				for _, v := range pathsOfNoun {
-					for i := 0; i < 2; i++ {
-						if p, e := q.GetField(v.Target, object.Kinds); e != nil {
-							t.Fatal(e)
-						} else if path, e := assign.ToString(p); e != nil {
-							t.Fatal("assign", e)
-						} else if path != v.Field {
-							t.Fatal("mismatch", v.Target, "got:", path, "expected:", v.Field)
-						}
+				els := pathsOfNoun
+				for i, cnt := 0, len(els); i < cnt; i += 2 {
+					tgt, field := els[i], els[i+1]
+					if p, e := q.GetField(tgt, object.Kinds); e != nil {
+						t.Fatal(e)
+					} else if path, e := assign.ToString(p); e != nil {
+						t.Fatal("assign", e)
+					} else if path != field {
+						t.Fatal("mismatch", tgt, "got:", tgt, "expected:", field)
 					}
 				}
 				if path, e := q.GetField("speedboat", object.Kinds); e == nil {

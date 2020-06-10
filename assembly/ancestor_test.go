@@ -30,7 +30,7 @@ func TestAncestors(t *testing.T) {
 			"P", "J",
 			"M", "J",
 		}
-		addKinds(asm, kinds)
+		addKinds(asm, kinds...)
 		t.Run("csv", func(t *testing.T) {
 			var buf strings.Builder
 			tables.WriteCsv(asm.db, &buf, `select * from asm_ancestry order by parent, kid`, 2)
@@ -114,12 +114,11 @@ func TestAncestorCycle(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		addKinds(asm, []string{
-			// kid, ancestor
+		addKinds(asm, // kid, ancestor
 			"T", "",
 			"P", "T",
 			"T", "P",
-		})
+		)
 		//
 		var kinds cachedKinds
 		if e := kinds.AddDescendentsOf(asm.db, "Ts"); e == nil {
@@ -138,14 +137,13 @@ func TestAncestorConflict(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		addKinds(asm, []string{
-			// kid, ancestor
+		addKinds(asm, // kid, ancestor
 			"T", "",
 			"P", "T",
 			"Q", "T",
 			"K", "P",
 			"K", "Q",
-		})
+		)
 		var kinds cachedKinds
 		if e := kinds.AddDescendentsOf(asm.db, "Ts"); e == nil {
 			t.Fatal("expected error")
@@ -155,26 +153,21 @@ func TestAncestorConflict(t *testing.T) {
 	}
 }
 
-func addKinds(asm *assemblyTest, pairs []string) {
-	plural := make(map[string]bool)
-	rec, w := asm.rec, asm.assembler
-	for _, n := range pairs {
-		// normally, we would assemble plurals first
-		// pluralizing singular names
-		if len(n) > 0 && !plural[n] {
-			plural[n] = true
-			// one, many
-			w.WritePlural(n, n+"s")
-		}
-	}
-
+// pairs passed are singular
+func addKinds(asm *assemblyTest, pairs ...string) {
+	var pc Plurals
+	rec := asm.rec
 	for i := 0; i < len(pairs); i += 2 {
+		pa, pb := pairs[i], pairs[i+1]
+		pc.AddOne(pa)
+		pc.AddOne(pb)
 		// cats are a kind of animal
-		pluralKid, ancestor := pairs[i]+"s", pairs[i+1]
+		pluralKid, ancestor := pa+"s", pb
 		if len(ancestor) > 0 {
 			kr := rec.NewName(pluralKid, tables.NAMED_KINDS, strconv.Itoa(i))
 			ar := rec.NewName(ancestor, tables.NAMED_KIND, strconv.Itoa(i+1))
 			rec.NewKind(kr, ar)
 		}
 	}
+	pc.WritePlurals(asm.assembler)
 }

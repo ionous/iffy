@@ -24,8 +24,8 @@ func AssembleNouns(asm *Assembler) (err error) {
 		from eph_noun en 
 		join eph_named nn
 			on (en.idNamedNoun = nn.rowid)
-		left join eph_named nk
-			on (en.idNamedKind = nk.rowid)
+		join asm_kind nk
+			on (en.idNamedKind = nk.singularId)
 		join mdl_kind ak
 			on (ak.kind = nk.name)
 		order by nn.name, nk.name

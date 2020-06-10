@@ -13,34 +13,35 @@ import (
 )
 
 // write some primitives
-func writeFields(rec *ephemera.Recorder, kfps []kfp) (err error) {
-	for _, p := range kfps {
-		kind := rec.NewName(p.kind, tables.NAMED_KINDS, "test")
-		field := rec.NewName(p.field, tables.NAMED_FIELD, "test")
-		rec.NewPrimitive(kind, field, p.fieldType)
+func writeFields(rec *ephemera.Recorder, els ...string) (err error) {
+	for i, cnt := 0, len(els); i < cnt; i += 3 {
+		kind, field, fieldType := els[i], els[i+1], els[i+2]
+		kn := rec.NewName(kind, tables.NAMED_KINDS, "test")
+		fn := rec.NewName(field, tables.NAMED_FIELD, "test")
+		rec.NewPrimitive(kn, fn, fieldType)
 	}
 	return
 }
 
 // name some fields that arent otherwise referenced
-func writeMissing(rec *ephemera.Recorder, missing []string) (err error) {
+func writeMissing(rec *ephemera.Recorder, missing ...string) (err error) {
 	for _, m := range missing {
 		rec.NewName(m, tables.NAMED_FIELD, "test")
 	}
 	return
 }
 
-func matchProperties(db *sql.DB, want []kfp) (err error) {
-	var curr kfp
-	var have []kfp
+func matchProperties(db *sql.DB, want ...string) (err error) {
+	var kind, field, fieldType string
+	var have []string
 	if e := tables.QueryAll(db,
 		`select kind, field, type 
 		from mdl_field 
 		order by kind, field, type`,
 		func() (err error) {
-			have = append(have, curr)
+			have = append(have, kind, field, fieldType)
 			return
-		}, &curr.kind, &curr.field, &curr.fieldType); e != nil {
+		}, &kind, &field, &fieldType); e != nil {
 		err = e
 	} else if !reflect.DeepEqual(have, want) {
 		err = errutil.New("mismatch", "have:", pretty.Sprint(have), "want:", pretty.Sprint(want))
@@ -54,25 +55,25 @@ func TestFields(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-			{"P", "T"},
-			{"Q", "T"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+			"Ps", "Ts",
+			"Qs", "Ts",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := writeFields(asm.rec, []kfp{
-			{"P", "a", tables.PRIM_TEXT},
-			{"Q", "b", tables.PRIM_TEXT},
-			{"T", "c", tables.PRIM_TEXT},
-		}); e != nil {
+		} else if e := writeFields(asm.rec,
+			"Ps", "a", tables.PRIM_TEXT,
+			"Qs", "b", tables.PRIM_TEXT,
+			"Ts", "c", tables.PRIM_TEXT,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleFields(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchProperties(asm.db, []kfp{
-			{"P", "a", tables.PRIM_TEXT},
-			{"Q", "b", tables.PRIM_TEXT},
-			{"T", "c", tables.PRIM_TEXT},
-		}); e != nil {
+		} else if e := matchProperties(asm.db,
+			"Ps", "a", tables.PRIM_TEXT,
+			"Qs", "b", tables.PRIM_TEXT,
+			"Ts", "c", tables.PRIM_TEXT,
+		); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -84,23 +85,22 @@ func TestFieldLca(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-			{"P", "T"},
-			{"Q", "T"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+			"Ps", "Ts",
+			"Qs", "Ts",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := writeFields(asm.rec, []kfp{
-			{"P", "a", tables.PRIM_TEXT},
-			{"Q", "a", tables.PRIM_TEXT},
-		}); e != nil {
+		} else if e := writeFields(asm.rec,
+			"Ps", "a", tables.PRIM_TEXT,
+			"Qs", "a", tables.PRIM_TEXT,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleFields(asm.assembler); e != nil {
 			t.Fatal(e)
-
-		} else if e := matchProperties(asm.db, []kfp{
-			{"T", "a", tables.PRIM_TEXT},
-		}); e != nil {
+		} else if e := matchProperties(asm.db,
+			"Ts", "a", tables.PRIM_TEXT,
+		); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -113,14 +113,14 @@ func TestFieldTypeMismatch(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := writeFields(asm.rec, []kfp{
-			{"T", "a", tables.PRIM_TEXT},
-			{"T", "a", tables.PRIM_DIGI},
-		}); e != nil {
+		} else if e := writeFields(asm.rec,
+			"Ts", "a", tables.PRIM_TEXT,
+			"Ts", "a", tables.PRIM_DIGI,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleFields(asm.assembler); e != nil {
 			t.Log("okay:", e)

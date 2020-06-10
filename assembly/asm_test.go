@@ -71,11 +71,3 @@ type assemblyTest struct {
 	assembler *Assembler
 	dilemmas  *Dilemmas
 }
-
-type kfp struct{ kind, field, fieldType string }
-type pair struct{ key, value string }
-
-type triplet struct {
-	target, prop string
-	value        interface{}
-}

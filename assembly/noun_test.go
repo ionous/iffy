@@ -18,24 +18,24 @@ func TestNounFormation(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			defer asm.db.Close()
-			if e := AddTestHierarchy(asm.assembler, []TargetField{
-				{"T", ""},
-			}); e != nil {
+			if e := AddTestHierarchy(asm.assembler,
+				"Ts", "",
+			); e != nil {
 				t.Fatal(e)
-			} else if e := addNouns(asm.rec, []pair{
-				{"apple", "T"},
-				{"pear", "T"},
-				{"toy boat", "T"},
-			}); e != nil {
+			} else if e := addNouns(asm.rec,
+				"apple", "T",
+				"pear", "T",
+				"toy boat", "T",
+			); e != nil {
 				t.Fatal(e)
 			} else if e := AssembleNouns(asm.assembler); e != nil {
 				t.Fatal(e)
 			} else if e := matchNouns(asm.db, []modeledNoun{
-				{"apple", "T", 0},
-				{"pear", "T", 0},
-				{"toy boat", "T", 0},
-				{"boat", "T", 1},
-				{"toy", "T", 2},
+				{"apple", "Ts", 0},
+				{"pear", "Ts", 0},
+				{"toy boat", "Ts", 0},
+				{"boat", "Ts", 1},
+				{"toy", "Ts", 2},
 			}); e != nil {
 				t.Fatal(e)
 			}
@@ -46,13 +46,13 @@ func TestNounFormation(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			defer asm.db.Close()
-			if e := AddTestHierarchy(asm.assembler, []TargetField{
-				{"T", ""},
-			}); e != nil {
+			if e := AddTestHierarchy(asm.assembler,
+				"Ts", "",
+			); e != nil {
 				t.Fatal(e)
-			} else if e := addNouns(asm.rec, []pair{
-				{"bad apple", "B"},
-			}); e != nil {
+			} else if e := addNouns(asm.rec,
+				"bad apple", "Bs",
+			); e != nil {
 				t.Fatal(e)
 			} else if e := AssembleNouns(asm.assembler); e == nil {
 				t.Fatal("expected error")
@@ -88,10 +88,11 @@ type modeledNoun struct {
 	rank       int
 }
 
-func addNouns(rec *ephemera.Recorder, els []pair) (err error) {
-	for _, el := range els {
-		n := rec.NewName(el.key, tables.NAMED_NOUN, "test")
-		k := rec.NewName(el.value, tables.NAMED_KINDS, "test")
+func addNouns(rec *ephemera.Recorder, els ...string) (err error) {
+	for i, cnt := 0, len(els); i < cnt; i += 2 {
+		key, value := els[i], els[i+1]
+		n := rec.NewName(key, tables.NAMED_NOUN, "test")
+		k := rec.NewName(value, tables.NAMED_KIND, "test")
 		rec.NewNoun(n, k)
 	}
 	return
@@ -103,27 +104,27 @@ func TestNounLcaSuccess(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-			{"P", "T"},
-			{"C", "P,T"},
-			{"D", "P,T"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+			"Ps", "Ts",
+			"Cs", "Ps,Ts",
+			"Ds", "Ps,Ts",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addNouns(asm.rec, []pair{
-			{"apple", "C"},
-			{"apple", "P"},
-			{"pear", "D"},
-			{"pear", "T"},
-			{"bandanna", "C"},
-		}); e != nil {
+		} else if e := addNouns(asm.rec,
+			"apple", "C",
+			"apple", "P",
+			"pear", "D",
+			"pear", "T",
+			"bandanna", "C",
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleNouns(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(asm.db, []modeledNoun{
-			{"apple", "P", 0},
-			{"bandanna", "C", 0},
-			{"pear", "T", 0},
+			{"apple", "Ps", 0},
+			{"bandanna", "Cs", 0},
+			{"pear", "Ts", 0},
 		}); e != nil {
 			t.Fatal(e)
 		}
@@ -137,17 +138,17 @@ func TestNounLcaFailure(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-			{"P", "T"},
-			{"C", "P,T"},
-			{"D", "P,T"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+			"Ps", "Ts",
+			"Cs", "Ps,Ts",
+			"Ds", "Ps,Ts",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addNouns(asm.rec, []pair{
-			{"apple", "C"},
-			{"apple", "D"},
-		}); e != nil {
+		} else if e := addNouns(asm.rec,
+			"apple", "C",
+			"apple", "D",
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleNouns(asm.assembler); e == nil {
 			t.Fatal("expected failure")
@@ -164,21 +165,21 @@ func TestNounParts(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addNouns(asm.rec, []pair{
-			{"collection of words", "T"},
-		}); e != nil {
+		} else if e := addNouns(asm.rec,
+			"collection of words", "T",
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleNouns(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(asm.db, []modeledNoun{
-			{"collection of words", "T", 0},
-			{"words", "T", 1},
-			{"of", "T", 2},
-			{"collection", "T", 3},
+			{"collection of words", "Ts", 0},
+			{"words", "Ts", 1},
+			{"of", "Ts", 2},
+			{"collection", "Ts", 3},
 		}); e != nil {
 			t.Fatal(e)
 		}

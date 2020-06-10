@@ -36,34 +36,33 @@ func TestVerbMismatches(t *testing.T) {
 	}
 }
 
-type dbrel struct {
-	r, k, q, c string
-}
-
-// write some relation ephemera to the database
+// write some relation ephemera to the database:
+// relation, kind1, kind2, cardinality
 // ( from which assembly will determine relations )
-func addRelations(rec *ephemera.Recorder, els []dbrel) (err error) {
-	for _, el := range els {
-		r := rec.NewName(el.r, tables.NAMED_RELATION, "test")
-		k := rec.NewName(el.k, tables.NAMED_KINDS, "test")
-		q := rec.NewName(el.q, tables.NAMED_KINDS, "test")
-		c := el.c
+func addRelations(rec *ephemera.Recorder, els ...string) (err error) {
+	for i, cnt := 0, len(els); i < cnt; i += 4 {
+		er, ek, eq, ec := els[i], els[i+1]+"s", els[i+2]+"s", els[i+3]
+		r := rec.NewName(er, tables.NAMED_RELATION, "test")
+		k := rec.NewName(ek, tables.NAMED_KINDS, "test")
+		q := rec.NewName(eq, tables.NAMED_KINDS, "test")
+		c := ec
 		rec.NewRelation(r, k, q, c)
 	}
 	return
 }
 
-func matchRelations(db *sql.DB, want []dbrel) (err error) {
-	var curr dbrel
-	var have []dbrel
+// relation, kind1, kind2, cardinality
+func matchRelations(db *sql.DB, want ...string) (err error) {
+	var have []string
+	var a, b, c, d string
 	if e := tables.QueryAll(db,
 		`select relation, kind, otherKind, cardinality
 			from mdl_rel 
 		order by relation, kind, otherKind, cardinality`,
 		func() (err error) {
-			have = append(have, curr)
+			have = append(have, a, b, c, d)
 			return
-		}, &curr.r, &curr.k, &curr.q, &curr.c); e != nil {
+		}, &a, &b, &c, &d); e != nil {
 		err = e
 	} else if !reflect.DeepEqual(have, want) {
 		err = errutil.New("mismatch", "have:", pretty.Sprint(have), "want:", pretty.Sprint(want))
@@ -78,27 +77,27 @@ func TestRelationCreation(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-			{"P", "T"},
-			{"Q", "T"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+			"Ps", "Ts",
+			"Qs", "Ts",
+		); e != nil {
 			t.Fatal(e)
 		} else if e := addRelations(
-			asm.rec, []dbrel{
-				{"R", "P", "Q", tables.ONE_TO_MANY},
-				{"G", "P", "Q", tables.MANY_TO_ONE},
-				{"G", "P", "Q", tables.MANY_TO_ONE},
-				{"H", "P", "P", tables.ONE_TO_MANY},
-			}); e != nil {
+			asm.rec,
+			"R", "P", "Q", tables.ONE_TO_MANY,
+			"G", "P", "Q", tables.MANY_TO_ONE,
+			"G", "P", "Q", tables.MANY_TO_ONE,
+			"H", "P", "P", tables.ONE_TO_MANY,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleRelations(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchRelations(asm.db, []dbrel{
-			{"G", "P", "Q", tables.MANY_TO_ONE},
-			{"H", "P", "P", tables.ONE_TO_MANY},
-			{"R", "P", "Q", tables.ONE_TO_MANY},
-		}); e != nil {
+		} else if e := matchRelations(asm.db,
+			"G", "Ps", "Qs", tables.MANY_TO_ONE,
+			"H", "Ps", "Ps", tables.ONE_TO_MANY,
+			"R", "Ps", "Qs", tables.ONE_TO_MANY,
+		); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -111,14 +110,14 @@ func TestRelationCardinality(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"P", ""},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ps", "",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(asm.rec, []dbrel{
-			{"R", "P", "P", tables.ONE_TO_MANY},
-			{"R", "P", "P", tables.MANY_TO_ONE},
-		}); e != nil {
+		} else if e := addRelations(asm.rec,
+			"R", "P", "P", tables.ONE_TO_MANY,
+			"R", "P", "P", tables.MANY_TO_ONE,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleRelations(asm.assembler); e == nil {
 			t.Fatal("expected error")
@@ -135,24 +134,24 @@ func TestRelationLcaSuccess(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-			{"P", "T"},
-			{"C", "P,T"},
-			{"D", "P,T"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+			"Ps", "Ts",
+			"Cs", "Ps,Ts",
+			"Ds", "Ps,Ts",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(asm.rec, []dbrel{
-			{"R", "P", "T", tables.ONE_TO_MANY},
-			{"R", "D", "T", tables.ONE_TO_MANY},
-			{"R", "C", "T", tables.ONE_TO_MANY},
-		}); e != nil {
+		} else if e := addRelations(asm.rec,
+			"R", "P", "T", tables.ONE_TO_MANY,
+			"R", "D", "T", tables.ONE_TO_MANY,
+			"R", "C", "T", tables.ONE_TO_MANY,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleRelations(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchRelations(asm.db, []dbrel{
-			{"R", "P", "T", tables.ONE_TO_MANY},
-		}); e != nil {
+		} else if e := matchRelations(asm.db,
+			"R", "Ps", "Ts", tables.ONE_TO_MANY,
+		); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -165,17 +164,17 @@ func TestRelationLcaFailure(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"T", ""},
-			{"P", "T"},
-			{"C", "P,T"},
-			{"D", "P,T"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ts", "",
+			"Ps", "Ts",
+			"Cs", "Ps,Ts",
+			"Ds", "Ps,Ts",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addRelations(asm.rec, []dbrel{
-			{"R", "D", "T", tables.ONE_TO_MANY},
-			{"R", "C", "T", tables.ONE_TO_MANY},
-		}); e != nil {
+		} else if e := addRelations(asm.rec,
+			"R", "D", "T", tables.ONE_TO_MANY,
+			"R", "C", "T", tables.ONE_TO_MANY,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleRelations(asm.assembler); e == nil {
 			t.Fatal("expected error")

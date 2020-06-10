@@ -16,7 +16,7 @@ create table eph_field( primType text, idNamedKind int, idNamedField int );
 create table eph_kind( idNamedKind int, idNamedParent int );
 /* user specified appellation and the location that specification came from */
 create table eph_named( name text, category text, idSource int, offset text );
-/* a named object in the game world */
+/* a named object in the game world and its kind (singular) */
 create table eph_noun( idNamedNoun int, idNamedKind int );
 /* declarations and references to pattern parameter and pattern return types.
 if idNamedPattern is idNamedParam it indicates a return type.

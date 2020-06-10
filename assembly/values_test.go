@@ -17,39 +17,39 @@ func TestInitialFieldAssignment(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"K", ""},
-			{"L", "K"},
-			{"M", "L,K"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ks", "",
+			"Ls", "Ks",
+			"Ms", "Ls,Ks",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(asm.assembler, []TargetValue{
-			{"K", "t", tables.PRIM_TEXT},
-			{"L", "d", tables.PRIM_DIGI},
-		}); e != nil {
+		} else if e := AddTestFields(asm.assembler,
+			"Ks", "t", tables.PRIM_TEXT,
+			"Ls", "d", tables.PRIM_DIGI,
+		); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestNouns(asm.assembler, []TargetField{
-			{"apple", "K"},
-			{"pear", "L"},
-			{"toy boat", "M"},
-			{"boat", "M"},
-		}); e != nil {
+		} else if e := AddTestNouns(asm.assembler,
+			"apple", "Ks",
+			"pear", "Ls",
+			"toy boat", "Ms",
+			"boat", "Ms",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(asm.rec, []TargetValue{
-			{"apple", "t", "some text"},
-			{"pear", "d", 123},
-			{"toy", "d", 321},
-			{"boat", "t", "more text"},
-		}); e != nil {
+		} else if e := addValues(asm.rec,
+			"apple", "t", "some text",
+			"pear", "d", 123,
+			"toy", "d", 321,
+			"boat", "t", "more text",
+		); e != nil {
 			t.Fatal(e)
 		} else if e := assembleInitialFields(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchValues(asm.db, []TargetValue{
-			{"apple", "t", "some text"},
-			{"boat", "t", "more text"},
-			{"pear", "d", int64(123)}, // int64, re: go's default scanner.
-			{"toy boat", "d", int64(321)},
-		}); e != nil {
+		} else if e := matchValues(asm.db,
+			"apple", "t", "some text",
+			"boat", "t", "more text",
+			"pear", "d", int64(123), // int64, re: go's default scanner.
+			"toy boat", "d", int64(321),
+		); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -62,62 +62,64 @@ func TestInitialTraitAssignment(t *testing.T) {
 	} else {
 		defer asm.db.Close()
 		//
-		if e := AddTestHierarchy(asm.assembler, []TargetField{
-			{"K", ""},
-			{"L", "K"},
-			{"M", "L,K"},
-		}); e != nil {
+		if e := AddTestHierarchy(asm.assembler,
+			"Ks", "",
+			"Ls", "Ks",
+			"Ms", "Ls,Ks",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestFields(asm.assembler, []TargetValue{
-			{"K", "A", tables.PRIM_ASPECT},
-			{"L", "B", tables.PRIM_ASPECT},
-		}); e != nil {
+		} else if e := AddTestFields(asm.assembler,
+			"Ks", "A", tables.PRIM_ASPECT,
+			"Ls", "B", tables.PRIM_ASPECT,
+		); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestTraits(asm.assembler, []TargetField{
-			{"A", "w"}, {"A", "x"}, {"A", "y"},
-			{"B", "z"},
-		}); e != nil {
+		} else if e := AddTestTraits(asm.assembler,
+			"A", "w",
+			"A", "x",
+			"A", "y",
+			"B", "z",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := AddTestNouns(asm.assembler, []TargetField{
-			{"apple", "K"},
-			{"pear", "L"},
-			{"toy boat", "M"},
-			{"boat", "M"},
-		}); e != nil {
+		} else if e := AddTestNouns(asm.assembler,
+			"apple", "Ks",
+			"pear", "Ls",
+			"toy boat", "Ms",
+			"boat", "Ms",
+		); e != nil {
 			t.Fatal(e)
-		} else if e := addValues(asm.rec, []TargetValue{
-			{"apple", "A", "y"},
-			{"pear", "x", true},
-			{"toy", "w", true},
-			{"boat", "z", true},
-		}); e != nil {
+		} else if e := addValues(asm.rec,
+			"apple", "A", "y",
+			"pear", "x", true,
+			"toy", "w", true,
+			"boat", "z", true,
+		); e != nil {
 			t.Fatal(e)
 		} else if e := AssembleValues(asm.assembler); e != nil {
 			t.Fatal(e)
-		} else if e := matchValues(asm.db, []TargetValue{
-			{"apple", "A", "y"},
-			{"boat", "B", "z"},
-			{"pear", "A", "x"},
-			{"toy boat", "A", "w"},
-		}); e != nil {
+		} else if e := matchValues(asm.db,
+			"apple", "A", "y",
+			"boat", "B", "z",
+			"pear", "A", "x",
+			"toy boat", "A", "w",
+		); e != nil {
 			t.Fatal(e)
 		}
 	}
 }
 
 // match generated model defaults
-func matchValues(db *sql.DB, want []TargetValue) (err error) {
-	var curr TargetValue
-	var have []TargetValue
+func matchValues(db *sql.DB, want ...interface{}) (err error) {
+	var a, b, c interface{}
+	var have []interface{}
 	if e := tables.QueryAll(db,
 		`select noun, field, value 
 			from mdl_start
 			order by noun, field, value`,
 		func() (err error) {
-			have = append(have, curr)
+			have = append(have, a, b, c)
 			return
 		},
-		&curr.Target, &curr.Field, &curr.Value); e != nil {
+		&a, &b, &c); e != nil {
 		err = e
 	} else if !reflect.DeepEqual(have, want) {
 		err = errutil.New("mismatch",
@@ -129,11 +131,11 @@ func matchValues(db *sql.DB, want []TargetValue) (err error) {
 
 // eph_value: fake noun, prop, value
 // prop: k, f, v
-func addValues(rec *ephemera.Recorder, vals []TargetValue) (err error) {
-	for _, v := range vals {
-		noun := rec.NewName(v.Target, tables.NAMED_NOUN, "test")
-		prop := rec.NewName(v.Field, tables.NAMED_PROPERTY, "test")
-		value := v.Value
+func addValues(rec *ephemera.Recorder, els ...interface{}) (err error) {
+	for i, cnt := 0, len(els); i < cnt; i += 3 {
+		tgt, field, value := els[i], els[i+1], els[i+2]
+		noun := rec.NewName(tgt.(string), tables.NAMED_NOUN, "test")
+		prop := rec.NewName(field.(string), tables.NAMED_PROPERTY, "test")
 		rec.NewValue(noun, prop, value)
 	}
 	return
