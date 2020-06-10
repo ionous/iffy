@@ -28,15 +28,15 @@ function localLang(make) {
 
     make.opt("noun_phrase", "{kind_of_noun}, {noun_attrs}, or {noun_relation}");
 
+    // fix: think this should always be "are" never "is"
+    make.run("kind_of_noun", "{are_an} {attribute*trait|comma-and} {kind:singular_kind} {?noun_relation}");
+
     make.opt("noun", "{proper_noun} or {common_noun}");
     make.run("common_noun", "{determiner} {common_name}");
     make.run("proper_noun", "{proper_name}");
 
      make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 
-    // fix: think this should always be "are" never "is"
-    make.run("kind_of_noun", "story_statement",
-             "{plural_kinds} are a kind of {singular_kind}.");
 
     make.str("proper_name", `Proper Name: A name given to some specific person, place, or thing.
 Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or 'Toronto'.`);
@@ -96,7 +96,9 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
   });
 
   make.group("Kinds", function() {
-    make.run("kind_of_noun", "{are_an} {attribute*trait|comma-and} {kind:singular_kind} {?noun_relation}");
+
+    make.run("kinds_of_kind", "story_statement",
+         "{plural_kinds} are a kind of {singular_kind}.");
 
     make.run("kinds_possess_properties", "story_statement",
               "{plural_kinds} have {determiner} {property_phrase}.");
