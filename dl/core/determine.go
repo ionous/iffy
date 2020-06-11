@@ -86,7 +86,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, patType string, fn func(p interfac
 func unpack(run rt.Runtime, pattern, param string) (ret string, err error) {
 	if usesIndex := len(param) > 1 && param[:1] == "$"; !usesIndex {
 		ret = param
-	} else if idx, e := strconv.Atoi(param); e != nil {
+	} else if idx, e := strconv.Atoi(param[1:]); e != nil {
 		err = e
 	} else {
 		ret, err = run.GetFieldByIndex(pattern, idx)
