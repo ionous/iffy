@@ -51,9 +51,9 @@ func (op *Exists) GetBool(run rt.Runtime) (ret bool, err error) {
 
 func (*KindOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "class_name",
+		Name:  "kind_of",
 		Group: "objects",
-		Desc:  "Kind Of: Friendly name of the object's class.",
+		Desc:  "Kind Of: Friendly name of the object's kind.",
 	}
 }
 
@@ -70,7 +70,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 
 func (*IsKindOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "is_class",
+		Name:  "is_kind_of",
 		Spec:  "Is {noun%obj} a kind of {kind:singular_kind}",
 		Group: "objects",
 		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",

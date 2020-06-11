@@ -122,7 +122,7 @@ function getStory() {
                                           "$TEMPLATE": {
                                             "id": "id-1724419eaa5-24",
                                             "type": "lines",
-                                            "value": "{nameOfKind: .target}"
+                                            "value": "{kindOf: .target}"
                                           }
                                         }
                                       }

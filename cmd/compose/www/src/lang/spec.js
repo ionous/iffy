@@ -383,7 +383,7 @@ const spec = [
     "group": [
       "objects"
     ],
-    "name": "class_name",
+    "name": "kind_of",
     "uses": "run",
     "with": {
       "params": {
@@ -796,7 +796,7 @@ const spec = [
     "group": [
       "objects"
     ],
-    "name": "is_class",
+    "name": "is_kind_of",
     "spec": "Is $OBJ a kind of $CLASS",
     "uses": "run",
     "with": {
