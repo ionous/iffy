@@ -15,28 +15,23 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 		} else {
 			field := out.FieldByIndex(path)
 			if f.Type.Kind() != r.Slice {
-				arg := args[0]
-				if argType := arg.Type(); !argType.AssignableTo(f.Type) {
-					err = errutil.Fmt("cant assign %s to field %s{ %s %s }",
-						argType, outType, f.Name, f.Type)
+				if arg, rest := popArg(f.Type, args); !arg.IsValid() {
+					err = errutil.Fmt("cant assign %T to field %s{ %s %s }",
+						args[0].Type(), outType, f.Name, f.Type)
 				} else {
 					field.Set(arg)
-					args = args[1:] // pop
+					args = rest
 				}
 			} else {
 				// when assigning to a slice, eat as many elements as possible.
 				// it makes having slices as the last element of a command a good idea.
 				slice, elType := field, f.Type.Elem()
 				for len(args) > 0 {
-					arg := args[0]
-					if on, ok := arg.Interface().(objectName); ok {
-						arg = r.ValueOf(on.getTextName())
-					}
-					if argType := arg.Type(); !argType.AssignableTo(elType) {
+					if arg, rest := popArg(elType, args); !arg.IsValid() {
 						break
 					} else {
 						slice = r.Append(slice, arg)
-						args = args[1:] // pop
+						args = rest
 					}
 				}
 				field.Set(slice)
@@ -46,6 +41,17 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 	})
 	if err == nil && len(args) > 0 {
 		err = errutil.New("unable to consume all args")
+	}
+	return
+}
+
+func popArg(elType r.Type, args []r.Value) (ret r.Value, rest []r.Value) {
+	arg := args[0]
+	if on, ok := arg.Interface().(objectName); ok {
+		arg = r.ValueOf(on.getTextName())
+	}
+	if argType := arg.Type(); argType.AssignableTo(elType) {
+		ret, rest = arg, args[1:] // pop
 	}
 	return
 }
