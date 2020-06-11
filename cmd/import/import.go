@@ -24,6 +24,10 @@ func main() {
 	flag.StringVar(&inFile, "in", "", "input file name (json)")
 	flag.StringVar(&outFile, "out", "", "output file name (sqlite3)")
 	flag.Parse()
+	if len(outFile) == 0 {
+		dir, _ := filepath.Split(inFile)
+		outFile = filepath.Join(dir, "ephemera.db")
+	}
 	if e := distill(outFile, inFile); e != nil {
 		log.Fatalln(e)
 	} else {

@@ -19,6 +19,10 @@ func main() {
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")
 	flag.StringVar(&outFile, "out", "", "output file name (sqlite3)")
 	flag.Parse()
+	if len(outFile) == 0 {
+		dir, _ := filepath.Split(inFile)
+		outFile = filepath.Join(dir, "play.db")
+	}
 	if e := assemble(outFile, inFile); e != nil {
 		log.Fatalln(e)
 	} else {

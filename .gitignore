@@ -3,6 +3,7 @@ template/old
 *.zip
 notes
 .vscode
+__debug_bin
 ephemera/cmd/parse
 ephemera/cmd/stem
 assembly/debug.test
