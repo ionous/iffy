@@ -24,7 +24,7 @@ func ExampleIndex() {
 	// 123
 }
 
-func ExampleEndings() {
+func ExampleChooseText() {
 	var run forTester
 	if e := rt.RunAll(&run, []rt.Execute{
 		&Say{&Commas{[]rt.Execute{
