@@ -84,10 +84,11 @@ func TestExpressions(t *testing.T) {
 	})
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
-			&core.DetermineText{"print name",
-				&core.Parameters{[]*core.Parameter{{
-					"$1", &core.FromText{T("A")},
-				}}}}); e != nil {
+			&core.Buffer{[]rt.Execute{
+				&core.DetermineAct{"print name",
+					&core.Parameters{[]*core.Parameter{{
+						"$1", &core.FromText{T("A")},
+					}}}}}}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -230,13 +231,13 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("hello {.object}",
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
-				&core.DetermineText{"print name",
-					&core.Parameters{[]*core.Parameter{
-						&core.Parameter{"$1",
-							&core.FromText{
-								&core.GetVar{Name: "object"},
-							}}}}}},
-			},
+				&core.Buffer{[]rt.Execute{
+					&core.DetermineAct{"print name",
+						&core.Parameters{[]*core.Parameter{
+							&core.Parameter{"$1",
+								&core.FromText{
+									&core.GetVar{Name: "object"},
+								}}}}}}}}},
 		); e != nil {
 			t.Fatal(e)
 		}
