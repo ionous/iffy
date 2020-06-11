@@ -89,7 +89,7 @@ func TestGetFieldValues(t *testing.T) {
 				{"speedboat", false},
 			}
 
-			q := NewObjectValues(db)
+			q := NewObjectValues(tables.NewCache(db))
 
 			// ensure we can ask for object existence
 			t.Run("object exists", func(t *testing.T) {

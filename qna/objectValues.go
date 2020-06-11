@@ -9,7 +9,8 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-// Fields populates itself from the database on demand.
+// Fields implements rt.Fields: key,field,value storage for nouns, kinds, and patterns.
+// It reads its data from the play database and caches the results in memory.
 type Fields struct {
 	pairs mapType
 	db    *tables.Cache
@@ -33,8 +34,8 @@ func (k *mapTarget) Scan(v interface{}) (err error) {
 	return
 }
 
-func NewObjectValues(db *sql.DB) *Fields {
-	return &Fields{make(mapType), tables.NewCache(db)}
+func NewObjectValues(db *tables.Cache) *Fields {
+	return &Fields{make(mapType), db}
 }
 
 // SetField to the passed value.

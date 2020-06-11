@@ -8,17 +8,20 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
+	"github.com/kr/pretty"
 )
 
 func newRule(rd pattern.Rule) r.Value {
 	rtype := r.TypeOf(rd).Elem()
 	return r.New(rtype)
 }
+
 func newRuleSet(rd pattern.Rule) r.Value {
 	rtype := r.TypeOf(rd.RuleDesc().RuleSet).Elem()
 	return r.New(rtype).Elem() // rulesets are arrays, not pointers to arrays
 }
 
+// given a name ( ex. text_rule ) return the rule type (ex. pattern.TextRule)
 func findRuleByTypeName(ruleType string) (ret pattern.Rule, err error) {
 	found := false
 	for _, rule := range pattern.Rules {
@@ -65,6 +68,7 @@ func (n *Fields) cacheRules(key keyType, pattern, patternType string) (ret inter
 				rules := rs.Interface()
 				n.pairs[key] = rules
 				ret = rules
+				pretty.Println(rules)
 			}
 		}
 	}
