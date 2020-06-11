@@ -6,12 +6,14 @@ import "github.com/ionous/iffy/rt"
 type BoolRules []*BoolRule
 
 // BoolRule responds with a true/false result when its filters are satisfied.
+// It implements rt.BoolEval.
 type BoolRule struct {
 	Filter rt.BoolEval
 	rt.BoolEval
 }
 
 // NumberRules finds the first matched rule and returns the result of that evaluation.
+// It implements rt.NumberEval.
 type NumberRules []*NumberRule
 
 // NumberRule responds with a single number when its filters are satisfied.
@@ -21,6 +23,7 @@ type NumberRule struct {
 }
 
 // TextRules finds the first matched rule and returns the result of that evaluation.
+// It implements rt.TextEval.
 type TextRules []*TextRule
 
 // TextRule responds with a bit of text when its filters are satisfied.

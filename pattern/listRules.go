@@ -5,9 +5,9 @@ import (
 	"github.com/ionous/iffy/rt/stream"
 )
 
-type NumListRules []NumListRule
-type TextListRules []TextListRule
-type ExecRules []ExecuteRule
+type NumListRules []*NumListRule
+type TextListRules []*TextListRule
+type ExecRules []*ExecuteRule
 
 // ListRule for any rule which can respond with multiple results.
 type ListRule struct {
@@ -104,7 +104,7 @@ func (ps ExecRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
 	return ps[i].ApplyByIndex(run)
 }
 
-func (ps ExecRules) Execute(run rt.Runtime) (ret bool, err error) {
+func (ps ExecRules) Execute(run rt.Runtime) (err error) {
 	if inds, e := splitRules(run, ps, len(ps)); e != nil {
 		err = e
 	} else {
@@ -113,7 +113,8 @@ func (ps ExecRules) Execute(run rt.Runtime) (ret bool, err error) {
 				err = e
 				break
 			}
-			ret = true // any executed
+			// NOTE: if we need to differentiate between "ran" and "not found",
+			// "didnt run" should probably become an error code.
 		}
 	}
 	return
