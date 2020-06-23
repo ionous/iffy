@@ -1,38 +1,39 @@
+
 function getStory() {
   return {
-    "id": "id-1709ef632af-3",
+    "id": "id-3",
     "type": "test",
     "value": {
       "$TEST_NAME": {
-        "id": "id-1709ef632af-0",
+        "id": "id-0",
         "type": "text",
         "value": "hello, goodbye"
       },
       "$GO": [
         {
-          "id": "id-1709ef632af-1",
+          "id": "id-1",
           "type": "execute",
           "value": {
-            "id": "id-1709ef632af-7",
+            "id": "id-7",
             "type": "choose",
             "value": {
               "$FALSE": [
                 {
-                  "id": "id-1709ef632af-4",
+                  "id": "id-4",
                   "type": "execute",
                   "value": {
-                    "id": "id-1709ef632af-15",
+                    "id": "id-15",
                     "type": "say",
                     "value": {
                       "$TEXT": {
-                        "id": "id-1709ef632af-14",
+                        "id": "id-14",
                         "type": "text_eval",
                         "value": {
-                          "id": "id-1709ef632af-20",
+                          "id": "id-20",
                           "type": "text_value",
                           "value": {
                             "$TEXT": {
-                              "id": "id-1709ef632af-19",
+                              "id": "id-19",
                               "type": "lines",
                               "value": "goodbye"
                             }
@@ -44,14 +45,14 @@ function getStory() {
                 }
               ],
               "$IF": {
-                "id": "id-1709ef632af-5",
+                "id": "id-5",
                 "type": "bool_eval",
                 "value": {
-                  "id": "id-1709ef632af-9",
+                  "id": "id-9",
                   "type": "bool_value",
                   "value": {
                     "$BOOL": {
-                      "id": "id-1709ef632af-8",
+                      "id": "id-8",
                       "type": "bool",
                       "value": "$TRUE"
                     }
@@ -60,21 +61,21 @@ function getStory() {
               },
               "$TRUE": [
                 {
-                  "id": "id-1709ef632af-6",
+                  "id": "id-6",
                   "type": "execute",
                   "value": {
-                    "id": "id-1709ef632af-11",
+                    "id": "id-11",
                     "type": "say",
                     "value": {
                       "$TEXT": {
-                        "id": "id-1709ef632af-10",
+                        "id": "id-10",
                         "type": "text_eval",
                         "value": {
-                          "id": "id-1709ef632af-13",
+                          "id": "id-13",
                           "type": "text_value",
                           "value": {
                             "$TEXT": {
-                              "id": "id-1709ef632af-12",
+                              "id": "id-12",
                               "type": "lines",
                               "value": "hello"
                             }
@@ -90,7 +91,7 @@ function getStory() {
         }
       ],
       "$LINES": {
-        "id": "id-1709ef632af-2",
+        "id": "id-2",
         "type": "lines",
         "value": "hello"
       }
