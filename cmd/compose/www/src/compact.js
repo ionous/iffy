@@ -39,12 +39,12 @@ function compact(obj) {
   const makeTag= function(field, obj) {
     // annotation for an array comes from the elements
     const antOf= obj.length>0 ? arrayType(obj): obj.type;
-    const fieldStr= field? field: "";
+
     // if field and type are the same name, elide the annotation
-    const antStr= antOf && (fieldStr!==antOf) ? `::${antOf}` : "";
+    const antStr= antOf  ? `${antOf}` : "";
+    const fieldStr= ((!field) || (field===antOf)) ? "": field;
     const idStr= obj.id? `@${obj.id}`:"";
-    //
-    return `${fieldStr}${antStr}${idStr}`;
+    return (antStr || idStr) ? `${fieldStr}::${antStr}${idStr}`: fieldStr;
   };
   const annotate= function(field, obj, val) {
     const tag= makeTag(field, obj);

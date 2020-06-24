@@ -1,9 +1,11 @@
+package sds
 
-// sdsTests.js
-// self describing storage
-(function() {
-  // sayTest storydata.
-  const compactData= [
+import (
+	"encoding/json"
+	"testing"
+)
+
+var compactData = `[
     "::test@id-3",{
       "test_name::text@id-0": "hello, goodbye",
       "go::execute": [
@@ -25,20 +27,23 @@
                   "text::lines@id-12": "hello"
                 }]}]}],
       "::lines@id-2": "hello"
-  }];
-  // compact
-  // -
-  const compacted= compact(getStory());
-  const got= JSON.stringify(compacted, 0, 2);
-  const want= JSON.stringify(compactData, 0, 2);
-  // pull some pairs of closing parens together, and opening brackets onto the same line
-  const out= got.replace(/([}\]])\n\s+([}\]])/g, "$1$2").replace(/",\n\s+([{\[])/g, '", $1');
-  if (got !== want) {
-    console.log(out);
-    throw new Error("mismatch");
-  }
+  }]`
 
-  // expand
-  // -
+func TestExpand(t *testing.T) {
+	var in []interface{}
+	if e := json.Unmarshal([]byte(compactData), &in); e != nil {
+		t.Fatal(e)
+	} else {
+		for s := NewSlice(in); s != nil; s = s.Next() {
+			t.Log(s.Note())
+			el := s.Elem()
+			ps := el.Params()
+			t.Log(ps)
+			// ::text@id-0 -- fix param names should be by short name
 
-}());
+			n, p := el.Param("test_name")
+			t.Log(n, p.Value())
+
+		}
+	}
+}
