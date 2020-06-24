@@ -26,16 +26,16 @@ function localLang(make) {
     // make.run("summary", "{The [summary] is:: %lines}");
     make.run("summary", "The summary is: {summary%lines|quote}");
 
-    make.opt("noun_phrase", "{kind_of_noun}, {noun_attrs}, or {noun_relation}");
+    make.opt("noun_phrase", "{kind_of_noun}, {noun_traits}, or {noun_relation}");
 
     // fix: think this should always be "are" never "is"
-    make.run("kind_of_noun", "{are_an} {attribute*trait|comma-and} {kind:singular_kind} {?noun_relation}");
+    make.run("kind_of_noun", "{are_an} {trait*trait|comma-and} {kind:singular_kind} {?noun_relation}");
 
     make.opt("noun", "{proper_noun} or {common_noun}");
     make.run("common_noun", "{determiner} {common_name}");
     make.run("proper_noun", "{proper_name}");
 
-     make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
+    make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 
 
     make.str("proper_name", `Proper Name: A name given to some specific person, place, or thing.
@@ -119,13 +119,20 @@ For example: animals, containers, etc.`);
 
     make.opt("variable_type", "a {simple value%primitive:primitive_type} or an {object:object_type}");
     make.run("object_type",  "{an} {kind of%kinds:plural_kinds} object");
-
   });
 
   make.group("Traits", function() {
-    make.run("noun_attrs", "{are_being} {attribute+trait|comma-and}");
-    make.str("quality");
-    make.str("qualities");
+    make.run("kinds_of_aspect", "story_statement",
+      "{aspects} {are_being} a kind of value.");
+
+    make.run("aspect_traits", "story_statement",
+      "{aspects} {trait_phrase}");
+
+    make.run("trait_phrase", "{are_either} {trait+trait|comma-or}.");
+
+    make.run("noun_traits", "{are_being} {trait+trait|comma-and}");
+    make.str("aspect");
+    make.str("aspects");
     make.str("trait");
   });
 
@@ -136,29 +143,18 @@ For example: animals, containers, etc.`);
             "The {property_name} of {+noun} is {the text%lines|summary}",
             "Noun Assignment: Assign text. Gives a noun one or more lines of text.");
 
-    make.opt("property_phrase", "{primitive_phrase} or {quality_phrase}");
+    make.opt("property_phrase", "{primitive_phrase} or {aspect_phrase}");
 
     make.run("optional_property", "called {property_name}");
-
-    make.run("kinds_of_quality", "story_statement",
-              "{qualities} are a kind of value.");
-
-    make.run("class_attributes", "story_statement",
-              "{plural_kinds} {attribute_phrase}");
-
-    make.run("quality_attributes", "story_statement",
-              "{qualities} {attribute_phrase}");
-
-    make.run("attribute_phrase", "{are_either} {attribute+trait|comma-and}.");
 
     make.run("certainties", "story_statement",
               "{plural_kinds} {are_being} {certainty} {trait}.");
 
-    make.run("quality_phrase", "{quality} {?optional_property}");
+    make.run("aspect_phrase", "{aspect} {?optional_property}");
 
     make.str("are_either", "{can be%canbe} {are either%either}");
     make.str("certainty",  "{usually}, {always}, {seldom}, or {never}",
-             "Certainty: Whether an attribute applies to a kind of noun.");
+             "Certainty: Whether an trait applies to a kind of noun.");
 
     make.str("property_name");
   });

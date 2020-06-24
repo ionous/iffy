@@ -304,7 +304,7 @@ const spec = [
   },
   {
     "name": "choose",
-    "spec": "if {choose%if:bool_eval} then: {true?execute|ghost} else: {false?execute|ghost}",
+    "spec": "if {choose%if:bool_eval} then: {true+execute|ghost} else: {false+execute|ghost}",
     "uses": "run",
     "with": {
       "slots": [
@@ -375,29 +375,6 @@ const spec = [
         "$IF",
         "$TRUE",
         "$FALSE"
-      ]
-    }
-  },
-  {
-    "desc": "Kind Of: Friendly name of the object's class.",
-    "group": [
-      "objects"
-    ],
-    "name": "kind_of",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$OBJ": {
-          "label": "obj",
-          "type": "text_eval"
-        }
-      },
-      "slots": [
-        "text_eval"
-      ],
-      "tokens": [
-        "kind of",
-        "$OBJ"
       ]
     }
   },
@@ -792,20 +769,6 @@ const spec = [
     }
   },
   {
-    "desc": "Is Kind Of: True if the object is compatible with the named kind.",
-    "group": [
-      "objects"
-    ],
-    "name": "is_kind_of",
-    "spec": "Is $OBJ a kind of $CLASS",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "bool_eval"
-      ]
-    }
-  },
-  {
     "desc": "Is Empty: True if the text is empty.",
     "group": [
       "strings"
@@ -853,6 +816,20 @@ const spec = [
         "is exact kind of",
         "$OBJ",
         "$KIND"
+      ]
+    }
+  },
+  {
+    "desc": "Is Kind Of: True if the object is compatible with the named kind.",
+    "group": [
+      "objects"
+    ],
+    "name": "is_kind_of",
+    "spec": "Is {noun%obj} a kind of {kind:singular_kind}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval"
       ]
     }
   },
@@ -928,6 +905,29 @@ const spec = [
         "join",
         "$SEP",
         "$PARTS"
+      ]
+    }
+  },
+  {
+    "desc": "Kind Of: Friendly name of the object's kind.",
+    "group": [
+      "objects"
+    ],
+    "name": "kind_of",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        }
+      },
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "kind of",
+        "$OBJ"
       ]
     }
   },
