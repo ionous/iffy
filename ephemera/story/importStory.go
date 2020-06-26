@@ -16,6 +16,9 @@ func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
 	storyNouns.names = nil
 	dec := decode.NewDecoder()
 	k := imp.NewImporterDecoder(src, db, dec)
+	// fix: this is a bit ugly b/c it assumes "AssembleStory" uses the same base kind.
+	// and "name" gets used by qna's runtime implementation.
+	k.NewImplicitField("name", "kinds", "reserved")
 	//
 	for _, slats := range iffy.AllSlats {
 		dec.AddDefaultCallbacks(slats)

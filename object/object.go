@@ -1,6 +1,10 @@
 package object
 
-const Prefix = "$"
+// reserved fields
+const Name = "name"
+
+// internal fields
+const Prefix = '$'         // leading character used for all internal fields
 const Exists = "$exists"   // whether a name refers to a declared game object
 const Kind = "$kind"       // type of a game object
 const Kinds = "$kinds"     // hierarchy of a game object ( a path )

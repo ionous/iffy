@@ -109,9 +109,9 @@ func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
-		k.ImplicitAspect("nounTypes", "things", "common", "proper")
+		k.NewImplicitAspect("nounTypes", "things", "common", "proper")
 		// whether a player can refer to an object by its name.
-		k.ImplicitAspect("privateNames", "things", "publicly-named", "privately-named")
+		k.NewImplicitAspect("privateNames", "things", "publicly-named", "privately-named")
 	}
 	return reader.Option(r, "noun", reader.ReadMaps{
 		"$PROPER_NOUN": k.Bind(imp_proper_noun),

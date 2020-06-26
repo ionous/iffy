@@ -311,7 +311,7 @@ function getStory() {
                                                 "$TEMPLATE": {
                                                   "id": "id-c-9",
                                                   "type": "lines",
-                                                  "value": "{.target.printedName}"
+                                                  "value": "{.target.name}"
                                                 }
                                               }
                                             }
@@ -435,9 +435,9 @@ function getStory() {
                             "type": "primitive_type",
                             "value": "$TEXT"
                           },
-                          "$PROPERTY_NAME": {
+                          "$PROPERTY": {
                             "id": "id-c-23",
-                            "type": "property_name",
+                            "type": "property",
                             "value": "printed name"
                           }
                         }
@@ -466,8 +466,8 @@ function getStory() {
                             "type": "primitive_type",
                             "value": "$TEXT"
                           },
-                          "$PROPERTY_NAME": {
-                            "type": "property_name",
+                          "$PROPERTY": {
+                            "type": "property",
                             "value": "printed plural name"
                           }
                         }
@@ -496,88 +496,12 @@ function getStory() {
                             "type": "primitive_type",
                             "value": "$TEXT"
                           },
-                          "$PROPERTY_NAME": {
-                            "type": "property_name",
+                          "$PROPERTY": {
+                            "type": "property",
                             "value": "indefinite article"
                           }
                         }
                       }
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "id": "id-d-0",
-              "type": "story_statement",
-              "value": {
-                "id": "id-d-7",
-                "type": "aspect_traits",
-                "value": {
-                  "$PLURAL_KINDS": {
-                    "id": "id-d-3",
-                    "type": "plural_kinds",
-                    "value": "Kinds"
-                  },
-                  "$TRAIT_PHRASE": {
-                    "id": "id-d-6",
-                    "type": "attribute_phrase",
-                    "value": {
-                      "$ARE_EITHER": {
-                        "id": "id-d-4",
-                        "type": "are_either",
-                        "value": "$EITHER"
-                      },
-                      "$TRAIT": [
-                        {
-                          "id": "id-d-5",
-                          "type": "trait",
-                          "value": "common named"
-                        },
-                        {
-                          "id": "id-d-8",
-                          "type": "trait",
-                          "value": "proper named"
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "id": "id-d-9",
-              "type": "story_statement",
-              "value": {
-                "id": "id-d-17",
-                "type": "aspect_traits",
-                "value": {
-                  "$PLURAL_KINDS": {
-                    "id": "id-d-13",
-                    "type": "plural_kinds",
-                    "value": "Kinds"
-                  },
-                  "$TRAIT_PHRASE": {
-                    "id": "id-d-16",
-                    "type": "attribute_phrase",
-                    "value": {
-                      "$ARE_EITHER": {
-                        "id": "id-d-14",
-                        "type": "are_either",
-                        "value": "$EITHER"
-                      },
-                      "$TRAIT": [
-                        {
-                          "id": "id-d-15",
-                          "type": "trait",
-                          "value": "singular named"
-                        },
-                        {
-                          "id": "id-d-18",
-                          "type": "trait",
-                          "value": "plural named"
-                        }
-                      ]
                     }
                   }
                 }

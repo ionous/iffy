@@ -3,7 +3,6 @@ package qna
 import (
 	"database/sql"
 	"strconv"
-	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
@@ -42,8 +41,8 @@ func NewObjectValues(db *tables.Cache) *Fields {
 // SetField to the passed value.
 
 func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
-	if strings.HasPrefix(field, object.Prefix) {
-		err = errutil.New("can't change internal field", field)
+	if len(field) == 0 || field[0] == object.Prefix || field == object.Name {
+		err = errutil.Fmt("can't change reserved field %q", field)
 	} else {
 		// check if the specified field is a trait
 		if a, e := n.GetField(obj+"."+field, object.Aspect); e != nil {
@@ -75,6 +74,15 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 		ret = val
 	} else {
 		switch field {
+		case object.Name:
+			// search for the full object name by a partial object name
+			ret, err = n.getCachingQuery(key,
+				`select noun 
+				from mdl_name
+				where name=?
+				order by rank
+				limit 1 `, obj)
+
 		case object.Aspect:
 			// noun.trait; we use "max" in order to always return a value.
 			ret, err = n.getCachingQuery(key,

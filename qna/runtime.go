@@ -10,10 +10,11 @@ import (
 
 func NewRuntime(db *sql.DB) *Runner {
 	cache := tables.NewCache(db)
+	fields := NewObjectValues(cache)
 	run := &Runner{
-		Fields: NewObjectValues(cache),
+		Fields: fields,
 	}
-	run.PushScope(&NounScope{db: cache})
+	run.PushScope(&NounScope{fields: fields})
 	return run
 }
 

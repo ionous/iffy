@@ -87,8 +87,17 @@ func (k *Porter) NewProg(typeName string, cmd interface{}) (ret ephemera.Prog, e
 	return
 }
 
-// ImplicitAspect declares an assembler specified aspect and its traits
-func (k *Porter) ImplicitAspect(aspect, kind string, traits ...string) {
+// NewImplicitField declares an assembler specified field
+func (k *Porter) NewImplicitField(field, kind, fieldType string) {
+	if src := "implicit " + kind + "." + field; k.Once(src) {
+		kKind := k.NewName(kind, tables.NAMED_KINDS, src)
+		kField := k.NewName(field, tables.NAMED_FIELD, src)
+		k.NewField(kKind, kField, fieldType)
+	}
+}
+
+// NewImplicitAspect declares an assembler specified aspect and its traits
+func (k *Porter) NewImplicitAspect(aspect, kind string, traits ...string) {
 	if src := "implicit " + kind + "." + aspect; k.Once(src) {
 		kKind := k.NewName(kind, tables.NAMED_KINDS, src)
 		kAspect := k.NewName(aspect, tables.NAMED_ASPECT, src)

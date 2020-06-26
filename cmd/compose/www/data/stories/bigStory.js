@@ -899,7 +899,7 @@ function getStory() {
                   "value": {
                     "$PROPERTY": {
                       "id": "id-16f3603b109-37",
-                      "type": "property_name",
+                      "type": "property",
                       "value": "description"
                     },
                     "$NOUN": [
@@ -941,7 +941,7 @@ function getStory() {
                   "value": {
                     "$PROPERTY": {
                       "id": "id-16f3603b109-50",
-                      "type": "property_name",
+                      "type": "property",
                       "value": "printed name"
                     },
                     "$NOUN": [
@@ -1091,7 +1091,7 @@ function getStory() {
                   "value": {
                     "$PROPERTY": {
                       "id": "id-16f3603b109-80",
-                      "type": "property_name",
+                      "type": "property",
                       "value": "description"
                     },
                     "$NOUN": [

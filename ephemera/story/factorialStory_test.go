@@ -31,8 +31,10 @@ func TestFactorialStory(t *testing.T) {
 			// eph_named
 			"factorial,test",         // name of the test
 			"factorial,pattern_name", // we declared the named pattern
-			"num,variable_name",      // we referenced the variable named
-			"number_eval,type",       // we evaluated the pattern
+			"kinds,kind",
+			"name,field",
+			"num,variable_name", // we referenced the variable named
+			"number_eval,type",  // we evaluated the pattern
 		); have != want {
 			t.Fatal(have)
 		}

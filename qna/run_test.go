@@ -32,8 +32,8 @@ func testAll(inFile string, db *sql.DB, m reader.Map) (err error) {
 		err = errutil.New("couldn't create tables", e)
 	} else if e := story.ImportStory(inFile, db, m); e != nil {
 		err = errutil.New("couldn't import story", e)
-	} else if e := assembly.AssembleStory(db, "things", ds.Add); e != nil {
-		err = errutil.New("couldnt assemble story", e)
+	} else if e := assembly.AssembleStory(db, "kinds", ds.Add); e != nil {
+		err = errutil.New("couldnt assemble story", e, ds.Err())
 	} else if len(ds) > 0 {
 		err = errutil.New("issues assembling", ds.Err())
 	} else if e := CheckAll(db); e != nil {
