@@ -5,7 +5,8 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// GetVariable reads from the value at name.
+// GetVariable reads a value of the specified name from the current scope.
+// ( ex. loop locals )
 type GetVar struct {
 	Name string
 }

@@ -18,7 +18,7 @@ func writeFields(rec *ephemera.Recorder, els ...string) (err error) {
 		kind, field, fieldType := els[i], els[i+1], els[i+2]
 		kn := rec.NewName(kind, tables.NAMED_KINDS, "test")
 		fn := rec.NewName(field, tables.NAMED_FIELD, "test")
-		rec.NewPrimitive(kn, fn, fieldType)
+		rec.NewField(kn, fn, fieldType)
 	}
 	return
 }

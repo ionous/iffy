@@ -1,9 +1,11 @@
 package object
 
+const Prefix = "$"
 const Exists = "$exists"   // whether a name refers to a declared game object
 const Kind = "$kind"       // type of a game object
 const Kinds = "$kinds"     // hierarchy of a game object ( a path )
 const Counter = "$counter" // sequence counter
+const Aspect = "$aspect"   // name of aspect for noun.trait
 
 // originally these were just "pattern"
 // it helps to have a type hint to GetField

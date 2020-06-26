@@ -122,46 +122,40 @@ For example: animals, containers, etc.`);
   });
 
   make.group("Traits", function() {
-    make.run("kinds_of_aspect", "story_statement",
-      "{aspects} {are_being} a kind of value.");
-
-    make.run("aspect_traits", "story_statement",
-      "{aspects} {trait_phrase}");
-
+    make.run("kinds_of_aspect", "story_statement", "{aspect} is a kind of value.");
+    make.run("aspect_traits", "story_statement", "{aspect} {trait_phrase}");
     make.run("trait_phrase", "{are_either} {trait+trait|comma-or}.");
 
     make.run("noun_traits", "{are_being} {trait+trait|comma-and}");
     make.str("aspect");
-    make.str("aspects");
     make.str("trait");
   });
 
   make.group("Properties", function() {
     // ex. The description of the nets is xxx
     make.run("noun_assignment", "story_statement",
-            // "The {property_name} of {+noun} is the {[text]:: %lines}",
-            "The {property_name} of {+noun} is {the text%lines|summary}",
+            // "The {property} of {+noun} is the {[text]:: %lines}",
+            "The {property} of {+noun} is {the text%lines|summary}",
             "Noun Assignment: Assign text. Gives a noun one or more lines of text.");
 
     make.opt("property_phrase", "{primitive_phrase} or {aspect_phrase}");
-
-    make.run("optional_property", "called {property_name}");
+    make.run("aspect_phrase", "{aspect} {?optional_property}");
+    make.run("optional_property", "called {property}");
 
     make.run("certainties", "story_statement",
               "{plural_kinds} {are_being} {certainty} {trait}.");
 
-    make.run("aspect_phrase", "{aspect} {?optional_property}");
-
     make.str("are_either", "{can be%canbe} {are either%either}");
+
     make.str("certainty",  "{usually}, {always}, {seldom}, or {never}",
              "Certainty: Whether an trait applies to a kind of noun.");
 
-    make.str("property_name");
+    make.str("property");
   });
 
   // primitive types
   make.group("Primitive Types", function() {
-    make.run("primitive_phrase", "{primitive_type} called {property_name}");
+    make.run("primitive_phrase", "{primitive_type} called {property}");
     make.str("primitive_type", "{a number%number}, {some text%text}, or {a true/false value%bool}");
     make.opt("primitive_value", "{text%boxed_text} or {number%boxed_number}");
 

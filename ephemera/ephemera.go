@@ -91,8 +91,8 @@ func (r *Recorder) NewPlural(plural, singluar Named) {
 	r.cache.Must(eph_plural, plural, singluar)
 }
 
-// NewPrimitive property in the named kind.
-func (r *Recorder) NewPrimitive(kind, prop Named, primType string) {
+// NewField property in the named kind.
+func (r *Recorder) NewField(kind, prop Named, primType string) {
 	r.cache.Must(eph_field, primType, kind, prop)
 }
 

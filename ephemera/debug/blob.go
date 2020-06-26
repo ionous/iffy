@@ -276,16 +276,16 @@ var Blob = `{
                           "id": "id-16f156a8166-13",
                           "type": "noun_phrase",
                           "value": {
-                            "$NOUN_ATTRS": {
+                            "$NOUN_TRAITS": {
                               "id": "id-16f156a8166-21",
-                              "type": "noun_attrs",
+                              "type": "noun_traits",
                               "value": {
                                 "$ARE_BEING": {
                                   "id": "id-16f156a8166-19",
                                   "type": "are_being",
                                   "value": "$IS"
                                 },
-                                "$ATTRIBUTE": [
+                                "$TRAIT": [
                                   {
                                     "id": "id-16f156a8166-20",
                                     "type": "trait",
@@ -355,16 +355,16 @@ var Blob = `{
                           "id": "id-16f156a8166-27",
                           "type": "noun_phrase",
                           "value": {
-                            "$NOUN_ATTRS": {
+                            "$NOUN_TRAITS": {
                               "id": "id-16f156a8166-35",
-                              "type": "noun_attrs",
+                              "type": "noun_traits",
                               "value": {
                                 "$ARE_BEING": {
                                   "id": "id-16f156a8166-33",
                                   "type": "are_being",
                                   "value": "$IS"
                                 },
-                                "$ATTRIBUTE": [
+                                "$TRAIT": [
                                   {
                                     "id": "id-16f156a8166-34",
                                     "type": "trait",
@@ -654,16 +654,16 @@ var Blob = `{
                           "id": "id-16f165d636d-14",
                           "type": "noun_phrase",
                           "value": {
-                            "$NOUN_ATTRS": {
+                            "$NOUN_TRAITS": {
                               "id": "id-16f165d636d-22",
-                              "type": "noun_attrs",
+                              "type": "noun_traits",
                               "value": {
                                 "$ARE_BEING": {
                                   "id": "id-16f165d636d-20",
                                   "type": "are_being",
                                   "value": "$IS"
                                 },
-                                "$ATTRIBUTE": [
+                                "$TRAIT": [
                                   {
                                     "id": "id-16f165d636d-21",
                                     "type": "trait",
@@ -723,16 +723,16 @@ var Blob = `{
                           "id": "id-16f165d636d-31",
                           "type": "noun_phrase",
                           "value": {
-                              "$NOUN_ATTRS": {
+                              "$NOUN_TRAITS": {
                               "id": "id-16f165d636d-39",
-                              "type": "noun_attrs",
+                              "type": "noun_traits",
                               "value": {
                                 "$ARE_BEING": {
                                   "id": "id-16f165d636d-37",
                                   "type": "are_being",
                                   "value": "$ARE"
                                 },
-                                "$ATTRIBUTE": [
+                                "$TRAIT": [
                                   {
                                     "id": "id-16f165d636d-38",
                                     "type": "trait",

@@ -4,21 +4,19 @@ import (
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
-	"github.com/ionous/iffy/tables"
 )
 
 func imp_story_statement(k *imp.Porter, r reader.Map) (err error) {
 	return reader.Slot(r, "story_statement", reader.ReadMaps{
 		"certainties":              k.Bind(imp_certainties),
-		"class_attributes":         k.Bind(imp_class_attributes),
-		"kinds_of_quality":         k.Bind(imp_kinds_of_quality),
+		"aspect_traits":            k.Bind(imp_aspect_traits),
+		"kinds_of_aspect":          k.Bind(imp_kinds_of_aspect),
 		"kinds_of_kind":            k.Bind(imp_kinds_of_kind),
 		"kinds_possess_properties": k.Bind(imp_kinds_possess_properties),
 		"noun_assignment":          k.Bind(imp_noun_assignment),
 		"noun_statement":           k.Bind(imp_noun_statement),
 		"pattern_decl":             k.Bind(imp_pattern_decl),
 		"pattern_variables_decl":   k.Bind(imp_pattern_variables_decl),
-		"quality_attributes":       k.Bind(imp_quality_attributes),
 		"relative_to_noun":         k.Bind(imp_relative_to_noun),
 		"test_statement":           k.Bind(imp_test_statement),
 		"pattern_handler":          k.Bind(imp_pattern_handler),
@@ -56,30 +54,12 @@ func imp_certainty(k *imp.Porter, r reader.Map) (ret string, err error) {
 	return
 }
 
-// "{plural_kinds} {attribute_phrase}"
-// ex. animals are fast or slow.
-func imp_class_attributes(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "class_attributes"); e != nil {
-		err = e
-	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
-		err = e
-	} else if traits, e := imp_attribute_phrase(k, m.MapOf("$ATTRIBUTE_PHRASE")); e != nil {
-		err = e
-	} else {
-		// create an implied aspect named after the first trait
-		// fix? maybe we should include the columns of named in the returned struct so we can pick out the source better.
-		aspect := k.NewName(traits[0].String(), tables.NAMED_ASPECT, m.StrOf(reader.ItemId))
-		k.NewPrimitive(kind, aspect, tables.PRIM_ASPECT)
-	}
-	return
-}
-
-// "{qualities} {are_an} kind of value."
+// "{aspects} {are_an} kind of value."
 // ex. colors are a kind of value
-func imp_kinds_of_quality(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "kinds_of_quality"); e != nil {
+func imp_kinds_of_aspect(k *imp.Porter, r reader.Map) (err error) {
+	if m, e := reader.Unpack(r, "kinds_of_aspect"); e != nil {
 		err = e
-	} else if _, e := imp_qualities(k, m.MapOf("$QUALITIES")); e != nil {
+	} else if _, e := imp_aspect(k, m.MapOf("$ASPECT")); e != nil {
 		err = e
 	}
 	return
@@ -100,19 +80,18 @@ func imp_kinds_of_kind(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-// {plural_kinds} have {determiner} {primitive_type} called {property}.
+// {plural_kinds} have {determiner} {property_phrase}.
 // ex. cats have some text called breed.
 // ex. horses have an aspect called speed.
 func imp_kinds_possess_properties(k *imp.Porter, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kinds_possess_properties"); e != nil {
 		err = e
-	} else if _, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
+	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
-	} else if _, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
+	} else /*if _, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
 		err = e
-	} else {
-		// opt.property_phrase missing
-		err = Unimplemented
+	} else */if e := imp_property_phrase(k, kind, m.MapOf("$PROPERTY_PHRASE")); e != nil {
+		err = e
 	}
 	return
 }
@@ -203,28 +182,19 @@ func imp_pattern_variables_decl(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-// "{qualities} {attribute_phrase}"
+// "{aspects} {trait_phrase}"
 // (the) colors are red, blue, or green.
-func imp_quality_attributes(k *imp.Porter, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "quality_attributes"); e != nil {
+func imp_aspect_traits(k *imp.Porter, r reader.Map) (err error) {
+	if m, e := reader.Unpack(r, "aspect_traits"); e != nil {
 		err = e
-	} else if aspect, e := imp_qualities(k, r.MapOf("$QUALITIES")); e != nil {
+	} else if aspect, e := imp_aspect(k, r.MapOf("$ASPECT")); e != nil {
 		err = e
-	} else if traits, e := imp_attribute_phrase(k, m.MapOf("$ATTRIBUTE_PHRASE")); e != nil {
+	} else if traits, e := imp_trait_phrase(k, m.MapOf("$TRAIT_PHRASE")); e != nil {
 		err = e
 	} else {
 		for rank, trait := range traits {
 			k.NewTrait(trait, aspect, rank)
 		}
-	}
-	return
-}
-
-func imp_qualities(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
-	if n, e := reader.String(r.MapOf("$QUALITIES"), "qualities"); e != nil {
-		err = e
-	} else {
-		ret = k.NewName(n, tables.NAMED_ASPECT, reader.At(r))
 	}
 	return
 }

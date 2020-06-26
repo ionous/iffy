@@ -47,7 +47,7 @@ func TestMissingAspects(t *testing.T) {
 			if known := i&1 == 0; known {
 				asm.rec.NewAspect(a)
 			}
-			asm.rec.NewPrimitive(parent, a, tables.PRIM_ASPECT)
+			asm.rec.NewField(parent, a, tables.PRIM_ASPECT)
 		}
 		expected := []string{"B", "D", "F"}
 		if missing, e := undeclaredAspects(asm.db); e != nil {

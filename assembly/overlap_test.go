@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// Test the lowest common ancestor helper function: findOverlap()
 func TestOverlap(t *testing.T) {
 	// lca, no match
 	if cmp, over := findOverlap(

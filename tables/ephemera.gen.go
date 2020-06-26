@@ -27,7 +27,7 @@ func ephemeraTemplate() string {
 		"create table eph_kind( idNamedKind int, idNamedParent int );\n" +
 		"/* user specified appellation and the location that specification came from */\n" +
 		"create table eph_named( name text, category text, idSource int, offset text );\n" +
-		"/* a named object in the game world */\n" +
+		"/* a named object in the game world and its kind (singular) */\n" +
 		"create table eph_noun( idNamedNoun int, idNamedKind int );\n" +
 		"/* declarations and references to pattern parameter and pattern return types.\n" +
 		"if idNamedPattern is idNamedParam it indicates a return type.\n" +

@@ -43,8 +43,8 @@ func TestPatternFields(t *testing.T) {
 		t.Fatal(e)
 	} else if field != "param" {
 		t.Fatal(e)
-	} else if pairs := run.Fields.pairs; len(pairs) != 2 {
-		t.Fatal("unexpected cached values", pairs)
+	} else if pairs := run.Fields.pairs; len(pairs) != 3 {
+		t.Fatal("unexpected cached values", pairs, len(pairs))
 	} else if val := pairs[keyType{"pat", "param"}]; val != "default" {
 		t.Fatal("expected cached default; have", val)
 	} else if field := pairs[keyType{"pat", "$1"}]; field != "param" {

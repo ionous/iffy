@@ -86,7 +86,7 @@ asm_default as
 from eph_default p join eph_named nk
 	on (p.idNamedKind = nk.rowid)
 left join eph_named nf
-		on (p.idNamedProp = nf.rowid);
+	on (p.idNamedProp = nf.rowid);
 
 
 /* resolve value ephemera to strings.

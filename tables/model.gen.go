@@ -20,9 +20,9 @@ func modelTemplate() string {
 		" * still need to determine if \"sources\" should be listed in model ( for debugging )\n" +
 		" */ \n" +
 		"create table mdl_check( name text, idProg int, expect text );\n" +
-		"/* default values for the field of a kind ( or one of its descendant kinds ) */\n" +
+		"/* default values for the field of a kind ( and its descendant kinds ) */\n" +
 		"create table mdl_default(kind text, field text, value blob );\n" +
-		"/* properties of a kind. type is a PRIM */\n" +
+		"/* properties of a kind. type is a PRIM_ */\n" +
 		"create table mdl_field(kind text, field text, type text, primary key(kind, field));\n" +
 		"/* a class of objects with shared characteristics */\n" +
 		"create table mdl_kind(kind text, path text, primary key(kind));\n" +
@@ -47,6 +47,21 @@ func modelTemplate() string {
 		"create table mdl_spec(type text, name text, spec text, primary key(type, name));\n" +
 		"/* initial values for various noun properties. these change over the course of a game. */\n" +
 		"create table mdl_start(noun text, field text, value blob);\n" +
-		""
+		"\n" +
+		"/**\n" +
+		" * all of the traits associated with each of the nouns\n" +
+		" * related, fix? should this be \"order by noun, aspect, rank, mt.rowid\"\n" +
+		" */\n" +
+		"create view \n" +
+		"mdl_noun_traits as \n" +
+		"select noun, aspect, trait\n" +
+		"from mdl_noun \n" +
+		"join mdl_kind mk \n" +
+		"\tusing (kind)\n" +
+		"join mdl_field mf\n" +
+		"\ton (mf.type = 'aspect' and \n" +
+		"\tinstr((select mk.kind || \",\" || mk.path || \",\"),  mf.kind || \",\"))\n" +
+		"join mdl_aspect ma \n" +
+		"\ton (ma.aspect = mf.field);"
 	return tmpl
 }

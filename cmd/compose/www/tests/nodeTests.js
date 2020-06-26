@@ -173,7 +173,7 @@ function nodeTests() {
     }],
     right: [{
       "parent": "td11",
-      "token": "$ATTRIBUTE",
+      "token": "$TRAIT",
       "item": null // b/c optional
     }],
     removes: { // delete the noun phrase
@@ -195,7 +195,7 @@ function nodeTests() {
     }],
     right: [{
         "parent": "td11",
-        "token": "$ATTRIBUTE",
+        "token": "$TRAIT",
         "item": null // b/c optional
       }
     ],
@@ -209,7 +209,7 @@ function nodeTests() {
   testMutation("td10", {
     left: [{
       "parent": "td11",
-      "token": "$ATTRIBUTE",
+      "token": "$TRAIT",
       "item": null
     }],
     right: [{
@@ -240,11 +240,11 @@ function nodeTests() {
   //
   runTest("test appending to a new (optional) list", function(nodes) {
     const kindOfNoun= nodes.all.td11.item;
-    if (kindOfNoun.value["$ATTRIBUTE"]) {
+    if (kindOfNoun.value["$TRAIT"]) {
       throw new Error("unexpected initial attribute");
     }
     nodes.newMutation( nodes.all.td10 ).mutate(-1);
-    if (kindOfNoun.value["$ATTRIBUTE"].length !== 1) {
+    if (kindOfNoun.value["$TRAIT"].length !== 1) {
       throw new Error("missing new attribute");
     }
   });

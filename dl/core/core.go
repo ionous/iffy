@@ -50,8 +50,8 @@ var Slats = []composer.Slat{
 	(*GetField)(nil),
 	(*GetVar)(nil),
 
-	(*Is)(nil),
-	(*IsNot)(nil),
+	(*Is)(nil),    // transparent pass-through of a bool eval
+	(*IsNot)(nil), // inverts a bool eval
 
 	(*Bool)(nil),
 	(*Number)(nil),

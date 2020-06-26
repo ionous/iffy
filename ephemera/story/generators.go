@@ -68,11 +68,11 @@ func imp_pronoun(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-// opt: "{kind_of_noun}, {noun_attrs}, or {noun_relation}"
+// opt: "{kind_of_noun}, {noun_traits}, or {noun_relation}"
 func imp_noun_phrase(k *imp.Porter, r reader.Map) (err error) {
 	return reader.Option(r, "noun_phrase", reader.ReadMaps{
 		"$KIND_OF_NOUN":  k.Bind(imp_kind_of_noun),
-		"$NOUN_ATTRS":    k.Bind(imp_noun_attrs),
+		"$NOUN_TRAITS":   k.Bind(imp_noun_traits),
 		"$NOUN_RELATION": k.Bind(imp_noun_relation),
 	})
 }
@@ -108,14 +108,10 @@ func imp_noun_relation(k *imp.Porter, r reader.Map) (err error) {
 func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
-		things := k.NewName("things", tables.NAMED_KINDS, once)
-		nounType := k.NewName("nounType", tables.NAMED_ASPECT, once)
-		common := k.NewName("common", tables.NAMED_TRAIT, once)
-		proper := k.NewName("proper", tables.NAMED_TRAIT, once)
-		k.NewAspect(nounType)
-		k.NewTrait(common, nounType, 0)
-		k.NewTrait(proper, nounType, 1)
-		k.NewPrimitive(things, nounType, tables.PRIM_ASPECT)
+		// common or proper nouns ( rabbit, vs. Roger )
+		k.ImplicitAspect("nounTypes", "things", "common", "proper")
+		// whether a player can refer to an object by its name.
+		k.ImplicitAspect("privateNames", "things", "publicly-named", "privately-named")
 	}
 	return reader.Option(r, "noun", reader.ReadMaps{
 		"$PROPER_NOUN": k.Bind(imp_proper_noun),
@@ -143,7 +139,7 @@ func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
 			if once := "common_noun"; k.Once(once) {
 				indefinite := k.NewName("indefinite article", tables.NAMED_FIELD, once)
 				things := k.NewName("things", tables.NAMED_KINDS, once)
-				k.NewPrimitive(things, indefinite, tables.PRIM_TEXT)
+				k.NewField(things, indefinite, tables.PRIM_TEXT)
 			}
 		}
 	}
@@ -170,7 +166,7 @@ func imp_proper_noun(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-// run: "{are_an} {*attribute:*trait} {kind:singular_kind} {?noun_relation}"
+// run: "{are_an} {*trait:*trait} {kind:singular_kind} {?noun_relation}"
 // ex. "(the box) is a closed container on the beach"
 func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kind_of_noun"); e != nil {
@@ -179,7 +175,7 @@ func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
 		err = e
 	} else {
 		var traits []ephemera.Named
-		if e := reader.Repeats(m.SliceOf("$ATTRIBUTE"), func(el reader.Map) (err error) {
+		if e := reader.Repeats(m.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
 			if trait, e := imp_trait(k, el); e != nil {
 				err = e
 			} else {
@@ -215,7 +211,7 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 		if once := "summary"; k.Once(once) {
 			things := k.NewName("things", tables.NAMED_KINDS, once)
 			appear := k.NewName("appearance", tables.NAMED_FIELD, once)
-			k.NewPrimitive(things, appear, tables.PRIM_EXPR)
+			k.NewField(things, appear, tables.PRIM_EXPR)
 		}
 		prop := k.NewName("appearance", tables.NAMED_FIELD, reader.At(m))
 		noun := storyNouns.Last()
@@ -224,10 +220,10 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-// run: "{are_being} {+attribute:trait}"
+// run: "{are_being} {+trait:trait}"
 // ex. "(the box) is closed"
-func imp_noun_attrs(k *imp.Porter, r reader.Map) (err error) {
-	return reader.Repeats(r.SliceOf("$ATTRIBUTE"), func(el reader.Map) (err error) {
+func imp_noun_traits(k *imp.Porter, r reader.Map) (err error) {
+	return reader.Repeats(r.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
 		if trait, e := imp_trait(k, el); e != nil {
 			err = e
 		} else {
@@ -239,9 +235,9 @@ func imp_noun_attrs(k *imp.Porter, r reader.Map) (err error) {
 	})
 }
 
-// fix... part of class attributes
-func imp_attribute_phrase(k *imp.Porter, r reader.Map) (ret []ephemera.Named, err error) {
-	err = reader.Repeats(r.SliceOf("$ATTRIBUTE"), func(el reader.Map) (err error) {
+// fix... part of class traits
+func imp_trait_phrase(k *imp.Porter, r reader.Map) (ret []ephemera.Named, err error) {
+	err = reader.Repeats(r.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
 		if trait, e := imp_trait(k, el); e != nil {
 			err = e
 		} else {

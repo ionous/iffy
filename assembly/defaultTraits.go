@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-// reads mdl_aspect, mdl_field, mdl_kind
+// reads asm_default, mdl_aspect, mdl_field, mdl_kind to write mdl_default
 func assembleDefaultTraits(asm *Assembler) (err error) {
 	var store traitStore
 	var curr, last traitInfo
@@ -15,6 +15,7 @@ func assembleDefaultTraits(asm *Assembler) (err error) {
 		// normalize aspect and trait requests
 		// we have to do traits and aspects at the same time because
 		// they talk about the same pool of values, and could generate conflicts.
+		// value := (asm.value === mt.trait)? 1 : asm.value;
 		`select asm.kind, mt.aspect, mt.trait,
 			ifnull(nullif(asm.value, mt.trait), 1)
 		from asm_default as asm

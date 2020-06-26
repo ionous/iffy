@@ -22,7 +22,7 @@ func TestNounFormation(t *testing.T) {
 				"Ts", "",
 			); e != nil {
 				t.Fatal(e)
-			} else if e := addNouns(asm.rec,
+			} else if e := addNounEphemera(asm.rec,
 				"apple", "T",
 				"pear", "T",
 				"toy boat", "T",
@@ -50,7 +50,7 @@ func TestNounFormation(t *testing.T) {
 				"Ts", "",
 			); e != nil {
 				t.Fatal(e)
-			} else if e := addNouns(asm.rec,
+			} else if e := addNounEphemera(asm.rec,
 				"bad apple", "Bs",
 			); e != nil {
 				t.Fatal(e)
@@ -88,7 +88,7 @@ type modeledNoun struct {
 	rank       int
 }
 
-func addNouns(rec *ephemera.Recorder, els ...string) (err error) {
+func addNounEphemera(rec *ephemera.Recorder, els ...string) (err error) {
 	for i, cnt := 0, len(els); i < cnt; i += 2 {
 		key, value := els[i], els[i+1]
 		n := rec.NewName(key, tables.NAMED_NOUN, "test")
@@ -111,7 +111,7 @@ func TestNounLcaSuccess(t *testing.T) {
 			"Ds", "Ps,Ts",
 		); e != nil {
 			t.Fatal(e)
-		} else if e := addNouns(asm.rec,
+		} else if e := addNounEphemera(asm.rec,
 			"apple", "C",
 			"apple", "P",
 			"pear", "D",
@@ -145,7 +145,7 @@ func TestNounLcaFailure(t *testing.T) {
 			"Ds", "Ps,Ts",
 		); e != nil {
 			t.Fatal(e)
-		} else if e := addNouns(asm.rec,
+		} else if e := addNounEphemera(asm.rec,
 			"apple", "C",
 			"apple", "D",
 		); e != nil {
@@ -169,7 +169,7 @@ func TestNounParts(t *testing.T) {
 			"Ts", "",
 		); e != nil {
 			t.Fatal(e)
-		} else if e := addNouns(asm.rec,
+		} else if e := addNounEphemera(asm.rec,
 			"collection of words", "T",
 		); e != nil {
 			t.Fatal(e)

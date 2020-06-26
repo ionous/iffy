@@ -36,7 +36,7 @@ func findRuleByTypeName(ruleType string) (ret pattern.Rule, err error) {
 	return
 }
 
-func (n *Fields) cacheRules(key keyType, pattern, patternType string) (ret interface{}, err error) {
+func (n *Fields) getCachingRules(key keyType, pattern, patternType string) (ret interface{}, err error) {
 	if rd, e := findRuleByTypeName(patternType); e != nil {
 		err = e
 	} else {

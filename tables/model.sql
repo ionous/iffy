@@ -9,9 +9,9 @@ create table mdl_aspect(aspect text, trait text, rank int, primary key(aspect, t
  * still need to determine if "sources" should be listed in model ( for debugging )
  */ 
 create table mdl_check( name text, idProg int, expect text );
-/* default values for the field of a kind ( or one of its descendant kinds ) */
+/* default values for the field of a kind ( and its descendant kinds ) */
 create table mdl_default(kind text, field text, value blob );
-/* properties of a kind. type is a PRIM */
+/* properties of a kind. type is a PRIM_ */
 create table mdl_field(kind text, field text, type text, primary key(kind, field));
 /* a class of objects with shared characteristics */
 create table mdl_kind(kind text, path text, primary key(kind));
@@ -36,3 +36,22 @@ create table mdl_rule( pattern text, idProg int );
 create table mdl_spec(type text, name text, spec text, primary key(type, name));
 /* initial values for various noun properties. these change over the course of a game. */
 create table mdl_start(noun text, field text, value blob);
+
+/**
+ * all of the traits associated with each of the nouns
+ * note: could use sqlite's special group by behavior to reduce to just the first aspect for each noun.
+ *  ie. "group by noun,aspect"
+ * -- the run_value clause would work just fine without it.
+ * related, fix? should this be "order by noun, aspect, rank, mt.rowid"
+ */
+create view 
+mdl_noun_traits as 
+select noun, aspect, trait
+from mdl_noun 
+join mdl_kind mk 
+	using (kind)
+join mdl_field mf
+	on (mf.type = 'aspect' and 
+	instr((select mk.kind || "," || mk.path || ","),  mf.kind || ","))
+join mdl_aspect ma 
+	on (ma.aspect = mf.field);

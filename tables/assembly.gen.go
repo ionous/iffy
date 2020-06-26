@@ -97,7 +97,7 @@ func assemblyTemplate() string {
 		"from eph_default p join eph_named nk\n" +
 		"\ton (p.idNamedKind = nk.rowid)\n" +
 		"left join eph_named nf\n" +
-		"\t\ton (p.idNamedProp = nf.rowid);\n" +
+		"\ton (p.idNamedProp = nf.rowid);\n" +
 		"\n" +
 		"\n" +
 		"/* resolve value ephemera to strings.\n" +

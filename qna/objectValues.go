@@ -3,6 +3,7 @@ package qna
 import (
 	"database/sql"
 	"strconv"
+	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
@@ -39,10 +40,31 @@ func NewObjectValues(db *tables.Cache) *Fields {
 }
 
 // SetField to the passed value.
-// fix, future: verify type?
+
 func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
-	key := keyType{obj, field}
-	n.pairs[key] = v
+	if strings.HasPrefix(field, object.Prefix) {
+		err = errutil.New("can't change internal field", field)
+	} else {
+		// check if the specified field is a trait
+		if a, e := n.GetField(obj+"."+field, object.Aspect); e != nil {
+			err = e
+		} else {
+			// no, just set the field normally.
+			if aspect := a.(string); len(aspect) == 0 {
+				// fix, future: verify type and existence?
+				key := keyType{obj, field}
+				n.pairs[key] = v
+			} else {
+				// yes, then we want to change the aspect not the trait
+				if val, ok := v.(bool); !ok || !val {
+					err = errutil.Fmt("%q.%q can only be set to true; have %T(%v)", obj, field, v, v)
+				} else {
+					// set
+					err = n.SetField(obj, aspect, field)
+				}
+			}
+		}
+	}
 	return
 }
 
@@ -53,38 +75,41 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 		ret = val
 	} else {
 		switch field {
+		case object.Aspect:
+			// noun.trait; we use "max" in order to always return a value.
+			ret, err = n.getCachingQuery(key,
+				`select ifnull(max(aspect),"") from mdl_noun_traits 
+				where (noun||'.'||trait)=?`, obj)
+
 		case object.Kind:
-			ret, err = n.cacheField(key, `select kind from mdl_noun where noun=?`, obj)
+			ret, err = n.getCachingQuery(key,
+				`select kind from mdl_noun where noun=?`, obj)
 
 		case object.Kinds:
-			ret, err = n.cacheField(key,
-				`select kind || ( case path when '' then ('') else ("," || path) end ) as path
+			ret, err = n.getCachingQuery(key,
+				`select kind || ( case path when '' then ('') else (',' || path) end ) as path
 				from mdl_noun mn 
 				join mdl_kind mk 
 					using (kind)
 				where noun=?`, obj)
 
 		case object.Exists:
-			ret, err = n.cacheField(key, `select count() from mdl_noun where noun=?`, obj)
+			ret, err = n.getCachingQuery(key, `select count() from mdl_noun where noun=?`, obj)
 
 		case object.BoolRule, object.NumberRule, object.TextRule,
 			object.ExecuteRule, object.NumListRule, object.TextListRule:
-			ret, err = n.cacheRules(key, obj, field[1:])
+			ret, err = n.getCachingRules(key, obj, field[1:])
 
 		default:
-			// FIX? needs more work to determine if the field really exists
-			// ex. possibly a union query of class field with a nil value
-			if v, e := n.cacheField(key, `select value 
-				from run_init 
-				where noun=? and field=? 
-				order by tier limit 1`,
-				obj, field); e == nil {
-				ret = v
-			} else if _, ok := e.(fieldNotFound); !ok {
+			// see if the user is asking for the status of a trait
+			if a, e := n.GetField(obj+"."+field, object.Aspect); e != nil {
 				err = e
 			} else {
-				n.pairs[key] = nil
-				ret = nil
+				if aspect := a.(string); len(aspect) > 0 {
+					ret, err = n.getCachingStatus(obj, aspect, field)
+				} else {
+					ret, err = n.getCachingField(key, obj, field)
+				}
 			}
 		}
 	}
@@ -100,7 +125,7 @@ func (n *Fields) GetFieldByIndex(obj string, idx int) (ret string, err error) {
 		// we use the cache to keep $(idx) -> param name.
 		val, ok := n.pairs[key]
 		if !ok {
-			val, err = n.cacheField(key,
+			val, err = n.getCachingQuery(key,
 				`select param from mdl_pat where pattern=? and idx=?`,
 				obj, idx)
 		}
@@ -113,7 +138,37 @@ func (n *Fields) GetFieldByIndex(obj string, idx int) (ret string, err error) {
 	return
 }
 
-func (n *Fields) cacheField(key keyType, q string, args ...interface{}) (ret interface{}, err error) {
+// return true if the object's aspect equals the specified trait.
+func (n *Fields) getCachingStatus(obj, aspect, trait string) (ret bool, err error) {
+	if val, e := n.GetField(obj, aspect); e != nil {
+		err = e
+	} else {
+		ret = val == trait
+	}
+	return
+}
+
+func (n *Fields) getCachingField(key keyType, obj, field string) (ret interface{}, err error) {
+	// FIX? needs more work to determine if the field really exists
+	// ex. possibly a union query of class field with a nil value
+	if v, e := n.getCachingQuery(key,
+		`select value 
+		from run_value 
+		where noun=? and field=? 
+		order by tier asc nulls last limit 1`,
+		obj, field); e == nil {
+		ret = v
+	} else if _, ok := e.(fieldNotFound); !ok {
+		err = e
+	} else {
+		n.pairs[key] = nil
+		ret = nil
+	}
+	return
+}
+
+// getCachingQuery uses the rowscanner to write the results of a query into the cache
+func (n *Fields) getCachingQuery(key keyType, q string, args ...interface{}) (ret interface{}, err error) {
 	tgt := mapTarget{key: key, pairs: n.pairs}
 	switch e := n.db.QueryRow(q, args...).Scan(&tgt); e {
 	case nil:

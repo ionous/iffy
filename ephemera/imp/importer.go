@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/tables"
 )
 
 // Porter helps read json.
@@ -74,7 +75,7 @@ func (k *Porter) DecodeAny(m reader.Map) (ret interface{}, err error) {
 	return
 }
 
-// add the passed cmd ephemera.
+// NewProg add the passed cmd ephemera.
 func (k *Porter) NewProg(typeName string, cmd interface{}) (ret ephemera.Prog, err error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
@@ -84,4 +85,18 @@ func (k *Porter) NewProg(typeName string, cmd interface{}) (ret ephemera.Prog, e
 		ret = k.Recorder.NewProg(typeName, buf.Bytes())
 	}
 	return
+}
+
+// ImplicitAspect declares an assembler specified aspect and its traits
+func (k *Porter) ImplicitAspect(aspect, kind string, traits ...string) {
+	if src := "implicit " + kind + "." + aspect; k.Once(src) {
+		kKind := k.NewName(kind, tables.NAMED_KINDS, src)
+		kAspect := k.NewName(aspect, tables.NAMED_ASPECT, src)
+		k.NewAspect(kAspect)
+		k.NewField(kKind, kAspect, tables.PRIM_ASPECT)
+		for i, trait := range traits {
+			kTrait := k.NewName(trait, tables.NAMED_TRAIT, src)
+			k.NewTrait(kTrait, kAspect, i)
+		}
+	}
 }

@@ -25,29 +25,29 @@ function directiveTests() {
         }
       }
     });
-    test(make.run("root", "{attributes%ATTRS:attributes}"),{
+    test(make.run("root", "{traits}"),{
       name: "root",
       uses: "run",
       with: {
-        tokens: ["$ATTRS"],
+        tokens: ["$TRAITS"],
         params: {
-          "$ATTRS": {
-            label: "attributes",
-            type: "attributes",
+          "$TRAITS": {
+            label: "traits",
+            type: "traits",
           }
         }
       }
     });
-    test(make.run("attributes", "{one or more attributes%ATTR*trait}",
+    test(make.run("traits", "{one or more traits%TRAIT*trait}",
                   "a list of states describing a noun"), {
-      name: "attributes",
+      name: "traits",
       desc: "a list of states describing a noun",
       uses: "run",
       with: {
-        tokens: ["$ATTR"],
+        tokens: ["$TRAIT"],
         params: {
-          "$ATTR": {
-            label: "one or more attributes",
+          "$TRAIT": {
+            label: "one or more traits",
             type: "trait",
             optional: true,
             repeats: true
@@ -61,9 +61,9 @@ function directiveTests() {
       desc: "a state describing a noun",
       uses: "str",
       with: {
-        tokens: ["$ATTRIBUTE"],
+        tokens: ["$TRAIT"],
         params: {
-          "$ATTRIBUTE": {
+          "$TRAIT": {
             label: "trait",
             value: null,
           }
@@ -86,9 +86,9 @@ function directiveTests() {
       }
     });
     test(make.str("certainty",  "{usually}, {always:5}, {seldom}, or {never}",
-      "whether an attribute applies to a kind of noun."), {
+      "whether an trait applies to a kind of noun."), {
       name: "certainty",
-      desc: "whether an attribute applies to a kind of noun.",
+      desc: "whether an trait applies to a kind of noun.",
       uses: "str",
       with: {
         tokens: ["$USUALLY", ", ", "$ALWAYS", ", ", "$SELDOM", ", or ", "$NEVER"],
@@ -104,21 +104,21 @@ function directiveTests() {
       }
     });
     test(make.opt("noun_phrase",
-      "the {kind:kind_of_noun}, {attributes%attrs:noun_attrs}, or {relationships%rel:noun_relation} of a noun.",
+      "the {kind:kind_of_noun}, {traits%traits:noun_traits}, or {relationships%rel:noun_relation} of a noun.",
       "characteristics of the preceding noun or nouns"), {
       name: "noun_phrase",
       desc: "characteristics of the preceding noun or nouns",
       uses: "opt",
       with: {
-        tokens: ["the ", "$KIND", ", ", "$ATTRS", ", or ", "$REL", " of a noun."],
+        tokens: ["the ", "$KIND", ", ", "$TRAITS", ", or ", "$REL", " of a noun."],
         params: {
           "$KIND": {
             label: "kind",
             type: "kind_of_noun"
           },
-          "$ATTRS": {
-            label: "attributes",
-            type: "noun_attrs"
+          "$TRAITS": {
+            label: "traits",
+            type: "noun_traits"
           },
           "$REL": {
             label: "relationships",
@@ -136,8 +136,8 @@ function directiveTests() {
         params: {},
       }
     });
-    test(make.run("noun_attrs", "", "the status of a noun"), {
-      name: "noun_attrs",
+    test(make.run("noun_traits", "", "the status of a noun"), {
+      name: "noun_traits",
       desc: "the status of a noun",
       uses: "run",
       with: {
