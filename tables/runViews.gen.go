@@ -10,6 +10,25 @@ package tables
 // That string should be parsed by the functions of the golang's template package.
 func runViewsTemplate() string {
 	var tmpl = "/* runtime views */\n" +
+		"/**\n" +
+		" * all of the traits associated with each of the nouns\n" +
+		" * note: could use sqlite's special group by behavior to reduce to just the first aspect for each noun.\n" +
+		" *  ie. \"group by noun,aspect\"\n" +
+		" * -- the run_value clause would work just fine without it.\n" +
+		" * related, fix? should this be \"order by noun, aspect, rank, mt.rowid\"\n" +
+		" */\n" +
+		"create temp view \n" +
+		"mdl_noun_traits as \n" +
+		"select noun, aspect, trait\n" +
+		"from mdl_noun \n" +
+		"join mdl_kind mk \n" +
+		"\tusing (kind)\n" +
+		"join mdl_field mf\n" +
+		"\ton (mf.type = 'aspect' and \n" +
+		"\tinstr((select mk.kind || \",\" || mk.path || \",\"),  mf.kind || \",\"))\n" +
+		"join mdl_aspect ma \n" +
+		"\ton (ma.aspect = mf.field)\n" +
+		"order by noun, aspect, ma.rank;\n" +
 		"\n" +
 		"/* the initial values of noun fields: noun, field, value, tier\n" +
 		"tier is hierarchy depth, more derived is better */\n" +

@@ -123,10 +123,17 @@ function getStory() {
                                             "id": "id-172fbe17c49-40",
                                             "type": "object_name",
                                             "value": {
-                                              "$NAMED": {
-                                                "id": "id-173014c27f4-3",
-                                                "type": "text",
-                                                "value": "target"
+                                              "$NAME": {
+                                                "type": "text_eval",
+                                                "value": {
+                                                  "type": "text_value",
+                                                  "value": {
+                                                    "$TEXT": {
+                                                      "type": "text",
+                                                      "value": "target"
+                                                    }
+                                                  }
+                                                }
                                               }
                                             }
                                           }
@@ -296,7 +303,7 @@ function getStory() {
                                   "$COMMON_NAME": {
                                     "id": "id-172fbf04bb4-6",
                                     "type": "common_name",
-                                    "value": "unnamed thing"
+                                    "value": "unnamed object"
                                   }
                                 }
                               }
@@ -457,15 +464,21 @@ function getStory() {
                                         "id": "id-172fbf04bb4-16",
                                         "type": "get_field",
                                         "value": {
-
                                           "$OBJ": {
                                             "id": "id-172fbf04bb4-14",
                                             "type": "object_name",
                                             "value": {
-                                              "$NAMED": {
-                                                "id": "id-172fbf04bb4-18",
-                                                "type": "text",
-                                                "value": "target"
+                                              "$NAME": {
+                                                "type": "text_eval",
+                                                "value": {
+                                                  "type": "text_value",
+                                                  "value": {
+                                                    "$TEXT": {
+                                                      "type": "text",
+                                                      "value": "target"
+                                                    }
+                                                  }
+                                                }
                                               }
                                             }
                                           },
@@ -514,19 +527,24 @@ function getStory() {
                                     "id": "id-172fbf04bb4-30",
                                     "type": "get_field",
                                     "value": {
-
                                       "$OBJ": {
                                         "id": "id-172fbf04bb4-28",
                                         "type": "object_name",
                                         "value": {
-                                          "$NAMED": {
-                                            "id": "id-172fbf04bb4-32",
-                                            "type": "text",
-                                            "value": "target"
+                                          "$NAME": {
+                                            "type": "text_eval",
+                                            "value": {
+                                              "type": "text_value",
+                                              "value": {
+                                                "$TEXT": {
+                                                  "type": "text",
+                                                  "value": "target"
+                                                }
+                                              }
+                                            }
                                           }
                                         }
                                       },
-
                                       "$FIELD": {
                                         "id": "id-172fbf04bb4-29",
                                         "type": "text_eval",
@@ -722,20 +740,24 @@ function getStory() {
                                         "id": "id-172fbe17c49-23",
                                         "type": "get_field",
                                         "value": {
-
                                           "$OBJ": {
                                             "id": "id-172fbe17c49-21",
                                             "type": "object_name",
                                             "value": {
-                                              "$NAMED": {
-                                                "id": "id-172fbe17c49-25",
-                                                "type": "text",
-                                                "value": "target"
+                                              "$NAME": {
+                                                "type": "text_eval",
+                                                "value": {
+                                                  "type": "text_value",
+                                                  "value": {
+                                                    "$TEXT": {
+                                                      "type": "text",
+                                                      "value": "target"
+                                                    }
+                                                  }
+                                                }
                                               }
                                             }
                                           },
-
-
                                           "$FIELD": {
                                             "id": "id-172fbe17c49-22",
                                             "type": "text_eval",
@@ -788,19 +810,24 @@ function getStory() {
                                           "id": "id-172fbe17c49-12",
                                           "type": "get_field",
                                           "value": {
-
                                             "$OBJ": {
                                               "id": "id-172fbe17c49-10",
                                               "type": "object_name",
                                               "value": {
-                                                "$NAMED": {
-                                                  "id": "id-172fbe17c49-14",
-                                                  "type": "text",
-                                                  "value": "target"
+                                                "$NAME": {
+                                                  "type": "text_eval",
+                                                  "value": {
+                                                    "type": "text_value",
+                                                    "value": {
+                                                      "$TEXT": {
+                                                        "type": "text",
+                                                        "value": "target"
+                                                      }
+                                                    }
+                                                  }
                                                 }
                                               }
                                             },
-
                                             "$FIELD": {
                                               "id": "id-172fbe17c49-11",
                                               "type": "text_eval",

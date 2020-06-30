@@ -38,7 +38,7 @@ func (*ObjectName) Compose() composer.Spec {
 		Name:  "object_name",
 		Group: "objects",
 		Desc:  "ObjectName: Returns a noun's full name, can also be used in true/false statements to determine if the named noun exists.",
-		Spec:  "the {global?global_only} object {named:text}",
+		Spec:  "the object named {?exactly} {name:text_eval}",
 	}
 }
 

@@ -109,9 +109,9 @@ func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
-		k.NewImplicitAspect("noun types", "things", "common", "proper")
+		k.NewImplicitAspect("nounTypes", "things", "common", "proper")
 		// whether a player can refer to an object by its name.
-		k.NewImplicitAspect("private names", "things", "publiclyNamed", "privatelyNamed")
+		k.NewImplicitAspect("privateNames", "things", "publiclyNamed", "privatelyNamed")
 	}
 	return reader.Option(r, "noun", reader.ReadMaps{
 		"$PROPER_NOUN": k.Bind(imp_proper_noun),
@@ -223,16 +223,22 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 // run: "{are_being} {+trait:trait}"
 // ex. "(the box) is closed"
 func imp_noun_traits(k *imp.Porter, r reader.Map) (err error) {
-	return reader.Repeats(r.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
-		if trait, e := imp_trait(k, el); e != nil {
-			err = e
-		} else {
-			for _, noun := range storyNouns.names {
-				k.NewValue(noun, trait, true) // the value of the trait for the noun is true
+	if m, e := reader.Unpack(r, "noun_traits"); e != nil {
+		err = e
+	} else {
+		leadinstoryNouns := storyNouns.Swap(nil) // FIX: should they really be swapped out here...?
+		err = reader.Repeats(m.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
+			if trait, e := imp_trait(k, el); e != nil {
+				err = e
+			} else {
+				for _, noun := range leadinstoryNouns {
+					k.NewValue(noun, trait, true) // the value of the trait for the noun is true
+				}
 			}
-		}
-		return
-	})
+			return
+		})
+	}
+	return
 }
 
 // fix... part of class traits

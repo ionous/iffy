@@ -23,6 +23,7 @@ func (*Is) Compose() composer.Spec {
 		Name:  "is_true",
 		Group: "logic",
 		Desc:  "Is True: Transparently returns the result of a boolean expression.",
+		Spec:  "{test} is true",
 	}
 }
 

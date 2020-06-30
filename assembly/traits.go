@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-// goal: build table of trait, aspect, rank.
+// goal: build table of aspects and their traits.
 // considerations:
 // o ambiguous ranks ( ignoring ranks for now. )
 // . conflicting traits ( different aspects; future, resolve via implications? )
@@ -22,7 +22,7 @@ func AssembleAspects(asm *Assembler) (err error) {
 		on (t.idNamedTrait = nt.rowid)
 	left join eph_named na
 		on (t.idNamedAspect = na.rowid)
-	order by nt.name, na.name`, func() (err error) {
+	order by na.name, t.rank, nt.name`, func() (err error) {
 			switch traitsMatch, aspectsMatch := last.Trait == curr.Trait, last.Aspect == curr.Aspect; {
 			case traitsMatch && !aspectsMatch:
 				err = errutil.New("same trait different aspect", curr.Trait, curr.Aspect, last.Aspect)
@@ -35,9 +35,15 @@ func AssembleAspects(asm *Assembler) (err error) {
 		}, &curr.Trait, &curr.Aspect); e != nil {
 		err = e
 	} else {
+		var last string
+		var rank int
 		for _, t := range traits {
-			// rank is not set yet.
-			if e := asm.WriteTrait(t.Aspect, t.Trait, 0); e != nil {
+			if last != t.Aspect {
+				last, rank = t.Aspect, 0
+			} else {
+				rank++
+			}
+			if e := asm.WriteTrait(t.Aspect, t.Trait, rank); e != nil {
 				err = errutil.Append(err, e)
 			}
 		}

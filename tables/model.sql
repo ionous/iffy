@@ -37,21 +37,3 @@ create table mdl_spec(type text, name text, spec text, primary key(type, name));
 /* initial values for various noun properties. these change over the course of a game. */
 create table mdl_start(noun text, field text, value blob);
 
-/**
- * all of the traits associated with each of the nouns
- * note: could use sqlite's special group by behavior to reduce to just the first aspect for each noun.
- *  ie. "group by noun,aspect"
- * -- the run_value clause would work just fine without it.
- * related, fix? should this be "order by noun, aspect, rank, mt.rowid"
- */
-create view 
-mdl_noun_traits as 
-select noun, aspect, trait
-from mdl_noun 
-join mdl_kind mk 
-	using (kind)
-join mdl_field mf
-	on (mf.type = 'aspect' and 
-	instr((select mk.kind || "," || mk.path || ","),  mf.kind || ","))
-join mdl_aspect ma 
-	on (ma.aspect = mf.field);

@@ -41,7 +41,7 @@ func matchTraits(db *sql.DB, want []expectedTrait) (err error) {
 	var curr expectedTrait
 	var have []expectedTrait
 	if e := tables.QueryAll(db,
-		`select aspect, trait, rank from mdl_aspect order by aspect, trait, rank`,
+		`select aspect, trait, rank from mdl_aspect order by aspect, rank`,
 		func() (err error) {
 			have = append(have, curr)
 			return
@@ -71,7 +71,7 @@ func TestTraits(t *testing.T) {
 			t.Fatal(e)
 		} else if e := matchTraits(asm.db, []expectedTrait{
 			{"A", "x", 0},
-			{"A", "y", 0},
+			{"A", "y", 1},
 			{"B", "z", 0},
 		}); e != nil {
 			t.Fatal("matchTraits:", e)

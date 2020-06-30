@@ -57,7 +57,7 @@ func (dec *Decoder) AddDefaultCallbacks(slats []composer.Slat) {
 func (dec *Decoder) ReadProg(m reader.Map) (ret interface{}, err error) {
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
 	if fn, ok := dec.cmds[itemType]; !ok {
-		err = errutil.Fmt("unknown type %q", itemType)
+		err = errutil.Fmt("unknown type %q at %s", itemType, reader.At(m))
 	} else {
 		ret, err = fn(itemValue)
 	}
@@ -117,7 +117,7 @@ func (dec *Decoder) readFields(out r.Value, in reader.Map) (err error) {
 func (dec *Decoder) importSlot(m reader.Map, slotType r.Type) (ret r.Value, err error) {
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
 	if cmdImport, ok := dec.cmds[itemType]; !ok {
-		err = errutil.New("unknown type", itemType, reader.At(m))
+		err = errutil.Fmt("unknown type %q at %s", itemType, reader.At(m))
 	} else if cmd, e := cmdImport(itemValue); e != nil {
 		err = e
 	} else {
@@ -176,6 +176,15 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			}
 			return
 		})
+
+	case r.Ptr:
+		if slat, ok := inVal.(map[string]interface{}); !ok {
+			err = errutil.New("value not a slot")
+		} else if v, e := dec.importSlot(slat, outAt.Type()); e != nil {
+			err = e
+		} else {
+			outAt.Set(v)
+		}
 
 	case r.Interface:
 		// note: this skips over the slot itself ( ex execute )

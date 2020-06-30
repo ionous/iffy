@@ -48,23 +48,6 @@ func modelTemplate() string {
 		"/* initial values for various noun properties. these change over the course of a game. */\n" +
 		"create table mdl_start(noun text, field text, value blob);\n" +
 		"\n" +
-		"/**\n" +
-		" * all of the traits associated with each of the nouns\n" +
-		" * note: could use sqlite's special group by behavior to reduce to just the first aspect for each noun.\n" +
-		" *  ie. \"group by noun,aspect\"\n" +
-		" * -- the run_value clause would work just fine without it.\n" +
-		" * related, fix? should this be \"order by noun, aspect, rank, mt.rowid\"\n" +
-		" */\n" +
-		"create view \n" +
-		"mdl_noun_traits as \n" +
-		"select noun, aspect, trait\n" +
-		"from mdl_noun \n" +
-		"join mdl_kind mk \n" +
-		"\tusing (kind)\n" +
-		"join mdl_field mf\n" +
-		"\ton (mf.type = 'aspect' and \n" +
-		"\tinstr((select mk.kind || \",\" || mk.path || \",\"),  mf.kind || \",\"))\n" +
-		"join mdl_aspect ma \n" +
-		"\ton (ma.aspect = mf.field);"
+		""
 	return tmpl
 }

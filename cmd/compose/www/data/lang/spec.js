@@ -839,20 +839,11 @@ const spec = [
       "logic"
     ],
     "name": "is_true",
+    "spec": "{test} is true",
     "uses": "run",
     "with": {
-      "params": {
-        "$TEST": {
-          "label": "test",
-          "type": "bool_eval"
-        }
-      },
       "slots": [
         "bool_eval"
-      ],
-      "tokens": [
-        "is",
-        "$TEST"
       ]
     }
   },
@@ -990,7 +981,7 @@ const spec = [
       "objects"
     ],
     "name": "object_name",
-    "spec": "the {global?global_only} object {named:text}",
+    "spec": "the object named {?exactly} {name:text_eval}",
     "uses": "run",
     "with": {
       "slots": [

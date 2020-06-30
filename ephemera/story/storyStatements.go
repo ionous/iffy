@@ -116,6 +116,7 @@ func imp_noun_assignment(k *imp.Porter, r reader.Map) (err error) {
 }
 
 func imp_noun_statement(k *imp.Porter, r reader.Map) (err error) {
+	storyNouns.Swap(nil) // fix?
 	if m, e := reader.Unpack(r, "noun_statement"); e != nil {
 		err = e
 	} else if e := imp_lede(k, m.MapOf("$LEDE")); e != nil {

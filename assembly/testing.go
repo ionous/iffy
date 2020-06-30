@@ -79,10 +79,16 @@ func AddTestFields(m *Assembler, els ...string) (err error) {
 
 // write aspect, trait pairs
 func AddTestTraits(m *Assembler, els ...string) (err error) {
+	var last string
+	var rank int
 	for i, cnt := 0, len(els); i < cnt; i += 2 {
-		kind, field := els[i], els[i+1]
-		// rank is not set yet, see AssembleAspects
-		if e := m.WriteTrait(kind, field, 0); e != nil {
+		aspect, field := els[i], els[i+1]
+		if aspect != last {
+			last, rank = aspect, 0
+		} else {
+			rank++
+		}
+		if e := m.WriteTrait(aspect, field, rank); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
