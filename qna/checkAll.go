@@ -17,6 +17,7 @@ import (
 func CheckAll(db *sql.DB) (err error) {
 	run := NewRuntime(db)
 	var prog []byte
+	var tests []check.Testing
 	if e := tables.QueryAll(db,
 		`select pg.bytes
 		from mdl_check as ck
@@ -28,12 +29,19 @@ func CheckAll(db *sql.DB) (err error) {
 			dec := gob.NewDecoder(bytes.NewBuffer(prog))
 			if e := dec.Decode(&res); e != nil {
 				log.Println(e)
-			} else if e := runTest(run, res); e != nil {
-				log.Println(e)
+			} else {
+				tests = append(tests, res)
 			}
 			return
 		}, &prog); e != nil {
 		err = e
+	} else {
+		// FIX: we have to pre-prepare the statements we want otherwise we cant use them during the select loop
+		for _, test := range tests {
+			if e := runTest(run, test); e != nil {
+				log.Println(e)
+			}
+		}
 	}
 	return
 }
