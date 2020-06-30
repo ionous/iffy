@@ -20,11 +20,13 @@ func ExampleCamelize() {
 		"Apple turnover",
 		"APPLE TURNOVER",
 		"apple-turnover",
+		"apple---turn---over",
 		// multi-word casing
 		"WasPascalCase",
 		"wasCamelCase",
 		"something-like-this",
 		"something_like_that",
+		"some___thing__like_that",
 		// rando
 		"whaTAboutThis",
 		//fatih
@@ -64,10 +66,12 @@ func ExampleCamelize() {
 	// "Apple turnover" => "appleTurnover"
 	// "APPLE TURNOVER" => "appleTurnover"
 	// "apple-turnover" => "appleTurnover"
+	// "apple---turn---over" => "appleTurnOver"
 	// "WasPascalCase" => "wasPascalCase"
 	// "wasCamelCase" => "wasCamelCase"
 	// "something-like-this" => "somethingLikeThis"
 	// "something_like_that" => "somethingLikeThat"
+	// "some___thing__like_that" => "someThingLikeThat"
 	// "whaTAboutThis" => "whaTaboutThis"
 	// "" => ""
 	// "lowercase" => "lowercase"
