@@ -48,10 +48,10 @@ func (*Parameter) Compose() composer.Spec {
 	}
 }
 
-// Stitch find the pattern, builds the scope, and executes the passed callback to generate a result.
-// Its an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
+// Stitch finds the pattern, builds the scope, and executes the passed callback to generate a result.
+// It's an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
 func (op *FromPattern) Stitch(run rt.Runtime, patType string, fn func(p interface{}) error) (err error) {
-	// find the pattern (p):
+	// find the pattern (p), qna's implementation assembles the rules by querying the db.
 	patName := op.Pattern
 	if pat, e := run.GetField(patName, patType); e != nil {
 		err = e
