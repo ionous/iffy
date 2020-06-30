@@ -50,6 +50,9 @@ func modelTemplate() string {
 		"\n" +
 		"/**\n" +
 		" * all of the traits associated with each of the nouns\n" +
+		" * note: could use sqlite's special group by behavior to reduce to just the first aspect for each noun.\n" +
+		" *  ie. \"group by noun,aspect\"\n" +
+		" * -- the run_value clause would work just fine without it.\n" +
 		" * related, fix? should this be \"order by noun, aspect, rank, mt.rowid\"\n" +
 		" */\n" +
 		"create view \n" +

@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/qna"
+	"github.com/ionous/iffy/tables"
 )
 
 func main() {
@@ -31,7 +32,11 @@ func checkFile(inFile string) (err error) {
 		err = errutil.New("couldn't create output file", inFile, e)
 	} else {
 		defer db.Close()
-		err = qna.CheckAll(db)
+		if tables.CreateRunViews(db); e != nil {
+			err = e
+		} else {
+			err = qna.CheckAll(db)
+		}
 	}
 	return
 }

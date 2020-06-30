@@ -13,7 +13,7 @@ func runViewsTemplate() string {
 		"\n" +
 		"/* the initial values of noun fields: noun, field, value, tier\n" +
 		"tier is hierarchy depth, more derived is better */\n" +
-		"create view\n" +
+		"create temp view\n" +
 		"run_value as \n" +
 		"/* future: select *, -1 as tier \n" +
 		"\tfrom mdl_run to get existing runtime values */\n" +

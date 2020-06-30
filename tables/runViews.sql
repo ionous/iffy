@@ -2,7 +2,7 @@
 
 /* the initial values of noun fields: noun, field, value, tier
 tier is hierarchy depth, more derived is better */
-create view
+create temp view
 run_value as 
 /* future: select *, -1 as tier 
 	from mdl_run to get existing runtime values */

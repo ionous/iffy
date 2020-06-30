@@ -11,6 +11,8 @@ package tables
 func runTemplate() string {
 	var tmpl = "/**\n" +
 		" * for saving, restoring a player's game session.\n" +
-		" */"
+		" */\n" +
+		"\n" +
+		""
 	return tmpl
 }
