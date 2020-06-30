@@ -6,7 +6,8 @@ import (
 )
 
 type SetField struct {
-	Obj, Field rt.TextEval
+	Obj   *ObjectName
+	Field rt.TextEval
 }
 
 type SetFieldBool struct {

@@ -56,6 +56,7 @@ var Slats = []composer.Slat{
 	(*Bool)(nil),
 	(*Number)(nil),
 	(*Text)(nil),
+	(*Lines)(nil),
 	(*Numbers)(nil),
 	(*Texts)(nil),
 
@@ -65,7 +66,7 @@ var Slats = []composer.Slat{
 	(*QuotientOf)(nil),
 	(*RemainderOf)(nil),
 
-	(*Exists)(nil),
+	(*ObjectName)(nil),
 	(*KindOf)(nil),
 	(*IsKindOf)(nil),
 	(*IsExactKindOf)(nil),

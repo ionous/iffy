@@ -2,6 +2,7 @@ package ephemera
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/ionous/iffy/tables"
 )
@@ -22,6 +23,7 @@ func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 // names are not unique, one name can be many types.
 // ofs depends on the source, might be item.id$parameter
 func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
+	name = strings.TrimSpace(name) //fix: temp
 	namedId := r.cache.Must(eph_named, name, category, r.srcId, ofs)
 	return Named{namedId, name}
 }

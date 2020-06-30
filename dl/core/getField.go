@@ -7,7 +7,8 @@ import (
 
 // GetField a property value from an object by name.
 type GetField struct {
-	Obj, Field rt.TextEval
+	Obj   *ObjectName
+	Field rt.TextEval
 }
 
 func (*GetField) Compose() composer.Spec {
@@ -15,7 +16,7 @@ func (*GetField) Compose() composer.Spec {
 		Name: "get_field",
 		// fix: should use determiner; that should be a hint... yeah?
 		// but if so... then doesnt GetField need that determiner?
-		Spec:  "{determiner} {object%obj:text_eval}'s {field:text_eval}",
+		Spec:  "the {field:text_eval} of {object%obj:object_name}",
 		Group: "objects",
 		Desc:  "Get Field: Return the value of the named object property.",
 	}
@@ -67,12 +68,13 @@ func (op *GetField) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
 }
 
 func (op *GetField) GetValue(run rt.Runtime) (ret interface{}, err error) {
-	if obj, e := rt.GetText(run, op.Obj); e != nil {
+	// we Get a name like "target", and then we resolve it to the actual object via GetVariable.
+	if name, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
 	} else {
-		ret, err = run.GetField(obj, field)
+		ret, err = run.GetField(name, field)
 	}
 	return
 }

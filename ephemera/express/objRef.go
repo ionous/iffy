@@ -7,18 +7,18 @@ import (
 
 // used for converting requests for objects into automatic printing of an object's name
 // ex. {.lantern}
-type objectName struct {
+type objRef struct {
 	name rt.TextEval
 }
 
-func (on objectName) getTextName() rt.TextEval {
+func (on objRef) getTextName() rt.TextEval {
 	return on.name
-
 }
-func (on objectName) getPrintedName() rt.TextEval {
+
+func (on objRef) getPrintedName() rt.TextEval {
 	return &core.Buffer{[]rt.Execute{
 		&core.DetermineAct{
-			Pattern: "print name",
+			Pattern: "printName",
 			Parameters: &core.Parameters{[]*core.Parameter{
 				&core.Parameter{
 					Name: "$1",

@@ -73,7 +73,7 @@ function getStory() {
                                                       "value": {
                                                         "$TEXT": {
                                                           "id": "id-1722fcbabd5-21",
-                                                          "type": "lines",
+                                                          "type": "text",
                                                           "value": "a"
                                                         }
                                                       }
@@ -88,7 +88,7 @@ function getStory() {
                                                       "value": {
                                                         "$TEXT": {
                                                           "id": "id-1722fcbabd5-23",
-                                                          "type": "lines",
+                                                          "type": "text",
                                                           "value": "b"
                                                         }
                                                       }
@@ -103,7 +103,7 @@ function getStory() {
                                                       "value": {
                                                         "$TEXT": {
                                                           "id": "id-1722fcbabd5-25",
-                                                          "type": "lines",
+                                                          "type": "text",
                                                           "value": "c"
                                                         }
                                                       }

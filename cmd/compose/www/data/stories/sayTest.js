@@ -34,7 +34,7 @@ function getStory() {
                           "value": {
                             "$TEXT": {
                               "id": "id-19",
-                              "type": "lines",
+                              "type": "text",
                               "value": "goodbye"
                             }
                           }
@@ -76,7 +76,7 @@ function getStory() {
                           "value": {
                             "$TEXT": {
                               "id": "id-12",
-                              "type": "lines",
+                              "type": "text",
                               "value": "hello"
                             }
                           }

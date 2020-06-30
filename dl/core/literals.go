@@ -23,6 +23,11 @@ type Text struct {
 	Text string
 }
 
+// Lines specifies a potentially multi-line string value.
+type Lines struct {
+	Lines string
+}
+
 // Numbers specifies multiple float values.
 type Numbers struct {
 	Values []float64
@@ -85,9 +90,9 @@ func (n *Number) String() string {
 func (*Text) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "text_value",
-		Spec:  "{text:lines|quote}",
+		Spec:  "{text}",
 		Group: "literals",
-		Desc:  "Text Value: specify one or more lines of text.",
+		Desc:  "Text Value: specify a small bit of text.",
 	}
 }
 
@@ -100,6 +105,26 @@ func (t *Text) GetText(run rt.Runtime) (ret string, err error) {
 // String returns the text.
 func (t *Text) String() string {
 	return t.Text
+}
+
+func (*Lines) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "lines_value",
+		Spec:  "{lines|quote}",
+		Group: "literals",
+		Desc:  "Lines Value: specify one or more lines of text.",
+	}
+}
+
+// GetLines implements interface LinesEval providing the dl with a lines literal.
+func (t *Lines) GetLines(run rt.Runtime) (ret string, err error) {
+	ret = t.Lines
+	return
+}
+
+// String returns the lines.
+func (t *Lines) String() string {
+	return t.Lines
 }
 
 func (*Numbers) Compose() composer.Spec {

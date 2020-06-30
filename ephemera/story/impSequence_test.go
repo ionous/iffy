@@ -37,7 +37,7 @@ var _cycle_text = map[string]interface{}{
 					"type": "text_value",
 					"value": map[string]interface{}{
 						"$TEXT": map[string]interface{}{
-							"type":  "lines",
+							"type":  "text",
 							"value": "a",
 						}}}},
 			map[string]interface{}{
@@ -46,7 +46,7 @@ var _cycle_text = map[string]interface{}{
 					"type": "text_value",
 					"value": map[string]interface{}{
 						"$TEXT": map[string]interface{}{
-							"type":  "lines",
+							"type":  "text",
 							"value": "b",
 						}}}},
 			map[string]interface{}{
@@ -55,7 +55,7 @@ var _cycle_text = map[string]interface{}{
 					"type": "text_value",
 					"value": map[string]interface{}{
 						"$TEXT": map[string]interface{}{
-							"type":  "lines",
+							"type":  "text",
 							"value": "c",
 						}}}}}},
 }

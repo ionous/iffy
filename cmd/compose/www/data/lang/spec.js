@@ -598,29 +598,6 @@ const spec = [
     }
   },
   {
-    "desc": "Exists: True if the named object exists.",
-    "group": [
-      "objects"
-    ],
-    "name": "exists",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$OBJ": {
-          "label": "obj",
-          "type": "text_eval"
-        }
-      },
-      "slots": [
-        "bool_eval"
-      ],
-      "tokens": [
-        "exists",
-        "$OBJ"
-      ]
-    }
-  },
-  {
     "desc": "For Each Number: Loops over the passed list of numbers, or runs the 'else' statement if empty.",
     "group": [
       "exec"
@@ -696,7 +673,7 @@ const spec = [
       "objects"
     ],
     "name": "get_field",
-    "spec": "{the object%obj:text_eval}'s {field:text_eval}",
+    "spec": "the {field:text_eval} of {object%obj:object_name}",
     "uses": "run",
     "with": {
       "slots": [
@@ -714,7 +691,7 @@ const spec = [
       "variables"
     ],
     "name": "get_var",
-    "spec": "the {name:text|quote}",
+    "spec": "the {name:text}",
     "uses": "run",
     "with": {
       "slots": [
@@ -806,7 +783,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "text_eval"
+          "type": "object_name"
         }
       },
       "slots": [
@@ -914,20 +891,11 @@ const spec = [
       "objects"
     ],
     "name": "kind_of",
+    "spec": "the kind of {obj:object_name}",
     "uses": "run",
     "with": {
-      "params": {
-        "$OBJ": {
-          "label": "obj",
-          "type": "text_eval"
-        }
-      },
       "slots": [
         "text_eval"
-      ],
-      "tokens": [
-        "kind of",
-        "$OBJ"
       ]
     }
   },
@@ -944,6 +912,16 @@ const spec = [
         "comparator"
       ]
     }
+  },
+  {
+    "desc": "Lines Value: specify one or more lines of text.",
+    "group": [
+      "literals"
+    ],
+    "name": "lines_value",
+    "spec": "{lines|quote}",
+    "uses": "run",
+    "with": {}
   },
   {
     "desc": "Number Value: Specify a particular number.",
@@ -1003,6 +981,21 @@ const spec = [
       "tokens": [
         "numbers",
         "$VALUES"
+      ]
+    }
+  },
+  {
+    "desc": "ObjectName: Returns a noun's full name, can also be used in true/false statements to determine if the named noun exists.",
+    "group": [
+      "objects"
+    ],
+    "name": "object_name",
+    "spec": "the {global?global_only} object {named:text}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval",
+        "text_eval"
       ]
     }
   },
@@ -1188,7 +1181,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "text_eval"
+          "type": "object_name"
         },
         "$VAL": {
           "label": "val",
@@ -1221,7 +1214,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "text_eval"
+          "type": "object_name"
         },
         "$VAL": {
           "label": "val",
@@ -1254,7 +1247,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "text_eval"
+          "type": "object_name"
         },
         "$VALS": {
           "label": "vals",
@@ -1287,7 +1280,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "text_eval"
+          "type": "object_name"
         },
         "$VAL": {
           "label": "val",
@@ -1320,7 +1313,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "text_eval"
+          "type": "object_name"
         },
         "$VALS": {
           "label": "vals",
@@ -1486,12 +1479,12 @@ const spec = [
     }
   },
   {
-    "desc": "Text Value: specify one or more lines of text.",
+    "desc": "Text Value: specify a small bit of text.",
     "group": [
       "literals"
     ],
     "name": "text_value",
-    "spec": "{text:lines|quote}",
+    "spec": "{text}",
     "uses": "run",
     "with": {
       "slots": [

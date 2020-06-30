@@ -16,6 +16,9 @@ func T(s string) rt.TextEval {
 func N(n float64) rt.NumberEval {
 	return &core.Number{n}
 }
+func O(n string, exact bool) *core.ObjectName {
+	return &core.ObjectName{&core.Text{n}, exact}
+}
 
 var True = &core.Bool{true}
 var False = &core.Bool{false}
@@ -85,33 +88,37 @@ func TestExpressions(t *testing.T) {
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
 			&core.Buffer{[]rt.Execute{
-				&core.DetermineAct{"print name",
+				&core.DetermineAct{"printName",
 					&core.Parameters{[]*core.Parameter{{
-						"$1", &core.FromText{T("A")},
+						"$1", &core.FromText{O("A", true)},
 					}}}}}}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("big dot", func(t *testing.T) {
 		if e := testExpression(".A.num",
-			&core.GetField{T("A"), T("num")}); e != nil {
+			&core.GetField{O("A", true), T("num")}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("little dot", func(t *testing.T) {
 		if e := testExpression(".a.b.c",
 			&core.GetField{
-				&core.GetField{&core.GetVar{"a"}, T("b")},
-				T("c"),
-			}); e != nil {
+				&core.ObjectName{
+					Name: &core.GetField{
+						O("a", false),
+						T("b")},
+					Exactly: true,
+				},
+				T("c")}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("binary", func(t *testing.T) {
 		if e := testExpression(".A.num * .b.num",
 			&core.ProductOf{
-				&core.GetField{T("A"), T("num")},
-				&core.GetField{&core.GetVar{"b"}, T("num")},
+				&core.GetField{O("A", true), T("num")},
+				&core.GetField{O("b", false), T("num")},
 			}); e != nil {
 			t.Fatal(e)
 		}
@@ -232,11 +239,11 @@ func TestTemplates(t *testing.T) {
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
 				&core.Buffer{[]rt.Execute{
-					&core.DetermineAct{"print name",
+					&core.DetermineAct{"printName",
 						&core.Parameters{[]*core.Parameter{
 							&core.Parameter{"$1",
 								&core.FromText{
-									&core.GetVar{Name: "object"},
+									O("object", false),
 								}}}}}}}}},
 		); e != nil {
 			t.Fatal(e)
@@ -244,9 +251,7 @@ func TestTemplates(t *testing.T) {
 	})
 	t.Run("global prop", func(t *testing.T) {
 		if e := testTemplate("{.Object.prop}",
-			&core.GetField{
-				T("Object"), T("prop"),
-			},
+			&core.GetField{O("Object", true), T("prop")},
 		); e != nil {
 			t.Fatal(e)
 		}

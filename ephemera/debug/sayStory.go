@@ -45,7 +45,7 @@ var SayStory = reader.Map{
 												"type": "text_value",
 												"value": map[string]interface{}{
 													"$TEXT": map[string]interface{}{
-														"type":  "lines",
+														"type":  "text",
 														"value": "goodbye",
 													}}}}}}}},
 						"$IF": map[string]interface{}{
@@ -69,7 +69,7 @@ var SayStory = reader.Map{
 												"type": "text_value",
 												"value": map[string]interface{}{
 													"$TEXT": map[string]interface{}{
-														"type":  "lines",
+														"type":  "text",
 														"value": "hello",
 													}}}}}}}}}}}}},
 }

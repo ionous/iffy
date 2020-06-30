@@ -38,8 +38,6 @@ func NewObjectValues(db *tables.Cache) *Fields {
 	return &Fields{make(mapType), db}
 }
 
-// SetField to the passed value.
-
 func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 	if len(field) == 0 || field[0] == object.Prefix || field == object.Name {
 		err = errutil.Fmt("can't change reserved field %q", field)
@@ -67,7 +65,6 @@ func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 	return
 }
 
-// GetField sets the value of the passed pointer to the value of the named property.
 func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 	key := keyType{obj, field}
 	if val, ok := n.pairs[key]; ok {
@@ -81,7 +78,7 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 				from mdl_name
 				where name=?
 				order by rank
-				limit 1 `, obj)
+				limit 1`, obj)
 
 		case object.Aspect:
 			// noun.trait; we use "max" in order to always return a value.
@@ -102,7 +99,9 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 				where noun=?`, obj)
 
 		case object.Exists:
-			ret, err = n.getCachingQuery(key, `select count() from mdl_noun where noun=?`, obj)
+			// searches for an exact name match
+			ret, err = n.getCachingQuery(key,
+				`select count() from mdl_noun where noun=?`, obj)
 
 		case object.BoolRule, object.NumberRule, object.TextRule,
 			object.ExecuteRule, object.NumListRule, object.TextListRule:
@@ -154,6 +153,11 @@ func (n *Fields) getCachingStatus(obj, aspect, trait string) (ret bool, err erro
 		ret = val == trait
 	}
 	return
+}
+
+func (n *Fields) GetCachingField(obj, field string) (ret interface{}, err error) {
+	key := keyType{obj, field}
+	return n.getCachingField(key, obj, field)
 }
 
 func (n *Fields) getCachingField(key keyType, obj, field string) (ret interface{}, err error) {

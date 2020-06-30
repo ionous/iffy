@@ -1,76 +1,331 @@
-//JSON.stringify(app.$data.story,0,2);
 function getStory() {
   return {
-    "id": "id-16f16b4668c-5",
+    "id": "id-a-2",
     "type": "story",
     "value": {
-      "$PARAGRAPH": [{
-          "id": "id-16f16b4668c-4",
+      "$PARAGRAPH": [
+        {
+          "id": "id-a-1",
           "type": "paragraph",
           "value": {
-            "$STORY_STATEMENT": [{
-                "id": "id2",
+            "$STORY_STATEMENT": [
+              {
+                "id": "id-a-0",
                 "type": "story_statement",
                 "value": {
-                  "id": "id3",
+                  "id": "id-a-5",
+                  "type": "pattern_decl",
+                  "value": {
+                    "$NAME": {
+                      "id": "id-a-3",
+                      "type": "pattern_name",
+                      "value": "printName"
+                    },
+                    "$TYPE": {
+                      "id": "id-a-4",
+                      "type": "pattern_type",
+                      "value": {
+                        "$ACTIVITY": {
+                          "id": "id-a-6",
+                          "type": "patterned_activity",
+                          "value": "$ACTIVITY"
+                        }
+                      }
+                    },
+                    "$OPTVARS": {
+                      "id": "id-a-10",
+                      "type": "pattern_variables_tail",
+                      "value": {
+                        "$VARIABLE_DECL": [
+                          {
+                            "id": "id-a-9",
+                            "type": "variable_decl",
+                            "value": {
+                              "$TYPE": {
+                                "id": "id-a-7",
+                                "type": "variable_type",
+                                "value": {
+                                  "$OBJECT": {
+                                    "id": "id-a-13",
+                                    "type": "object_type",
+                                    "value": {
+                                      "$AN": {
+                                        "id": "id-a-11",
+                                        "type": "an",
+                                        "value": "$A"
+                                      },
+                                      "$KINDS": {
+                                        "id": "id-a-12",
+                                        "type": "plural_kinds",
+                                        "value": "things"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "$NAME": {
+                                "id": "id-a-8",
+                                "type": "variable_name",
+                                "value": "target"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "id-a-15",
+          "type": "paragraph",
+          "value": {
+            "$STORY_STATEMENT": [
+              {
+                "id": "id-a-14",
+                "type": "story_statement",
+                "value": {
+                  "id": "id-a-18",
+                  "type": "pattern_handler",
+                  "value": {
+                    "$NAME": {
+                      "id": "id-a-16",
+                      "type": "pattern_name",
+                      "value": "printName"
+                    },
+                    "$HOOK": {
+                      "id": "id-a-17",
+                      "type": "pattern_hook",
+                      "value": {
+                        "$ACTIVITY": {
+                          "id": "id-a-20",
+                          "type": "pattern_activity",
+                          "value": {
+                            "$GO": [
+                              {
+                                "id": "id-172fbe17c49-37",
+                                "type": "execute",
+                                "value": {
+                                  "id": "id-172fbe17c49-39",
+                                  "type": "say_text",
+                                  "value": {
+                                    "$TEXT": {
+                                      "id": "id-172fbe17c49-38",
+                                      "type": "text_eval",
+                                      "value": {
+                                        "id": "id-172fbe17c49-41",
+                                        "type": "kind_of",
+                                        "value": {
+                                          "$OBJ": {
+                                            "id": "id-172fbe17c49-40",
+                                            "type": "object_name",
+                                            "value": {
+                                              "$NAMED": {
+                                                "id": "id-173014c27f4-3",
+                                                "type": "text",
+                                                "value": "target"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "id-a-21",
+                "type": "story_statement",
+                "value": {
+                  "id": "id-a-57",
                   "type": "noun_statement",
                   "value": {
                     "$LEDE": {
-                      "id": "id4",
+                      "id": "id-a-56",
                       "type": "lede",
                       "value": {
                         "$NOUN": [
                           {
-                            "id": "id5",
+                            "id": "id-a-54",
                             "type": "noun",
                             "value": {
-                              "id": "id8",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id6",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id7",
-                                  "type": "common_name",
-                                  "value": "cabin"
+                              "$COMMON_NOUN": {
+                                "id": "id-a-60",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-a-58",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-a-59",
+                                    "type": "common_name",
+                                    "value": "named object"
+                                  }
                                 }
                               }
                             }
                           }
                         ],
                         "$NOUN_PHRASE": {
-                          "id": "id8",
+                          "id": "id-a-55",
                           "type": "noun_phrase",
                           "value": {
-                            "id": "id9",
-                            "type": "kind_of_noun",
-                            "value": {
-                              "$ARE_AN": {
-                                "id": "id10",
-                                "type": "are_an",
-                                "value": "$ISA"
-                              },
-                              "$KIND": {
-                                "id": "id11",
-                                "type": "singular_kind",
-                                "value": "room"
+                            "$KIND_OF_NOUN": {
+                              "id": "id-a-63",
+                              "type": "kind_of_noun",
+                              "value": {
+                                "$ARE_AN": {
+                                  "id": "id-a-61",
+                                  "type": "are_an",
+                                  "value": "$ISA"
+                                },
+                                "$KIND": {
+                                  "id": "id-a-62",
+                                  "type": "singular_kind",
+                                  "value": "thing"
+                                }
                               }
                             }
                           }
                         }
                       }
-                    },
-                    "$SUMMARY": {
-                      "id": "id12",
-                      "type": "summary",
+                    }
+                  }
+                }
+              },
+              {
+                "id": "id-172f216bee4-0",
+                "type": "story_statement",
+                "value": {
+                  "id": "id-172f216bee4-4",
+                  "type": "noun_statement",
+                  "value": {
+                    "$LEDE": {
+                      "id": "id-172f216bee4-3",
+                      "type": "lede",
                       "value": {
-                        "$LINES": {
-                          "id": "id13",
-                          "type": "lines",
-                          "value": "The front of the small cabin is entirely occupied with navigational instruments, a radar display, and radios for calling back to shore. Along each side runs a bench with faded blue vinyl cushions[if the compartment is closed], which can be lifted to reveal the storage space underneath[otherwise], one of which is currently lifted to allow access to the storage compartment within[end if]. A glass case against the wall contains several fishing rods.\n\nScratched windows offer a view of the surrounding bay, and there is a door south to the deck. A sign taped to one wall announces the menu of tours offered by the Yakutat Charter Boat Company."
+                        "$NOUN": [
+                          {
+                            "id": "id-172f216bee4-1",
+                            "type": "noun",
+                            "value": {
+                              "$COMMON_NOUN": {
+                                "id": "id-172f216bee4-7",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-172f216bee4-5",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-172f216bee4-6",
+                                    "type": "common_name",
+                                    "value": "unnamed object"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "$NOUN_PHRASE": {
+                          "id": "id-172f216bee4-2",
+                          "type": "noun_phrase",
+                          "value": {
+                            "$KIND_OF_NOUN": {
+                              "id": "id-172f216bee4-10",
+                              "type": "kind_of_noun",
+                              "value": {
+                                "$ARE_AN": {
+                                  "id": "id-172f216bee4-8",
+                                  "type": "are_an",
+                                  "value": "$ISA"
+                                },
+                                "$KIND": {
+                                  "id": "id-172f216bee4-9",
+                                  "type": "singular_kind",
+                                  "value": "thing"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "id-172fbf04bb4-0",
+                "type": "story_statement",
+                "value": {
+                  "id": "id-172fbf04bb4-4",
+                  "type": "noun_statement",
+                  "value": {
+                    "$LEDE": {
+                      "id": "id-172fbf04bb4-3",
+                      "type": "lede",
+                      "value": {
+                        "$NOUN": [
+                          {
+                            "id": "id-172fbf04bb4-1",
+                            "type": "noun",
+                            "value": {
+                              "$COMMON_NOUN": {
+                                "id": "id-172fbf04bb4-7",
+                                "type": "common_noun",
+                                "value": {
+                                  "$DETERMINER": {
+                                    "id": "id-172fbf04bb4-5",
+                                    "type": "determiner",
+                                    "value": "$THE"
+                                  },
+                                  "$COMMON_NAME": {
+                                    "id": "id-172fbf04bb4-6",
+                                    "type": "common_name",
+                                    "value": "unnamed thing"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "$NOUN_PHRASE": {
+                          "id": "id-172fbf04bb4-2",
+                          "type": "noun_phrase",
+                          "value": {
+                            "$NOUN_TRAITS": {
+                              "id": "id-172fbf04bb4-10",
+                              "type": "noun_traits",
+                              "value": {
+                                "$ARE_BEING": {
+                                  "id": "id-172fbf04bb4-8",
+                                  "type": "are_being",
+                                  "value": "$IS"
+                                },
+                                "$TRAIT": [
+                                  {
+                                    "id": "id-172fbf04bb4-9",
+                                    "type": "trait",
+                                    "value": "privatelyNamed"
+                                  }
+                                ]
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -79,354 +334,88 @@ function getStory() {
               }
             ]
           }
-        }, {
-          "id": "id-16-0",
+        },
+        {
+          "id": "id-a-27",
           "type": "paragraph",
           "value": {
             "$STORY_STATEMENT": [
               {
-                "id": "id14",
+                "id": "id-a-26",
                 "type": "story_statement",
                 "value": {
-                  "id": "id15",
-                  "type": "noun_statement",
+                  "id": "id-a-30",
+                  "type": "test_statement",
                   "value": {
-                    "$LEDE": {
-                      "id": "id16",
-                      "type": "lede",
+                    "$NAME": {
+                      "id": "id-a-28",
+                      "type": "text",
+                      "value": "testNameOfKind"
+                    },
+                    "$TEST": {
+                      "id": "id-a-29",
+                      "type": "testing",
                       "value": {
-                        "$NOUN": [
-                          {
-                            "id": "id17",
-                            "type": "noun",
-                            "value": {
-                              "id": "id18",
-                              "type": "common_noun",
+                        "id": "id-a-33",
+                        "type": "test_output",
+                        "value": {
+                          "$LINES": {
+                            "id": "id-a-31",
+                            "type": "lines",
+                            "value": "named object\nthing"
+                          },
+                          "$GO": [
+                            {
+                              "id": "id-a-64",
+                              "type": "execute",
                               "value": {
-                                "$DETERMINER": {
-                                  "id": "id19",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id20",
-                                  "type": "common_name",
-                                  "value": "cabin"
-                                }
-                              }
-                            }
-                          }
-                        ],
-                        "$NOUN_PHRASE": {
-                          "id": "id21",
-                          "type": "noun_phrase",
-                          "value": {
-                            "id": "id22",
-                            "type": "noun_relation",
-                            "value": {
-                              "$RELATION": {
-                                "id": "id23",
-                                "type": "relation",
-                                "value": "contains"
-                              },
-                              "$NOUN": [
-                                {
-                                  "id": "id24",
-                                  "type": "noun",
-                                  "value": {
-                                    "id": "id25",
-                                    "type": "common_noun",
+                                "id": "id-a-66",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-a-65",
+                                    "type": "text_eval",
                                     "value": {
-                                      "$DETERMINER": {
-                                        "id": "id26",
-                                        "type": "determiner",
-                                        "value": "$A"
-                                      },
-                                      "$COMMON_NAME": {
-                                        "id": "id27",
-                                        "type": "common_name",
-                                        "value": "glass case"
+                                      "id": "id-a-68",
+                                      "type": "render_template",
+                                      "value": {
+                                        "$TEMPLATE": {
+                                          "id": "id-a-67",
+                                          "type": "lines",
+                                          "value": "{.named}"
+                                        }
                                       }
                                     }
                                   }
                                 }
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "id": "id28",
-                "type": "story_statement",
-                "value": {
-                  "id": "id-16f156a8166-4",
-                  "type": "relative_to_noun",
-                  "value": {
-                    "$RELATION": {
-                      "id": "id-16f156a8166-0",
-                      "type": "relation",
-                      "value": "In"
-                    },
-                    "$NOUN": [
-                      {
-                        "id": "id-16f156a8166-1",
-                        "type": "noun",
-                        "value": {
-                          "id": "id-16f156a8166-7",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f156a8166-5",
-                              "type": "determiner",
-                              "value": "$THE"
+                              }
                             },
-                            "$COMMON_NAME": {
-                              "id": "id-16f156a8166-6",
-                              "type": "common_name",
-                              "value": "glass case"
-                            }
-                          }
-                        }
-                      }
-                    ],
-                    "$ARE_BEING": {
-                      "id": "id-16f156a8166-2",
-                      "type": "are_being",
-                      "value": "$IS"
-                    },
-                    "$NOUN1": [
-                      {
-                        "id": "id-16f156a8166-3",
-                        "type": "noun",
-                        "value": {
-                          "id": "id-16f156a8166-10",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f156a8166-8",
-                              "type": "determiner",
-                              "value": "$A"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "id-16f156a8166-9",
-                              "type": "common_name",
-                              "value": "collection of fishing rods"
-                            }
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "id-16f156a8166-11",
-                "type": "story_statement",
-                "value": {
-                  "id": "id-16f156a8166-15",
-                  "type": "noun_statement",
-                  "value": {
-                    "$LEDE": {
-                      "id": "id-16f156a8166-14",
-                      "type": "lede",
-                      "value": {
-                        "$NOUN": [
-                          {
-                            "id": "id-16f156a8166-12",
-                            "type": "noun",
-                            "value": {
-                              "id": "id-16f156a8166-18",
-                              "type": "common_noun",
+                            {
+                              "id": "id-172f216bee4-11",
+                              "type": "execute",
                               "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-16",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-17",
-                                  "type": "common_name",
-                                  "value": "case"
-                                }
-                              }
-                            }
-                          }
-                        ],
-                        "$NOUN_PHRASE": {
-                          "id": "id-16f156a8166-13",
-                          "type": "noun_phrase",
-                          "value": {
-                            "id": "id-16f156a8166-21",
-                            "type": "noun_traits",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f156a8166-19",
-                                "type": "are_being",
-                                "value": "$IS"
-                              },
-                              "$TRAIT": [
-                                {
-                                  "id": "id-16f156a8166-20",
-                                  "type": "trait",
-                                  "value": "closed"
-                                },
-                                {
-                                  "id": "id-16f156a8166-22",
-                                  "type": "trait",
-                                  "value": "transparent"
-                                },
-                                {
-                                  "id": "id-16f156a8166-23",
-                                  "type": "trait",
-                                  "value": "lockable"
-                                },
-                                {
-                                  "id": "id-16f156a8166-24",
-                                  "type": "trait",
-                                  "value": "locked"
-                                }
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "id": "id-16f156a8166-25",
-                "type": "story_statement",
-                "value": {
-                  "id": "id-16f156a8166-29",
-                  "type": "noun_statement",
-                  "value": {
-                    "$LEDE": {
-                      "id": "id-16f156a8166-28",
-                      "type": "lede",
-                      "value": {
-                        "$NOUN": [
-                          {
-                            "id": "id-16f156a8166-26",
-                            "type": "noun",
-                            "value": {
-                              "id": "id-16f156a8166-32",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-30",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-31",
-                                  "type": "common_name",
-                                  "value": "case"
-                                }
-                              }
-                            }
-                          }
-                        ],
-                        "$NOUN_PHRASE": {
-                          "id": "id-16f156a8166-27",
-                          "type": "noun_phrase",
-                          "value": {
-                            "id": "id-16f156a8166-35",
-                            "type": "noun_traits",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f156a8166-33",
-                                "type": "are_being",
-                                "value": "$IS"
-                              },
-                              "$TRAIT": [
-                                {
-                                  "id": "id-16f156a8166-34",
-                                  "type": "trait",
-                                  "value": "scenery"
-                                }
-                              ]
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "id": "id-16f156a8166-36",
-                "type": "story_statement",
-                "value": {
-                  "id": "id-16f156a8166-40",
-                  "type": "noun_statement",
-                  "value": {
-                    "$LEDE": {
-                      "id": "id-16f156a8166-39",
-                      "type": "lede",
-                      "value": {
-                        "$NOUN": [
-                          {
-                            "id": "id-16f156a8166-37",
-                            "type": "noun",
-                            "value": {
-                              "id": "id-16f156a8166-43",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-41",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-42",
-                                  "type": "common_name",
-                                  "value": "small silver key"
-                                }
-                              }
-                            }
-                          }
-                        ],
-                        "$NOUN_PHRASE": {
-                          "id": "id-16f156a8166-38",
-                          "type": "noun_phrase",
-                          "value": {
-                            "id": "id-16f156a8166-55",
-                            "type": "noun_relation",
-                            "value": {
-                              "$RELATION": {
-                                "id": "id-16f156a8166-53",
-                                "type": "relation",
-                                "value": "unlocks"
-                              },
-                              "$NOUN": [
-                                {
-                                  "id": "id-16f156a8166-54",
-                                  "type": "noun",
-                                  "value": {
-                                    "id": "id-16f156a8166-58",
-                                    "type": "common_noun",
+                                "id": "id-172f216bee4-13",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-172f216bee4-12",
+                                    "type": "text_eval",
                                     "value": {
-                                      "$DETERMINER": {
-                                        "id": "id-16f156a8166-56",
-                                        "type": "determiner",
-                                        "value": "$THE"
-                                      },
-                                      "$COMMON_NAME": {
-                                        "id": "id-16f156a8166-57",
-                                        "type": "common_name",
-                                        "value": "case"
+                                      "id": "id-172f216bee4-15",
+                                      "type": "render_template",
+                                      "value": {
+                                        "$TEMPLATE": {
+                                          "id": "id-172f216bee4-14",
+                                          "type": "lines",
+                                          "value": "{.unnamed}"
+                                        }
                                       }
                                     }
                                   }
                                 }
-                              ]
+                              }
                             }
-                          }
+                          ]
                         }
                       }
                     }
@@ -434,77 +423,194 @@ function getStory() {
                 }
               },
               {
-                "id": "id-16f156a8166-59",
+                "id": "id-b-0",
                 "type": "story_statement",
                 "value": {
-                  "id": "id-16f156a8166-68",
-                  "type": "noun_statement",
+                  "id": "id-b-3",
+                  "type": "pattern_handler",
                   "value": {
-                    "$LEDE": {
-                      "id": "id-16f156a8166-67",
-                      "type": "lede",
+                    "$NAME": {
+                      "id": "id-b-1",
+                      "type": "pattern_name",
+                      "value": "printName"
+                    },
+                    "$HOOK": {
+                      "id": "id-b-2",
+                      "type": "pattern_hook",
                       "value": {
-                        "$NOUN": [
-                          {
-                            "id": "id-16f156a8166-65",
-                            "type": "noun",
-                            "value": {
-                              "id": "id-16f156a8166-71",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f156a8166-69",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f156a8166-70",
-                                  "type": "common_name",
-                                  "value": "bench"
-                                }
-                              }
-                            }
-                          }
-                        ],
-                        "$NOUN_PHRASE": {
-                          "id": "id-16f156a8166-66",
-                          "type": "noun_phrase",
+                        "$ACTIVITY": {
+                          "id": "id-b-5",
+                          "type": "pattern_activity",
                           "value": {
-                            "id": "id-16f156a8166-74",
-                            "type": "noun_relation",
-                            "value": {
-                              "$RELATION": {
-                                "id": "id-16f156a8166-72",
-                                "type": "relation",
-                                "value": "in"
-                              },
-                              "$NOUN": [
-                                {
-                                  "id": "id-16f156a8166-73",
-                                  "type": "noun",
+                            "$GO": [
+                              {
+                                "id": "id-172fbf04bb4-11",
+                                "type": "execute",
+                                "value": {
+                                  "id": "id-172fbf04bb4-13",
+                                  "type": "say_text",
                                   "value": {
-                                    "id": "id-16f156a8166-77",
-                                    "type": "common_noun",
-                                    "value": {
-                                      "$DETERMINER": {
-                                        "id": "id-16f156a8166-75",
-                                        "type": "determiner",
-                                        "value": "$THE"
-                                      },
-                                      "$COMMON_NAME": {
-                                        "id": "id-16f156a8166-76",
-                                        "type": "common_name",
-                                        "value": "cabin"
+                                    "$TEXT": {
+                                      "id": "id-172fbf04bb4-12",
+                                      "type": "text_eval",
+                                      "value": {
+                                        "id": "id-172fbf04bb4-16",
+                                        "type": "get_field",
+                                        "value": {
+
+                                          "$OBJ": {
+                                            "id": "id-172fbf04bb4-14",
+                                            "type": "object_name",
+                                            "value": {
+                                              "$NAMED": {
+                                                "id": "id-172fbf04bb4-18",
+                                                "type": "text",
+                                                "value": "target"
+                                              }
+                                            }
+                                          },
+                                          "$FIELD": {
+                                            "id": "id-172fbf04bb4-15",
+                                            "type": "text_eval",
+                                            "value": {
+                                              "id": "id-172fbf04bb4-20",
+                                              "type": "text_value",
+                                              "value": {
+                                                "$TEXT": {
+                                                  "id": "id-172fbf04bb4-19",
+                                                  "type": "text",
+                                                  "value": "name"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
                                       }
                                     }
                                   }
                                 }
-                              ],
-                              "$ARE_BEING": {
-                                "id": "id-16f15d108e6-0",
-                                "type": "are_being",
-                                "value": "$IS"
                               }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "$FILTERS": {
+                      "id": "id-172fbf04bb4-22",
+                      "type": "pattern_filters",
+                      "value": {
+                        "$FILTER": [
+                          {
+                            "id": "id-172fbf04bb4-21",
+                            "type": "bool_eval",
+                            "value": {
+                              "id": "id-172fbf04bb4-27",
+                              "type": "is_true",
+                              "value": {
+                                "$TEST": {
+                                  "id": "id-172fbf04bb4-26",
+                                  "type": "bool_eval",
+                                  "value": {
+                                    "id": "id-172fbf04bb4-30",
+                                    "type": "get_field",
+                                    "value": {
+
+                                      "$OBJ": {
+                                        "id": "id-172fbf04bb4-28",
+                                        "type": "object_name",
+                                        "value": {
+                                          "$NAMED": {
+                                            "id": "id-172fbf04bb4-32",
+                                            "type": "text",
+                                            "value": "target"
+                                          }
+                                        }
+                                      },
+
+                                      "$FIELD": {
+                                        "id": "id-172fbf04bb4-29",
+                                        "type": "text_eval",
+                                        "value": {
+                                          "id": "id-172fbf04bb4-34",
+                                          "type": "text_value",
+                                          "value": {
+                                            "$TEXT": {
+                                              "id": "id-172fbf04bb4-33",
+                                              "type": "text",
+                                              "value": "publiclyNamed"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "id-c-12",
+                "type": "story_statement",
+                "value": {
+                  "id": "id-c-15",
+                  "type": "kinds_of_kind",
+                  "value": {
+                    "$PLURAL_KINDS": {
+                      "id": "id-c-13",
+                      "type": "plural_kinds",
+                      "value": " things"
+                    },
+                    "$SINGULAR_KIND": {
+                      "id": "id-c-14",
+                      "type": "singular_kind",
+                      "value": "kind"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "id-c-17",
+          "type": "paragraph",
+          "value": {
+            "$STORY_STATEMENT": [
+              {
+                "id": "id-c-16",
+                "type": "story_statement",
+                "value": {
+                  "id": "id-c-21",
+                  "type": "kinds_possess_properties",
+                  "value": {
+                    "$PLURAL_KINDS": {
+                      "id": "id-c-18",
+                      "type": "plural_kinds",
+                      "value": " things"
+                    },
+                    "$PROPERTY_PHRASE": {
+                      "id": "id-c-20",
+                      "type": "property_phrase",
+                      "value": {
+                        "$PRIMITIVE_PHRASE": {
+                          "id": "id-c-24",
+                          "type": "primitive_phrase",
+                          "value": {
+                            "$PRIMITIVE_TYPE": {
+                              "id": "id-c-22",
+                              "type": "primitive_type",
+                              "value": "$TEXT"
+                            },
+                            "$PROPERTY": {
+                              "id": "id-c-23",
+                              "type": "property",
+                              "value": "printedName"
                             }
                           }
                         }
@@ -514,126 +620,27 @@ function getStory() {
                 }
               },
               {
-                "id": "id-16f165d636d-0",
                 "type": "story_statement",
                 "value": {
-                  "id": "id-16f165d636d-5",
-                  "type": "relative_to_noun",
+                  "type": "kinds_possess_properties",
                   "value": {
-                    "$RELATION": {
-                      "id": "id-16f165d636d-1",
-                      "type": "relation",
-                      "value": "On"
+                    "$PLURAL_KINDS": {
+                      "type": "plural_kinds",
+                      "value": " things"
                     },
-                    "$NOUN": [
-                      {
-                        "id": "id-16f165d636d-2",
-                        "type": "noun",
-                        "value": {
-                          "id": "id-16f165d636d-8",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f165d636d-6",
-                              "type": "determiner",
-                              "value": "$THE"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "id-16f165d636d-7",
-                              "type": "common_name",
-                              "value": "bench"
-                            }
-                          }
-                        }
-                      }
-                    ],
-                    "$ARE_BEING": {
-                      "id": "id-16f165d636d-3",
-                      "type": "are_being",
-                      "value": "$ARE"
-                    },
-                    "$NOUN1": [
-                      {
-                        "id": "id-16f165d636d-4",
-                        "type": "noun",
-                        "value": {
-                          "id": "id-16f165d636d-11",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "id-16f165d636d-9",
-                              "type": "determiner",
-                              "value": "some"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "id-16f165d636d-10",
-                              "type": "common_name",
-                              "value": "blue vinyl cushions"
-                            }
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "id": "id-16f165d636d-12",
-                "type": "story_statement",
-                "value": {
-                  "id": "id-16f165d636d-16",
-                  "type": "noun_statement",
-                  "value": {
-                    "$LEDE": {
-                      "id": "id-16f165d636d-15",
-                      "type": "lede",
+                    "$PROPERTY_PHRASE": {
+                      "type": "property_phrase",
                       "value": {
-                        "$NOUN": [
-                          {
-                            "id": "id-16f165d636d-13",
-                            "type": "noun",
-                            "value": {
-                              "id": "id-16f165d636d-19",
-                              "type": "common_noun",
-                              "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f165d636d-17",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f165d636d-18",
-                                  "type": "common_name",
-                                  "value": "bench"
-                                }
-                              }
-                            }
-                          }
-                        ],
-                        "$NOUN_PHRASE": {
-                          "id": "id-16f165d636d-14",
-                          "type": "noun_phrase",
+                        "$PRIMITIVE_PHRASE": {
+                          "type": "primitive_phrase",
                           "value": {
-                            "id": "id-16f165d636d-22",
-                            "type": "noun_traits",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f165d636d-20",
-                                "type": "are_being",
-                                "value": "$IS"
-                              },
-                              "$TRAIT": [
-                                {
-                                  "id": "id-16f165d636d-21",
-                                  "type": "trait",
-                                  "value": "enterable"
-                                },
-                                {
-                                  "id": "id-16f165d636d-23",
-                                  "type": "trait",
-                                  "value": "scenery"
-                                }
-                              ]
+                            "$PRIMITIVE_TYPE": {
+                              "type": "primitive_type",
+                              "value": "$TEXT"
+                            },
+                            "$PROPERTY": {
+                              "type": "property",
+                              "value": "pluralName"
                             }
                           }
                         }
@@ -643,60 +650,182 @@ function getStory() {
                 }
               },
               {
-                "id": "id-16f165d636d-25",
                 "type": "story_statement",
                 "value": {
-                  "id": "id-16f165d636d-33",
-                  "type": "noun_statement",
+                  "type": "kinds_possess_properties",
                   "value": {
-                    "$LEDE": {
-                      "id": "id-16f165d636d-32",
-                      "type": "lede",
+                    "$PLURAL_KINDS": {
+                      "type": "plural_kinds",
+                      "value": " things"
+                    },
+                    "$PROPERTY_PHRASE": {
+                      "type": "property_phrase",
                       "value": {
-                        "$NOUN": [
+                        "$PRIMITIVE_PHRASE": {
+                          "type": "primitive_phrase",
+                          "value": {
+                            "$PRIMITIVE_TYPE": {
+                              "type": "primitive_type",
+                              "value": "$TEXT"
+                            },
+                            "$PROPERTY": {
+                              "type": "property",
+                              "value": "indefiniteArticle"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "id-172eed384e3-1",
+          "type": "paragraph",
+          "value": {
+            "$STORY_STATEMENT": [
+              {
+                "id": "id-172fbe17c49-0",
+                "type": "story_statement",
+                "value": {
+                  "id": "id-172fbe17c49-3",
+                  "type": "pattern_handler",
+                  "value": {
+                    "$NAME": {
+                      "id": "id-172fbe17c49-1",
+                      "type": "pattern_name",
+                      "value": "printName"
+                    },
+                    "$HOOK": {
+                      "id": "id-172fbe17c49-2",
+                      "type": "pattern_hook",
+                      "value": {
+                        "$ACTIVITY": {
+                          "id": "id-172fbe17c49-18",
+                          "type": "pattern_activity",
+                          "value": {
+                            "$GO": [
+                              {
+                                "id": "id-172fbe17c49-17",
+                                "type": "execute",
+                                "value": {
+                                  "id": "id-172fbe17c49-20",
+                                  "type": "say_text",
+                                  "value": {
+                                    "$TEXT": {
+                                      "id": "id-172fbe17c49-19",
+                                      "type": "text_eval",
+                                      "value": {
+                                        "id": "id-172fbe17c49-23",
+                                        "type": "get_field",
+                                        "value": {
+
+                                          "$OBJ": {
+                                            "id": "id-172fbe17c49-21",
+                                            "type": "object_name",
+                                            "value": {
+                                              "$NAMED": {
+                                                "id": "id-172fbe17c49-25",
+                                                "type": "text",
+                                                "value": "target"
+                                              }
+                                            }
+                                          },
+
+
+                                          "$FIELD": {
+                                            "id": "id-172fbe17c49-22",
+                                            "type": "text_eval",
+                                            "value": {
+                                              "id": "id-172fbe17c49-27",
+                                              "type": "text_value",
+                                              "value": {
+                                                "$TEXT": {
+                                                  "id": "id-172fbe17c49-26",
+                                                  "type": "text",
+                                                  "value": "printedName"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "$FILTERS": {
+                      "id": "id-172fbe17c49-5",
+                      "type": "pattern_filters",
+                      "value": {
+                        "$FILTER": [
                           {
-                            "id": "id-16f165d636d-30",
-                            "type": "noun",
+                            "id": "id-172fbe17c49-4",
+                            "type": "bool_eval",
                             "value": {
-                              "id": "id-16f165d636d-36",
-                              "type": "common_noun",
+                              "id": "id-172fbe17c49-7",
+                              "type": "is_not",
                               "value": {
-                                "$DETERMINER": {
-                                  "id": "id-16f165d636d-34",
-                                  "type": "determiner",
-                                  "value": "$THE"
-                                },
-                                "$COMMON_NAME": {
-                                  "id": "id-16f165d636d-35",
-                                  "type": "common_name",
-                                  "value": "cushions"
+                                "$TEST": {
+                                  "id": "id-172fbe17c49-6",
+                                  "type": "bool_eval",
+                                  "value": {
+                                    "id": "id-172fbe17c49-9",
+                                    "type": "is_empty",
+                                    "value": {
+                                      "$TEXT": {
+                                        "id": "id-172fbe17c49-8",
+                                        "type": "text_eval",
+                                        "value": {
+                                          "id": "id-172fbe17c49-12",
+                                          "type": "get_field",
+                                          "value": {
+
+                                            "$OBJ": {
+                                              "id": "id-172fbe17c49-10",
+                                              "type": "object_name",
+                                              "value": {
+                                                "$NAMED": {
+                                                  "id": "id-172fbe17c49-14",
+                                                  "type": "text",
+                                                  "value": "target"
+                                                }
+                                              }
+                                            },
+
+                                            "$FIELD": {
+                                              "id": "id-172fbe17c49-11",
+                                              "type": "text_eval",
+                                              "value": {
+                                                "id": "id-172fbe17c49-16",
+                                                "type": "text_value",
+                                                "value": {
+                                                  "$TEXT": {
+                                                    "id": "id-172fbe17c49-15",
+                                                    "type": "text",
+                                                    "value": "printedName"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
                                 }
                               }
                             }
                           }
-                        ],
-                        "$NOUN_PHRASE": {
-                          "id": "id-16f165d636d-31",
-                          "type": "noun_phrase",
-                          "value": {
-                            "id": "id-16f165d636d-39",
-                            "type": "noun_traits",
-                            "value": {
-                              "$ARE_BEING": {
-                                "id": "id-16f165d636d-37",
-                                "type": "are_being",
-                                "value": "$ARE"
-                              },
-                              "$TRAIT": [
-                                {
-                                  "id": "id-16f165d636d-38",
-                                  "type": "trait",
-                                  "value": "scenery"
-                                }
-                              ]
-                            }
-                          }
-                        }
+                        ]
                       }
                     }
                   }
@@ -707,6 +836,5 @@ function getStory() {
         }
       ]
     }
-  };
+  }
 }
-

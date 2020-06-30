@@ -8,22 +8,23 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+// test some simple functionality of the object commands using a mock runtime
 func TestObjects(t *testing.T) {
-	this, that, nothing := &Text{"this"}, &Text{"that"}, &Text{"nothing"}
+	this, that, nothing := named("this"), named("that"), named("nothing")
 	base, derived := &Text{"base"}, &Text{"derived"}
 
 	run := modelTest{clsMap: map[string]string{
 		// objects:
-		this.Text: base.Text,
-		that.Text: derived.Text,
+		"this": base.Text,
+		"that": derived.Text,
 		// hierarchy:
-		base.Text:    base.Text,
-		derived.Text: derived.Text + "," + base.Text,
+		"base":    base.Text,
+		"derived": derived.Text + "," + base.Text,
 	}}
 
 	t.Run("exists", func(t *testing.T) {
-		testTrue(t, &run, &Exists{this})
-		testTrue(t, &run, &IsNot{&Exists{nothing}})
+		testTrue(t, &run, this)
+		testTrue(t, &run, &IsNot{nothing})
 	})
 	t.Run("kind of", func(t *testing.T) {
 		if cls, e := rt.GetText(&run, &KindOf{this}); e != nil {
@@ -45,7 +46,10 @@ func TestObjects(t *testing.T) {
 		testTrue(t, &run, &IsExactKindOf{that, derived})
 		testTrue(t, &run, &IsNot{&IsExactKindOf{this, derived}})
 	})
+}
 
+func named(n string) *ObjectName {
+	return &ObjectName{Name: &Text{n}, Exactly: true}
 }
 
 type modelTest struct {

@@ -30,7 +30,7 @@ func (c *Converter) Convert(xs template.Expression) (ret interface{}, err error)
 		err = e
 	} else if op, e := c.stack.flush(); e != nil {
 		err = e
-	} else if on, ok := op.(objectName); ok {
+	} else if on, ok := op.(objRef); ok {
 		ret = on.getPrintedName()
 	} else {
 		ret = op
@@ -170,7 +170,7 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 
 func newAssignment(arg r.Value) (ret core.Assignment, err error) {
 	switch arg := arg.Interface().(type) {
-	case objectName:
+	case objRef:
 		ret = &core.FromText{arg.getTextName()}
 	case rt.BoolEval:
 		ret = &core.FromBool{arg}
@@ -210,7 +210,7 @@ func (c *Converter) buildSpan(arity int) (err error) {
 		var txts []rt.TextEval
 		for _, el := range args {
 			switch el := el.Interface().(type) {
-			case objectName:
+			case objRef:
 				txts = append(txts, el.getPrintedName())
 			case rt.TextEval:
 				txts = append(txts, el)
@@ -252,24 +252,36 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 			// build a chain of GetFields
 			// to start: we either want the object named "text"
 			// or, we want the object name that's stored in the local variable called "text"
-			var op rt.TextEval
-			if name := fields[0]; lang.IsCapitalized(name) {
-				// fix: this should add ephemera that there's an object of name
-				op = &core.Text{name}
-			} else {
-				// fix: can this add ephemera that there's a local of name?
-				op = &core.GetVar{name}
+			//
+			// fix: this should add ephemera that there's an object of name
+			// fix: can this add ephemera that there's a local of name?
+			name := fields[0]
+			dotObject := &core.ObjectName{
+				Name:    &core.Text{name},
+				Exactly: lang.IsCapitalized(name),
 			}
-			// .a.b: from the named object a, we want its field b
-			// .a.b.c: after getting the object name in field b, get that object's field c
-			for _, field := range fields[1:] {
-				op = &core.GetField{op, &core.Text{field}}
-			}
-			// the whole chain becomes a single "function"
 			if len(fields) == 1 {
-				c.buildOne(objectName{op})
+				c.buildOne(objRef{dotObject})
 			} else {
-				c.buildOne(op)
+				var prevField *core.GetField
+				// .a.b: from the named object a, we want its field b
+				// .a.b.c: after getting the object name in field b, get that object's field c
+				for _, field := range fields[1:] {
+					// the first time through, we already have the dotObject;
+					// otherwise we have to make it out of the previous field.
+					if prevField != nil {
+						dotObject = &core.ObjectName{
+							Name:    prevField,
+							Exactly: true, // assume stored object names are full names
+						}
+					}
+					//
+					prevField = &core.GetField{
+						dotObject,
+						&core.Text{field},
+					}
+				}
+				c.buildOne(prevField)
 			}
 		}
 

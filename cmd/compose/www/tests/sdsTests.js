@@ -12,7 +12,7 @@
             "id-4::say@id-15",{
               "text::text_eval@id-14": [
               "::text_value@id-20", {
-                "text::lines@id-19": "goodbye"
+                "text::text@id-19": "goodbye"
               }]}],
           "if::bool_eval@id-5": [
             "::bool_value@id-9",{
@@ -22,9 +22,9 @@
             "id-6::say@id-11",{
               "text::text_eval@id-10": [
                 "::text_value@id-13",{
-                  "text::lines@id-12": "hello"
+                  "text::text@id-12": "hello"
                 }]}]}],
-      "::lines@id-2": "hello"
+      "::text@id-2": "hello"
   }];
   // compact
   // -
