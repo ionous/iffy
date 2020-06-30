@@ -72,7 +72,7 @@ func imp_kinds_of_kind(k *imp.Porter, r reader.Map) (err error) {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
 		err = e
-	} else if parent, e := imp_singular_kind(k, m.MapOf("$KIND")); e != nil {
+	} else if parent, e := imp_singular_kind(k, m.MapOf("$SINGULAR_KIND")); e != nil {
 		err = e
 	} else {
 		k.NewKind(kind, parent)
