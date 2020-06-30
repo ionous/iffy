@@ -20,8 +20,19 @@ func imp_property_phrase(k *imp.Porter, kind ephemera.Named, r reader.Map) (err 
 	})
 }
 
+// fix -- really this should allow object types, eval types and primitive types, etc.
+// make.run("primitive_phrase", "{primitive_type} called {property}");
 func imp_primitive_phrase(k *imp.Porter, kind ephemera.Named, r reader.Map) (err error) {
-	return Unimplemented
+	if m, e := reader.Unpack(r, "primitive_phrase"); e != nil {
+		err = e
+	} else if prop, e := imp_property(k, m.MapOf("$PROPERTY")); e != nil {
+		err = e
+	} else if prim, e := imp_primitive_prop(k, m.MapOf("$PRIMITIVE_TYPE")); e != nil {
+		err = e
+	} else {
+		k.NewField(kind, prop, prim)
+	}
+	return
 }
 
 // make.run("aspect_phrase", "{aspects} {?optional_property}");

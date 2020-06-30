@@ -109,9 +109,9 @@ func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
-		k.NewImplicitAspect("nounTypes", "things", "common", "proper")
+		k.NewImplicitAspect("noun types", "things", "common", "proper")
 		// whether a player can refer to an object by its name.
-		k.NewImplicitAspect("privateNames", "things", "publicly-named", "privately-named")
+		k.NewImplicitAspect("private names", "things", "publiclyNamed", "privatelyNamed")
 	}
 	return reader.Option(r, "noun", reader.ReadMaps{
 		"$PROPER_NOUN": k.Bind(imp_proper_noun),
@@ -265,7 +265,7 @@ func imp_variable_decl(k *imp.Porter, r reader.Map) (retName, retType ephemera.N
 func imp_variable_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
 	err = reader.Option(r, "variable_type", reader.ReadMaps{
 		"$PRIMITIVE": func(m reader.Map) (err error) {
-			ret, err = imp_primitive_type(k, m)
+			ret, err = imp_primitive_var(k, m)
 			return
 		},
 		"$OBJECT": func(m reader.Map) (err error) {
@@ -277,8 +277,9 @@ func imp_variable_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err err
 }
 
 // "{a number%number}, {some text%text}, or {a true/false value%bool}"
-// returns one of the evalType(s)
-func imp_primitive_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
+// returns one of the evalType(s) as a "Named" value --
+// we return a name to normalize references to object kinds which are also used as variables
+func imp_primitive_var(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
 	if evalType, e := reader.Enum(r, "primitive_type", reader.Map{
 		"$NUMBER": "number_eval",
 		"$TEXT":   "text_eval",
@@ -289,6 +290,16 @@ func imp_primitive_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err er
 		ret = k.NewName(evalType.(string), tables.NAMED_TYPE, reader.At(r))
 	}
 	return
+}
+
+// ick. fix. see imp_primitive_phrase.
+func imp_primitive_prop(k *imp.Porter, r reader.Map) (string, error) {
+	p, e := reader.Enum(r, "primitive_type", reader.Map{
+		"$NUMBER": tables.PRIM_DIGI,
+		"$TEXT":   tables.PRIM_TEXT,
+		"$BOOL":   tables.PRIM_BOOL,
+	})
+	return p.(string), e
 }
 
 // "{an} {kind of%kinds:plural_kinds} object"
@@ -302,8 +313,6 @@ func imp_object_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error
 	return
 }
 
-func unimplemented(k *imp.Porter, r reader.Map) (err error) {
-	return Unimplemented
+func Unimplemented(k *imp.Porter, r reader.Map) (err error) {
+	return errutil.New("unimplemented", r.StrOf(reader.ItemType), reader.At(r))
 }
-
-const Unimplemented = errutil.Error("github.com/ionous/iffy/cmd/import/internal/Unimplemented")

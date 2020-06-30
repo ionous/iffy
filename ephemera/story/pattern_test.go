@@ -67,7 +67,7 @@ func TestPatternVariablesDecl(t *testing.T) {
 func TestPrimitiveType(t *testing.T) {
 	k, db := newTestImporter(t)
 	defer db.Close()
-	if typ, e := imp_primitive_type(k, _primitive_type); e != nil {
+	if typ, e := imp_primitive_var(k, _primitive_type); e != nil {
 		t.Fatal(e)
 	} else if typ.String() != "bool_eval" {
 		t.Fatal(typ)
