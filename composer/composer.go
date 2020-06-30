@@ -118,6 +118,7 @@ func tempTest(ctx context.Context, cfg *Config, in io.Reader) (err error) {
 func runImport(ctx context.Context, cfg *Config, inFile, hashed string) (ret string, err error) {
 	log.Println("Importing", inFile+"...")
 	ephFile := path.Join(cfg.Documents, hashed, "ephemera.db")
+	log.Println(">", cfg.Import, "-in", inFile, "-out", ephFile)
 	imported, e := exec.CommandContext(ctx, cfg.Import, "-in", inFile, "-out", ephFile).CombinedOutput()
 	if e != nil {
 		err = e
@@ -131,6 +132,7 @@ func runImport(ctx context.Context, cfg *Config, inFile, hashed string) (ret str
 func runAsm(ctx context.Context, cfg *Config, ephFile, hashed string) (ret string, err error) {
 	log.Println("Assembling", ephFile+"...")
 	inFile, playFile := ephFile, path.Join(cfg.Documents, hashed, "play.db")
+	log.Println(">", cfg.Assemble, "-in", inFile, "-out", playFile)
 	assembled, e := exec.CommandContext(ctx, cfg.Assemble, "-in", inFile, "-out", playFile).CombinedOutput()
 	if e != nil {
 		err = e
@@ -143,6 +145,7 @@ func runAsm(ctx context.Context, cfg *Config, ephFile, hashed string) (ret strin
 }
 func runCheck(ctx context.Context, cfg *Config, playFile string) (err error) {
 	log.Println("Checking", playFile+"...")
+	log.Println(">", cfg.Check, "-in", playFile)
 	checked, e := exec.CommandContext(ctx, cfg.Check, "-in", playFile).CombinedOutput()
 	if e != nil {
 		err = e

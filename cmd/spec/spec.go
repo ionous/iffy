@@ -10,7 +10,7 @@ import (
 	"github.com/ionous/iffy/cmd/spec/internal"
 )
 
-// go run spec.go > /Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/compose/www/src/lang/spec.js
+// go run spec.go > /Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/compose/www/data/lang/spec.js
 func main() {
 	var c internal.Collect
 	for _, slots := range iffy.AllSlots {

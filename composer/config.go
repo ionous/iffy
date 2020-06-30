@@ -19,7 +19,7 @@ type Config struct {
 
 // DevConfig creates a reasonable(?) config based on the developer go path.
 func DevConfig(base string) *Config {
-	repo := "src/github.com/ionous/iffy/cmd"
+	bin := "bin"
 	var dir string // echo $TMPDIR
 	if temp, e := ioutil.TempDir("", "iffy"); e != nil {
 		log.Fatal(e)
@@ -28,10 +28,10 @@ func DevConfig(base string) *Config {
 	}
 	i, a, c, p := "import", "asm", "check", "play"
 	return &Config{
-		Import:    path.Join(base, repo, i, i),
-		Assemble:  path.Join(base, repo, a, a),
-		Check:     path.Join(base, repo, c, c),
-		Play:      path.Join(base, repo, p, p),
+		Import:    path.Join(base, bin, i),
+		Assemble:  path.Join(base, bin, a),
+		Check:     path.Join(base, bin, c),
+		Play:      path.Join(base, bin, p),
 		Documents: dir,
 		Port:      3000,
 	}
