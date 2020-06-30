@@ -13,7 +13,7 @@ func TestIdent(t *testing.T) {
 		if e := Parse(&p, str); e != nil {
 			err = e
 		} else if v := p.Identifier(); len(v) == 0 {
-			err = errutil.New("couldnt Parse ident")
+			err = errutil.New("couldnt parse identifier")
 		} else {
 			ret = v
 		}
