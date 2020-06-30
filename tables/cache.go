@@ -55,9 +55,9 @@ func (c *Cache) Exec(q string, args ...interface{}) (ret int64, err error) {
 	if stmt, e := c.prep(q); e != nil {
 		err = e
 	} else if res, e := stmt.Exec(args...); e != nil {
-		err = e
+		err = errutil.New("Exec error:", e)
 	} else if id, e := res.LastInsertId(); e != nil {
-		err = e
+		err = errutil.New("LastInsertId error:", e)
 	} else {
 		ret = id
 	}
@@ -67,8 +67,10 @@ func (c *Cache) Exec(q string, args ...interface{}) (ret int64, err error) {
 func (c *Cache) Query(q string, args ...interface{}) (ret *sql.Rows, err error) {
 	if stmt, e := c.prep(q); e != nil {
 		err = e
+	} else if rows, e := stmt.Query(args...); e != nil {
+		err = errutil.New("Query error", e)
 	} else {
-		ret, err = stmt.Query(args...)
+		ret = rows
 	}
 	return
 }
@@ -90,7 +92,7 @@ func (c *Cache) prep(q string) (ret *sql.Stmt, err error) {
 	} else if stmt := c.cache[q]; stmt != nil {
 		ret = stmt
 	} else if stmt, e := c.db.Prepare(q); e != nil {
-		err = e
+		err = errutil.New("Prepare error:", e)
 	} else {
 		c.cache[q] = stmt
 		ret = stmt

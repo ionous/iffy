@@ -27,7 +27,7 @@ func Must(db *sql.DB, q string, args ...interface{}) (ret int64) {
 // For each row, it writes the row to the 'dest' args and calls 'cb' for processing.
 func QueryAll(db Query, q string, cb func() error, dest ...interface{}) (err error) {
 	if rows, e := db.Query(q); e != nil {
-		err = e
+		err = errutil.New("QueryAll error:", e)
 	} else {
 		err = ScanAll(rows, cb, dest...)
 	}
@@ -39,7 +39,7 @@ func QueryAll(db Query, q string, cb func() error, dest ...interface{}) (err err
 func ScanAll(rows *sql.Rows, cb func() error, dest ...interface{}) (err error) {
 	for rows.Next() {
 		if e := rows.Scan(dest...); e != nil {
-			err = e
+			err = errutil.New("ScanAll error:", e)
 			break
 		} else if e := cb(); e != nil {
 			err = e
