@@ -69,7 +69,7 @@ func (k *Porter) DecodeSlot(m reader.Map, slotType string) (ret interface{}, err
 func (k *Porter) DecodeAny(m reader.Map) (ret interface{}, err error) {
 	if k.decoder == nil {
 		err = errutil.New("no decoder initialized")
-	} else {
+	} else if m != nil {
 		ret, err = k.decoder.ReadProg(m)
 	}
 	return

@@ -156,7 +156,7 @@ func imp_pattern_activity(k *imp.Porter, r reader.Map) (ret *ruleBuilder, err er
 		func(m reader.Map) (err error) {
 			if i, e := k.DecodeSlot(m, "execute"); e != nil {
 				err = e
-			} else {
+			} else if i != nil {
 				exes = append(exes, i.(rt.Execute))
 			}
 			return

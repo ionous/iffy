@@ -20,7 +20,7 @@ func (m Map) StrOf(key string) (ret string) {
 
 // MapOf the value at the passed key as a map.
 func (m Map) MapOf(key string) (ret Map) {
-	if v, ok := m[key]; ok {
+	if v, ok := m[key]; ok && v != nil {
 		ret = Box(v)
 	}
 	return ret

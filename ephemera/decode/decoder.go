@@ -204,7 +204,11 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 						if e := unpack(item, func(v interface{}) (err error) {
 							// map[string]interface{}, for JSON objects
 							if itemData, ok := v.(map[string]interface{}); !ok {
-								err = errutil.Fmt("item data not a slot %T", itemData)
+								// execute has some single nulls sometimes;
+								// fix: parsing errors shouldnt generally be critical errors
+								if v != nil {
+									err = errutil.Fmt("item data not a slot %T", itemData)
+								}
 							} else if v, e := dec.importSlot(itemData, elType); e != nil {
 								err = e
 							} else {

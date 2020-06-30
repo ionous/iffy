@@ -18,7 +18,7 @@ class Sds {
       ret= 'array';
     } else {
       const val= obj.value;
-      if (Sds.isPrim(val) || Array.isArray(val)) {
+      if (Sds.isPrim(val) || Array.isArray(val) || val===null) {
         ret= 'leaf'; // a 'value' that's an array is a primitive array.
       } else if (!val.value) {
         ret= 'slat';
