@@ -13,7 +13,14 @@ import (
 // It reads its data from the play database and caches the results in memory.
 type Fields struct {
 	pairs mapType
-	db    *tables.Cache
+	valueOf,
+	patternAt,
+	patternBytes,
+	countOf,
+	ancestorsOf,
+	kindOf,
+	aspectOf,
+	nameOf *sql.Stmt
 }
 
 type keyType struct {
@@ -34,8 +41,50 @@ func (k *mapTarget) Scan(v interface{}) (err error) {
 	return
 }
 
-func NewObjectValues(db *tables.Cache) *Fields {
-	return &Fields{make(mapType), db}
+func NewFields(db *sql.DB) (ret *Fields, err error) {
+	var ps tables.Prep
+	f := &Fields{
+		pairs: make(mapType),
+		valueOf: ps.Prep(db,
+			`select value 
+				from run_value 
+				where noun=? and field=? 
+				order by tier asc nulls last limit 1`),
+		patternAt: ps.Prep(db,
+			`select param from mdl_pat where pattern=? and idx=?`),
+		patternBytes: ps.Prep(db,
+			`select bytes 
+				from mdl_rule mr
+				join mdl_prog mp
+				on (mr.idProg = mp.rowid)
+				where mr.pattern = ?
+				and mp.type = ?`),
+		countOf: ps.Prep(db,
+			`select count() from mdl_noun where noun=?`),
+		ancestorsOf: ps.Prep(db,
+			`select kind || ( case path when '' then ('') else (',' || path) end ) as path
+				from mdl_noun mn 
+				join mdl_kind mk 
+					using (kind)
+				where noun=?`),
+		kindOf: ps.Prep(db,
+			`select kind from mdl_noun where noun=?`),
+		aspectOf: ps.Prep(db,
+			`select ifnull(max(aspect),"") from mdl_noun_traits 
+				where (noun||'.'||trait)=?`),
+		nameOf: ps.Prep(db,
+			`select noun 
+				from mdl_name
+				where name=?
+				order by rank
+				limit 1`),
+	}
+	if e := ps.Err(); e != nil {
+		err = e
+	} else {
+		ret = f
+	}
+	return
 }
 
 func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
@@ -73,35 +122,21 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 		switch field {
 		case object.Name:
 			// search for the full object name by a partial object name
-			ret, err = n.getCachingQuery(key,
-				`select noun 
-				from mdl_name
-				where name=?
-				order by rank
-				limit 1`, obj)
+			ret, err = n.getCachingQuery(key, n.nameOf, obj)
 
 		case object.Aspect:
 			// noun.trait; we use "max" in order to always return a value.
-			ret, err = n.getCachingQuery(key,
-				`select ifnull(max(aspect),"") from mdl_noun_traits 
-				where (noun||'.'||trait)=?`, obj)
+			ret, err = n.getCachingQuery(key, n.aspectOf, obj)
 
 		case object.Kind:
-			ret, err = n.getCachingQuery(key,
-				`select kind from mdl_noun where noun=?`, obj)
+			ret, err = n.getCachingQuery(key, n.kindOf, obj)
 
 		case object.Kinds:
-			ret, err = n.getCachingQuery(key,
-				`select kind || ( case path when '' then ('') else (',' || path) end ) as path
-				from mdl_noun mn 
-				join mdl_kind mk 
-					using (kind)
-				where noun=?`, obj)
+			ret, err = n.getCachingQuery(key, n.ancestorsOf, obj)
 
 		case object.Exists:
 			// searches for an exact name match
-			ret, err = n.getCachingQuery(key,
-				`select count() from mdl_noun where noun=?`, obj)
+			ret, err = n.getCachingQuery(key, n.countOf, obj)
 
 		case object.BoolRule, object.NumberRule, object.TextRule,
 			object.ExecuteRule, object.NumListRule, object.TextListRule:
@@ -132,9 +167,7 @@ func (n *Fields) GetFieldByIndex(obj string, idx int) (ret string, err error) {
 		// we use the cache to keep $(idx) -> param name.
 		val, ok := n.pairs[key]
 		if !ok {
-			val, err = n.getCachingQuery(key,
-				`select param from mdl_pat where pattern=? and idx=?`,
-				obj, idx)
+			val, err = n.getCachingQuery(key, n.patternAt, obj, idx)
 		}
 		if field, ok := val.(string); !ok {
 			err = fieldNotFound{key.owner, key.member}
@@ -163,12 +196,7 @@ func (n *Fields) GetCachingField(obj, field string) (ret interface{}, err error)
 func (n *Fields) getCachingField(key keyType, obj, field string) (ret interface{}, err error) {
 	// FIX? needs more work to determine if the field really exists
 	// ex. possibly a union query of class field with a nil value
-	if v, e := n.getCachingQuery(key,
-		`select value 
-		from run_value 
-		where noun=? and field=? 
-		order by tier asc nulls last limit 1`,
-		obj, field); e == nil {
+	if v, e := n.getCachingQuery(key, n.valueOf, obj, field); e == nil {
 		ret = v
 	} else if _, ok := e.(fieldNotFound); !ok {
 		err = e
@@ -180,9 +208,9 @@ func (n *Fields) getCachingField(key keyType, obj, field string) (ret interface{
 }
 
 // getCachingQuery uses the rowscanner to write the results of a query into the cache
-func (n *Fields) getCachingQuery(key keyType, q string, args ...interface{}) (ret interface{}, err error) {
+func (n *Fields) getCachingQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret interface{}, err error) {
 	tgt := mapTarget{key: key, pairs: n.pairs}
-	switch e := n.db.QueryRow(q, args...).Scan(&tgt); e {
+	switch e := q.QueryRow(args...).Scan(&tgt); e {
 	case nil:
 		ret = tgt.value
 	case sql.ErrNoRows:

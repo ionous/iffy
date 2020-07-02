@@ -6,17 +6,22 @@ import (
 	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/writer"
-	"github.com/ionous/iffy/tables"
 )
 
 func NewRuntime(db *sql.DB) *Runner {
-	cache := tables.NewCache(db)
-	fields := NewObjectValues(cache)
-	run := &Runner{
-		Fields: fields,
+	var run *Runner
+	if plurals, e := NewPlurals(db); e != nil {
+		panic(e) // report?
+	} else if fields, e := NewFields(db); e != nil {
+		panic(e)
+	} else {
+		run = &Runner{
+			Fields:  fields,
+			plurals: plurals,
+		}
+		run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
+		run.PushScope(&NounScope{fields: fields})
 	}
-	run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
-	run.PushScope(&NounScope{fields: fields})
 	return run
 }
 
@@ -25,4 +30,23 @@ type Runner struct {
 	Randomizer
 	writer.Sink
 	*Fields
+	plurals *Plurals
+}
+
+func (run *Runner) SingularOf(str string) (ret string) {
+	if n, e := run.plurals.Singular(str); e != nil {
+		ret = str // fix: report e
+	} else {
+		ret = n
+	}
+	return
+}
+
+func (run *Runner) PluralOf(str string) (ret string) {
+	if n, e := run.plurals.Plural(str); e != nil {
+		ret = str // fix: report e
+	} else {
+		ret = n
+	}
+	return
 }

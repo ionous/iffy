@@ -16,7 +16,10 @@ import (
 func TestFieldAccess(t *testing.T) {
 	db := newFieldAccessTest(t, memory)
 	defer db.Close()
-	q := NewObjectValues(tables.NewCache(db))
+	q, e := NewFields(db)
+	if e != nil {
+		t.Fatal(e)
+	}
 
 	// ensure we can ask for object existence
 	t.Run("object exists", func(t *testing.T) {

@@ -4,11 +4,6 @@ import (
 	"github.com/ionous/iffy/rt/writer"
 )
 
-// Pluralize turns single words into their plural variants.
-// type Pluralize interface {
-// 	Pluralize(single string) string
-// }
-
 // VariableScope reads from and writes to a pool of named variables;
 // the variables, their names, and initial values depend on the implementation and its context.
 // Often, scopes are arranged in a stack with the newest scope checked for variables first, the oldest last.
@@ -36,13 +31,15 @@ type Fields interface {
 type Runtime interface {
 	Fields
 	VariableStack
+	// turn single words into their plural variants, and vice-versa
+	PluralOf(single string) string
+	SingularOf(plural string) string
+	// return a pseudo-random number
 	Random(inclusiveMin, exclusiveMax int) int
 	// Return the built-in writer, or the current override.
 	Writer() writer.Output
 	// Override the current writer
 	SetWriter(writer.Output) (prev writer.Output)
-	//
-	// Pluralize
 }
 
 // WritersBlock applies a writer to the runtime for the duration of fn.

@@ -37,3 +37,9 @@ func (Panic) PopScope() {
 func (Panic) Random(inclusiveMin, exclusiveMax int) int {
 	panic("Runtime panic")
 }
+func (Panic) PluralOf(single string) string {
+	panic("Runtime panic")
+}
+func (Panic) SingularOf(plural string) string {
+	panic("Runtime panic")
+}

@@ -50,6 +50,9 @@ func TestSayMe(t *testing.T) {
 		t.Fatal(e)
 	}
 	//
+	if e := tables.CreateRunViews(db); e != nil {
+		t.Fatal(e)
+	}
 	run := NewRuntime(db)
 	if p, e := run.GetField("sayMe", object.TextRule); e != nil {
 		t.Fatal(e)

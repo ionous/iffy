@@ -39,37 +39,27 @@ func findRuleByTypeName(ruleType string) (ret pattern.Rule, err error) {
 func (n *Fields) getCachingRules(key keyType, pattern, patternType string) (ret interface{}, err error) {
 	if rd, e := findRuleByTypeName(patternType); e != nil {
 		err = e
+	} else if rows, e := n.patternBytes.Query(pattern, patternType); e != nil {
+		err = e
 	} else {
 		var prog []byte
-		if rows, e := n.db.Query(
-			`select bytes 
-					from mdl_rule mr
-					join mdl_prog mp
-					on (mr.idProg = mp.rowid)
-					where mr.pattern = ?
-					and mp.type = ?`,
-			pattern, // object is the name of the patter
-			patternType); e != nil {
-			err = e
-		} else {
-			rs := newRuleSet(rd)
-			if e := tables.ScanAll(rows, func() (err error) {
-				rl := newRule(rd)
-				dec := gob.NewDecoder(bytes.NewBuffer(prog))
-				if e := dec.DecodeValue(rl); e != nil {
-					err = e
-				} else {
-					rs = r.Append(rs, rl)
-				}
-				return
-			}, &prog); e != nil {
+		rs := newRuleSet(rd)
+		if e := tables.ScanAll(rows, func() (err error) {
+			rl := newRule(rd)
+			dec := gob.NewDecoder(bytes.NewBuffer(prog))
+			if e := dec.DecodeValue(rl); e != nil {
 				err = e
 			} else {
-				rules := rs.Interface()
-				n.pairs[key] = rules
-				ret = rules
-				pretty.Println(rules)
+				rs = r.Append(rs, rl)
 			}
+			return
+		}, &prog); e != nil {
+			err = e
+		} else {
+			rules := rs.Interface()
+			n.pairs[key] = rules
+			ret = rules
+			pretty.Println(rules)
 		}
 	}
 	return
