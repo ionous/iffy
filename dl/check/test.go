@@ -7,6 +7,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/print"
 )
 
 // Testing interface as a slot for testing commands
@@ -32,13 +33,16 @@ func (*TestOutput) Compose() composer.Spec {
 // RunTest returns an error on failure.
 func (op *TestOutput) RunTest(run rt.Runtime) (err error) {
 	var buf bytes.Buffer
-	if e := rt.WritersBlock(run, &buf, func() error {
-		return rt.RunAll(run, op.Go)
-	}); e != nil {
+	auto := run.Writer().(*print.AutoWriter)
+	prev := auto.Target
+	auto.Target = &buf
+	//
+	if e := rt.RunAll(run, op.Go); e != nil {
 		err = errutil.New("encountered error:", e)
 	} else if t := buf.String(); t != op.Lines {
 		err = errutil.New("expected:", op.Lines, "got:", t)
 	} else {
+		auto.Target = prev
 		log.Println("ok:", t)
 	}
 	return

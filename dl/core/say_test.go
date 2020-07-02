@@ -15,6 +15,7 @@ var helloThereWorld = []rt.Execute{
 
 func ExampleSpan() {
 	var run sayTester
+	run.SetWriter(writer.NewStdout())
 	if e := rt.WriteText(&run, &Span{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
@@ -24,6 +25,7 @@ func ExampleSpan() {
 
 func ExampleBracket() {
 	var run sayTester
+	run.SetWriter(writer.NewStdout())
 	if e := rt.WriteText(&run, &Bracket{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
@@ -33,6 +35,7 @@ func ExampleBracket() {
 
 func ExampleSlash() {
 	var run sayTester
+	run.SetWriter(writer.NewStdout())
 	if e := rt.WriteText(&run, &Slash{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
@@ -42,6 +45,7 @@ func ExampleSlash() {
 
 func ExampleCommas() {
 	var run sayTester
+	run.SetWriter(writer.NewStdout())
 	if e := rt.WriteText(&run, &Commas{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}

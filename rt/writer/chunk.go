@@ -1,11 +1,10 @@
-package print
+package writer
 
 import (
 	"unicode/utf8"
-
-	"github.com/ionous/iffy/rt/writer"
 )
 
+// Chunk wraps the four possible output types so that they can be handled generically.
 type Chunk struct {
 	Data interface{}
 }
@@ -39,7 +38,22 @@ func (c *Chunk) DecodeRune() (ret rune, cnt int) {
 	return
 }
 
-func (c *Chunk) WriteTo(w writer.Output) (ret int, err error) {
+func (c *Chunk) DecodeLastRune() (ret rune, cnt int) {
+	switch b := c.Data.(type) {
+	case byte:
+		r := rune(b)
+		ret, cnt = r, utf8.RuneLen(r)
+	case rune:
+		ret, cnt = b, utf8.RuneLen(b)
+	case []byte:
+		ret, cnt = utf8.DecodeLastRune(b)
+	case string:
+		ret, cnt = utf8.DecodeLastRuneInString(b)
+	}
+	return
+}
+
+func (c *Chunk) WriteTo(w Output) (ret int, err error) {
 	switch b := c.Data.(type) {
 	case byte:
 		if e := w.WriteByte(b); e != nil {

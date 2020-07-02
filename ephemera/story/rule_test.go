@@ -31,8 +31,8 @@ func TestPatternActivity(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		var run testRuntime
-		var out print.Lines
-		run.SetWriter(&out)
+		out := print.NewLines()
+		run.SetWriter(out)
 		if e := rt.RunOne(&run, rule.buildRule().(rt.Execute)); e != nil {
 			t.Fatal(e)
 		} else if diff := pretty.Diff(out.Lines(), []string{"hello", "hello"}); len(diff) > 0 {

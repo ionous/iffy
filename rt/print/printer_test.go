@@ -6,53 +6,53 @@ import (
 )
 
 func TestBracket(t *testing.T) {
-	var buffer Spanner
-	w := Parens(&buffer)
+	span := NewSpanner()
+	w := Parens(span)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
 	w.Close()
-	if str := buffer.String(); str != "( hello you )" {
+	if str := span.String(); str != "( hello you )" {
 		t.Fatal("mismatched", str)
 	}
 }
 
 func TestManualBracket(t *testing.T) {
-	var buffer Spanner
-	w := &buffer
+	span := NewSpanner()
+	w := span
 	io.WriteString(w, "hello")
 	io.WriteString(w, "( you )")
 	io.WriteString(w, "guys")
-	if str := buffer.String(); str != "hello ( you ) guys" {
+	if str := span.String(); str != "hello ( you ) guys" {
 		t.Fatal("mismatched", str)
 	}
 }
 
 func TestCapitalize(t *testing.T) {
-	var buffer Spanner
-	w := Capitalize(&buffer)
+	span := NewSpanner()
+	w := Capitalize(span)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
-	if str := buffer.String(); str != "Hello you" {
+	if str := span.String(); str != "Hello you" {
 		t.Fatal("mismatched", str)
 	}
 }
 
 func TestLowercase(t *testing.T) {
-	var buffer Spanner
-	w := Lowercase(&buffer)
+	span := NewSpanner()
+	w := Lowercase(span)
 	io.WriteString(w, "Hello")
 	io.WriteString(w, "Hugh")
-	if str := buffer.String(); str != "hello hugh" {
+	if str := span.String(); str != "hello hugh" {
 		t.Fatal("mismatched", str)
 	}
 }
 
 func TestTitlecase(t *testing.T) {
-	var buffer Spanner
-	w := TitleCase(&buffer)
+	span := NewSpanner()
+	w := TitleCase(span)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
-	if str := buffer.String(); str != "Hello You" {
+	if str := span.String(); str != "Hello You" {
 		t.Fatal("mismatched", str)
 	}
 }

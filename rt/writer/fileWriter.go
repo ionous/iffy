@@ -2,6 +2,10 @@ package writer
 
 import "os"
 
+func NewStdout() *FileWriter {
+	return &FileWriter{os.Stdout}
+}
+
 type FileWriter struct {
 	*os.File
 }

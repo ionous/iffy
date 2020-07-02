@@ -2,11 +2,21 @@ package print
 
 import (
 	"bytes"
+
+	"github.com/ionous/iffy/rt/writer"
 )
 
 // Lines implements io.Writer, buffering every Write as a new line.
+// use MakeChunks to construct a valid line writer.
 type Lines struct {
+	writer.ChunkOutput
 	lines []string
+}
+
+func NewLines() *Lines {
+	lines := new(Lines)
+	writer.InitChunks(lines)
+	return lines
 }
 
 // Lines returns all current lines.
@@ -15,22 +25,8 @@ func (l *Lines) Lines() []string {
 	return l.lines
 }
 
-func (l *Lines) Write(p []byte) (int, error) {
-	return l.write(Chunk{p})
-}
-func (l *Lines) WriteByte(c byte) error {
-	_, e := l.write(Chunk{c})
-	return e
-}
-func (l *Lines) WriteRune(r rune) (int, error) {
-	return l.write(Chunk{r})
-}
-func (l *Lines) WriteString(s string) (int, error) {
-	return l.write(Chunk{s})
-}
-
 // Write implements writer.Output, spacing writes with separators.
-func (l *Lines) write(c Chunk) (int, error) {
+func (l *Lines) WriteChunk(c writer.Chunk) (int, error) {
 	var buf bytes.Buffer
 	n, e := c.WriteTo(&buf)
 	l.lines = append(l.lines, buf.String())

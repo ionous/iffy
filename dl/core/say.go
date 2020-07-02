@@ -83,8 +83,8 @@ func (*Span) Compose() composer.Spec {
 }
 
 func (op *Span) GetText(run rt.Runtime) (ret string, err error) {
-	var span print.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, &span, func() error {
+	span := print.NewSpanner() // separate punctuation with spaces
+	if e := rt.WritersBlock(run, span, func() error {
 		return rt.RunAll(run, op.Go)
 	}); e != nil {
 		err = e
@@ -104,8 +104,9 @@ func (*Bracket) Compose() composer.Spec {
 }
 
 func (op *Bracket) GetText(run rt.Runtime) (ret string, err error) {
-	var span print.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, print.Parens(&span), func() error {
+	span := print.NewSpanner() // separate punctuation with spaces
+	w := print.Parens(span)
+	if e := rt.WritersBlock(run, w, func() error {
 		return rt.RunAll(run, op.Go)
 	}); e != nil {
 		err = e
@@ -125,8 +126,9 @@ func (*Slash) Compose() composer.Spec {
 }
 
 func (op *Slash) GetText(run rt.Runtime) (ret string, err error) {
-	var span print.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, print.Slash(&span), func() error {
+	span := print.NewSpanner() // separate punctuation with spaces
+	w := print.Slash(span)
+	if e := rt.WritersBlock(run, w, func() error {
 		return rt.RunAll(run, op.Go)
 	}); e != nil {
 		err = e
@@ -146,8 +148,9 @@ func (*Commas) Compose() composer.Spec {
 }
 
 func (op *Commas) GetText(run rt.Runtime) (ret string, err error) {
-	var span print.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, print.AndSeparator(&span), func() error {
+	span := print.NewSpanner() // separate punctuation with spaces
+	w := print.AndSeparator(span)
+	if e := rt.WritersBlock(run, w, func() error {
 		return rt.RunAll(run, op.Go)
 	}); e != nil {
 		err = e

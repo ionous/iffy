@@ -3,6 +3,7 @@ package qna
 import (
 	"database/sql"
 
+	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/writer"
 	"github.com/ionous/iffy/tables"
@@ -14,6 +15,7 @@ func NewRuntime(db *sql.DB) *Runner {
 	run := &Runner{
 		Fields: fields,
 	}
+	run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
 	run.PushScope(&NounScope{fields: fields})
 	return run
 }

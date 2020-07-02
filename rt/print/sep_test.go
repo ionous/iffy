@@ -42,8 +42,8 @@ func TestPrintSep(t *testing.T) {
 }
 
 func write(sep func(w writer.Output) writer.OutputCloser, names ...string) (ret string, err error) {
-	var buffer Spanner
-	w := sep(&buffer)
+	span := NewSpanner()
+	w := sep(span)
 	for _, n := range names {
 		if _, e := io.WriteString(w, n); e != nil {
 			err = e
@@ -55,7 +55,7 @@ func write(sep func(w writer.Output) writer.OutputCloser, names ...string) (ret 
 		if e := w.Close(); e != nil {
 			err = e
 		} else {
-			ret = buffer.String()
+			ret = span.String()
 		}
 	}
 	return

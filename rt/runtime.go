@@ -1,15 +1,13 @@
 package rt
 
 import (
-	"io"
-
 	"github.com/ionous/iffy/rt/writer"
 )
 
 // Pluralize turns single words into their plural variants.
-type Pluralize interface {
-	Pluralize(single string) string
-}
+// type Pluralize interface {
+// 	Pluralize(single string) string
+// }
 
 // VariableScope reads from and writes to a pool of named variables;
 // the variables, their names, and initial values depend on the implementation and its context.
@@ -34,22 +32,16 @@ type Fields interface {
 	GetFieldByIndex(taget string, index int) (string, error)
 }
 
-// Ancestors customizes the parent-child event hierarchy.
-// type Ancestors interface {
-// 	// GetAncestors returns a stream of objects starting with the parent of the passed object, walking up whatever hierarchy the particular runtime implementation has defined.
-// 	GetAncestors(Runtime, string) (ObjectStream, error)
-// }
-
 // Runtime environment for an in-progress game.
 type Runtime interface {
 	Fields
 	VariableStack
 	Random(inclusiveMin, exclusiveMax int) int
-
-	//
+	// Return the built-in writer, or the current override.
 	Writer() writer.Output
+	// Override the current writer
 	SetWriter(writer.Output) (prev writer.Output)
-
+	//
 	// Pluralize
 }
 
@@ -62,8 +54,8 @@ func WritersBlock(run Runtime, w writer.Output, fn func() error) (err error) {
 	run.SetWriter(was)
 	if e != nil {
 		err = e
-	} else if closer, ok := w.(io.Closer); ok {
-		err = closer.Close()
+	} else {
+		err = writer.Close(w)
 	}
 	return
 }

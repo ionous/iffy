@@ -12,6 +12,7 @@ import (
 // ExampleIndex verifies the loop index property.
 func ExampleIndex() {
 	var run forTester
+	run.SetWriter(writer.NewStdout())
 	if e := rt.RunAll(&run, []rt.Execute{
 		&ForEachText{
 			In: &Texts{oneTwoThree},
@@ -27,6 +28,7 @@ func ExampleIndex() {
 
 func ExampleChooseText() {
 	var run forTester
+	run.SetWriter(writer.NewStdout())
 	if e := rt.RunAll(&run, []rt.Execute{
 		&Say{&Commas{[]rt.Execute{
 			&ForEachText{
