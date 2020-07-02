@@ -14,9 +14,9 @@ type MakeSingular struct {
 func (*MakeSingular) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "singularize",
-		Group: "text",
+		Group: "format",
 		Desc:  "Singularize: Returns the singular form of a plural word. (ex. apple for apples )",
-		Spec:  "singular of {text:text_eval}",
+		Spec:  "the singular of {text:text_eval}",
 	}
 }
 
@@ -38,9 +38,9 @@ type MakePlural struct {
 func (*MakePlural) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "pluralize",
-		Group: "text",
+		Group: "format",
 		Desc:  "Pluralize: Returns the plural form of a singular word. (ex.  apples for apple. )",
-		Spec:  "plural of {text:text_eval}",
+		Spec:  "the plural of {text:text_eval}",
 	}
 }
 

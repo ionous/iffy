@@ -1009,6 +1009,20 @@ const spec = [
     "with": {}
   },
   {
+    "desc": "Pluralize: Returns the plural form of a singular word. (ex.  apples for apple. )",
+    "group": [
+      "format"
+    ],
+    "name": "pluralize",
+    "spec": "the plural of {text:text_eval}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
+      ]
+    }
+  },
+  {
     "desc": "A number as text: Writes a number using numerals, eg. '1'.",
     "group": [
       "printing"
@@ -1343,6 +1357,20 @@ const spec = [
       "tokens": [
         "shuffle text",
         "$PARTS"
+      ]
+    }
+  },
+  {
+    "desc": "Singularize: Returns the singular form of a plural word. (ex. apple for apples )",
+    "group": [
+      "format"
+    ],
+    "name": "singularize",
+    "spec": "the singular of {text:text_eval}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
       ]
     }
   },

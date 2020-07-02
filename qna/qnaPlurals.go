@@ -43,7 +43,7 @@ func (n *Plurals) Plural(str string) (ret string, err error) {
 
 func (n *Plurals) get(s *sql.Stmt, str string,
 	mani func(string) string) (ret string, err error) {
-	if s != nil {
+	if s == nil {
 		err = errutil.New("invalid statement")
 	} else if cached, ok := n.cache[str]; ok {
 		ret = cached
@@ -51,6 +51,7 @@ func (n *Plurals) get(s *sql.Stmt, str string,
 		var res string
 		switch e := s.QueryRow(str).Scan(&res); e {
 		case nil:
+			// res was scanned in succesfully.
 		case sql.ErrNoRows:
 			res = mani(str)
 		default:
@@ -60,6 +61,7 @@ func (n *Plurals) get(s *sql.Stmt, str string,
 			n.cache = make(map[string]string)
 		}
 		n.cache[str] = res
+		ret = res
 	}
 	return
 }
