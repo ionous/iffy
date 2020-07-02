@@ -5,8 +5,9 @@ import (
 
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/qna"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/print"
+	"github.com/ionous/iffy/rt/writer"
 )
 
 func TestCheck(t *testing.T) {
@@ -28,6 +29,15 @@ func TestCheck(t *testing.T) {
 }
 
 func runTest(prog check.Testing) (err error) {
-	run := qna.NewRuntime(nil)
-	return prog.RunTest(run)
+	var run checkTester
+	run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
+	return prog.RunTest(&run)
+}
+
+type baseRuntime struct {
+	rt.Panic
+}
+type checkTester struct {
+	baseRuntime
+	writer.Sink
 }
