@@ -1,64 +1,81 @@
 package print
 
 import (
-	"io"
+	"bytes"
+
+	"github.com/ionous/iffy/rt/writer"
 )
 
-// Sep implements io.Writer, treating every Write as a new word.
+// Sep implements writer.Output, treating every Write as a new word.
 type Sep struct {
-	io.Writer
-	last  string // separators
-	queue string // last string sent to Write()
-	cnt   int    // number of non-zero writes to the underlying writer.
+	out     writer.Output
+	last    string       // separators
+	pending bytes.Buffer // last string sent to Write()
+	cnt     int          // number of non-zero writes to the underlying writer.
 }
 
 // AndSeparator creates a phrase: a, b, c, and d.
 // Note: spacing between words is left to print.Spacing.
-func AndSeparator(w io.Writer) io.WriteCloser {
-	return &Sep{Writer: w, last: "and"}
+func AndSeparator(w writer.Output) writer.OutputCloser {
+	return &Sep{out: w, last: "and"}
 }
 
 // OrSeparator creates a phrase: a, b, c, or d.
 // Note: spacing between words is left to print.Spacing.
-func OrSeparator(w io.Writer) io.WriteCloser {
-	return &Sep{Writer: w, last: "or"}
+func OrSeparator(w writer.Output) writer.OutputCloser {
+	return &Sep{out: w, last: "or"}
 }
 
-// Write implements io.Writer, spacing writes with separators.
-func (l *Sep) Write(p []byte) (ret int, err error) {
-	const mid = ","
-	if len(p) > 0 {
-		s := string(p)
-		err = l.flush(mid)
-		l.queue = s
-		ret = len(s)
-	}
-	return
+func (l *Sep) Write(p []byte) (int, error) {
+	return l.write(Chunk{p})
+}
+func (l *Sep) WriteByte(c byte) error {
+	_, e := l.write(Chunk{c})
+	return e
+}
+func (l *Sep) WriteRune(r rune) (int, error) {
+	return l.write(Chunk{r})
+}
+func (l *Sep) WriteString(s string) (int, error) {
+	return l.write(Chunk{s})
 }
 
 // Close writes all pending lines with appropriate separators.
 func (l *Sep) Close() error {
-	var fini string
 	if l.cnt > 1 {
-		fini = ", " + l.last
-	} else {
-		fini = l.last
+		l.out.WriteRune(',')
 	}
-	return l.flush(fini)
+	return l.flush(l.last)
 }
 
-// Flush empties the queue
+// Write implements writer.Output, spacing writes with separators.
+func (l *Sep) write(c Chunk) (ret int, err error) {
+	if !c.IsEmpty() {
+		const mid = ","
+		if e := l.flush(mid); e != nil {
+			err = e
+		} else {
+			ret, err = c.WriteTo(&l.pending)
+		}
+	}
+	return
+}
+
+// Flush writes pending text, prefixed if needed with a separator
 func (l *Sep) flush(sep string) (err error) {
-	if len(l.queue) > 0 {
+	// pending text pending, write it.
+	if l.pending.Len() > 0 {
+		// separate text already written
 		if l.cnt != 0 {
-			_, e := io.WriteString(l.Writer, sep)
+			_, e := l.out.WriteString(sep)
 			err = e
 		}
+		// write the pending text
 		if err == nil {
-			_, e := io.WriteString(l.Writer, l.queue)
+			_, e := l.out.Write(l.pending.Bytes())
 			err = e
 		}
-		l.queue = ""
+		l.pending.Reset()
 		l.cnt++
 	}
 	return

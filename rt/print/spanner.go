@@ -2,9 +2,7 @@ package print
 
 import (
 	"bytes"
-	"io"
 	"unicode"
-	"unicode/utf8"
 )
 
 // Spanner buffers with spacing, treating each new Write as word and adding spaces to separate words as necessary.
@@ -15,6 +13,7 @@ type Spanner struct {
 func (p *Spanner) Len() int {
 	return p.buf.Len()
 }
+
 func (p *Spanner) Bytes() []byte {
 	return p.buf.Bytes()
 }
@@ -23,22 +22,36 @@ func (p *Spanner) String() string {
 	return p.buf.String()
 }
 
-func (p *Spanner) Write(b []byte) (ret int, err error) {
-	if len(b) > 0 {
-		// printed something before? check for spacing.
-		if p.buf.Len() > 0 {
-			letter, cnt := utf8.DecodeRune(b)
-			if cnt > 0 {
-				if !unicode.IsSpace(letter) && !unicode.In(letter, unicode.Po, unicode.Pi, unicode.Pf) {
-					n, _ := io.WriteString(&p.buf, " ")
-					ret += n
-				}
-			}
+func (p *Spanner) Write(b []byte) (int, error) {
+	return p.WriteChunk(Chunk{b})
+}
+func (p *Spanner) WriteByte(c byte) error {
+	_, e := p.WriteChunk(Chunk{c})
+	return e
+}
+func (p *Spanner) WriteRune(r rune) (int, error) {
+	return p.WriteChunk(Chunk{r})
+}
+func (p *Spanner) WriteString(s string) (int, error) {
+	return p.WriteChunk(Chunk{s})
+}
+
+func (p *Spanner) WriteChunk(c Chunk) (ret int, err error) {
+	// writing something?
+	if b, cnt := c.DecodeRune(); cnt > 0 {
+		// and already written something and the thing we are writing is not a space?
+		if p.Len() > 0 && !spaceLike(b) {
+			n, _ := p.buf.WriteRune(' ')
+			ret += n
 		}
-		n, _ := p.buf.Write(b)
+		n, _ := c.WriteTo(&p.buf)
 		ret += n
 	}
 	return
+}
+
+func spaceLike(r rune) bool {
+	return unicode.IsSpace(r) || unicode.In(r, unicode.Po, unicode.Pi, unicode.Pf)
 }
 
 // https://www.compart.com/en/unicode/category/Pi

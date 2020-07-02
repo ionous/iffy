@@ -1,6 +1,8 @@
 package rt
 
-import "io"
+import (
+	"github.com/ionous/iffy/rt/writer"
+)
 
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
@@ -14,13 +16,10 @@ func (Panic) GetField(target, field string) (interface{}, error) {
 func (Panic) SetField(target, field string, v interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) Write(p []byte) (n int, err error) {
+func (Panic) Writer() writer.Output {
 	panic("Runtime panic")
 }
-func (Panic) PushWriter(io.Writer) {
-	panic("Runtime panic")
-}
-func (Panic) PopWriter() {
+func (Panic) SetWriter(writer.Output) writer.Output {
 	panic("Runtime panic")
 }
 func (Panic) GetVariable(name string) (interface{}, error) {

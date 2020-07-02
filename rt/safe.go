@@ -1,6 +1,6 @@
 package rt
 
-import "io"
+import "github.com/ionous/errutil"
 
 // MissingEval error type for unknown variables while processing loops.
 type MissingEval string
@@ -37,8 +37,10 @@ func RunOne(run Runtime, exe Execute) (err error) {
 func WriteText(run Runtime, eval TextEval) (err error) {
 	if t, e := GetText(run, eval); e != nil {
 		err = e
+	} else if w := run.Writer(); w == nil {
+		err = errutil.New("missing writer")
 	} else {
-		_, e := io.WriteString(run, t)
+		_, e := w.WriteString(t)
 		err = e
 	}
 	return

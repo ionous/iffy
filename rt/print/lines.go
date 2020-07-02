@@ -15,10 +15,24 @@ func (l *Lines) Lines() []string {
 	return l.lines
 }
 
-// Write implements io.Writer, treating every Write as a new line.
-func (l *Lines) Write(p []byte) (ret int, err error) {
+func (l *Lines) Write(p []byte) (int, error) {
+	return l.write(Chunk{p})
+}
+func (l *Lines) WriteByte(c byte) error {
+	_, e := l.write(Chunk{c})
+	return e
+}
+func (l *Lines) WriteRune(r rune) (int, error) {
+	return l.write(Chunk{r})
+}
+func (l *Lines) WriteString(s string) (int, error) {
+	return l.write(Chunk{s})
+}
+
+// Write implements writer.Output, spacing writes with separators.
+func (l *Lines) write(c Chunk) (int, error) {
 	var buf bytes.Buffer
-	ret, err = buf.Write(p)
+	n, e := c.WriteTo(&buf)
 	l.lines = append(l.lines, buf.String())
-	return
+	return n, e
 }

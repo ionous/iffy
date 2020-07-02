@@ -7,7 +7,7 @@ import (
 
 func TestBracket(t *testing.T) {
 	var buffer Spanner
-	w := Bracket(&buffer)
+	w := Parens(&buffer)
 	io.WriteString(w, "hello")
 	io.WriteString(w, "you")
 	w.Close()

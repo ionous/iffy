@@ -105,7 +105,7 @@ func (*Bracket) Compose() composer.Spec {
 
 func (op *Bracket) GetText(run rt.Runtime) (ret string, err error) {
 	var span print.Spanner // separate punctuation with spaces
-	if e := rt.WritersBlock(run, print.Bracket(&span), func() error {
+	if e := rt.WritersBlock(run, print.Parens(&span), func() error {
 		return rt.RunAll(run, op.Go)
 	}); e != nil {
 		err = e

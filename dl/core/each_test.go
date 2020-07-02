@@ -2,10 +2,11 @@ package core
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/scope"
+	"github.com/ionous/iffy/rt/writer"
 )
 
 // ExampleIndex verifies the loop index property.
@@ -53,6 +54,7 @@ var oneTwoThree = []string{"one", "two", "three"}
 
 type forTester struct {
 	baseRuntime
-	print.Stack
+	strings.Builder
 	scope.ScopeStack
+	writer.Sink
 }

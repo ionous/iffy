@@ -3,6 +3,8 @@ package print
 import (
 	"io"
 	"testing"
+
+	"github.com/ionous/iffy/rt/writer"
 )
 
 func TestPrintSep(t *testing.T) {
@@ -39,7 +41,7 @@ func TestPrintSep(t *testing.T) {
 	}
 }
 
-func write(sep func(w io.Writer) io.WriteCloser, names ...string) (ret string, err error) {
+func write(sep func(w writer.Output) writer.OutputCloser, names ...string) (ret string, err error) {
 	var buffer Spanner
 	w := sep(&buffer)
 	for _, n := range names {

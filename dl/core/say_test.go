@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/print"
+	"github.com/ionous/iffy/rt/writer"
 )
 
 var helloThereWorld = []rt.Execute{
@@ -54,5 +54,5 @@ type baseRuntime struct {
 }
 type sayTester struct {
 	baseRuntime
-	print.Stack
+	writer.Sink
 }

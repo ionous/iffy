@@ -1,6 +1,10 @@
 package rt
 
-import "io"
+import (
+	"io"
+
+	"github.com/ionous/iffy/rt/writer"
+)
 
 // Pluralize turns single words into their plural variants.
 type Pluralize interface {
@@ -36,31 +40,26 @@ type Fields interface {
 // 	GetAncestors(Runtime, string) (ObjectStream, error)
 // }
 
-type WriterStack interface {
-	io.Writer
-	PushWriter(io.Writer)
-	PopWriter()
-}
-
 // Runtime environment for an in-progress game.
 type Runtime interface {
 	Fields
-	WriterStack
 	VariableStack
 	Random(inclusiveMin, exclusiveMax int) int
 
-	// Ancestors
-	// Pluralize
+	//
+	Writer() writer.Output
+	SetWriter(writer.Output) (prev writer.Output)
 
+	// Pluralize
 }
 
 // WritersBlock applies a writer to the runtime for the duration of fn.
 // If the writer also implements io.Closer and fn is free of errors,
 // w.Close gets called and its result returned.
-func WritersBlock(run Runtime, w io.Writer, fn func() error) (err error) {
-	run.PushWriter(w)
+func WritersBlock(run Runtime, w writer.Output, fn func() error) (err error) {
+	was := run.SetWriter(w)
 	e := fn()
-	run.PopWriter()
+	run.SetWriter(was)
 	if e != nil {
 		err = e
 	} else if closer, ok := w.(io.Closer); ok {

@@ -104,7 +104,6 @@ func (p Dilemmas) Err() (ret error) {
 // Dilemmas is a utility function that prints a list of errors to w,
 // one error per line, if the err parameter is an Dilemmas. Otherwise
 // it prints the err string.
-//
 func PrintDilemmas(w io.Writer, err error) {
 	if list, ok := err.(Dilemmas); ok {
 		for _, e := range list {

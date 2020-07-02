@@ -6,6 +6,7 @@ import (
 
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
+	"github.com/ionous/iffy/rt/writer"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
@@ -30,9 +31,11 @@ func TestPatternActivity(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		var run testRuntime
+		var out print.Lines
+		run.SetWriter(&out)
 		if e := rt.RunOne(&run, rule.buildRule().(rt.Execute)); e != nil {
 			t.Fatal(e)
-		} else if diff := pretty.Diff(run.out.Lines(), []string{"hello", "hello"}); len(diff) > 0 {
+		} else if diff := pretty.Diff(out.Lines(), []string{"hello", "hello"}); len(diff) > 0 {
 			t.Fatal(diff)
 		}
 	}
@@ -116,11 +119,10 @@ var _text_eval = map[string]interface{}{
 	},
 }
 
-type testRuntime struct {
+type baseRuntime struct {
 	rt.Panic
-	out print.Lines
 }
-
-func (t *testRuntime) Write(p []byte) (ret int, err error) {
-	return t.out.Write(p)
+type testRuntime struct {
+	baseRuntime
+	writer.Sink
 }
