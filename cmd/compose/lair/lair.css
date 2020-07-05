@@ -1,19 +1,19 @@
 .table {
   display: grid;
   column-gap: 10px;
-  /*row-gap: 15px;*/
-  /*grid-template-columns: auto auto; */
+  grid-template-columns: auto auto; 
 }
-.item {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-columns: 4ch auto;
-  column-gap: 3px;
-}
-
 .handle {
   background-color: whitesmoke;
   color: grey;
   width: 100%;
   text-align: right;
+}
+.dragimg {
+  position: absolute;;
+  left:0;
+  top:0;
+  width: 40px; 
+  height: 40px; 
+  background: red;
 }

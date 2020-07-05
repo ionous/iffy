@@ -13,6 +13,9 @@ class Lipsum {
     lastIndex= (lastIndex+cnt) % allWords.length;
     this.words= Lipsum.words(idx, cnt);
   }
+  get text() {
+    return this.words.join(" ");
+  }
   // return an array of
   static words(idx, cnt) {
     // when the end index is greater, that's fine.
