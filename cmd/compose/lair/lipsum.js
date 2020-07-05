@@ -3,8 +3,8 @@
 const lipsum= `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec lorem malesuada, condimentum nibh ac, viverra justo. Pellentesque eleifend lectus in quam rhoncus, a sodales orci rutrum. Donec eu nulla elementum, tincidunt nunc id, consequat eros. Cras laoreet facilisis neque id viverra. Vivamus a semper nisl. Nulla ultricies lectus sed rutrum pulvinar. Aliquam in diam efficitur est volutpat sollicitudin nec eu massa. Sed tempus, augue eget vehicula tristique, odio elit suscipit erat, sit amet congue est erat at mauris. Maecenas scelerisque dapibus metus, at pulvinar augue congue eu.`
 
 const allWords = lipsum.split(' ');
-var lastIndex=0;
-
+let lastIndex=0;
+let lastItem=0;
 
 // a slice of words from the above lipsum string.
 class Lipsum {
@@ -12,6 +12,7 @@ class Lipsum {
     const idx= lastIndex;
     lastIndex= (lastIndex+cnt) % allWords.length;
     this.words= Lipsum.words(idx, cnt);
+    this.id= "id"+ (++lastItem);
   }
   get text() {
     return this.words.join(" ");
