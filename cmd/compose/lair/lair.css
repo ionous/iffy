@@ -5,20 +5,30 @@
   position: relative;
   margin-right: 0.5ch;
 }
-.em-gutter:not(.dragging) {
+.em-item:not(.em-drag-mark) > .em-gutter {
   color: grey;
   background-color: whitesmoke;
-}
-.em-len {
-  visibility: hidden;
-}
-.dragging {
-  color: grey;
-  background-color: silver;
 }
 .em-num {
   position: absolute;
   width: 100%;
   top: 0;
   text-align: right;
+}
+.em-len {
+  visibility: hidden;
+}
+.em-drag-image {
+  color: grey;
+  background-color: silver;
+}
+
+/* dragEnter adds, dragLeave removes .drag */
+.em-drag-highlight {
+  background-color: blue !important;
+  transition: background-color 0.5s ease;
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
 }
