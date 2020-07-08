@@ -39,7 +39,7 @@ class DragHelper {
   }
   end() {
     ++this.count.end;
-    this.clearCurrent();
+    this.clearFocus();
     this.setEdge(false);
     this.setBounds(false);
     this.startEl= false;
@@ -61,11 +61,10 @@ class DragHelper {
       if (focus) {
         const bounds= container.getBoundingClientRect();
         if (evt.clientX > 0/*bounds.x*/) {
-          const b= evt.clientY - bounds.bottom;
           if (focus !== this.startEl) {
             edge= 1;
           }
-
+          const b= evt.clientY - bounds.bottom;
           if (b >=0) {
             edge= (b < this.height)? 0: -1; // top edge of the first element.
           }
@@ -81,22 +80,34 @@ class DragHelper {
         lastEl.classList.remove(...this.edgeClasses);
       }
       if (!newEl || newEdge < 0) {
-        this.edgeEl= false;
-        this.edgeIdx= -1;
+        this.clearEdge();
       } else {
         const name= this.edgeClasses[newEdge];
         newEl.classList.add(name);
         this.edgeEl= newEl;
         this.edgeIdx= newEdge;
-        console.log("edge", name);
+        console.log("edge", this.edgeIdx);
+        if (this.focusEl) {
+          this.focusEl.classList.add(...this.focusClasses);
+        }
       }
     }
   }
-  // forcibly clearCurrent the drag highlights
-  clearCurrent() {
+  clearEdge() {
+    if (this.edgeEl !== false && this.edgeIdx !== -1) {
+      this.edgeEl= false;
+      this.edgeIdx= -1;
+      // out of bounds, clear the highlight too
+      if (this.focusEl) {
+        this.focusEl.classList.remove(...this.focusClasses);
+      }
+      console.log("edge cleared");
+    }
+  }
+  // forcibly clearFocus the drag highlights
+  clearFocus() {
     ++this.count.clear;
     if (this.focusEl) {
-      // this.focusEl.classList.remove(...this.edgeClasses);
       this.focusEl.classList.remove(...this.focusClasses);
       this.focusEl= false;
       this.count.focus=0;
@@ -105,8 +116,10 @@ class DragHelper {
   enter(el) {
     ++this.count.enter;
     if (el !== this.focusEl) {
-      this.clearCurrent();
-      this.setEdge(el, (el !== this.startEl)? 1:-1 );
+      console.log("enter");
+      this.clearFocus();
+      const atStart= (el === this.startEl);
+      this.setEdge(el, atStart? -1: 1 );
       el.classList.add(...this.focusClasses);
       this.focusEl= el;
     }
@@ -115,9 +128,6 @@ class DragHelper {
     ++this.count.leave;
     if (el === this.focusEl) {
       --this.count.focus;
-      // if ((--this.count.focus) <= 0) {
-      //   this.clearCurrent();
-      // }
     }
   }
 };
