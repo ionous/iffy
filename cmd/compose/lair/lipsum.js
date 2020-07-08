@@ -10,8 +10,8 @@ let lastItem=0;
 class Lipsum {
   constructor(cnt) {
     const idx= lastIndex;
-    lastIndex= (lastIndex+cnt) % allWords.length;
-    this.words= Lipsum.words(idx, cnt);
+    lastIndex= (lastIndex+(cnt||0)) % allWords.length;
+    this.words= cnt? Lipsum.words(idx, cnt): ["<blank>"];
     this.id= "id"+ (++lastItem);
   }
   get text() {

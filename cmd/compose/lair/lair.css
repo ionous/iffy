@@ -1,5 +1,9 @@
+.em-table {
+  padding-left: 2em;
+}
 .em-item {
   display: flex;
+  box-sizing: border-box;
 }
 .em-gutter {
   position: relative;
@@ -8,6 +12,12 @@
 .em-item:not(.em-drag-mark) > .em-gutter {
   color: grey;
   background-color: whitesmoke;
+}
+.em-item--top {
+  border-top: 3px solid black;
+}
+.em-item--bot {
+  border-bottom: 3px solid black;
 }
 .em-num {
   position: absolute;
@@ -23,9 +33,9 @@
   background-color: silver;
 }
 
-/* dragEnter adds, dragLeave removes .drag */
+/* dragEnter adds, dragLeave removes */
 .em-drag-highlight {
-  background-color: blue !important;
+  background-color: lightblue !important;
   transition: background-color 0.5s ease;
 }
 

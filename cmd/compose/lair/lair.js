@@ -1,42 +1,6 @@
 const counts= [15, 30, 3, 5, 25, 7];
 let allItems= counts.map((c) => new Lipsum(c));
 
-class DragHelper {
-  constructor() {
-    this.currentEl= false;
-    this.counter= 0;
-    this.highlight= ["em-drag-highlight", "em-drag-mark"];
-  }
-  clear() {
-    if (this.currentEl) {
-      this.currentEl.classList.remove(...this.highlight);
-      this.counter=0;
-    }
-  }
-  enter(el) {
-    if (el !== this.currentEl) {
-      this.clear();
-      el.classList.add(...this.highlight);
-      this.currentEl= el;
-    }
-    ++this.counter;
-  }
-  leave(el) {
-    if (el === this.currentEl) {
-      if (--this.counter <= 0) {
-        this.clear();
-      }
-    }
-  }
-  // dataTransfer, elements
-  setDragImage(dt, itemEl) {
-    itemEl.classList.add("em-drag-image", "em-drag-mark");
-    dt.setDragImage(itemEl,10,10);
-    setTimeout(()=>{
-      itemEl.classList.remove("em-drag-image", "em-drag-mark");
-    });
-  }
-};
 const dragHelper= new DragHelper();
 
 
@@ -60,8 +24,8 @@ Vue.component('em-item', {
   `<div class="em-item"
       @dragstart="onDragStart($event)"
       @dragend="onDragEnd($event)"
-      @dragenter="onDrag($event, true)"
-      @dragover="onDrag($event)"
+      @dragenter="onDragOver($event, true)"
+      @dragover="onDragOver($event)"
       @dragleave="onDragLeave($event, true)"
     ><em-gutter
       :num="num"
@@ -85,8 +49,8 @@ Vue.component('em-item', {
       console.log(evt.type, item.id, target.classList[0], dt.dropEffect);
     },
 
-    // moving over an element, it has bubbled up to the item.
-    onDrag(evt, enter) {
+    // moving over a drop target; it has bubbled up to the item.
+    onDragOver(evt, enter) {
       this.logEvent(evt);
       //
       const dt= evt.dataTransfer;
@@ -107,7 +71,7 @@ Vue.component('em-item', {
     onDragEnd(evt) {
       this.logEvent(evt);
       evt.preventDefault();
-      dragHelper.clear();
+      dragHelper.end();
     },
     // the event targets the em-gutter (draggable=true)
     // the user is attempting to drag,
@@ -124,9 +88,8 @@ Vue.component('em-item', {
       dt.setData('application/json', json);
       dt.effectAllowed= 'move';
       // set the drag image
-      dragHelper.setDragImage(dt, evt.currentTarget);
-      // stop instead of prevent.
-      evt.stopPropagation();
+      dragHelper.start(evt.currentTarget, dt);
+      // propagate to parent
     },
   }
 });
@@ -137,7 +100,8 @@ Vue.component('em-table', {
   },
   template:
   `<div
-      class="table"
+      class="em-table"
+      @dragstart="onDragStart($event)"
       @drop="onDrop($event)"
     ><transition-group
       name="flip-list"
@@ -150,7 +114,10 @@ Vue.component('em-table', {
     ></transition-group
   ></div>`,
   methods: {
-
+    onDragStart(evt) {
+      dragHelper.setBounds(evt.currentTarget);
+      evt.stopPropagation();
+    },
     // since this handler is on the table
     // we either get here by a drop on the item, or by bubble up from one of its elements.
     onDrop(evt) {
@@ -175,9 +142,16 @@ Vue.component('em-table', {
           // find the original item
           const srcIdx= items.findIndex((item)=> item.id === json.id);
 
-          if (srcIdx !== dstIdx) {
-            // add it, and remove it.
-            // ( we should technically wait till onDragEnd -- but why. )
+          // by default we are removing src, and inserting above dst
+          // if dst is the next item, we'd stay in the same spot
+          // so instead, we insert a blank line
+          if (srcIdx+1 === dstIdx) {
+            const blank= new Lipsum();
+            items.splice(srcIdx, 0, blank);
+          } else if (srcIdx< dstIdx) {
+            const rub= items.splice(srcIdx,1);
+            items.splice(dstIdx-1,0,rub[0]);
+          } else if (srcIdx > dstIdx) {
             const rub= items.splice(srcIdx,1);
             items.splice(dstIdx,0,rub[0]);
           }
