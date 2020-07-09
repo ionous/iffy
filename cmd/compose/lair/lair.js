@@ -26,7 +26,6 @@ Vue.component('em-item', {
       @dragend="onDragEnd($event)"
       @dragenter="onDragOver($event, true)"
       @dragover="onDragOver($event)"
-      @dragleave="onDragLeave($event, true)"
     ><em-gutter
       :num="num"
       :max="1234"
@@ -42,36 +41,11 @@ Vue.component('em-item', {
   },
   methods: {
     logEvent(evt) {
-      // return;
+      return;
       const item= this.item;
       const target= evt.target;
       const dt= evt.dataTransfer;
-      console.log(evt.type, item.id, target.classList[0], dt.dropEffect);
-    },
-
-    // moving over a drop target; it has bubbled up to the item.
-    onDragOver(evt, enter) {
-      this.logEvent(evt);
-      //
-      const dt= evt.dataTransfer;
-      dt.dropEffect='move';
-      //
-      if (enter) {
-        dragHelper.enter(evt.currentTarget);
-      }
-      evt.preventDefault();
-    },
-    onDragLeave(evt) {
-      this.logEvent(evt);
-      dragHelper.leave(evt.currentTarget);
-      evt.preventDefault();
-    },
-    // sent to the target which triggered the drag
-    // ( the em-gutter ) and bubbles up to this item handler.
-    onDragEnd(evt) {
-      this.logEvent(evt);
-      evt.preventDefault();
-      dragHelper.end();
+      console.log(evt.type, item.id, target.nodeName, dt.dropEffect);
     },
     // the event targets the em-gutter (draggable=true)
     // the user is attempting to drag,
@@ -86,11 +60,31 @@ Vue.component('em-item', {
       const dt= evt.dataTransfer;
       dt.setData('text/plain', text);
       dt.setData('application/json', json);
-      dt.effectAllowed= 'move';
+      dt.effectAllowed= 'all';
       // set the drag image
-      dragHelper.start(evt.currentTarget, dt);
+      dragHelper.start(item.id, evt.currentTarget, dt);
       // propagate to parent
     },
+    // moving over a drop target; it has bubbled up to the item.
+    onDragOver(evt, enter) {
+      const dt= evt.dataTransfer;
+      if (dt) {
+        dt.dropEffect= "copy";
+      }
+      dragHelper.drag(this.item.id, evt.currentTarget);
+      this.logEvent(evt);
+      // evt.stopPropagation();
+      evt.preventDefault();
+    },
+    // sent to the target which triggered the drag
+    // ( the em-gutter ) and bubbles up to this item handler.
+    onDragEnd(evt) {
+      this.logEvent(evt);
+      evt.stopPropagation();
+      evt.preventDefault();
+      dragHelper.end();
+    },
+
   }
 });
 
@@ -103,6 +97,7 @@ Vue.component('em-table', {
       class="em-table"
       @dragstart="onDragStart($event)"
       @drop="onDrop($event)"
+
     ><transition-group
       name="flip-list"
       ><em-item
@@ -112,10 +107,20 @@ Vue.component('em-table', {
         :num="i*i*i"
       ></em-item
     ></transition-group
+    ><div
+      class="em-table__footer"
+      @dragenter="onDragOver($event, true)"
+      @dragover="onDragOver($event)"
+    ></div
   ></div>`,
-  methods: {
+   methods: {
     onDragStart(evt) {
-      dragHelper.setBounds(evt.currentTarget);
+      // dragHelper.setBounds(evt.currentTarget);
+      evt.stopPropagation();
+    },
+    // moving over a drop target; it has bubbled up to the item.
+    onDragOver(evt, enter) {
+      dragHelper.drawDecor(0);
       evt.stopPropagation();
     },
     // since this handler is on the table
@@ -129,7 +134,7 @@ Vue.component('em-table', {
       }
       const items= this.items;
       const dstIdx= items.findIndex((i)=> i === item);
-      console.log("drop at", dstIdx);
+      // console.log("drop at", dstIdx);
       if (dstIdx >=0) {
         // note: dropEffect isnt registering as move here for some reason.
         const dt= evt.dataTransfer;
