@@ -6,11 +6,16 @@
 			<script src="lib/vue.js"></script>
 	</head>
 	<body>
-		<div id="app">
-			<em-table :items="items"></em-table>
-		</div
+		<div id="app"
+		><em-table 
+				:items="items"
+				:drag-helper="dragHelper"
+			></em-table
+		></div
 		><script src="dragHelper.js"></script
+		><script src="dragHandler.js"></script
 		><script src="lipsum.js"></script
 		><script src="lair.js"></script
 	></body>
 </html>
+

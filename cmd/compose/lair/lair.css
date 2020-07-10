@@ -13,21 +13,6 @@
   user-select: none;
   cursor: grab;
 }
-.em-drag-mark {
-  cursor: grabbing;
-  cursor: -moz-grabbing;
-  cursor: -webkit-grabbing;  
-}
-.em-item:not(.em-drag-mark) > .em-gutter {
-  color: grey;
-  background-color: whitesmoke;
-}
-.em-item--top {
-  box-shadow:inset 0px 3px rgba(0,0,0,0.6);
-}
-.em-item--bot {
-  box-shadow:inset 0px -3px rgba(0,0,0,0.6);
-}
 .em-num {
   position: absolute;
   width: 100%;
@@ -37,17 +22,25 @@
 .em-len {
   visibility: hidden;
 }
+.em-item:not(.em-drag-mark) > .em-gutter {
+  color: grey;
+  background-color: whitesmoke;
+}
+.em-item--head {
+  box-shadow:inset 0px 3px rgba(0,0,0,0.6);
+}
+.em-item--tail {
+  box-shadow:inset 0px -3px rgba(0,0,0,0.6);
+}
+/* dragEnter adds, dragLeave removes */
+.em-item--head, .em-item--tail, .em-item--body {
+  background-color: lightblue/* !important*/;
+  transition: background-color 0.25s ease;
+}
 .em-drag-image {
   color: grey;
   background-color: silver;
 }
-
-/* dragEnter adds, dragLeave removes */
-.em-drag-highlight {
-  background-color: lightblue/* !important*/;
-  transition: background-color 0.5s ease;
-}
-
 .flip-list-move {
   transition: transform 0.5s;
 }
