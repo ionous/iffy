@@ -1,53 +1,47 @@
 class DragHelper {
   constructor() {
-     this.currIdx= false;
-     this.currEdge= false;
+    this.reset();
   }
-  setIdx(idx, edge=0) {
-    if (this.currIdx !== idx || this.currEdge !== edge) {
-      console.log("changing focus", idx, edge);
-      this.currIdx= idx;
-      this.currEdge= edge;
-    }
+  setSource(group, item) {
+    const src= DragHelper._group(group, item);
+    this.source= src;
+    this.target= src;
+    console.log("dropper set source");
   }
-    // FIX: move this to drag context.
-  // generate a vue class for an item based on the current highlight settings.
-  highlight(idx, selector="em-item") {
-    let ret= false;
-    // console.log("highlight", idx, d.currIdx);
-    if (idx === this.currIdx) {
-      const curr= idx< 0? -1: this.currEdge;
-      const edge= curr< 0 ? "--head":
-                  curr> 0 ? "--tail":
-                  "--body";
-      ret= {
-        [selector+edge]: true,
-        "em-drag-mark": true,
-      };
-    }
-    return ret;
+  static _group(group, {el, idx, edge}) {
+    return { group, el, idx, edge };
   }
-  static findEl(el, nothrow, name="dragIdx") {
-    for (; el; el= el.parentElement) {
-      if (el.dataset[name] !== undefined) {
-        break;
+  setTarget(group, item) {
+    if (!group) {
+      if (this.target) {
+        console.log("dropper cleared");
+        this.target= false;
       }
+    } else if (this.target.group!== group ||
+        this.target.idx !== item.idx ||
+        this.target.edge !== item.edge) {
+      console.log("dropper changed", item.idx, item.edge);
+      this.target= DragHelper._group(group, item);
     }
-    if (!el && nothrow === undefined) {
-      throw new Error("missing drag index");
-    }
-    return el;
   }
-  static findIdx(el, defaultVal, name="dragIdx") {
-    let ret= defaultVal;
-    const idxEl= DragHelper.findEl(el, defaultVal, name);
-    const val= idxEl && idxEl.dataset[name];
-    if (val !== undefined) {
-      ret= parseInt(val);
+  reset(log) {
+    if (log) {
+      console.log("dropper reset");
     }
-    return ret;
+    this.source= false;
+    this.target= false;
   }
-  static setDragData(el, dt, data, imgClasses= ["em-drag-image", "em-drag-mark"]) {
+  // generate a vue class for an item based on the current highlight settings.
+  highlight(idx) {
+    const at = this.target;
+    // we cheat slightly and use == to hide the differences between idx strings and ints
+    return at && (idx == at.idx) && {
+        "em-drag-highlight": (!at.edge),
+        "em-drag-border": (at.edge) || (at.idx != this.source.idx),
+        "em-drag-mark": true,
+    };
+  }
+  static setDragData(dt, el, data, imgClasses= ["em-drag-image", "em-drag-mark"]) {
     // set fx
     dt.effectAllowed= 'all';
     // set the drag image

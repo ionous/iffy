@@ -21,7 +21,7 @@ Vue.component('em-gutter', {
 Vue.component('em-item', {
   template:
   `<div class="em-item"
-      :class="focus.highlight(idx)"
+      :class="dropper.highlight(idx)"
       :data-drag-idx="idx"
     ><em-gutter
       :num="num"
@@ -36,48 +36,55 @@ Vue.component('em-item', {
     idx: Number,
     num: Number,
     max: Number,
-    focus: DragHelper,
+    dropper: DragHelper,
     item: Object,
   }
 });
 Vue.component('em-table', {
   data() {
-    const items= this.items;
-    const helper= this.dragHelper;
+    const list= new DragList(this.items, ()=> new Lipsum());
+    const dropper= this.dropper;
     return {
       drag: new DragHandler(
-        helper, {
-        serializeItem(idx)  {
-          const item= items[idx];
+        dropper, {
+        serializeItem(at)  {
+          const item= list.items[parseInt(at)];
           return {
             'text/plain': item.text,
-            'application/json': JSON.stringify(item.words),
           };
         },
-        removeItem(idx) {
-          // needs some thought.
+        removeItem(src, dst, width=1) {
+          return list.removeFrom(parseInt(src), parseInt(dst), width);
+        },
+        // note: addItem might happen in a group other than serialize and removeItem.
+        addItem(src, dst, rub) {
+          list.addTo(parseInt(src), parseInt(dst), rub);
         },
       })
     }
   },
   props: {
     items: Array,
-    dragHelper: DragHelper,
+    dropper: DragHelper,
+  },
+  mounted() {
+    this.drag.listen(this.$el);
+  },
+  beforeDestroy() {
+    this.drag.silence();
   },
   template:
-  `<div
-      class="em-table"
-      @dragstart="drag.onDragStart($event)"
-      @dragenter="drag.onDragItem($event)"
-      @dragover="drag.onDragItem($event)"
-      @dragleave="drag.onDragLeave($event)"
-      @dragend="drag.onDragEnd($event)"
-      @drag="drag.onDragUpdate($event)"
+  `<div class="em-table"
+    ><div
+      class="em-table__header"
+      :data-drag-edge="-1"
+      :class="dropper.highlight(-1)"
+    ></div
     ><transition-group
       name="flip-list"
       ><em-item
         v-for="(item,idx) in items"
-        :focus="dragHelper"
+        :dropper="dropper"
         :key="item.id"
         :item="item"
         :idx="idx"
@@ -87,8 +94,8 @@ Vue.component('em-table', {
     ></transition-group
     ><div
       class="em-table__footer"
-      :data-drag-idx="-1"
-      :data-drag-prev="items.length-1"
+      :data-drag-edge="items.length"
+      :class="dropper.highlight(items.length)"
     ></div
   ></div>`
 });
@@ -97,6 +104,6 @@ const app= new Vue({
   el: '#app',
   data: {
     items:allItems,
-    dragHelper: new DragHelper(),
+    dropper: new DragHelper(),
   },
 });

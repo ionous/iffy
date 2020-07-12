@@ -1,7 +1,7 @@
 .em-table {
   padding-left: 2em;
 }
-.em-table__footer {
+.em-table__header, .em-table__footer {
   height: 0.5em;
 }
 .em-item {
@@ -26,14 +26,16 @@
   color: grey;
   background-color: whitesmoke;
 }
-.em-item--head {
+/* highlight upper edge */
+.em-item.em-drag-border, .em-table__footer.em-drag-border  {
   box-shadow:inset 0px 3px rgba(0,0,0,0.6);
 }
-.em-item--tail {
+/* highlight lower edge */
+.em-table__header.em-drag-border {
   box-shadow:inset 0px -3px rgba(0,0,0,0.6);
 }
 /* dragEnter adds, dragLeave removes */
-.em-item--head, .em-item--tail, .em-item--body {
+.em-item.em-drag-highlight {
   background-color: lightblue/* !important*/;
   transition: background-color 0.25s ease;
 }
