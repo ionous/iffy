@@ -49,13 +49,12 @@ class DragList {
   }
 };
 
-
 (function() {
   console.log("testing drag list");
-  function test(og, s, e, expect) {
+  function test(og, src, dst, expect) {
     const items= og.split('');
     const dl= new DragList(items, ()=>"_");
-    dl.adjust(s,e);
+    dl.adjust(src,dst);
     const res= items.join("");
     if (expect !== res) {
      console.log("Error, moving", og[s], "want:", expect, "have:", res);

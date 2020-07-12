@@ -20,7 +20,8 @@ class DragHelper {
     } else if (this.target.group!== group ||
         this.target.idx !== item.idx ||
         this.target.edge !== item.edge) {
-      console.log("dropper changed", item.idx, item.edge);
+      const sign=Math.sign(this.source.idx-item.idx);
+      console.log("dropper changed", item.idx, sign, item.edge);
       this.target= DragHelper._group(group, item);
     }
   }
@@ -33,13 +34,22 @@ class DragHelper {
   }
   // generate a vue class for an item based on the current highlight settings.
   highlight(idx) {
+    var ret;
     const at = this.target;
-    // we cheat slightly and use == to hide the differences between idx strings and ints
-    return at && (idx == at.idx) && {
-        "em-drag-highlight": (!at.edge),
-        "em-drag-border": (at.edge) || (at.idx != this.source.idx),
-        "em-drag-mark": true,
-    };
+    const from= this.source;
+    if (at && from) {
+      // the edge display needs a lot more work
+      // it has to follow the same rules as the insertion does.
+      // const edges= ["em-item--head","em-item--body","em-item--tail"];
+      // const sign= Math.sign(from.idx-at.idx); // negative upper
+      // const edge= edges[sign+1];
+      ret= ((idx === at.idx) || (idx === at.edge)) && {
+          "em-drag-highlight": true,
+          // [edge]:true,
+          "em-drag-mark": true,
+      };
+    }
+    return ret;
   }
   static setDragData(dt, el, data, imgClasses= ["em-drag-image", "em-drag-mark"]) {
     // set fx

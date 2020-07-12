@@ -17,27 +17,41 @@ class TargetFinder {
   // return the idx and edge targeted by el.
   get(target, noedges) {
     if (this.lastTgt !== target) {
-      let res= this.findIdx(target, false);
-      if (!res && !noedges) {
-        res= this.findIdx(target, true);
-      }
-      // cache...
-      this.lastTgt= target;
+      const res= this.findIdx(target);
+      this.lastTgt= target; // cache...
       this.lastRes= res;
     }
     return this.lastRes;
   }
-  // search upwards from el for the named dataset attribute
-  findIdx(el, edge) {
+  // search upwards from el for the dataset attributes
+  findIdx(el) {
     var ret= false;
-    const key= edge? "dragEdge": "dragIdx";
     for (const topEl= this.topEl; el !== topEl; el= el.parentElement) {
-      const idx= el.dataset[key];
+      const idx= TargetFinder.getData(el, "dragIdx");
       if (idx !== undefined) {
-        ret= { el, idx, edge };
+        const edge= TargetFinder.getData(el, "dragEdge");
+        ret= { el, idx, edge  };
         break;
       }
     }
     return ret;
+  }
+  // from https://github.com/jquery/jquery/blob/master/src/data.js
+  static getData(el, key) {
+    const data= el.dataset[key];
+    if ( data === "true" ) {
+      return true;
+    }
+    if ( data === "false" ) {
+      return false;
+    }
+    if ( data === "null" ) {
+      return null;
+    }
+    // Only convert to a number if it doesn't change the string
+    if ( data === +data + "" ) {
+      return +data;
+    }
+    return data;
   }
 };

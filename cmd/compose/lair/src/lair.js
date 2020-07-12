@@ -1,12 +1,11 @@
 const counts= [15, 30, 3, 5, 25, 7];
 const allItems= counts.map((c) => new Lipsum(c));
 
-
 // use a pair of numbers for the gutter to manage the sizing.
 Vue.component('em-gutter', {
   template:
   `<div class="em-gutter"
-    ><div class="em-len"
+    ><div class="em-max"
     >{{max}}</div
     ><div class="em-num"
     >{{num}}</div
@@ -17,12 +16,10 @@ Vue.component('em-gutter', {
   },
 });
 
-// emits @dragon(idx, el,
+// simple content with numbered gutter
 Vue.component('em-item', {
   template:
   `<div class="em-item"
-      :class="dropper.highlight(idx)"
-      :data-drag-idx="idx"
     ><em-gutter
       :num="num"
       :max="max"
@@ -30,16 +27,15 @@ Vue.component('em-item', {
     ></em-gutter
     ><div
       class="em-content"
-    >{{item.text}}</div
+    >{{text}}</div
   ></div>`,
   props: {
-    idx: Number,
     num: Number,
     max: Number,
-    dropper: DragHelper,
-    item: Object,
+    text: String,
   }
 });
+
 Vue.component('em-table', {
   data() {
     const list= new DragList(this.items, ()=> new Lipsum());
@@ -48,17 +44,17 @@ Vue.component('em-table', {
       drag: new DragHandler(
         dropper, {
         serializeItem(at)  {
-          const item= list.items[parseInt(at)];
+          const item= list.items[at];
           return {
             'text/plain': item.text,
           };
         },
         removeItem(src, dst, width=1) {
-          return list.removeFrom(parseInt(src), parseInt(dst), width);
+          return list.removeFrom(src, dst, width);
         },
         // note: addItem might happen in a group other than serialize and removeItem.
         addItem(src, dst, rub) {
-          list.addTo(parseInt(src), parseInt(dst), rub);
+          list.addTo(src, dst, rub);
         },
       })
     }
@@ -77,25 +73,25 @@ Vue.component('em-table', {
   `<div class="em-table"
     ><div
       class="em-table__header"
-      :data-drag-edge="-1"
-      :class="dropper.highlight(-1)"
+      :data-drag-idx="-1"
+      :data-drag-edge="0"
     ></div
     ><transition-group
       name="flip-list"
       ><em-item
         v-for="(item,idx) in items"
-        :dropper="dropper"
+        :class="dropper.highlight(idx)"
+        :data-drag-idx="idx"
         :key="item.id"
-        :item="item"
-        :idx="idx"
         :num="idx*idx*idx"
         :max="1234"
+        :text="item.text"
       ></em-item
     ></transition-group
     ><div
       class="em-table__footer"
-      :data-drag-edge="items.length"
-      :class="dropper.highlight(items.length)"
+      :data-drag-idx="items.length"
+      :data-drag-edge="items.length-1"
     ></div
   ></div>`
 });

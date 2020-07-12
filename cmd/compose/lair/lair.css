@@ -19,7 +19,7 @@
   top: 0;
   text-align: right;
 }
-.em-len {
+.em-max {
   visibility: hidden;
 }
 .em-item:not(.em-drag-mark) > .em-gutter {
@@ -27,11 +27,11 @@
   background-color: whitesmoke;
 }
 /* highlight upper edge */
-.em-item.em-drag-border, .em-table__footer.em-drag-border  {
+.em-item--head {
   box-shadow:inset 0px 3px rgba(0,0,0,0.6);
 }
 /* highlight lower edge */
-.em-table__header.em-drag-border {
+.em-item--tail {
   box-shadow:inset 0px -3px rgba(0,0,0,0.6);
 }
 /* dragEnter adds, dragLeave removes */
