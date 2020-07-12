@@ -37,10 +37,9 @@ Vue.component('em-item', {
 Vue.component('em-table', {
   data() {
     const list= new DragList(this.items, ()=> new Lipsum());
+    const dropper= this.dropper;
     return {
-      drag: new DragHandler(
-        this.group,
-        this.dropper, {
+      drag: dropper.newGroup(this.group, {
         serializeItem(at)  {
           const item= list.items[at];
           return {
@@ -60,13 +59,13 @@ Vue.component('em-table', {
   props: {
     items: Array,
     group: String,
-    dropper: DragHelper,
+    dropper: Dropper,
   },
   mounted() {
-    this.drag.listen(this.$el);
+    this.drag.handler.listen(this.$el);
   },
   beforeDestroy() {
-    this.drag.silence();
+    this.drag.handler.silence();
   },
   template:
   `<div class="em-table"
@@ -79,7 +78,7 @@ Vue.component('em-table', {
       name="flip-list"
       ><em-item
         v-for="(item,idx) in items"
-        :class="dropper.highlight(group, idx)"
+        :class="drag.highlight(idx)"
         :data-drag-idx="idx"
         :key="item.id"
         :num="idx*idx*idx"
@@ -100,6 +99,6 @@ const app= new Vue({
   data: {
     g1: Lipsum.list(15, 30, 3, 5, 25, 7),
     g2: Lipsum.list(8, 12, 5, 42, 2, 17),
-    dropper: new DragHelper(),
+    dropper: new Dropper(),
   },
 });

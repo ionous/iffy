@@ -2,12 +2,9 @@
 
 // event handler
 class DragHandler {
-  constructor(group, dropper, {serializeItem, addItem, removeItem}) {
+  constructor(group, dropper) {
     this.group= group;
     this.dropper= dropper;
-    this.serializeItem= serializeItem;
-    this.addItem= addItem;
-    this.removeItem= removeItem;
     this.finder= false;
     this.listeners= false;
   }
@@ -52,26 +49,25 @@ class DragHandler {
     const dt= evt.dataTransfer;
     const start= this.finder.get(evt.target, true);
     if (start) {
-      this.dropper.setSource(this, start);
-      DragHelper.setDragData(dt, start.el, this.serializeItem(start.idx));
+      this.dropper.setSource(this.group, start);
+      Dropper.setDragData(dt, start.el, this.group.serializeItem(start.idx));
       evt.stopPropagation();
       this.log(evt)
     }
   }
-  // caught by bubbling
-  // we've already removed items from
+  // caught by bubbling in the group that receives the item
   onDrop(evt) {
     this.log(evt);
     const dt= evt.dataTransfer;
     /*if (dt === "copy")*/ {
       const drop= this.finder.get(evt.target);
       if (drop) {
-        const {idx:dragIdx, handler:dragHandler} = this.dropper.source;
-        const {idx:dropIdx, handler:dropHandler}= drop;
-        const newGroup= dropHandler!== dragHandler;
+        const {idx:dropIdx}= drop;
+        const {idx:dragIdx, group:dragGroup} = this.dropper.source;
+        const newGroup= this.group!== dragGroup;
         //
-        const rub= dragHandler.removeItem(dragIdx, dropIdx, 1, newGroup);
-        this.addItem(dragIdx, dropIdx, rub, newGroup);
+        const rub= dragGroup.removeItem(dragIdx, dropIdx, 1, newGroup);
+        this.group.addItem(dragIdx, dropIdx, rub, newGroup);
       }
     }
     //
@@ -97,7 +93,7 @@ class DragHandler {
   }
   onDragLeave(evt) {
     this.log(evt);
-    this.dropper.leaving= this;
+    this.dropper.leaving= this.group;
     evt.stopPropagation();
     evt.preventDefault();
   }
@@ -109,20 +105,20 @@ class DragHandler {
       dt.dropEffect= "copy";
       this.log(evt);
       //
-      this.dropper.setTarget(this, over);
+      this.dropper.setTarget(this.group, over);
 
       evt.stopPropagation();
       evt.preventDefault();
     }
   }
   log(evt) {
-    // return;
+    return;
     const el= evt.target;
     const dt= evt.dataTransfer;
     const tgt= this.finder.get(el) || {idx:"xxx", edge:false};
     const fx= (dt&&dt.dropEffect)||"???";
     console.log(evt.type, "@", el.nodeName,
-      "idx:", this.group, tgt.idx, "edge:", tgt.edge,
+      "idx:", this.group.name, tgt.idx, "edge:", tgt.edge,
       "fx:", fx);
   }
 };
