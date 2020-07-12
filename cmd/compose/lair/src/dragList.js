@@ -11,66 +11,76 @@ class DragList {
   }
   removeFrom(src, dst, width=1) {
     var rub;
-    const diff= src-dst;
-    if (diff) {
-      // movement within 1 spot adds a space to the opposite side
-      if ((diff === 1) || (diff === -1)) {
-        const blank= this.makeBlank();
-        rub= [ blank ];
-      } else{
-        rub= this.items.splice(src,width);
-      }
+    const d= src-dst;
+    if (d >0) {
+      rub= this._remove(src,dst, 1, width);
+    } else if (d<0) {
+      rub= this._remove(src,dst,-1, width);
     }
     return rub;
   }
   addTo(src, dst, rub) {
-    const diff= src-dst;
-    if (diff) {
-      // movement within 1 spot adds a space to the opposite side
-      if (diff === 1) {
-        dst= src+1;
-      } else if (diff === -1) {
-        dst= src;
-      } else if (diff <0) {
-        // dst>src; then removing src shifted down dst by one slot
-        --dst;
-      }
-      this.items.splice(Math.max(0,dst),0,...rub);
+    const d= src-dst;
+    if (d >0) {
+      this._add(src,dst, 1, rub);
+    } else if (d<0) {
+      this._add(src,dst,-1, rub);
     }
+  }
+  _remove(src,dst,sign, width) {
+    return (src-dst === sign) ?
+          [ this.makeBlank() ] :
+          this.items.splice(src, width);
+  }
+  _add(src,dst,sign, rub) {
+    // if (src-dst!==sign) {
+    //   dst= dst+sign;
+    // } else if (sign>0) {
+    //   dst= src+sign;
+    // } else {
+    //   dst= dst+sign;
+    // }
+    if (src-dst===1) {
+      dst= src+1;
+    } else {
+      dst= dst+sign;
+    }
+    this.items.splice(dst,0,...rub);
   }
 };
 
 
 (function() {
-  function test(list, s, e, expect) {
-    const items= list.split(',');
+  console.log("testing drag list");
+  function test(og, s, e, expect) {
+    const items= og.split('');
     const dl= new DragList(items, ()=>"_");
     dl.adjust(s,e);
-    const res= items.join(",")
+    const res= items.join("");
     if (expect !== res) {
-     console.log("Error, want:", expect, "have:", res);
+     console.log("Error, moving", og[s], "want:", expect, "have:", res);
     }
   };
-  const abc= "a,b,c";
-  // console.log("moving a");
-  test(abc, 0, -1, "a,_,b,c");
-  test(abc, 0, 0, abc);
-  test(abc, 0, 1, "_,a,b,c");
-  test(abc, 0, 2, "b,a,c");
-  test(abc, 0, 3, "b,c,a");
 
-  // console.log("moving b");
-  test(abc, 1, -1, "b,a,c"); // a,b,c
-  test(abc, 1, 0, "a,b,_,c");
-  test(abc, 1, 1, abc);
-  test(abc, 1, 2, "a,_,b,c");
-  test(abc, 1, 3, "a,c,b");
+  // a
+  test("abc", 0,-1, "a_bc"); // trailing head
+  test("abc", 0, 0, "abc");  // <no change>
+  test("abc", 0, 1, "_abc"); // leading b
+  test("abc", 0, 2, "bac");  // leading c
+  test("abc", 0, 3, "bca");  // leading tail
 
-  // console.log("moving c");
-  test(abc, 2, -1, "c,a,b");
-  test(abc, 2, 0, "c,a,b");
-  test(abc, 2, 1, "a,b,c,_");
-  test(abc, 2, 2, abc);
-  test(abc, 2, 3, "a,b,_,c");
+  // b
+  test("abc", 1,-1, "bac");  // trailing head
+  test("abc", 1, 0, "ab_c"); // trailing a
+  test("abc", 1, 1, "abc");  // <no change>
+  test("abc", 1, 2, "a_bc"); // leading c
+  test("abc", 1, 3, "acb");  // leading tail
 
-})();
+  // c
+  test("abc", 2,-1, "cab");  // trailing head
+  test("abc", 2, 0, "acb");  // trailing a
+  test("abc", 2, 1, "abc_"); // trailing b
+  test("abc", 2, 2, "abc");  // <no change>
+  test("abc", 2, 3, "ab_c"); // leading tail
+
+})/*()*/;
