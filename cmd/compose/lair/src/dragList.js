@@ -9,22 +9,31 @@ class DragList {
     const rub= this.removeFrom(src, dst, width);
     this.addTo(src, dst, rub);
   }
-  removeFrom(src, dst, width=1) {
+  removeFrom(src, dst, width=1, newGroup=false) {
     var rub;
-    const d= src-dst;
-    if (d >0) {
-      rub= this._remove(src,dst, 1, width);
-    } else if (d<0) {
-      rub= this._remove(src,dst,-1, width);
+    if (newGroup) {
+      rub= this.items.splice(src, width);
+    } else {
+      const d= src-dst;
+      if (d >0) {
+        rub= this._remove(src,dst, 1, width);
+      } else if (d<0) {
+        rub= this._remove(src,dst,-1, width);
+      }
     }
     return rub;
   }
-  addTo(src, dst, rub) {
-    const d= src-dst;
-    if (d >0) {
-      this._add(src,dst, 1, rub);
-    } else if (d<0) {
-      this._add(src,dst,-1, rub);
+  addTo(src, dst, rub, newGroup=false) {
+    if (newGroup) {
+      const at= Math.min(Math.max(0,dst+1), this.items.length);
+      this.items.splice(at,0,...rub);
+    } else{
+      const d= src-dst;
+      if (d >0) {
+        this._add(src,dst, 1, rub);
+      } else if (d<0) {
+        this._add(src,dst,-1, rub);
+      }
     }
   }
   _remove(src,dst,sign, width) {
@@ -33,13 +42,6 @@ class DragList {
           this.items.splice(src, width);
   }
   _add(src,dst,sign, rub) {
-    // if (src-dst!==sign) {
-    //   dst= dst+sign;
-    // } else if (sign>0) {
-    //   dst= src+sign;
-    // } else {
-    //   dst= dst+sign;
-    // }
     if (src-dst===1) {
       dst= src+1;
     } else {

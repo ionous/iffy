@@ -7,9 +7,17 @@
 	</head>
 	<body>
 		<div id="app"
-		><em-table 
-				:items="items"
-				:dropper="dropper"
+			><h3>group 1</h3
+			><em-table 
+					:group="'g1'"
+					:items="g1"
+					:dropper="dropper"
+			></em-table
+			><h3>group 2</h3
+			><em-table 
+					:group="'g2'"
+					:items="g2"
+					:dropper="dropper"
 			></em-table
 		></div>
 		<script src="src/dragList.js"></script> 

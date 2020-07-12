@@ -17,6 +17,9 @@ class Lipsum {
   get text() {
     return this.words.join(" ");
   }
+  static list(...wordcounts) {
+    return wordcounts.map((c) => new Lipsum(c));
+  }
   // return an array of
   static words(idx, cnt) {
     // when the end index is greater, that's fine.

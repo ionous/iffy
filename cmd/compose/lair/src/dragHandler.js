@@ -2,12 +2,12 @@
 
 // event handler
 class DragHandler {
-  constructor(dropper, {serializeItem, addItem, removeItem}) {
+  constructor(group, dropper, {serializeItem, addItem, removeItem}) {
+    this.group= group;
     this.dropper= dropper;
     this.serializeItem= serializeItem;
     this.addItem= addItem;
     this.removeItem= removeItem;
-    this.leaving= false;
     this.finder= false;
     this.listeners= false;
   }
@@ -21,7 +21,7 @@ class DragHandler {
       // triggered on the item in question.
       dragstart: "onDragStart",
       // a dragged item has moved;
-      // triggered on the drag start item.
+      // triggered on the drag start item, in the original group.
       drag:      "onDragUpdate",
       // a dragged item enters a valid drop target;
       // triggered on the target of the drop.
@@ -66,11 +66,12 @@ class DragHandler {
     /*if (dt === "copy")*/ {
       const drop= this.finder.get(evt.target);
       if (drop) {
-        const {idx:startIdx, group:srcGroup} = this.dropper.source;
-        const {idx:dropIdx}= drop;
+        const {idx:dragIdx, handler:dragHandler} = this.dropper.source;
+        const {idx:dropIdx, handler:dropHandler}= drop;
+        const newGroup= dropHandler!== dragHandler;
         //
-        const rub= srcGroup.removeItem(startIdx, dropIdx);
-        this.addItem(startIdx, dropIdx, rub);
+        const rub= dragHandler.removeItem(dragIdx, dropIdx, 1, newGroup);
+        this.addItem(dragIdx, dropIdx, rub, newGroup);
       }
     }
     //
@@ -79,11 +80,10 @@ class DragHandler {
   }
   // the drag event targets the same element as drag start
   // and happens periodically as you move the cursor around.
+  // ie. it only happens in the originating group
   onDragUpdate(evt) {
     // this.log(evt);
-    if (this.leaving) {
-      this.dropper.setTarget(false);
-    }
+    this.dropper.updateTarget(this);
     evt.stopPropagation();
   }
   onDragEnd(evt) {
@@ -97,7 +97,7 @@ class DragHandler {
   }
   onDragLeave(evt) {
     this.log(evt);
-    this.leaving= true;
+    this.dropper.leaving= this;
     evt.stopPropagation();
     evt.preventDefault();
   }
@@ -107,23 +107,22 @@ class DragHandler {
     if (over) {
       const dt= evt.dataTransfer;
       dt.dropEffect= "copy";
+      this.log(evt);
       //
       this.dropper.setTarget(this, over);
-      this.leaving= false;
 
       evt.stopPropagation();
       evt.preventDefault();
-      this.log(evt);
     }
   }
   log(evt) {
-    return;
+    // return;
     const el= evt.target;
     const dt= evt.dataTransfer;
     const tgt= this.finder.get(el) || {idx:"xxx", edge:false};
     const fx= (dt&&dt.dropEffect)||"???";
     console.log(evt.type, "@", el.nodeName,
-      "idx:", tgt.idx, "edge:", tgt.edge,
+      "idx:", this.group, tgt.idx, "edge:", tgt.edge,
       "fx:", fx);
   }
 };
