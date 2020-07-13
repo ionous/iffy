@@ -4,7 +4,7 @@
 .em-table__header, .em-table__footer {
   height: 0.5em;
 }
-.em-item {
+.em-row {
   display: flex;
 }
 .em-gutter {
@@ -22,7 +22,7 @@
 .em-max {
   visibility: hidden;
 }
-.em-item:not(.em-drag-mark) > .em-gutter {
+.em-row:not(.em-drag-mark) > .em-gutter {
   color: grey;
   background-color: whitesmoke;
 }
@@ -42,7 +42,4 @@
 .em-drag-image {
   color: grey;
   background-color: silver;
-}
-.flip-list-move {
-  transition: transform 0.5s;
 }

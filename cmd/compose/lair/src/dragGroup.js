@@ -9,7 +9,7 @@ class DragGroup {
   }
    // generate a vue class for an item based on the current highlight settings.
   highlight(idx) {
-    var ret;
+    let ret= "em-item";
     const {target:at, source:from} = this.dropper;
     if (at && from && at.group.name===this.name) {
       // the edge display needs a lot more work
@@ -21,6 +21,7 @@ class DragGroup {
           "em-drag-highlight": true,
           // [edge]:true,
           "em-drag-mark": true,
+          "em-item": true,
       };
     }
     return ret;

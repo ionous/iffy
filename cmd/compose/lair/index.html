@@ -1,6 +1,6 @@
 <html>
 		<head>
-			<title>Draggin' tests</title>
+			<title>Dragon Drop</title>
 			<meta name="google" content="notranslate">
 			<link rel="stylesheet" href="lair.css">
 			<script src="lib/vue.js"></script>
@@ -12,12 +12,14 @@
 					:group="'g1'"
 					:items="g1"
 					:dropper="dropper"
-			></em-table
-			><h3>group 2</h3
-			><em-table 
-					:group="'g2'"
-					:items="g2"
-					:dropper="dropper"
+				><template 
+					v-slot="{item, idx}"
+					><em-row
+        		:num="idx"
+		        :max="g1.length"
+		        :text="item.text"
+					></em-row
+				></template
 			></em-table
 		></div>
 		<script src="src/dragList.js"></script> 

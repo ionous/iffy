@@ -15,9 +15,9 @@ Vue.component('em-gutter', {
 });
 
 // simple content with numbered, draggable gutter
-Vue.component('em-item', {
+Vue.component('em-row', {
   template:
-  `<div class="em-item"
+  `<div class="em-row"
     ><em-gutter
       :num="num"
       :max="max"
@@ -74,18 +74,15 @@ Vue.component('em-table', {
       :data-drag-idx="-1"
       :data-drag-edge="0"
     ></div
-    ><transition-group
-      name="flip-list"
-      ><em-item
-        v-for="(item,idx) in items"
+    ><div v-for="(item,idx) in items"
         :class="drag.highlight(idx)"
         :data-drag-idx="idx"
         :key="item.id"
-        :num="idx*idx*idx"
-        :max="1234"
-        :text="item.text"
-      ></em-item
-    ></transition-group
+      ><slot
+        :idx="idx"
+        :item="item"
+      ></slot
+    ></div
     ><div
       class="em-table__footer"
       :data-drag-idx="items.length"
