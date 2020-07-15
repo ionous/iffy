@@ -1,34 +1,25 @@
 // use a pair of numbers for the gutter to manage the sizing.
 Vue.component('elem', {
   template:
-  `<em-item
-      :idx="idx"
-      :max="max"
-      :item="item"
-    ><template v-slot="{item,idx}"
-      ><div v-if="subitems.length===1"
-          class="em-content"
-        >{{text}}</div
-      ><em-table v-else
-          :group="'g'+item.id"
-          :items="subitems"
-          :dropper="dropper"
-        ><template
-          v-slot:default="{item,idx}"
-          ><elem
-            :item="item"
-            :idx="idx"
-            :max="subitems.length"
-            :dropper="dropper"
-          ></elem
-        ></template
-      ></em-table
+  `<div v-if="subitems.length===1"
+      class="em-content"
+    >{{text}}</div
+    ><em-table v-else
+      :group="'g'+item.id"
+      :items="subitems"
+      :dropper="dropper"
+    ><template
+      v-slot:default="{item,idx}"
+      ><elem
+        :item="item"
+        :idx="idx"
+        :dropper="dropper"
+      ></elem
     ></template
-  ></em-item>`,
+  ></em-table>`,
   props: {
-    item:Object,
     idx:Number,
-    max:Number,
+    item:Object,
     dropper:Object,
   },
   data(){
@@ -48,7 +39,6 @@ Vue.component('elem', {
   }
 });
 
-
 // use a pair of numbers for the gutter to manage the sizing.
 Vue.component('em-gutter', {
   template:
@@ -64,27 +54,6 @@ Vue.component('em-gutter', {
   },
   beforeDestroy() {
     console.log(`gutter ${this.num}/${this.max} being destroyed`);
-  }
-});
-
-// simple content with numbered, draggable gutter
-Vue.component('em-item', {
-  template:
-  `<div class="em-item"
-    ><em-gutter
-      :num="idx+1"
-      :max="max"
-      draggable="true"
-    ></em-gutter
-    ><slot
-      :idx="idx"
-      :item="item"
-    ></slot
-  ></div>`,
-  props: {
-    idx: Number,
-    max: Number,
-    item: Object,
   }
 });
 
@@ -132,10 +101,16 @@ Vue.component('em-table', {
         :class="drag.highlight(idx)"
         :data-drag-idx="idx"
         :key="item.id"
+      ><em-gutter
+        :num="idx+1"
+        :max="items.length"
+        draggable="true"
+        ></em-gutter
       ><slot
         :idx="idx"
         :item="item"
       ></slot
+      ></em-gutter
     ></div
     ><div
       class="em-table__footer"

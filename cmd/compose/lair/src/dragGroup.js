@@ -9,7 +9,7 @@ class DragGroup {
   }
    // generate a vue class for an item based on the current highlight settings.
   highlight(idx) {
-    let ret= "em-row";
+    let highlight= false;
     const {target:at, source:from} = this.dropper;
     if (at && from && at.group.name===this.name) {
       // the edge display needs a lot more work
@@ -17,14 +17,13 @@ class DragGroup {
       // const edges= ["em-table__head","em-row--body","em-table__tail"];
       // const sign= Math.sign(from.idx-at.idx); // negative upper
       // const edge= edges[sign+1];
-      ret= ((idx === at.idx) || (idx === at.edge)) && {
-          "em-drag-highlight": true,
-          // [edge]:true,
-          "em-drag-mark": true,
-          "em-row": true,
-      };
+      highlight=((idx === at.idx) || (idx === at.edge));
     }
-    return ret;
+    return {
+      "em-row": true,
+      "em-drag-mark": highlight,
+      "em-drag-highlight": highlight,
+    }
   }
 };
 

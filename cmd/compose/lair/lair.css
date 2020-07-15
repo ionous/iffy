@@ -4,7 +4,7 @@
 .em-table__header, .em-table__footer {
   height: 0.5em;
 }
-.em-item {
+.em-row {
   display: flex;
 }
 .em-gutter {
@@ -22,7 +22,7 @@
 .em-max {
   visibility: hidden;
 }
-.em-item:not(.em-drag-mark) > .em-gutter {
+.em-row:not(.em-drag-mark) > .em-gutter {
   color: grey;
   background-color: whitesmoke;
 }
@@ -35,7 +35,7 @@
   box-shadow:inset 0px -3px rgba(0,0,0,0.6);
 }
 /* dragEnter adds, dragLeave removes */
-.em-row.em-drag-highlight {
+.em-drag-highlight {
   background-color: lightblue/* !important*/;
   transition: background-color 0.25s ease;
 }
