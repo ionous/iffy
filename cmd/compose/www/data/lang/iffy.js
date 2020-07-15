@@ -165,7 +165,7 @@ For example: animals, containers, etc.`);
 
     make.str("bool", "{true} or {false}");
     make.str("text", `A sequence of characters of any length, all on one line.
-Examples include letters, words, or short sentances.
+Examples include letters, words, or short sentences.
 Text is generally something displayed to the player.
 See also: lines.`);
 
