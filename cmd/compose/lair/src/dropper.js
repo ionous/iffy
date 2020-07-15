@@ -6,27 +6,27 @@ class Dropper {
     return new DragGroup(name, this, ops);
   }
   reset(log) {
-    if (log) {
+    if (log && (this.source || this.target || this.leaving)) {
       console.log("dropper reset");
     }
     this.source= false;
     this.target= false;
     this.leaving= false;
   }
-  setSource(group, item) {
-    const src= Dropper.setGroup(group, item);
+  setSource(group, found) {
+    const src= Dropper.setGroup(group, found);
     this.source= src;
     this.target= src;
     console.log("dropper set source");
   }
-  setTarget(group, item) {
+  setTarget(group, found) {
    if (this.target.group!== group ||
-        this.target.idx !== item.idx ||
-        this.target.edge !== item.edge)
+        this.target.idx !== found.idx ||
+        this.target.edge !== found.edge)
    {
-      const sign=Math.sign(this.source.idx-item.idx);
-      console.log("dropper changed", group.name, item.idx, sign, item.edge);
-      this.target= Dropper.setGroup(group, item);
+      const sign=Math.sign(this.source.idx-found.idx);
+      console.log("dropper changed", group.name, found.idx, sign, found.edge);
+      this.target= Dropper.setGroup(group, found);
     }
     this.leaving= false;
   }

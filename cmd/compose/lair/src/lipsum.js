@@ -7,15 +7,15 @@ let lastIndex=0;
 let lastItem=0;
 
 // a slice of words from the above lipsum string.
+// id, words, text
 class Lipsum {
   constructor(cnt) {
     const idx= lastIndex;
+    const words= cnt? Lipsum.words(idx, cnt): ["<blank>"];
     lastIndex= (lastIndex+(cnt||0)) % allWords.length;
-    this.words= cnt? Lipsum.words(idx, cnt): ["<blank>"];
+    //
     this.id= "id"+ (++lastItem);
-  }
-  get text() {
-    return this.words.join(" ");
+    this.text= words.join(" ");
   }
   static list(...wordcounts) {
     return wordcounts.map((c) => new Lipsum(c));

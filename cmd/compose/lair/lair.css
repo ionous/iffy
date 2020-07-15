@@ -4,7 +4,7 @@
 .em-table__header, .em-table__footer {
   height: 0.5em;
 }
-.em-row {
+.em-item {
   display: flex;
 }
 .em-gutter {
@@ -22,20 +22,20 @@
 .em-max {
   visibility: hidden;
 }
-.em-row:not(.em-drag-mark) > .em-gutter {
+.em-item:not(.em-drag-mark) > .em-gutter {
   color: grey;
   background-color: whitesmoke;
 }
 /* highlight upper edge */
-.em-item--head {
+.em-table__head {
   box-shadow:inset 0px 3px rgba(0,0,0,0.6);
 }
 /* highlight lower edge */
-.em-item--tail {
+.em-table__tail {
   box-shadow:inset 0px -3px rgba(0,0,0,0.6);
 }
 /* dragEnter adds, dragLeave removes */
-.em-item.em-drag-highlight {
+.em-row.em-drag-highlight {
   background-color: lightblue/* !important*/;
   transition: background-color 0.25s ease;
 }

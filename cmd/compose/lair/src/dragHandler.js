@@ -1,5 +1,3 @@
-
-
 // event handler
 class DragHandler {
   constructor(group, dropper) {
@@ -59,18 +57,25 @@ class DragHandler {
   onDrop(evt) {
     this.log(evt);
     const dt= evt.dataTransfer;
-    /*if (dt === "copy")*/ {
+    // not sure why, but drop effect is often 'none' here on chrome;
+    // ( even though drag end will be copy )
+    /*if (dt && dt.dropEffect=== "copy")*/ {
       const drop= this.finder.get(evt.target);
       if (drop) {
         const {idx:dropIdx}= drop;
         const {idx:dragIdx, group:dragGroup} = this.dropper.source;
         const newGroup= this.group!== dragGroup;
+        // add and remove can ( sometimes ) cause dragend not to fire.
+        // fix? while moving items is quick and easy
+        // technically, we should create new items here by serialization --
+        // and wait to remove items in drag end.
         //
         const rub= dragGroup.removeItem(dragIdx, dropIdx, 1, newGroup);
         this.group.addItem(dragIdx, dropIdx, rub, newGroup);
+        // clear b/c we dont always get dragEnd.
+        this.dropper.reset(true);
       }
     }
-    //
     evt.stopPropagation();
     evt.preventDefault();
   }
@@ -82,12 +87,12 @@ class DragHandler {
     this.dropper.updateTarget(this);
     evt.stopPropagation();
   }
+  // this gets triggered on the drag start element, and bubbles here.
+  // if the drag start element has been removed, this will never fire.
   onDragEnd(evt) {
     this.log(evt);
     //
-    this.finder.reset(true);
     this.dropper.reset(true);
-    //
     evt.stopPropagation();
     evt.preventDefault();
   }
@@ -112,7 +117,7 @@ class DragHandler {
     }
   }
   log(evt) {
-    return;
+    // return;
     const el= evt.target;
     const dt= evt.dataTransfer;
     const tgt= this.finder.get(el) || {idx:"xxx", edge:false};

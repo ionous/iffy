@@ -12,13 +12,14 @@
 					:group="'g1'"
 					:items="g1"
 					:dropper="dropper"
-				><template 
-					v-slot="{item, idx}"
-					><em-row
-        		:num="idx"
-		        :max="g1.length"
-		        :text="item.text"
-					></em-row
+				><template
+					v-slot="{item,idx}"
+					><elem
+						:item="item"
+						:idx="idx"
+						:max="g1.length"
+						:dropper="dropper"
+					></elem
 				></template
 			></em-table
 		></div>

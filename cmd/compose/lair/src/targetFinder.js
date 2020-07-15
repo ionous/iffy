@@ -5,18 +5,12 @@ class TargetFinder {
   // ex. a container of drop items.
   constructor(el) {
     this.topEl= el;
-    this.reset();
-  }
-  reset(log) {
-    if (log) {
-      console.log("target reset");
-    }
     this.lastTgt= false;
-    this.lastRes= false;;
+    this.lastRes= false;
   }
   // return the idx and edge targeted by el.
-  get(target, noedges) {
-    if (this.lastTgt !== target) {
+  get(target, reset) {
+    if (reset || (this.lastTgt !== target)) {
       const res= this.findIdx(target);
       this.lastTgt= target; // cache...
       this.lastRes= res;
@@ -38,20 +32,30 @@ class TargetFinder {
   }
   // from https://github.com/jquery/jquery/blob/master/src/data.js
   static getData(el, key) {
-    const data= el.dataset[key];
-    if ( data === "true" ) {
-      return true;
+    var ret;
+    const ds= el.dataset;
+    if (ds) {
+      const data= el.dataset[key];
+      switch (data) {
+      case "true":
+        ret= true;
+        break;
+      case "false":
+        ret= false;
+        break;
+      case "null":
+        ret= null;
+        break;
+      default:
+        // Only convert to a number if it doesn't change the string
+        const num= +data;
+        if ( data === num + "" ) {
+          ret= num;
+        } else {
+          ret= data;
+        }
+      }; // end switch
     }
-    if ( data === "false" ) {
-      return false;
-    }
-    if ( data === "null" ) {
-      return null;
-    }
-    // Only convert to a number if it doesn't change the string
-    if ( data === +data + "" ) {
-      return +data;
-    }
-    return data;
+    return ret;
   }
 };

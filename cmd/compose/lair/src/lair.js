@@ -1,3 +1,53 @@
+// use a pair of numbers for the gutter to manage the sizing.
+Vue.component('elem', {
+  template:
+  `<em-item
+      :idx="idx"
+      :max="max"
+      :item="item"
+    ><template v-slot="{item,idx}"
+      ><div v-if="subitems.length===1"
+          class="em-content"
+        >{{text}}</div
+      ><em-table v-else
+          :group="'g'+item.id"
+          :items="subitems"
+          :dropper="dropper"
+        ><template
+          v-slot:default="{item,idx}"
+          ><elem
+            :item="item"
+            :idx="idx"
+            :max="subitems.length"
+            :dropper="dropper"
+          ></elem
+        ></template
+      ></em-table
+    ></template
+  ></em-item>`,
+  props: {
+    item:Object,
+    idx:Number,
+    max:Number,
+    dropper:Object,
+  },
+  data(){
+    const id= this.item.id;
+    const text= this.item.text;
+    const subitems= text.split(". ").map((x, i) => {
+      // fake items:
+      return {
+        id: `${id}-${i}`,
+        text: x,
+      }
+    });
+    return {
+      text: text,
+      subitems: subitems,
+    }
+  }
+});
+
 
 // use a pair of numbers for the gutter to manage the sizing.
 Vue.component('em-gutter', {
@@ -12,25 +62,29 @@ Vue.component('em-gutter', {
     num: Number,
     max: Number,
   },
+  beforeDestroy() {
+    console.log(`gutter ${this.num}/${this.max} being destroyed`);
+  }
 });
 
 // simple content with numbered, draggable gutter
-Vue.component('em-row', {
+Vue.component('em-item', {
   template:
-  `<div class="em-row"
+  `<div class="em-item"
     ><em-gutter
-      :num="num"
+      :num="idx+1"
       :max="max"
       draggable="true"
     ></em-gutter
-    ><div
-      class="em-content"
-    >{{text}}</div
+    ><slot
+      :idx="idx"
+      :item="item"
+    ></slot
   ></div>`,
   props: {
-    num: Number,
+    idx: Number,
     max: Number,
-    text: String,
+    item: Object,
   }
 });
 
@@ -51,7 +105,7 @@ Vue.component('em-table', {
         },
         // note: addItem might happen in a group other than serialize and removeItem.
         addItem(src, dst, rub, newGroup) {
-          list.addTo(src, dst, rub, newGroup );
+          list.addTo(src, dst, rub, newGroup);
         },
       })
     }
@@ -94,7 +148,7 @@ Vue.component('em-table', {
 const app= new Vue({
   el: '#app',
   data: {
-    g1: Lipsum.list(15, 30, 3, 5, 25, 7),
+    g1: Lipsum.list(15, 31, 3, 5, 8, 17),
     g2: Lipsum.list(8, 12, 5, 42, 2, 17),
     dropper: new Dropper(),
   },
