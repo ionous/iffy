@@ -46,7 +46,7 @@ class Dropper {
     dt.effectAllowed= 'all';
     // set the drag image
     el.classList.add(...imgClasses);
-    dt.setDragImage(el,10,10); // fix? maybe should be click relative?
+    dt.setDragImage(el,-10,-10); // fix? maybe should be click relative?
     setTimeout(()=>{
       el.classList.remove(...imgClasses);
     });

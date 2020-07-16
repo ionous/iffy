@@ -15,29 +15,29 @@ div {
   /*user-select: none;*/
   cursor: grab;
 }
-  .em-table--block > div {
-      display: block;
-
+.em-table--block > div {
+    display: block;Sed tempus, augue eget vehicula tristique, odio elit suscipit erat, sit amet congue est erat at mauris.
+}
+.em-row {
+  box-sizing: border-box;
   }
 
 .em-table__header, .em-table__footer {
   width: 1ch;
   height: 1em;
-  background-color: blue;
   display: inline-block;
 }
 
-
-  .em-row:not(.em-drag-mark) > .em-gutter {
+.em-row:not(.em-drag-mark) > .em-gutter {
   color: grey;
   background-color: whitesmoke;
 }
 /* highlight upper edge */
-.em-table__head {
+.em-table--block > .em-drag-head {
   box-shadow:inset 0px 3px rgba(0,0,0,0.6);
 }
 /* highlight lower edge */
-.em-table__tail {
+.em-table--block > .em-drag-tail {
   box-shadow:inset 0px -3px rgba(0,0,0,0.6);
 }
 /* dragEnter adds, dragLeave removes */
@@ -48,4 +48,14 @@ div {
 .em-drag-image {
   color: grey;
   background-color: silver;
+}
+.em-item--block > .em-drag-head {
+  border-left: solid 3px black;
+  margin-right: -3px;
+}
+
+.em-item--block > .em-drag-tail {
+  border-right: solid 3px black;
+  margin-right: -3px;
+  
 }
