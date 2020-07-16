@@ -2,13 +2,14 @@
 Vue.component('elem', {
   template:
   `<em-table
+      :classmod="'inline'"
       :items="subitems"
       :dropper="dropper"
-      :grip="'$'"
+      :grip="'\u201C'"
     ><template
       v-slot="{item,idx}"
-      ><div
-      >{{item.text}}</div
+      ><span class="em-content"
+      >{{item.text}}</span
     ></template
   ></em-table>`,
   props: {
@@ -23,7 +24,7 @@ Vue.component('elem', {
       // fake items:
       return {
         id: `${id}-${i}`,
-        text: x,
+        text: `${x.trim().replace(/\.|,$/,'')}.`,
       }
     });
     return {
@@ -33,12 +34,15 @@ Vue.component('elem', {
 });
 
 // use a pair of numbers for the gutter to manage the sizing.
+// note: we have to put the draggable on the inner-most element
+// https://bugs.chromium.org/p/chromium/issues/detail?id=982219
 Vue.component('em-gutter', {
   template:
   `<div class="em-gutter"
     ><div class="em-max"
     >{{max}}</div
     ><div class="em-num"
+    draggable="true"
     >{{grip || num}}</div
   ></div>`,
   props: {
@@ -77,6 +81,7 @@ Vue.component('em-table', {
     grip:String,
     items: Array,
     dropper: Dropper,
+    classmod: String,
   },
   mounted() {
     this.drag.handler.listen(this.$el);
@@ -85,21 +90,20 @@ Vue.component('em-table', {
     this.drag.handler.silence();
   },
   template:
-  `<div class="em-table"
+  `<div :class="['em-table', 'em-table--'+classmod]"
     ><div
-      class="em-table__header"
+      :class="['em-row', 'em-row__header--'+classmod]"
       :data-drag-idx="-1"
       :data-drag-edge="0"
     ></div
     ><div v-for="(item,idx) in items"
-        :class="drag.highlight(idx)"
+        :class="drag.highlight(idx, classmod)"
         :data-drag-idx="idx"
         :key="item.id"
       ><em-gutter
         :num="idx+1"
         :grip="grip"
-        :max="items.length"
-        draggable="true"
+        :max="60+items.length"
         ></em-gutter
       ><slot
         :idx="idx"
@@ -108,7 +112,7 @@ Vue.component('em-table', {
       ></em-gutter
     ></div
     ><div
-      class="em-table__footer"
+      :class="['em-row', 'em-row__footer--'+classmod]"
       :data-drag-idx="items.length"
       :data-drag-edge="items.length-1"
     ></div

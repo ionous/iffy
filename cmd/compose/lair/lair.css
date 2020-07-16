@@ -1,42 +1,72 @@
-.em-table {
-  padding-left: 2em;
+.em-table--inline {
+  margin: 0.1em 0em;
 }
-.em-table__header, .em-table__footer {
-  height: 0.5em;
-}
-.em-row {
+.em-row--block {
   display: flex;
 }
+.em-row--inline {
+  display: inline;
+}
 .em-gutter {
+  color: grey;
+  background-color: #cfcfcf;
+}
+
+.em-gutter {
+  display: inline-block;
   position: relative;
-  margin-right: 0.5ch;
-  user-select: none;
   cursor: grab;
+  text-align: center;
+}
+.em-row--block > .em-gutter {
+  text-align: right;
+  margin-right: 0.5ch;
+}
+/** shift key turns inline gutters on and off **/
+.em-row--inline > .em-gutter {
+  display: none;
+}
+.em-shift .em-row--inline > .em-gutter {
+  display: inline-block;
+}
+.em-row--inline > .em-gutter {
+  font-weight: bold;
+  font-size: smaller;
+  color: white;
+  background-color: blue;
+  border-radius: 5px;
+  margin-right: 0.5ch;
+  margin-left: 0.5ch;
 }
 .em-num {
   position: absolute;
-  width: 100%;
   top: 0;
-  text-align: right;
+  width: 100%;
 }
 .em-max {
   visibility: hidden;
+
 }
-.em-row:not(.em-drag-mark) > .em-gutter {
-  color: grey;
-  background-color: whitesmoke;
+.em-row__header--inline, .em-row__footer--inline  {
+  display: inline;
+}
+.em-row__header--inline, .em-row__footer--inline {
+  min-width: 1ch;
+}
+.em-row__header--block, .em-row__footer--block {
+  height: 0.5em;
 }
 /* highlight upper edge */
-.em-table__head {
+.em-drag-head {
   box-shadow:inset 0px 3px rgba(0,0,0,0.6);
 }
 /* highlight lower edge */
-.em-table__tail {
+.em-drag-tail {
   box-shadow:inset 0px -3px rgba(0,0,0,0.6);
 }
 /* dragEnter adds, dragLeave removes */
 .em-drag-highlight {
-  background-color: lightblue/* !important*/;
+  background-color: lightblue;
   transition: background-color 0.25s ease;
 }
 .em-drag-image {
