@@ -2,8 +2,8 @@ class Dropper {
   constructor() {
     this.reset();
   }
-  newGroup(name, ops) {
-    return new DragGroup(name, this, ops);
+  newGroup(ops) {
+    return new DragGroup(this, ops);
   }
   reset(log) {
     if (log && (this.source || this.target || this.leaving)) {

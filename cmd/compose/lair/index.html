@@ -2,19 +2,20 @@
 		<head>
 			<title>Dragon Drop</title>
 			<meta name="google" content="notranslate">
-			<link rel="stylesheet" href="lair.css">
+			<link rel="stylesheet" href="lair2.css">
 			<script src="lib/vue.js"></script>
 	</head>
 	<body>
 		<div id="app"
-			><h3>group 1</h3
+			><h3>Drag Text {{shift?"y":"n"}}</h3
 			><em-table 
-					:group="'g1'"
-					:items="g1"
+					class="em-table--block"
+					:items="groups[0]"
 					:dropper="dropper"
 				><template
 					v-slot="{item,idx}"
 					><elem
+						class="em-item--block"
 						:idx="idx"
 						:item="item"
 						:dropper="dropper"

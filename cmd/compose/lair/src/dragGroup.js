@@ -1,6 +1,7 @@
+let lastGroup= 0;
 class DragGroup {
-  constructor(name, dropper, {serializeItem, addItem, removeItem}) {
-    this.name= name;
+  constructor(dropper, {serializeItem, addItem, removeItem}) {
+    this.name= `group-${++lastGroup}`;
     this.dropper= dropper;
     this.serializeItem= serializeItem;
     this.addItem= addItem;
@@ -11,7 +12,7 @@ class DragGroup {
   highlight(idx) {
     let highlight= false;
     const {target:at, source:from} = this.dropper;
-    if (at && from && at.group.name===this.name) {
+    if (at && from && at.group ===this) {
       // the edge display needs a lot more work
       // it has to follow the same rules as the insertion does.
       // const edges= ["em-table__head","em-row--body","em-table__tail"];

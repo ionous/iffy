@@ -1,0 +1,51 @@
+div {
+  display: inline;
+}
+.em-table--block {
+  display: block;
+}
+.em-max {
+  display: none;
+}
+.em-gutter {
+  /*position: relative;*/
+  padding-right: 3px;
+  padding-left: 3px;
+
+  /*user-select: none;*/
+  cursor: grab;
+}
+  .em-table--block > div {
+      display: block;
+
+  }
+
+.em-table__header, .em-table__footer {
+  width: 1ch;
+  height: 1em;
+  background-color: blue;
+  display: inline-block;
+}
+
+
+  .em-row:not(.em-drag-mark) > .em-gutter {
+  color: grey;
+  background-color: whitesmoke;
+}
+/* highlight upper edge */
+.em-table__head {
+  box-shadow:inset 0px 3px rgba(0,0,0,0.6);
+}
+/* highlight lower edge */
+.em-table__tail {
+  box-shadow:inset 0px -3px rgba(0,0,0,0.6);
+}
+/* dragEnter adds, dragLeave removes */
+.em-drag-highlight {
+  background-color: lightblue/* !important*/;
+  transition: background-color 0.25s ease;
+}
+.em-drag-image {
+  color: grey;
+  background-color: silver;
+}

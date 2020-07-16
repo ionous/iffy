@@ -1,20 +1,14 @@
 // use a pair of numbers for the gutter to manage the sizing.
 Vue.component('elem', {
   template:
-  `<div v-if="subitems.length===1"
-      class="em-content"
-    >{{text}}</div
-    ><em-table v-else
-      :group="'g'+item.id"
+  `<em-table
       :items="subitems"
       :dropper="dropper"
+      :grip="'$'"
     ><template
-      v-slot:default="{item,idx}"
-      ><elem
-        :item="item"
-        :idx="idx"
-        :dropper="dropper"
-      ></elem
+      v-slot="{item,idx}"
+      ><div
+      >{{item.text}}</div
     ></template
   ></em-table>`,
   props: {
@@ -33,7 +27,6 @@ Vue.component('elem', {
       }
     });
     return {
-      text: text,
       subitems: subitems,
     }
   }
@@ -46,9 +39,10 @@ Vue.component('em-gutter', {
     ><div class="em-max"
     >{{max}}</div
     ><div class="em-num"
-    >{{num}}</div
+    >{{grip || num}}</div
   ></div>`,
   props: {
+    grip: String,
     num: Number,
     max: Number,
   },
@@ -62,7 +56,7 @@ Vue.component('em-table', {
     const list= new DragList(this.items, ()=> new Lipsum());
     const dropper= this.dropper;
     return {
-      drag: dropper.newGroup(this.group, {
+      drag: dropper.newGroup({
         serializeItem(at)  {
           const item= list.items[at];
           return {
@@ -80,8 +74,8 @@ Vue.component('em-table', {
     }
   },
   props: {
+    grip:String,
     items: Array,
-    group: String,
     dropper: Dropper,
   },
   mounted() {
@@ -103,6 +97,7 @@ Vue.component('em-table', {
         :key="item.id"
       ><em-gutter
         :num="idx+1"
+        :grip="grip"
         :max="items.length"
         draggable="true"
         ></em-gutter
@@ -122,9 +117,25 @@ Vue.component('em-table', {
 //
 const app= new Vue({
   el: '#app',
+  created() {
+    document.addEventListener("keydown", (e) => {
+      console.log("keydown", e.key === "Shift");
+      this.shift= true;
+    });
+    document.addEventListener("keyup", (e) => {
+      console.log("keyup", e.key === "Shift");
+      this.shift= false;
+    });
+    window.addEventListener("blur", (e) => {
+      this.shift= false;
+    });
+  },
   data: {
-    g1: Lipsum.list(15, 31, 3, 5, 8, 17),
-    g2: Lipsum.list(8, 12, 5, 42, 2, 17),
+    groups: [
+          Lipsum.list(15, 31, 3, 5, 8, 17),
+          Lipsum.list(8, 12, 5, 42, 2, 17),
+    ],
     dropper: new Dropper(),
+    shift: false,
   },
 });
