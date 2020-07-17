@@ -84,10 +84,35 @@ Vue.component('em-table', {
     classmod: String,
   },
   mounted() {
-    this.drag.handler.listen(this.$el);
+    this.drag.handler.listen(this.$el, this.classmod==="inline");
   },
   beforeDestroy() {
     this.drag.handler.silence();
+  },
+  methods: {
+    // generate a vue css class object for an item based on the current highlight settings.
+    highlight(idx) {
+      let highlight= false;
+      let edge= false;
+      const {target:at, source:from} = this.dropper;
+      const atGroup= at && (at.group === this.drag);
+      const fromGroup= from && (from.group === this.drag);
+      if (atGroup) {
+        edge= idx === at.edge;
+        highlight=(idx === at.idx) || edge;
+      }
+      const mod= this.classmod;
+      const inline= mod==="inline";
+      return {
+        "em-row": true,
+        ["em-row--"+mod] : !!mod,
+        "em-drag-mark": highlight,
+        "em-drag-highlight": highlight,
+        "em-drag-head": edge && (at.idx < 0),
+        "em-drag-tail": edge && (at.idx > 0),
+        "em-drag-from": fromGroup && ((idx === from.idx) || (inline && idx > from.idx))
+      }
+    }
   },
   template:
   `<div :class="['em-table', 'em-table--'+classmod]"
@@ -97,7 +122,7 @@ Vue.component('em-table', {
       :data-drag-edge="0"
     ></div
     ><div v-for="(item,idx) in items"
-        :class="drag.highlight(idx, classmod)"
+        :class="highlight(idx)"
         :data-drag-idx="idx"
         :key="item.id"
       ><em-gutter

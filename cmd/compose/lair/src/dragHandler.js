@@ -5,11 +5,14 @@ class DragHandler {
     this.dropper= dropper;
     this.finder= false;
     this.listeners= false;
+    //
+    this.inline= false;
   }
-  listen(el) {
+  listen(el, inline=false) {
     if (this.listeners) {
       throw new Error("still listening");
     }
+    this.inline= inline;
     this.finder= new TargetFinder(el);
     this.listeners= new EventGroup(el, this, {
       // the user starts dragging an item;
@@ -47,8 +50,23 @@ class DragHandler {
     const dt= evt.dataTransfer;
     const start= this.finder.get(evt.target, true);
     if (start) {
+      let tgt= start.el;
+      // create a temporary set of elements for an image
+      // the blur drag source style is left to the .highlight
+      if (this.inline) {
+        tgt = document.createElement("span");
+        let sib= start.el;
+        while (1) {
+          const add = sib.cloneNode(true);
+          tgt.appendChild(add);
+          sib= sib.nextSibling;
+          if (!sib || TargetFinder.getData(sib, "dragIdx") === undefined) {
+            break;
+          }
+        }
+      }
       this.dropper.setSource(this.group, start);
-      Dropper.setDragData(dt, start.el, this.group.serializeItem(start.idx));
+      Dropper.setDragData(dt, tgt, this.group.serializeItem(start.idx));
       evt.stopPropagation();
       this.log(evt)
     }
@@ -70,7 +88,11 @@ class DragHandler {
         // technically, we should create new items here by serialization --
         // and wait to remove items in drag end.
         //
-        const rub= dragGroup.removeItem(dragIdx, dropIdx, 1, newGroup);
+        let width= 1;
+        if (dragGroup.handler.inline) {
+          width= Number.MAX_VALUE;
+        }
+        const rub= dragGroup.removeItem(dragIdx, dropIdx, width, newGroup);
         this.group.addItem(dragIdx, dropIdx, rub, newGroup);
         // clear b/c we dont always get dragEnd.
         this.dropper.reset(true);

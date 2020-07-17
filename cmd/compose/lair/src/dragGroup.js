@@ -8,23 +8,5 @@ class DragGroup {
     this.removeItem= removeItem;
     this.handler= new DragHandler(this, dropper);
   }
-   // generate a vue class for an item based on the current highlight settings.
-  highlight(idx, mod) {
-    let highlight= false;
-    let edge= false;
-    const {target:at, source:from} = this.dropper;
-    if (at && from && at.group ===this) {
-      edge= idx === at.edge;
-      highlight=(idx === at.idx) || edge;
-    }
-    return {
-      "em-row": true,
-      ["em-row--"+mod] : !!mod,
-      "em-drag-mark": highlight,
-      "em-drag-highlight": highlight,
-      "em-drag-head": edge && (at.idx < 0),
-      "em-drag-tail": edge && (at.idx > 0),
-    }
-  }
 };
 

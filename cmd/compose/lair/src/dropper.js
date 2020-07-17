@@ -17,7 +17,7 @@ class Dropper {
     const src= Dropper.setGroup(group, found);
     this.source= src;
     this.target= src;
-    console.log("dropper set source");
+    console.log("dropper set source", found);
   }
   setTarget(group, found) {
    if (this.target.group!== group ||
@@ -42,13 +42,21 @@ class Dropper {
     return { group, el, idx, edge };
   }
   static setDragData(dt, el, data, imgClasses= ["em-drag-image", "em-drag-mark"]) {
+    const existed= !!el.parentElement;
+    if (!existed) {
+        document.body.append(el);
+    }
     // set fx
     dt.effectAllowed= 'all';
     // set the drag image
     el.classList.add(...imgClasses);
     dt.setDragImage(el,-10,-10); // fix? maybe should be click relative?
     setTimeout(()=>{
-      el.classList.remove(...imgClasses);
+      if (existed) {
+        el.classList.remove(...imgClasses);
+      } else {
+        el.remove();
+      }
     });
     // set drag content
     for (const k in data) {

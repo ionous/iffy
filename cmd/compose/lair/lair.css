@@ -11,7 +11,6 @@
   color: grey;
   background-color: #cfcfcf;
 }
-
 .em-gutter {
   display: inline-block;
   position: relative;
@@ -45,7 +44,6 @@
 }
 .em-max {
   visibility: hidden;
-
 }
 .em-row__header--inline, .em-row__footer--inline  {
   display: inline;
@@ -72,4 +70,7 @@
 .em-drag-image {
   color: grey;
   background-color: silver;
+}
+.em-drag-from:not(.em-drag-image) {
+  filter: blur(1px);
 }
