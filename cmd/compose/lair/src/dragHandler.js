@@ -1,18 +1,15 @@
 // event handler
 class DragHandler {
-  constructor(group, dropper) {
-    this.group= group;
-    this.dropper= dropper;
+  // dragStart, drop, dragOver, drag, dragLeave, drop, dragEnd
+  constructor(callbacks) {
+    this.on= callbacks;
     this.finder= false;
     this.listeners= false;
-    //
-    this.inline= false;
   }
-  listen(el, inline=false) {
+  listen(el) {
     if (this.listeners) {
       throw new Error("still listening");
     }
-    this.inline= inline;
     this.finder= new TargetFinder(el);
     this.listeners= new EventGroup(el, this, {
       // the user starts dragging an item;
@@ -47,26 +44,9 @@ class DragHandler {
   // the user is attempting to drag,
   // and bubbles up here to the item.
   onDragStart(evt) {
-    const dt= evt.dataTransfer;
     const start= this.finder.get(evt.target, true);
     if (start) {
-      let tgt= start.el;
-      // create a temporary set of elements for an image
-      // the blur drag source style is left to the .highlight
-      if (this.inline) {
-        tgt = document.createElement("span");
-        let sib= start.el;
-        while (1) {
-          const add = sib.cloneNode(true);
-          tgt.appendChild(add);
-          sib= sib.nextSibling;
-          if (!sib || TargetFinder.getData(sib, "dragIdx") === undefined) {
-            break;
-          }
-        }
-      }
-      this.dropper.setSource(this.group, start);
-      Dropper.setDragData(dt, tgt, this.group.serializeItem(start.idx));
+      this.on.dragStart(start, evt.dataTransfer);
       evt.stopPropagation();
       this.log(evt)
     }
@@ -80,22 +60,7 @@ class DragHandler {
     /*if (dt && dt.dropEffect=== "copy")*/ {
       const drop= this.finder.get(evt.target);
       if (drop) {
-        const {idx:dropIdx}= drop;
-        const {idx:dragIdx, group:dragGroup} = this.dropper.source;
-        const newGroup= this.group!== dragGroup;
-        // add and remove can ( sometimes ) cause dragend not to fire.
-        // fix? while moving items is quick and easy
-        // technically, we should create new items here by serialization --
-        // and wait to remove items in drag end.
-        //
-        let width= 1;
-        if (dragGroup.handler.inline) {
-          width= Number.MAX_VALUE;
-        }
-        const rub= dragGroup.removeItem(dragIdx, dropIdx, width, newGroup);
-        this.group.addItem(dragIdx, dropIdx, rub, newGroup);
-        // clear b/c we dont always get dragEnd.
-        this.dropper.reset(true);
+        this.on.drop(drop, evt.dataTransfer);
       }
     }
     evt.stopPropagation();
@@ -106,34 +71,30 @@ class DragHandler {
   // ie. it only happens in the originating group
   onDragUpdate(evt) {
     // this.log(evt);
-    this.dropper.updateTarget(this);
+    this.on.drag();
     evt.stopPropagation();
   }
   // this gets triggered on the drag start element, and bubbles here.
   // if the drag start element has been removed, this will never fire.
   onDragEnd(evt) {
     this.log(evt);
-    //
-    this.dropper.reset(true);
+    this.on.dragEnd()
     evt.stopPropagation();
     evt.preventDefault();
   }
   onDragLeave(evt) {
     this.log(evt);
-    this.dropper.leaving= this.group;
+    const leave= this.finder.get(evt.target);
+    this.on.dragLeave(leave, evt.dataTransfer);
     evt.stopPropagation();
     evt.preventDefault();
   }
   // called on dragenter, dragover
   onDragEnterOver(evt) {
+    this.log(evt);
     const over= this.finder.get(evt.target);
     if (over) {
-      const dt= evt.dataTransfer;
-      dt.dropEffect= "copy";
-      this.log(evt);
-      //
-      this.dropper.setTarget(this.group, over);
-
+      this.on.dragOver(over, evt.dataTransfer);
       evt.stopPropagation();
       evt.preventDefault();
     }
@@ -145,7 +106,7 @@ class DragHandler {
     const tgt= this.finder.get(el) || {idx:"xxx", edge:false};
     const fx= (dt&&dt.dropEffect)||"???";
     console.log(evt.type, "@", el.nodeName,
-      "idx:", this.group.name, tgt.idx, "edge:", tgt.edge,
+      "idx:", tgt.idx, "edge:", tgt.edge,
       "fx:", fx);
   }
 };

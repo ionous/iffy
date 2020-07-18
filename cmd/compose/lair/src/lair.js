@@ -2,7 +2,7 @@
 Vue.component('elem', {
   template:
   `<em-table
-      :classmod="'inline'"
+      :inline="true"
       :items="subitems"
       :dropper="dropper"
       :grip="'\u201C'"
@@ -57,37 +57,29 @@ Vue.component('em-gutter', {
 
 Vue.component('em-table', {
   data() {
-    const list= new DragList(this.items, ()=> new Lipsum());
+    const list= new DragList(this.items, this.inline, ()=> new Lipsum());
     const dropper= this.dropper;
     return {
-      drag: dropper.newGroup({
-        serializeItem(at)  {
-          const item= list.items[at];
-          return {
-            'text/plain': item.text,
-          };
-        },
-        removeItem(src, dst, width=1, newGroup) {
-          return list.removeFrom(src, dst, width, newGroup);
-        },
-        // note: addItem might happen in a group other than serialize and removeItem.
-        addItem(src, dst, rub, newGroup) {
-          list.addTo(src, dst, rub, newGroup);
-        },
-      })
+      list,
+      handler: new DragHandler(new DragGroup(list, dropper)),
+    };
+  },
+  computed: {
+    classmod() {
+      return this.inline? "inline":"block";
     }
   },
   props: {
     grip:String,
     items: Array,
     dropper: Dropper,
-    classmod: String,
+    inline: Boolean,
   },
   mounted() {
-    this.drag.handler.listen(this.$el, this.classmod==="inline");
+    this.handler.listen(this.$el);
   },
   beforeDestroy() {
-    this.drag.handler.silence();
+    this.handler.silence();
   },
   methods: {
     // generate a vue css class object for an item based on the current highlight settings.
@@ -95,22 +87,22 @@ Vue.component('em-table', {
       let highlight= false;
       let edge= false;
       const {target:at, source:from} = this.dropper;
-      const atGroup= at && (at.group === this.drag);
-      const fromGroup= from && (from.group === this.drag);
-      if (atGroup) {
+      const atList= at && (at.list === this.list);
+      const fromList= from && (from.list === this.list);
+      if (atList) {
         edge= idx === at.edge;
         highlight=(idx === at.idx) || edge;
       }
       const mod= this.classmod;
-      const inline= mod==="inline";
+      const inline= this.inline;
       return {
         "em-row": true,
-        ["em-row--"+mod] : !!mod,
+        ["em-row--"+mod] : true,
         "em-drag-mark": highlight,
         "em-drag-highlight": highlight,
         "em-drag-head": edge && (at.idx < 0),
         "em-drag-tail": edge && (at.idx > 0),
-        "em-drag-from": fromGroup && ((idx === from.idx) || (inline && idx > from.idx))
+        "em-drag-from": fromList && ((idx === from.idx) || (inline && idx > from.idx))
       }
     }
   },
@@ -161,8 +153,8 @@ const app= new Vue({
   },
   data: {
     groups: [
-          Lipsum.list(15, 31, 3, 5, 8, 17),
-          Lipsum.list(8, 12, 5, 42, 2, 17),
+      Lipsum.list(15, 31, 3, 5, 8, 17),
+      Lipsum.list(8, 12, 5, 42, 2, 17),
     ],
     dropper: new Dropper(),
     shift: false,

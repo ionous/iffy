@@ -1,53 +1,39 @@
+let lastList= 0;
+
 class DragList {
-  constructor(items, makeBlank) {
+  constructor(items, inline, makeBlank) {
+    this.name= `list-${++lastList}`;
     this.items= items;
     this.makeBlank= makeBlank;
+    this.inline= inline;
   }
-  // here for testing, illustration
-  // can't really be in a single function b/c it can happen across groups.
-  adjust(src, dst, width=1) {
-    const rub= this.removeFrom(src, dst, width);
-    this.addTo(src, dst, rub);
-  }
-  removeFrom(src, dst, width=1, newGroup=false) {
-    var rub;
-    if (newGroup) {
-      rub= this.items.splice(src, width);
-    } else {
-      const d= src-dst;
-      if (d >0) {
-        rub= this._remove(src,dst, 1, width);
-      } else if (d<0) {
-        rub= this._remove(src,dst,-1, width);
-      }
-    }
-    return rub;
-  }
-  addTo(src, dst, rub, newGroup=false) {
-    if (newGroup) {
-      const at= Math.min(Math.max(0,dst+1), this.items.length);
-      this.items.splice(at,0,...rub);
-    } else{
-      const d= src-dst;
-      if (d >0) {
-        this._add(src,dst, 1, rub);
-      } else if (d<0) {
-        this._add(src,dst,-1, rub);
-      }
+  // note: cant always move items in a single moment
+  // ( ex. adding/removing across groups)
+  move(src, dst, width=1) {
+     if (src!== dst) {
+      const rub= this.removeFrom(src, dst, width);
+      this.addTo(src, dst, rub);
     }
   }
-  _remove(src,dst,sign, width) {
+  removeFrom(src, dst, width=1) {
+    const sign= Math.sign(src-dst);
     return (src-dst === sign) ?
           [ this.makeBlank() ] :
           this.items.splice(src, width);
   }
-  _add(src,dst,sign, rub) {
+  addTo(src, dst, rub) {
+    const tgt= this.adjustIndex(src, dst);
+    this.items.splice(tgt,0,...rub);
+  }
+  // when removing and re-adding to the same list,
+  // the index of the "add" can change b/c of the removed element.
+  adjustIndex(src, dst) {
     if (src-dst===1) {
       dst= src+1;
     } else {
-      dst= dst+sign;
+      dst= dst+ Math.sign(src-dst);
     }
-    this.items.splice(dst,0,...rub);
+    return dst;
   }
 };
 
@@ -55,11 +41,11 @@ class DragList {
   console.log("testing drag list");
   function test(og, src, dst, expect) {
     const items= og.split('');
-    const dl= new DragList(items, ()=>"_");
-    dl.adjust(src,dst);
+    const dl= new DragList(items, false, ()=>"_");
+    dl.move(src,dst);
     const res= items.join("");
     if (expect !== res) {
-     console.log("Error, moving", og[s], "want:", expect, "have:", res);
+     console.log("Error, moving", og[src], "want:", expect, "have:", res);
     }
   };
 
@@ -84,4 +70,4 @@ class DragList {
   test("abc", 2, 2, "abc");  // <no change>
   test("abc", 2, 3, "ab_c"); // leading tail
 
-})/*()*/;
+})();

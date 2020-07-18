@@ -2,9 +2,6 @@ class Dropper {
   constructor() {
     this.reset();
   }
-  newGroup(ops) {
-    return new DragGroup(this, ops);
-  }
   reset(log) {
     if (log && (this.source || this.target || this.leaving)) {
       console.log("dropper reset");
@@ -13,33 +10,32 @@ class Dropper {
     this.target= false;
     this.leaving= false;
   }
-  setSource(group, found) {
-    const src= Dropper.setGroup(group, found);
+  setSource(list, found) {
+    const src= Dropper.record(list, found);
     this.source= src;
     this.target= src;
     console.log("dropper set source", found);
   }
-  setTarget(group, found) {
-   if (this.target.group!== group ||
+  setTarget(list, found) {
+   if (this.target.list!== list ||
         this.target.idx !== found.idx ||
         this.target.edge !== found.edge)
    {
       const sign=Math.sign(this.source.idx-found.idx);
-      console.log("dropper changed", group.name, found.idx, sign, found.edge);
-      this.target= Dropper.setGroup(group, found);
+      console.log("dropper changed", list.name, found.idx, sign, found.edge);
+      this.target= Dropper.record(list, found);
     }
     this.leaving= false;
   }
   updateTarget() {
-    if (this.leaving === this.target.group) {
+    if (this.leaving === this.target.list) {
       console.log("dropper target cleared");
       this.target= false;
     }
   }
-
-  // add the group to the passed parameter set
-  static setGroup(group, {el, idx, edge}) {
-    return { group, el, idx, edge };
+  // add the list to the passed parameter set
+  static record(list, {el, idx, edge}) {
+    return { list, el, idx, edge };
   }
   static setDragData(dt, el, data, imgClasses= ["em-drag-image", "em-drag-mark"]) {
     const existed= !!el.parentElement;
