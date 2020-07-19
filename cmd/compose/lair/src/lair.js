@@ -4,17 +4,27 @@
 // https://bugs.chromium.org/p/chromium/issues/detail?id=982219
 Vue.component('em-gutter', {
   template:
-  `<div class="em-gutter"
+  `<div :class="cls"
     ><div class="em-max"
-    >{{max}}</div
+    >{{max}} </div
     ><div class="em-num"
     draggable="true"
-    >{{grip || num}}</div
+    >{{grip || (num)}} </div
   ></div>`,
   props: {
     grip: String,
     num: Number,
     max: Number,
+  },
+  computed: {
+    cls() {
+      const grip= !!this.grip;
+      return {
+        "em-gutter": true,
+        "em-gutter--grip": grip,
+        "em-gutter--digi": !grip,
+      };
+    }
   },
   beforeDestroy() {
     console.log(`gutter ${this.num}/${this.max} being destroyed`);

@@ -8,27 +8,25 @@
   display: inline;
 }
 .em-gutter {
-  color: grey;
-  background-color: #cfcfcf;
-}
-.em-gutter {
+  background-color: whitesmoke;
   display: inline-block;
   position: relative;
   cursor: grab;
-  text-align: center;
 }
-.em-row--block > .em-gutter {
+.em-gutter--digi {
+  white-space: pre;
   text-align: right;
   margin-right: 0.5ch;
 }
 /** shift key turns inline gutters on and off **/
-.em-row--inline > .em-gutter {
+.em-gutter--grip {
   display: none;
 }
-.em-shift .em-row--inline > .em-gutter {
+.em-shift .em-gutter--grip {
   display: inline-block;
 }
-.em-row--inline > .em-gutter {
+.em-gutter--grip {
+  text-align: center;
   font-weight: bold;
   font-size: smaller;
   color: white;
