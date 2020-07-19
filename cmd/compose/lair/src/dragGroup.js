@@ -4,10 +4,29 @@ class DragGroup {
   constructor(list, dropper) {
     this.list= list;
     this.dropper= dropper;
-  };
+  }
   dragOver(over,dt) {
-    this.dropper.setTarget(this.list, over);
-    dt.dropEffect= "copy";
+    const mylist= this.list;
+    const start= this.dropper.start
+    // dont allow parents to be dropped into their children.
+    // this is lair specific; we would need to check "is parent" more generically.
+    var overStart;
+    if (start.list === mylist) {
+        overStart= (over.idx === start.idx) ||
+                  (mylist.inline && (over.idx > start.idx));
+    } else {
+      // bad cases: a, b, c, d
+      // 1. same (inline) group and idx is same (or larger)
+      // 2. the item we are over has the parent of the item being moved.
+      // FIX: dragging a row ( block source ) into the midst of an item.
+      const overItem= this.list.items[over.idx];
+      const startItem= start.list.items[start.idx];
+      overStart= overItem && overItem.parent=== startItem;
+    }
+    if (!overStart) {
+      this.dropper.setTarget(mylist, over);
+      dt.dropEffect= "copy";
+    }
   }
   drag() {
     this.dropper.updateTarget(this.list);
@@ -26,7 +45,7 @@ class DragGroup {
   drop(drop, dt) {
     const dropGroup= this.list;
     const {idx:dropIdx}= drop;
-    const {idx:dragIdx, list:dragGroup} = this.dropper.source;
+    const {idx:dragIdx, list:dragGroup} = this.dropper.start;
     // add and remove can ( sometimes ) cause dragend not to fire.
     // fix? while moving items is quick and easy
     // technically, we should create new items here by serialization --
@@ -42,15 +61,23 @@ class DragGroup {
       let rub= dragGroup.items.splice(dragIdx, width);
       const at= Math.min(Math.max(0,dropIdx+1), dropGroup.items.length);
 
-      // if we are moving multiple items from an inline group to a block group
+      // moving multiple items from an inline group to a block group?
       const merge= (rub.length > 1 && dragGroup.inline && !dropGroup.inline);
       if (!merge) {
-        dropGroup.items.splice(at,0,...rub);
+        // moving a block into an inline list of items.
+        if (!dragGroup.inline && dropGroup.inline) {
+
+          dropGroup.items.splice(at, 0,...rub[0].content);
+        } else {
+          dropGroup.items.splice(at, 0,...rub);
+        }
       } else {
-        const text= rub.map((x)=>x.text).join(" ");
-        console.log("merging", text);
-        const obj= { id: rub[0].id, text  };
-        dropGroup.items.splice(at,0, obj);
+        const parent= new Item();
+        parent.content= rub.map((x)=> {
+          x.parent= parent;
+          return x;
+        });
+        dropGroup.items.splice(at, 0, parent);
       }
     }
 
@@ -67,7 +94,7 @@ class DragGroup {
   _getDragImage(start, dt) {
     let tgt= start.el;
     // create a temporary set of elements for an image
-    // the blur drag source style is left to the .highlight
+    // the blur drag start style is left to the .highlight
     if (this.list.inline) {
       tgt = document.createElement("span");
       let sib= start.el;

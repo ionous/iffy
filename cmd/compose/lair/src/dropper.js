@@ -3,25 +3,25 @@ class Dropper {
     this.reset();
   }
   reset(log) {
-    if (log && (this.source || this.target || this.leaving)) {
+    if (log && (this.start || this.target || this.leaving)) {
       console.log("dropper reset");
     }
-    this.source= false;
+    this.start= false;
     this.target= false;
     this.leaving= false;
   }
   setSource(list, found) {
     const src= Dropper.record(list, found);
-    this.source= src;
+    this.start= src;
     this.target= src;
-    console.log("dropper set source", found);
+    console.log("dropper set start", found);
   }
   setTarget(list, found) {
    if (this.target.list!== list ||
         this.target.idx !== found.idx ||
         this.target.edge !== found.edge)
    {
-      const sign=Math.sign(this.source.idx-found.idx);
+      const sign=Math.sign(this.start.idx-found.idx);
       console.log("dropper changed", list.name, found.idx, sign, found.edge);
       this.target= Dropper.record(list, found);
     }

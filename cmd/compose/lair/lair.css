@@ -71,6 +71,6 @@
   color: grey;
   background-color: silver;
 }
-.em-drag-from:not(.em-drag-image) {
+.em-drag-start:not(.em-drag-image) {
   filter: blur(1px);
 }

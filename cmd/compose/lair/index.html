@@ -9,19 +9,26 @@
 		<div id="app"
 			><h3>Drag Text</h3
 			><em-table
-				:class="shift && 'em-shift'"
-				:items="groups[0]"
-				:dropper="dropper"
+					:class="shift && 'em-shift'"
+					:items="groups[0]"
+					:dropper="dropper"
 				><template
 					v-slot="{item,idx}"
-					><elem
-						:idx="idx"
-						:item="item"
-						:dropper="dropper"
-					></elem
+					><em-table
+				      :inline="true"
+				      :items="item.content"
+				      :dropper="dropper"
+				      :grip="'\u201C'"
+				    ><template
+				      v-slot="{item,idx}"
+				      ><span class="em-content"
+				      >{{item.content}} </span
+				    ></template
+				  ></em-table
 				></template
 			></em-table
 		></div>
+		<script src="src/item.js"></script>
 		<script src="src/dragList.js"></script> 
 		<script src="src/eventGroup.js"></script>
 		<script src="src/targetFinder.js"></script>

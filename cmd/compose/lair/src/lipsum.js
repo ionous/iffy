@@ -1,24 +1,28 @@
-//lipsum.js
-
 const lipsum= `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum nec lorem malesuada, condimentum nibh ac, viverra justo. Pellentesque eleifend lectus in quam rhoncus, a sodales orci rutrum. Donec eu nulla elementum, tincidunt nunc id, consequat eros. Cras laoreet facilisis neque id viverra. Vivamus a semper nisl. Nulla ultricies lectus sed rutrum pulvinar. Aliquam in diam efficitur est volutpat sollicitudin nec eu massa. Sed tempus, augue eget vehicula tristique, odio elit suscipit erat, sit amet congue est erat at mauris. Maecenas scelerisque dapibus metus, at pulvinar augue congue eu.`
 
 const allWords = lipsum.split(' ');
-let lastIndex=0;
-let lastItem=0;
+let lastWord=0;
 
 // a slice of words from the above lipsum string.
 // id, words, text
 class Lipsum {
   constructor(cnt) {
-    const idx= lastIndex;
+    const idx= lastWord;
     const words= cnt? Lipsum.words(idx, cnt): ["<blank>"];
-    lastIndex= (lastIndex+(cnt||0)) % allWords.length;
-    //
-    this.id= "id"+ (++lastItem);
+    lastWord= (lastWord+(cnt||0)) % allWords.length;
     this.text= words.join(" ");
   }
+  // generate an array of arrays of strings [[a,b,c],[d,e,f]]
   static list(...wordcounts) {
-    return wordcounts.map((c) => new Lipsum(c));
+    let wordset= wordcounts.map((c) => {
+      const lipsum= new Lipsum(c);
+      const parent= new Item();
+      parent.content= lipsum.text.split(". ").map((x) => {
+        return new Item(parent, `${x.trim().replace(/\.|,$/,'')}.`);
+      });
+      return parent;
+    });
+    return wordset;
   }
   // return an array of
   static words(idx, cnt) {

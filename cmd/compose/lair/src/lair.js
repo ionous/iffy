@@ -1,37 +1,3 @@
-// use a pair of numbers for the gutter to manage the sizing.
-Vue.component('elem', {
-  template:
-  `<em-table
-      :inline="true"
-      :items="subitems"
-      :dropper="dropper"
-      :grip="'\u201C'"
-    ><template
-      v-slot="{item,idx}"
-      ><span class="em-content"
-      >{{item.text}}</span
-    ></template
-  ></em-table>`,
-  props: {
-    idx:Number,
-    item:Object,
-    dropper:Object,
-  },
-  data(){
-    const id= this.item.id;
-    const text= this.item.text;
-    const subitems= text.split(". ").map((x, i) => {
-      // fake items:
-      return {
-        id: `${id}-${i}`,
-        text: `${x.trim().replace(/\.|,$/,'')}.`,
-      }
-    });
-    return {
-      subitems: subitems,
-    }
-  }
-});
 
 // use a pair of numbers for the gutter to manage the sizing.
 // note: we have to put the draggable on the inner-most element
@@ -86,9 +52,9 @@ Vue.component('em-table', {
     highlight(idx) {
       let highlight= false;
       let edge= false;
-      const {target:at, source:from} = this.dropper;
+      const {target:at, start} = this.dropper;
       const atList= at && (at.list === this.list);
-      const fromList= from && (from.list === this.list);
+      const startList= start && (start.list === this.list);
       if (atList) {
         edge= idx === at.edge;
         highlight=(idx === at.idx) || edge;
@@ -102,7 +68,7 @@ Vue.component('em-table', {
         "em-drag-highlight": highlight,
         "em-drag-head": edge && (at.idx < 0),
         "em-drag-tail": edge && (at.idx > 0),
-        "em-drag-from": fromList && ((idx === from.idx) || (inline && idx > from.idx))
+        "em-drag-start": startList && ((idx === start.idx) || (inline && idx > start.idx))
       }
     }
   },
@@ -140,12 +106,14 @@ const app= new Vue({
   el: '#app',
   created() {
     document.addEventListener("keydown", (e) => {
-      console.log("keydown", e.key === "Shift");
-      this.shift= true;
+      const shift= e.key === "Shift";
+      this.shift= this.shift || shift;
+      // console.log("keydown", e.key, shift);
     });
     document.addEventListener("keyup", (e) => {
-      console.log("keyup", e.key === "Shift");
-      this.shift= false;
+      const shift= e.key === "Shift";
+      this.shift= this.shift && !shift;
+      // console.log("keyup", e.key, shift);
     });
     window.addEventListener("blur", (e) => {
       this.shift= false;
