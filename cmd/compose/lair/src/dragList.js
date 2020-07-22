@@ -7,6 +7,9 @@ class DragList {
     this.makeBlank= makeBlank;
     this.inline= inline;
   }
+  get block() {
+    return !this.inline;
+  }
   // note: cant always move items in a single moment
   // ( ex. adding/removing across groups)
   move(src, dst, width=1) {
@@ -70,4 +73,4 @@ class DragList {
   test("abc", 2, 2, "abc");  // <no change>
   test("abc", 2, 3, "ab_c"); // leading tail
 
-})();
+})/*()*/;

@@ -11,6 +11,9 @@
   background-color: whitesmoke;
   display: inline-block;
   position: relative;
+  cursor: default;
+}
+.em-gutter > div[draggable="true"] {
   cursor: grab;
 }
 .em-gutter--digi {
@@ -28,12 +31,21 @@
 .em-gutter--grip {
   text-align: center;
   font-weight: bold;
-  font-size: smaller;
+  /*font-size: smaller;*/
   color: white;
   background-color: blue;
   border-radius: 5px;
   margin-right: 0.5ch;
   margin-left: 0.5ch;
+  border: 1px solid white;
+}
+.em-gutter.em-gutter--unfilled {
+  background-color: inherit;
+  border: 1px solid black;
+  color: black;
+  -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
 .em-num {
   position: absolute;

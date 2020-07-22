@@ -8,33 +8,43 @@ Vue.component('em-gutter', {
     ><div class="em-max"
     >{{max}} </div
     ><div class="em-num"
-    draggable="true"
+    :draggable="draggable"
+    @dragstart="startDrag"
     >{{grip || (num)}} </div
   ></div>`,
   props: {
     grip: String,
     num: Number,
     max: Number,
+    draggable: {
+      type: Boolean,
+      default: true,
+    }
+  },
+  methods: {
+    startDrag(evt) {
+      if (!this.draggable) {
+        evt.stopPropagation();
+      }
+    }
   },
   computed: {
     cls() {
-      const grip= !!this.grip;
+      const digi= !this.grip;
       return {
         "em-gutter": true,
-        "em-gutter--grip": grip,
-        "em-gutter--digi": !grip,
+        "em-gutter--digi":  digi,
+        "em-gutter--grip": !digi,
       };
     }
-  },
-  beforeDestroy() {
-    console.log(`gutter ${this.num}/${this.max} being destroyed`);
   }
 });
 
 Vue.component('em-table', {
   data() {
-    const list= new DragList(this.items, this.inline, ()=> new Lipsum());
-    const dropper= this.dropper;
+    const { items, inline, dropper }= this;
+    const makeBlank= ()=> new Item(inline?"":[]);
+    const list= new DragList(items, inline, makeBlank);
     return {
       list,
       handler: new DragHandler(new DragGroup(list, dropper)),
@@ -108,8 +118,70 @@ Vue.component('em-table', {
       :class="['em-row', 'em-row__footer--'+classmod]"
       :data-drag-idx="items.length"
       :data-drag-edge="items.length-1"
+    ><slot
+        name="footer"
+    ></slot
     ></div
   ></div>`
+});
+//
+Vue.component('main-panel', {
+  template:
+  `<em-table
+      :class="$root.shift && 'em-shift'"
+      :items="items"
+      :dropper="dropper"
+    ><template
+      v-slot="{item,idx}"
+      ><em-table v-if="item.content.length"
+          :inline="true"
+          :items="item.content"
+          :dropper="dropper"
+          :grip="gripOf(item.outputType)"
+        ><template
+          v-slot="{item,idx}"
+          ><span class="em-content"
+          >{{item.content}} </span
+        ></template
+        ><template
+          v-slot:footer
+          ><em-gutter
+            class="em-gutter--unfilled"
+            :num="items.length"
+            :draggable="false"
+            :grip="gripOf(items[items.length-1].inputType)"
+            :max="60+items.length"
+          ></em-gutter
+        ></template
+      ></em-table
+      ><em-gutter v-else
+        class="em-gutter--unfilled"
+        :num="idx+1"
+        :draggable="false"
+        :grip="gripOf(item.outputType)"
+        :max="60+items.length"
+      ></em-gutter
+    ></template
+  ></em-table>`,
+  props: {
+    items: Array,
+    dropper: Dropper,
+  },
+  methods: {
+    gripOf(t) {
+      return itemTypes[t]
+    }
+  },
+  computed: {
+    cls() {
+      const digi= !this.grip;
+      return {
+        "em-gutter": true,
+        "em-gutter--digi":  digi,
+        "em-gutter--grip": !digi,
+      };
+    }
+  }
 });
 //
 const app= new Vue({
@@ -131,9 +203,10 @@ const app= new Vue({
   },
   data: {
     groups: [
-      Lipsum.list(15, 31, 3, 5, 8, 17),
+      Lipsum.list(15, 31, 3, 5, 0, 8, 17),
       Lipsum.list(8, 12, 5, 42, 2, 17),
     ],
+
     dropper: new Dropper(),
     shift: false,
   },
