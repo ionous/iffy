@@ -1,0 +1,86 @@
+.em-table--inline {
+  margin: 0.1em 0em;
+}
+.em-row--block {
+  display: flex;
+}
+.em-row--inline {
+  display: inline;
+}
+.em-gutter {
+  background-color: whitesmoke;
+  display: inline-block;
+  position: relative;
+  cursor: default;
+}
+.em-gutter > div[draggable="true"] {
+  cursor: grab;
+}
+.em-gutter--digi {
+  white-space: pre;
+  text-align: right;
+  margin-right: 0.5ch;
+}
+/** shift key turns inline gutters on and off **/
+.em-gutter--grip {
+  display: none;
+}
+.em-shift .em-gutter--grip {
+  display: inline-block;
+}
+.em-gutter--grip {
+  text-align: center;
+  font-weight: bold;
+  /*font-size: smaller;*/
+  color: white;
+  background-color: blue;
+  border-radius: 5px;
+  margin-right: 0.5ch;
+  margin-left: 0.5ch;
+  border: 1px solid white;
+}
+.em-gutter.em-gutter--unfilled {
+  background-color: inherit;
+  border: 1px solid black;
+  color: black;
+  -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+}
+.em-num {
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+.em-max {
+  visibility: hidden;
+}
+.em-row__header--inline, .em-row__footer--inline  {
+  display: inline;
+}
+.em-row__header--inline, .em-row__footer--inline {
+  min-width: 1ch;
+}
+.em-row__header--block, .em-row__footer--block {
+  height: 0.5em;
+}
+/* highlight upper edge */
+.em-drag-head {
+  box-shadow:inset 0px 3px rgba(0,0,0,0.6);
+}
+/* highlight lower edge */
+.em-drag-tail {
+  box-shadow:inset 0px -3px rgba(0,0,0,0.6);
+}
+/* dragEnter adds, dragLeave removes */
+.em-drag-highlight {
+  background-color: lightblue;
+  transition: background-color 0.25s ease;
+}
+.em-drag-image {
+  color: grey;
+  background-color: silver;
+}
+.em-drag-start:not(.em-drag-image) {
+  filter: blur(1px);
+}
