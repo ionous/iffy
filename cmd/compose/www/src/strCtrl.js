@@ -20,7 +20,7 @@ Vue.component('mk-str-ctrl', {
       >{{showText? itemText: label}}</mk-a-button
       ><mk-auto-text
         v-if="editing"
-        :key="node.item.id"
+        :key="node.key"
         :autoText="autoText"
         :initialText="showText? itemText:''"
         @change="onInputChange"

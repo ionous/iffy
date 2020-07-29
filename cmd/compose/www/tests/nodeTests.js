@@ -1,40 +1,11 @@
-class Nodes {
+class NodeTest {
     constructor(rootItem) {
-      this.all= {};
-      this.makeNodes(rootItem);
+      this.nodes= Nodes.Unroll(rootItem);
       this.redux= new Redux(null, 100);
     }
     newMutation(node) {
       const state= new MutationState(node);
       return new Mutation(this.redux, state);
-    }
-    // recursively create nodes from data.
-    makeNodes( item, parent=null, fieldInParent= null ) {
-      const node= new Node( item, parent, fieldInParent );
-      this.all[item.id]= node;
-      const { value }= item;
-      const valueType= typeof value;
-      if (valueType === 'string' || valueType === 'number') {
-      } else {
-        // ex. story statement doesnt have any fields
-        // its value is directly another item -- a slat.
-        if (value && "id" in value) {
-          this.makeNodes( value, node );
-        } else {
-          // walk fields of our
-          for (const field in value) {
-            const arg= value[field];
-            if (!Array.isArray(arg)) {
-              this.makeNodes( arg, node, field );
-            } else {
-              for (const el of arg) {
-                this.makeNodes( el, node, field );
-              }
-            }
-          }
-        }
-      }
-      return node;
     }
 }
 
@@ -43,7 +14,7 @@ function nodeTests() {
     const make= new Make(new Types());
     makeLang(make);
 
-    const nodes= new Nodes(root || {
+    const test= new NodeTest(root || {
       "id": "td1",
       "type": "story_statements",
       "value": {
@@ -106,19 +77,19 @@ function nodeTests() {
       }
     });
     console.log("testing", name);
-    testFn(nodes);
+    testFn(test);
   }
 
   function testMutation(name, expected) {
-    runTest(`mutation ${name}`, function(nodes) {
-      const node= nodes.all[name];
-      const mutation= nodes.newMutation(node);
+    runTest(`mutation ${name}`, function(test) {
+      const node= test.nodes.all[name];
+      const mutation= test.newMutation(node);
       const have= JSON.stringify(mutation.state,0,2);
       const want= JSON.stringify(expected,0,2);
       if (have !== want) {
         console.log("have:", have);
         console.log("want:", want);
-        throw new Error(`${node.item.id} mismatched`);
+        throw new Error(`${node.key} mismatched`);
       }
     });
   }
@@ -238,58 +209,58 @@ function nodeTests() {
   //
   // test actually mutating some data
   //
-  runTest("test appending to a new (optional) list", function(nodes) {
-    const kindOfNoun= nodes.all.td11.item;
+  runTest("test appending to a new (optional) list", function(test) {
+    const kindOfNoun= test.nodes.all.td11.item;
     if (kindOfNoun.value["$TRAIT"]) {
       throw new Error("unexpected initial attribute");
     }
-    nodes.newMutation( nodes.all.td10 ).mutate(-1);
+    test.newMutation( test.nodes.all.td10 ).mutate(-1);
     if (kindOfNoun.value["$TRAIT"].length !== 1) {
       throw new Error("missing new attribute");
     }
   });
   //
-  runTest("test appending to an existing (required) list", function(nodes) {
-    const lede= nodes.all.td4.item;
+  runTest("test appending to an existing (required) list", function(test) {
+    const lede= test.nodes.all.td4.item;
     if (lede.value["$NOUN"].length !== 1) {
         throw new Error("expected one initial noun");
     }
-    nodes.newMutation( nodes.all.td9 ).mutate(-1);
+    test.newMutation( test.nodes.all.td9 ).mutate(-1);
     if (lede.value["$NOUN"].length !== 2) {
         throw new Error("expected a new noun");
     }
   });
   //
-  runTest("test creating a non-repeating optional item", function(nodes) {
-    const nounStatement= nodes.all.td5.item;
+  runTest("test creating a non-repeating optional item", function(test) {
+    const nounStatement= test.nodes.all.td5.item;
     if (nounStatement.value["$SUMMARY"]) {
       throw new Error("unexpected initial summary");
     }
-    nodes.newMutation( nodes.all.td10 ).mutate(3);
+    test.newMutation( test.nodes.all.td10 ).mutate(3);
     const summary= nounStatement.value["$SUMMARY"];
     if (!summary || (summary.type !== "summary")) {
       throw new Error("unexpected new empty summary");
     }
   });
   // deletion
-  runTest("delete a slat", function(nodes) {
-    const nounPhrase= nodes.all.td3.item;
+  runTest("delete a slat", function(test) {
+    const nounPhrase= test.nodes.all.td3.item;
     if (nounPhrase.value.type !== "kind_of_noun") {
       throw new Error("expected initial 'kind of noun' phrase");
     }
     // delete the "kind of noun" noun phrase
-    nodes.newMutation( nodes.all.td9 ).mutate(0);
+    test.newMutation( test.nodes.all.td9 ).mutate(0);
     if (nounPhrase.value) {
       throw new Error("expected noun phrase slat was deleted");
     }
   });
-  runTest("delete a repeating item", function(nodes) {
-    const statementList= nodes.all.td1.item.value["$STORY_STATEMENT"];
+  runTest("delete a repeating item", function(test) {
+    const statementList= test.nodes.all.td1.item.value["$STORY_STATEMENT"];
     if (statementList.length !== 2) {
       throw new Error("expected two initial statements");
     }
     // delete the second story statement
-    nodes.newMutation( nodes.all.td2 ).mutate(0);
+    test.newMutation( test.nodes.all.td2 ).mutate(0);
     if (statementList.length !== 1) {
       throw new Error("expected one remaining statements");
     }
@@ -309,13 +280,13 @@ function nodeTests() {
         }]
       }
     });
-  runTest("delete an optional item", function(nodes) {
-    const nounStatement= nodes.all.td1.item.value;
+  runTest("delete an optional item", function(test) {
+    const nounStatement= test.nodes.all.td1.item.value;
     if (!nounStatement["$SUMMARY"]) {
       throw new Error("expected summary statement");
     }
     // delete the summary
-    nodes.newMutation( nodes.all.td3 ).mutate(0);
+    test.newMutation( test.nodes.all.td3 ).mutate(0);
     if (nounStatement["$SUMMARY"]) {
       throw new Error("expected no summary statement");
     }
@@ -340,13 +311,13 @@ function nodeTests() {
     }
   });
   //
-  runTest("add to left side of root", function(nodes) {
-    const statementList= nodes.all.td1.item.value["$STORY_STATEMENT"];
+  runTest("add to left side of root", function(test) {
+    const statementList= test.nodes.all.td1.item.value["$STORY_STATEMENT"];
     if (statementList.length !== 1) {
       throw new Error("expected one additional statement");
     }
     const og= statementList[0];
-    nodes.newMutation( nodes.all.td6 ).mutate(-2);
+    test.newMutation( test.nodes.all.td6 ).mutate(-2);
     if (statementList.length !== 2) {
       throw new Error("expected one additional statement");
     }
@@ -357,13 +328,13 @@ function nodeTests() {
       throw new Error("expected right side addition");
     }
   });
-  runTest("add to right side of root", function(nodes){
-    const statementList= nodes.all.td1.item.value["$STORY_STATEMENT"];
+  runTest("add to right side of root", function(test){
+    const statementList= test.nodes.all.td1.item.value["$STORY_STATEMENT"];
     if (statementList.length !== 1) {
       throw new Error("expected one initial statements");
     }
     const og= statementList[0];
-    nodes.newMutation( nodes.all.td10 ).mutate(4);
+    test.newMutation( test.nodes.all.td10 ).mutate(4);
     if (statementList.length !== 2) {
       throw new Error("expected one additional statement");
     }

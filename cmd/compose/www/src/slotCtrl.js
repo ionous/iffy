@@ -13,7 +13,7 @@ Vue.component('mk-slot-ctrl', {
         >{{label}}</mk-a-button
         ><mk-auto-text
           v-if="editing"
-          :key="node.item.id"
+          :key="node.key"
           :autoText="autoText"
           @change="onInputChange"
           @reject="onActivated(false)"
@@ -94,7 +94,7 @@ Vue.component('mk-slot-ctrl', {
           const typeName = this.labelTypes[choice];
           const childItem= Types.createItem(typeName);
           this.$root.setChild( node, childItem );
-          this.childNode= node.newKid( childItem );
+          this.childNode= this.$root.nodes.newNode(node, childItem );
         }
       }
     },

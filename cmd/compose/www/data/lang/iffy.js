@@ -3,7 +3,7 @@ function localLang(make) {
     make.run("story_statements", "{+story_statement}"); // old
 
     make.run("story", "{+paragraph|ghost}");
-    make.run("paragraph", "{+story_statement|ghost}");
+    make.run("paragraph", "{+story_statement}");
     make.slot("story_statement");
 
     make.run("test_statement", "story_statement", "For the test {test name%name:text|quote}, {test type%test:testing}");

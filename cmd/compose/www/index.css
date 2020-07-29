@@ -124,7 +124,7 @@ body {
 }
 
 .mk-run-ctrl__ghost:before {
-  content:"\FE62";
+  content:"\FE62"; /*Small Plus Sign. ﹢ */
 }
 
 .mk-slot-ctrl__item,

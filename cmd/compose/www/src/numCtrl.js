@@ -9,7 +9,7 @@ Vue.component('mk-num-ctrl', {
       >{{itemText}}</mk-a-button
       ><mk-auto-text
         v-if="editing"
-        :key="node.item.id"
+        :key="node.key"
         :autoText="autoText"
         :initialText="itemText"
         @change="onInputChange"

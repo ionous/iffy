@@ -36,7 +36,7 @@ Vue.component('mk-pick-inline', {
   methods: {
     onPick(opt) {
       const { node } = this;
-      console.log("pickInline", node.item.id, "picked", opt);
+      console.log("pickInline", node.key, "picked", opt);
       this.$emit("picked", opt);
     }
   },

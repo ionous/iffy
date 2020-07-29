@@ -35,7 +35,7 @@ Vue.component('mk-opt-ctrl', {
       const childItem= Types.createItem(childType);
 
       this.$root.setPrim(node, { [token]: childItem } );
-      this.childNode= node.newKid( childItem, token );
+      this.childNode= this.$root.nodes.newNode(node, childItem, token);
     },
   },
   mixins: [bemMixin()],

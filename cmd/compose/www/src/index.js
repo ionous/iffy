@@ -53,10 +53,10 @@ const app= new Vue({
     // ghosts provide trailing links for easily adding new content.
     // clicking a ghost expands into corresponding element.
     // fix? bind these better....
-    isGhost(node, token) {
-      const param= node.itemType.with.params[token];
-      return param.filters  && param.filters.includes("ghost");
-    },
+    // isGhost(node, token) {
+    //   const param= node.itemType.with.params[token];
+    //   return param.filters && param.filters.includes("ghost");
+    // },
     newGhost(node, token) {
       const field= new ItemField( node.item, token );
       const newItem= Types.createItem(field.param.type);
@@ -90,8 +90,13 @@ const app= new Vue({
        return JSON.stringify(this.story.item,0,2);
     }
   },
+  computed: {
+    story() {
+      return this.nodes.root;
+    },
+  },
   data: {
-    story: Node.Unroll(getStory()),
+    nodes: Nodes.Unroll(getStory()),
     dropper: new Dropper(),
   }
 });

@@ -5,8 +5,10 @@ Vue.component('mk-run-ctrl', {
     `<span
     :class="bemBlock()"
     :data-tag="node.item.type"
-    ><template
+    ><span
       v-for="param in params"
+      class="mk-run-param"
+      :data-tag="param.type"
       >{{param.head}}<mk-switch
         :node=param.node
         :key="param.node.key"
@@ -16,8 +18,8 @@ Vue.component('mk-run-ctrl', {
         :class="bemElem('ghost')"
         @activate="$emit('ghost', param.node.token)"
       >{{param.ghost}}</mk-a-button
-    ></template
-  ></span>`,
+    ></span
+    ></span>`,
   methods: {
     // when the ghost is clicked, we want to expand it.
     onGhost(token) {
@@ -27,9 +29,10 @@ Vue.component('mk-run-ctrl', {
   computed: {
     params() {
       return this.node.kids.map((kid) => {
-        var head, tail, ghost;
+        var head, tail, ghost, type;
         const { param }= kid.field;
         if (param) {
+          type= param.type;
           const { filters }= param;
           if (filters) {
             if (filters.includes("quote")) {
@@ -47,6 +50,7 @@ Vue.component('mk-run-ctrl', {
           head,
           tail,
           ghost,
+          type,
         };
       });
     },
