@@ -11,9 +11,8 @@
   display: list-item;
 }
 
-
 .mk-run-ctrl[data-tag="pattern_return"],
-.mk-run-ctrl__item--repeats[data-tag="execute"]  {
+.mk-repeater[data-tag="execute"]  {
   display: block;
   list-style: none;
   margin-left: 2em;

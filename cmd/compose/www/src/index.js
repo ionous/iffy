@@ -5,39 +5,43 @@ const events= new Vue(); // global event bus
 //
 const app= new Vue({
   el: '#app',
+  mixins: [shiftMixin()],
   methods: {
     newMutation(node, extras={}, after={}) {
       const state= new MutationState(node);
+      // REFACTOR
       // fix: ways to make this more generic?
-      const sides= [{
-        side: "left",
-        label: "/break before",
-      },{
-        side: "right",
-        label: "/break after"
-      }];
-      for (let k=0; k< sides.length; ++k) {
-        const {side, label} = sides[k];
-        const fields= state[side];
-        for (let i=0; i< fields.length; ++i) {
-          const field= fields[i];
-          const { item } = field;
-          if (item && item.type==="story_statement") {
-            if (Sibling.HasAdjacentEls(item, field, k*2-1)) {
-              let target= node;
-              while (target.item.id !== item.id) {
-                target= target.parentNode;
-              }
-              after[label]= () => {
-                // note: the new item has a blank entry which gets overwritten.
-                const containerType= target.parentNode.item.type;
-                const para= Types.createItem(containerType); // ex. paragraph
-                redux.split( target, para, !k );
-              };
-            }
-          }
-        }
-      }
+      // fix -- this exists to create paragraphs,
+      // changing this and the node hierarchy to handle drag and drop
+      // const sides= [{
+      //   side: "left",
+      //   label: "/break before",
+      // },{
+      //   side: "right",
+      //   label: "/break after"
+      // }];
+      // for (let k=0; k< sides.length; ++k) {
+      //   const {side, label} = sides[k];
+      //   const fields= state[side];
+      //   for (let i=0; i< fields.length; ++i) {
+      //     const field= fields[i];
+      //     const { item } = field;
+      //     if (item && item.type==="story_statement") {
+      //       if (Sibling.HasAdjacentEls(item, field, k*2-1)) {
+      //         let target= node;
+      //         while (target.item.id !== item.id) {
+      //           target= target.parentNode;
+      //         }
+      //         after[label]= () => {
+      //           // note: the new item has a blank entry which gets overwritten.
+      //           const containerType= target.parentNode.item.type;
+      //           const para= Types.createItem(containerType); // ex. paragraph
+      //           redux.split( target, para, !k );
+      //         };
+      //       }
+      //     }
+      //   }
+      // }
       return new Mutation(redux, state, extras, after);
     },
     setPrim(node, value) {
@@ -64,7 +68,7 @@ const app= new Vue({
     cmdSelected(cmdName) {
       this.$emit("cmd-selected", cmdName);
     },
-    // find the filter for displaying labels ( ex. strCtr.labelData. )
+    // find the filter for displaying labels ( ex. strCtrl.labelData. )
     filter(node) {
       let isAtStart= false;
       while (node.field && node.field.tokenIndex <= 0) {
@@ -87,7 +91,8 @@ const app= new Vue({
     }
   },
   data: {
-    story: new Node(getStory()),
+    story: Node.Unroll(getStory()),
+    dropper: new Dropper(),
   }
 });
 

@@ -15,27 +15,13 @@ Vue.component('mk-opt-ctrl', {
   ></span>`,
   computed: {
     hasPicked() {
+      // REFACTOR -- this should be based on node kid, not item.
       const { value } = this.node.item;
       return value && !!Object.keys(value).length;
     },
-  },
-  data() {
-    const { node } = this;
-    const val= node.item.value;
-    var childNode;
-    if (!val) {
-       childNode= null;
-    } else {
-        // val should be an object with a single key.
-        for (const token in val) {
-          const childItem= val[token];
-          childNode= this.node.newKid(childItem, token);
-          break;
-        }
-    }
-    return {
-      childNode
-    };
+    childNode() {
+      return this.node.firstChild;
+    },
   },
   methods: {
     onPick(token) {

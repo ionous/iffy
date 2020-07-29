@@ -25,6 +25,9 @@ class ItemField {
       item: Array.isArray(this.value) ? "[...]": (this.value && this.value.id)
     };
   }
+  get name() {
+    return this.token.replace("$", "").toLowerCase();
+  }
   get tokenIndex() {
     if (this._tokenIndex === undefined) {
       const parentType = this.parentType;

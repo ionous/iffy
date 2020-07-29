@@ -1,65 +1,36 @@
 //------------------------------------------------
-// simple slot based switch statement
-// see: https://github.com/vuejs/vue/issues/8097#issuecomment-486018518
-Vue.component('v-switch', {
-  functional: true,
-  props: {
-    value: { type: [String, Number], required: true }
-  },
-  render(createElement, { data, props, scopedSlots:slots }) {
-    const { value } = props;
-    const slotFn = value in slots ?
-                    slots[value] :
-                    slots.default;
-    return slotFn ? slotFn(data.attrs) : null;
-  }
-});
-
-//------------------------------------------------
-// fix? replace switch with a custom render that looks up the components by name
+// expands to a control appropriate for a node based on its type.
 Vue.component('mk-switch', {
   props: {
-    node: {
-      type: Node,
-      required: true
+    node: Node,
+ },
+ render(createElement) {
+    const defaultComponent= "span";
+    var component;
+    const { node } = this;
+    if (!node) {
+      component= defaultComponent;
+    } else if (node.isArray) {
+      component= "mk-repeater-ctrl";
+    } else if (node.plainText) {
+      component= "mk-plain-text";
+    } else if (node.item) {
+      const { itemType } = node;
+      if (!itemType) {
+        component= defaultComponent;
+      } else {
+        // search for a template particular to the item's underlying type.
+        component= `mk-${itemType.name}-ctrl`
+        // if not, use a generic control based on item's role.
+        if (!(component in Vue.options.components)) {
+          component= `mk-${itemType.uses}-ctrl`;
+        }
+      }
     }
-  },
-  computed: {
-    uses() {
-      return this.node.itemType.uses;
-    }
-  },
-  template:
-  `<v-switch :value="uses"
-    ><template #num
-      ><mk-num-ctrl
-          :node=node
-      ></mk-num-ctrl
-    ></template
-    ><template #opt
-      ><mk-opt-ctrl
-          :node=node
-      ></mk-opt-ctrl
-    ></template
-    ><template #run
-      ><mk-run-ctrl
-          :node=node
-      ></mk-run-ctrl
-    ></template
-    ><template #slot
-      ><mk-slot-ctrl
-          :node=node
-      ></mk-slot-ctrl
-    ></template
-    ><template #str
-      ><mk-str-ctrl
-          :node=node
-      ></mk-str-ctrl
-    ></template
-    ><template #txt
-      ><mk-txt-ctrl
-          :node=node
-      ></mk-txt-ctrl
-    ></template
-  ></v-switch>`
+    return createElement( component, {
+      props: {
+        node,
+      }
+    });
+  }
 });

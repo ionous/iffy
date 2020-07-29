@@ -70,11 +70,12 @@ Vue.component('mk-slot-ctrl', {
     mutation() {
       return this.$root.newMutation( this.node);
     },
+    childNode() {
+      return this.node.firstChild;
+    },
   },
   data() {
-    const childItem= this.node.item.value;
     return {
-      childNode: childItem? this.node.newKid(childItem): null,
       editing: false,
     };
   },

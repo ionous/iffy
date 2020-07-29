@@ -34,10 +34,10 @@ body {
 }
 .mk-buttons {
   grid-area: buttons;
-  }
+}
 .mk-header button {
   margin-left: 5em;
-  }
+}
 .mk-browser {
   grid-area: sidebar;
   overflow-y: scroll;
@@ -108,12 +108,6 @@ body {
   overflow-y:scroll;
 }
 
-
-.mk-run-ctrl__item--plain {
-	/* an attempt at running in full-stops; but it disrupts normal spacing b/t words too.
-	*/
-	/*margin-left: -1px;*/
-}
 .mk-a-button:hover {
   text-decoration: underline;
   color: #0366d6;
