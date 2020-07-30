@@ -22,10 +22,76 @@ class Nodes {
   static Unroll(item) {
     const nodes= new Nodes();
     const root= nodes.newNode(null, item);
-    root._unroll(nodes);
+    nodes._unroll(root, item);
     nodes.root= root;
     return nodes;
   }
+
+  _unroll(node, item) {
+    if (!item) {
+      return;
+    }
+    const role= node.itemType.uses;
+    const spec= node.itemType.with;
+    switch( role ) {
+    case "opt": {
+      // we only expect there to be at most one token
+      const val= item.value;
+      if (val) {
+        for (const token in val) {
+          const childItem= val[token];
+          const kid= this.newNode(node, childItem, token);
+          this._unroll(kid, childItem);
+          break;
+        }
+      }
+    }
+    break;
+    case "run": {
+      // problems, of course.
+      // 1. run doesnt walk data, it walks spec
+      // 2. the kids expand repeats in place
+      // 3. plain text tokens become {} too
+      for (const token of spec.tokens) {
+        if (!token.startsWith("$")) {
+          this.newNode(node, null, token);
+        } else {
+          const arg = item.value[token];
+          const param = spec.params[token];
+          const kid= this.newNode(node, arg, token);
+          if (!param.repeats) {
+            this._unroll(kid, arg);
+          } else {
+            kid.isArray= true;
+            if (arg) {
+              arg.forEach((i) => {
+                const el= this.newNode(kid, i, token);
+                this._unroll(el, i);
+              });
+            }
+          }
+        }
+      }
+    }
+    break;
+    case "slot": {
+      const slot= item.value;
+      if (slot) {
+        const kid= this.newNode(node, slot);
+        this._unroll(kid, slot);
+      }
+    }
+    break;
+    case "num":
+    case "str":
+    case "txt":
+      this.newNode(node,item.value);
+    break;
+    default:
+      throw new Error("unknown type role", role);
+    }
+  }
+
 };
 
 class Node {
@@ -72,76 +138,5 @@ class Node {
   get firstChild() {
     const { kids } = this;
     return kids.length && kids[0];
-  }
-
-  _unroll(nodes) {
-    const item= this.item;
-    if (!item) {
-      return;
-    }
-  // something, something, something
-  // switch on item role, the role is going to have to come from spec.
-    const role= this.itemType.uses;
-    const spec= this.itemType.with;
-    switch( role ) {
-    case "opt": {
-      // we only expect there to be at most one token
-      const val= item.value;
-      if (val) {
-        for (const token in val) {
-          const childItem= val[token];
-          const kid= nodes.newNode(this, childItem, token);
-          kid._unroll(nodes);
-          break;
-        }
-      }
-    }
-    break;
-    case "run": {
-      // problems, of course.
-      // 1. run doesnt walk data, it walks spec
-      // 2. the kids expand repeats in place
-      // 3. plain text tokens become {} too
-      for (const token of spec.tokens) {
-        if (!token.startsWith("$")) {
-          nodes.newNode(this, null, token);
-        } else {
-          const arg = item.value[token];
-          const param = spec.params[token];
-          const kid= nodes.newNode(this, arg, token);
-          if (!param.repeats) {
-            kid._unroll(nodes);
-          } else {
-            kid.isArray= true;
-            if (arg) {
-              arg.forEach((i) => {
-                const el= nodes.newNode(kid, i, token)
-                el._unroll(nodes);
-              });
-            }
-          }
-        }
-      }
-    }
-    break;
-    case "slot": {
-      if (item.value) {
-        const kid= nodes.newNode(this,item.value);
-        kid._unroll(nodes);
-      }
-    }
-    break;
-    case "num":{
-    }
-    break;
-    case "str":{
-    }
-    break;
-    case "txt":{
-    }
-    break;
-    default:
-      throw new Error("unknown type role", role);
-    }
   }
 };
