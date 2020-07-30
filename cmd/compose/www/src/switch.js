@@ -14,7 +14,7 @@ Vue.component('mk-switch', {
       component= "mk-repeater-ctrl";
     } else if (node.plainText) {
       component= "mk-plain-text";
-    } else if (node.item) {
+    } else {
       const { itemType } = node;
       if (!itemType) {
         component= defaultComponent;

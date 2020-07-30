@@ -1,4 +1,4 @@
-//JSON.stringify(app.$data.story,0,2);
+// app.$data.story.serialize();
 function getStory() {
   return {
     "id": "id-16f16b4668c-5",

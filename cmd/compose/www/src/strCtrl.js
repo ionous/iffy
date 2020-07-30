@@ -6,7 +6,7 @@ Vue.component('mk-str-ctrl', {
   template:
   `<span
       :class="bemBlock()"
-      :data-tag="node.item.type"
+      :data-tag="node.type"
     ><span v-if="prefix"
       >{{prefix}}</span
     ><mk-pick-inline
@@ -32,9 +32,8 @@ Vue.component('mk-str-ctrl', {
   ></span>`,
   // -----------------------------------------------------
   computed: {
-    // have we already picked a value?
     hasPicked() {
-      return !!this.node.item.value;
+      return this.node.value !== null;
     },
     autoText() {
       return new AutoTextOptions({
@@ -67,7 +66,7 @@ Vue.component('mk-str-ctrl', {
       // text to return is either the label, or the raw value
       return (labelToken!== undefined)? labelToken[0]: value;
     },
-    // the possible choices for this str
+    // the possible choices for this str and stored in the item spec
     // ex. { "the": "$THE" }
     labelData() {
       const lts= {};
@@ -84,7 +83,7 @@ Vue.component('mk-str-ctrl', {
       }
       return {
         map: lts,
-        value: filter(this.node.item.value)
+        value: filter(this.node.value)
       };
     },
     mutation() {
@@ -94,20 +93,17 @@ Vue.component('mk-str-ctrl', {
       return this.mutationFactory? this.mutationFactory():
               this.$root.newMutation( this.node);
     },
-    field() {
-      return this.node.field;
-    },
     prefix() {
-      const param= this.checkParam();
-      return param.prefix;
+      const { param } = this.node;
+      return param && param.prefix;
     },
     label() {
-      const param= this.checkParam();
-      return param.label || Filters.capitalize( param );
+      const { param } = this.node;
+      return (param && param.label) || Filters.capitalize( param );
     },
     suffix() {
-      const param= this.checkParam();
-      return param.suffix;
+      const { param } = this.node;
+      return param && param.suffix;
     }
   },
   data() {
@@ -116,17 +112,10 @@ Vue.component('mk-str-ctrl', {
     };
   },
   methods: {
-    checkParam() {
-      const field= this.field;
-      if (!field.param) {
-        console.log(this.node);
-        throw new Error("missing param");
-      }
-      return field.param;
-    },
     // value is text picked or typed.
     // we *only* send along our labels to the completion control
     onInputChange(choice) {
+      const { node } = this;
       if (choice.startsWith("/")) {
         const cmd= this.commandMap[choice];
         this.mutation.mutate( cmd );
@@ -135,22 +124,24 @@ Vue.component('mk-str-ctrl', {
         if (choice in lts) {
           choice= lts[choice];
         }
-        this.$root.setPrim( this.node, choice );
+        this.$root.setPrim( node, choice );
       }
       this.editing= false;
     },
     onPickInline(token) {
       // skip setting the user data entry key
-      const param= this.node.itemType.with.params[token];
+      const { node } = this;
+      const param= node.itemType.with.params[token];
       if (param.value !== null) {
-        this.$root.setPrim( this.node, token );
+        this.$root.setPrim( node, token );
       }
       this.editing= true;
-      this.$root.fieldSelected(this.field);
+      this.$root.nodeSelected(node);
     },
     onActivated(yes=true) {
+      const { node } = this;
       this.editing= yes;
-      this.$root.fieldSelected(this.field);
+      this.$root.nodeSelected(node);
     },
   },
   mixins: [bemMixin()],

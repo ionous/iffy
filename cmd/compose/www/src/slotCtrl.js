@@ -4,7 +4,7 @@ Vue.component('mk-slot-ctrl', {
   template:
   `<span
       :class="bemBlock()"
-      :data-tag="node.item.type"
+      :data-tag="node.type"
      ><template
        v-if="!hasChosen"
        ><mk-a-button
@@ -26,7 +26,7 @@ Vue.component('mk-slot-ctrl', {
    ></span>`,
   computed: {
     hasChosen() {
-      return this.node.item.value;
+      return !!this.node.kids.length;
     },
     // label => typeName
     labelTypes() {
@@ -59,16 +59,13 @@ Vue.component('mk-slot-ctrl', {
        return this.mutation.commandMap;
     },
     slotType() {
-      return this.field.param.type;
-    },
-    field() {
-      return this.node.field;
+      return this.node.param.type;
     },
     label() {
-      return this.field.param.label || Filters.capitalize( this.field.param );
+      return this.node.param.label || Filters.capitalize( this.node.param );
     },
     mutation() {
-      return this.$root.newMutation( this.node);
+      return this.$root.newMutation(this.node);
     },
     childNode() {
       return this.node.firstChild;
@@ -82,7 +79,7 @@ Vue.component('mk-slot-ctrl', {
   methods: {
     onActivated(yes=true) {
       this.editing= yes;
-      this.$root.fieldSelected(this.field);
+      this.$root.nodeSelected(this.node);
     },
     onInputChange(choice) {
       if (choice) {
@@ -94,7 +91,7 @@ Vue.component('mk-slot-ctrl', {
           const typeName = this.labelTypes[choice];
           const childItem= Types.createItem(typeName);
           this.$root.setChild( node, childItem );
-          this.childNode= this.$root.nodes.newNode(node, childItem );
+          this.childNode= this.$root.nodes.newNode(node, childItem);
         }
       }
     },

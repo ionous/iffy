@@ -4,7 +4,7 @@ Vue.component('mk-repeater-ctrl', {
   template:
     `<span
       class="mk-repeater"
-      :data-tag="node.field.param.type"
+      :data-tag="node.type"
     ><template
       v-for="(kid, i) in node.kids"
       ><template v-if="commas"
@@ -46,7 +46,7 @@ Vue.component('mk-repeater-ctrl', {
   computed: {
     commas() {
       const { node }= this;
-      return node.kids.length > 1 && this.commaText(node.field.param.filters);
+      return node.kids.length > 1 && this.commaText(node.param.filters);
     },
   },
 });

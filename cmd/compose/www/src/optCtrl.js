@@ -3,7 +3,7 @@ Vue.component('mk-opt-ctrl', {
   template:
   `<span
       :class="bemBlock()"
-      :data-tag="node.item.type"
+      :data-tag="node.type"
     ><mk-switch
       v-if="hasPicked"
       :node="childNode"
@@ -15,9 +15,7 @@ Vue.component('mk-opt-ctrl', {
   ></span>`,
   computed: {
     hasPicked() {
-      // REFACTOR -- this should be based on node kid, not item.
-      const { value } = this.node.item;
-      return value && !!Object.keys(value).length;
+      return !!this.node.kids.length;
     },
     childNode() {
       return this.node.firstChild;
@@ -35,7 +33,7 @@ Vue.component('mk-opt-ctrl', {
       const childItem= Types.createItem(childType);
 
       this.$root.setPrim(node, { [token]: childItem } );
-      this.childNode= this.$root.nodes.newNode(node, childItem, token);
+      this.childNode= this.$root.nodes.newNode(node, childItem, token, param);
     },
   },
   mixins: [bemMixin()],

@@ -3,7 +3,7 @@ Vue.component('mk-num-ctrl', {
   template:
   `<span
       :class="bemBlock()"
-      :data-tag="node.item.type"
+      :data-tag="node.type"
     ><mk-a-button
         @activate="onActivated"
       >{{itemText}}</mk-a-button
@@ -32,17 +32,14 @@ Vue.component('mk-num-ctrl', {
       return this.mutation.commandMap;
     },
     itemText() {
-      return String(this.node.item.value);
+      return String(this.node.value);
     },
     mutation() {
       return this.$root.newMutation(this.node);
     },
-    field() {
-      return this.node.field;
-    },
     label() {
-      const param= this.checkParam();
-      return param.label || Filters.capitalize( param );
+      const { param } = this.node;
+      return (param && param.label) || Filters.capitalize( param );
     },
   },
   data() {
@@ -51,14 +48,6 @@ Vue.component('mk-num-ctrl', {
     };
   },
   methods: {
-    checkParam() {
-      const field= this.field;
-      if (!field.param) {
-        console.log(this.node);
-        throw new Error("missing param");
-      }
-      return field.param;
-    },
     // value is text picked or typed.
     // we *only* send along our labels to the completion control
     onInputChange(choice) {
@@ -75,7 +64,7 @@ Vue.component('mk-num-ctrl', {
     },
    onActivated(yes=true) {
       this.editing= yes;
-      this.$root.fieldSelected(this.field);
+      this.$root.nodeSelected(this.node);
     },
   },
   mixins: [bemMixin()],

@@ -36,7 +36,7 @@ Vue.component('mk-tools', {
       this.msg= "Connecting...";
       this.allow.testing= false;
       const { story } = app.$data;
-      const serial = JSON.stringify(story.item, 0, 2);
+      const serial = story.serialize();
       // console.log("testing", serial);
       xhr.open("PUT", "/story/check");
       xhr.setRequestHeader("Content-Type", "application/json");

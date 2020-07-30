@@ -4,7 +4,7 @@ Vue.component('mk-run-ctrl', {
   template:
     `<span
     :class="bemBlock()"
-    :data-tag="node.item.type"
+    :data-tag="node.type"
     ><span
       v-for="param in params"
       class="mk-run-param"
@@ -30,7 +30,7 @@ Vue.component('mk-run-ctrl', {
     params() {
       return this.node.kids.map((kid) => {
         var head, tail, ghost, type;
-        const { param }= kid.field;
+        const { param }= kid;
         if (param) {
           type= param.type;
           const { filters }= param;

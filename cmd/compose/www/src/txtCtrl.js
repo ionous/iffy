@@ -3,8 +3,8 @@
 Vue.component('mk-txt-ctrl', {
   template:
   `<span
-      :class="bemBlock(node.item.value? '':'empty')"
-      :data-tag="node.item.type"` +
+      :class="bemBlock(node.value? '':'empty')"
+      :data-tag="node.type"` +
     // removed for say, because this was duplicating the a-link
     // even though there was no prefix/suffix text.
     // tdb if its really needed.
@@ -17,13 +17,13 @@ Vue.component('mk-txt-ctrl', {
     // ></mk-str-ctrl
     `><mk-txt-edit
       v-if="editing"
-      :initialText="node.item.value"
-      :header="node.field.param.label"
+      :initialText="node.value"
+      :header="label"
       @close="acceptText($event)"
     ></mk-txt-edit
     ><mk-txt-lines
-      :text="node.item.value"
-      :placeholder="node.field.param.label"
+      :text="node.value"
+      :placeholder="label"
       @click="onClick"
       @keydown.prevent.space="onClick"
       @keydown.prevent.enter="onClick"
@@ -133,6 +133,8 @@ Vue.component('mk-txt-ctrl', {
   data() {
     return {
       editing: false,
+      label: this.node.param && this.node.param.label,
+
     };
   },
   methods: {
@@ -144,7 +146,7 @@ Vue.component('mk-txt-ctrl', {
       console.log("mk-txt-ctrl: acceptText");
       // ensure that we dont do this twice
       if (this.editing) {
-        this.node.item.value= text;
+        this.node.value= text;
         if (this.editing !== 1)  { // for testing.
           this.editing= false;
         }
@@ -153,7 +155,7 @@ Vue.component('mk-txt-ctrl', {
     // create the mutator command list
     // adding in the "edit" command
     mutationFactory() {
-      let text= this.node.item.value;
+      let text= this.node.value;
       if (!text) {
         text= "/edit";
       } else {

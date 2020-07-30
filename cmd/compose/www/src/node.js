@@ -2,35 +2,37 @@
 // item is the direct serialized to disk data:
 // { id string; type string; value any; } object;
 //
-// note: item does not necessarily equal parentNode.item[token] b/c of arrays.
+// note: item does not necessarily equal parent.item[token] b/c of arrays.
 // fix? replace Node with an indexedDB based get item by id.
 
 
 class Nodes {
-  constructor(item) {
-    this.all= {};
+  constructor(pool) {
+    this.all= pool;
     this.nodeCounter=0; // used for generating keys
     this.root= null; //
   }
-  newNode(parentNode, item, token) {
-    const kid= new Node(parentNode, item, token);
+  newNode(parent, typeName) {
+    const itemType= typeName && Types.get(typeName);
+    if (typeName && !itemType) {
+      throw new Error(`missing type ${typeName}`);
+    }
+    const kid= new Node(parent, itemType);
     const key= `node-${++this.nodeCounter}`;
-    this.all[key]= kid;
+    if (this.all) {
+      this.all[key]= kid;
+    }
     kid.key= key;
     return kid;
   }
-  static Unroll(item) {
-    const nodes= new Nodes();
-    const root= nodes.newNode(null, item);
+  static Unroll(item, pool) {
+    const nodes= new Nodes(pool);
+    const root= nodes.newNode(null, item.type);
     nodes._unroll(root, item);
     nodes.root= root;
     return nodes;
   }
-
   _unroll(node, item) {
-    if (!item) {
-      return;
-    }
     const role= node.itemType.uses;
     const spec= node.itemType.with;
     switch( role ) {
@@ -38,11 +40,18 @@ class Nodes {
       // we only expect there to be at most one token
       const val= item.value;
       if (val) {
-        for (const token in val) {
-          const childItem= val[token];
-          const kid= this.newNode(node, childItem, token);
-          this._unroll(kid, childItem);
-          break;
+        for (let t=0; t< spec.tokens.length; ++t) {
+          const token= spec.tokens[t];
+          if (token in val) {
+            // the param and token in this case describe the option
+            const childItem= val[token];
+            const param= spec.params[token];
+            const kid= this.newNode(node, childItem.type);
+            kid.token= token;
+            kid.param= param;
+            this._unroll(kid, childItem);
+            break;
+          }
         }
       }
     }
@@ -54,20 +63,29 @@ class Nodes {
       // 3. plain text tokens become {} too
       for (const token of spec.tokens) {
         if (!token.startsWith("$")) {
-          this.newNode(node, null, token);
+          const kid= this.newNode(node);
+          kid.plainText= token;
         } else {
           const arg = item.value[token];
           const param = spec.params[token];
-          const kid= this.newNode(node, arg, token);
-          if (!param.repeats) {
-            this._unroll(kid, arg);
-          } else {
-            kid.isArray= true;
-            if (arg) {
-              arg.forEach((i) => {
-                const el= this.newNode(kid, i, token);
-                this._unroll(el, i);
-              });
+          if (arg !== undefined) {
+            const kid= this.newNode(node, arg.type);
+            kid.token= token;
+            kid.param= param;
+            //
+            if (!param.repeats) {
+              this._unroll(kid, arg);
+            } else {
+              kid.isArray= true;
+              if (arg) {
+                arg.forEach((i) => {
+                  const el= this.newNode(kid, i.type);
+                  el.inArray= true;
+                  el.token= token;
+                  el.param= param;
+                  this._unroll(el, i);
+                });
+              }
             }
           }
         }
@@ -77,63 +95,38 @@ class Nodes {
     case "slot": {
       const slot= item.value;
       if (slot) {
-        const kid= this.newNode(node, slot);
+        const kid= this.newNode(node, slot.type);
         this._unroll(kid, slot);
       }
     }
     break;
     case "num":
     case "str":
-    case "txt":
-      this.newNode(node,item.value);
-    break;
+    case "txt": {
+      node.value= item.value;
+    } break;
     default:
       throw new Error("unknown type role", role);
     }
   }
-
 };
 
 class Node {
-  constructor(parentNode, item, token) {
-    // REFACTOR
-    let og= parentNode;
-    if (parentNode && parentNode.isArray) {
-      parentNode= parentNode.parentNode;
-    }
-
-    if (parentNode && parentNode.itemType.uses === 'run' && (typeof token !== 'string')) {
-      throw new Error(`unexpected token '${token}'`)
-    }
-    this.item = item;  // Item
-    this.token= token;
-    this.parentNode = parentNode;  // Node
+  constructor(parent, itemType) {
+    this.parent = parent;  // Node
+    this.itemType= itemType;
     this.kids= [];
     //
-    if (!parentNode) {
-      this.field = false;
-    } else {
-      this.field= new ItemField( parentNode.item, token );
-      og.kids.push(this);
+    if (parent) {
+      parent.kids.push(this);
     }
   }
-  toJSON() {
-    return {
-      key: this.key,
-      field: this.field,
-      kids: this.kids.map(k=> k.key),
-    };
+  serialize() {
+    throw new Error("reimplement");
+    return JSON.stringify(story.item, 0, 2);
   }
-  get plainText() {
-    return (this.token && !this.token.startsWith("$")) ? this.token: false;
-  }
-  get itemType() {
-    const typeName= this.item.type;
-    const type= Types.get(typeName);
-    if (!type) {
-      throw new Error(`missing type ${typeName}`);
-    }
-    return type;
+  get type() {
+    return this.itemType && this.itemType.name;
   }
   get firstChild() {
     const { kids } = this;

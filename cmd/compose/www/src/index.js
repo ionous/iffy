@@ -29,12 +29,12 @@ const app= new Vue({
       //     if (item && item.type==="story_statement") {
       //       if (Sibling.HasAdjacentEls(item, field, k*2-1)) {
       //         let target= node;
-      //         while (target.item.id !== item.id) {
+      //         while (target.key !== item.key) {
       //           target= target.parentNode;
       //         }
       //         after[label]= () => {
       //           // note: the new item has a blank entry which gets overwritten.
-      //           const containerType= target.parentNode.item.type;
+      //           const containerType= target.parentNode.type;
       //           const para= Types.createItem(containerType); // ex. paragraph
       //           redux.split( target, para, !k );
       //         };
@@ -45,10 +45,10 @@ const app= new Vue({
       return new Mutation(redux, state, extras, after);
     },
     setPrim(node, value) {
-      redux.setPrim( node.item, value );
+      redux.setPrim( node, value );
     },
     setChild(node, childItem) {
-      redux.setChild( node.item, childItem );
+      redux.setChild( node, childItem );
     },
     // ghosts provide trailing links for easily adding new content.
     // clicking a ghost expands into corresponding element.
@@ -58,12 +58,11 @@ const app= new Vue({
     //   return param.filters && param.filters.includes("ghost");
     // },
     newGhost(node, token) {
-      const field= new ItemField( node.item, token );
-      const newItem= Types.createItem(field.param.type);
-      redux.addRepeat(field, newItem);
+      const newItem= Types.createItem(node.param.type);
+      redux.addRepeat(node, newItem);
     },
-    fieldSelected(itemField) {
-      this.$emit("field-selected", itemField);
+    nodeSelected(node) {
+      this.$emit("node-selected", node);
     },
     cmdSelected(cmdName) {
       this.$emit("cmd-selected", cmdName);
@@ -72,14 +71,14 @@ const app= new Vue({
     filter(node) {
       let isAtStart= false;
       while (node.field && node.field.tokenIndex <= 0) {
-        if (node.field.isRepeatable() && Sibling.HasAdjacentEls(node.item, node.field, -1)) {
+        if (node.field.isRepeatable() && Sibling.HasAdjacentEls(node, -1)) {
           break;
         }
         node= node.parentNode;
         if (!node) {
           break;
         }
-        if (!node.field || (node.item.type === "story_statement")) {
+        if (!node.field || (node.type === "story_statement")) {
           isAtStart= true;
           break;
         }
@@ -87,7 +86,7 @@ const app= new Vue({
       return isAtStart? Filters.capitalize: Filters.none;
     },
     dumpStory() {
-       return JSON.stringify(this.story.item,0,2);
+      return this.story.serialize();
     }
   },
   computed: {

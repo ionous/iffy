@@ -18,10 +18,9 @@ class Shortcuts {
         (el.contentEditable && el.contentEditable == 'true');
     };
     this.mousetrap.bind('mod+s', function(e) {
-      // JSON.stringify(app.$data.story,0,2)
       const { story } = app.$data;
       if (redux.changed) {
-        const serial = JSON.stringify(story.item, 0, 2);
+        const serial = story.serialize();
         localStorage.setItem("save", serial);
         redux.changed = 0;
         console.log("saved", serial);
