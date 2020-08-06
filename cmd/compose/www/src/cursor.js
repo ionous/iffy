@@ -1,36 +1,3 @@
-// add a new item to the left (front) or right (end) of the targeted array.
-//  hmmm... regarding target and existing elements
-
-//  weve got multiple routes --
-//  first, what are we tring to do here?
-
-//  1. new ghost, which is append to a list
-//  2. mutation ( the current test )
-//    a. splice in front of ( left ), or behind ( right ) a specific repeated element
-//    b. append at end of a repeating element ( left sib ), or at front ( right sib )
-
-
-//  3. deleteAt, remove a specific targeted element
-
-// -------------------------------------------------------------------------------------
-
-//  1. mutating field == focused field
-//    - we arent targeting any specific element of the field
-//    - note: cursor doesnt support targeting a field and not an element, should it?
-
-//  2a, mutating field == focused field
-//    -  we are tareting a specific element, left means infront, right means behind
-
-//  2b. mutating field != focused field
-//    - we are targeting a specific element, left means behind, right means in front
-
-
-// -------------------------
-// how do we deal with optional arrays?
-
-
-
-
 class Cursor  {
   // points to a potential node from a parent node.
   constructor(parent, token, index=-1) {

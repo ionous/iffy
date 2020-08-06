@@ -42,7 +42,7 @@ class RunNode extends Node {
   getChildCount() {
     return this.kids.length;
   }
-  getChildAt(token) {
+  getChild(token) {
     return this.kids[token];
   }
   // visit each parameter and argument in turn

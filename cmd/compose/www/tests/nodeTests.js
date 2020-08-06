@@ -217,33 +217,33 @@ function nodeTests() {
   //
   runTest("test appending to a new (optional) list", function(test) {
     const kindOfNoun= test.all.td11;
-    if (kindOfNoun.getChildAt("$TRAIT")) {
+    if (kindOfNoun.getChild("$TRAIT")) {
       throw new Error("unexpected initial attribute");
     }
     test.newMutation( test.all.td10 ).mutate(-1);
-    if (kindOfNoun.getChildAt("$TRAIT").getChildCount() !== 1) {
+    if (kindOfNoun.getChild("$TRAIT").getChildCount() !== 1) {
       throw new Error("missing new attribute");
     }
   });
   //
   runTest("test appending to an existing (required) list", function(test) {
     const lede= test.all.td4;
-    if (lede.getChildAt("$NOUN").getChildCount() !== 1) {
+    if (lede.getChild("$NOUN").getChildCount() !== 1) {
         throw new Error("expected one initial noun");
     }
     test.newMutation( test.all.td9 ).mutate(-1);
-    if (lede.getChildAt("$NOUN").getChildCount() !== 2) {
+    if (lede.getChild("$NOUN").getChildCount() !== 2) {
         throw new Error("expected a new noun");
     }
   });
   //
   runTest("test creating a non-repeating optional item", function(test) {
     const nounStatement= test.all.td5;
-    if (nounStatement.getChildAt("$SUMMARY")) {
+    if (nounStatement.getChild("$SUMMARY")) {
       throw new Error("unexpected initial summary");
     }
     test.newMutation( test.all.td10 ).mutate(3);
-    const summary= nounStatement.getChildAt("$SUMMARY");
+    const summary= nounStatement.getChild("$SUMMARY");
     if (!summary || (summary.type !== "summary")) {
       throw new Error("unexpected new empty summary");
     }
@@ -261,7 +261,7 @@ function nodeTests() {
     }
   });
   runTest("delete a repeating item", function(test) {
-    const statementList= test.all.td1.getChildAt("$STORY_STATEMENT");
+    const statementList= test.all.td1.getChild("$STORY_STATEMENT");
     if (statementList.getChildCount() !== 2) {
       throw new Error("expected two initial statements");
     }
@@ -288,12 +288,12 @@ function nodeTests() {
     });
   runTest("delete an optional item", function(test) {
     const nounStatement= test.all.td1;
-    if (!nounStatement.getChildAt("$SUMMARY")) {
+    if (!nounStatement.getChild("$SUMMARY")) {
       throw new Error("expected summary statement");
     }
     // delete the summary
     test.newMutation( test.all.td3 ).mutate(0);
-    if (nounStatement.getChildAt("$SUMMARY")) {
+    if (nounStatement.getChild("$SUMMARY")) {
       throw new Error("expected no summary statement");
     }
   }, {
@@ -318,7 +318,7 @@ function nodeTests() {
   });
   //
   runTest("add to left side of root", function(test) {
-    const statementList= test.all.td1.getChildAt("$STORY_STATEMENT");
+    const statementList= test.all.td1.getChild("$STORY_STATEMENT");
     if (statementList.getChildCount() !== 1) {
       throw new Error("expected one additional statement");
     }
@@ -335,7 +335,7 @@ function nodeTests() {
     }
   });
   runTest("add to right side of root", function(test){
-    const statementList= test.all.td1.getChildAt("$STORY_STATEMENT");
+    const statementList= test.all.td1.getChild("$STORY_STATEMENT");
     if (statementList.getChildCount() !== 1) {
       throw new Error("expected one initial statements");
     }

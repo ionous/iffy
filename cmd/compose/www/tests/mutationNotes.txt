@@ -1,0 +1,70 @@
+ add a new item to the left (front) or right (end) of the targeted array.
+  hmmm... regarding target and existing elements
+
+  weve got multiple routes --
+  first, what are we tring to do here?
+
+  1. new ghost, which is append to a list
+  2. mutation ( the current test )
+    a. we are targeting a repeating field that doesnt yet exist 
+	b. splice in front of ( left ), or behind ( right ) a specific repeated element
+    c. append at end of a repeating element ( left sib ), or at front ( right sib )
+    d. its also possible that the sib doesnt exist, and we need to add
+
+  3. deleteAt, remove a specific targeted element;
+
+ -------------------------------------------------------------------------------------
+
+  1. mutating field == focused field
+    - we arent targeting any specific element of the field
+  
+  2a. mutating field == focused field
+
+  2b. mutating field == focused field
+    -  we are tareting a specific element, left means infront, right means behind
+
+  2c. mutating field != focused field
+    - we are targeting a specific element, left means behind, right means in front
+
+  2d. mutating field != focused field
+  	the thing in commo with 2a. is that the field doesnt exist 
+  	this is more important than the "at sibling" question
+ 
+ -------------------------
+ how do we deal with optional arrays?
+	 A> required non-repeating fields 
+	 B> optional non-repeating fields 
+	 C> fields with one or more elements 
+	 D> fields with zero or more elements
+
+
+A. not an issue here, cant mutate 
+B. not quite worried about it yet, we can add and remove the field switching on isRepeating if need be 
+C. when we create the parent run, we create an array containing one element;
+   we shouldnt even generate the remove mutation so we dont worry about this in the remove code 
+D. options:
+	- creating the parent creates the empty array
+	- creating the parent skips the element 
+   so far, weve skipped creating the elemnent 
+
+....................
+1. the "append" function could add / remove the array if it doesnt exist 
+2a,d. we should create an element and add it to a new array for the field, then remove the array 
+2b. the array exists, because we are tagetting an element 
+2c. the array exists, because we are tagetting an element 
+3. perhaps we are deleting the last element of an optional array 
+	- we shouldnt be generating this request to delete if the array is of type C 
+	so we can ignore the question of "is this optional" -- we just assume it is 
+	so if the array is of length 1 we remove the array altogether
+
+..............
+okay, the mutations are two fold:
+M1. add to an array field 
+M2. delete from an array field 
+
+----------------
+M1. add to an array field 
+	- the target exists, either the target is the field or the target is an element 
+		( we can ask for getChild(token) to determine if the field exists in general )
+
+	
