@@ -9,7 +9,7 @@ Vue.component('mk-num-ctrl', {
       >{{itemText}}</mk-a-button
       ><mk-auto-text
         v-if="editing"
-        :key="node.key"
+        :key="node.id"
         :autoText="autoText"
         :initialText="itemText"
         @change="onInputChange"
@@ -69,9 +69,6 @@ Vue.component('mk-num-ctrl', {
   },
   mixins: [bemMixin()],
   props: {
-    node: {
-      type:Node,
-      required:true,
-    },
+    node: PrimNode,
   }
 });

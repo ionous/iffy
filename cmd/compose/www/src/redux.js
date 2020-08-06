@@ -37,8 +37,10 @@ class Restack {
 
 // Redux handles undo/redo
 class Redux {
-  constructor(vm, max=500) {
+  // vm is a subset of Vue used for triggering change tracking.
+  constructor(vm, nodes, max=500) {
     this.vm= vm;
+    this.nodes= nodes;
     this.applied= new Restack(max);
     this.revoked= new Restack(max);
     this.changed= 0;
@@ -71,6 +73,93 @@ class Redux {
     this.revoked.clear();
     ++this.changed;
   }
+  // we can generically create optional members of runs
+  // cursor c, must target a member of a run
+  newAt(c, leftSide= false) {
+    if (!("kids" in c.parent)) {
+      throw new Error("cursor should target the field of a run");
+    }
+    if (c.isRepeatable()) {
+      this.newElem(c, leftSide);
+    } else {
+      throw new Error("new field?")
+    }
+  }
+  // add a new item to the left (front) or right (end) of the targeted array.
+  // hmmm... regarding target and existing elements
+
+  newElem(c, leftSide=false) {
+    const { parent, target, token, param, index: i  }= c;
+
+    const newElem= this.nodes.newFromType(parent, param.type);
+    const index=  (i>=0)? i: (leftSide? 0: parent.kids.length-1);
+
+    this.invoke({
+      apply(vm) {
+        let els= parent.kids[token];
+        if (els === undefined) {
+          els= vm.set(parent.kids, token, []);
+        }
+        if (leftSide) {
+          els.unshift(newElem);
+        } else {
+          els.push(newElem);
+        }
+      },
+      revoke(vm) {
+        if (!target) {
+          vm.delete(parent, token);
+        } else {
+          const els= parent.kids[token];
+          if (leftSide) {
+            els.shift();
+          } else {
+            els.pop();
+          }
+        }
+      }
+    });
+  }
+  newSlot(parent, typeName) {
+    const oldSlot= parent.slot;
+    const newSlot= this.nodes.newFromType(parent, typeName);
+      this.invoke({
+      apply() {
+        parent.slot= newSlot;
+      },
+      revoke() {
+        parent.slot= oldSlot;
+      }
+    });
+  }
+  newSwap(parent, newChoice, typeName) {
+    const oldKid= parent.kid;
+    const oldChoice= parent.choice;
+    const newSwap= this.nodes.newFromType(parent, typeName);
+      this.invoke({
+      apply() {
+        parent.kid= newSwap;
+        parent.choice= newChoice;
+      },
+      revoke() {
+        parent.kid= newSwap;
+        parent.choice= oldChoice;
+      }
+    });
+  }
+  // remove an existing item from a field
+  deleteAt(curse) {
+    const { target } = curse;
+    this.invoke({
+      apply(vm) {
+        curse.deleteMe(vm);
+      },
+      revoke(vm) {
+        curse.spliceTarget(target, vm);
+      }
+    });
+  }
+
   // change the value of an existing item
   setChild(item, newValue) {
     // resuse primitive, that's fine for now.
@@ -102,43 +191,6 @@ class Redux {
       },
       revoke() {
         field.deleteMe();
-      }
-    });
-  }
-  // remove an existing item from a field
-  deleteField(field) {
-    const item = field.item; // remember me
-    if (field.isRepeatable()) {
-      const index= field.value.indexOf(item);
-      this.invoke({
-        apply() {
-           // remove:
-          field.value.splice(index, 1);
-        },
-        revoke() {
-          // add:
-          field.value.splice(index, 0, item);
-        }
-      });
-    } else {
-      this.invoke({
-        apply() {
-          field.deleteMe();
-        },
-        revoke(vm) {
-          field.setValue(item, vm);
-        }
-      });
-    }
-  }
-  // add a new item to the left or right of the target field
-  addRepeat(field, newItem, leftSide) {
-    this.invoke({
-      apply(vm) {
-        field.addRepeat(newItem, leftSide, vm);
-      },
-      revoke() {
-        field.removeRepeat(leftSide);
       }
     });
   }

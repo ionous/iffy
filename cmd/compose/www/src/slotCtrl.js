@@ -5,35 +5,35 @@ Vue.component('mk-slot-ctrl', {
   `<span
       :class="bemBlock()"
       :data-tag="node.type"
-     ><template
-       v-if="!hasChosen"
-       ><mk-a-button
+    ><template
+      v-if="!childNode"
+      ><mk-a-button
          :class="bemElem('item')"
           @activate="onActivated"
         >{{label}}</mk-a-button
         ><mk-auto-text
           v-if="editing"
-          :key="node.key"
+          :key="node.id"
           :autoText="autoText"
           @change="onInputChange"
           @reject="onActivated(false)"
-       ></mk-auto-text
-     ></template
-     ><mk-switch
-        v-else
-        :node="childNode"
-     ></mk-switch
-   ></span>`,
+      ></mk-auto-text
+    ></template
+    ><mk-switch
+      v-else
+      :node="childNode"
+    ></mk-switch
+  ></span>`,
   computed: {
-    hasChosen() {
-      return !!this.node.kids.length;
+    childNode() {
+      return this.node.kid;
     },
     // label => typeName
     labelTypes() {
       const ret= {};
       const { node }= this;
-      // get all of the slats that fit into this slot.
-      const slats= Types.slats(this.slotType);
+      // determine all of the slats that fit into this slot.
+      const slats= Types.slats(node.type);
       if (slats) {
         for ( const type of slats ) {
           const label= Types.labelOf(type);
@@ -50,7 +50,7 @@ Vue.component('mk-slot-ctrl', {
           const all= txt.concat( Object.keys(this.commandMap) );
           return all;
         },
-        placeholder: placeholder,
+        placeholder,
         // header:"boop",
         autoFocus: true,
       });
@@ -58,17 +58,12 @@ Vue.component('mk-slot-ctrl', {
     commandMap() {
        return this.mutation.commandMap;
     },
-    slotType() {
-      return this.node.param.type;
-    },
     label() {
-      return this.node.param.label || Filters.capitalize( this.node.param );
+      return this.param? (this.param.label || Filters.capitalize( this.param )):
+             Types.labelOf(this.node.itemType);
     },
     mutation() {
       return this.$root.newMutation(this.node);
-    },
-    childNode() {
-      return this.node.firstChild;
     },
   },
   data() {
@@ -89,9 +84,9 @@ Vue.component('mk-slot-ctrl', {
         } else {
           const { node } = this;
           const typeName = this.labelTypes[choice];
-          const childItem= Types.createItem(typeName);
-          this.$root.setChild( node, childItem );
-          this.childNode= this.$root.nodes.newNode(node, childItem);
+          if (typeName) {
+            this.$root.redux.newSlot( node, typeName );
+          }
         }
       }
     },
@@ -99,8 +94,10 @@ Vue.component('mk-slot-ctrl', {
   mixins: [bemMixin()],
   props: {
     node: {
-      type:Node,
-      required:true
-    }
+      type: SlotNode,
+      required: true
+    },
+    param: Object,
+    token: String,
   }
 });

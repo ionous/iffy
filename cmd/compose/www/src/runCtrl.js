@@ -1,43 +1,46 @@
-// a run ( aka a slot ) contains an array of parameters.
-
+// a run ( aka a slat ) contains an array of parameters.
 Vue.component('mk-run-ctrl', {
   template:
     `<span
     :class="bemBlock()"
     :data-tag="node.type"
     ><span
-      v-for="param in params"
+      v-for="el in els"
       class="mk-run-param"
-      :data-tag="param.type"
-      >{{param.head}}<mk-switch
-        :node=param.node
-        :key="param.node.key"
+      :data-tag="el.param && el.param.type"
+      >{{el.opener}}<mk-switch
+        :node="el.kid"
+        :token="el.token"
+        :param="el.param"
       ></mk-switch
-      >{{param.tail}}<mk-a-button
-        v-if="param.ghost"
+      >{{el.closer}}<mk-a-button
+        v-if="el.ghost"
         :class="bemElem('ghost')"
-        @activate="$emit('ghost', param.node.token)"
-      >{{param.ghost}}</mk-a-button
+        @activate="$emit('ghost', el.token)"
+      >{{el.ghost}}</mk-a-button
     ></span
     ></span>`,
   methods: {
     // when the ghost is clicked, we want to expand it.
     onGhost(token) {
-      this.$root.newGhost(this.node, token);
+      // FIX: this isnt right because cursor expects index for arrays
+      // and ghosts are generally, always? arrays.
+      const c= new Cursor(this.node, token);
+      this.$root.redux.newElem(c);
     },
   },
   computed: {
-    params() {
-      return this.node.kids.map((kid) => {
-        var head, tail, ghost, type;
-        const { param }= kid;
-        if (param) {
-          type= param.type;
-          const { filters }= param;
+    els() {
+      let els= [];
+      this.node.forEach(({token, param, kid})=> {
+        var opener, closer, ghost;
+        if (param) { // plain text doesnt have param
+          const type= param.type;
+          const filters = param.filters;
           if (filters) {
             if (filters.includes("quote")) {
-              head= `\u201C`;
-              tail= `\u201D`;
+              opener= `\u201C`;
+              closer= `\u201D`;
             }
             if (filters.includes("ghost")) {
               const gtype= Types.get(param.type);
@@ -45,18 +48,22 @@ Vue.component('mk-run-ctrl', {
             }
           }
         }
-        return {
-          node:kid,
-          head,
-          tail,
+        els.push({
+          kid,
+          token,
+          param,
+          opener,
+          closer,
           ghost,
-          type,
-        };
+        });
       });
+      return els;
     },
   },
   mixins: [bemMixin()],
   props: {
-    node: Node,
+    node: RunNode,
+    param: Object,
+    token: String,
   }
 });

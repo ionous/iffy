@@ -5,20 +5,18 @@ Vue.component('mk-opt-ctrl', {
       :class="bemBlock()"
       :data-tag="node.type"
     ><mk-switch
-      v-if="hasPicked"
+      v-if="childNode"
       :node="childNode"
     ></mk-switch
-    ><mk-pick-inline v-else
+    ><mk-pick-inline
+      v-else
       :node="node"
       @picked="onPick"
     ></mk-pick-inline
   ></span>`,
   computed: {
-    hasPicked() {
-      return !!this.node.kids.length;
-    },
     childNode() {
-      return this.node.firstChild;
+      return this.node.kid;
     },
   },
   methods: {
@@ -29,55 +27,14 @@ Vue.component('mk-opt-ctrl', {
         throw new Error(`unknown token picked '${token}'`);
       }
       const param= params[token];
-      const childType= param.type || param; // an opt's param can map straight to their type.
-      const childItem= Types.createItem(childType);
-
-      this.$root.setPrim(node, { [token]: childItem } );
-      this.childNode= this.$root.nodes.newNode(node, childItem, token, param);
+      const typeName= param.type || param; // an opt's param can map straight to their type.
+      this.$root.redux.newSwap(node, token, typeName);
     },
   },
   mixins: [bemMixin()],
   props: {
-    node: {
-      type:Node,
-      required:true,
-    }
+    node: SwapNode,
+    param: Object,
+    token: String,
   }
 });
-
-/*
-example_type: {
-  "name": "primitive_value",
-  "uses": "opt",
-  "with": {
-    "tokens": [
-      "$BOXED_TEXT",
-      " or ",
-      "$BOXED_NUMBER"
-    ],
-    "params": {
-      "$BOXED_TEXT": {
-        "label": "text",
-        "type": "text"
-      },
-      "$BOXED_NUMBER": "number",
-      }
-    }
-  }
-},
-example_data: {
-  "type": "primitive_value",
-  "value": {
-    "$BOXED_TEXT": {
-      "type": "boxed_text",
-      "value": {
-        "$TEXT": {
-          "type": "text",
-          "value": "5"
-        }
-      }
-    }
-  }
-}
-
-*/

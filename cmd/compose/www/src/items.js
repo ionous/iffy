@@ -151,7 +151,7 @@ class Types {
       case "txt": {
         // ex. Item("trait", "testing")
         // determine default value
-        var defautValue= "";
+        let defautValue= "";
         const { tokens, params }= type.with;
         if (tokens.length === 1) {
           const t= tokens[0];

@@ -108,7 +108,7 @@ Vue.component('mk-txt-ctrl', {
         const lines= text.split('\n');
         // between every line we have to createElement.
         const els= [lines[0]];
-        for ( var i= 1; i< lines.length; ++i ) {
+        for ( let i= 1; i< lines.length; ++i ) {
           els.push( createElement("br") );
           els.push( lines[i] );
         }
@@ -133,8 +133,7 @@ Vue.component('mk-txt-ctrl', {
   data() {
     return {
       editing: false,
-      label: this.node.param && this.node.param.label,
-
+      label: this.param && this.param.label,
     };
   },
   methods: {
@@ -143,6 +142,7 @@ Vue.component('mk-txt-ctrl', {
       this.editing= true;
     },
     acceptText(text) {
+      const { node } = this;
       console.log("mk-txt-ctrl: acceptText");
       // ensure that we dont do this twice
       if (this.editing) {
@@ -155,6 +155,7 @@ Vue.component('mk-txt-ctrl', {
     // create the mutator command list
     // adding in the "edit" command
     mutationFactory() {
+      const { node } = this;
       let text= this.node.value;
       if (!text) {
         text= "/edit";
@@ -188,8 +189,10 @@ Vue.component('mk-txt-ctrl', {
   },
   props: {
     node: {
-      type: Node,
+      type: PrimNode,
       required: true
     },
+    param: Object,
+    token: String,
   }
 });

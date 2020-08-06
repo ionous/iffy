@@ -20,7 +20,7 @@ Vue.component('mk-str-ctrl', {
       >{{showText? itemText: label}}</mk-a-button
       ><mk-auto-text
         v-if="editing"
-        :key="node.key"
+        :key="node.id"
         :autoText="autoText"
         :initialText="showText? itemText:''"
         @change="onInputChange"
@@ -147,7 +147,7 @@ Vue.component('mk-str-ctrl', {
   mixins: [bemMixin()],
   props: {
     node: {
-      type:Node,
+      type:PrimNode,
       required:true,
     },
     permissive: {

@@ -1,14 +1,17 @@
 makeLang(new Make(new Types()));
 
-const redux= new Redux(Vue);
 const events= new Vue(); // global event bus
+const nodes= new Nodes();
+const redux= new Redux(Vue, nodes);
+
 //
 const app= new Vue({
   el: '#app',
   mixins: [shiftMixin()],
   methods: {
     newMutation(node, extras={}, after={}) {
-      const state= new MutationState(node);
+      const state= new MutationState();
+      state.addEdges(node, [-1,1]);
       // REFACTOR
       // fix: ways to make this more generic?
       // fix -- this exists to create paragraphs,
@@ -29,7 +32,7 @@ const app= new Vue({
       //     if (item && item.type==="story_statement") {
       //       if (Sibling.HasAdjacentEls(item, field, k*2-1)) {
       //         let target= node;
-      //         while (target.key !== item.key) {
+      //         while (target.id !== item.id) {
       //           target= target.parentNode;
       //         }
       //         after[label]= () => {
@@ -43,23 +46,6 @@ const app= new Vue({
       //   }
       // }
       return new Mutation(redux, state, extras, after);
-    },
-    setPrim(node, value) {
-      redux.setPrim( node, value );
-    },
-    setChild(node, childItem) {
-      redux.setChild( node, childItem );
-    },
-    // ghosts provide trailing links for easily adding new content.
-    // clicking a ghost expands into corresponding element.
-    // fix? bind these better....
-    // isGhost(node, token) {
-    //   const param= node.itemType.with.params[token];
-    //   return param.filters && param.filters.includes("ghost");
-    // },
-    newGhost(node, token) {
-      const newItem= Types.createItem(node.param.type);
-      redux.addRepeat(node, newItem);
     },
     nodeSelected(node) {
       this.$emit("node-selected", node);
@@ -95,7 +81,8 @@ const app= new Vue({
     },
   },
   data: {
-    nodes: Nodes.Unroll(getStory()),
+    redux: redux,
+    nodes: nodes.unroll(getStory()),
     dropper: new Dropper(),
   }
 });

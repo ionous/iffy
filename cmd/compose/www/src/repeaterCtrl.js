@@ -1,12 +1,11 @@
-// the node is a parameter of a parent run control
-// it REPEATS
+//
 Vue.component('mk-repeater-ctrl', {
   template:
     `<span
       class="mk-repeater"
       :data-tag="node.type"
     ><template
-      v-for="(kid, i) in node.kids"
+      v-for="(kid, i) in nodes"
       ><template v-if="commas"
         ><template v-if="mid(i)"
         >, </template
@@ -15,22 +14,34 @@ Vue.component('mk-repeater-ctrl', {
       ></template
       ><mk-switch
         :node="kid"
-        :key="kid.key"
+        :key="kid && kid.id"
+        :param="param"
+        :token="token"
       ></mk-switch
     ></template
   ></span>`,
   props: {
-    node: Node,
+    node: Array, // node is really nodes for repeater control.
+    param: Object,
+    token: String,
   },
-  // mixins: [bemMixin()],
+  computed: {
+    nodes() {
+      return this.node;
+    },
+    commas() {
+      const { nodes, param }= this;
+      return nodes.length > 1 && this.commaText(param.filters);
+    },
+  },
+
   methods: {
     mid(i) {
-      const { node }= this;
       return i && ((i>1) || !this.last(i));
     },
     last(i) {
-      const { node }= this;
-      return i === (node.kids.length - 1);
+      const { nodes }= this;
+      return i === (nodes.length - 1);
     },
     commaText(filters) {
       let ret= "";
@@ -41,12 +52,6 @@ Vue.component('mk-repeater-ctrl', {
           filters= "or";
         }
       }
-    },
-  },
-  computed: {
-    commas() {
-      const { node }= this;
-      return node.kids.length > 1 && this.commaText(node.param.filters);
     },
   },
 });

@@ -13,7 +13,7 @@ class Tab extends Map {
   }
   // return { label, name } of the sub items.
   contents(k) {
-    var ret= [];
+    let ret= [];
     if (!k || this.sansContent) {
         ret= this.outline();
       } else {

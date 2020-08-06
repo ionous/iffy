@@ -11,16 +11,14 @@ class CommandMap {
     CommandMap.add(out, "insert", -1, state.left);
     return out;
   }
-  // add label -> field for
+  // list = [Cursor]
   static add(out, prefix, side, list) {
     let dupes= {};
     for (let i=0; i< list.length; ++i) {
-      const field= list[i];
-      const { param, item } = field;
-      if (!param && !item) {
-        throw new Error( "what does this look like?" );
-      }
-      let txt= param? (param.label || param.type): item.type;
+      const c= list[i];
+      const { target, param } = c;
+
+      let txt= param? (param.label || param.type): target.type;
       const counter= dupes[txt] || 0;
       dupes[txt]= counter+1;
       if (counter) {
@@ -43,103 +41,82 @@ class Mutation {
     }
   }
   // <0:left, >0:right, 0:remove.
-  mutate(index) {
-    if (typeof index === 'function') {
-      index(this)
-    } else if (!index) {
-      const field= this.state.removes;
-      this.redux.deleteField(field);
+  mutate(which) {
+    if (typeof which === 'function') {
+      which(this)
     } else {
-      const field= (index<0) ? this.state.left[-index-1]:this.state.right[index-1];
-      const newItem= Types.createItem(field.param.type);
-      if (!newItem) {
-        throw new Error("couldn't create item");
-      }
-      if (field.isRepeatable()) {
-        this.redux.addRepeat(field, newItem, index<0);
+      const { redux, state } = this;
+      if (!which) {
+        redux.deleteAt(state.removes);
       } else {
-        this.redux.addField(field, newItem);
+        const curse= (which<0) ? state.left[-which-1]: state.right[which-1];
+        // FIX: probably have to handle terminal injections: starting node == mutation
+        redux.newAt(curse, which<0);
       }
     }
   }
 }
 
-// backwards compat: tack item on to field
-// really we should use a separate object {item, field}
-function newMutableItem(item, field) {
-    field.item= item;
-    field.toJSON= function() {
-      return {
-        parent: field.parentItem ? field.parentItem.id : -1,
-        token: field.token,
-        item: item? item.id: null
-      };
-    }
-    return field;
-}
-
+// places in the tree where mutations can happen
 class MutationState {
   constructor(node) {
-    this.left = [];     // array of ItemField(s) indicating insertion points
-    this.right= [];     // array of ItemField(s) indicating appending points
-    this.removes= null; // a single ItemField or null
-    this.addEdges(node, [-1,1]);
-  }
-  pushRepeater(item, field, sides) {
-    for (const side of sides) {
-      this.pushField(item, field, side);
-    }
+    this.left = [];     // array of Cursor(s) indicating insertion points
+    this.right= [];     // array of Cursor(s) indicating appending points
+    this.removes= null; // a single Cursor or null
   }
   // side: -1/+1
-  pushField(item, field, side) {
+  _remember(c, side) {
     const reps= (side<0)? this.left: this.right;
-    reps.push(newMutableItem(item,field));
+    reps.push(c);
   }
-  // internal recursive
+  // the basic idea is this:
+  // starting from a node, look at its left and right siblings.
+  // if the node is repeatable, remember that
+  // if there is a missing optional sibling: remember that, and look at the next sibling.
+  // if you hit an edge -- that is, if you have no sibling --
+  // move up to the parent node, and repeat.
   addEdges(node, sides) {
-    const field= node.field;
-    if (field) {
+    const c= Cursor.At(node);
+    if (c) {
       // at most one deletable element
-      if (!this.removes && field.isDeletable()) {
-        this.removes= newMutableItem(node.item, field);
+      if (!this.removes && c.isDeletable()) {
+        this.removes= c;
       }
-      // can the element be repeated?
-      const repeats= field.isRepeatable();
+      // can the current element be repeated?
+      const repeats= c.isRepeatable();
       if (repeats) {
-        this.pushRepeater(node.item, field, sides);
+        sides.forEach(side => this._remember(c, side));
       }
-      // check if the node is an edge
+      // next sides tracks whether we should look up to the parent or not.
+      // -- only if we are at an edge.
       const nextSides= [];
-      let it= new Sibling(node.item, field);
       for (const side of sides) {
-        // note: cant be an edge if we are in an array with sibling elements.
-        if (!repeats || !it.hasAdjacentEls(side)) {
-          let sib= it.step(side);
-          // if it's not optional than it will have a value
-          // if its repeatable then we can add to that value
-          // fix? can this and the empty sib loop be merged better?
-          if (sib && sib.field.isRepeatable() && !sib.field.isOptional()) {
-            this.pushField(sib.item, sib.field, side);
+        let ok= false;
+        for (let sib= c; sib; ) {
+          // fix: optimize the internal token index lookup
+          sib= sib.step(side);
+          if (!sib) { // no sibling, we're an edge.
+            ok = true;
+          } else if (!sib.target) { // empty sibling, remember it.
+            this._remember(sib, side);
           } else {
-            for (; sib && MutationState.emptySib(sib); sib= sib.step(side)) {
-              this.pushField(sib.item, sib.field, side);
+            // we have a sibling, we're not an edge
+            // *unless* that sibling is a separate kid, and it repeats
+            // in which case we should be able to add to it.
+            if ((c.token !== sib.token) && sib.isRepeatable()) {
+              this._remember(sib, side);
             }
-            // missing a valid sibling: we are an edge
-            // so we will want to check this edge in our parent as well.
-            if (!sib) {
-              nextSides.push(side);
-            }
+            break; // since we're not on a (true) edge, end.
           }
         }
-      }
+        if (ok) {
+          nextSides.push(side);
+        }
+      };
+      //
       if (nextSides.length) {
-        this.addEdges(node.parentNode, nextSides);
+        this.addEdges(c.parent, nextSides);
       }
-    } //~if field is valid
-  }
-
-  static emptySib(sib) {
-    const { field } = sib;
-    return field.isEmpty()  && (field.isOptional() || field.isRepeatable());
+    } //~if c is valid
   }
 }

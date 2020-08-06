@@ -15,11 +15,11 @@ Vue.component('mk-pick-inline', {
    ></ol>`,
   computed: {
     lines() {
-      const { node } = this;
+      const { node, param } = this;
       const spec = node.itemType.with;
       // when there's only a single option,
       // use the field's label instead of our own inline label.
-      const solo = (spec.tokens.length == 1) && node.param.label;
+      const solo = (spec.tokens.length == 1) && param.label;
       return spec.tokens.map(t => {
         const opt= spec.params[t];
         return opt ? {
@@ -36,15 +36,14 @@ Vue.component('mk-pick-inline', {
   methods: {
     onPick(opt) {
       const { node } = this;
-      console.log("pickInline", node.key, "picked", opt);
+      console.log("pickInline", node.id, "picked", opt);
       this.$emit("picked", opt);
     }
   },
   mixins: [bemMixin()],
   props: {
-    node: {
-      type: Node,
-      required:true,
-    }
+    node: Node,
+    param: Object,
+    token: String,
   }
 });

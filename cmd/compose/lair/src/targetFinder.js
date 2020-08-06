@@ -19,7 +19,7 @@ class TargetFinder {
   }
   // search upwards from el for the dataset attributes
   findIdx(el) {
-    var ret= false;
+    let ret= false;
     for (const topEl= this.topEl; el !== topEl; el= el.parentElement) {
       const idx= TargetFinder.getData(el, "dragIdx");
       if (idx !== undefined) {
