@@ -10,7 +10,7 @@ const app= new Vue({
   mixins: [shiftMixin()],
   methods: {
     newMutation(node, extras={}, after={}) {
-      const state= new MutationState(node);x
+      const state= new MutationState(node);
       // REFACTOR
       // fix: ways to make this more generic?
       // fix -- this exists to create paragraphs,
