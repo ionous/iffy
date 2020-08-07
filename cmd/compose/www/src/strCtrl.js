@@ -124,7 +124,7 @@ Vue.component('mk-str-ctrl', {
         if (choice in lts) {
           choice= lts[choice];
         }
-        this.$root.setPrim( node, choice );
+        this.$root.redux.setPrim( node, choice );
       }
       this.editing= false;
     },
@@ -133,7 +133,7 @@ Vue.component('mk-str-ctrl', {
       const { node } = this;
       const param= node.itemType.with.params[token];
       if (param.value !== null) {
-        this.$root.setPrim( node, token );
+        this.$root.redux.setPrim( node, token );
       }
       this.editing= true;
       this.$root.nodeSelected(node);

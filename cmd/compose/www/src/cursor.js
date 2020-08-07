@@ -104,42 +104,6 @@ class Cursor  {
     }
     return ret;
   }
-  // inject the passed node at the current target.
-  spliceTarget(node, vm) {
-    const { parent, token }= this;
-    if (!token) { // no token means swap or slot
-      parent.kid= node;
-    } else {
-      const { index } = this;
-      if ((index>=0) && (token in parent.kids)) {
-        parent.kids[token].splice(index, 0, node);
-      } else {
-        const value= (index<0)? node: [node];
-        if (vm) {
-          vm.set(parent, token, value);
-        } else {
-          parent[token]= value;
-        }
-      }
-    }
-  }
-  // note: this will happily delete non-optional elements.
-  // vm is an (optional) concession to trigger vue change watchers
-  deleteMe(vm) {
-    const { parent, token }= this;
-    if (!token) { // no token means swap or slot
-      parent.kid= null;
-    } else {
-      const { index } = this;
-      if (index > 0) { // a non-zero index means remove a repeater
-        parent.kids[token].splice(index, 1);
-      } else if (vm) { // otherwise, remove the field entirely
-        vm.delete(parent, token);
-      } else {
-        delete parent[token];
-      }
-    }
-  }
   static At( node ) {
     let ret= null;
     const { parent }= node;

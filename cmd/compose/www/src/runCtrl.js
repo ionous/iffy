@@ -23,10 +23,8 @@ Vue.component('mk-run-ctrl', {
   methods: {
     // when the ghost is clicked, we want to expand it.
     onGhost(token) {
-      // FIX: this isnt right because cursor expects index for arrays
-      // and ghosts are generally, always? arrays.
-      const c= new Cursor(this.node, token);
-      this.$root.redux.newElem(c);
+      const at= new Cursor(this.node, token);
+      this.$root.redux.newElem(at);
     },
   },
   computed: {

@@ -39,10 +39,7 @@ class RunNode extends Node {
       kids: this.kids,
     };
   }
-  getChildCount() {
-    return this.kids.length;
-  }
-  getChild(token) {
+  getKid(token) {
     return this.kids[token];
   }
   // visit each parameter and argument in turn
@@ -163,13 +160,13 @@ class Nodes {
   }
   newFromType(parent, typeName) {
     const item= Types.createItem(typeName);
-    const kid= this.newNode(parent, item.type, item.id);
-    kid.unroll(this, item.value);
-    return kid;
+    return this.newFromItem(parent, item);
   }
   newFromItem(parent, item) {
     const kid= this.newNode(parent, item.type, item.id);
-    kid.unroll(this, item.value);
+    if (item.value) {
+      kid.unroll(this, item.value);
+    }
     return kid;
   }
   newNode(parent, typeName, itemId) {

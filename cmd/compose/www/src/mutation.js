@@ -60,9 +60,17 @@ class Mutation {
 // places in the tree where mutations can happen
 class MutationState {
   constructor(node) {
+    this.focus= node;
     this.left = [];     // array of Cursor(s) indicating insertion points
     this.right= [];     // array of Cursor(s) indicating appending points
     this.removes= null; // a single Cursor or null
+    this._addEdges(node, [-1,1]);
+  }
+  toJSON() {
+    const { left, right, removes } = this;
+    return {
+      left, right, removes,
+    }
   }
   // side: -1/+1
   _remember(c, side) {
@@ -75,7 +83,7 @@ class MutationState {
   // if there is a missing optional sibling: remember that, and look at the next sibling.
   // if you hit an edge -- that is, if you have no sibling --
   // move up to the parent node, and repeat.
-  addEdges(node, sides) {
+  _addEdges(node, sides) {
     const c= Cursor.At(node);
     if (c) {
       // at most one deletable element
@@ -115,7 +123,7 @@ class MutationState {
       };
       //
       if (nextSides.length) {
-        this.addEdges(c.parent, nextSides);
+        this._addEdges(c.parent, nextSides);
       }
     } //~if c is valid
   }

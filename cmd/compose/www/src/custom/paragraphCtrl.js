@@ -15,7 +15,7 @@ Vue.component('xmk-paragraph-ctrl', {
   },
   computed: {
     items() {
-      return this.node.getChild("$STORY_STATEMENT");
+      return this.node.getKid("$STORY_STATEMENT");
     }
   }
 });

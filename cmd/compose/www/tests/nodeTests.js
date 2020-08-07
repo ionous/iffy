@@ -13,8 +13,7 @@ class NodeTest {
      this.nodes.unroll(rootItem);
     }
     newMutation(node) {
-      const state= new MutationState();
-      state.addEdges(node, [-1,1]);
+      const state= new MutationState(node);
       return new Mutation(this.redux, state);
     }
 }
@@ -50,6 +49,7 @@ function nodeTests() {
                             "$DETERMINER": {
                               "id": "td6",
                               "type": "determiner",
+
                               "value": "$THE"
                             },
                             "$COMMON_NAME": {
@@ -69,15 +69,11 @@ function nodeTests() {
                         "id": "td11",
                         "type": "kind_of_noun",
                         "value": {
-
-
                           "$ARE_AN": {
                             "id": "td9",
                             "type": "are_an",
                             "value": "$ISA"
                           },
-
-
                           "$KIND": {
                             "id": "td10",
                             "type": "singular_kind",
@@ -99,7 +95,7 @@ function nodeTests() {
   }
   function runTest(name, testFn, root) {
     try {
-      _runTest(name,testFn,root);
+      _runTest(name, testFn, root);
     } catch (error) {
       console.error("FAILED", name, error);
     }
@@ -107,6 +103,7 @@ function nodeTests() {
 
   function testMutation(name, expected) {
     runTest(`mutation ${name}`, function(test) {
+      const before= JSON.stringify(test.rootItem, 0, 2);
       const node= test.all[name];
       const mutation= test.newMutation(node);
       const have= JSON.stringify(mutation.state,0,2);
@@ -115,6 +112,11 @@ function nodeTests() {
         console.log("have:", have);
         console.log("want:", want);
         throw new Error(`${node.id} mismatched`);
+      }
+      const after= JSON.stringify(test.rootItem, 0, 2);
+      if (before !== after) {
+        console.log("have:", after);
+        throw new Error(`original data changed?!`);
       }
     });
   }
@@ -217,57 +219,58 @@ function nodeTests() {
   //
   runTest("test appending to a new (optional) list", function(test) {
     const kindOfNoun= test.all.td11;
-    if (kindOfNoun.getChild("$TRAIT")) {
+    if (kindOfNoun.getKid("$TRAIT")) {
       throw new Error("unexpected initial attribute");
     }
     test.newMutation( test.all.td10 ).mutate(-1);
-    if (kindOfNoun.getChild("$TRAIT").getChildCount() !== 1) {
+    if (kindOfNoun.getKid("$TRAIT").length !== 1) {
       throw new Error("missing new attribute");
     }
   });
   //
   runTest("test appending to an existing (required) list", function(test) {
     const lede= test.all.td4;
-    if (lede.getChild("$NOUN").getChildCount() !== 1) {
+    if (lede.getKid("$NOUN").length!== 1) {
         throw new Error("expected one initial noun");
     }
     test.newMutation( test.all.td9 ).mutate(-1);
-    if (lede.getChild("$NOUN").getChildCount() !== 2) {
+    if (lede.getKid("$NOUN").length!== 2) {
         throw new Error("expected a new noun");
     }
   });
   //
   runTest("test creating a non-repeating optional item", function(test) {
     const nounStatement= test.all.td5;
-    if (nounStatement.getChild("$SUMMARY")) {
+    if (nounStatement.getKid("$SUMMARY")) {
       throw new Error("unexpected initial summary");
     }
     test.newMutation( test.all.td10 ).mutate(3);
-    const summary= nounStatement.getChild("$SUMMARY");
+    const summary= nounStatement.getKid("$SUMMARY");
     if (!summary || (summary.type !== "summary")) {
       throw new Error("unexpected new empty summary");
     }
   });
-  // deletion
+  // deletion,
   runTest("delete a slat", function(test) {
+    // td3 is a noun_phrase set to "$KIND_OF_NOUN"
     const nounPhrase= test.all.td3;
-    if (nounPhrase.firstChild.token !== "$KIND_OF_NOUN") {
+    if ((nounPhrase.choice !== "$KIND_OF_NOUN") || (nounPhrase.kid.type != "kind_of_noun")) {
       throw new Error("expected initial 'kind of noun' phrase");
     }
     // delete the "kind of noun" noun phrase
     test.newMutation( test.all.td9 ).mutate(0);
-    if (nounPhrase.firstChild) {
-      throw new Error("expected noun phrase slat was deleted");
+    if (nounPhrase.choice || nounPhrase.kid) {
+      throw new Error(`expected noun phrase was deleted ${JSON.stringify(nounPhrase)}`);
     }
   });
   runTest("delete a repeating item", function(test) {
-    const statementList= test.all.td1.getChild("$STORY_STATEMENT");
-    if (statementList.getChildCount() !== 2) {
+    const statementList= test.all.td1.getKid("$STORY_STATEMENT");
+    if (statementList.length !== 2) {
       throw new Error("expected two initial statements");
     }
     // delete the second story statement
     test.newMutation( test.all.td2 ).mutate(0);
-    if (statementList.getChildCount() !== 1) {
+    if (statementList.length !== 1) {
       throw new Error("expected one remaining statements");
     }
     if (statementList[0].id !== "td0") {
@@ -288,12 +291,12 @@ function nodeTests() {
     });
   runTest("delete an optional item", function(test) {
     const nounStatement= test.all.td1;
-    if (!nounStatement.getChild("$SUMMARY")) {
+    if (!nounStatement.getKid("$SUMMARY")) {
       throw new Error("expected summary statement");
     }
     // delete the summary
     test.newMutation( test.all.td3 ).mutate(0);
-    if (nounStatement.getChild("$SUMMARY")) {
+    if (nounStatement.getKid("$SUMMARY")) {
       throw new Error("expected no summary statement");
     }
   }, {
@@ -318,13 +321,13 @@ function nodeTests() {
   });
   //
   runTest("add to left side of root", function(test) {
-    const statementList= test.all.td1.getChild("$STORY_STATEMENT");
-    if (statementList.getChildCount() !== 1) {
+    const statementList= test.all.td1.getKid("$STORY_STATEMENT");
+    if (statementList.length !== 1) {
       throw new Error("expected one additional statement");
     }
     const og= statementList[0];
     test.newMutation( test.all.td6 ).mutate(-2);
-    if (statementList.getChildCount() !== 2) {
+    if (statementList.length !== 2) {
       throw new Error("expected one additional statement");
     }
     const ogLeftMost=((statementList[0] === og) &&
@@ -335,13 +338,13 @@ function nodeTests() {
     }
   });
   runTest("add to right side of root", function(test){
-    const statementList= test.all.td1.getChild("$STORY_STATEMENT");
-    if (statementList.getChildCount() !== 1) {
+    const statementList= test.all.td1.getKid("$STORY_STATEMENT");
+    if (statementList.length !== 1) {
       throw new Error("expected one initial statements");
     }
     const og= statementList[0];
     test.newMutation( test.all.td10 ).mutate(4);
-    if (statementList.getChildCount() !== 2) {
+    if (statementList.length !== 2) {
       throw new Error("expected one additional statement");
     }
     const ogLeftMost=((statementList[0] === og) &&

@@ -75,46 +75,108 @@ class Redux {
   }
   // we can generically create optional members of runs
   // cursor c, must target a member of a run
-  newAt(c, leftSide= false) {
-    if (!("kids" in c.parent)) {
+  newAt(at, leftSide= false) {
+    if (!("kids" in at.parent)) {
       throw new Error("cursor should target the field of a run");
     }
-    if (c.isRepeatable()) {
-      this.newElem(c, leftSide);
+    if (at.isRepeatable()) {
+      this._newElem(at, leftSide);
     } else {
-      throw new Error("new field?")
+      this._newField(at);
     }
   }
-  // add a new item to the left (front) or right (end) of the targeted array.
-  // hmmm... regarding target and existing elements
-
-  newElem(c, leftSide=false) {
-    const { parent, target, token, param, index: i  }= c;
-
-    const newElem= this.nodes.newFromType(parent, param.type);
-    const index=  (i>=0)? i: (leftSide? 0: parent.kids.length-1);
-
+  // add a new item to a field
+  _newField(at) {
+    if (at.isRepeatable()) {
+      throw new Error(`newField should target a non-repeatable field ${JSON.stringify(at)}`);
+    }
+    const { parent, token, param }= at;
+    const newField= this.nodes.newFromType(parent, param.type);
     this.invoke({
       apply(vm) {
-        let els= parent.kids[token];
-        if (els === undefined) {
-          els= vm.set(parent.kids, token, []);
-        }
-        if (leftSide) {
-          els.unshift(newElem);
+        const { kids } = parent;
+        vm.set(kids, token, newField);
+      },
+      revoke(vm) {
+        const { kids } = parent;
+        vm.delete(kids, token);
+      }
+    });
+  }
+  _newElem(at, leftSide=false) {
+    if (!at.isRepeatable()) {
+      throw new Error(`newElem should target a repeatable field ${JSON.stringify(at)}`);
+    }
+    const { parent, token, param, index }= at;
+    const newElem= this.nodes.newFromType(parent, param.type);
+    this.invoke({
+      apply(vm) {
+        // if the field doesnt exist, add the new node via a new array.
+        const { kids } = parent;
+        const field= kids[token];
+        if (!field) {
+          vm.set(kids, token, [newElem]);
+        } else if (index<0) {
+          field.push(newElem); // no specific element targeted, append.
         } else {
-          els.push(newElem);
+          const i= leftSide? index: index+1;
+          field.splice(i, 0, newElem);
         }
       },
       revoke(vm) {
-        if (!target) {
-          vm.delete(parent, token);
+        const { kids } = parent;
+        const field= kids[token];
+        if (field.length <= 1) {
+          vm.delete(kids, token);
         } else {
-          const els= parent.kids[token];
-          if (leftSide) {
-            els.shift();
+          // re-determine the index to avoid left/right side issues.
+          const rub= field.indexOf(newElem);
+          field.splice(rub, 1);
+        }
+      }
+    });
+  }
+  // remove an existing child targeted by the passed cursor
+  // note: this will happily delete non-optional elements.
+  deleteAt(at) {
+    const { parent, token, index }= at;
+    const oldKid= at.target;
+    const oldChoice= parent.choice;
+
+    this.invoke({
+      apply(vm) {
+        if (!token) { // no token means swap or slot
+          parent.kid= null;
+          if (oldChoice!== undefined) {
+            parent.choice= null;
+          }
+        } else {
+          const { kids } = parent;
+          const field= kids[token];
+          if (field) {
+            // delete the field, or remove a single element?
+            if ((index >= 0) && (field.length > 1)) {
+              field.splice(index, 1);
+            } else {
+              vm.delete(kids, token);
+            }
+          }
+        }
+      },
+      revoke(vm) {
+        if (!token) { // no token means swap or slot
+          parent.kid= oldKid;
+          if (oldChoice!== undefined) {
+            parent.choice= oldChoice;
+          }
+        } else {
+          const { kids } = parent;
+          if ((index >= 0) && (token in kids)) {
+            const field= kids[token];
+            field.splice(index, 0, oldKid);
           } else {
-            els.pop();
+            const value= (index<0)? oldKid: [oldKid];
+            vm.set(kids, token, value);
           }
         }
       }
@@ -136,7 +198,7 @@ class Redux {
     const oldKid= parent.kid;
     const oldChoice= parent.choice;
     const newSwap= this.nodes.newFromType(parent, typeName);
-      this.invoke({
+    this.invoke({
       apply() {
         parent.kid= newSwap;
         parent.choice= newChoice;
@@ -146,24 +208,6 @@ class Redux {
         parent.choice= oldChoice;
       }
     });
-  }
-  // remove an existing item from a field
-  deleteAt(curse) {
-    const { target } = curse;
-    this.invoke({
-      apply(vm) {
-        curse.deleteMe(vm);
-      },
-      revoke(vm) {
-        curse.spliceTarget(target, vm);
-      }
-    });
-  }
-
-  // change the value of an existing item
-  setChild(item, newValue) {
-    // resuse primitive, that's fine for now.
-    return this.setPrim(item, newValue);
   }
   // change a primitive value
   setPrim(item, newValue) {
@@ -177,23 +221,7 @@ class Redux {
       }
     });
   }
-  // add a new item to a field
-  addField(field, newItem) {
-    if (!field.isOptional()) {
-      throw new Error(`unexpected mutation ${JSON.stringify(field)}`);
-    }
-    if (field.item != null) {
-      throw new Error(`attempting to add existing field ${JSON.stringify(field)}`);
-    }
-    this.invoke({
-      apply(vm) {
-        field.setValue(newItem, vm);
-      },
-      revoke() {
-        field.deleteMe();
-      }
-    });
-  }
+
   // we move node's item and / or the items after it into the newItem's container.
   // leftSide (aka splitBefore) the els after and including the field.
   // rightSide (aka splitAfter ) the els after field not including the field.
