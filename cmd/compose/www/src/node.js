@@ -12,8 +12,7 @@ class Node {
     };
   }
   serialize() {
-    throw new Error("reimplement");
-    return JSON.stringify(story.item, 0, 2);
+    return JSON.stringify(this, 0, 2);
   }
   unroll(nodes, itemValue) {
     throw new Error("unroll unhandled");
@@ -36,7 +35,7 @@ class RunNode extends Node {
     return {
       id: this.id,
       type: this.type,
-      kids: this.kids,
+      value: this.kids,
     };
   }
   getKid(token) {
@@ -82,11 +81,14 @@ class SwapNode extends Node {
     this.kid= null;
   }
   toJSON() {
+    const { choice, kid } = this;
+    const value= choice && {
+        [choice]: kid
+    };
     return {
       id: this.id,
       type: this.type,
-      choice: this.choice,
-      kid: this.kid,
+      value,
     };
   }
   unroll(nodes, itemValue) {
@@ -115,7 +117,7 @@ class SlotNode extends Node {
     return {
       id: this.id,
       type: this.type,
-      kid: this.kid,
+      value: this.kid,
     };
   }
   unroll(nodes, itemValue) {

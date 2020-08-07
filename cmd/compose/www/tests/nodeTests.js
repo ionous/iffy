@@ -10,7 +10,8 @@ class NodeTest {
           delete tgt[field];
         },
       }, this.nodes, 100);
-     this.nodes.unroll(rootItem);
+      this.nodes.unroll(rootItem);
+      this.rootItem= rootItem
     }
     newMutation(node) {
       const state= new MutationState(node);
@@ -215,6 +216,15 @@ function nodeTests() {
     }
   });
   //
+  runTest("serialization", function(test) {
+    const ogJson= JSON.stringify(test.rootItem,0,2);
+    const nodeJson= test.nodes.root.serialize();
+    if (nodeJson !== ogJson) {
+      console.log(nodeJson);
+      throw new Error("mismatched serialization");
+    }
+  });
+  //
   // test actually mutating some data
   //
   runTest("test appending to a new (optional) list", function(test) {
@@ -354,5 +364,6 @@ function nodeTests() {
       throw new Error("expected right side addition");
     }
   });
+
 }
 nodeTests();
