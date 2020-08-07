@@ -68,7 +68,7 @@ class Redux {
     return okay;
   }
   // { function(vm) apply, revoke; }
-  invoke(act) {
+  _invoke(act) {
     this.applied.push(act).apply(this.vm);
     this.revoked.clear();
     ++this.changed;
@@ -92,7 +92,7 @@ class Redux {
     }
     const { parent, token, param }= at;
     const newField= this.nodes.newFromType(parent, param.type);
-    this.invoke({
+    this._invoke({
       apply(vm) {
         const { kids } = parent;
         vm.set(kids, token, newField);
@@ -109,7 +109,7 @@ class Redux {
     }
     const { parent, token, param, index }= at;
     const newElem= this.nodes.newFromType(parent, param.type);
-    this.invoke({
+    this._invoke({
       apply(vm) {
         // if the field doesnt exist, add the new node via a new array.
         const { kids } = parent;
@@ -143,7 +143,7 @@ class Redux {
     const oldKid= at.target;
     const oldChoice= parent.choice;
 
-    this.invoke({
+    this._invoke({
       apply(vm) {
         if (!token) { // no token means swap or slot
           parent.kid= null;
@@ -185,7 +185,7 @@ class Redux {
   newSlot(parent, typeName) {
     const oldSlot= parent.slot;
     const newSlot= this.nodes.newFromType(parent, typeName);
-      this.invoke({
+      this._invoke({
       apply() {
         parent.slot= newSlot;
       },
@@ -198,7 +198,7 @@ class Redux {
     const oldKid= parent.kid;
     const oldChoice= parent.choice;
     const newSwap= this.nodes.newFromType(parent, typeName);
-    this.invoke({
+    this._invoke({
       apply() {
         parent.kid= newSwap;
         parent.choice= newChoice;
@@ -212,7 +212,7 @@ class Redux {
   // change a primitive value
   setPrim(item, newValue) {
     const oldValue= item.value;
-    this.invoke({
+    this._invoke({
       apply(vm) {
         item.value= newValue;
       },
@@ -226,32 +226,32 @@ class Redux {
   // leftSide (aka splitBefore) the els after and including the field.
   // rightSide (aka splitAfter ) the els after field not including the field.
   // field.value is the old container
-  split(node, newItem, leftSide) {
-    const field= node.field;
-    const parentField= node.parentNode.field;
-    this.invoke({
-      apply() {
-        // field.item, ex. "$STORY_STATEMENT": [{ type: "story_statement", value: {} }]
-        const { item } = node;
-        const { value:oldItems } = field;
-        const index= oldItems.indexOf(item) + (leftSide? 0: 1);
-        const removed= oldItems.splice(index);
-        // newItem.value holds the new container
-        // we need to overwrite its placeholder item with our items.
-        const newItems= newItem.value[field.token];
-        newItems.splice(0, 1, ...removed);
-        // and we need to put the newItem after our current group
-        // regardless of which side of the item we broke on
-        parentField.addRepeat( newItem );
-      },
-      revoke() {
-        const { value:oldItems } = field;
-        const newItems= newItem.value[field.token];
-        const removed= newItems.splice(0); // remove all the items we added.
-        oldItems.splice(oldItems.length, 0, ...removed);
-        parentField.removeRepeat();
-      }
-    });
-  }
+  // split(node, newItem, leftSide) {
+  //   const field= node.field;
+  //   const parentField= node.parentNode.field;
+  //   this._invoke({
+  //     apply() {
+  //       // field.item, ex. "$STORY_STATEMENT": [{ type: "story_statement", value: {} }]
+  //       const { item } = node;
+  //       const { value:oldItems } = field;
+  //       const index= oldItems.indexOf(item) + (leftSide? 0: 1);
+  //       const removed= oldItems.splice(index);
+  //       // newItem.value holds the new container
+  //       // we need to overwrite its placeholder item with our items.
+  //       const newItems= newItem.value[field.token];
+  //       newItems.splice(0, 1, ...removed);
+  //       // and we need to put the newItem after our current group
+  //       // regardless of which side of the item we broke on
+  //       parentField.addRepeat( newItem );
+  //     },
+  //     revoke() {
+  //       const { value:oldItems } = field;
+  //       const newItems= newItem.value[field.token];
+  //       const removed= newItems.splice(0); // remove all the items we added.
+  //       oldItems.splice(oldItems.length, 0, ...removed);
+  //       parentField.removeRepeat();
+  //     }
+  //   });
+  // }
 }
 
