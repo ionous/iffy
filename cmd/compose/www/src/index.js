@@ -55,18 +55,17 @@ const app= new Vue({
     // find the filter for displaying labels ( ex. strCtrl.labelData. )
     filter(node) {
       let isAtStart= false;
-      while (node.field && node.field.tokenIndex <= 0) {
-        if (node.field.isRepeatable() && Sibling.HasAdjacentEls(node, -1)) {
-          break;
-        }
-        node= node.parentNode;
-        if (!node) {
-          break;
-        }
-        if (!node.field || (node.type === "story_statement")) {
+      // find an edge
+      while (node) {
+        if (node.type === "story_statement") {
           isAtStart= true;
           break;
         }
+        // elements exist to the left?
+        if (Cursor.At(node).step(-1)) {
+          break;
+        }
+        node= node.parent;
       }
       return isAtStart? Filters.capitalize: Filters.none;
     },
