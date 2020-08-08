@@ -1,23 +1,24 @@
-class StoryList extends DragList {
+// FIX -- other new Item(s) like merge.
+class InlineStory extends DragList {
   constructor(node, nodes, items) {
     super(items);
     this.node= node;
     this.nodes= nodes;
+    this.inline= true;
   }
   makeBlank() {
     return this.nodes.newFromType(this.node, "story_statement");
   }
 }
 
-// paragraphs could be removed
-// instead just separate groups of lines by blank lines.
-// curr story has one line in the first paragraph.
+// paragraphs are actually, basically, the discrete lines of a story.
 Vue.component('mk-paragraph-ctrl', {
   template:
   `<em-table
       :class="$root.shift && 'em-shift'"
       :list="list"
-      :dropper="$root.dropper"
+      :dropper="dropper"
+      :grip="'\u2630'"
   ><template
       v-slot="{item, idx}"
     ><mk-switch
@@ -29,14 +30,11 @@ Vue.component('mk-paragraph-ctrl', {
     node: Node,
   },
   data() {
-    const { node } = this;
+    const { node, "$root": root } = this;
     const items= this.node.getKid("$STORY_STATEMENT");
-    const inline= false;
-    return { // FIX -- other new Item(s) like merge.
-      list: new StoryList(node, this.$root.nodes, items)
+    return {
+      list: new InlineStory(node, this.$root.nodes, items),
+      dropper: this.$root.dropper,
     }
   },
 });
-
-
- // FIX!

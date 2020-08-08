@@ -3,7 +3,8 @@ let lastItem=0;
 const itemTypes= {
     "lower" : '+', // plus
     "middle": '!',
-    "upper" : '\u201C',
+    "upper" : '\u201C', // left quote
+    // '\u2630' hamburder heaven
 };
 const typeNames= Object.keys(itemTypes);
 
