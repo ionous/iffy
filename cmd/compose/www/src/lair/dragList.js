@@ -1,11 +1,10 @@
 let lastList= 0;
 
 class DragList {
-  constructor(items, inline, makeBlank) {
+  constructor(items, inline=false) {
     this.name= `list-${++lastList}`;
     this.items= items;
-    this.makeBlank= makeBlank;
-    this.inline= inline;
+    this.inline= !!inline;
   }
   get block() {
     return !this.inline;
@@ -38,13 +37,57 @@ class DragList {
     }
     return dst;
   }
+  makeBlank() {
+    throw new Error("not implemented");
+  }
+  dropFrom(drop, from) {
+    const {idx:dropIdx}= drop;
+    const {idx:fromIdx, list:fromList} = from;
+    // add and remove can ( sometimes ) cause dragend not to fire.
+    // fix? while moving items is quick and easy
+    // technically, we should create new items here by serialization --
+    // and wait to remove items in drag end.
+    //
+    let width= 1;
+    if (fromList.inline) {
+      width= Number.MAX_VALUE;
+    }
+    if (this === fromList) {
+      fromList.move(fromIdx, dropIdx, width);
+    } else {
+      let rub= fromList.items.splice(fromIdx, width);
+      const at= Math.min(Math.max(0,dropIdx+1), this.items.length);
+
+      // moving item(s) from an inline group to a block group?
+      const merge= (fromList.inline && this.block);
+      if (!merge) {
+        // moving a block into an inline list of items.
+        if (fromList.block && this.inline) {
+          this.items.splice(at, 0,...rub[0].content);
+        } else {
+          this.items.splice(at, 0,...rub);
+        }
+      } else {
+        let row= new Item();
+        row.content= rub.map((x)=> {
+          x.parent= row;
+          return x;
+        });
+        this.items.splice(at, 0, row);
+      }
+    }
+  }
+
 };
 
 (function() {
   console.log("testing drag list");
   function test(og, src, dst, expect) {
+    class TestList extends DragList {
+      makeBlank() { return "_" }
+    }
     const items= og.split('');
-    const dl= new DragList(items, false, ()=>"_");
+    const dl= new TestList(items);
     dl.move(src,dst);
     const res= items.join("");
     if (expect !== res) {

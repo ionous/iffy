@@ -2,7 +2,7 @@ function localLang(make) {
   make.group("Story Statements", function() {
     make.run("story_statements", "{+story_statement}"); // old
 
-    make.run("story", "{+paragraph|ghost}");
+    make.run("story", "{+paragraph}");
     make.run("paragraph", "{+story_statement}");
     make.slot("story_statement");
 
@@ -44,7 +44,6 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     make.str("common_name", `Common Name: A generalized name given to some specific item, place, or thing.
     Common names are usually not capitalized. For example, maybe: 'table', 'chair', or 'dog park'.`);
   });
-
 
   make.group("Patterns", function() {
     make.run("pattern_decl", "story_statement",

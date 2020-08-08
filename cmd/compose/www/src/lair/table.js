@@ -1,24 +1,16 @@
 Vue.component('em-table', {
   data() {
-    const { items, inline, dropper }= this;
-    // FIX!
-    const makeBlank= ()=> new Item(inline?"":[]);
-    const list= new DragList(items, inline, makeBlank);
+    const { list, dropper }= this;
     return {
-      list,
+      items: list.items,
       handler: new DragHandler(new DragGroup(list, dropper)),
+      classmod: list.inline? "inline":"block",
     };
-  },
-  computed: {
-    classmod() {
-      return this.inline? "inline":"block";
-    }
   },
   props: {
     grip:String,
-    items: Array,
     dropper: Dropper,
-    inline: Boolean,
+    list: DragList,
   },
   mounted() {
     this.handler.listen(this.$el);
@@ -39,7 +31,7 @@ Vue.component('em-table', {
         highlight=(idx === at.idx) || edge;
       }
       const mod= this.classmod;
-      const inline= this.inline;
+      const inline= this.list.inline;
       return {
         "em-row": true,
         ["em-row--"+mod] : true,

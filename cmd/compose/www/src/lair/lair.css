@@ -8,7 +8,8 @@
   display: inline;
 }
 .em-gutter {
-  background-color: whitesmoke;
+  /*background-color: whitesmoke;*/
+  color: rgb(239, 207, 173);
   display: inline-block;
   position: relative;
   cursor: default;

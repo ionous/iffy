@@ -1,29 +1,42 @@
+class StoryList extends DragList {
+  constructor(node, nodes, items) {
+    super(items);
+    this.node= node;
+    this.nodes= nodes;
+  }
+  makeBlank() {
+    return this.nodes.newFromType(this.node, "story_statement");
+  }
+}
 
-//
-Vue.component('xmk-paragraph-ctrl', {
+// paragraphs could be removed
+// instead just separate groups of lines by blank lines.
+// curr story has one line in the first paragraph.
+Vue.component('mk-paragraph-ctrl', {
   template:
   `<em-table
       :class="$root.shift && 'em-shift'"
-      :items="items"
+      :list="list"
       :dropper="$root.dropper"
   ><template
-      v-slot="{item,idx}"
-    >....</template
+      v-slot="{item, idx}"
+    ><mk-switch
+      :node="item"
+    ></mk-switch
+    ></template
   ></em-table>`,
   props: {
     node: Node,
   },
-  computed: {
-    items() {
-      return this.node.getKid("$STORY_STATEMENT");
+  data() {
+    const { node } = this;
+    const items= this.node.getKid("$STORY_STATEMENT");
+    const inline= false;
+    return { // FIX -- other new Item(s) like merge.
+      list: new StoryList(node, this.$root.nodes, items)
     }
-  }
+  },
 });
 
 
-// "$STORY_STATEMENT": [{
-//   "id": "id-a-0",
-//   "type": "story_statement",
-//   "value": {
-//    }
-// ]
+ // FIX!

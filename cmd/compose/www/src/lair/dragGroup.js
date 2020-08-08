@@ -45,44 +45,9 @@ class DragGroup {
     Dropper.setDragData(dt, tgt, this._serializeItem(start));
   }
   drop(drop, dt) {
-    const dropGroup= this.list;
     const start= this.dropper.start;
     if (start) {
-      const {idx:dragIdx, list:dragGroup} = start;
-      const {idx:dropIdx}= drop;
-      // add and remove can ( sometimes ) cause dragend not to fire.
-      // fix? while moving items is quick and easy
-      // technically, we should create new items here by serialization --
-      // and wait to remove items in drag end.
-      //
-      let width= 1;
-      if (dragGroup.inline) {
-        width= Number.MAX_VALUE;
-      }
-      if (dropGroup === dragGroup) {
-        dragGroup.move(dragIdx, dropIdx, width);
-      } else {
-        let rub= dragGroup.items.splice(dragIdx, width);
-        const at= Math.min(Math.max(0,dropIdx+1), dropGroup.items.length);
-
-        // moving item(s) from an inline group to a block group?
-        const merge= (dragGroup.inline && dropGroup.block);
-        if (!merge) {
-          // moving a block into an inline list of items.
-          if (dragGroup.block && dropGroup.inline) {
-            dropGroup.items.splice(at, 0,...rub[0].content);
-          } else {
-            dropGroup.items.splice(at, 0,...rub);
-          }
-        } else {
-          let row= new Item();
-          row.content= rub.map((x)=> {
-            x.parent= row;
-            return x;
-          });
-          dropGroup.items.splice(at, 0, row);
-        }
-      }
+      this.list.dropFrom(drop, start);
     }
     // clear b/c we dont always get dragEnd.
     this.dropper.reset(true);

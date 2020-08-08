@@ -17,5 +17,9 @@
   list-style: none;
   margin-left: 2em;
   padding-left: 1em;
-  border-left: 3px double rgba(239, 207, 173, 0.7); 
+  border-left: 3px double rgb(239, 207, 173); 
+}
+
+.em-gutter--digi {
+  border-right: 3px double rgb(239, 207, 173); 
 }

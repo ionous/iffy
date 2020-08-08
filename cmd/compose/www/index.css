@@ -93,19 +93,23 @@ body {
   font-weight: bold;
 }
 /*https://codepen.io/Thibaut/pen/xjHef*/
+
 .mk-composer {
-  padding: 10px;
   color: #6a5f49;
-  background-color: #f2f6c1;
-  background-image: -webkit-repeating-linear-gradient(top, transparent 0%, transparent 29px, rgba(239, 207, 173, 0.7) 29px, rgba(239, 207, 173, 0.7) 30px);
-  background-image: -moz-repeating-linear-gradient(top, transparent 0%, transparent 29px, rgba(239, 207, 173, 0.7) 29px, rgba(239, 207, 173, 0.7) 30px);
-  background-image:  -o-repeating-linear-gradient(top, transparent 0%, transparent 29px, rgba(239, 207, 173, 0.7) 29px, rgba(239, 207, 173, 0.7) 30px);
+ 
   border: 1px solid #c3baaa;
   border-color: rgba(195, 186, 170, 0.9);
   cursor: default;
-  line-height: 1.5em;
   grid-area: editor;
   overflow-y:scroll;
+  background-color: #f2f6c1;
+
+  line-height: 25px;
+  background-image: -moz-linear-gradient(top, transparent, transparent 24px, rgb(239, 207, 173) 0px);
+  background-image: -webkit-linear-gradient(top, transparent, transparent 24px, rgb(239, 207, 173) 0px);
+  -webkit-background-size: 100% 25px;
+  background-size: 100% 25px;
+  padding: 20px;
 }
 
 .mk-a-button:hover {
