@@ -49,13 +49,17 @@ class NodeTable extends DragList {
     });
   }
   // move items within this same list
-  move(src, dst, width) {
+  move(src, dst, width, nothrow) {
     const { redux, items } = this;
     if (width<=0) {
-      throw new Error("invalid width");
+      const e= new Error("invalid width");
+      if (nothrow) { return e; }
+      throw e;
     }
     if ((dst > src) && (dst < src+width)) {
-      throw new Error("invalid dest");
+      const e= new Error("invalid dest");
+      if (nothrow) { return e; }
+      throw e;
     }
     if (src+width> items.length) {
       width= items.length-src;

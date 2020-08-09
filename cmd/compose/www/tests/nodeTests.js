@@ -406,10 +406,21 @@ function nodeTests() {
     table.addBlank(2);
     expect("012", "initially");
     table.move(1,0,2);
-    expect("120", "moved");
+    expect("120", "moved src>dst");
     test.redux.undo();
     expect("012", "undone");
-
+    table.move(0,3,2);
+    expect("201", "moved dst>src");
+    test.redux.undo();
+    expect("012", "undone again");
+    const nothrow= true;
+    const illegalMove= table.move(0,1,3, nothrow);
+    console.assert(illegalMove, "expected illegal move detected")
+    expect("012", "steady state");
+    table.move(2,0,10000);
+    expect("201", "width cap");
+    test.redux.undo();
+    expect("012", "undone done");
   }, emptyParagraph);
 
 }
