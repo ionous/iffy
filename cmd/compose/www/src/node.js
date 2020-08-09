@@ -21,6 +21,14 @@ class Node {
   get type() {
     return this.itemType && this.itemType.name;
   }
+  // assuming target is an array owned by this node
+  // splice the passed els while re-parenting each one.
+  static Splice(parent, target, idx, len, ...els) {
+    return target.splice(idx, len, els.map(el=> {
+      el.parent= parent;
+      return el;
+    }));
+  }
 };
 
 // A set of conceptually related nodes.
@@ -143,16 +151,27 @@ class PrimNode extends Node {
   unroll(nodes, itemValue) {
     this.value= itemValue;
   }
-};
+}
+
+// currently, ids are serialized. that's not the long term plan.
+class Ids {
+  constructor(namespace= false) {
+    this.counter=0;
+    this.base= namespace !== false? namespace: ("id-" + Date.now().toString(16) + "-");
+  }
+  nextId() {
+    return this.base + this.counter++;
+  }
+}
 
 // node wraps items to provide a complete tree
 // item is the direct serialized to disk data:
 // { id string; type string; value any; } object;
 class Nodes {
-  constructor(pool) {
+  constructor(pool, idNamespace=false) {
     this.pool= pool;
-    this.nodeCounter=0; // used for generating keys
     this.root= null; //
+    this.ids= new Ids(idNamespace);
   }
   unroll(item) {
     // newFromItem "unrolls" the item data.
@@ -188,7 +207,7 @@ class Nodes {
     const kid= newNode[role](
       parent,
       itemType,
-      itemId || `node-${++this.nodeCounter}`,
+      itemId || this.ids.nextId(),
     );
     if (this.pool) {
       this.pool[kid.id]= kid;

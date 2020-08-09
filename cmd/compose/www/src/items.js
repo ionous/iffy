@@ -1,16 +1,3 @@
-// items wrap values to make even string and number primitives unique.
-// items exist for every required value, even if the value itself is empty.
-// currently, ids are serialized. that's not the long term plan.
-class Ids {
-  constructor() {
-    this.counter=0;
-    this.base= "id-" + Date.now().toString(16) + "-";
-  }
-  nextId() {
-    return this.base + this.counter++;
-  }
-}
-
 // inner class for Types
 // while a single global Type class simplifies code, it hurts testing.
 // this provides a way to have a mixture of both.
@@ -19,16 +6,13 @@ class TypeSet {
     this.all= {};
     this.slots= {}; // slot name => [ runs that implement the slot ]
     this.groups= {}; // group name => [ runs that implement the group ]
-    this.ids= new Ids();
   }
-
   get(typeName) {
     return this.all[typeName];
   }
   has(typeName) {
     return !!this.get(typeName);
   }
-
   // object { string name; string uses;
   //  union { string; object { label, short, long string } } desc;
   //  object with?; }
@@ -40,12 +24,11 @@ class TypeSet {
     this.all[ name ]= type;
     return type;
   }
-
   newItem(typeName, value) {
     if (!(typeName in this.all)) {
       throw new Error(`expected type, got '${typeName}'`);
     }
-    return { id:this.ids.nextId(), type:typeName, value };
+    return { type:typeName, value };
   }
 }
 
@@ -105,7 +88,7 @@ class Types {
   // produce an item/tree for the named type;
   // filling out defaults for all required fields.
   static createItem(typeName, ctx=null) {
-    console.log("Types.createItem", typeName);
+    console.debug("Types.createItem", typeName);
     if (typeof typeName !== 'string') {
       throw new Error("expected type string");
     }

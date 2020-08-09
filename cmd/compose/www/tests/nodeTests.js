@@ -1,7 +1,7 @@
 class NodeTest {
     constructor(rootItem) {
       this.all= {};
-      this.nodes= new Nodes( this.all );
+      this.nodes= new Nodes( this.all, "" );
       this.redux= new Redux({
         set(tgt, field, value) {
           tgt[field]= value;
@@ -26,7 +26,7 @@ function nodeTests() {
 
     const test= new NodeTest(root || {
       "id": "td1",
-      "type": "story_statements",
+      "type": "paragraph",
       "value": {
         "$STORY_STATEMENT": [{
           "id": "td0",
@@ -364,6 +364,53 @@ function nodeTests() {
       throw new Error("expected right side addition");
     }
   });
+  //
+  runTest("add blank story statement", function(test) {
+    const para= test.nodes.root;
+    const statements= para.getKid("$STORY_STATEMENT");
+    const table= new StatementTable(test.redux, para, statements);
+    if (statements.length!==1 || statements[0].id !== "td0") {
+      throw new Error(" td0 should start as the first statement");
+    }
+    table.addBlank(0);
+    if (statements.length!==2 || statements[1].id !== "td0") {
+      throw new Error(" td0 should now be the second statement");
+    }
+    const isBlank= statements[0];
+    if (isBlank.type !== "story_statement" || isBlank.kid !== null) {
+      throw new Error("a blank statement should now lead");
+    }
+    const undid= test.redux.undo();
+    if (!undid) {
+      throw new Error("undo failed");
+    }
+    if (statements.length!==1 || statements[0].id !== "td0") {
+      throw new Error(" undo should restore td0 as the first statement");
+    }
+  });
+  const emptyParagraph= {
+      "id": "root",
+      "type": "paragraph",
+      "value": {"$STORY_STATEMENT": []}
+  };
+  runTest("move story statements", function(test) {
+    const para= test.nodes.root;
+    const statements= para.getKid("$STORY_STATEMENT");
+    function expect(ids, reason) {
+      const have= statements.reduce((a,n)=> a + n.id, "");
+      console.assert(have === ids, `${reason} unexpected ids ${have}`);
+    }
+    const table= new StatementTable(test.redux, para, statements);
+    table.addBlank(0);
+    table.addBlank(1);
+    table.addBlank(2);
+    expect("012", "initially");
+    table.move(1,0,2);
+    expect("120", "moved");
+    test.redux.undo();
+    expect("012", "undone");
+
+  }, emptyParagraph);
 
 }
 nodeTests();
