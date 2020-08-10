@@ -23,10 +23,28 @@ class NodeTest {
     const have= src.reduce((a,n)=> a + n.id, "");
     console.assert(have === ids, `${reason} unexpected ids ${have}`);
   }
+
+  addComment(para, txt) {
+    const c= this.nodes.newFromItem(para, {
+      "type": "story_statement",
+      "id": txt,
+      "value": {
+        "type": "comment",
+        "value": {
+          "$LINES": {
+            "type": "lines",
+            "value": txt
+          }
+        }
+      }
+    });
+    para.getKid("$STORY_STATEMENT").push(c);
+    return c;
+  };
 }
 
 function nodeTests() {
-  const testStory= {
+  const testParagraph= {
     "id": "td1",
     "type": "paragraph",
     "value": {
@@ -86,7 +104,7 @@ function nodeTests() {
     console.log("testing", name);
     testFn(test);
   }
-  function runTest(name, testFn, root=testStory) {
+  function runTest(name, testFn, root=testParagraph) {
     try {
       _runTest(name, testFn, root);
     } catch (error) {
@@ -380,7 +398,6 @@ function nodeTests() {
     }
   });
   const emptyParagraph= {
-      "id": "root",
       "type": "paragraph",
       "value": {"$STORY_STATEMENT": []}
   };
@@ -391,37 +408,37 @@ function nodeTests() {
     table.addBlank(0);
     table.addBlank(1);
     table.addBlank(2);
-    test.expect(statements, "012", "initially");
+    test.expect(statements, "123", "initially");
     table.move(1,0,2);
-    test.expect(statements, "120", "moved src>dst");
+    test.expect(statements, "231", "moved src>dst");
     test.redux.undo();
-    test.expect(statements, "012", "undone");
+    test.expect(statements, "123", "undone");
     table.move(0,3,2);
-    test.expect(statements, "201", "moved dst>src");
+    test.expect(statements, "312", "moved dst>src");
     test.redux.undo();
-    test.expect(statements, "012", "undone again");
+    test.expect(statements, "123", "undone again");
     const nothrow= true;
     const illegalMove= table.move(0,1,3, nothrow);
     console.assert(illegalMove, "expected illegal move detected")
-    test.expect(statements, "012", "steady state");
+    test.expect(statements, "123", "steady state");
     table.move(2,0,10000);
-    test.expect(statements, "201", "width cap");
+    test.expect(statements, "312", "width cap");
     test.redux.undo();
-    test.expect(statements, "012", "undone done");
+    test.expect(statements, "123", "undone done");
   }, emptyParagraph);
   //
   runTest("drop p from ps to other ps", function(test) {
     // there's only one list of paragraphs per story, so this never happens in reality.
     const { nodes, redux } = test;
-    const mainStory= nodes.newFromType(null, "story");
-    const otherStory= nodes.newFromType(null, "story");
+    const mainStory= nodes.newFromType("story");
+    const otherStory= nodes.newFromType("story");
 
     const ps1= new ParagraphTable(redux, mainStory);
     const ps2= new ParagraphTable(redux, otherStory);
     test.expect(ps1.items, "1");
     test.expect(ps2.items, "4");
 
-    ps2.transferTo(0, { list:ps1, idx:0 });
+    ps2.transferTo(0, ps1, 0);
     test.expect(ps1.items, "");
     test.expect(ps2.items, "14");
 
@@ -429,8 +446,33 @@ function nodeTests() {
     test.expect(ps1.items, "1");
     test.expect(ps2.items, "4");
   }, null);
+  // "comment"
+
   runTest("drop p from ps appending to a line", function(test) {
-  });
+    const { nodes, redux } = test;
+    const mainStory= nodes.newFromType("story");
+    const ps= new ParagraphTable( redux, mainStory );
+    // p1: c1, c2
+    // p2: c3, c4
+    const p1= ps.items[0];
+    p1.getKid("$STORY_STATEMENT").splice(0);
+    const c1= test.addComment(p1, "c1");
+    const c2= test.addComment(p1, "c2");
+    const p2= ps.addBlank();
+    p2.getKid("$STORY_STATEMENT").splice(0);
+    const c3= test.addComment(p2, "c3");
+    const c4= test.addComment(p2, "c4");
+    // drop p1 at c3
+    // p1: x
+    // p2: c3, c1, c2, c4
+    const ts= new StatementTable(redux, p2);
+    test.expect(ts.items, "c3c4");
+    ts.transferTo(1, ps, 0);
+    test.expect(ts.items, "c3c1c2c4");
+    redux.undo();
+    test.expect(ts.items, "c3c4");
+
+  }, null);
   runTest("drop partial line from p into ps, creating a p", function(test) {
   });
   runTest("drop partial line from p appending to a line", function(test) {

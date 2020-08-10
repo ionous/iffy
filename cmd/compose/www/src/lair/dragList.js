@@ -6,7 +6,7 @@ class DragList {
     this.items= items;
     this.inline= !!inline;
   }
-  transferTo(at, from) {
+  transferTo(at, list, idx) {
     throw new Error("not implemented");
   }
 };

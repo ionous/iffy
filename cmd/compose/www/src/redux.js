@@ -91,15 +91,17 @@ class Redux {
       throw new Error(`newField should target a non-repeatable field ${JSON.stringify(at)}`);
     }
     const { parent, token, param }= at;
-    const newField= this.nodes.newFromType(parent, param.type);
+    const newField= this.nodes.newFromType(param.type);
     this.invoke({
       apply(vm) {
         const { kids } = parent;
         vm.set(kids, token, newField);
+        newField.parent= parent;
       },
       revoke(vm) {
         const { kids } = parent;
         vm.delete(kids, token);
+        newField.parent= null;
       }
     });
   }
@@ -108,7 +110,7 @@ class Redux {
       throw new Error(`newElem should target a repeatable field ${JSON.stringify(at)}`);
     }
     const { parent, token, param, index }= at;
-    const newElem= this.nodes.newFromType(parent, param.type);
+    const newElem= this.nodes.newFromType(param.type);
     this.invoke({
       apply(vm) {
         // if the field doesnt exist, add the new node via a new array.
@@ -122,6 +124,7 @@ class Redux {
           const i= leftSide? index: index+1;
           field.splice(i, 0, newElem);
         }
+        newElem.parent= parent;
       },
       revoke(vm) {
         const { kids } = parent;
@@ -133,6 +136,7 @@ class Redux {
           const rub= field.indexOf(newElem);
           field.splice(rub, 1);
         }
+        newElem.parent= null;
       }
     });
   }
@@ -184,28 +188,32 @@ class Redux {
   }
   newSlot(parent, typeName) {
     const oldSlot= parent.slot;
-    const newSlot= this.nodes.newFromType(parent, typeName);
+    const newSlot= this.nodes.newFromType(typeName);
       this.invoke({
       apply() {
         parent.slot= newSlot;
+        newSlot.parent= parent;
       },
       revoke() {
         parent.slot= oldSlot;
+        newSlot.parent= null;
       }
     });
   }
   newSwap(parent, newChoice, typeName) {
     const oldKid= parent.kid;
     const oldChoice= parent.choice;
-    const newSwap= this.nodes.newFromType(parent, typeName);
+    const newSwap= this.nodes.newFromType(typeName);
     this.invoke({
       apply() {
         parent.kid= newSwap;
         parent.choice= newChoice;
+        newSwap.parent= parent;
       },
       revoke() {
         parent.kid= newSwap;
         parent.choice= oldChoice;
+        newSwap.parent= null;
       }
     });
   }

@@ -171,9 +171,9 @@ class Nodes {
     this.root= root;
     return this;
   }
-  newFromType(parent, typeName) {
+  newFromType(typeName) {
     const item= Types.createItem(typeName);
-    return this.newFromItem(parent, item);
+    return this.newFromItem(null, item);
   }
   newFromItem(parent, item) {
     const kid= this.newNode(parent, item.type, item.id);

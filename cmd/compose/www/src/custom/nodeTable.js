@@ -10,11 +10,9 @@ class NodeTable extends DragList {
     throw new Error("not implemented");
   }
   // at:index, from:{list,idx}
-  transferTo(at, from) {
+  transferTo(at, fromList, fromIdx) {
     const toIdx= at;
     const toList= this;
-    const fromList= from.list;
-    const fromIdx= from.idx;
 
     if (toList === fromList) {
       const needBlank= Math.abs(fromIdx - toIdx) === 1;
@@ -26,28 +24,35 @@ class NodeTable extends DragList {
     } else {
       const { redux } = this;
       redux.invoke({
+        added: 0, // inelegant to say the least.
         apply() {
           const paraEls= fromList.removeFrom(fromIdx);
-          toList.addTo( toIdx, paraEls );
+          this.added= toList.addTo( toIdx, paraEls );
         },
         revoke() {
-          const paraEls= toList.removeFrom( toIdx );
+          const paraEls= toList.removeFrom( toIdx, this.added );
           fromList.addTo( fromIdx, paraEls );
         },
       });
     }
   }
-  addBlank(at) {
-    const { redux, items } = this;
+  addBlank(at=-1) {
+    const { redux, node, items } = this;
     const blank= this.makeBlank();
+    if (at<0) {
+      at= items.length;
+    }
     redux.invoke({
       apply() {
+        blank.parent= node;
         items.splice(at,0,blank);
       },
       revoke() {
+        blank.parent= null;
         items.splice(at,1);
       },
     });
+    return blank;
   }
   // move items within this same list
   move(src, dst, width, nothrow) {

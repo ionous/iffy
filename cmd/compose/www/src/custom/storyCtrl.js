@@ -1,10 +1,10 @@
 class ParagraphTable extends NodeTable {
-    constructor(redux, node) {
-    super(redux, node, node.getKid("$PARAGRAPH"));
+    constructor(redux, story) {
+    super(redux, story, story.getKid("$PARAGRAPH"));
     this.inline= false;
   }
   makeBlank() {
-    return this.nodes.newFromType(this.node, "paragraph");
+    return this.nodes.newFromType("paragraph");
   }
   // when we drag, we re/move a single paragraph ( a line ) at once.
   // returns a single statement
@@ -31,13 +31,15 @@ class ParagraphTable extends NodeTable {
       const els= paraEls;
       const para= this.makeBlank();
       // move els into the new paragraph...
-      para.getKid("story_statement").splice(at, 0, ...els.map(el=> {
+      const kids= para.getKid("$STORY_STATEMENT");
+      kids.splice(at, 0, ...els.map(el=> {
         el.parent= para;
         return el;
       }));
       // add the paragraph to us.
       this.addTo(at, para);
     }
+    return 1;
   }
 }
 
