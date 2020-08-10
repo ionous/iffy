@@ -21,14 +21,6 @@ class Node {
   get type() {
     return this.itemType && this.itemType.name;
   }
-  // assuming target is an array owned by this node
-  // splice the passed els while re-parenting each one.
-  static Splice(parent, target, idx, len, ...els) {
-    return target.splice(idx, len, els.map(el=> {
-      el.parent= parent;
-      return el;
-    }));
-  }
 };
 
 // A set of conceptually related nodes.

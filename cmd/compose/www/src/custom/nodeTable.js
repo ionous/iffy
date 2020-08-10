@@ -9,13 +9,14 @@ class NodeTable extends DragList {
   makeBlank() {
     throw new Error("not implemented");
   }
-  dropFrom(to, from) {
-    const thisList= this.list;
-    const thatList= from.list;
-    const toIdx= to.idx;
+  // at:index, from:{list,idx}
+  transferTo(at, from) {
+    const toIdx= at;
+    const toList= this;
+    const fromList= from.list;
     const fromIdx= from.idx;
 
-    if (thisList !== thatList) {
+    if (toList === fromList) {
       const needBlank= Math.abs(fromIdx - toIdx) === 1;
       if (needBlank) {
         this.addBlank(toIdx);
@@ -26,12 +27,12 @@ class NodeTable extends DragList {
       const { redux } = this;
       redux.invoke({
         apply() {
-          const paraEls= thatList.removeFrom(fromIdx);
-          thisList.addTo( toIdx, paraEls );
+          const paraEls= fromList.removeFrom(fromIdx);
+          toList.addTo( toIdx, paraEls );
         },
         revoke() {
-          const paraEls= thisList.removeFrom( toIdx );
-          thatList.addTo( fromIdx, paraEls );
+          const paraEls= toList.removeFrom( toIdx );
+          fromList.addTo( fromIdx, paraEls );
         },
       });
     }

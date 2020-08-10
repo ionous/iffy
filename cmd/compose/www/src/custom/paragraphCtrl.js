@@ -1,14 +1,18 @@
 class StatementTable extends NodeTable {
-  constructor(redux, node, storyStatements) {
-    super(redux, node, storyStatements);
+  constructor(redux, node) {
+    super(redux, node, node.getKid("$STORY_STATEMENT"));
     this.inline= true;
   }
   makeBlank() {
     return this.nodes.newFromType(this.node, "story_statement");
   }
   // when we drag, we re/move everything from a given statement till the end of line.
+  // returns a list of statements
   removeFrom(at) {
-    return Node.Splice(null, this.items, at, Number.MAX_VALUE);
+    return this.items.splice(at, Number.MAX_VALUE).map(el=> {
+      el.parent= null;
+      return el;
+    });
   }
   // add a paragraph, or a line of statements
   // at the line of statements targeted
@@ -23,7 +27,10 @@ class StatementTable extends NodeTable {
       this.addTo( at, els );
     } else {
       const els= paraEls;
-      Node.Splice(node, items, at, 0, els.length);
+      items.splice(at, 0, ...els.map(el=> {
+        el.parent= node;
+        return el;
+      }));
     }
   }
 }
@@ -49,9 +56,8 @@ Vue.component('mk-paragraph-ctrl', {
   data() {
     const { node, "$root": root } = this;
     // each item is a story statement slot
-    const items= this.node.getKid("$STORY_STATEMENT");
     return {
-      list: new StatementTable(root.redux, node, items),
+      list: new StatementTable(root.redux, node),
       dropper: root.dropper,
     }
   },

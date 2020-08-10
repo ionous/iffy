@@ -1,107 +1,98 @@
 class NodeTest {
-    constructor(rootItem) {
-      this.all= {};
-      this.nodes= new Nodes( this.all, "" );
-      this.redux= new Redux({
-        set(tgt, field, value) {
-          tgt[field]= value;
-        },
-        "delete": (tgt, field) => {
-          delete tgt[field];
-        },
-      }, this.nodes, 100);
+  constructor(rootItem) {
+    this.all= {};
+    this.nodes= new Nodes( this.all, "" );
+    this.redux= new Redux({
+      set(tgt, field, value) {
+        tgt[field]= value;
+      },
+      "delete": (tgt, field) => {
+        delete tgt[field];
+      },
+    }, this.nodes, 100);
+    if (rootItem){
       this.nodes.unroll(rootItem);
-      this.rootItem= rootItem
     }
-    newMutation(node) {
-      const state= new MutationState(node);
-      return new Mutation(this.redux, state);
-    }
+    this.rootItem= rootItem
+  }
+  newMutation(node) {
+    const state= new MutationState(node);
+    return new Mutation(this.redux, state);
+  }
+  expect(src, ids, reason) {
+    const have= src.reduce((a,n)=> a + n.id, "");
+    console.assert(have === ids, `${reason} unexpected ids ${have}`);
+  }
 }
 
 function nodeTests() {
+  const testStory= {
+    "id": "td1",
+    "type": "paragraph",
+    "value": {
+      "$STORY_STATEMENT": [{
+        "id": "td0",
+        "type": "story_statement",
+        "value": {
+          "id": "td5",
+          "type": "noun_statement",
+          "value": {
+            "$LEDE": {
+              "id": "td4",
+              "type": "lede",
+              "value": {
+                "$NOUN": [{
+                  "id": "td2",
+                  "type": "noun",
+                  "value": {
+                     "$COMMON_NOUN": {
+                        "id": "td8",
+                        "type": "common_noun",
+                        "value": {
+                          "$DETERMINER": {
+                            "id": "td6",
+                            "type": "determiner",
+
+                            "value": "$THE"
+                          },
+                          "$COMMON_NAME": {
+                            "id": "td7",
+                            "type": "common_name",
+                            "value": "box"
+                          }}}}}],
+                "$NOUN_PHRASE": {
+                  "id": "td3",
+                  "type": "noun_phrase",
+                  "value": {
+                    "$KIND_OF_NOUN": {
+                      "id": "td11",
+                      "type": "kind_of_noun",
+                      "value": {
+                        "$ARE_AN": {
+                          "id": "td9",
+                          "type": "are_an",
+                          "value": "$ISA"
+                        },
+                        "$KIND": {
+                          "id": "td10",
+                          "type": "singular_kind",
+                          "value": "container"
+                        }}}}}}}}}}]
+    }};
   function _runTest(name, testFn, root) {
     const make= new Make(new Types());
     makeLang(make);
-
-    const test= new NodeTest(root || {
-      "id": "td1",
-      "type": "paragraph",
-      "value": {
-        "$STORY_STATEMENT": [{
-          "id": "td0",
-          "type": "story_statement",
-          "value": {
-            "id": "td5",
-            "type": "noun_statement",
-            "value": {
-              "$LEDE": {
-                "id": "td4",
-                "type": "lede",
-                "value": {
-                  "$NOUN": [{
-                    "id": "td2",
-                    "type": "noun",
-                    "value": {
-                       "$COMMON_NOUN": {
-                          "id": "td8",
-                          "type": "common_noun",
-                          "value": {
-                            "$DETERMINER": {
-                              "id": "td6",
-                              "type": "determiner",
-
-                              "value": "$THE"
-                            },
-                            "$COMMON_NAME": {
-                              "id": "td7",
-                              "type": "common_name",
-                              "value": "box"
-                            }
-                          }
-                        }
-                      }
-                  }],
-                  "$NOUN_PHRASE": {
-                    "id": "td3",
-                    "type": "noun_phrase",
-                    "value": {
-                      "$KIND_OF_NOUN": {
-                        "id": "td11",
-                        "type": "kind_of_noun",
-                        "value": {
-                          "$ARE_AN": {
-                            "id": "td9",
-                            "type": "are_an",
-                            "value": "$ISA"
-                          },
-                          "$KIND": {
-                            "id": "td10",
-                            "type": "singular_kind",
-                            "value": "container"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }]
-      }
-    });
+    const test= new NodeTest(root);
     console.log("testing", name);
     testFn(test);
   }
-  function runTest(name, testFn, root) {
+  function runTest(name, testFn, root=testStory) {
     try {
       _runTest(name, testFn, root);
     } catch (error) {
       console.error("FAILED", name, error);
     }
   }
-
   function testMutation(name, expected) {
     runTest(`mutation ${name}`, function(test) {
       const before= JSON.stringify(test.rootItem, 0, 2);
@@ -368,7 +359,7 @@ function nodeTests() {
   runTest("add blank story statement", function(test) {
     const para= test.nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    const table= new StatementTable(test.redux, para, statements);
+    const table= new StatementTable(test.redux, para);
     if (statements.length!==1 || statements[0].id !== "td0") {
       throw new Error(" td0 should start as the first statement");
     }
@@ -396,32 +387,59 @@ function nodeTests() {
   runTest("move story statements", function(test) {
     const para= test.nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    function expect(ids, reason) {
-      const have= statements.reduce((a,n)=> a + n.id, "");
-      console.assert(have === ids, `${reason} unexpected ids ${have}`);
-    }
-    const table= new StatementTable(test.redux, para, statements);
+    const table= new StatementTable(test.redux, para);
     table.addBlank(0);
     table.addBlank(1);
     table.addBlank(2);
-    expect("012", "initially");
+    test.expect(statements, "012", "initially");
     table.move(1,0,2);
-    expect("120", "moved src>dst");
+    test.expect(statements, "120", "moved src>dst");
     test.redux.undo();
-    expect("012", "undone");
+    test.expect(statements, "012", "undone");
     table.move(0,3,2);
-    expect("201", "moved dst>src");
+    test.expect(statements, "201", "moved dst>src");
     test.redux.undo();
-    expect("012", "undone again");
+    test.expect(statements, "012", "undone again");
     const nothrow= true;
     const illegalMove= table.move(0,1,3, nothrow);
     console.assert(illegalMove, "expected illegal move detected")
-    expect("012", "steady state");
+    test.expect(statements, "012", "steady state");
     table.move(2,0,10000);
-    expect("201", "width cap");
+    test.expect(statements, "201", "width cap");
     test.redux.undo();
-    expect("012", "undone done");
+    test.expect(statements, "012", "undone done");
   }, emptyParagraph);
+  //
+  runTest("drop p from ps to other ps", function(test) {
+    // there's only one list of paragraphs per story, so this never happens in reality.
+    const { nodes, redux } = test;
+    const mainStory= nodes.newFromType(null, "story");
+    const otherStory= nodes.newFromType(null, "story");
+
+    const ps1= new ParagraphTable(redux, mainStory);
+    const ps2= new ParagraphTable(redux, otherStory);
+    test.expect(ps1.items, "1");
+    test.expect(ps2.items, "4");
+
+    ps2.transferTo(0, { list:ps1, idx:0 });
+    test.expect(ps1.items, "");
+    test.expect(ps2.items, "14");
+
+    test.redux.undo();
+    test.expect(ps1.items, "1");
+    test.expect(ps2.items, "4");
+  }, null);
+  runTest("drop p from ps appending to a line", function(test) {
+  });
+  runTest("drop partial line from p into ps, creating a p", function(test) {
+  });
+  runTest("drop partial line from p appending to a line", function(test) {
+  });
+  runTest("drop full line from p appending to a line, removing the original line", function(test) {
+  });
+  runTest("drop full line from p into ps, creating a p, removing the original line", function(test) {
+  });
+
 
 }
 nodeTests();

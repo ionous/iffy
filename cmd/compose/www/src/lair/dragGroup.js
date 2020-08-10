@@ -47,7 +47,7 @@ class DragGroup {
   drop(drop, dt) {
     const start= this.dropper.start;
     if (start) {
-      this.list.dropFrom(drop, start);
+      this.list.transferTo(drop.idx, start);
     }
     // clear b/c we dont always get dragEnd.
     this.dropper.reset(true);
