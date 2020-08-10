@@ -505,9 +505,36 @@ function nodeTests() {
     console.assert(ps.items.length, 2);
     test.expect(ts1.items, "c1,c2,c3");
   });
-  runTest("drop partial line from p appending to a line", function(test) {
+  runTest("drop partial line from p into a line", function(test) {
+    const { nodes, redux } = test;
+    const mainStory= nodes.newFromType("story");
+    // put two completely blank pargraphs in ps
+    const ps= new ParagraphTable( redux, mainStory );
+    const p1= ps.items[0];
+    const p2= ps.addBlank();
+    console.assert(ps.items.length, 2);
+    const ts1= new StatementTable(redux, p1);
+    const ts2= new StatementTable(redux, p2);
+    ts1.items.splice(0);
+    ts2.items.splice(0);
+    // p1: c1, c2, c3
+    // p2: c4
+    // --  transfer 2,3 after 4
+    const c1= test.addComment(p1, "c1");
+    const c2= test.addComment(p1, "c2");
+    const c3= test.addComment(p1, "c3");
+    const c4= test.addComment(p2, "c4");
+    test.expect(ts1.items, "c1,c2,c3");
+    test.expect(ts2.items, "c4");
+    //
+    ts2.transferTo(1, ts1, 1);
+    test.expect(ts1.items, "c1");
+    test.expect(ts2.items, "c4,c2,c3");
+    redux.undo();
+    test.expect(ts1.items, "c1,c2,c3");
+    test.expect(ts2.items, "c4");
   });
-  runTest("drop full line from p appending to a line, removing the original line", function(test) {
+  runTest("drop full line from p into a line, removing the original line", function(test) {
   });
   runTest("drop full line from p into ps, creating a p, removing the original line", function(test) {
   });
