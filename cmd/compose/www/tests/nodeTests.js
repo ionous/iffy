@@ -534,11 +534,10 @@ function nodeTests() {
     test.expect(ts1.items, "c1,c2,c3");
     test.expect(ts2.items, "c4");
   });
-  runTest("drop full line from p into a line, removing the original line", function(test) {
-  });
-  runTest("drop full line from p into ps, creating a p, removing the original line", function(test) {
-  });
-
-
+  // "drop full line from p into a line, removing the original line"
+  // "drop full line from p into ps, creating a p, removing the original line"
+  // these are easier said than done. we'd have to do something like connect the "inline" table to a parent "block" table,
+  // or pull the grandparent out of the table's node, etc.
+  // users could get this same affect by dragging an empty paragraph a trash; that should be good enough.
 }
 nodeTests();

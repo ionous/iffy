@@ -6,7 +6,16 @@ class NodeTable extends DragList {
     this.nodes= redux.nodes;
     this.node= node;
   }
+  // users should generally call "addBlank"
   makeBlank() {
+    throw new Error("not implemented");
+  }
+  // returns number of elements added
+  addTo(at, elOrEls) {
+    throw new Error("not implemented");
+  }
+  // returns the element or elements removed
+  removeFrom(at, width) {
     throw new Error("not implemented");
   }
   // at:index, from:{list,idx}
