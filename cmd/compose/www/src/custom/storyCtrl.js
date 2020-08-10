@@ -27,12 +27,13 @@ class ParagraphTable extends NodeTable {
       para.parent= node;
       items.splice(at, 0, para);
     } else {
-      // make a new paragraph...
       const els= paraEls;
+      // make a new paragraph...
       const para= this.makeBlank();
-      // move els into the new paragraph...
+      // move els into the new paragraph
       const kids= para.getKid("$STORY_STATEMENT");
-      kids.splice(at, 0, ...els.map(el=> {
+      // noting: we have to remove the default created els first.
+      kids.splice(0, Number.MAX_VALUE, ...els.map(el=> {
         el.parent= para;
         return el;
       }));
