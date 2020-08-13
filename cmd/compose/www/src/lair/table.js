@@ -1,9 +1,12 @@
 Vue.component('em-table', {
   data() {
     const { list, dropper }= this;
+    const group= new DragGroup(list);
+    const handler= new DragHandler(dropper, group);
     return {
       items: list.items,
-      handler: new DragHandler(new DragGroup(list, dropper)),
+      group,
+      handler,
       classmod: list.inline? "inline":"block",
     };
   },
@@ -23,9 +26,10 @@ Vue.component('em-table', {
     highlight(idx) {
       let highlight= false;
       let edge= false;
-      const {target:at, start} = this.dropper;
-      const atList= at && (at.list === this.list);
-      const startList= start && (start.list === this.list);
+      const at = this.dropper.target;
+      const start= this.dropper.start;
+      const atList= at && (at.group === this.group);
+      const startList= start && (start.group === this.group);
       if (atList) {
         edge= idx === at.edge;
         highlight=(idx === at.idx) || edge;

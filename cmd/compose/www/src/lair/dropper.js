@@ -10,32 +10,34 @@ class Dropper {
     this.target= false;
     this.leaving= false;
   }
-  setSource(list, found) {
-    const src= Dropper.record(list, found);
+  get dragging() {
+    return !!this.start;
+  }
+  // found includes { el, idx, edge }
+  setSource(group, found) {
+    const src= Dropper.record(group, found);
     this.start= src;
     this.target= src;
     console.log("dropper set start", found);
   }
-  setTarget(list, found) {
-   if (this.target.list!== list ||
+  setTarget(group, found) {
+   if (this.target.group!== group ||
         this.target.idx !== found.idx ||
         this.target.edge !== found.edge)
    {
-      const sign=Math.sign(this.start.idx-found.idx);
-      console.log("dropper changed", list.name, found.idx, sign, found.edge);
-      this.target= Dropper.record(list, found);
+      this.target= Dropper.record(group, found);
     }
     this.leaving= false;
   }
   updateTarget() {
-    if (this.leaving === this.target.list) {
+    if (this.leaving === this.target.group) {
       console.log("dropper target cleared");
       this.target= false;
     }
   }
-  // add the list to the passed parameter set
-  static record(list, {el, idx, edge}) {
-    return { list, el, idx, edge };
+  // add the group to the passed parameter set
+  static record(group, {el, idx, edge}) {
+    return { group, el, idx, edge };
   }
   static setDragData(dt, el, data, imgClasses= ["em-drag-image", "em-drag-mark"]) {
     const existed= !!el.parentElement;

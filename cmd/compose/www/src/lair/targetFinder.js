@@ -8,7 +8,7 @@ class TargetFinder {
     this.lastTgt= false;
     this.lastRes= false;
   }
-  // return the idx and edge targeted by el.
+  // return the idx and edge targeted by el. { el, idx, edge }
   get(target, reset) {
     if (reset || (this.lastTgt !== target)) {
       const res= this.findIdx(target);

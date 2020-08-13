@@ -1,16 +1,17 @@
 // event handler
 class DragHandler {
-  // dragStart, drop, dragOver, drag, dragLeave, drop, dragEnd
-  constructor(callbacks) {
-    this.on= callbacks;
-    this.finder= false;
+  // group is an object with the following optional methods:
+  // bind, dragStart, dragOver, drop, drag, dragLeave, dragEnd.
+  constructor(dropper, group) {
+    this.group= group;
+    this.dropper= dropper;
     this.listeners= false;
   }
   listen(el) {
-    if (this.listeners) {
+    const { listeners, group } = this;
+    if (listeners) {
       throw new Error("still listening");
     }
-    this.finder= new TargetFinder(el);
     this.listeners= new EventGroup(el, this, {
       // the user starts dragging an item;
       // triggered on the item in question.
@@ -35,34 +36,42 @@ class DragHandler {
       // triggered on the drag start item
       dragend:   "onDragEnd",
     });
+    if (group.bind) {
+      group.bind(el);
+    }
   }
   silence() {
-    this.listeners= this.listeners.silence();
-    this.finder= false;
+    const { listeners, group } = this;
+    if (group.bind) {
+      group.bind(null);
+    }
+    listeners.silence();
+    this.listeners= null;
   }
   // the event targets the em-gutter (draggable=true)
   // the user is attempting to drag,
   // and bubbles up here to the item.
   onDragStart(evt) {
-    const start= this.finder.get(evt.target, true);
-    if (start) {
-      this.on.dragStart(start, evt.dataTransfer);
-      evt.stopPropagation();
-      this.log(evt)
+    const { dropper, group } = this;
+    if (group.dragStart) {
+      const start= group.dragStart(evt.target, evt.dataTransfer);
+      if (start!==undefined) {
+        if (start) {
+          dropper.setSource(group, start);
+        }
+        evt.stopPropagation();
+        this.log(evt)
+      }
     }
   }
   // caught by bubbling in the group that receives the item
   onDrop(evt) {
+    const { dropper, group } = this;
     this.log(evt);
-    const dt= evt.dataTransfer;
-    // not sure why, but drop effect is often 'none' here on chrome;
-    // ( even though drag end will be copy )
-    /*if (dt && dt.dropEffect=== "copy")*/ {
-      const drop= this.finder.get(evt.target);
-      if (drop) {
-        this.on.drop(drop, evt.dataTransfer);
-      }
+    if (dropper.start && group.drop) {
+      group.drop(dropper.start, evt.target, evt.dataTransfer);
     }
+    dropper.reset(true); // clear here b/c we dont always get dragEnd.
     evt.stopPropagation();
     evt.preventDefault();
   }
@@ -71,42 +80,61 @@ class DragHandler {
   // ie. it only happens in the originating group
   onDragUpdate(evt) {
     // this.log(evt);
-    this.on.drag();
+    const { dropper, group } = this;
+    if (group.drag) {
+      group.drag();
+    }
+    dropper.updateTarget();
     evt.stopPropagation();
   }
   // this gets triggered on the drag start element, and bubbles here.
   // if the drag start element has been removed, this will never fire.
   onDragEnd(evt) {
     this.log(evt);
-    this.on.dragEnd()
+    const { dropper, group } = this;
+    if (group.dragEnd) {
+      group.dragEnd()
+    }
+    dropper.reset(true);
     evt.stopPropagation();
     evt.preventDefault();
   }
   onDragLeave(evt) {
     this.log(evt);
-    const leave= this.finder.get(evt.target);
-    this.on.dragLeave(leave, evt.dataTransfer);
+    const { dropper, group } = this;
+    if (group.dragLeave) {
+      group.dragLeave(evt.dataTransfer);
+    }
+    dropper.leaving= group;
     evt.stopPropagation();
     evt.preventDefault();
   }
   // called on dragenter, dragover
   onDragEnterOver(evt) {
     this.log(evt);
-    const over= this.finder.get(evt.target);
-    if (over) {
-      this.on.dragOver(over, evt.dataTransfer);
-      evt.stopPropagation();
-      evt.preventDefault();
+    const { dropper, group } = this;
+    const { start } = dropper;
+    if (group.dragOver && start)  {
+      const { target, dataTransfer:dt } = evt;
+      const res= group.dragOver(start, target, evt);
+      if (res !== undefined) {
+        if (res) {
+          dropper.setTarget(group, res);
+          dt.dropEffect= "copy";
+        }
+        evt.stopPropagation();
+        evt.preventDefault();
+      }
     }
   }
   log(evt) {
     // return;
     const el= evt.target;
     const dt= evt.dataTransfer;
-    const tgt= this.finder.get(el) || {idx:"xxx", edge:false};
+    // const tgt= this.finder.get(el) || {idx:"xxx", edge:false};
     const fx= (dt&&dt.dropEffect)||"???";
     console.log(evt.type, "@", el.nodeName,
-      "idx:", tgt.idx, "edge:", tgt.edge,
+      // "idx:", tgt.idx, "edge:", tgt.edge,
       "fx:", fx);
   }
 };

@@ -1,3 +1,4 @@
+// manage a bunch of related event event listeners
 class EventGroup {
   constructor(el, that, events) {
     this.el= el;

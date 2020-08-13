@@ -97,7 +97,6 @@ body {
 .mk-composer {
   color: #6a5f49;
   border: 1px solid #c3baaa;
-  border-color: rgba(195, 186, 170, 0.9);
   cursor: default;
   grid-area: editor;
   overflow-y:scroll;
@@ -109,8 +108,25 @@ body {
   background-image: -webkit-repeating-linear-gradient(top, transparent 0%, transparent 24px, rgba(239, 207, 173, 0.7) 24px, rgba(239, 207, 173, 0.7) 25px);
   background-image:  -moz-repeating-linear-gradient(top, transparent 0%, transparent 24px, rgba(239, 207, 173, 0.7) 24px, rgba(239, 207, 173, 0.7) 25px);
   background-image:  -o-repeating-linear-gradient(top, transparent 0%, transparent 24px, rgba(239, 207, 173, 0.7) 24px, rgba(239, 207, 173, 0.7) 25px);
+}
 
-
+.mk-trash-can {
+  position: sticky;
+  text-align: right;
+  bottom: 1.2rem;
+  font-size: 2rem;
+}
+.mk-trash-can__trash {
+  border: 1px solid grey;
+  border-radius: 100px;
+  background: #f4f5f7;
+  padding: 5px;
+  -webkit-text-stroke: 1px black;
+}
+.mk-trash-can__trash--over {
+  color: lightgreen;
+  font-size: 2.2rem;
+}
 
 .mk-a-button:hover {
   text-decoration: underline;
@@ -127,7 +143,7 @@ body {
   user-select: none;
 }
 
-.mk-run-ctrl__ghost:before {
+.mk-run-ctrl__ghost::before {
   content:"\FE62"; /*Small Plus Sign. ﹢ */
 }
 
