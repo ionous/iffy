@@ -68,7 +68,7 @@ class Redux {
     return okay;
   }
   // { function(vm) apply, revoke; }
-  invoke(act) {
+  doit(act) {
     this.applied.push(act).apply(this.vm);
     this.revoked.clear();
     ++this.changed;
@@ -92,7 +92,7 @@ class Redux {
     }
     const { parent, token, param }= at;
     const newField= this.nodes.newFromType(param.type);
-    this.invoke({
+    this.doit({
       apply(vm) {
         const { kids } = parent;
         vm.set(kids, token, newField);
@@ -111,7 +111,7 @@ class Redux {
     }
     const { parent, token, param, index }= at;
     const newElem= this.nodes.newFromType(param.type);
-    this.invoke({
+    this.doit({
       apply(vm) {
         // if the field doesnt exist, add the new node via a new array.
         const { kids } = parent;
@@ -147,7 +147,7 @@ class Redux {
     const oldKid= at.target;
     const oldChoice= parent.choice;
 
-    this.invoke({
+    this.doit({
       apply(vm) {
         if (!token) { // no token means swap or slot
           parent.kid= null;
@@ -189,7 +189,7 @@ class Redux {
   newSlot(parent, typeName) {
     const oldSlot= parent.slot;
     const newSlot= this.nodes.newFromType(typeName);
-      this.invoke({
+      this.doit({
       apply() {
         parent.slot= newSlot;
         newSlot.parent= parent;
@@ -204,7 +204,7 @@ class Redux {
     const oldKid= parent.kid;
     const oldChoice= parent.choice;
     const newSwap= this.nodes.newFromType(typeName);
-    this.invoke({
+    this.doit({
       apply() {
         parent.kid= newSwap;
         parent.choice= newChoice;
@@ -220,7 +220,7 @@ class Redux {
   // change a primitive value
   setPrim(item, newValue) {
     const oldValue= item.value;
-    this.invoke({
+    this.doit({
       apply(vm) {
         item.value= newValue;
       },
@@ -237,7 +237,7 @@ class Redux {
   // split(node, newItem, leftSide) {
   //   const field= node.field;
   //   const parentField= node.parentNode.field;
-  //   this.invoke({
+  //   this.doit({
   //     apply() {
   //       // field.item, ex. "$STORY_STATEMENT": [{ type: "story_statement", value: {} }]
   //       const { item } = node;

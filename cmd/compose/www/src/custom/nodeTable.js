@@ -32,7 +32,7 @@ class NodeTable extends DragList {
       }
     } else {
       const { redux } = this;
-      redux.invoke({
+      redux.doit({
         added: 0, // inelegant to say the least.
         apply() {
           const paraEls= fromList.removeFrom(fromIdx);
@@ -51,7 +51,7 @@ class NodeTable extends DragList {
     if (at<0) {
       at= items.length;
     }
-    redux.invoke({
+    redux.doit({
       apply() {
         blank.parent= node;
         items.splice(at,0,blank);
@@ -82,7 +82,7 @@ class NodeTable extends DragList {
     if (dst > src) {
       dst -= width;
     }
-    redux.invoke({
+    redux.doit({
       apply() {
         const rub= items.splice(src, width);
         items.splice(dst, 0, ...rub);

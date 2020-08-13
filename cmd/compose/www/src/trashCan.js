@@ -13,7 +13,7 @@ class TrashGroup {
   drop(from) {
     const { redux } = this;
     const { group, idx } = from;
-    redux.invoke({
+    redux.doit({
       paraEls: false, // inelegant to say the least.
       apply() {
         this.paraEls= group.list.removeFrom(idx);
