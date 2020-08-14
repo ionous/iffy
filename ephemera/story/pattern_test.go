@@ -13,7 +13,7 @@ func TestObjectType(t *testing.T) {
 	defer db.Close()
 	if n, e := imp_object_type(k, _object_type); e != nil {
 		t.Fatal(e)
-	} else if n.String() != "animals" {
+	} else if n.String() != "animal" {
 		t.Fatal(n)
 	}
 }
@@ -37,7 +37,7 @@ func TestVariableDeclObject(t *testing.T) {
 		t.Fatal(e)
 	} else if varName.String() != "pet" {
 		t.Fatal(varName)
-	} else if typeName.String() != "animals" {
+	} else if typeName.String() != "animal" {
 		t.Fatal(typeName)
 	}
 }
@@ -54,7 +54,7 @@ func TestPatternVariablesDecl(t *testing.T) {
 		if have, want := buf.String(), lines(
 			"corral,pattern_name",  // 1
 			"pet,variable_name",    // 2
-			"animals,plural_kinds", // 3
+			"animal,singular_kind", // 3
 			"1,2,3,1",              // NewPatternDecl
 		); have != want {
 			t.Fatal("mismatch", have)
@@ -211,9 +211,9 @@ var _object_type = map[string]interface{}{
 			"type":  "an",
 			"value": "$AN",
 		},
-		"$KINDS": map[string]interface{}{
-			"type":  "plural_kinds",
-			"value": "animals",
+		"$KIND": map[string]interface{}{
+			"type":  "singular_kind",
+			"value": "animal",
 		},
 	},
 }

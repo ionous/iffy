@@ -308,13 +308,13 @@ func imp_primitive_prop(k *imp.Porter, r reader.Map) (string, error) {
 	return p.(string), e
 }
 
-// "{an} {kind of%kinds:plural_kinds} object"
-// returns the name of "plural_kinds"
+// "{an} {kind of%kind:singular_kind} object"
+// returns the name of "singular_kind"
 func imp_object_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
 	if m, e := reader.Unpack(r, "object_type"); e != nil {
 		err = e
 	} else {
-		ret, err = imp_plural_kinds(k, m.MapOf("$KINDS"))
+		ret, err = imp_singular_kind(k, m.MapOf("$KIND"))
 	}
 	return
 }

@@ -54,10 +54,10 @@ function getStory() {
                                       "type": "an",
                                       "value": "$A"
                                     },
-                                    "$KINDS": {
+                                    "$KIND": {
                                       "id": "id-a-12",
-                                      "type": "plural_kinds",
-                                      "value": "things"
+                                      "type": "singular_kind",
+                                      "value": "thing"
                                     }
                                   }
                                 }

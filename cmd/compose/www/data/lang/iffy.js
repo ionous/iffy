@@ -117,7 +117,7 @@ For example: animals, containers, etc.`);
     make.str("variable_name");
 
     make.opt("variable_type", "a {simple value%primitive:primitive_type} or an {object:object_type}");
-    make.run("object_type",  "{an} {kind of%kinds:plural_kinds} object");
+    make.run("object_type",  "{an} {kind of%kind:singular_kind}");
   });
 
   make.group("Traits", function() {
