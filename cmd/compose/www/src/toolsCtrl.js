@@ -35,7 +35,7 @@ Vue.component('mk-tools', {
       });
       this.msg= "Connecting...";
       this.allow.testing= false;
-      const { story } = app.$data;
+      const { story } = this.$root;
       const serial = story.serialize();
       // console.log("testing", serial);
       xhr.open("PUT", "/story/check");
