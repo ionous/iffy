@@ -7,6 +7,7 @@ Vue.component('mk-run-ctrl', {
     ><span
       v-for="el in els"
       class="mk-run-param"
+      :data-dot="el.plain"
       :data-tag="el.param && el.param.type"
       >{{el.opener}}<mk-switch
         :node="el.kid"
@@ -46,9 +47,11 @@ Vue.component('mk-run-ctrl', {
             }
           }
         }
+        const plain= token.trim().replace(/ /g, '-').replace(/^\$/, '').toLowerCase()
         els.push({
           kid,
           token,
+          plain,
           param,
           opener,
           closer,
