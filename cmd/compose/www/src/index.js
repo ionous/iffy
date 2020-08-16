@@ -62,7 +62,8 @@ const app= new Vue({
           break;
         }
         // elements exist to the left?
-        if (Cursor.At(node).step(-1)) {
+        const includePlainText= true;
+        if (Cursor.At(node).step(-1, includePlainText)) {
           break;
         }
         node= node.parent;

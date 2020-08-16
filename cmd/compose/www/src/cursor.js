@@ -27,6 +27,10 @@ class Cursor  {
     }
     return ret;
   }
+  isPlainText() {
+    const { token } = this;
+    return token && token.startsWith('$');
+  }
   isOptional() {
     const { param } = this;
     return param && param.optional;
@@ -58,17 +62,17 @@ class Cursor  {
     return ret;
   }
   // return a cursor one element to the left or right of current
-  step(side) {
+  step(side, plainText=false) {
     let ret= null;
     const { index } = this;
     if (index < 0) { // not an array
-      ret= this.stepSibling(side);
+      ret= this.stepSibling(side, plainText);
     } else {
       const { parent, token } = this;
       const ar= parent.kids[token];
       const next= index+side;
       if (!ar || (next<0) || (next >= ar.length)) {
-        ret= this.stepSibling(side); // an array, but out of bounds.
+        ret= this.stepSibling(side, plainText); // an array, but out of bounds.
       } else {
         // otherwise move one index
         ret= new Cursor( parent, token, next );
@@ -77,7 +81,7 @@ class Cursor  {
     return ret;
   }
   // return a cursor that's one field left or right of current
-  stepSibling(side) {
+  stepSibling(side, plainText) {
     let ret= null;
     const { token } = this;
     if (token) {
@@ -87,7 +91,7 @@ class Cursor  {
       const tokenIndex= tokens.indexOf(token);
       for (let n= tokenIndex+side; n>=0 && n<tokens.length; n+= side) {
         const t= tokens[n];
-        if (t && t[0] === '$') {
+        if (plainText || t.startsWith('$')) {
           var i;
           const el= kids[t];
           if (!Array.isArray(el)) {
