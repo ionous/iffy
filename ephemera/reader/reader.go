@@ -27,8 +27,8 @@ func At(m Map) string {
 	return m.StrOf(ItemId)
 }
 
-func BadType(wanted, got, at string) error {
-	return errutil.New("unexpected type", got, "wanted", wanted, "at", at)
+func BadType(ctx, wanted, got, at string) error {
+	return errutil.Fmt("unexpected type: %s wanted %q got %q at %s", ctx, wanted, got, at)
 }
 
 func BadValue(t string, got interface{}, at string) error {
@@ -38,7 +38,7 @@ func BadValue(t string, got interface{}, at string) error {
 // helper: check the type of the passed m map
 func Type(m Map, expectedType string) (ret string, err error) {
 	if t := m.StrOf(ItemType); t != expectedType {
-		err = BadType(expectedType, t, At(m))
+		err = BadType("type", expectedType, t, At(m))
 	} else {
 		ret = m.StrOf(ItemId)
 	}
@@ -72,7 +72,7 @@ func Slot(r Map, expectedType string, slots ReadMaps) (err error) {
 // we expect to see one, and only one, of the sub keys in the ItemValue of m.
 func Option(r Map, expectedType string, slots ReadMaps) (err error) {
 	if t := r.StrOf(ItemType); t != expectedType {
-		err = BadType(expectedType, t, At(r))
+		err = BadType("option", expectedType, t, At(r))
 	} else if m := r.MapOf(ItemValue); len(m) != 1 {
 		err = BadValue(t, m, At(r))
 	} else {
@@ -92,7 +92,7 @@ func Option(r Map, expectedType string, slots ReadMaps) (err error) {
 // expect a string variable
 func String(m Map, expectedType string) (ret string, err error) {
 	if t := m.StrOf(ItemType); t != expectedType {
-		err = BadType(expectedType, t, At(m))
+		err = BadType("string", expectedType, t, At(m))
 	} else if v := m.StrOf(ItemValue); len(v) == 0 {
 		err = BadValue(t, v, At(m))
 	} else {
@@ -104,7 +104,7 @@ func String(m Map, expectedType string) (ret string, err error) {
 // expect a string constant
 func Const(m Map, expectedType, expectedValue string) (err error) {
 	if t := m.StrOf(ItemType); t != expectedType {
-		err = BadType(expectedType, t, At(m))
+		err = BadType("const", expectedType, t, At(m))
 	} else if v := m.StrOf(ItemValue); v != expectedValue {
 		err = BadValue(t, v, At(m))
 	}
@@ -114,7 +114,7 @@ func Const(m Map, expectedType, expectedValue string) (err error) {
 //
 func Enum(m Map, expectedType string, sub Map) (ret interface{}, err error) {
 	if t := m.StrOf(ItemType); t != expectedType {
-		err = BadType(expectedType, t, At(m))
+		err = BadType("enum", expectedType, t, At(m))
 	} else {
 		n := m.StrOf(ItemValue)
 		if i, ok := sub[n]; !ok {

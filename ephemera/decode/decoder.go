@@ -12,6 +12,11 @@ import (
 // ReadRet is similar to reader.ReadMap, except it returns a value.
 type ReadRet func(reader.Map) (interface{}, error)
 
+type cmdRec struct {
+	elem         r.Type
+	customReader ReadRet
+}
+
 type Override struct {
 	Spec     composer.Slat
 	Callback ReadRet
@@ -19,11 +24,11 @@ type Override struct {
 
 // Decoder reads programs from json.
 type Decoder struct {
-	cmds map[string]ReadRet
+	cmds map[string]cmdRec
 }
 
 func NewDecoder() *Decoder {
-	dec := &Decoder{make(map[string]ReadRet)}
+	dec := &Decoder{make(map[string]cmdRec)}
 	return dec
 }
 
@@ -35,41 +40,43 @@ func (dec *Decoder) AddCallbacks(overrides []Override) {
 
 // AddCallback registers a command parser.
 func (dec *Decoder) AddCallback(cmd composer.Slat, cb ReadRet) {
-	if spec := cmd.Compose(); len(spec.Name) == 0 {
-		panic(errutil.Fmt("missing name for spec %T", cmd))
+	spec := cmd.Compose()
+	elem := r.TypeOf(cmd).Elem()
+	if n := spec.Name; len(n) == 0 {
+		panic(errutil.New("missing name for spec %q", elem))
+	} else if was, exists := dec.cmds[n]; exists && was.customReader != nil {
+		panic(errutil.Fmt("conflicting name for spec %q %q!=%q", n, was.elem, elem))
 	} else {
-		dec.cmds[spec.Name] = cb
+		dec.cmds[spec.Name] = cmdRec{elem, cb}
 	}
 }
 
 // AddDefaultCallbacks registers default command parsers.
 func (dec *Decoder) AddDefaultCallbacks(slats []composer.Slat) {
-	for _, slat := range slats {
-		spec := slat.Compose()
-		elem := r.TypeOf(slat).Elem()
-		dec.cmds[spec.Name] = func(m reader.Map) (ret interface{}, err error) {
-			return dec.readNew(m, elem)
-		}
+	for _, cmd := range slats {
+		dec.AddCallback(cmd, nil)
 	}
 }
 
 // ReadProg attempts to parse the passed json data as a golang program.
 func (dec *Decoder) ReadProg(m reader.Map) (ret interface{}, err error) {
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
-	if fn, ok := dec.cmds[itemType]; !ok {
-		err = errutil.Fmt("unknown type %q at %s", itemType, reader.At(m))
+	if cmd, ok := dec.cmds[itemType]; !ok {
+		err = errutil.Fmt("unknown type %q with reading a program at %s", itemType, reader.At(m))
 	} else {
-		ret, err = fn(itemValue)
+		ret, err = dec.readNew(cmd, itemValue)
 	}
 	return
 }
 
 // m is the contents of slotType is a concrete command ( not a ptr to a command )
-func (dec *Decoder) readNew(m reader.Map, slotType r.Type) (ret interface{}, err error) {
-	if slotType.Kind() != r.Struct {
+func (dec *Decoder) readNew(cmd cmdRec, m reader.Map) (ret interface{}, err error) {
+	if read := cmd.customReader; read != nil {
+		ret, err = read(m)
+	} else if cmd.elem.Kind() != r.Struct {
 		panic("expected a struct")
 	} else {
-		ptr := r.New(slotType)
+		ptr := r.New(cmd.elem)
 		if e := dec.readFields(ptr.Elem(), m.MapOf(reader.ItemValue)); e != nil {
 			err = e
 		} else {
@@ -116,9 +123,9 @@ func (dec *Decoder) readFields(out r.Value, in reader.Map) (err error) {
 // returns a ptr r.Value
 func (dec *Decoder) importSlot(m reader.Map, slotType r.Type) (ret r.Value, err error) {
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
-	if cmdImport, ok := dec.cmds[itemType]; !ok {
-		err = errutil.Fmt("unknown type %q at %s", itemType, reader.At(m))
-	} else if cmd, e := cmdImport(itemValue); e != nil {
+	if cmd, ok := dec.cmds[itemType]; !ok {
+		err = errutil.Fmt("unknown type %q while importing slot %q at %s", itemType, slotType, reader.At(m))
+	} else if cmd, e := dec.readNew(cmd, itemValue); e != nil {
 		err = e
 	} else {
 		rval := r.ValueOf(cmd)
