@@ -32,7 +32,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id7",
                                   "type": "common_name",
                                   "value": "cabin"
@@ -108,7 +108,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id20",
                                   "type": "common_name",
                                   "value": "cabin"
@@ -142,7 +142,7 @@ function getStory() {
                                         "type": "determiner",
                                         "value": "$A"
                                       },
-                                      "$COMMON_NAME": {
+                                      "$NAME": {
                                         "id": "id27",
                                         "type": "common_name",
                                         "value": "glass case"
@@ -184,7 +184,7 @@ function getStory() {
                               "type": "determiner",
                               "value": "$THE"
                             },
-                            "$COMMON_NAME": {
+                            "$NAME": {
                               "id": "id-16f156a8166-6",
                               "type": "common_name",
                               "value": "glass case"
@@ -211,7 +211,7 @@ function getStory() {
                               "type": "determiner",
                               "value": "$A"
                             },
-                            "$COMMON_NAME": {
+                            "$NAME": {
                               "id": "id-16f156a8166-9",
                               "type": "common_name",
                               "value": "collection of fishing rods"
@@ -247,7 +247,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-16f156a8166-17",
                                   "type": "common_name",
                                   "value": "case"
@@ -322,7 +322,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-16f156a8166-31",
                                   "type": "common_name",
                                   "value": "case"
@@ -382,7 +382,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-16f156a8166-42",
                                   "type": "common_name",
                                   "value": "small silver key"
@@ -416,7 +416,7 @@ function getStory() {
                                         "type": "determiner",
                                         "value": "$THE"
                                       },
-                                      "$COMMON_NAME": {
+                                      "$NAME": {
                                         "id": "id-16f156a8166-57",
                                         "type": "common_name",
                                         "value": "case"
@@ -457,7 +457,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-16f156a8166-70",
                                   "type": "common_name",
                                   "value": "bench"
@@ -491,7 +491,7 @@ function getStory() {
                                         "type": "determiner",
                                         "value": "$THE"
                                       },
-                                      "$COMMON_NAME": {
+                                      "$NAME": {
                                         "id": "id-16f156a8166-76",
                                         "type": "common_name",
                                         "value": "cabin"
@@ -538,7 +538,7 @@ function getStory() {
                               "type": "determiner",
                               "value": "$THE"
                             },
-                            "$COMMON_NAME": {
+                            "$NAME": {
                               "id": "id-16f165d636d-7",
                               "type": "common_name",
                               "value": "bench"
@@ -565,7 +565,7 @@ function getStory() {
                               "type": "determiner",
                               "value": "some"
                             },
-                            "$COMMON_NAME": {
+                            "$NAME": {
                               "id": "id-16f165d636d-10",
                               "type": "common_name",
                               "value": "blue vinyl cushions"
@@ -601,7 +601,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-16f165d636d-18",
                                   "type": "common_name",
                                   "value": "bench"
@@ -666,7 +666,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-16f165d636d-35",
                                   "type": "common_name",
                                   "value": "cushions"

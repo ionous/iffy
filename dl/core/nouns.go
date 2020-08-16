@@ -28,6 +28,8 @@ type Determiner string
 // internal because, currently, iffy.js defines the spec.
 func (*CommonNoun) Compose() composer.Spec {
 	return composer.Spec{
+		Name:  "common_noun",
+		Spec:  "{determiner} {name%common_name}",
 		Group: "internal",
 	}
 }
@@ -48,6 +50,8 @@ func (op *CommonNoun) GetObjectRef(run rt.Runtime) (ret string, exact bool, err 
 // internal because, currently, iffy.js defines the spec.
 func (*ProperNoun) Compose() composer.Spec {
 	return composer.Spec{
+		Name:  "proper_noun",
+		Spec:  "{name%proper_name}",
 		Group: "internal",
 	}
 }

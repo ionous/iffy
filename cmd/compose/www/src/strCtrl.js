@@ -58,7 +58,7 @@ Vue.component('mk-str-ctrl', {
     },
     itemText() {
       // find entry for value
-      const { labelData } = this; // ex. "", $COMMON_NAME
+      const { labelData } = this; // ex. "", $NAME
       const { map, value } = labelData;
       const labelToken= Object.entries(map).find(
         ([label,token]) => token===value

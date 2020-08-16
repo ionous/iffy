@@ -125,7 +125,7 @@ func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
 		err = e
 	} else if det, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
 		err = e
-	} else if noun, e := imp_common_name(k, m.MapOf("$COMMON_NAME")); e != nil {
+	} else if noun, e := imp_common_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else {
 		storyNouns.Add(noun)
@@ -155,7 +155,7 @@ func imp_determiner(k *imp.Porter, r reader.Map) (ret string, err error) {
 func imp_proper_noun(k *imp.Porter, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "proper_noun"); e != nil {
 		err = e
-	} else if noun, e := imp_proper_name(k, m.MapOf("$PROPER_NAME")); e != nil {
+	} else if noun, e := imp_proper_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else {
 		storyNouns.Add(noun)

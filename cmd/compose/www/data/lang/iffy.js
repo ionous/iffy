@@ -32,8 +32,8 @@ function localLang(make) {
     make.run("kind_of_noun", "{are_an} {trait*trait|comma-and} {kind:singular_kind} {?noun_relation}");
 
     make.opt("noun", "{proper_noun} or {common_noun}");
-    make.run("common_noun", "object_ref", "{determiner} {name%common_name}");
-    make.run("proper_noun", "object_ref", "{name%proper_name}");
+    make.run("common_noun", "object_ref", "{determiner} {name:common_name}");
+    make.run("proper_noun", "object_ref", "{name:proper_name}");
 
     make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 

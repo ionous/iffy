@@ -73,7 +73,7 @@ function nodeTests() {
 
                             "value": "$THE"
                           },
-                          "$COMMON_NAME": {
+                          "$NAME": {
                             "id": "td7",
                             "type": "common_name",
                             "value": "box"
@@ -144,7 +144,7 @@ function nodeTests() {
       "item": "td0"
     }],
     right: [
-    // right of td6 is "$COMMON_NAME", so td6 isnt a right edge.
+    // right of td6 is "$NAME", so td6 isnt a right edge.
     ],
     // delete the common noun
     // there's no way to "undo" the common noun choice except by way of delete

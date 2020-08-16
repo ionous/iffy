@@ -19,7 +19,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-a-3",
                     "type": "pattern_name",
-                    "value": "printName"
+                    "value": "Print a name"
                   },
                   "$TYPE": {
                     "id": "id-a-4",
@@ -94,7 +94,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-a-16",
                     "type": "pattern_name",
-                    "value": "printName"
+                    "value": "print a name"
                   },
                   "$HOOK": {
                     "id": "id-a-17",
@@ -138,7 +138,7 @@ function getStory() {
                                                       "type": "determiner",
                                                       "value": "$THE"
                                                     },
-                                                    "$COMMON_NAME": {
+                                                    "$NAME": {
                                                       "id": "id-173f8fba4ff-3",
                                                       "type": "common_name",
                                                       "value": "target"
@@ -188,7 +188,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-a-59",
                                   "type": "common_name",
                                   "value": "named object"
@@ -250,7 +250,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-172f216bee4-6",
                                   "type": "common_name",
                                   "value": "unnamed object"
@@ -312,7 +312,7 @@ function getStory() {
                                   "type": "determiner",
                                   "value": "$THE"
                                 },
-                                "$COMMON_NAME": {
+                                "$NAME": {
                                   "id": "id-172fbf04bb4-6",
                                   "type": "common_name",
                                   "value": "unnamed object"
@@ -369,7 +369,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-a-28",
                     "type": "text",
-                    "value": "testNameOfKind"
+                    "value": "name of a kind"
                   },
                   "$TEST": {
                     "id": "id-a-29",
@@ -426,7 +426,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-b-1",
                     "type": "pattern_name",
-                    "value": "printName"
+                    "value": "print a name"
                   },
                   "$FILTERS": {
                     "id": "id-172fbf04bb4-22",
@@ -474,7 +474,7 @@ function getStory() {
                                             "type": "determiner",
                                             "value": "$THE"
                                           },
-                                          "$COMMON_NAME": {
+                                          "$NAME": {
                                             "id": "id-173f8fba4ff-7",
                                             "type": "common_name",
                                             "value": "target"
@@ -541,7 +541,7 @@ function getStory() {
                                                 "type": "determiner",
                                                 "value": "$THE"
                                               },
-                                              "$COMMON_NAME": {
+                                              "$NAME": {
                                                 "id": "id-173f8fba4ff-11",
                                                 "type": "common_name",
                                                 "value": "target"
@@ -720,7 +720,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-172fbe17c49-1",
                     "type": "pattern_name",
-                    "value": "printName"
+                    "value": "print a name"
                   },
                   "$FILTERS": {
                     "id": "id-172fbe17c49-5",
@@ -775,7 +775,7 @@ function getStory() {
                                                   "type": "determiner",
                                                   "value": "$THE"
                                                 },
-                                                "$COMMON_NAME": {
+                                                "$NAME": {
                                                   "id": "id-173f8fba4ff-29",
                                                   "type": "common_name",
                                                   "value": "target"
@@ -845,7 +845,7 @@ function getStory() {
                                                 "type": "determiner",
                                                 "value": "$THE"
                                               },
-                                              "$COMMON_NAME": {
+                                              "$NAME": {
                                                 "id": "id-173f8fba4ff-33",
                                                 "type": "common_name",
                                                 "value": "target"
