@@ -6,7 +6,7 @@ import (
 )
 
 type SetField struct {
-	Obj   *ObjectName
+	Obj   ObjectRef
 	Field rt.TextEval
 }
 

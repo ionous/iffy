@@ -9,7 +9,16 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// ObjectName checks for an object by name.
+// ObjectRef checks for an object by name.
+// Implementations also generally implement GetText and GetBool
+type ObjectRef interface {
+	GetObjectRef(run rt.Runtime) (retName string, retExact bool, err error)
+	rt.TextEval // see getObjectFullName
+	rt.BoolEval // see getObjectExists
+}
+
+// ObjectName implements ObjectRef, searching for an object named exactly as specified.
+// It matches rt.TextEval, exists for differentiation in the composer.
 type ObjectName struct {
 	Name    rt.TextEval
 	Exactly bool
@@ -17,19 +26,19 @@ type ObjectName struct {
 
 // KindOf returns the class of an object.
 type KindOf struct {
-	Obj *ObjectName
+	Obj ObjectRef
 }
 
-// IsKindOf  is less about caring, and more about sharing;
+// IsKindOf is less about caring, and more about sharing;
 // it returns true when the object is compatible with the named kind.
 type IsKindOf struct {
-	Obj  *ObjectName
+	Obj  ObjectRef
 	Kind rt.TextEval
 }
 
 // IsExactKindOf  returns true when the object is of exactly the named kind.
 type IsExactKindOf struct {
-	Obj  *ObjectName
+	Obj  ObjectRef
 	Kind rt.TextEval
 }
 
@@ -43,36 +52,44 @@ func (*ObjectName) Compose() composer.Spec {
 }
 
 func (op *ObjectName) GetText(run rt.Runtime) (ret string, err error) {
-	if n, e := op.getFullName(run); e != nil {
+	return getObjectFullName(run, op)
+}
+
+func (op *ObjectName) GetBool(run rt.Runtime) (ret bool, err error) {
+	return getObjectExists(run, op)
+}
+
+func (op *ObjectName) GetObjectRef(run rt.Runtime) (ret string, exact bool, err error) {
+	if name, e := rt.GetText(run, op.Name); e != nil {
 		err = e
 	} else {
-		ret = n
+		ret, exact = name, op.Exactly
 	}
 	return
 }
 
-func (op *ObjectName) GetBool(run rt.Runtime) (ret bool, err error) {
-	if n, e := op.getFullName(run); e != nil {
+func getObjectExists(run rt.Runtime, ref ObjectRef) (okay bool, err error) {
+	if n, e := getObjectFullName(run, ref); e != nil {
 		err = e
 	} else {
-		ret = len(n) > 0
+		okay = len(n) > 0
 	}
 	return
 }
 
 // returns the object's full name
-func (op *ObjectName) getFullName(run rt.Runtime) (ret string, err error) {
-	if name, e := rt.GetText(run, op.Name); e != nil {
+func getObjectFullName(run rt.Runtime, ref ObjectRef) (ret string, err error) {
+	if name, exactly, e := ref.GetObjectRef(run); e != nil {
 		err = e
-	} else if op.Exactly {
-		ret, err = op.getExactly(run, name)
+	} else if exactly {
+		ret, err = getObjectExactly(run, name)
 	} else {
-		ret, err = op.getInexactly(run, name)
+		ret, err = getObjectInexactly(run, name)
 	}
 	return
 }
 
-func (op *ObjectName) getExactly(run rt.Runtime, name string) (ret string, err error) {
+func getObjectExactly(run rt.Runtime, name string) (ret string, err error) {
 	if b, e := run.GetField(name, object.Exists); e != nil {
 		err = e
 	} else if exists, e := assign.ToBool(b); e != nil {
@@ -83,7 +100,7 @@ func (op *ObjectName) getExactly(run rt.Runtime, name string) (ret string, err e
 	return
 }
 
-func (op *ObjectName) getInexactly(run rt.Runtime, name string) (ret string, err error) {
+func getObjectInexactly(run rt.Runtime, name string) (ret string, err error) {
 	// first look for the name in scope, the top scope (NounScope) will look globally if need be.
 	if local, e := run.GetVariable(name); e != nil {
 		err = e
@@ -107,7 +124,7 @@ func (*KindOf) Compose() composer.Spec {
 		Name:  "kind_of",
 		Group: "objects",
 		Desc:  "Kind Of: Friendly name of the object's kind.",
-		Spec:  "the kind of {obj:object_name}",
+		Spec:  "the kind of {object%obj:object_ref}",
 	}
 }
 
@@ -125,7 +142,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 func (*IsKindOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "is_kind_of",
-		Spec:  "Is {noun%obj} a kind of {kind:singular_kind}",
+		Spec:  "Is {object%obj:object_ref} a kind of {kind:singular_kind}",
 		Group: "objects",
 		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",
 	}

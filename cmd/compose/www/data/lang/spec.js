@@ -31,6 +31,11 @@ const spec = [
     "uses": "slot"
   },
   {
+    "desc": "Object Reference: Helper used when referring to objects.",
+    "name": "object_ref",
+    "uses": "slot"
+  },
+  {
     "desc": "Testing: Run a series of tests.",
     "name": "testing",
     "uses": "slot"
@@ -673,7 +678,7 @@ const spec = [
       "objects"
     ],
     "name": "get_field",
-    "spec": "the {field:text_eval} of {object%obj:object_name}",
+    "spec": "the {field:text_eval} of {object%obj:object_ref}",
     "uses": "run",
     "with": {
       "slots": [
@@ -783,7 +788,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_name"
+          "type": "object_ref"
         }
       },
       "slots": [
@@ -802,7 +807,7 @@ const spec = [
       "objects"
     ],
     "name": "is_kind_of",
-    "spec": "Is {noun%obj} a kind of {kind:singular_kind}",
+    "spec": "Is {object%obj:object_ref} a kind of {kind:singular_kind}",
     "uses": "run",
     "with": {
       "slots": [
@@ -882,7 +887,7 @@ const spec = [
       "objects"
     ],
     "name": "kind_of",
-    "spec": "the kind of {obj:object_name}",
+    "spec": "the kind of {object%obj:object_ref}",
     "uses": "run",
     "with": {
       "slots": [
@@ -986,7 +991,8 @@ const spec = [
     "with": {
       "slots": [
         "bool_eval",
-        "text_eval"
+        "text_eval",
+        "object_ref"
       ]
     }
   },
@@ -1186,7 +1192,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_name"
+          "type": "object_ref"
         },
         "$VAL": {
           "label": "val",
@@ -1219,7 +1225,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_name"
+          "type": "object_ref"
         },
         "$VAL": {
           "label": "val",
@@ -1252,7 +1258,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_name"
+          "type": "object_ref"
         },
         "$VALS": {
           "label": "vals",
@@ -1285,7 +1291,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_name"
+          "type": "object_ref"
         },
         "$VAL": {
           "label": "val",
@@ -1318,7 +1324,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_name"
+          "type": "object_ref"
         },
         "$VALS": {
           "label": "vals",

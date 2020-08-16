@@ -7,7 +7,7 @@ import (
 
 // GetField a property value from an object by name.
 type GetField struct {
-	Obj   *ObjectName
+	Obj   ObjectRef
 	Field rt.TextEval
 }
 
