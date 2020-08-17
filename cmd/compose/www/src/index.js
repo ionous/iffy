@@ -70,9 +70,6 @@ const app= new Vue({
       }
       return isAtStart? Filters.capitalize: Filters.none;
     },
-    dumpStory() {
-      return this.story.serialize();
-    }
   },
   computed: {
     story() {
