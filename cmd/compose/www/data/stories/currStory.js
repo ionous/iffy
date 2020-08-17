@@ -573,7 +573,7 @@ function getStory() {
                   "$PLURAL_KINDS": {
                     "id": "id-c-13",
                     "type": "plural_kinds",
-                    "value": " things"
+                    "value": "things"
                   },
                   "$SINGULAR_KIND": {
                     "id": "id-c-14",
@@ -601,7 +601,7 @@ function getStory() {
                   "$PLURAL_KINDS": {
                     "id": "id-c-18",
                     "type": "plural_kinds",
-                    "value": " things"
+                    "value": "things"
                   },
                   "$PROPERTY_PHRASE": {
                     "id": "id-c-20",
@@ -638,7 +638,7 @@ function getStory() {
                   "$PLURAL_KINDS": {
                     "id": "id-173f8fba4ff-14",
                     "type": "plural_kinds",
-                    "value": " things"
+                    "value": "things"
                   },
                   "$PROPERTY_PHRASE": {
                     "id": "id-173f8fba4ff-15",
@@ -675,7 +675,7 @@ function getStory() {
                   "$PLURAL_KINDS": {
                     "id": "id-173f8fba4ff-21",
                     "type": "plural_kinds",
-                    "value": " things"
+                    "value": "things"
                   },
                   "$PROPERTY_PHRASE": {
                     "id": "id-173f8fba4ff-22",
