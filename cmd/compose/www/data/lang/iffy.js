@@ -67,7 +67,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     // pattern handler
     // similar to pattern_type, but with statements hooks instead of type declarations
     make.run("pattern_handler", "story_statement",
-      "To determine the {name:pattern_name}{filters?pattern_filters}: {hook:pattern_hook}",
+      "To {name:pattern_name}{filters?pattern_filters}: {hook:pattern_hook}",
       "Pattern Handler: Actions to take when a pattern gets used."
       );
 
