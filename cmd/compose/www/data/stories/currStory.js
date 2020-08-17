@@ -381,7 +381,7 @@ function getStory() {
                         "$LINES": {
                           "id": "id-a-31",
                           "type": "lines",
-                          "value": "named object thing"
+                          "value": "named object, thing"
                         },
                         "$GO": [
                           {
@@ -401,7 +401,7 @@ function getStory() {
                                       "$TEMPLATE": {
                                         "id": "id-a-67",
                                         "type": "lines",
-                                        "value": "{.named} {.unnamed}"
+                                        "value": "{.named}, {.unnamed}"
                                       }
                                     }
                                   }
