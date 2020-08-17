@@ -9,23 +9,14 @@ import (
 )
 
 type Recorder struct {
-	srcId          int64
-	cache          *tables.Cache
-	normalizeNames bool
+	srcId int64
+	cache *tables.Cache
 }
 
-func NewNormalizingRecorder(srcURI string, db *sql.DB) *Recorder {
-	rec := NewRecorder(srcURI, db)
-	rec.normalizeNames = true
-	return rec
-}
-
-// backwards compatibility method;
-// tests are written without expecting name normalization so...
 func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 	cache := tables.NewCache(db)
 	srcId := cache.Must(eph_source, srcURI)
-	return &Recorder{srcId, cache, false}
+	return &Recorder{srcId, cache}
 }
 
 // NewName records a user-specified string, including a category and location,
@@ -36,11 +27,13 @@ func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
 	norm := strings.TrimSpace(name)
 	// many tests would have to be adjusted to be able to handle normalization wholesale
 	// so for now make this opt-in.
-	if r.normalizeNames {
-		switch category {
-		case tables.NAMED_TEST, tables.NAMED_PATTERN:
-			norm = lang.Camelize(norm)
-		}
+	switch category {
+	case tables.NAMED_TEST,
+		tables.NAMED_PATTERN,
+		tables.NAMED_ASPECT,
+		tables.NAMED_TRAIT,
+		tables.NAMED_FIELD:
+		norm = lang.Camelize(norm)
 	}
 	namedId := r.cache.Must(eph_named, norm, category, r.srcId, ofs, name)
 	return Named{namedId, norm}

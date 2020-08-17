@@ -70,9 +70,9 @@ func TestTraits(t *testing.T) {
 		} else if e := AssembleAspects(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchTraits(asm.db, []expectedTrait{
-			{"A", "x", 0},
-			{"A", "y", 1},
-			{"B", "z", 0},
+			{"a", "x", 0},
+			{"a", "y", 1},
+			{"b", "z", 0},
 		}); e != nil {
 			t.Fatal("matchTraits:", e)
 		}
@@ -114,7 +114,7 @@ func TestTraitMissingAspect(t *testing.T) {
 		} else if e := AssembleAspects(asm.assembler); e == nil {
 			t.Fatal("expected error")
 		} else if asm.dilemmas.Len() != 1 ||
-			!strings.Contains((*asm.dilemmas)[0].Msg, `missing aspect: "Z"`) {
+			!strings.Contains((*asm.dilemmas)[0].Msg, `missing aspect: "z"`) {
 			t.Fatal(asm.dilemmas)
 		} else {
 			t.Log("ok:", e)

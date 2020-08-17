@@ -121,9 +121,9 @@ func TestFieldAccess(t *testing.T) {
 	})
 	t.Run("change traits", func(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
-		if e := q.SetField("apple", "A", "y"); e != nil {
+		if e := q.SetField("apple", "a", "y"); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField("apple", "A"); e != nil {
+		} else if v, e := q.GetField("apple", "a"); e != nil {
 			t.Fatal(e)
 		} else if str := v.(string); str != "y" {
 			t.Fatal("mismatch", str)
@@ -133,7 +133,7 @@ func TestFieldAccess(t *testing.T) {
 		// boat.B has a default value of zz
 		if e := q.SetField("boat", "z", true); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField("boat", "B"); e != nil {
+		} else if v, e := q.GetField("boat", "b"); e != nil {
 			t.Fatal(e)
 		} else if str := v.(string); str != "z" {
 			t.Fatal("mismatch", str)
@@ -143,7 +143,7 @@ func TestFieldAccess(t *testing.T) {
 		// toy boat.A has an initial value of y
 		if e := q.SetField("toy boat", "w", true); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField("toy boat", "A"); e != nil {
+		} else if v, e := q.GetField("toy boat", "a"); e != nil {
 			t.Fatal(e)
 		} else if str := v.(string); str != "w" {
 			t.Fatal("mismatch", str)
@@ -237,30 +237,30 @@ var FieldTest = struct {
 	/*fields*/ []string{
 		"Ks", "d", tables.PRIM_DIGI,
 		"Ks", "t", tables.PRIM_TEXT,
-		"Ks", "A", tables.PRIM_ASPECT,
-		"Ls", "B", tables.PRIM_ASPECT,
+		"Ks", "a", tables.PRIM_ASPECT,
+		"Ls", "b", tables.PRIM_ASPECT,
 	},
 	/*traits*/ []string{
-		"A", "w",
-		"A", "x",
-		"A", "y",
-		"B", "z",
-		"B", "zz",
+		"a", "w",
+		"a", "x",
+		"a", "y",
+		"b", "z",
+		"b", "zz",
 	},
 	/*default values*/ []interface{}{
 		"Ks", "d", 42,
 		"Js", "t", "chippo",
 		"Ls", "t", "weazy",
 		"Fs", "d", 13,
-		"Fs", "B", "zz",
-		"Ls", "A", "x",
+		"Fs", "b", "zz",
+		"Ls", "a", "x",
 	},
 	/*starting values*/ []interface{}{
 		"apple", "d", 5,
 		"duck", "d", 1,
 		"toy boat", "t", "boboat",
 		"boat", "t", "xyzzy",
-		"toy boat", "A", "y",
+		"toy boat", "a", "y",
 	},
 	/*txtValues*/ []interface{}{
 		"apple", "t", "",
@@ -268,17 +268,17 @@ var FieldTest = struct {
 		"duck", "t", "chippo",
 		"toy boat", "t", "boboat",
 		//
-		"apple" /*   */, "A", "w",
-		"duck" /*    */, "A", "w",
-		"toy boat" /**/, "A", "y",
-		"boat" /* */, "A", "x",
+		"apple" /*   */, "a", "w",
+		"duck" /*    */, "a", "w",
+		"toy boat" /**/, "a", "y",
+		"boat" /* */, "a", "x",
 		//
-		"toy boat" /**/, "B", "z",
-		"boat" /* */, "B", "zz",
+		"toy boat" /**/, "b", "z",
+		"boat" /* */, "b", "zz",
 
 		// asking for an improper or invalid aspect returns nothing
 		// fix? should it return or log error instead?
-		"apple" /*   */, "B", "",
+		"apple" /*   */, "b", "",
 		"boat" /*   */, "G", "",
 	},
 	/*numValues*/ []interface{}{

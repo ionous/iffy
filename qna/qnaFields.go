@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/tables"
 )
@@ -25,6 +26,10 @@ type Fields struct {
 
 type keyType struct {
 	owner, member string
+}
+
+func (k *keyType) dot() string {
+	return k.owner + "." + k.member
 }
 
 type mapType map[keyType]interface{}
@@ -91,19 +96,19 @@ func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 	if len(field) == 0 || field[0] == object.Prefix || field == object.Name {
 		err = errutil.Fmt("can't change reserved field %q", field)
 	} else {
+		// fix, future: verify type and existence?
+		key := newKey(obj, field)
 		// check if the specified field is a trait
-		if a, e := n.GetField(obj+"."+field, object.Aspect); e != nil {
+		if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
 			err = e
 		} else {
 			// no, just set the field normally.
 			if aspect := a.(string); len(aspect) == 0 {
-				// fix, future: verify type and existence?
-				key := keyType{obj, field}
 				n.pairs[key] = v
 			} else {
 				// yes, then we want to change the aspect not the trait
 				if val, ok := v.(bool); !ok || !val {
-					err = errutil.Fmt("%q.%q can only be set to true; have %T(%v)", obj, field, v, v)
+					err = errutil.Fmt("%q can only be set to true; have %T(%v)", key, v, v)
 				} else {
 					// set
 					err = n.SetField(obj, aspect, field)
@@ -114,12 +119,28 @@ func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 	return
 }
 
+func newKey(obj, field string) keyType {
+	// FIX FIX FIX --
+	// operations generating get field should be registering the field as a name
+	// and, as best as possible, relating obj to field for property verification
+	// name translation should be done there.
+	if len(field) > 0 && field[0] != object.Prefix {
+		field = lang.Camelize(field)
+	}
+	return keyType{obj, field}
+}
+
+func newKeyWithIndex(obj string, idx int) keyType {
+	return keyType{obj, "$" + strconv.Itoa(idx)}
+}
+
 func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
-	key := keyType{obj, field}
+	key := newKey(obj, field)
 	if val, ok := n.pairs[key]; ok {
 		ret = val
 	} else {
-		switch field {
+		// note: uses the normalized member name, not the raw parameter name
+		switch field := key.member; field {
 		case object.Name:
 			// search for the full object name by a partial object name
 			ret, err = n.getCachingQuery(key, n.nameOf, obj)
@@ -144,13 +165,13 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 
 		default:
 			// see if the user is asking for the status of a trait
-			if a, e := n.GetField(obj+"."+field, object.Aspect); e != nil {
+			if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
 				err = e
 			} else {
 				if aspect := a.(string); len(aspect) > 0 {
 					ret, err = n.getCachingStatus(obj, aspect, field)
 				} else {
-					ret, err = n.getCachingField(key, obj, field)
+					ret, err = n.getCachingField(key)
 				}
 			}
 		}
@@ -163,7 +184,7 @@ func (n *Fields) GetFieldByIndex(obj string, idx int) (ret string, err error) {
 		err = errutil.New("GetFieldByIndex out of range", idx)
 	} else {
 		// first, lookup the parameter name
-		key := keyType{obj, "$" + strconv.Itoa(idx)}
+		key := newKeyWithIndex(obj, idx)
 		// we use the cache to keep $(idx) -> param name.
 		val, ok := n.pairs[key]
 		if !ok {
@@ -189,14 +210,14 @@ func (n *Fields) getCachingStatus(obj, aspect, trait string) (ret bool, err erro
 }
 
 func (n *Fields) GetCachingField(obj, field string) (ret interface{}, err error) {
-	key := keyType{obj, field}
-	return n.getCachingField(key, obj, field)
+	key := newKey(obj, field)
+	return n.getCachingField(key)
 }
 
-func (n *Fields) getCachingField(key keyType, obj, field string) (ret interface{}, err error) {
+func (n *Fields) getCachingField(key keyType) (ret interface{}, err error) {
 	// FIX? needs more work to determine if the field really exists
 	// ex. possibly a union query of class field with a nil value
-	if v, e := n.getCachingQuery(key, n.valueOf, obj, field); e == nil {
+	if v, e := n.getCachingQuery(key, n.valueOf, key.owner, key.member); e == nil {
 		ret = v
 	} else if _, ok := e.(fieldNotFound); !ok {
 		err = e

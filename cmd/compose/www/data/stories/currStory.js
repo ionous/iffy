@@ -339,7 +339,7 @@ function getStory() {
                                 {
                                   "id": "id-172fbf04bb4-9",
                                   "type": "trait",
-                                  "value": "privatelyNamed"
+                                  "value": "privately named"
                                 }
                               ]
                             }
@@ -457,7 +457,7 @@ function getStory() {
                                           "$TEXT": {
                                             "id": "id-172fbf04bb4-33",
                                             "type": "text",
-                                            "value": "publiclyNamed"
+                                            "value": "publicly named"
                                           }
                                         }
                                       }
@@ -619,7 +619,7 @@ function getStory() {
                           "$PROPERTY": {
                             "id": "id-c-23",
                             "type": "property",
-                            "value": "printedName"
+                            "value": "printed name"
                           }
                         }
                       }
@@ -656,7 +656,7 @@ function getStory() {
                           "$PROPERTY": {
                             "id": "id-173f8fba4ff-18",
                             "type": "property",
-                            "value": "pluralName"
+                            "value": "plural name"
                           }
                         }
                       }
@@ -693,7 +693,7 @@ function getStory() {
                           "$PROPERTY": {
                             "id": "id-173f8fba4ff-25",
                             "type": "property",
-                            "value": "indefiniteArticle"
+                            "value": "indefinite article"
                           }
                         }
                       }
@@ -758,7 +758,7 @@ function getStory() {
                                                 "$TEXT": {
                                                   "id": "id-172fbe17c49-15",
                                                   "type": "text",
-                                                  "value": "printedName"
+                                                  "value": "printed name"
                                                 }
                                               }
                                             }
@@ -828,7 +828,7 @@ function getStory() {
                                               "$TEXT": {
                                                 "id": "id-172fbe17c49-26",
                                                 "type": "text",
-                                                "value": "printedName"
+                                                "value": "printed name"
                                               }
                                             }
                                           }
