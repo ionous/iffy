@@ -26,7 +26,7 @@ func NewImporter(srcURI string, db *sql.DB) *Porter {
 }
 
 func NewImporterDecoder(srcURI string, db *sql.DB, dec *decode.Decoder) *Porter {
-	rec := ephemera.NewRecorder(srcURI, db)
+	rec := ephemera.NewNormalizingRecorder(srcURI, db)
 	return &Porter{
 		Recorder: rec,
 		oneTime:  make(map[string]bool),

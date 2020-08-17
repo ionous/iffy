@@ -8,24 +8,38 @@ import (
 )
 
 type Recorder struct {
-	srcId int64
-	cache *tables.Cache
+	srcId          int64
+	cache          *tables.Cache
+	normalizeNames bool
 }
 
+func NewNormalizingRecorder(srcURI string, db *sql.DB) *Recorder {
+	rec := NewRecorder(srcURI, db)
+	rec.normalizeNames = true
+	return rec
+}
+
+// backwards compatibility method;
+// tests are written without expecting name normalization so...
 func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 	cache := tables.NewCache(db)
 	srcId := cache.Must(eph_source, srcURI)
-	return &Recorder{srcId, cache}
+	return &Recorder{srcId, cache, false}
 }
 
-// Named records a user-specified string, including its meaning, location and returns a unique identifier for it.
-// category is likely one of kind, noun, aspect, attribute, property, relation, alias
-// names are not unique, one name can be many types.
-// ofs depends on the source, might be item.id$parameter
+// NewName records a user-specified string, including a category and location,
+// and returns a unique identifier for it.
+// Category is likely one of kind, noun, aspect, attribute, property, relation.
+// The format of the location ofs depends on the data source.
 func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
-	name = strings.TrimSpace(name) //fix: temp
-	namedId := r.cache.Must(eph_named, name, category, r.srcId, ofs)
-	return Named{namedId, name}
+	var norm string
+	// if r.normalizeNames {
+	// 	norm = lang.Camelize(name)
+	// } else {
+	norm = strings.TrimSpace(name)
+	// }
+	namedId := r.cache.Must(eph_named, norm, category, r.srcId, ofs, name)
+	return Named{namedId, norm}
 }
 
 type Prog struct{ Named }
@@ -136,7 +150,7 @@ var eph_default = tables.Insert("eph_default", "idNamedKind", "idNamedProp", "va
 var eph_field = tables.Insert("eph_field", "primType", "idNamedKind", "idNamedField")
 var eph_rule = tables.Insert("eph_rule", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
-var eph_named = tables.Insert("eph_named", "name", "category", "idSource", "offset")
+var eph_named = tables.Insert("eph_named", "name", "category", "idSource", "offset", "og")
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")
 var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType", "decl")
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")
