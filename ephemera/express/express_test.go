@@ -88,7 +88,7 @@ func TestExpressions(t *testing.T) {
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
 			&core.Buffer{[]rt.Execute{
-				&core.DetermineAct{"printName",
+				&core.DetermineAct{"printAName",
 					&core.Parameters{[]*core.Parameter{{
 						"$1", &core.FromText{O("A", true)},
 					}}}}}}); e != nil {
@@ -239,7 +239,7 @@ func TestTemplates(t *testing.T) {
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
 				&core.Buffer{[]rt.Execute{
-					&core.DetermineAct{"printName",
+					&core.DetermineAct{"printAName",
 						&core.Parameters{[]*core.Parameter{
 							&core.Parameter{"$1",
 								&core.FromText{

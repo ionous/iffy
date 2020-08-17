@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"strings"
 
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -32,12 +33,15 @@ func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 // Category is likely one of kind, noun, aspect, attribute, property, relation.
 // The format of the location ofs depends on the data source.
 func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
-	var norm string
-	// if r.normalizeNames {
-	// 	norm = lang.Camelize(name)
-	// } else {
-	norm = strings.TrimSpace(name)
-	// }
+	norm := strings.TrimSpace(name)
+	// many tests would have to be adjusted to be able to handle normalization wholesale
+	// so for now make this opt-in.
+	if r.normalizeNames {
+		switch category {
+		case tables.NAMED_TEST, tables.NAMED_PATTERN:
+			norm = lang.Camelize(norm)
+		}
+	}
 	namedId := r.cache.Must(eph_named, norm, category, r.srcId, ofs, name)
 	return Named{namedId, norm}
 }

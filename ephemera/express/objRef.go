@@ -18,7 +18,7 @@ func (on objRef) getTextName() rt.TextEval {
 func (on objRef) getPrintedName() rt.TextEval {
 	return &core.Buffer{[]rt.Execute{
 		&core.DetermineAct{
-			Pattern: "printName",
+			Pattern: "printAName",
 			Parameters: &core.Parameters{[]*core.Parameter{
 				&core.Parameter{
 					Name: "$1",
