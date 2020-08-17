@@ -61,6 +61,10 @@ const app= new Vue({
           isAtStart= true;
           break;
         }
+        if (node.type === "execute") {
+          isAtStart= true;
+          break;
+        }
         // elements exist to the left?
         const includePlainText= true;
         if (Cursor.At(node).step(-1, includePlainText)) {

@@ -31,9 +31,15 @@ Vue.component('mk-run-ctrl', {
   computed: {
     els() {
       let els= [];
-      this.node.forEach(({token, param, kid})=> {
+      const { node, "$root": root  } = this;
+      node.forEach(({token, param, kid})=> {
         var opener, closer, ghost;
-        if (param) { // plain text doesnt have param
+        // plain text doesnt have param
+        if (!param) {
+          // handle caps for execute statements in a block.
+          const filter= root.filter(node);
+          token= filter(token);
+        } else {
           const type= param.type;
           const filters = param.filters;
           if (filters) {
