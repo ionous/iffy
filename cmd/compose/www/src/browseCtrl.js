@@ -16,19 +16,19 @@ class Tab extends Map {
     let ret= [];
     if (!k || this.sansContent) {
         ret= this.outline();
+    } else {
+      const names= this.get(k);
+      if (this.txtContent) {
+        ret= Array.from(names, (k) => ({
+            label:k
+        }));
       } else {
-        const names= this.get(k);
-        if (this.txtContent) {
-          ret= Array.from(names, (k) => ({
-              label:k
-          }));
-        } else {
-          ret= Array.from(names, (k) => ({
-              name:k, label:Types.labelOf( Types.get(k) )
-          }));
-        }
+        ret= Array.from(names, (k) => ({
+            name:k, label:Types.labelOf( Types.get(k) )
+        }));
       }
-      return ret;
+    }
+    return ret.sort((a,b)=>  a.name.localeCompare(b.name));
   }
 };
 Vue.component('mk-browser', {
