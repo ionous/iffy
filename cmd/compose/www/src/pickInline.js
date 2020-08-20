@@ -1,4 +1,5 @@
 // allow the user to pick from an item's tokens displayed horizontally
+// note: used also for str-ctrl to display the first time empty text.
 Vue.component('mk-pick-inline', {
   template:
   `<ol :class="bemBlock(lines.length>1 && 'pad')"
@@ -19,7 +20,7 @@ Vue.component('mk-pick-inline', {
       const spec = node.itemType.with;
       // when there's only a single option,
       // use the field's label instead of our own inline label.
-      const solo = (spec.tokens.length == 1) && param.label;
+      const solo = (spec.tokens.length === 1) && Node.LabelFromParam(param);
       return spec.tokens.map(t => {
         const opt= spec.params[t];
         return opt ? {

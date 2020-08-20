@@ -46,9 +46,12 @@ const app= new Vue({
       // }
       return new Mutation(redux, state, extras, after);
     },
-    nodeSelected(node) {
-      this.$emit("node-selected", node);
+    // used to sync context, browser, etc. controls
+    ctrlSelected(ctrl) {
+      this.$emit("node-selected", ctrl.node, ctrl.param, ctrl.token);
     },
+    // used to sync context, browser, etc. controls
+    // cmdName is the name of the type
     cmdSelected(cmdName) {
       this.$emit("cmd-selected", cmdName);
     },

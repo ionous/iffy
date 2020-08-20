@@ -21,6 +21,16 @@ class Node {
   get type() {
     return this.itemType && this.itemType.name;
   }
+
+  static LabelFromParam(param, def= "") {
+    let ret= def;
+    if (param && param.value !== null) {
+      // for recapitulation ( where the param value is null and the user can type anything )
+      // use the empty string as the label.
+      ret= param.label || (""+param);
+    }
+    return ret;
+  }
 };
 
 // A set of conceptually related nodes.
@@ -132,6 +142,7 @@ class SlotNode extends Node {
 class PrimNode extends Node {
   constructor(parent, itemType, itemId) {
     super(parent, itemType, itemId);
+    this.value= null;
   }
   toJSON() {
     return {

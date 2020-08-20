@@ -49,22 +49,24 @@ Vue.component('mk-context', {
     }
   },
   methods: {
-    onFieldSelected(field) {
-      this.currField= field;
-      this.currType= field && field.param.type;
+    onCmdSelected(cmdName) {
+      // FIX: synchronize context display
+      // this.currField= field;
+      // this.currType= field && field.param.type;
     },
-    onCmdSelected(typeName) {
-      this.currType= typeName;
-      this.currField= null;
+    onNodeSelected(node, param, token) {
+      // FIX: synchronize context display
+      // this.currType= typeName;
+      // this.currField= null;
     }
   },
   mounted() {
-    this.$root.$on("field-selected", this.onFieldSelected);
     this.$root.$on("cmd-selected", this.onCmdSelected);
+    this.$root.$on("node-selected", this.onNodeSelected);
   },
   beforeDestroy() {
-    this.$root.$off("field-selected", this.onFieldSelected);
-    this.$root.off("cmd-selected", this.onCmdSelected);
+    this.$root.$off("cmd-selected", this.onCmdSelected);
+    this.$root.$off("node-selected", this.onNodeSelected);
   },
   mixins: [bemMixin()],
 });

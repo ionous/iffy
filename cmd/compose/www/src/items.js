@@ -65,7 +65,7 @@ class Types {
     }
     return slats;
   }
-
+  // where t is a Type object
   static labelOf(t) {
     const label= !t.desc ? Filters.titlecase(t.name.replace(/[-_]/g, ' '))  /* friendlyish name */ :
           (typeof t.desc === 'string') ? t.desc :

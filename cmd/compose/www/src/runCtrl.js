@@ -33,7 +33,7 @@ Vue.component('mk-run-ctrl', {
       let els= [];
       const { node, "$root": root  } = this;
       node.forEach(({token, param, kid})=> {
-        var opener, closer, ghost;
+        var opener, closer, ghost,plain ;
         // plain text doesnt have param
         if (!param) {
           // handle caps for execute statements in a block.
@@ -52,8 +52,8 @@ Vue.component('mk-run-ctrl', {
               ghost= Types.labelOf(gtype);
             }
           }
+          plain= token.trim().replace(/ /g, '-').replace(/^\$/, '').toLowerCase();
         }
-        const plain= token.trim().replace(/ /g, '-').replace(/^\$/, '').toLowerCase()
         els.push({
           kid,
           token,

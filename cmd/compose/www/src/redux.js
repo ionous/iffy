@@ -186,46 +186,67 @@ class Redux {
       }
     });
   }
-  newSlot(parent, typeName) {
-    const oldSlot= parent.slot;
-    const newSlot= this.nodes.newFromType(typeName);
+  // fill out the passed slot with a newly created node of typeName
+  setSlot(node, typeName) {
+    const oldKid= node.kid;
+    const newKid= typeName && this.nodes.newFromType(typeName);
       this.doit({
       apply() {
-        parent.slot= newSlot;
-        newSlot.parent= parent;
+        node.kid= newKid;
+        if (newKid) {
+          newKid.parent= node;
+        }
+        if (oldKid) {
+          oldKid.parent= null;
+        }
       },
       revoke() {
-        parent.slot= oldSlot;
-        newSlot.parent= null;
+        node.kid= oldKid;
+        if (newKid) {
+          newKid.parent= null;
+        }
+        if (oldKid) {
+          oldKid.parent= node;
+        }
       }
     });
   }
-  newSwap(parent, newChoice, typeName) {
-    const oldKid= parent.kid;
-    const oldChoice= parent.choice;
-    const newSwap= this.nodes.newFromType(typeName);
+  setSwap(node, newChoice, typeName) {
+    const oldKid= node.kid;
+    const oldChoice= node.choice;
+    const newKid= typeName && this.nodes.newFromType(typeName);
     this.doit({
       apply() {
-        parent.kid= newSwap;
-        parent.choice= newChoice;
-        newSwap.parent= parent;
+        node.kid= newKid;
+        node.choice= newChoice;
+        if (newKid) {
+          newKid.parent= node;
+        }
+        if (oldKid) {
+          oldKid.parent= null;
+        }
       },
       revoke() {
-        parent.kid= newSwap;
-        parent.choice= oldChoice;
-        newSwap.parent= null;
+        node.kid= oldKid;
+        node.choice= oldChoice;
+        if (newKid) {
+          newKid.parent= null;
+        }
+        if (oldKid) {
+          oldKid.parent= node;
+        }
       }
     });
   }
   // change a primitive value
-  setPrim(item, newValue) {
-    const oldValue= item.value;
+  setPrim(node, newValue) {
+    const oldValue= node.value;
     this.doit({
       apply(vm) {
-        item.value= newValue;
+        node.value= newValue;
       },
       revoke() {
-        item.value= oldValue;
+        node.value= oldValue;
       }
     });
   }

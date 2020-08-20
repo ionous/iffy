@@ -87,10 +87,10 @@ class Cursor  {
     if (token) {
       const { parent } = this;
       const { kids } = parent;
-      const { tokens } = parent.itemType.with;
-      const tokenIndex= tokens.indexOf(token);
-      for (let n= tokenIndex+side; n>=0 && n<tokens.length; n+= side) {
-        const t= tokens[n];
+      const spec= parent.itemType.with;
+      const tokenIndex= spec.tokens.indexOf(token);
+      for (let n= tokenIndex+side; n>=0 && n<spec.tokens.length; n+= side) {
+        const t= spec.tokens[n];
         if (plainText || t.startsWith('$')) {
           var i;
           const el= kids[t];

@@ -5,14 +5,21 @@ function localLang(make) {
     make.run("story", "{+paragraph}");
     make.run("paragraph", "{+story_statement}");
     make.slot("story_statement");
-
-    make.run("test_statement", "story_statement", "For the test {test name%name:text|quote}, {test type%test:testing}");
     //
     make.run("noun_statement", "story_statement", "{:lede} {*tail} {?summary}",
              "Noun statement: Describes people, places, or things.");
 
     make.run("comment", "story_statement", "Note: {comment%lines}",
       "Comment: Information about the story not used by the story.")
+  });
+
+  make.group("Tests", function() {
+
+    make.run("test_statement", "story_statement",
+      "For the test {test name%name:text|quote}, {test type%test:testing}");
+
+    make.run("test_scene", "story_statement",
+      "During the test {test name%name:text|quote}: {+story_statement}");
   });
 
   make.group("Nouns", function() {

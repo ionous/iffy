@@ -74,7 +74,7 @@ Vue.component('mk-slot-ctrl', {
   methods: {
     onActivated(yes=true) {
       this.editing= yes;
-      this.$root.nodeSelected(this.node);
+      this.$root.ctrlSelected(this);
     },
     onInputChange(choice) {
       if (choice) {
@@ -85,7 +85,7 @@ Vue.component('mk-slot-ctrl', {
           const { node } = this;
           const typeName = this.labelTypes[choice];
           if (typeName) {
-            this.$root.redux.newSlot( node, typeName );
+            this.$root.redux.setSlot( node, typeName );
           }
         }
       }

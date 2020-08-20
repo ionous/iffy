@@ -12,6 +12,8 @@ Vue.component('mk-str-ctrl', {
     ><mk-pick-inline
       v-if="!hasPicked && !editing"
       :node="node"
+      :param="param"
+      :token="token"
       @picked="onPickInline"
     ></mk-pick-inline
     ><template v-else
@@ -33,14 +35,17 @@ Vue.component('mk-str-ctrl', {
   // -----------------------------------------------------
   computed: {
     hasPicked() {
-      return this.node.value !== null;
+      // technically, an unpicked value is null
+      // but empty strings behave similar
+      // fix: what about the appearance of empty values? multiple spaces, etc.
+      return !!this.node.value;
     },
     autoText() {
       return new AutoTextOptions({
         autoFocus: true, // grab the focus when created.
         choices:() => {
-          const {itemText, labelData}= this;
-          const choices= Object.keys(labelData.map).filter(t=>t).sort((a,b)=>{
+          const {itemText, labelTokens}= this;
+          const choices= Object.keys(labelTokens).filter(t=>t).sort((a,b)=>{
             return a===itemText? -1: a.localeCompare(b);
           });
           if (choices.length && choices[0] !== itemText) {
@@ -56,35 +61,21 @@ Vue.component('mk-str-ctrl', {
     commandMap() {
       return this.mutation.commandMap;
     },
+    // used for link text
     itemText() {
       // find entry for value
-      const { labelData } = this; // ex. "", $NAME
-      const { map, value } = labelData;
-      const labelToken= Object.entries(map).find(
-        ([label,token]) => token===value
+      const { labelTokens, filteredValue } = this; // ex. "", $NAME
+      const labelToken= Object.entries(labelTokens).find(
+        ([label,token]) => token===filteredValue
       );
       // text to return is either the label, or the raw value
-      return (labelToken!== undefined)? labelToken[0]: value;
+      const itemText= (labelToken!== undefined)? labelToken[0]: filteredValue;
+      console.assert("string" === typeof itemText, "expected text for item text");
+      return itemText;
     },
-    // the possible choices for this str and stored in the item spec
-    // ex. { "the": "$THE" }
-    labelData() {
-      const lts= {};
-      const { tokens, params }= this.node.itemType.with;
-      const filter= this.$root.filter(this.node);
-      for (const token of tokens) {
-        const param= params[token];
-        if (param) {
-          // for recapitulation ( where value is null )
-          // use the empty string as the label.
-          const label= (param.value !== null)? (param.label || param): "";
-          lts[filter(label)]= token;
-        }
-      }
-      return {
-        map: lts,
-        value: filter(this.node.value)
-      };
+    filteredValue() {
+      const { value } = this.node;
+      return this.filter(value || "");
     },
     mutation() {
       // fix: is there's a way to ask for ancestor properties?
@@ -107,41 +98,64 @@ Vue.component('mk-str-ctrl', {
     }
   },
   data() {
+    const { node } = this;
+    // fix: filtering depends on placement.
+    // it is possible that adding an optional element in front of this node could change the filter
+    // the only? way to detect that would be to either .watch for it ( somehow ) or track vue index in parent.
+    const filter= this.$root.filter(node);
+    // the possible choices for this str and stored in the item spec
+    // ex. { "the": "$THE" }
+    const labelTokens= {};
+    const spec= node.itemType.with;
+    for (const token of spec.tokens) {
+      const param= spec.params[token];
+      if (param) {
+        // for recapitulation ( where the param value is null and the user can type anything. )
+        // use the empty string as the label.
+        const label= Node.LabelFromParam(param);
+        const filteredLabel= filter(label);
+        labelTokens[filteredLabel]= token;
+      }
+    }
     return {
-      editing: false
+      editing: false,
+      filter,
+      labelTokens,
     };
   },
   methods: {
     // value is text picked or typed.
     // we *only* send along our labels to the completion control
     onInputChange(choice) {
-      const { node } = this;
+      const { node, labelTokens } = this;
       if (choice.startsWith("/")) {
         const cmd= this.commandMap[choice];
         this.mutation.mutate( cmd );
       } else {
-        const lts= this.labelData.map;
-        if (choice in lts) {
+        if (choice in labelTokens) {
           choice= lts[choice];
         }
         this.$root.redux.setPrim( node, choice );
       }
       this.editing= false;
     },
+    // which of the tokens were selected?
+    // note: for "recapitulation" the token is the $(NAME_OF_TYPE)
+    // and the param value is null; that's true for single entry "type anything" str controls too.
     onPickInline(token) {
       // skip setting the user data entry key
       const { node } = this;
-      const param= node.itemType.with.params[token];
+      const spec= node.itemType.with;
+      const param= spec.params[token];
       if (param.value !== null) {
         this.$root.redux.setPrim( node, token );
       }
       this.editing= true;
-      this.$root.nodeSelected(node);
+      this.$root.ctrlSelected(this);
     },
     onActivated(yes=true) {
-      const { node } = this;
       this.editing= yes;
-      this.$root.nodeSelected(node);
+      this.$root.ctrlSelected(this);
     },
   },
   mixins: [bemMixin()],
@@ -150,6 +164,8 @@ Vue.component('mk-str-ctrl', {
       type:PrimNode,
       required:true,
     },
+    param: Object,
+    token: String,
     permissive: {
       type: Boolean,
       default: true,

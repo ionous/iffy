@@ -144,14 +144,15 @@ Vue.component('mk-browser', {
       }
       this.$root.cmdSelected(k);
     },
-    onFieldSelected(field) {
+    onNodeSelected(node, param, token) {
+      // FIX: synchronize browser display
     },
   },
   mounted() {
-    this.$root.$on("field-selected", this.onFieldSelected);
+    this.$root.$on("node-selected", this.onNodeSelected);
   },
   beforeDestroy() {
-    this.$root.$off("field-selected", this.onFieldSelected);
+    this.$root.$off("node-selected", this.onNodeSelected);
   },
   mixins: [bemMixin()],
 });

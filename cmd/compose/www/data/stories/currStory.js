@@ -162,7 +162,28 @@ function getStory() {
                   }
                 }
               }
-            },
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1740db6898f-0",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1740db6898f-1",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1740db6898f-2",
+                "type": "test_scene",
+                "value": {
+                  "$NAME": {
+                    "id": "id-1740db6898f-3",
+                    "type": "text",
+                    "value": "name of a kind"
+                  },
+                  "$STORY_STATEMENT": [
             {
               "id": "id-a-21",
               "type": "story_statement",
@@ -348,6 +369,10 @@ function getStory() {
                       }
                     }
                   }
+                }
+              }
+            }
+          ]
                 }
               }
             }

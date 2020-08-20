@@ -11,6 +11,7 @@ Vue.component('mk-opt-ctrl', {
     ><mk-pick-inline
       v-else
       :node="node"
+      :param="param"
       @picked="onPick"
     ></mk-pick-inline
   ></span>`,
@@ -22,13 +23,13 @@ Vue.component('mk-opt-ctrl', {
   methods: {
     onPick(token) {
       const { node } = this;
-      const { params } = node.itemType.with;
-      if (!token in params) {
+      const spec= node.itemType.with;
+      if (!token in spec.params) {
         throw new Error(`unknown token picked '${token}'`);
       }
-      const param= params[token];
+      const param= spec.params[token];
       const typeName= param.type || param; // an opt's param can map straight to their type.
-      this.$root.redux.newSwap(node, token, typeName);
+      this.$root.redux.setSwap(node, token, typeName);
     },
   },
   mixins: [bemMixin()],

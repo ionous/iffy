@@ -64,11 +64,13 @@ Vue.component('mk-num-ctrl', {
     },
    onActivated(yes=true) {
       this.editing= yes;
-      this.$root.nodeSelected(this.node);
+      this.$root.ctrlSelected(this);
     },
   },
   mixins: [bemMixin()],
   props: {
     node: PrimNode,
+    token: String,
+    param: Object,
   }
 });
