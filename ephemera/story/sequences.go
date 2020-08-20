@@ -4,12 +4,11 @@ import (
 	"strconv"
 
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/rt"
 )
 
-func imp_cycle_text(k *imp.Porter, r reader.Map) (ret interface{}, err error) {
+func imp_cycle_text(k *Importer, r reader.Map) (ret interface{}, err error) {
 	if m, e := reader.Unpack(r, "cycle_text"); e != nil {
 		err = e
 	} else if seq, e := fromSequence(k, m); e != nil {
@@ -20,7 +19,7 @@ func imp_cycle_text(k *imp.Porter, r reader.Map) (ret interface{}, err error) {
 	return
 }
 
-func imp_shuffle_text(k *imp.Porter, r reader.Map) (ret interface{}, err error) {
+func imp_shuffle_text(k *Importer, r reader.Map) (ret interface{}, err error) {
 	if m, e := reader.Unpack(r, "shuffle_text"); e != nil {
 		err = e
 	} else if seq, e := fromSequence(k, m); e != nil {
@@ -31,7 +30,7 @@ func imp_shuffle_text(k *imp.Porter, r reader.Map) (ret interface{}, err error) 
 	return
 }
 
-func imp_stopping_text(k *imp.Porter, r reader.Map) (ret interface{}, err error) {
+func imp_stopping_text(k *Importer, r reader.Map) (ret interface{}, err error) {
 	if m, e := reader.Unpack(r, "stopping_text"); e != nil {
 		err = e
 	} else if seq, e := fromSequence(k, m); e != nil {
@@ -42,7 +41,7 @@ func imp_stopping_text(k *imp.Porter, r reader.Map) (ret interface{}, err error)
 	return
 }
 
-func fromSequence(k *imp.Porter, m reader.Map) (ret core.Sequence, err error) {
+func fromSequence(k *Importer, m reader.Map) (ret core.Sequence, err error) {
 	var ps []rt.TextEval
 	if e := reader.Repeats(m.SliceOf("$PARTS"),
 		func(m reader.Map) (err error) {
@@ -61,12 +60,12 @@ func fromSequence(k *imp.Porter, m reader.Map) (ret core.Sequence, err error) {
 	return
 }
 
-func getCounter(k *imp.Porter, m reader.Map) (ret string) {
+func getCounter(k *Importer, m reader.Map) (ret string) {
 	if at := reader.At(m); len(at) > 0 {
 		ret = at
 	} else {
-		k.AutoCounter++
-		ret = "autoimp" + strconv.Itoa(k.AutoCounter)
+		k.autoCounter++
+		ret = "autoimp" + strconv.Itoa(k.autoCounter)
 	}
 	return
 }

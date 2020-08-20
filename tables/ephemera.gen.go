@@ -25,8 +25,10 @@ func ephemeraTemplate() string {
 		" * ex. cats are a kind of animal.\n" +
 		" */\n" +
 		"create table eph_kind( idNamedKind int, idNamedParent int );\n" +
-		"/* user specified appellation and the location that specification came from */\n" +
-		"create table eph_named( name text, category text, idSource int, offset text, og text );\n" +
+		"/* user specified appellation and the location that specification came from \n" +
+		" * domain references another name\n" +
+		" */\n" +
+		"create table eph_named( name text, og text, category text, domain int, idSource int, offset text );\n" +
 		"/* a named object in the game world and its kind (singular) */\n" +
 		"create table eph_noun( idNamedNoun int, idNamedKind int );\n" +
 		"/* declarations and references to pattern parameter and pattern return types.\n" +

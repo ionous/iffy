@@ -3,13 +3,12 @@ package story
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera/express"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 )
 
-func imp_render_template(k *imp.Porter, r reader.Map) (ret interface{}, err error) {
+func imp_render_template(k *Importer, r reader.Map) (ret interface{}, err error) {
 	if m, e := reader.Unpack(r, "render_template"); e != nil {
 		err = e
 	} else if str, e := imp_lines(k, m.MapOf("$TEMPLATE")); e != nil {

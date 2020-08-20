@@ -22,7 +22,7 @@ func TestFactorialStory(t *testing.T) {
 		tables.WriteCsv(db, &buf, "select count() from eph_rule", 1)
 		tables.WriteCsv(db, &buf, "select count() from eph_prog", 1)
 		tables.WriteCsv(db, &buf, "select count() from eph_pattern", 1)
-		tables.WriteCsv(db, &buf, "select distinct name, category from eph_named order by name", 2)
+		tables.WriteCsv(db, &buf, "select distinct name, category from eph_named where category != 'scene' order by name", 2)
 		if have, want := buf.String(), lines(
 			"1", // eph_check -- 1 unit test
 			"2", // eph_rule -- 2 rules

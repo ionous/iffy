@@ -4,11 +4,10 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/ephemera"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 )
 
-func imp_test_statement(k *imp.Porter, r reader.Map) (err error) {
+func imp_test_statement(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "test_statement"); e != nil {
 		err = e
 	} else if n, e := imp_test_name(k, m.MapOf("$NAME")); e != nil {
@@ -23,7 +22,21 @@ func imp_test_statement(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-func imp_test_output(k *imp.Porter, test ephemera.Named, r reader.Map) (err error) {
+func imp_test_scene(k *Importer, r reader.Map) (err error) {
+	if m, e := reader.Unpack(r, "test_scene"); e != nil {
+		err = e
+	} else if n, e := imp_test_name(k, m.MapOf("$NAME")); e != nil {
+		err = e
+	} else {
+		lastScene := k.Current.Scene
+		k.Current.Scene = n
+		err = reader.Repeats(m.SliceOf("$STORY_STATEMENT"), k.Bind(imp_story_statement))
+		k.Current.Scene = lastScene
+	}
+	return
+}
+
+func imp_test_output(k *Importer, test ephemera.Named, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "test_output"); e != nil {
 		err = e
 	} else if expect, e := imp_lines(k, m.MapOf("$LINES")); e != nil {
@@ -47,6 +60,6 @@ func imp_test_output(k *imp.Porter, test ephemera.Named, r reader.Map) (err erro
 	return
 }
 
-func imp_lines(k *imp.Porter, r reader.Map) (ret string, err error) {
+func imp_lines(k *Importer, r reader.Map) (ret string, err error) {
 	return reader.String(r, "lines")
 }

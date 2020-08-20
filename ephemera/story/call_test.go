@@ -30,7 +30,7 @@ func TestDetermineNum(t *testing.T) {
 		tables.WriteCsv(db, &buf, "select count() from eph_prog", 1)
 		tables.WriteCsv(db, &buf, "select count() from eph_rule", 1)
 		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
-		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
+		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
 		if have, want := buf.String(), lines(
 			// eph_prog count
 			// no programs b/c no container for the call into determine.
@@ -39,8 +39,8 @@ func TestDetermineNum(t *testing.T) {
 			// no rules b/c the pattern is called but not implemented.
 			"0",
 			// eph_pattern
-			"1,2,3,0", // from NewPatternRef -> "determine num" takes a parameter that is from a number eval
-			"1,1,4,0", // from NewPatternRef -> "determine num" indicates factorial returns a number eval
+			"2,3,4,0", // from NewPatternRef -> "determine num" takes a parameter that is from a number eval
+			"2,2,5,0", // from NewPatternRef -> "determine num" indicates factorial returns a number eval
 			//
 			"factorial,pattern_name", // 1.
 			"num,variable_name",      // 2.

@@ -1,6 +1,16 @@
 package lang
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
+
+func TestEmptyCamelize(t *testing.T) {
+	// ensure the alg doesnt panic on the empty string
+	if len(Camelize("")) != 0 {
+		t.Fatal("empty failure")
+	}
+}
 
 func ExampleCamelize() {
 	print := func(s ...string) {

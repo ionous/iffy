@@ -46,8 +46,6 @@ func modelTemplate() string {
 		"/* documentation for pieces of the model: kinds, nouns, fields, etc. */\n" +
 		"create table mdl_spec(type text, name text, spec text, primary key(type, name));\n" +
 		"/* initial values for various noun properties. these change over the course of a game. */\n" +
-		"create table mdl_start(noun text, field text, value blob);\n" +
-		"\n" +
-		""
+		"create table mdl_start(noun text, field text, value blob);"
 	return tmpl
 }

@@ -14,8 +14,10 @@ create table eph_field( primType text, idNamedKind int, idNamedField int );
  * ex. cats are a kind of animal.
  */
 create table eph_kind( idNamedKind int, idNamedParent int );
-/* user specified appellation and the location that specification came from */
-create table eph_named( name text, category text, idSource int, offset text, og text );
+/* user specified appellation and the location that specification came from 
+ * domain references another name
+ */
+create table eph_named( name text, og text, category text, domain int, idSource int, offset text );
 /* a named object in the game world and its kind (singular) */
 create table eph_noun( idNamedNoun int, idNamedKind int );
 /* declarations and references to pattern parameter and pattern return types.

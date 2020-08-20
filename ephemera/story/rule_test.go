@@ -51,7 +51,7 @@ func TestPatternRule(t *testing.T) {
 		// execute_rule
 		tables.WriteCsv(db, &buf, "select type from eph_prog", 1)
 		// example, pattern_name
-		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
+		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
 		// 1 pattern handler reference
 		tables.WriteCsv(db, &buf, "select count() from eph_pattern", 1)
 		// 1, 1 - the first name, the first program are used to make the rule
@@ -60,7 +60,7 @@ func TestPatternRule(t *testing.T) {
 			"execute_rule",
 			"example,pattern_name",
 			"0", // eph_pattern -- rules are recorded via eph_prog,
-			"1,1",
+			"2,1",
 		); have != want {
 			t.Fatal(have)
 		}

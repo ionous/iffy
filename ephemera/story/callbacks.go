@@ -5,12 +5,11 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 )
 
-func imp_determine_act(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+func imp_determine_act(k *Importer, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineAct
 	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
@@ -19,7 +18,7 @@ func imp_determine_act(k *imp.Porter, m reader.Map) (ret interface{}, err error)
 	}
 	return
 }
-func imp_determine_num(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+func imp_determine_num(k *Importer, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineNum
 	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
@@ -28,7 +27,7 @@ func imp_determine_num(k *imp.Porter, m reader.Map) (ret interface{}, err error)
 	}
 	return
 }
-func imp_determine_text(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+func imp_determine_text(k *Importer, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineText
 	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
@@ -37,7 +36,7 @@ func imp_determine_text(k *imp.Porter, m reader.Map) (ret interface{}, err error
 	}
 	return
 }
-func imp_determine_bool(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+func imp_determine_bool(k *Importer, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineBool
 	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
@@ -46,7 +45,7 @@ func imp_determine_bool(k *imp.Porter, m reader.Map) (ret interface{}, err error
 	}
 	return
 }
-func imp_determine_num_list(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+func imp_determine_num_list(k *Importer, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineNumList
 	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
@@ -55,7 +54,7 @@ func imp_determine_num_list(k *imp.Porter, m reader.Map) (ret interface{}, err e
 	}
 	return
 }
-func imp_determine_text_list(k *imp.Porter, m reader.Map) (ret interface{}, err error) {
+func imp_determine_text_list(k *Importer, m reader.Map) (ret interface{}, err error) {
 	var from core.DetermineTextList
 	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
 		err = e
@@ -67,7 +66,7 @@ func imp_determine_text_list(k *imp.Porter, m reader.Map) (ret interface{}, err 
 
 // used by "determine_num", etc.
 // from and spec are the same object, but go-type unpacking from interfaces isnt always easy.
-func fromPattern(k *imp.Porter,
+func fromPattern(k *Importer,
 	m reader.Map,
 	spec composer.Slat,
 	from *core.FromPattern) (err error) {
@@ -91,7 +90,7 @@ func fromPattern(k *imp.Porter,
 	return
 }
 
-func imp_parameters(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.Parameters, err error) {
+func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Parameters, err error) {
 	if m, e := reader.Unpack(r, "parameters"); e != nil {
 		err = e
 	} else {
@@ -114,7 +113,7 @@ func imp_parameters(k *imp.Porter, pid ephemera.Named, r reader.Map) (ret *core.
 	return
 }
 
-func imp_parameter(k *imp.Porter, patternName ephemera.Named, r reader.Map) (ret *core.Parameter, err error) {
+func imp_parameter(k *Importer, patternName ephemera.Named, r reader.Map) (ret *core.Parameter, err error) {
 	if m, e := reader.Unpack(r, "parameter"); e != nil {
 		err = e
 	} else if paramName, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
@@ -131,7 +130,7 @@ func imp_parameter(k *imp.Porter, patternName ephemera.Named, r reader.Map) (ret
 	return
 }
 
-func imp_assignment(k *imp.Porter, m reader.Map) (ret core.Assignment, err error) {
+func imp_assignment(k *Importer, m reader.Map) (ret core.Assignment, err error) {
 	if a, e := k.DecodeSlot(m, "assignment"); e != nil {
 		err = e
 	} else if a, ok := a.(core.Assignment); !ok {
@@ -142,6 +141,6 @@ func imp_assignment(k *imp.Porter, m reader.Map) (ret core.Assignment, err error
 	return
 }
 
-func imp_text(k *imp.Porter, m reader.Map) (ret string, err error) {
+func imp_text(k *Importer, m reader.Map) (ret string, err error) {
 	return reader.String(m, "text")
 }

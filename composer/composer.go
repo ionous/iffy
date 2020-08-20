@@ -20,7 +20,6 @@ import (
 )
 
 // Compose starts the composer server, this function doesnt return.
-// ex. go run compose.go -dir /Users/ionous/Documents/Iffy
 func Compose(cfg *Config) {
 	// configure server
 	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {

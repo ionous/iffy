@@ -7,15 +7,13 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/express"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 )
 
 func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
 	iffy.RegisterGobs()
-	storyNouns.names = nil
 	dec := decode.NewDecoder()
-	k := imp.NewImporterDecoder(src, db, dec)
+	k := NewImporterDecoder(src, db, dec)
 	// fix: this is a bit ugly b/c it assumes "AssembleStory" uses the same base kind.
 	// and "name" gets used by qna's runtime implementation.
 	k.NewImplicitField("name", "kinds", "reserved")

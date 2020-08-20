@@ -36,4 +36,3 @@ create table mdl_rule( pattern text, idProg int );
 create table mdl_spec(type text, name text, spec text, primary key(type, name));
 /* initial values for various noun properties. these change over the course of a game. */
 create table mdl_start(noun text, field text, value blob);
-

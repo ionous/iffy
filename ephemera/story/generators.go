@@ -3,7 +3,6 @@ package story
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 )
@@ -14,7 +13,7 @@ import (
 
 // story is a bunch of paragraphs
 //make.run("story", "{+paragraph|ghost}");
-func imp_story(k *imp.Porter, r reader.Map) (err error) {
+func imp_story(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "story"); e != nil {
 		err = e
 	} else {
@@ -24,18 +23,18 @@ func imp_story(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // paragraph is a bunch of statements
-func imp_paragraph(k *imp.Porter, r reader.Map) (err error) {
+func imp_paragraph(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "paragraph"); e != nil {
 		err = e
 	} else {
-		storyNouns.Swap(nil)
+		k.ParagraphEnv = ParagraphEnv{}
 		err = reader.Repeats(m.SliceOf("$STORY_STATEMENT"), k.Bind(imp_story_statement))
 	}
 	return
 }
 
 // run: "{+names} {noun_phrase}."
-func imp_lede(k *imp.Porter, r reader.Map) (err error) {
+func imp_lede(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "lede"); e != nil {
 		err = e
 	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun)); e != nil {
@@ -47,7 +46,7 @@ func imp_lede(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // run: "{pronoun} {noun_phrase}."
-func imp_tail(k *imp.Porter, r reader.Map) (err error) {
+func imp_tail(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "tail"); e != nil {
 		err = e
 	} else if e := imp_pronoun(k, m.MapOf("$PRONOUN")); e != nil {
@@ -59,7 +58,7 @@ func imp_tail(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // make.str("pronoun",  "{it}, {they}, or {pronoun}");
-func imp_pronoun(k *imp.Porter, r reader.Map) (err error) {
+func imp_pronoun(k *Importer, r reader.Map) (err error) {
 	if _, e := reader.String(r, "pronoun"); e != nil {
 		err = e
 	} else {
@@ -69,7 +68,7 @@ func imp_pronoun(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // opt: "{kind_of_noun}, {noun_traits}, or {noun_relation}"
-func imp_noun_phrase(k *imp.Porter, r reader.Map) (err error) {
+func imp_noun_phrase(k *Importer, r reader.Map) (err error) {
 	return reader.Option(r, "noun_phrase", reader.ReadMaps{
 		"$KIND_OF_NOUN":  k.Bind(imp_kind_of_noun),
 		"$NOUN_TRAITS":   k.Bind(imp_noun_traits),
@@ -78,26 +77,22 @@ func imp_noun_phrase(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // run: "{?are_being} {relation} {+noun}"
-// ex. (the cat and the hat) are in (the book)
-// ex. (Hector and Maria) are suspicious of (Santa and Santana).
-func imp_noun_relation(k *imp.Porter, r reader.Map) (err error) {
-	// unexpected type  wanted noun_relation at
+// ex. [the cat and the hat] (are) (in) (the book)
+// ex. [Hector and Maria] (are) (suspicious of) (Santa and Santana).
+// fix? parse are_being
+func imp_noun_relation(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "noun_relation"); e != nil {
 		err = e
 	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
 		err = e
+	} else if e := k.Recent.Nouns.CollectObjects(func() error {
+		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+	}); e != nil {
+		err = e
 	} else {
-		// fix? parse are_being
-		leadinstoryNouns := storyNouns.Swap(nil)
-		if e := reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun)); e != nil {
-			err = e
-		} else {
-			trailinstoryNouns := storyNouns.Swap(leadinstoryNouns)
-			//
-			for _, n := range leadinstoryNouns {
-				for _, d := range trailinstoryNouns {
-					k.NewRelative(n, relation, d)
-				}
+		for _, subject := range k.Recent.Nouns.Subjects {
+			for _, object := range k.Recent.Nouns.Objects {
+				k.NewRelative(subject, relation, object)
 			}
 		}
 	}
@@ -105,7 +100,7 @@ func imp_noun_relation(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // noun: "{proper_noun} or {common_noun}"
-func imp_noun(k *imp.Porter, r reader.Map) (err error) {
+func imp_noun(k *Importer, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
@@ -120,7 +115,7 @@ func imp_noun(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // run: "{determiner} {common_name}"
-func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
+func imp_common_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "common_noun"); e != nil {
 		err = e
 	} else if det, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
@@ -128,7 +123,7 @@ func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
 	} else if noun, e := imp_common_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else {
-		storyNouns.Add(noun)
+		k.Recent.Nouns.Add(noun)
 		// set common nounType to true ( implicitly defined by "noun" )
 		nounType := k.NewName("common", tables.NAMED_TRAIT, reader.At(r))
 		k.NewValue(noun, nounType, true)
@@ -146,19 +141,19 @@ func imp_common_noun(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-func imp_determiner(k *imp.Porter, r reader.Map) (ret string, err error) {
+func imp_determiner(k *Importer, r reader.Map) (ret string, err error) {
 	return reader.String(r, "determiner")
 }
 
 // run: "{proper_name}"
 // common / proper setting
-func imp_proper_noun(k *imp.Porter, r reader.Map) (err error) {
+func imp_proper_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "proper_noun"); e != nil {
 		err = e
 	} else if noun, e := imp_proper_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else {
-		storyNouns.Add(noun)
+		k.Recent.Nouns.Add(noun)
 		// set proper nounType to true ( implicitly defined by "noun" )
 		nounType := k.NewName("proper", tables.NAMED_TRAIT, reader.At(m))
 		k.NewValue(noun, nounType, true)
@@ -168,7 +163,7 @@ func imp_proper_noun(k *imp.Porter, r reader.Map) (err error) {
 
 // run: "{are_an} {*trait:*trait} {kind:singular_kind} {?noun_relation}"
 // ex. "(the box) is a closed container on the beach"
-func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
+func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kind_of_noun"); e != nil {
 		err = e
 	} else if kind, e := imp_singular_kind(k, m.MapOf("$KIND")); e != nil {
@@ -186,7 +181,7 @@ func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
 			err = e
 		} else {
 			// we collect the nouns, but delay processing them till now.
-			for _, noun := range storyNouns.names {
+			for _, noun := range k.Recent.Nouns.Subjects {
 				k.NewNoun(noun, kind)
 				for _, trait := range traits {
 					k.NewValue(noun, trait, true) // the value of the trait for the noun is true
@@ -201,7 +196,7 @@ func imp_kind_of_noun(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // run: "{The [summary] is:: %lines}"
-func imp_summary(k *imp.Porter, r reader.Map) (err error) {
+func imp_summary(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "summary"); e != nil {
 		err = e
 	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
@@ -214,7 +209,7 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 			k.NewField(things, appear, tables.PRIM_EXPR)
 		}
 		prop := k.NewName("appearance", tables.NAMED_FIELD, reader.At(m))
-		noun := storyNouns.Last()
+		noun := LastNameOf(k.Recent.Nouns.Subjects)
 		k.NewValue(noun, prop, lines)
 	}
 	return
@@ -222,16 +217,15 @@ func imp_summary(k *imp.Porter, r reader.Map) (err error) {
 
 // run: "{are_being} {+trait:trait}"
 // ex. "(the box) is closed"
-func imp_noun_traits(k *imp.Porter, r reader.Map) (err error) {
+func imp_noun_traits(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "noun_traits"); e != nil {
 		err = e
 	} else {
-		leadinstoryNouns := storyNouns.Swap(nil) // FIX: should they really be swapped out here...?
 		err = reader.Repeats(m.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
 			if trait, e := imp_trait(k, el); e != nil {
 				err = e
 			} else {
-				for _, noun := range leadinstoryNouns {
+				for _, noun := range k.Recent.Nouns.Subjects {
 					k.NewValue(noun, trait, true) // the value of the trait for the noun is true
 				}
 			}
@@ -242,7 +236,7 @@ func imp_noun_traits(k *imp.Porter, r reader.Map) (err error) {
 }
 
 // fix... part of class traits
-func imp_trait_phrase(k *imp.Porter, r reader.Map) (ret []ephemera.Named, err error) {
+func imp_trait_phrase(k *Importer, r reader.Map) (ret []ephemera.Named, err error) {
 	err = reader.Repeats(r.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
 		if trait, e := imp_trait(k, el); e != nil {
 			err = e
@@ -255,7 +249,7 @@ func imp_trait_phrase(k *imp.Porter, r reader.Map) (ret []ephemera.Named, err er
 }
 
 // "{type:variable_type} ( called {name:variable_name|quote} )"
-func imp_variable_decl(k *imp.Porter, r reader.Map) (retName, retType ephemera.Named, err error) {
+func imp_variable_decl(k *Importer, r reader.Map) (retName, retType ephemera.Named, err error) {
 	if m, e := reader.Unpack(r, "variable_decl"); e != nil {
 		err = e
 	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
@@ -268,7 +262,7 @@ func imp_variable_decl(k *imp.Porter, r reader.Map) (retName, retType ephemera.N
 	return
 }
 
-func imp_variable_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
+func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	err = reader.Option(r, "variable_type", reader.ReadMaps{
 		"$PRIMITIVE": func(m reader.Map) (err error) {
 			ret, err = imp_primitive_var(k, m)
@@ -285,7 +279,7 @@ func imp_variable_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err err
 // "{a number%number}, {some text%text}, or {a true/false value%bool}"
 // returns one of the evalType(s) as a "Named" value --
 // we return a name to normalize references to object kinds which are also used as variables
-func imp_primitive_var(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
+func imp_primitive_var(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	if evalType, e := reader.Enum(r, "primitive_type", reader.Map{
 		"$NUMBER": "number_eval",
 		"$TEXT":   "text_eval",
@@ -299,7 +293,7 @@ func imp_primitive_var(k *imp.Porter, r reader.Map) (ret ephemera.Named, err err
 }
 
 // ick. fix. see imp_primitive_phrase.
-func imp_primitive_prop(k *imp.Porter, r reader.Map) (string, error) {
+func imp_primitive_prop(k *Importer, r reader.Map) (string, error) {
 	p, e := reader.Enum(r, "primitive_type", reader.Map{
 		"$NUMBER": tables.PRIM_DIGI,
 		"$TEXT":   tables.PRIM_TEXT,
@@ -310,7 +304,7 @@ func imp_primitive_prop(k *imp.Porter, r reader.Map) (string, error) {
 
 // "{an} {kind of%kind:singular_kind} object"
 // returns the name of "singular_kind"
-func imp_object_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error) {
+func imp_object_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	if m, e := reader.Unpack(r, "object_type"); e != nil {
 		err = e
 	} else {
@@ -319,6 +313,6 @@ func imp_object_type(k *imp.Porter, r reader.Map) (ret ephemera.Named, err error
 	return
 }
 
-func Unimplemented(k *imp.Porter, r reader.Map) (err error) {
+func Unimplemented(k *Importer, r reader.Map) (err error) {
 	return errutil.New("unimplemented", r.StrOf(reader.ItemType), reader.At(r))
 }

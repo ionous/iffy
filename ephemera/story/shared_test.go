@@ -11,7 +11,6 @@ import (
 	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -19,11 +18,11 @@ func lines(s ...string) string {
 	return strings.Join(s, "\n") + "\n"
 }
 
-func newTestImporter(t *testing.T) (ret *imp.Porter, retDB *sql.DB) {
+func newTestImporter(t *testing.T) (ret *Importer, retDB *sql.DB) {
 	return newTestImporterDecoder(t, nil)
 }
 
-func newTestDecoder(t *testing.T) (ret *imp.Porter, retDB *sql.DB) {
+func newTestDecoder(t *testing.T) (ret *Importer, retDB *sql.DB) {
 	iffy.RegisterGobs()
 	//
 	dec := decode.NewDecoder()
@@ -32,12 +31,12 @@ func newTestDecoder(t *testing.T) (ret *imp.Porter, retDB *sql.DB) {
 	return newTestImporterDecoder(t, dec)
 }
 
-func newTestImporterDecoder(t *testing.T, dec *decode.Decoder) (ret *imp.Porter, retDB *sql.DB) {
+func newTestImporterDecoder(t *testing.T, dec *decode.Decoder) (ret *Importer, retDB *sql.DB) {
 	db := newImportDB(t, memory)
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create ephemera", e)
 	} else {
-		ret = imp.NewImporterDecoder(t.Name(), db, dec)
+		ret = NewImporterDecoder(t.Name(), db, dec)
 		retDB = db
 	}
 	return

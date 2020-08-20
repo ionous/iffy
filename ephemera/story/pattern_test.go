@@ -49,13 +49,13 @@ func TestPatternVariablesDecl(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		var buf strings.Builder
-		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
+		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
 		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
 		if have, want := buf.String(), lines(
 			"corral,pattern_name",  // 1
 			"pet,variable_name",    // 2
 			"animal,singular_kind", // 3
-			"1,2,3,1",              // NewPatternDecl
+			"2,3,4,1",              // NewPatternDecl
 		); have != want {
 			t.Fatal("mismatch", have)
 		} else {
@@ -111,12 +111,12 @@ func TestPatternDecl(t *testing.T) {
 		t.Fatal(e)
 	} else {
 		var buf strings.Builder
-		tables.WriteCsv(db, &buf, "select name, category from eph_named", 2)
+		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
 		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
 		if have, want := buf.String(), lines(
 			"corral,pattern_name", // 1
 			"execute,type",        // 2
-			"1,1,2,1",             // NewPatternDecl
+			"2,2,3,1",             // NewPatternDecl
 		); have != want {
 			t.Fatal("mismatch", have)
 		} else {

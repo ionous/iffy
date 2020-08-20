@@ -24,6 +24,10 @@ func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 // Category is likely one of kind, noun, aspect, attribute, property, relation.
 // The format of the location ofs depends on the data source.
 func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
+	return r.NewDomainName(Named{}, name, category, ofs)
+}
+
+func (r *Recorder) NewDomainName(domain Named, name, category, ofs string) (ret Named) {
 	norm := strings.TrimSpace(name)
 	// many tests would have to be adjusted to be able to handle normalization wholesale
 	// so for now make this opt-in.
@@ -35,7 +39,7 @@ func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
 		tables.NAMED_FIELD:
 		norm = lang.Camelize(norm)
 	}
-	namedId := r.cache.Must(eph_named, norm, category, r.srcId, ofs, name)
+	namedId := r.cache.Must(eph_named, norm, name, category, domain, r.srcId, ofs)
 	return Named{namedId, norm}
 }
 
@@ -147,7 +151,7 @@ var eph_default = tables.Insert("eph_default", "idNamedKind", "idNamedProp", "va
 var eph_field = tables.Insert("eph_field", "primType", "idNamedKind", "idNamedField")
 var eph_rule = tables.Insert("eph_rule", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
-var eph_named = tables.Insert("eph_named", "name", "category", "idSource", "offset", "og")
+var eph_named = tables.Insert("eph_named", "name", "og", "category", "domain", "idSource", "offset")
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")
 var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType", "decl")
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")

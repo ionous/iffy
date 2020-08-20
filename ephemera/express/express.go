@@ -22,7 +22,7 @@ func Convert(xs template.Expression) (ret interface{}, err error) {
 type Converter struct {
 	stack cmdStack // the stack is empty initially, and we fill it with converted commands
 	// ( to be used later by other commands )
-	AutoCounter int
+	autoCounter int
 }
 
 func (c *Converter) Convert(xs template.Expression) (ret interface{}, err error) {
@@ -111,8 +111,8 @@ func (c *Converter) buildSequence(cmd rt.TextEval, seq *core.Sequence, count int
 			}
 		}
 		if err == nil {
-			c.AutoCounter++
-			counter := "autoexp" + strconv.Itoa(c.AutoCounter)
+			c.autoCounter++
+			counter := "autoexp" + strconv.Itoa(c.autoCounter)
 			// seq is part of cmd
 			seq.Parts = parts
 			seq.Seq = counter

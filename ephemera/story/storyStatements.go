@@ -2,11 +2,10 @@ package story
 
 import (
 	"github.com/ionous/iffy/ephemera"
-	"github.com/ionous/iffy/ephemera/imp"
 	"github.com/ionous/iffy/ephemera/reader"
 )
 
-func imp_story_statement(k *imp.Porter, r reader.Map) (err error) {
+func imp_story_statement(k *Importer, r reader.Map) (err error) {
 	return reader.Slot(r, "story_statement", reader.ReadMaps{
 		"certainties":              k.Bind(imp_certainties),
 		"aspect_traits":            k.Bind(imp_aspect_traits),
@@ -19,13 +18,14 @@ func imp_story_statement(k *imp.Porter, r reader.Map) (err error) {
 		"pattern_variables_decl":   k.Bind(imp_pattern_variables_decl),
 		"relative_to_noun":         k.Bind(imp_relative_to_noun),
 		"test_statement":           k.Bind(imp_test_statement),
+		"test_scene":               k.Bind(imp_test_scene),
 		"pattern_handler":          k.Bind(imp_pattern_handler),
 	})
 }
 
 //"{plural_kinds} {are_being} {certainty} {trait}.");
 // horses are usually fast.
-func imp_certainties(k *imp.Porter, r reader.Map) (err error) {
+func imp_certainties(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "certainties"); e != nil {
 		err = e
 	} else if certainty, e := imp_certainty(k, m.MapOf("$CERTAINTY")); e != nil {
@@ -40,7 +40,7 @@ func imp_certainties(k *imp.Porter, r reader.Map) (err error) {
 	return
 }
 
-func imp_certainty(k *imp.Porter, r reader.Map) (ret string, err error) {
+func imp_certainty(k *Importer, r reader.Map) (ret string, err error) {
 	if n, e := reader.Enum(r, "certainty", map[string]interface{}{
 		"$ALWAYS":  "always",
 		"$NEVER":   "never",
@@ -56,7 +56,7 @@ func imp_certainty(k *imp.Porter, r reader.Map) (ret string, err error) {
 
 // "{aspects} {are_an} kind of value."
 // ex. colors are a kind of value
-func imp_kinds_of_aspect(k *imp.Porter, r reader.Map) (err error) {
+func imp_kinds_of_aspect(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kinds_of_aspect"); e != nil {
 		err = e
 	} else if _, e := imp_aspect(k, m.MapOf("$ASPECT")); e != nil {
@@ -67,7 +67,7 @@ func imp_kinds_of_aspect(k *imp.Porter, r reader.Map) (err error) {
 
 // "{plural_kinds} {are_an} kind of {kind}."
 // ex. "cats are a kind of animal"
-func imp_kinds_of_kind(k *imp.Porter, r reader.Map) (err error) {
+func imp_kinds_of_kind(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kinds_of_kind"); e != nil {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
@@ -83,7 +83,7 @@ func imp_kinds_of_kind(k *imp.Porter, r reader.Map) (err error) {
 // {plural_kinds} have {determiner} {property_phrase}.
 // ex. cats have some text called breed.
 // ex. horses have an aspect called speed.
-func imp_kinds_possess_properties(k *imp.Porter, r reader.Map) (err error) {
+func imp_kinds_possess_properties(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kinds_possess_properties"); e != nil {
 		err = e
 	} else if kind, e := imp_plural_kinds(k, m.MapOf("$PLURAL_KINDS")); e != nil {
@@ -98,7 +98,7 @@ func imp_kinds_possess_properties(k *imp.Porter, r reader.Map) (err error) {
 
 // run "The {property} of {+noun} is the {[text]:: %lines}"
 // ex. The description of the nets is xxx
-func imp_noun_assignment(k *imp.Porter, r reader.Map) (err error) {
+func imp_noun_assignment(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "noun_assignment"); e != nil {
 		err = e
 	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
@@ -108,15 +108,14 @@ func imp_noun_assignment(k *imp.Porter, r reader.Map) (err error) {
 	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun)); e != nil {
 		err = e
 	} else {
-		for _, noun := range storyNouns.names {
+		for _, noun := range k.Recent.Nouns.Subjects {
 			k.NewValue(noun, prop, lines)
 		}
 	}
 	return
 }
 
-func imp_noun_statement(k *imp.Porter, r reader.Map) (err error) {
-	storyNouns.Swap(nil) // fix?
+func imp_noun_statement(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "noun_statement"); e != nil {
 		err = e
 	} else if e := imp_lede(k, m.MapOf("$LEDE")); e != nil {
@@ -132,7 +131,7 @@ func imp_noun_statement(k *imp.Porter, r reader.Map) (err error) {
 // Adds a new pattern declaration and optionally some associated pattern parameters.
 // {name:pattern_name|quote} determines {type:pattern_type}.
 // {optvars?pattern_variables_tail}
-func imp_pattern_decl(k *imp.Porter, r reader.Map) (err error) {
+func imp_pattern_decl(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_decl"); e != nil {
 		err = e
 	} else if patternName, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
@@ -150,7 +149,7 @@ func imp_pattern_decl(k *imp.Porter, r reader.Map) (err error) {
 
 // `Pattern variables: Storage for values used during the execution of a pattern.`)
 // {+variable_decl|comma-and}.",
-func imp_pattern_variables_tail(k *imp.Porter, patternName ephemera.Named, r reader.Map) (err error) {
+func imp_pattern_variables_tail(k *Importer, patternName ephemera.Named, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_variables_tail"); e != nil {
 		err = e
 	} else {
@@ -159,7 +158,7 @@ func imp_pattern_variables_tail(k *imp.Porter, patternName ephemera.Named, r rea
 	return
 }
 
-func rep_variable_decl(k *imp.Porter, patternName ephemera.Named, r reader.Map) error {
+func rep_variable_decl(k *Importer, patternName ephemera.Named, r reader.Map) error {
 	return reader.Repeats(r.SliceOf("$VARIABLE_DECL"),
 		func(m reader.Map) (err error) {
 			if paramName, paramType, e := imp_variable_decl(k, m); e != nil {
@@ -172,7 +171,7 @@ func rep_variable_decl(k *imp.Porter, patternName ephemera.Named, r reader.Map) 
 }
 
 // "The pattern {pattern_name|quote} uses {+variable_decl|comma-and}."
-func imp_pattern_variables_decl(k *imp.Porter, r reader.Map) (err error) {
+func imp_pattern_variables_decl(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_variables_decl"); e != nil {
 		err = e
 	} else if patternName, e := imp_pattern_name(k, m.MapOf("$PATTERN_NAME")); e != nil {
@@ -185,7 +184,7 @@ func imp_pattern_variables_decl(k *imp.Porter, r reader.Map) (err error) {
 
 // "{aspects} {trait_phrase}"
 // (the) colors are red, blue, or green.
-func imp_aspect_traits(k *imp.Porter, r reader.Map) (err error) {
+func imp_aspect_traits(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "aspect_traits"); e != nil {
 		err = e
 	} else if aspect, e := imp_aspect(k, r.MapOf("$ASPECT")); e != nil {
@@ -202,23 +201,23 @@ func imp_aspect_traits(k *imp.Porter, r reader.Map) (err error) {
 
 // "{relation} {+noun} {are_being} {+noun}."
 // ex. On the beach are shells.
-func imp_relative_to_noun(k *imp.Porter, r reader.Map) (err error) {
+func imp_relative_to_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "relative_to_noun"); e != nil {
 		err = e
 	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
 		err = e
-	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun)); e != nil {
+	} else if e := k.Recent.Nouns.CollectObjects(func() error {
+		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+	}); e != nil {
+		err = e
+	} else if e := k.Recent.Nouns.CollectSubjects(func() error {
+		return reader.Repeats(m.SliceOf("$NOUN1"), k.Bind(imp_noun))
+	}); e != nil {
 		err = e
 	} else {
-		leadinstoryNouns := storyNouns.Swap(nil)
-		if e := reader.Repeats(m.SliceOf("$NOUN1"), k.Bind(imp_noun)); e != nil {
-			err = e
-		} else {
-			trailinstoryNouns := storyNouns.Swap(leadinstoryNouns)
-			for _, a := range leadinstoryNouns {
-				for _, b := range trailinstoryNouns {
-					k.NewRelative(a, relation, b)
-				}
+		for _, object := range k.Recent.Nouns.Objects {
+			for _, subject := range k.Recent.Nouns.Subjects {
+				k.NewRelative(object, relation, subject)
 			}
 		}
 	}
