@@ -33,11 +33,13 @@ func imp_paragraph(k *Importer, r reader.Map) (err error) {
 	return
 }
 
-// run: "{+names} {noun_phrase}."
+// run: "{+noun} {noun_phrase}."
 func imp_lede(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "lede"); e != nil {
 		err = e
-	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun)); e != nil {
+	} else if e := k.Recent.Nouns.CollectSubjects(func() error {
+		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+	}); e != nil {
 		err = e
 	} else if e := imp_noun_phrase(k, m.MapOf("$NOUN_PHRASE")); e != nil {
 		err = e
@@ -124,6 +126,7 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else {
 		k.Recent.Nouns.Add(noun)
+
 		// set common nounType to true ( implicitly defined by "noun" )
 		nounType := k.NewName("common", tables.NAMED_TRAIT, reader.At(r))
 		k.NewValue(noun, nounType, true)
@@ -132,8 +135,9 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 			article := k.NewName("indefinite article", tables.NAMED_FIELD, reader.At(r))
 			k.NewValue(noun, article, det)
 			if once := "common_noun"; k.Once(once) {
-				indefinite := k.NewName("indefinite article", tables.NAMED_FIELD, once)
-				things := k.NewName("things", tables.NAMED_KINDS, once)
+				domain := k.gameDomain()
+				indefinite := k.NewDomainName(domain, "indefinite article", tables.NAMED_FIELD, once)
+				things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
 				k.NewField(things, indefinite, tables.PRIM_TEXT)
 			}
 		}
@@ -162,7 +166,7 @@ func imp_proper_noun(k *Importer, r reader.Map) (err error) {
 }
 
 // run: "{are_an} {*trait:*trait} {kind:singular_kind} {?noun_relation}"
-// ex. "(the box) is a closed container on the beach"
+// ex. "[the box] (is a) (closed) (container) ((on) (the beach))"
 func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kind_of_noun"); e != nil {
 		err = e
@@ -180,7 +184,7 @@ func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 		}); e != nil {
 			err = e
 		} else {
-			// we collect the nouns, but delay processing them till now.
+			// we collected the nouns and delayed processing them till now.
 			for _, noun := range k.Recent.Nouns.Subjects {
 				k.NewNoun(noun, kind)
 				for _, trait := range traits {
@@ -204,8 +208,9 @@ func imp_summary(k *Importer, r reader.Map) (err error) {
 	} else {
 		// declare the existence of the field "appearance"
 		if once := "summary"; k.Once(once) {
-			things := k.NewName("things", tables.NAMED_KINDS, once)
-			appear := k.NewName("appearance", tables.NAMED_FIELD, once)
+			domain := k.gameDomain()
+			things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
+			appear := k.NewDomainName(domain, "appearance", tables.NAMED_FIELD, once)
 			k.NewField(things, appear, tables.PRIM_EXPR)
 		}
 		prop := k.NewName("appearance", tables.NAMED_FIELD, reader.At(m))

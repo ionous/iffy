@@ -10,7 +10,7 @@ type ParagraphEnv struct {
 		Nouns Nouns
 	}
 	Current struct {
-		Scene ephemera.Named
+		Domain ephemera.Named
 	}
 }
 

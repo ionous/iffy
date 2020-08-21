@@ -28,10 +28,10 @@ func imp_test_scene(k *Importer, r reader.Map) (err error) {
 	} else if n, e := imp_test_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else {
-		lastScene := k.Current.Scene
-		k.Current.Scene = n
+		lastScene := k.Current.Domain
+		k.Current.Domain = n
 		err = reader.Repeats(m.SliceOf("$STORY_STATEMENT"), k.Bind(imp_story_statement))
-		k.Current.Scene = lastScene
+		k.Current.Domain = lastScene
 	}
 	return
 }

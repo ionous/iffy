@@ -105,7 +105,9 @@ func imp_noun_assignment(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else if prop, e := imp_property(k, m.MapOf("$PROPERTY")); e != nil {
 		err = e
-	} else if e := reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun)); e != nil {
+	} else if e := k.Recent.Nouns.CollectSubjects(func() error {
+		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+	}); e != nil {
 		err = e
 	} else {
 		for _, noun := range k.Recent.Nouns.Subjects {

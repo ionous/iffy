@@ -19,7 +19,7 @@ type Importer struct {
 	oneTime     map[string]bool
 	decoder     *decode.Decoder
 	autoCounter int // helper for making auto variables.
-	gameDomain  ephemera.Named
+	entireGame  ephemera.Named
 	ParagraphEnv
 }
 
@@ -37,14 +37,18 @@ func NewImporterDecoder(srcURI string, db *sql.DB, dec *decode.Decoder) *Importe
 }
 
 func (k *Importer) NewName(name, category, ofs string) ephemera.Named {
-	domain := k.Current.Scene
+	domain := k.Current.Domain
 	if !domain.IsValid() {
-		if !k.gameDomain.IsValid() {
-			k.gameDomain = k.Recorder.NewName("Entire Game", tables.NAMED_SCENE, "internal")
-		}
-		domain = k.gameDomain
+		domain = k.gameDomain()
 	}
 	return k.Recorder.NewDomainName(domain, name, category, ofs)
+}
+
+func (k *Importer) gameDomain() ephemera.Named {
+	if !k.entireGame.IsValid() {
+		k.entireGame = k.Recorder.NewName("Entire Game", tables.NAMED_SCENE, "internal")
+	}
+	return k.entireGame
 }
 
 // return true if m is the first time once has been called with the specified string.
@@ -103,8 +107,9 @@ func (k *Importer) NewProg(typeName string, cmd interface{}) (ret ephemera.Prog,
 // NewImplicitField declares an assembler specified field
 func (k *Importer) NewImplicitField(field, kind, fieldType string) {
 	if src := "implicit " + kind + "." + field; k.Once(src) {
-		kKind := k.NewName(kind, tables.NAMED_KINDS, src)
-		kField := k.NewName(field, tables.NAMED_FIELD, src)
+		domain := k.gameDomain()
+		kKind := k.NewDomainName(domain, kind, tables.NAMED_KINDS, src)
+		kField := k.NewDomainName(domain, field, tables.NAMED_FIELD, src)
 		k.NewField(kKind, kField, fieldType)
 	}
 }
@@ -112,12 +117,13 @@ func (k *Importer) NewImplicitField(field, kind, fieldType string) {
 // NewImplicitAspect declares an assembler specified aspect and its traits
 func (k *Importer) NewImplicitAspect(aspect, kind string, traits ...string) {
 	if src := "implicit " + kind + "." + aspect; k.Once(src) {
-		kKind := k.NewName(kind, tables.NAMED_KINDS, src)
-		kAspect := k.NewName(aspect, tables.NAMED_ASPECT, src)
+		domain := k.gameDomain()
+		kKind := k.NewDomainName(domain, kind, tables.NAMED_KINDS, src)
+		kAspect := k.NewDomainName(domain, aspect, tables.NAMED_ASPECT, src)
 		k.NewAspect(kAspect)
 		k.NewField(kKind, kAspect, tables.PRIM_ASPECT)
 		for i, trait := range traits {
-			kTrait := k.NewName(trait, tables.NAMED_TRAIT, src)
+			kTrait := k.NewDomainName(domain, trait, tables.NAMED_TRAIT, src)
 			k.NewTrait(kTrait, kAspect, i)
 		}
 	}
