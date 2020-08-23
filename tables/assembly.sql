@@ -100,26 +100,26 @@ left join eph_named np
 	on (pv.idNamedProp = np.rowid);
 
 /* resolve value ephemera to nouns.
+	matches nouns by partial name, albeit in a preliminary way.
  */
 create temp view
 asm_noun as 
 	select *, ( 
-		select n.noun 
-		from mdl_name as n
-		where asm.name = n.name 
-	 	order by rank
-		limit 1 
+		select me.noun 
+		from mdl_name as me
+		where asm.name = me.name 
+	 	order by me.rank limit 1 
 	) as noun
 from asm_value as asm;
 
 /* resolve relative ephemera to strings.
  */
 create temp view
-asm_relative as
+asm_relative_name as
 select rel.rowid as idEphRel, 
-	na.name as noun, 
+	na.name as firstName, 
 	nv.name as stem,
-	nb.name as otherNoun
+	nb.name as secondName
 from eph_relative rel
 join eph_named na
 	on (rel.idNamedHead = na.rowid)
@@ -127,6 +127,23 @@ left join eph_named nv
 		on (rel.idNamedStem = nv.rowid)
 	left join eph_named nb
 		on (rel.idNamedDependent = nb.rowid);
+
+/* resolve relative ephemera to nouns.
+ */
+create temp view
+asm_relative as 
+select ar.idEphRel, 
+	( select me.noun from mdl_name me
+		where (me.name=ar.firstName) 
+		order by rank limit 1)
+	as firstNoun, 
+	ar.stem, 
+	( select me.noun from mdl_name me
+		where (me.name=ar.secondName) 
+		order by rank limit 1)
+	as secondNoun 
+from asm_relative_name ar
+where firstNoun is not null and secondNoun is not null;
 
 /* resolve relative ephemera to nouns and relations
 use left join(s) to return nulls for missing elements 
@@ -140,35 +157,35 @@ select
 	/* first contains the kind of the user specified noun;
 		swapped contains the kind of the relation 
 	*/
-	first.noun as noun, 
+	first.noun as firstNoun, 
 	case when instr((
 	 			select mk.kind || "," || mk.path || ","
 				from mdl_kind mk
 				where mk.kind = first.kind
-			),  swapped.kind || ",") 
+			),  swapped.firstKind || ",") 
 			then first.kind 
-	end as kind,
+	end as firstKind,
 
 	/* second contains the kind of the other user specified noun;
 		swapped contains the other kind of the relation
 	 */
-	second.noun as otherNoun,
+	second.noun as secondNoun,
 	case when instr((
 	 			select mk.kind || "," || mk.path || ","
 				from mdl_kind mk
 				where mk.kind = second.kind
-			),  swapped.otherKind || ",") 
+			),  swapped.secondKind || ",") 
 			then second.kind
-	end as otherKind
+	end as secondKind
 from (
 	select 
 		idEphRel,stem,relation,cardinality,
-		case swap when 1 then otherNoun else noun end as noun,
-		case swap when 1 then noun else otherNoun end as otherNoun,
-		case swap when 1 then otherKind else kind end as kind,
-		case swap when 1 then kind else otherKind end as otherKind
+		case swap when 1 then secondNoun else firstNoun end as firstNoun,
+		case swap when 1 then firstNoun else secondNoun end as secondNoun,
+		case swap when 1 then otherKind else kind end as firstKind,
+		case swap when 1 then kind else otherKind end as secondKind
 	from (
-		select *, (cardinality = 'one_one') and (noun > otherNoun) as swap
+		select *, (cardinality = 'one_one') and (ar.firstNoun > ar.secondNoun) as swap
 			from asm_relative ar
 			left join asm_verb mv
 				using (stem)
@@ -177,43 +194,44 @@ from (
 	)
 ) as swapped
 left join mdl_noun first
-	 on (first.noun = swapped.noun)
+	 on (first.noun = swapped.firstNoun)
 left join mdl_noun second 
-	on (second.noun = swapped.otherNoun);
+	on (second.noun = swapped.secondNoun);
+
 
 /* the bits of asm_relation which didnt make it into the mdl_pair table.
  */
 create temp view 
 asm_mismatch as
-select idEphRel, stem, relation, cardinality, noun, kind, otherNoun, otherKind
-from asm_relation asm
-where max(asm.relation, asm.kind, asm.otherKind) is null
-or case asm.cardinality
+select idEphRel, stem, relation, cardinality, firstNoun, firstKind, secondNoun, secondKind
+from asm_relation ar
+where max(ar.relation, ar.firstKind, ar.secondKind) is null
+or case ar.cardinality
 	when 'one_one' then
 	exists(
 		select 1 
 		from mdl_pair rel 
-		where (asm.relation = rel.relation) 
-		and ((asm.noun = rel.noun) and (asm.otherNoun != rel.otherNoun)
-		or (asm.otherNoun = rel.otherNoun) and (asm.noun != rel.noun))
+		where (ar.relation = rel.relation) 
+		and ((ar.firstNoun = rel.noun) and (ar.secondNoun != rel.otherNoun)
+		or (ar.secondNoun = rel.otherNoun) and (ar.firstNoun != rel.noun))
 	)
 	when 'one_any' then 
 	exists(
 		/* given otherNoun there is only one valid noun */
 		select 1 
 		from mdl_pair rel 
-		where (asm.relation = rel.relation)
-		and (asm.otherNoun = rel.otherNoun) 
-		and (asm.noun != rel.noun)
+		where (ar.relation = rel.relation)
+		and (ar.secondNoun = rel.otherNoun) 
+		and (ar.firstNoun != rel.noun)
 	)
 	when 'any_one' then 
 	exists(
 		/* given noun there is only one valid otherNoun */
 		select 1 
 		from mdl_pair rel 
-		where (asm.relation = rel.relation)
-		and (asm.noun = rel.noun) 
-		and (asm.otherNoun != rel.otherNoun)
+		where (ar.relation = rel.relation)
+		and (ar.firstNoun = rel.noun) 
+		and (ar.secondNoun != rel.otherNoun)
 	)
 end;
 

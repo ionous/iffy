@@ -21,7 +21,8 @@ type Fields struct {
 	ancestorsOf,
 	kindOf,
 	aspectOf,
-	nameOf *sql.Stmt
+	nameOf,
+	idOf *sql.Stmt
 }
 
 type keyType struct {
@@ -77,11 +78,19 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 		aspectOf: ps.Prep(db,
 			`select ifnull(max(aspect),"") from mdl_noun_traits 
 				where (noun||'.'||trait)=?`),
+		// given an id, find the name
 		nameOf: ps.Prep(db,
-			`select noun 
-				from mdl_name
-				where name=?
-				order by rank
+			`select me.name 
+				from mdl_name me
+				where me.noun=?
+				order by me.rank
+				limit 1`),
+		// given a name, find the id
+		idOf: ps.Prep(db,
+			`select me.noun 
+				from mdl_name me
+				where me.name=?
+				order by me.rank
 				limit 1`),
 	}
 	if e := ps.Err(); e != nil {
@@ -142,8 +151,12 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 		// note: uses the normalized member name, not the raw parameter name
 		switch field := key.member; field {
 		case object.Name:
-			// search for the full object name by a partial object name
+			// search for the object name using the object's id
 			ret, err = n.getCachingQuery(key, n.nameOf, obj)
+
+		case object.Id:
+			// search for the object id by a partial object name
+			ret, err = n.getCachingQuery(key, n.idOf, obj)
 
 		case object.Aspect:
 			// noun.trait; we use "max" in order to always return a value.
@@ -167,12 +180,10 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 			// see if the user is asking for the status of a trait
 			if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
 				err = e
+			} else if aspect := a.(string); len(aspect) > 0 {
+				ret, err = n.getCachingStatus(obj, aspect, field)
 			} else {
-				if aspect := a.(string); len(aspect) > 0 {
-					ret, err = n.getCachingStatus(obj, aspect, field)
-				} else {
-					ret, err = n.getCachingField(key)
-				}
+				ret, err = n.getCachingField(key)
 			}
 		}
 	}

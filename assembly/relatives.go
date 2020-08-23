@@ -4,14 +4,14 @@ package assembly
 func AssembleRelatives(asm *Assembler) error {
 	_, e := asm.cache.DB().Exec(`
 insert into mdl_pair( noun, relation, otherNoun )
-select distinct noun, relation, otherNoun from (
+select distinct firstNoun, relation, secondNoun from (
 	select *, row_number() over n1 as n1, row_number() over n2 as n2
 	from asm_relation
-	where max(noun, stem, otherNoun, relation, kind, otherKind) is not null
+	where max(firstNoun, stem, secondNoun, relation, firstKind, secondKind) is not null
 	window 
 	/* count the times the nouns appear in their respective columns */
-      n1 as (partition by relation,noun),
-	  n2 as (partition by relation,otherNoun)
+      n1 as (partition by relation,firstNoun),
+	  n2 as (partition by relation,secondNoun)
 ) 
 where case cardinality
 	when 'one_one'

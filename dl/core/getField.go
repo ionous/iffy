@@ -23,7 +23,7 @@ func (*GetField) Compose() composer.Spec {
 }
 
 func (op *GetField) GetBool(run rt.Runtime) (ret bool, err error) {
-	if p, e := op.GetValue(run); e != nil {
+	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
 		ret, err = GetBool(run, p)
@@ -32,7 +32,7 @@ func (op *GetField) GetBool(run rt.Runtime) (ret bool, err error) {
 }
 
 func (op *GetField) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if p, e := op.GetValue(run); e != nil {
+	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
 		ret, err = GetNumber(run, p)
@@ -41,7 +41,7 @@ func (op *GetField) GetNumber(run rt.Runtime) (ret float64, err error) {
 }
 
 func (op *GetField) GetText(run rt.Runtime) (ret string, err error) {
-	if p, e := op.GetValue(run); e != nil {
+	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
 		ret, err = GetText(run, p)
@@ -50,7 +50,7 @@ func (op *GetField) GetText(run rt.Runtime) (ret string, err error) {
 }
 
 func (op *GetField) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	if p, e := op.GetValue(run); e != nil {
+	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
 		ret, err = GetNumbers(run, p)
@@ -59,7 +59,7 @@ func (op *GetField) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error)
 }
 
 func (op *GetField) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	if p, e := op.GetValue(run); e != nil {
+	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
 		ret, err = GetTexts(run, p)
@@ -67,8 +67,7 @@ func (op *GetField) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
 	return
 }
 
-func (op *GetField) GetValue(run rt.Runtime) (ret interface{}, err error) {
-	// we Get a name like "target", and then we resolve it to the actual object via GetVariable.
+func (op *GetField) getValue(run rt.Runtime) (ret interface{}, err error) {
 	if name, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {

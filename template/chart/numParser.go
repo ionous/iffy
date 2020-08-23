@@ -37,6 +37,7 @@ func (n negate) mul(f float64) float64 {
 func (*NumParser) StateName() string {
 	return "num parser"
 }
+
 func (p *NumParser) GetOperand() (ret postfix.Function, err error) {
 	if n, e := p.GetValue(); e != nil {
 		err = e

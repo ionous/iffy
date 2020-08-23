@@ -23,32 +23,32 @@ func reportMissingKinds(asm *Assembler) (err error) {
 	return
 }
 
-// fix? what about alternative names ( aliases and partial names ) in the story text?
+// reports ephemera names which don't exist in the final name/noun table
 func reportMissingNouns(asm *Assembler) error {
 	return reportMissing(asm, "noun",
-		`select 1 from mdl_noun mn 
-			where name= mn.noun`)
+		`select 1 from mdl_name me
+			where named= me.name`)
 }
 
-// MissingFields returns named fields which don't have a defined property.
+// reports named fields which don't have a defined property.
 func reportMissingFields(asm *Assembler) error {
 	return reportMissing(asm, "field",
 		`select 1 from mdl_field mf
-		where name = mf.field`)
+		where named = mf.field`)
 }
 
 //
 func reportMissingTraits(asm *Assembler) error {
 	return reportMissing(asm, "trait",
 		`select 1 from mdl_aspect ma
-		where name = ma.trait`)
+		where named = ma.trait`)
 }
 
 //
 func reportMissingAspects(asm *Assembler) error {
 	return reportMissing(asm, "aspect",
 		`select 1 from mdl_aspect ma
-		where name = ma.aspect`)
+		where named = ma.aspect`)
 }
 
 // fix:
@@ -59,7 +59,8 @@ func reportMissingAspects(asm *Assembler) error {
 
 func reportMissing(asm *Assembler, cat, exists string) error {
 	var name, source, offset string
-	q := fmt.Sprintf(`select en.name, es.src, en.offset 
+	// select the original author specified names
+	q := fmt.Sprintf(`select en.name as named, es.src, en.offset 
 		from eph_named en
 		left join eph_source es 
 			on (en.idSource = es.rowid)

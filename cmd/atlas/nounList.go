@@ -19,12 +19,12 @@ func listOfNouns(w io.Writer, db *sql.DB) (err error) {
 	var nouns []Noun
 	var name, kind, spec string
 	if e := tables.QueryAll(db, `
-		select noun, kind, coalesce((
-			select spec from mdl_spec 
-			where type='noun' and name=noun
+		select mn.noun, mn.kind, coalesce((
+			select ms.spec from mdl_spec ms
+			where ms.type='noun' and ms.name=mn.noun
 			limit 1), '')
-		from mdl_noun
-		order by noun`,
+		from mdl_noun mn
+		order by mn.noun`,
 		func() (err error) {
 			var prop, value, rel string
 			var props []Prop

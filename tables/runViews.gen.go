@@ -41,7 +41,7 @@ func runViewsTemplate() string {
 		"union all \n" +
 		"select noun, field, value, \n" +
 		"\tinstr(mk.kind || \",\" || mk.path || \",\", md.kind || \",\") as tier\n" +
-		"\tfrom mdl_noun mn\n" +
+		"\tfrom mdl_noun\n" +
 		"\tjoin mdl_kind mk\n" +
 		"\tusing (kind)\n" +
 		"\tjoin mdl_default md\n" +

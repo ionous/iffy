@@ -67,11 +67,11 @@ func collectNouns(db *sql.DB) (ret []modeledNoun, err error) {
 	var curr modeledNoun
 	var nouns []modeledNoun
 	if e := tables.QueryAll(db,
-		`select n.name, i.kind, n.rank
-		from mdl_name n 
-		join mdl_noun i
-			on (n.noun = i.noun)
-		order by i.noun, rank, name`,
+		`select me.name, mn.kind, me.rank
+		from mdl_name me
+		join mdl_noun mn
+			using (noun)
+		order by me.noun, me.rank, me.name`,
 		func() (err error) {
 			nouns = append(nouns, curr)
 			return

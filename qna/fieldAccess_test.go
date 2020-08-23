@@ -36,12 +36,14 @@ func TestFieldAccess(t *testing.T) {
 		}
 		els := existence
 		for _, v := range els {
-			if p, e := q.GetField(v.name, object.Exists); e != nil {
-				t.Fatal("existence", v.name, e)
+			tgt := v.name
+			name := assembly.DomainNameOf("test", tgt)
+			if p, e := q.GetField(name, object.Exists); e != nil {
+				t.Fatal("existence", name, e)
 			} else if exists, e := assign.ToBool(p); e != nil {
 				t.Fatal("assign", e)
 			} else if v.exists != exists {
-				t.Fatal("existence", v.name, "wanted", v.exists)
+				t.Fatal("existence", name, "wanted", v.exists)
 			}
 		}
 	})
@@ -50,12 +52,13 @@ func TestFieldAccess(t *testing.T) {
 		els := FieldTest.kindsOfNoun
 		for i, cnt := 0, len(els); i < cnt; i += 2 {
 			tgt, field := els[i], els[i+1]
-			if p, e := q.GetField(tgt, object.Kind); e != nil {
+			name := assembly.DomainNameOf("test", tgt)
+			if p, e := q.GetField(name, object.Kind); e != nil {
 				t.Fatal(e)
 			} else if kind, e := assign.ToString(p); e != nil {
 				t.Fatal("assign", e)
 			} else if kind != field {
-				t.Fatal("mismatch", tgt, field, "got:", kind, "expected:", field)
+				t.Fatal("mismatch", name, field, "got:", kind, "expected:", field)
 			}
 		}
 		if k, e := q.GetField("speedboat", object.Kind); e == nil {
@@ -67,38 +70,41 @@ func TestFieldAccess(t *testing.T) {
 		els := FieldTest.pathsOfNoun
 		for i, cnt := 0, len(els); i < cnt; i += 2 {
 			tgt, field := els[i], els[i+1]
+			name := assembly.DomainNameOf("test", tgt)
 			// asking for "Kinds" should get us the hierarchy
-			if p, e := q.GetField(tgt, object.Kinds); e != nil {
+			if p, e := q.GetField(name, object.Kinds); e != nil {
 				t.Fatal(e)
 			} else if path, e := assign.ToString(p); e != nil {
 				t.Fatal("assign", e)
 			} else if path != field {
-				t.Fatal("mismatch", tgt, field, "got:", tgt, "expected:", field)
+				t.Fatal("mismatch", name, field, "got:", name, "expected:", field)
 			}
 		}
 		if path, e := q.GetField("speedboat", object.Kinds); e == nil {
 			t.Fatal("expected error; got", path)
 		}
 	})
-	t.Run("get text", func(t *testing.T) {
+	t.Run("get_text", func(t *testing.T) {
 		els := FieldTest.txtValues
 		for i, cnt := 0, len(els); i < cnt; i += 3 {
-			name, field, value := els[i].(string), els[i+1].(string), els[i+2].(string)
+			tgt, field, value := els[i].(string), els[i+1].(string), els[i+2].(string)
+			name := assembly.DomainNameOf("test", tgt)
 			for i := 0; i < 2; i++ {
 				if p, e := q.GetField(name, field); e != nil {
 					t.Fatal(e)
 				} else if txt, e := assign.ToString(p); e != nil {
 					t.Fatal("assign", e)
 				} else if txt != value {
-					t.Fatalf("mismatch %s.%s got:%q expected:%q", name, field, txt, value)
+					t.Fatalf("mismatch %s.%s got:%q expected:%q", tgt, field, txt, value)
 				}
 			}
 		}
 	})
-	t.Run("get numbers", func(t *testing.T) {
+	t.Run("get_numbers", func(t *testing.T) {
 		els := FieldTest.numValues
 		for i, cnt := 0, len(els); i < cnt; i += 3 {
-			name, field, value := els[i].(string), els[i+1].(string), els[i+2].(float64)
+			tgt, field, value := els[i].(string), els[i+1].(string), els[i+2].(float64)
+			name := assembly.DomainNameOf("test", tgt)
 			for i := 0; i < 2; i++ {
 				if p, e := q.GetField(name, field); e != nil {
 					t.Fatal(e)
@@ -110,10 +116,11 @@ func TestFieldAccess(t *testing.T) {
 			}
 		}
 	})
-	t.Run("get traits", func(t *testing.T) {
+	t.Run("get_traits", func(t *testing.T) {
 		els := FieldTest.boolValues
 		for i, cnt := 0, len(els); i < cnt; i += 2 {
-			name, csv := els[i].(string), els[i+1].(string)
+			tgt, csv := els[i].(string), els[i+1].(string)
+			name := assembly.DomainNameOf("test", tgt)
 			if e := testTraits(q, name, csv); e != nil {
 				t.Fatal(e)
 			}
@@ -121,33 +128,36 @@ func TestFieldAccess(t *testing.T) {
 	})
 	t.Run("change traits", func(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
-		if e := q.SetField("apple", "a", "y"); e != nil {
+		apple := assembly.DomainNameOf("test", "apple")
+		boat := assembly.DomainNameOf("test", "boat")
+		toyBoat := assembly.DomainNameOf("test", "toy boat")
+		if e := q.SetField(apple, "a", "y"); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField("apple", "a"); e != nil {
+		} else if v, e := q.GetField(apple, "a"); e != nil {
 			t.Fatal(e)
 		} else if str := v.(string); str != "y" {
 			t.Fatal("mismatch", str)
-		} else if e := testTraits(q, "apple", "y,w,x"); e != nil {
+		} else if e := testTraits(q, apple, "y,w,x"); e != nil {
 			t.Fatal(e)
 		}
 		// boat.B has a default value of zz
-		if e := q.SetField("boat", "z", true); e != nil {
+		if e := q.SetField(boat, "z", true); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField("boat", "b"); e != nil {
+		} else if v, e := q.GetField(boat, "b"); e != nil {
 			t.Fatal(e)
 		} else if str := v.(string); str != "z" {
 			t.Fatal("mismatch", str)
-		} else if e := testTraits(q, "boat", "z, zz"); e != nil {
+		} else if e := testTraits(q, boat, "z, zz"); e != nil {
 			t.Fatal(e)
 		}
 		// toy boat.A has an initial value of y
-		if e := q.SetField("toy boat", "w", true); e != nil {
+		if e := q.SetField(toyBoat, "w", true); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField("toy boat", "a"); e != nil {
+		} else if v, e := q.GetField(toyBoat, "a"); e != nil {
 			t.Fatal(e)
 		} else if str := v.(string); str != "w" {
 			t.Fatal("mismatch", str)
-		} else if e := testTraits(q, "toy boat", "w,x,y"); e != nil {
+		} else if e := testTraits(q, toyBoat, "w,x,y"); e != nil {
 			t.Fatal(e)
 		}
 	})

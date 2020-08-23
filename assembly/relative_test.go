@@ -3,6 +3,7 @@ package assembly
 import (
 	"database/sql"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/ionous/errutil"
@@ -96,6 +97,9 @@ func matchRelatives(db *sql.DB, want ...string) (err error) {
 			from mdl_pair
 			order by relation, noun, otherNoun`,
 		func() (err error) {
+			// strip off namespace for test comparisons
+			b = strings.Split(b, "::")[1]
+			c = strings.Split(c, "::")[1]
 			have = append(have, a, b, c)
 			return
 		},
@@ -121,11 +125,13 @@ func TestOneToOneViolations(t *testing.T) {
 				var a, b, c string
 				var have []string
 				if e := tables.QueryAll(asm.db,
-					`select distinct coalesce(noun, ''), 
+					`select distinct coalesce(firstNoun, ''), 
 									 coalesce(stem, ''), 
-									 coalesce(otherNoun, '')
+									 coalesce(secondNoun, '')
 					from asm_mismatch`,
 					func() (err error) {
+						a = strings.Split(a, "::")[1]
+						c = strings.Split(c, "::")[1]
 						have = append(have, a, b, c)
 						return
 					},

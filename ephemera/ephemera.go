@@ -118,7 +118,7 @@ func (r *Recorder) NewRelation(relation, primaryKind, secondaryKind Named, cardi
 	r.cache.Must(eph_relation, relation, primaryKind, secondaryKind, cardinality)
 }
 
-// NewRelative connects two specific nouns using a verb stem.
+// NewRelative connects two named nouns using a verb stem.
 func (r *Recorder) NewRelative(primary, stem, secondary Named) {
 	r.cache.Must(eph_relative, primary, stem, secondary)
 }

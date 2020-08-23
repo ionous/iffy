@@ -8,7 +8,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
-	"github.com/kr/pretty"
 )
 
 func newRule(rd pattern.Rule) r.Value {
@@ -59,7 +58,7 @@ func (n *Fields) getCachingRules(key keyType, pattern, patternType string) (ret 
 			rules := rs.Interface()
 			n.pairs[key] = rules
 			ret = rules
-			pretty.Println(rules)
+			// pretty.Println(rules)
 		}
 	}
 	return

@@ -6,6 +6,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 	"github.com/reiver/go-porterstemmer"
 )
@@ -58,6 +59,17 @@ func (m *Assembler) WriteDefault(kind, field string, value interface{}) error {
 	return e
 }
 
+func DomainNameOf(domain, noun string) string {
+	var b strings.Builder
+	b.WriteRune('#')
+	if len(domain) > 0 {
+		b.WriteString(domain)
+		b.WriteString("::")
+	}
+	b.WriteString(lang.Camelize(noun))
+	return b.String()
+}
+
 func (m *Assembler) WriteNoun(noun, kind string) error {
 	_, e := m.cache.Exec(mdl_noun, noun, kind)
 	return e
@@ -69,18 +81,21 @@ func (m *Assembler) WriteName(noun, name string, rank int) error {
 	return e
 }
 
-// WriteNounWithNames
-func (m *Assembler) WriteNounWithNames(noun, kind string) (err error) {
-	if e := m.WriteNoun(noun, kind); e != nil {
+// WriteNounWithNames writes the noun to the model,
+// and splits the name into separate space separated words.
+// each word is recorded as a possible reference to the noun.
+func (m *Assembler) WriteNounWithNames(domain, noun, kind string) (err error) {
+	id := DomainNameOf(domain, noun)
+	if e := m.WriteNoun(id, kind); e != nil {
 		err = errutil.Append(err, e)
-	} else if e := m.WriteName(noun, noun, 0); e != nil {
+	} else if e := m.WriteName(id, noun, 0); e != nil {
 		err = errutil.Append(err, e)
 	} else {
 		split := strings.Fields(noun)
 		if cnt := len(split); cnt > 1 {
 			for i, k := range split {
 				rank := cnt - i
-				if e := m.WriteName(noun, k, rank); e != nil {
+				if e := m.WriteName(id, k, rank); e != nil {
 					err = errutil.Append(err, e)
 				}
 			}

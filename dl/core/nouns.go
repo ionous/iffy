@@ -35,7 +35,7 @@ func (*CommonNoun) Compose() composer.Spec {
 }
 
 func (op *CommonNoun) GetText(run rt.Runtime) (ret string, err error) {
-	return getObjectFullName(run, op)
+	return getObjectId(run, op)
 }
 
 func (op *CommonNoun) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -57,7 +57,7 @@ func (*ProperNoun) Compose() composer.Spec {
 }
 
 func (op *ProperNoun) GetText(run rt.Runtime) (ret string, err error) {
-	return getObjectFullName(run, op)
+	return getObjectId(run, op)
 }
 
 func (op *ProperNoun) GetBool(run rt.Runtime) (ret bool, err error) {

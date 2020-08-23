@@ -57,9 +57,10 @@ func AddTestHierarchy(m *Assembler, els ...string) (err error) {
 // mdl_noun:  kind, ret id noun
 // mdl_name: noun, name, rank
 func AddTestNouns(m *Assembler, els ...string) (err error) {
+	domain := "test"
 	for i, cnt := 0, len(els); i < cnt; i += 2 {
 		noun, kind := els[i], els[i+1]
-		if e := m.WriteNounWithNames(noun, kind); e != nil {
+		if e := m.WriteNounWithNames(domain, noun, kind); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
@@ -99,7 +100,8 @@ func AddTestTraits(m *Assembler, els ...string) (err error) {
 func AddTestStarts(m *Assembler, els ...interface{}) (err error) {
 	for i, cnt := 0, len(els); i < cnt; i += 3 {
 		noun, field, value := els[i], els[i+1], els[i+2]
-		if e := m.WriteStart(noun.(string), field.(string), value); e != nil {
+		name := DomainNameOf("test", noun.(string))
+		if e := m.WriteStart(name, field.(string), value); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

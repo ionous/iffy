@@ -20,7 +20,9 @@ func AssembleNouns(asm *Assembler) (err error) {
 	if e := tables.QueryAll(asm.cache.DB(),
 		// note: nk is known to refer to kinds b/c it comes from eph_noun.idNamedKind
 		// therefore, we dont have to filter where category=kind(s).
-		`select nn.name, nk.name, coalesce(ak.path, "")
+		`select nn.name, nk.name, coalesce(ak.path, ""), coalesce(
+			(select dn.name from eph_named dn 
+				where (dn.rowid = nn.domain)), "" ) as domain
 		from eph_noun en 
 		join eph_named nn
 			on (en.idNamedNoun = nn.rowid)
@@ -37,11 +39,16 @@ func AssembleNouns(asm *Assembler) (err error) {
 				curr.kind.set(curr.kind.getAncestry())
 				last = curr
 			} else {
+				if last.domain != curr.domain {
+					asm.reportIssuef("noun %q has conflicting domains %q %q",
+						curr.noun, last.domain, curr.domain)
+					last.domain = curr.domain // silent future warnings
+				}
 				last.kind.update(&curr.kind)
 			}
 			return
 		},
-		&curr.noun, &curr.kind.name, &curr.kind.parents,
+		&curr.noun, &curr.kind.name, &curr.kind.parents, &curr.domain,
 	); e != nil {
 		err = e
 	} else {
@@ -58,8 +65,9 @@ func AssembleNouns(asm *Assembler) (err error) {
 }
 
 type nounInfo struct {
-	noun string
-	kind hierarchy
+	noun   string
+	domain string    // fix: eventually, probably, a hierarchy
+	kind   hierarchy // tracks all mentioned kinds, and tries to determine a lowest common ancestor
 }
 
 func (p *nounInfo) flush(store *nounStore) {
@@ -77,9 +85,9 @@ type nounStore struct {
 func (store *nounStore) writeNouns(m *Assembler) (err error) {
 	for _, p := range store.list {
 		if !p.kind.valid {
-			e := errutil.New("couldnt determine valid lowest common ancestor")
+			e := errutil.New("couldnt determine valid lowest common kind")
 			err = errutil.Append(err, e)
-		} else if e := m.WriteNounWithNames(p.noun, p.kind.name); e != nil {
+		} else if e := m.WriteNounWithNames(p.domain, p.noun, p.kind.name); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

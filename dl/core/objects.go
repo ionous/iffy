@@ -13,7 +13,7 @@ import (
 // Implementations also generally implement GetText and GetBool
 type ObjectRef interface {
 	GetObjectRef(run rt.Runtime) (retName string, retExact bool, err error)
-	rt.TextEval // see getObjectFullName
+	rt.TextEval // see getObjectId
 	rt.BoolEval // see getObjectExists
 }
 
@@ -52,7 +52,7 @@ func (*ObjectName) Compose() composer.Spec {
 }
 
 func (op *ObjectName) GetText(run rt.Runtime) (ret string, err error) {
-	return getObjectFullName(run, op)
+	return getObjectId(run, op)
 }
 
 func (op *ObjectName) GetBool(run rt.Runtime) (ret bool, err error) {
@@ -69,7 +69,7 @@ func (op *ObjectName) GetObjectRef(run rt.Runtime) (ret string, exact bool, err 
 }
 
 func getObjectExists(run rt.Runtime, ref ObjectRef) (okay bool, err error) {
-	if n, e := getObjectFullName(run, ref); e != nil {
+	if n, e := getObjectId(run, ref); e != nil {
 		err = e
 	} else {
 		okay = len(n) > 0
@@ -78,7 +78,7 @@ func getObjectExists(run rt.Runtime, ref ObjectRef) (okay bool, err error) {
 }
 
 // returns the object's full name
-func getObjectFullName(run rt.Runtime, ref ObjectRef) (ret string, err error) {
+func getObjectId(run rt.Runtime, ref ObjectRef) (ret string, err error) {
 	if name, exactly, e := ref.GetObjectRef(run); e != nil {
 		err = e
 	} else if exactly {
@@ -89,32 +89,28 @@ func getObjectFullName(run rt.Runtime, ref ObjectRef) (ret string, err error) {
 	return
 }
 
+// find an object with the passed partial name; return its id
 func getObjectExactly(run rt.Runtime, name string) (ret string, err error) {
-	if b, e := run.GetField(name, object.Exists); e != nil {
+	if id, e := run.GetField(name, object.Id); e != nil {
 		err = e
-	} else if exists, e := assign.ToBool(b); e != nil {
-		err = e
-	} else if exists {
-		ret = name
+	} else {
+		ret, err = assign.ToString(id)
 	}
 	return
 }
 
+// first look for a variable named "name" in scope, unbox it if need be return the object's id.
 func getObjectInexactly(run rt.Runtime, name string) (ret string, err error) {
-	// first look for the name in scope, the top scope (NounScope) will look globally if need be.
 	if local, e := run.GetVariable(name); e != nil {
 		err = e
 	} else if str, e := assign.ToString(local); e != nil {
 		err = e
+	} else if strings.HasPrefix(str, "#") {
+		ret = str // ids start with prefix #
+	} else if id, e := run.GetField(str, object.Id); e != nil {
+		err = e
 	} else {
-		// then, search by inexact name of the unpacked local
-		// ( fix? if its from NounScope, then this is a double lookup;
-		// maybe NounScope isnt needed now that we have ObjectName )
-		if n, e := run.GetField(str, object.Name); e != nil {
-			err = e
-		} else {
-			ret, err = assign.ToString(n)
-		}
+		ret, err = assign.ToString(id)
 	}
 	return
 }

@@ -30,7 +30,7 @@ select noun, field, value, 0 as tier
 union all 
 select noun, field, value, 
 	instr(mk.kind || "," || mk.path || ",", md.kind || ",") as tier
-	from mdl_noun mn
+	from mdl_noun
 	join mdl_kind mk
 	using (kind)
 	join mdl_default md

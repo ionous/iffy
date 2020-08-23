@@ -111,26 +111,26 @@ func assemblyTemplate() string {
 		"\ton (pv.idNamedProp = np.rowid);\n" +
 		"\n" +
 		"/* resolve value ephemera to nouns.\n" +
+		"\tmatches nouns by partial name, albeit in a preliminary way.\n" +
 		" */\n" +
 		"create temp view\n" +
 		"asm_noun as \n" +
 		"\tselect *, ( \n" +
-		"\t\tselect n.noun \n" +
-		"\t\tfrom mdl_name as n\n" +
-		"\t\twhere asm.name = n.name \n" +
-		"\t \torder by rank\n" +
-		"\t\tlimit 1 \n" +
+		"\t\tselect me.noun \n" +
+		"\t\tfrom mdl_name as me\n" +
+		"\t\twhere asm.name = me.name \n" +
+		"\t \torder by me.rank limit 1 \n" +
 		"\t) as noun\n" +
 		"from asm_value as asm;\n" +
 		"\n" +
 		"/* resolve relative ephemera to strings.\n" +
 		" */\n" +
 		"create temp view\n" +
-		"asm_relative as\n" +
+		"asm_relative_name as\n" +
 		"select rel.rowid as idEphRel, \n" +
-		"\tna.name as noun, \n" +
+		"\tna.name as firstName, \n" +
 		"\tnv.name as stem,\n" +
-		"\tnb.name as otherNoun\n" +
+		"\tnb.name as secondName\n" +
 		"from eph_relative rel\n" +
 		"join eph_named na\n" +
 		"\ton (rel.idNamedHead = na.rowid)\n" +
@@ -138,6 +138,23 @@ func assemblyTemplate() string {
 		"\t\ton (rel.idNamedStem = nv.rowid)\n" +
 		"\tleft join eph_named nb\n" +
 		"\t\ton (rel.idNamedDependent = nb.rowid);\n" +
+		"\n" +
+		"/* resolve relative ephemera to nouns.\n" +
+		" */\n" +
+		"create temp view\n" +
+		"asm_relative as \n" +
+		"select ar.idEphRel, \n" +
+		"\t( select me.noun from mdl_name me\n" +
+		"\t\twhere (me.name=ar.firstName) \n" +
+		"\t\torder by rank limit 1)\n" +
+		"\tas firstNoun, \n" +
+		"\tar.stem, \n" +
+		"\t( select me.noun from mdl_name me\n" +
+		"\t\twhere (me.name=ar.secondName) \n" +
+		"\t\torder by rank limit 1)\n" +
+		"\tas secondNoun \n" +
+		"from asm_relative_name ar\n" +
+		"where firstNoun is not null and secondNoun is not null;\n" +
 		"\n" +
 		"/* resolve relative ephemera to nouns and relations\n" +
 		"use left join(s) to return nulls for missing elements \n" +
@@ -151,35 +168,35 @@ func assemblyTemplate() string {
 		"\t/* first contains the kind of the user specified noun;\n" +
 		"\t\tswapped contains the kind of the relation \n" +
 		"\t*/\n" +
-		"\tfirst.noun as noun, \n" +
+		"\tfirst.noun as firstNoun, \n" +
 		"\tcase when instr((\n" +
 		"\t \t\t\tselect mk.kind || \",\" || mk.path || \",\"\n" +
 		"\t\t\t\tfrom mdl_kind mk\n" +
 		"\t\t\t\twhere mk.kind = first.kind\n" +
-		"\t\t\t),  swapped.kind || \",\") \n" +
+		"\t\t\t),  swapped.firstKind || \",\") \n" +
 		"\t\t\tthen first.kind \n" +
-		"\tend as kind,\n" +
+		"\tend as firstKind,\n" +
 		"\n" +
 		"\t/* second contains the kind of the other user specified noun;\n" +
 		"\t\tswapped contains the other kind of the relation\n" +
 		"\t */\n" +
-		"\tsecond.noun as otherNoun,\n" +
+		"\tsecond.noun as secondNoun,\n" +
 		"\tcase when instr((\n" +
 		"\t \t\t\tselect mk.kind || \",\" || mk.path || \",\"\n" +
 		"\t\t\t\tfrom mdl_kind mk\n" +
 		"\t\t\t\twhere mk.kind = second.kind\n" +
-		"\t\t\t),  swapped.otherKind || \",\") \n" +
+		"\t\t\t),  swapped.secondKind || \",\") \n" +
 		"\t\t\tthen second.kind\n" +
-		"\tend as otherKind\n" +
+		"\tend as secondKind\n" +
 		"from (\n" +
 		"\tselect \n" +
 		"\t\tidEphRel,stem,relation,cardinality,\n" +
-		"\t\tcase swap when 1 then otherNoun else noun end as noun,\n" +
-		"\t\tcase swap when 1 then noun else otherNoun end as otherNoun,\n" +
-		"\t\tcase swap when 1 then otherKind else kind end as kind,\n" +
-		"\t\tcase swap when 1 then kind else otherKind end as otherKind\n" +
+		"\t\tcase swap when 1 then secondNoun else firstNoun end as firstNoun,\n" +
+		"\t\tcase swap when 1 then firstNoun else secondNoun end as secondNoun,\n" +
+		"\t\tcase swap when 1 then otherKind else kind end as firstKind,\n" +
+		"\t\tcase swap when 1 then kind else otherKind end as secondKind\n" +
 		"\tfrom (\n" +
-		"\t\tselect *, (cardinality = 'one_one') and (noun > otherNoun) as swap\n" +
+		"\t\tselect *, (cardinality = 'one_one') and (ar.firstNoun > ar.secondNoun) as swap\n" +
 		"\t\t\tfrom asm_relative ar\n" +
 		"\t\t\tleft join asm_verb mv\n" +
 		"\t\t\t\tusing (stem)\n" +
@@ -188,43 +205,44 @@ func assemblyTemplate() string {
 		"\t)\n" +
 		") as swapped\n" +
 		"left join mdl_noun first\n" +
-		"\t on (first.noun = swapped.noun)\n" +
+		"\t on (first.noun = swapped.firstNoun)\n" +
 		"left join mdl_noun second \n" +
-		"\ton (second.noun = swapped.otherNoun);\n" +
+		"\ton (second.noun = swapped.secondNoun);\n" +
+		"\n" +
 		"\n" +
 		"/* the bits of asm_relation which didnt make it into the mdl_pair table.\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_mismatch as\n" +
-		"select idEphRel, stem, relation, cardinality, noun, kind, otherNoun, otherKind\n" +
-		"from asm_relation asm\n" +
-		"where max(asm.relation, asm.kind, asm.otherKind) is null\n" +
-		"or case asm.cardinality\n" +
+		"select idEphRel, stem, relation, cardinality, firstNoun, firstKind, secondNoun, secondKind\n" +
+		"from asm_relation ar\n" +
+		"where max(ar.relation, ar.firstKind, ar.secondKind) is null\n" +
+		"or case ar.cardinality\n" +
 		"\twhen 'one_one' then\n" +
 		"\texists(\n" +
 		"\t\tselect 1 \n" +
 		"\t\tfrom mdl_pair rel \n" +
-		"\t\twhere (asm.relation = rel.relation) \n" +
-		"\t\tand ((asm.noun = rel.noun) and (asm.otherNoun != rel.otherNoun)\n" +
-		"\t\tor (asm.otherNoun = rel.otherNoun) and (asm.noun != rel.noun))\n" +
+		"\t\twhere (ar.relation = rel.relation) \n" +
+		"\t\tand ((ar.firstNoun = rel.noun) and (ar.secondNoun != rel.otherNoun)\n" +
+		"\t\tor (ar.secondNoun = rel.otherNoun) and (ar.firstNoun != rel.noun))\n" +
 		"\t)\n" +
 		"\twhen 'one_any' then \n" +
 		"\texists(\n" +
 		"\t\t/* given otherNoun there is only one valid noun */\n" +
 		"\t\tselect 1 \n" +
 		"\t\tfrom mdl_pair rel \n" +
-		"\t\twhere (asm.relation = rel.relation)\n" +
-		"\t\tand (asm.otherNoun = rel.otherNoun) \n" +
-		"\t\tand (asm.noun != rel.noun)\n" +
+		"\t\twhere (ar.relation = rel.relation)\n" +
+		"\t\tand (ar.secondNoun = rel.otherNoun) \n" +
+		"\t\tand (ar.firstNoun != rel.noun)\n" +
 		"\t)\n" +
 		"\twhen 'any_one' then \n" +
 		"\texists(\n" +
 		"\t\t/* given noun there is only one valid otherNoun */\n" +
 		"\t\tselect 1 \n" +
 		"\t\tfrom mdl_pair rel \n" +
-		"\t\twhere (asm.relation = rel.relation)\n" +
-		"\t\tand (asm.noun = rel.noun) \n" +
-		"\t\tand (asm.otherNoun != rel.otherNoun)\n" +
+		"\t\twhere (ar.relation = rel.relation)\n" +
+		"\t\tand (ar.firstNoun = rel.noun) \n" +
+		"\t\tand (ar.secondNoun != rel.otherNoun)\n" +
 		"\t)\n" +
 		"end;\n" +
 		"\n" +

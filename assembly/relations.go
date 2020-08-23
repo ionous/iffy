@@ -26,7 +26,7 @@ type relStore struct {
 func (store *relStore) write(m *Assembler) (err error) {
 	for _, p := range store.list {
 		if !p.kind.valid || !p.otherKind.valid {
-			e := errutil.New("couldnt determine valid lowest common ancestor")
+			e := errutil.New("couldnt determine valid lowest common relation")
 			err = errutil.Append(err, e)
 		} else if e := m.WriteRelation(p.relation, p.kind.name,
 			p.cardinality, p.otherKind.name); e != nil {

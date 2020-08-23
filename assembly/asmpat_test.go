@@ -71,7 +71,6 @@ func TestRuleAsm(t *testing.T) {
 			if e := copyRules(asm.db); e != nil {
 				t.Fatal(e)
 			} else {
-
 				var buf strings.Builder
 				tables.WriteCsv(asm.db, &buf, "select count() from mdl_rule", 1)
 				if have, want := buf.String(), lines(

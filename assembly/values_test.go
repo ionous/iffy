@@ -112,9 +112,12 @@ func matchValues(db *sql.DB, want ...interface{}) (err error) {
 	var a, b, c interface{}
 	var have []interface{}
 	if e := tables.QueryAll(db,
-		`select noun, field, value 
-			from mdl_start
-			order by noun, field, value`,
+		`select (select me.name from mdl_name me  
+				where (me.noun = mv.noun) 
+				order by rank limit 1) as name,  
+		field, value 
+			from mdl_start mv
+			order by mv.noun, mv.field, mv.value`,
 		func() (err error) {
 			have = append(have, a, b, c)
 			return

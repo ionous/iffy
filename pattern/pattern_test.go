@@ -68,10 +68,10 @@ func (m *patternRuntime) GetField(name, field string) (ret interface{}, err erro
 		if p, ok := m.patternMap[name]; ok {
 			ret = p
 		} else {
-			err = errutil.New("unknown pattern", field)
+			err = errutil.New("patternRuntime: unknown pattern", field)
 		}
 	default:
-		err = errutil.New("unknown field", field)
+		err = errutil.New("patternRuntime: unknown field", field)
 	}
 	return
 }
