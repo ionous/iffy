@@ -47,7 +47,7 @@ func (*ObjectName) Compose() composer.Spec {
 		Name:  "object_name",
 		Group: "objects",
 		Desc:  "ObjectName: Returns a noun's full name, can also be used in true/false statements to determine if the named noun exists.",
-		Spec:  "the object named {?exactly} {name:text_eval}",
+		Spec:  "object named {?exactly} {name:text_eval}",
 	}
 }
 
@@ -120,7 +120,7 @@ func (*KindOf) Compose() composer.Spec {
 		Name:  "kind_of",
 		Group: "objects",
 		Desc:  "Kind Of: Friendly name of the object's kind.",
-		Spec:  "the kind of {object%obj:object_ref}",
+		Spec:  "kind of {object%obj:object_ref}",
 	}
 }
 

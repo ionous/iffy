@@ -16,7 +16,7 @@ func (*MakeSingular) Compose() composer.Spec {
 		Name:  "singularize",
 		Group: "format",
 		Desc:  "Singularize: Returns the singular form of a plural word. (ex. apple for apples )",
-		Spec:  "the singular of {text:text_eval}",
+		Spec:  "the singular {text:text_eval}",
 	}
 }
 

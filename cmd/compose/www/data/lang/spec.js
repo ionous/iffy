@@ -887,7 +887,7 @@ const spec = [
       "objects"
     ],
     "name": "kind_of",
-    "spec": "the kind of {object%obj:object_ref}",
+    "spec": "kind of {object%obj:object_ref}",
     "uses": "run",
     "with": {
       "slots": [
@@ -986,7 +986,7 @@ const spec = [
       "objects"
     ],
     "name": "object_name",
-    "spec": "the object named {?exactly} {name:text_eval}",
+    "spec": "object named {?exactly} {name:text_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -1372,7 +1372,7 @@ const spec = [
       "format"
     ],
     "name": "singularize",
-    "spec": "the singular of {text:text_eval}",
+    "spec": "the singular {text:text_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -1472,7 +1472,7 @@ const spec = [
       "tests"
     ],
     "name": "test_output",
-    "spec": "expect the text {lines|quote} when running: {activity%go+execute|ghost}",
+    "spec": "expects the output {lines|quote} when running: {activity%go+execute|ghost}",
     "uses": "run",
     "with": {
       "slots": [

@@ -24,7 +24,7 @@ type TestOutput struct {
 func (*TestOutput) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "test_output",
-		Spec:  "expect the text {lines|quote} when running: {activity%go+execute|ghost}",
+		Spec:  "expects the output {lines|quote} when running: {activity%go+execute|ghost}",
 		Group: "tests",
 		Desc:  "Test Output: Run some statements, and expect that their output matches a specific value.",
 	}

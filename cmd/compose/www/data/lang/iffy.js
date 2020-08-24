@@ -14,9 +14,9 @@ function localLang(make) {
   });
 
   make.group("Tests", function() {
-
+    // "testing" is an interface, currently with one implementation type: TestOutput
     make.run("test_statement", "story_statement",
-      "For the test {test name%name:text|quote}, {test type%test:testing}");
+      "The test {test name%name:text|quote} {expects%test:testing}");
 
     make.run("test_scene", "story_statement",
       "During the test {test name%name:text|quote}: {+story_statement}");
@@ -68,7 +68,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
        `Pattern variables: Storage for values used during the execution of a pattern.`);
 
     make.opt("pattern_type", "an {activity:patterned_activity} or a {value:variable_type}");
-    make.str("patterned_activity", "{activity}");
+    make.str("patterned_activity", "{an activity%activity}");
     make.str("pattern_name");
 
     // pattern handler
