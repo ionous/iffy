@@ -167,6 +167,8 @@ func newFieldAccessTest(t *testing.T, dbloc string) (ret *sql.DB) {
 	db := newQnaDB(t, dbloc)
 	if e := tables.CreateModel(db); e != nil {
 		t.Fatal(e)
+	} else if e := tables.CreateRun(db); e != nil {
+		t.Fatal(e)
 	} else if e := tables.CreateRunViews(db); e != nil {
 		t.Fatal(e)
 	} else {
@@ -182,6 +184,8 @@ func newFieldAccessTest(t *testing.T, dbloc string) (ret *sql.DB) {
 		} else if e := assembly.AddTestNouns(m, FieldTest.kindsOfNoun...); e != nil {
 			t.Fatal(e)
 		} else if e := assembly.AddTestDefaults(m, FieldTest.defaultValues...); e != nil {
+			t.Fatal(e)
+		} else if e := ActivateDomain(db, "test", true); e != nil {
 			t.Fatal(e)
 		} else {
 			ret = db

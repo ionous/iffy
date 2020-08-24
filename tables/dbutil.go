@@ -56,11 +56,15 @@ func ScanAll(rows *sql.Rows, cb func() error, dest ...interface{}) (err error) {
 // Insert creates a sqlite friendly insert statement.
 // For example: "insert into foo(col1, col2, ...) values(?, ?, ...)"
 func Insert(table string, keys ...string) string {
+	return InsertWith(table, "", keys...)
+}
+
+func InsertWith(table string, rest string, keys ...string) string {
 	vals := "?"
 	if kcnt := len(keys) - 1; kcnt > 0 {
 		vals += strings.Repeat(",?", kcnt)
 	}
 	return "INSERT into " + table +
 		"(" + strings.Join(keys, ", ") + ")" +
-		" values " + "(" + vals + ");"
+		" values " + "(" + vals + ")" + rest + ";"
 }

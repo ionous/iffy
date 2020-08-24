@@ -49,6 +49,14 @@ func runViewsTemplate() string {
 		"union all \n" +
 		"select noun, aspect as field, trait as value, null as tier\n" +
 		"\tfrom mdl_noun_traits;\n" +
-		""
+		"\n" +
+		"/* active nouns */\n" +
+		"create temp view\n" +
+		"run_noun as \n" +
+		"select mn.noun, mn.kind \n" +
+		"from mdl_noun mn \n" +
+		"join run_domain rd \n" +
+		"\ton (mn.noun like ('#' || rd.domain || '::%'))\n" +
+		"where rd.active = true;"
 	return tmpl
 }

@@ -32,7 +32,11 @@ func checkFile(inFile string) (err error) {
 		err = errutil.New("couldn't create output file", inFile, e)
 	} else {
 		defer db.Close()
-		if tables.CreateRunViews(db); e != nil {
+		if tables.CreateRun(db); e != nil {
+			err = e
+		} else if tables.CreateRunViews(db); e != nil {
+			err = e
+		} else if e := qna.ActivateDomain(db, "entireGame", true); e != nil {
 			err = e
 		} else {
 			err = qna.CheckAll(db)

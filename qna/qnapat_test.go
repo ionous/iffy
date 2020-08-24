@@ -50,7 +50,9 @@ func TestSayMe(t *testing.T) {
 		t.Fatal(e)
 	}
 	//
-	if e := tables.CreateRunViews(db); e != nil {
+	if e := tables.CreateRun(db); e != nil {
+		t.Fatal(e)
+	} else if e := tables.CreateRunViews(db); e != nil {
 		t.Fatal(e)
 	}
 	run := NewRuntime(db)

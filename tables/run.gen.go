@@ -12,7 +12,8 @@ func runTemplate() string {
 	var tmpl = "/**\n" +
 		" * for saving, restoring a player's game session.\n" +
 		" */\n" +
-		"\n" +
+		"create table if not exists \n" +
+		"\trun_domain( domain text, active int, primary key( domain )); \n" +
 		""
 	return tmpl
 }

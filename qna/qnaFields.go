@@ -66,7 +66,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				where mr.pattern = ?
 				and mp.type = ?`),
 		countOf: ps.Prep(db,
-			`select count() from mdl_noun where noun=?`),
+			`select count() from run_noun where noun=?`),
 		ancestorsOf: ps.Prep(db,
 			`select kind || ( case path when '' then ('') else (',' || path) end ) as path
 				from mdl_noun mn 
@@ -80,17 +80,21 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				where (noun||'.'||trait)=?`),
 		// given an id, find the name
 		nameOf: ps.Prep(db,
-			`select me.name 
-				from mdl_name me
-				where me.noun=?
-				order by me.rank
+			`select name 
+				from mdl_name
+				join run_noun
+					using (noun)
+				where noun=?
+				order by rank
 				limit 1`),
 		// given a name, find the id
 		idOf: ps.Prep(db,
-			`select me.noun 
-				from mdl_name me
-				where me.name=?
-				order by me.rank
+			`select noun 
+				from mdl_name
+				join run_noun
+					using (noun)
+				where noun=?
+				order by rank
 				limit 1`),
 	}
 	if e := ps.Err(); e != nil {

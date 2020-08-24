@@ -38,3 +38,12 @@ select noun, field, value,
 union all 
 select noun, aspect as field, trait as value, null as tier
 	from mdl_noun_traits;
+
+/* active nouns */
+create temp view
+run_noun as 
+select mn.noun, mn.kind 
+from mdl_noun mn 
+join run_domain rd 
+	on (mn.noun like ('#' || rd.domain || '::%'))
+where rd.active = true;
