@@ -7,11 +7,11 @@ import (
 	"github.com/ionous/iffy/rt/writer"
 )
 
-var helloThereWorld = []rt.Execute{
+var helloThereWorld = NewActivity(
 	&Say{&Text{"hello"}},
 	&Say{&Text{"there"}},
 	&Say{&Text{"world"}},
-}
+)
 
 func ExampleSpan() {
 	var run sayTester

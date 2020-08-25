@@ -15,7 +15,7 @@ type DoNothing struct{}
 // If the list is empty, it executes an alternative block of statements.
 type ForEachNum struct {
 	In       rt.NumListEval
-	Go, Else []rt.Execute
+	Go, Else *Activity
 }
 
 // ForEachText visits values in a text list.
@@ -23,7 +23,7 @@ type ForEachNum struct {
 // If the list is empty, it executes an alternative block of statements.
 type ForEachText struct {
 	In       rt.TextListEval
-	Go, Else []rt.Execute
+	Go, Else *Activity
 }
 
 func (*DoNothing) Compose() composer.Spec {
@@ -107,11 +107,11 @@ func (h *readOnlyValue) GetVariable(n string) (ret interface{}, err error) {
 func loop(
 	run rt.Runtime,
 	it interface{ HasNext() bool },
-	Go, Else []rt.Execute,
+	Run, Else *Activity,
 	next func() (scope.ReadOnly, error),
 ) (err error) {
 	if !it.HasNext() {
-		if e := rt.RunAll(run, Else); e != nil {
+		if e := rt.RunOne(run, Else); e != nil {
 			err = e
 		}
 	} else {
@@ -119,9 +119,16 @@ func loop(
 		for it.HasNext() {
 			if varscope, e := next(); e != nil {
 				err = e
-			} else if e := rt.ScopeBlock(run, lf.NextScope(varscope, it.HasNext()), Go); e != nil {
-				err = e
 				break
+			} else {
+				// brings the names of an object's properties into scope for the duration of fn.
+				run.PushScope(lf.NextScope(varscope, it.HasNext()))
+				e := rt.RunOne(run, Run)
+				run.PopScope()
+				if e != nil {
+					err = e
+					break
+				}
 			}
 		}
 	}

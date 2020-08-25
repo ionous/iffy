@@ -16,27 +16,27 @@ type Say struct {
 // Buffer collects text said by other statements and returns them as a string.
 // Unlike Span, it does not add or alter spaces between writes.
 type Buffer struct {
-	Go []rt.Execute
+	Go *Activity
 }
 
 // Span collects text printed during a block and writes the text with spaces.
 type Span struct {
-	Go []rt.Execute
+	Go *Activity
 }
 
 // Bracket sandwiches text printed during a block and puts them inside parenthesis ().
 type Bracket struct {
-	Go []rt.Execute
+	Go *Activity
 }
 
 // Slash separates text printed during a block with left-leaning slashes.
 type Slash struct {
-	Go []rt.Execute
+	Go *Activity
 }
 
 // Commas writes words separated with commas, ending with an "and".
 type Commas struct {
-	Go []rt.Execute
+	Go *Activity
 }
 
 // Compose defines a spec for the composer editor.
@@ -64,7 +64,7 @@ func (*Buffer) Compose() composer.Spec {
 func (op *Buffer) GetText(run rt.Runtime) (ret string, err error) {
 	var buf bytes.Buffer
 	if e := rt.WritersBlock(run, &buf, func() error {
-		return rt.RunAll(run, op.Go)
+		return rt.RunOne(run, op.Go)
 	}); e != nil {
 		err = e
 	} else {
@@ -85,7 +85,7 @@ func (*Span) Compose() composer.Spec {
 func (op *Span) GetText(run rt.Runtime) (ret string, err error) {
 	span := print.NewSpanner() // separate punctuation with spaces
 	if e := rt.WritersBlock(run, span, func() error {
-		return rt.RunAll(run, op.Go)
+		return rt.RunOne(run, op.Go)
 	}); e != nil {
 		err = e
 	} else {
@@ -107,7 +107,7 @@ func (op *Bracket) GetText(run rt.Runtime) (ret string, err error) {
 	span := print.NewSpanner() // separate punctuation with spaces
 	w := print.Parens(span)
 	if e := rt.WritersBlock(run, w, func() error {
-		return rt.RunAll(run, op.Go)
+		return rt.RunOne(run, op.Go)
 	}); e != nil {
 		err = e
 	} else {
@@ -129,7 +129,7 @@ func (op *Slash) GetText(run rt.Runtime) (ret string, err error) {
 	span := print.NewSpanner() // separate punctuation with spaces
 	w := print.Slash(span)
 	if e := rt.WritersBlock(run, w, func() error {
-		return rt.RunAll(run, op.Go)
+		return rt.RunOne(run, op.Go)
 	}); e != nil {
 		err = e
 	} else {
@@ -151,7 +151,7 @@ func (op *Commas) GetText(run rt.Runtime) (ret string, err error) {
 	span := print.NewSpanner() // separate punctuation with spaces
 	w := print.AndSeparator(span)
 	if e := rt.WritersBlock(run, w, func() error {
-		return rt.RunAll(run, op.Go)
+		return rt.RunOne(run, op.Go)
 	}); e != nil {
 		err = e
 	} else {

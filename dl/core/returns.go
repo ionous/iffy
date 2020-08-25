@@ -9,7 +9,7 @@ import (
 // Returns allows a local variable to be used as an output.
 type Returns struct {
 	Name  string
-	Using []rt.Execute
+	Using *Activity
 }
 
 type returnScope struct {
@@ -43,7 +43,7 @@ func (*Returns) Compose() composer.Spec {
 func (op *Returns) run(run rt.Runtime, cb func(interface{}) error) (err error) {
 	k := returnScope{name: op.Name}
 	run.PushScope(&k)
-	if e := rt.RunAll(run, op.Using); e != nil {
+	if e := rt.RunOne(run, op.Using); e != nil {
 		err = e
 	} else {
 		err = cb(k.v)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
 )
@@ -18,7 +19,7 @@ type Testing interface {
 // TestOutput that running statements prints 'Lines'
 type TestOutput struct {
 	Lines string
-	Go    []rt.Execute
+	Go    *core.Activity
 }
 
 func (*TestOutput) Compose() composer.Spec {
@@ -37,7 +38,7 @@ func (op *TestOutput) RunTest(run rt.Runtime) (err error) {
 	prev := auto.Target
 	auto.Target = &buf
 	//
-	if e := rt.RunAll(run, op.Go); e != nil {
+	if e := rt.RunOne(run, op.Go); e != nil {
 		err = errutil.New("encountered error:", e)
 	} else if t := buf.String(); t != op.Lines {
 		err = errutil.New("expected:", op.Lines, "got:", t)

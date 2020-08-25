@@ -56,11 +56,3 @@ func WritersBlock(run Runtime, w writer.Output, fn func() error) (err error) {
 	}
 	return
 }
-
-// ScopeBlock brings the names of an object's properties into scope for the duration of fn.
-func ScopeBlock(run Runtime, scope VariableScope, block []Execute) (err error) {
-	run.PushScope(scope)
-	err = RunAll(run, block)
-	run.PopScope()
-	return
-}

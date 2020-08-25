@@ -13,13 +13,14 @@ import (
 func ExampleIndex() {
 	var run forTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.RunAll(&run, []rt.Execute{
+	if e := rt.RunOne(&run,
 		&ForEachText{
 			In: &Texts{oneTwoThree},
-			Go: []rt.Execute{
-				&Say{&PrintNum{&GetVar{"index"}}}},
+			Go: NewActivity(
+				&Say{&PrintNum{&GetVar{"index"}}},
+			),
 		},
-	}); e != nil {
+	); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -29,11 +30,11 @@ func ExampleIndex() {
 func ExampleChooseText() {
 	var run forTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.RunAll(&run, []rt.Execute{
-		&Say{&Commas{[]rt.Execute{
+	if e := rt.RunOne(&run,
+		&Say{&Commas{NewActivity(
 			&ForEachText{
 				In: &Texts{oneTwoThree},
-				Go: []rt.Execute{
+				Go: NewActivity(
 					&Say{&ChooseText{
 						If:   &GetVar{"last"},
 						True: &Text{"last"},
@@ -42,9 +43,9 @@ func ExampleChooseText() {
 							True:  &Text{"first"},
 							False: &GetVar{"text"},
 						},
-					}}},
-			}},
-		}}}); e != nil {
+					}}),
+			}),
+		}}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:

@@ -19,6 +19,7 @@ var Slots = []composer.Slot{{
 }}
 
 var Slats = []composer.Slat{
+	(*Activity)(nil),
 	(*AllTrue)(nil),
 	(*AnyTrue)(nil),
 

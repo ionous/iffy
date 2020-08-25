@@ -51,8 +51,8 @@ func newTextRule(i rt.TextEval) *ruleBuilder {
 	ptr := &pattern.TextRule{TextEval: i}
 	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }
-func newExecuteRule(exes []rt.Execute) *ruleBuilder {
-	ptr := &pattern.ExecuteRule{Go: exes}
+func newExecuteRule(i rt.Execute) *ruleBuilder {
+	ptr := &pattern.ExecuteRule{Execute: i}
 	return &ruleBuilder{ptr, &ptr.Filter, nil}
 }
 func newTextListRule(i rt.TextListEval) *ruleBuilder {

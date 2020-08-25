@@ -8,7 +8,7 @@ import (
 // Choose to execute one of two blocks based on a boolean test.
 type Choose struct {
 	If          rt.BoolEval
-	True, False []rt.Execute
+	True, False *Activity
 }
 
 // Choose one of two number evaluations based on a boolean test.
@@ -35,13 +35,13 @@ func (op *Choose) Execute(run rt.Runtime) (err error) {
 	if b, e := rt.GetBool(run, op.If); e != nil {
 		err = e
 	} else {
-		var next []rt.Execute
+		var next *Activity
 		if b {
 			next = op.True
 		} else {
 			next = op.False
 		}
-		err = rt.RunAll(run, next)
+		err = rt.RunOne(run, next)
 	}
 	return
 }

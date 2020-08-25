@@ -42,21 +42,24 @@ var FactorialTestStatement = map[string]interface{}{
 						"type":  "lines",
 						"value": "6",
 					},
-					"$GO": []interface{}{
-						map[string]interface{}{
-							"type": "execute",
-							"value": map[string]interface{}{
-								"type": "say_text",
-								"value": map[string]interface{}{
-									"$TEXT": map[string]interface{}{
-										"type": "text_eval",
+					"$GO": map[string]interface{}{
+						"type": "activity",
+						"value": map[string]interface{}{
+							"$EXE": []interface{}{
+								map[string]interface{}{
+									"type": "execute",
+									"value": map[string]interface{}{
+										"type": "say_text",
 										"value": map[string]interface{}{
-											"type": "print_num",
-											"value": map[string]interface{}{
-												"$NUM": map[string]interface{}{
-													"type":  "number_eval",
-													"value": FactorialDetermineNum,
-												}}}}}}}}}}}},
+											"$TEXT": map[string]interface{}{
+												"type": "text_eval",
+												"value": map[string]interface{}{
+													"type": "print_num",
+													"value": map[string]interface{}{
+														"$NUM": map[string]interface{}{
+															"type":  "number_eval",
+															"value": FactorialDetermineNum,
+														}}}}}}}}}}}}}},
 }
 
 // determine num of factorial where num = 3

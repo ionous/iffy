@@ -74,11 +74,15 @@ func imp_pattern_filters(k *Importer, rule *ruleBuilder, r reader.Map) (err erro
 	return
 }
 
-// opt("pattern_hook", "{activity:pattern_activity} or {result:pattern_return}");
+// opt("pattern_hook", "{activity} or {result:pattern_return}");
 func imp_pattern_hook(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
 	err = reader.Option(r, "pattern_hook", reader.ReadMaps{
 		"$ACTIVITY": func(m reader.Map) (err error) {
-			ret, err = imp_pattern_activity(k, m)
+			if act, e := imp_activity(k, m); e != nil {
+				err = e
+			} else {
+				ret = newExecuteRule(act)
+			}
 			return
 		},
 		"$RESULT": func(m reader.Map) (err error) {
@@ -143,27 +147,6 @@ func imp_primitive_func(k *Importer, r reader.Map) (ret *ruleBuilder, err error)
 			return
 		},
 	})
-	return
-}
-
-// run("pattern_activity", "run: {activity%go+execute|ghost}");
-func imp_pattern_activity(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
-	var exes []rt.Execute
-	if m, e := reader.Unpack(r, "pattern_activity"); e != nil {
-		err = e
-	} else if e := reader.Repeats(m.SliceOf("$GO"),
-		func(m reader.Map) (err error) {
-			if i, e := k.DecodeSlot(m, "execute"); e != nil {
-				err = e
-			} else if i != nil {
-				exes = append(exes, i.(rt.Execute))
-			}
-			return
-		}); e != nil {
-		err = e
-	} else {
-		ret = newExecuteRule(exes)
-	}
 	return
 }
 

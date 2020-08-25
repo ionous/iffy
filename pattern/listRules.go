@@ -30,7 +30,7 @@ type TextListRule struct {
 // ExecuteListRule triggers a series of statements when its filters are satisfied.
 type ExecuteRule struct {
 	ListRule
-	Go []rt.Execute
+	rt.Execute
 }
 
 func (*NumListRule) RuleDesc() RuleDesc {
@@ -95,10 +95,6 @@ func (ps TextListRules) GetTextStream(run rt.Runtime) (ret rt.Iterator, err erro
 	return
 }
 
-func (ps ExecuteRule) Execute(run rt.Runtime) error {
-	return rt.RunAll(run, ps.Go)
-}
-
 // ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
 func (ps ExecRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
 	return ps[i].ApplyByIndex(run)
@@ -109,7 +105,7 @@ func (ps ExecRules) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else {
 		for _, i := range inds {
-			if e := rt.RunAll(run, ps[i].Go); e != nil {
+			if e := rt.RunOne(run, ps[i].Execute); e != nil {
 				err = e
 				break
 			}

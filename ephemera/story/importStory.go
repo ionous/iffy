@@ -23,6 +23,9 @@ func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
 	}
 	dec.AddDefaultCallbacks(core.Slats)
 	dec.AddCallbacks([]decode.Override{
+		{(*core.Activity)(nil), k.BindRet(func(i *Importer, m reader.Map) (interface{}, error) {
+			return imp_activity(i, m) // imp_activity returns *Activity, BindRet expects interface{}
+		})},
 		{(*core.DetermineAct)(nil), k.BindRet(imp_determine_act)},
 		{(*core.DetermineNum)(nil), k.BindRet(imp_determine_num)},
 		{(*core.DetermineText)(nil), k.BindRet(imp_determine_text)},

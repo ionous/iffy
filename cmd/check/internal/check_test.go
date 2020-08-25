@@ -12,16 +12,16 @@ import (
 
 func TestCheck(t *testing.T) {
 	prog := &check.TestOutput{
-		"hello", []rt.Execute{
+		"hello", core.NewActivity(
 			&core.Choose{
 				If: &core.Bool{Bool: true},
-				True: []rt.Execute{&core.Say{
+				True: core.NewActivity(&core.Say{
 					Text: &core.Text{"hello"},
-				}},
-				False: []rt.Execute{&core.Say{
+				}),
+				False: core.NewActivity(&core.Say{
 					Text: &core.Text{"goodbye"},
-				}},
-			}},
+				}),
+			}),
 	}
 	if e := runTest(prog); e != nil {
 		t.Fatal(e)

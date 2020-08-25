@@ -51,6 +51,16 @@ const spec = [
     "uses": "slot"
   },
   {
+    "name": "activity",
+    "spec": "{exe+execute}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "execute"
+      ]
+    }
+  },
+  {
     "desc": "All True: returns true if all of the evaluations are true.",
     "group": [
       "logic"
@@ -271,8 +281,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         }
       },
       "slots": [
@@ -294,8 +303,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         }
       },
       "slots": [
@@ -394,8 +402,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         }
       },
       "slots": [
@@ -613,13 +620,11 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         },
         "$GO": {
           "label": "go",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         },
         "$IN": {
           "label": "in",
@@ -648,13 +653,11 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         },
         "$GO": {
           "label": "go",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         },
         "$IN": {
           "label": "in",
@@ -1391,8 +1394,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         }
       },
       "slots": [
@@ -1415,8 +1417,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
-          "repeats": true,
-          "type": "execute"
+          "type": "activity"
         }
       },
       "slots": [

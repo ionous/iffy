@@ -27,13 +27,14 @@ func TestObjectFunc(t *testing.T) {
 func TestPatternActivity(t *testing.T) {
 	k, db := newTestDecoder(t)
 	defer db.Close()
-	if rule, e := imp_pattern_activity(k, _pattern_activity); e != nil {
+	if rule, e := imp_activity(k, _pattern_activity); e != nil {
 		t.Fatal(e)
 	} else {
 		var run testRuntime
 		out := print.NewLines()
 		run.SetWriter(out)
-		if e := rt.RunOne(&run, rule.buildRule().(rt.Execute)); e != nil {
+		// should this call/test buildRule
+		if e := rt.RunOne(&run, rule); e != nil {
 			t.Fatal(e)
 		} else if diff := pretty.Diff(out.Lines(), []string{"hello", "hello"}); len(diff) > 0 {
 			t.Fatal(diff)
@@ -87,9 +88,9 @@ var _object_func = map[string]interface{}{
 }
 
 var _pattern_activity = map[string]interface{}{
-	"type": "pattern_activity",
+	"type": "activity",
 	"value": map[string]interface{}{
-		"$GO": []interface{}{
+		"$EXE": []interface{}{
 			_say_exec,
 			_say_exec,
 		},
