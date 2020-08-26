@@ -59,9 +59,11 @@
 .em-row__header--inline, .em-row__footer--inline {
   min-width: 1ch;
 }
+/*
+this throws off the line padding.
 .em-row__header--block, .em-row__footer--block {
   height: 0.5em;
-}
+}*/
 /* highlight upper edge */
 .em-drag-head {
   box-shadow:inset 0px 3px rgba(0,0,0,0.6);

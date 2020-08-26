@@ -40,6 +40,7 @@ class StatementTable extends NodeTable {
 }
 
 // paragraphs are actually, basically, the discrete lines of a story.
+// u2630 - hamburger heaven
 Vue.component('mk-paragraph-ctrl', {
   template:
   `<em-table

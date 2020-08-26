@@ -1,24 +1,3 @@
-.mk-run-ctrl[data-tag="paragraph"]  {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-.mk-slot-ctrl[data-tag="execute"]  {
-  display: list-item;
-}
-
-.mk-run-ctrl[data-tag="pattern_return"]  {
-  display: list-item;
-}
-
-.mk-run-ctrl[data-tag="pattern_return"],
-.mk-run-param[data-tag="execute"]  {
-  display: block;
-  list-style: none;
-  margin-left: 2em;
-  padding-left: 1em;
-  border-left: 3px double rgb(239, 207, 173); 
-}
 
 .em-gutter--digi {
   border-right: 3px double rgb(239, 207, 173); 

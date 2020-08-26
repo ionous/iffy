@@ -103,6 +103,7 @@ body {
   overflow-y:scroll;
   background-color: whitesmoke;
 
+  padding-top: 10px;
   line-height: 25px;
   background-position: 0px 6px;
   background-color: #f2f6c1;

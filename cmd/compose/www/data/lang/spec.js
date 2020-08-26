@@ -317,7 +317,7 @@ const spec = [
   },
   {
     "name": "choose",
-    "spec": "if {choose%if:bool_eval} then: {true+execute|ghost} else: {false+execute|ghost}",
+    "spec": "if {choose%if:bool_eval} then: {true:activity} else: {false:activity}",
     "uses": "run",
     "with": {
       "slots": [
@@ -1473,7 +1473,7 @@ const spec = [
       "tests"
     ],
     "name": "test_output",
-    "spec": "expects the output {lines|quote} when running: {activity%go+execute|ghost}",
+    "spec": "expects the output {lines|quote} when running: {go:activity}",
     "uses": "run",
     "with": {
       "slots": [
