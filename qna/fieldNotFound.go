@@ -7,5 +7,5 @@ type fieldNotFound struct {
 }
 
 func (f fieldNotFound) Error() string {
-	return errutil.Sprint("field not found", f.owner, f.field)
+	return errutil.Sprintf("field not found '%s.%s'", f.owner, f.field)
 }
