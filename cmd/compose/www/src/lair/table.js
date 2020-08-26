@@ -53,7 +53,7 @@ Vue.component('em-table', {
       :class="['em-row', 'em-row__header--'+classmod]"
       :data-drag-idx="-1"
       :data-drag-edge="0"
-    ></div
+    >&nbsp;</div
     ><div v-for="(item,idx) in items"
         :class="highlight(idx)"
         :data-drag-idx="idx"
@@ -75,7 +75,7 @@ Vue.component('em-table', {
       :data-drag-edge="items.length-1"
     ><slot
         name="footer"
-    ></slot
+    >&nbsp;</slot
     ></div
   ></div>`
 });

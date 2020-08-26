@@ -59,11 +59,11 @@
 .em-row__header--inline, .em-row__footer--inline {
   min-width: 1ch;
 }
-/*
-this throws off the line padding.
+
+/* this throws off the line padding, but is (currently) necessary for edge detection */
 .em-row__header--block, .em-row__footer--block {
-  height: 0.5em;
-}*/
+  line-height: 3px;
+}
 /* highlight upper edge */
 .em-drag-head {
   box-shadow:inset 0px 3px rgba(0,0,0,0.6);

@@ -19,16 +19,17 @@ class NodeTable extends DragList {
     throw new Error("not implemented");
   }
   // at:index, from:{list,idx}
-  transferTo(at, fromList, fromIdx) {
+  transferTo(at, fromGroup, fromIdx) {
     const toIdx= at;
     const toList= this;
+    const fromList= fromGroup.list;
 
     if (toList === fromList) {
       const needBlank= Math.abs(fromIdx - toIdx) === 1;
       if (needBlank) {
         this.addBlank(toIdx);
       } else {
-        this.move(toIdx, fromIdx);
+        this.move(toIdx, fromIdx, fromList.inline?Number.MAX_VALUE:1 );
       }
     } else {
       const { redux } = this;
@@ -66,9 +67,9 @@ class NodeTable extends DragList {
   // move items within this same list
   move(src, dst, width, nothrow) {
     const { redux, items } = this;
-    if (width<=0) {
+    if ((!width) || (width<0)) {
       const e= new Error("invalid width");
-      if (nothrow) { return e; }
+      if (nothrow) { console.error(e); return e; }
       throw e;
     }
     if ((dst > src) && (dst < src+width)) {

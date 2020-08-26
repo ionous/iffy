@@ -2,13 +2,13 @@
 // implementation specific to em-table.
 class DragGroup {
   constructor(list) {
-    this.list= list;
+    this.list= list; // always a DragList
     this.finder= false;
   }
   bind(el) {
     this.finder= el? new TargetFinder(el): false;
   }
-  dragOver(start,target) {
+  dragOver(start, target) {
     var res;
     const over= this.finder.get(target);
     if (over) {
@@ -17,7 +17,7 @@ class DragGroup {
       let overStart;
       if (start.group === this) {
           overStart= (over.idx === start.idx) ||
-                    (this.inline && (over.idx > start.idx));
+                    (this.list.inline && (over.idx > start.idx));
       } else {
         // bad cases: a, b, c, d
         // 1. same (inline) group and idx is same (or larger)
@@ -48,7 +48,7 @@ class DragGroup {
     // ( even though drag end will be copy )
     const drop= this.finder.get(el);
     if (drop) {
-      this.list.transferTo(drop.idx, from.group.list, from.idx);
+      this.list.transferTo(drop.idx, from.group, from.idx);
     }
   }
   // fix: this should be more ....

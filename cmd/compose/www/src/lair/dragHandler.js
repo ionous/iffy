@@ -131,7 +131,7 @@ class DragHandler {
     // return;
     const el= evt.target;
     const dt= evt.dataTransfer;
-    // const tgt= this.finder.get(el) || {idx:"xxx", edge:false};
+    // const tgt= this.finder.findIdx(el) || {idx:"xxx", edge:false};
     const fx= (dt&&dt.dropEffect)||"???";
     console.log(evt.type, "@", el.nodeName,
       // "idx:", tgt.idx, "edge:", tgt.edge,

@@ -1,4 +1,4 @@
-
+// standalone drop target
 class TrashGroup {
   constructor(redux) {
     this.redux= redux;
@@ -31,13 +31,11 @@ class TrashGroup {
 // U+267B  -- filled recycling
 // 267A -- thin recycling
 // 2672 -- empty recycling
-//
-
 Vue.component('mk-trash-can', {
   template:
   `<div
     :class="bemBlock()"
-    v-show="dropper.dragging"
+    v-show="showing"
   ><span
     :class="bemElem('trash', hovering && 'over')"
     :data-drag-idx="-2"
@@ -50,6 +48,10 @@ Vue.component('mk-trash-can', {
     this.handler.silence();
   },
   computed: {
+    showing() {
+      const { start } = this.dropper;
+      return start && (start.group instanceof DragGroup);
+    },
     hovering() {
       const at = this.dropper.target;
       const atList= at && (at.group === this.group);

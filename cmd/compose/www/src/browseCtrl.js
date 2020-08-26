@@ -1,5 +1,5 @@
-// maps typeName to array of names
-class Tab extends Map {
+// a list of { name, labels } representing commands used by the composer
+class TabList extends Map {
   constructor({sansContent=false, txtContent=false}={}) {
     super();
     this.sansContent= sansContent;
@@ -28,21 +28,63 @@ class Tab extends Map {
         }));
       }
     }
-    return ret.sort((a,b)=>  a.name.localeCompare(b.name));
+    return ret.sort((a,b)=> a.label.localeCompare(b.label));
   }
-};
+}
+
+// a group of tabs, each with their own list of {name, label} commands.
+class Tabbable {
+  constructor(lists) {
+    this.finder= null; // see bind()
+    this.names= Object.keys(lists);
+    this.lists= lists;
+    this.items= [];// items => [{name, label}]
+  }
+  // change the active items
+  updateTab({tab, item}) {
+    this.items= this.lists[tab].contents(item);
+  }
+  // bind a container of items
+  // each el in containerEl should have a data-drag-idx
+  bind(containerEl) {
+    this.finder= containerEl? new TargetFinder(containerEl): false;
+  }
+  // can only drag from
+  dragOver(start) {
+    return false;
+  }
+  dragStart(el, dt) {
+    let okay;
+    if (this.items) {
+      const start= this.finder && this.finder.findIdx(el, true); // { el, idx, edge };
+      if (start) {
+        Dropper.setDragData(dt, el, this._serializeItem(start));
+        okay= true;
+      }
+    }
+    return okay;
+  }
+  _serializeItem(start) {
+    const item= this.items[start.idx];
+    return {
+      'text/plain': item.name,
+    };
+  }
+}
+
+// displays the Tabbable commands
 Vue.component('mk-browser', {
   template:
   `<div :class="cls.win"
   ><div class="mk-aux__title mk-aux__title--right"
      >commands</div
   ><div :class="bemElem('nav')"
-    ><span v-for="(x,i) in tabNames"
+    ><span v-for="(x,i) in tabbable.names"
       ><template v-if="i"
       >, </template
       ><mk-a-button
           :class="[ bemElem('btn'), tab===x?cls.btnSel:false ]"
-          @activate="onFilter(x)"
+          @activate="onTab(x)"
       >{{x| capitalize}}</mk-a-button
     ></span
   >.</div
@@ -50,9 +92,15 @@ Vue.component('mk-browser', {
      >{{item}} {{tab|capitalize}}</div
   ><ul
     class="mk-browser-list"
+    ref="browserList"
     ><li
-      v-for="k in kids"
-      ><span v-if="k.name">&#x2753;<mk-a-button
+      v-for="(k,idx) in tabbable.items"
+      ><span
+        v-if="k.name"
+        :key="k.name"
+      >&#x2753;<mk-a-button
+          :data-drag-idx="idx"
+          draggable="true"
           @activate="onItem(k.name)"
         >{{k.label| titlecase}}</mk-a-button
       ></span
@@ -60,19 +108,13 @@ Vue.component('mk-browser', {
     ></li
   ></ul
   ></div>`,
-   computed: {
-    // list of commands to display
-    kids() {
-      return this.tabs[this.tab].contents(this.item);
-    },
-  },
   data(){
     const types= allTypes.all;
     // compile groups, slots, and strs
-    const all= new Tab({sansContent:true});
-    const groups= new Tab(); // group name => [ runs that implement the group ]
-    const slots= new Tab();
-    const str= new Tab({txtContent:true});
+    const all= new TabList({sansContent:true});
+    const groups= new TabList(); // group name => [ runs that implement the group ]
+    const slots= new TabList();
+    const str= new TabList({txtContent:true});
     //
     for (const typeName in types) {
       const type= types[typeName];
@@ -112,15 +154,19 @@ Vue.component('mk-browser', {
         }
       };
     }
-    const tabs= {
-        all,
-        groups,
-        slots,
-        str,
-      };
+    const tabbable= new Tabbable({
+      all,
+      groups,
+      slots,
+      str,
+    });
+    const { "$root": root } = this;
+    const dropper= root.dropper;
+    const handler= new DragHandler(dropper, tabbable);
+    this.$nextTick(function() {
+      this.onTab("all");
+    });
     return {
-      // all possible tabNames. displayed at top of ctrl.
-      tabNames: Object.keys(tabs),
       // current tab. changed by the user.
       tab: "groups",
       // current item within a tab.
@@ -130,19 +176,22 @@ Vue.component('mk-browser', {
         win: [ this.bemBlock(), 'mk-aux' ],
         btnSel: this.bemElem('btn', 'sel'),
       },
-      tabs,
+      tabbable,    // list of clickable tab names
+      handler, // drag-drop listener
     };
   },
   methods: {
-    onFilter(x) {
-      this.tab= x;
+    onTab(tab) {
+      this.tab= tab;
       this.item= "";
+      this.tabbable.updateTab(this);
     },
-    onItem(k) {
+    onItem(item) {
       if (!this.item) {
-        this.item= k; // selected a sub-group
+        this.item= item; // selected a sub-group
       }
-      this.$root.cmdSelected(k);
+      this.tabbable.updateTab(this);
+      this.$root.cmdSelected(item);
     },
     onNodeSelected(node, param, token) {
       // FIX: synchronize browser display
@@ -150,9 +199,11 @@ Vue.component('mk-browser', {
   },
   mounted() {
     this.$root.$on("node-selected", this.onNodeSelected);
+    this.handler.listen(this.$refs.browserList);
   },
   beforeDestroy() {
     this.$root.$off("node-selected", this.onNodeSelected);
+    this.handler.silence();
   },
   mixins: [bemMixin()],
 });
