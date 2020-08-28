@@ -1,4 +1,4 @@
-//
+// listen to shift key presses
 function shiftMixin() {
   return {
     created() {

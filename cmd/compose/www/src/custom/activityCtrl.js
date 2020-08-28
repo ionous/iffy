@@ -1,11 +1,12 @@
-class ActivityTable extends NodeTable {
+class ActivityList extends NodeList {
   constructor(redux, para) {
-    super(redux, para, para.getKid("$EXE"));
+    super(redux, para, "$EXE");
     this.inline= false;
   }
   makeBlank() {
-    return this.nodes.newFromType("execute");
+    return this.redux.nodes.newFromType("execute");
   }
+
   // when we drag, we re/move a single execute ( a line ) at once.
   // returns a single statement
   removeFrom(at) {
@@ -27,17 +28,16 @@ class ActivityTable extends NodeTable {
 // paragraphs are actually, basically, the discrete lines of a story.
 Vue.component('mk-activity-ctrl', {
   template:
-  `<em-table
+  `<em-node-table
       :class="$root.shift && 'em-shift'"
       :list="list"
-      :dropper="dropper"
   ><template
       v-slot="{item, idx}"
     ><mk-switch
       :node="item"
     ></mk-switch
     ></template
-  ></em-table>`,
+  ></em-node-table>`,
   props: {
     node: Node,
   },
@@ -45,7 +45,7 @@ Vue.component('mk-activity-ctrl', {
     const { node, "$root": root } = this;
     // each item is a story statement slot
     return {
-      list: new ActivityTable(root.redux, node),
+      list: new ActivityList(root.redux, node),
       dropper: root.dropper,
     }
   },

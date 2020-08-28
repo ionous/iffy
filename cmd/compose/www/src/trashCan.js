@@ -1,25 +1,26 @@
-// standalone drop target
-class TrashGroup {
-  constructor(redux) {
+// standalone drop handler
+class TrashHandler  {
+  constructor(redux, target) {
     this.redux= redux;
+    this.target= target;
   }
   dragOver() {
-    return true;
+    return this.target;
   }
   // cant drag out of trash icon
   dragStart() {
     return false;
   }
-  drop(from) {
+  dragDrop(from) {
     const { redux } = this;
-    const { group, idx } = from;
+    const { list, target: { idx } } = from;
     redux.doit({
       paraEls: false, // inelegant to say the least.
       apply() {
-        this.paraEls= group.list.removeFrom(idx);
+        this.paraEls= list.removeFrom(idx);
       },
       revoke() {
-        group.list.addTo( idx, this.paraEls );
+        list.addTo( idx, this.paraEls );
       },
     });
   }
@@ -41,32 +42,27 @@ Vue.component('mk-trash-can', {
     :data-drag-idx="-2"
   >&#x267A</span
   ></div>`,
+  created() {
+    this.trashTarget= new Draggable();
+  },
   mounted() {
-    this.handler.listen(this.$el);
+    const { "$root": root } = this;
+    this.handler= new DragHandler(root.dropper, new TrashHandler(root.redux, this.trashTarget)).
+                  listen(this.$el);
   },
   beforeDestroy() {
     this.handler.silence();
+    this.handler= null;
   },
   computed: {
     showing() {
-      const { start } = this.dropper;
-      return start && (start.group instanceof DragGroup);
+      const { "$root": root } = this;
+      const { start } = root.dropper;
+      return start && (start instanceof DraggableNode);
     },
     hovering() {
-      const at = this.dropper.target;
-      const atList= at && (at.group === this.group);
-      return atList;
-    }
-  },
-  data() {
-    const { "$root": root } = this;
-    const dropper= root.dropper;
-    const group= new TrashGroup(root.redux);
-    const handler= new DragHandler(dropper, group);
-    return {
-      dropper,
-      handler,
-      group
+      const { "$root": root } = this;
+      return root.dropper.target === this.trashTarget;
     }
   },
   mixins: [bemMixin()],

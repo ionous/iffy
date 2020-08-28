@@ -1,38 +1,39 @@
-Vue.component('em-table', {
+// we have two lists types controlled by the same control
+// one of "paragraphs" ( lines ) and one of "statements" ( line elements )
+Vue.component('em-node-table', {
   data() {
-    const { list, dropper }= this;
-    const group= new DragGroup(list);
-    const handler= new DragHandler(dropper, group);
+    const { list }= this;
     return {
       items: list.items,
-      group,
-      handler,
       classmod: list.inline? "inline":"block",
     };
   },
   props: {
     grip:String,
-    dropper: Dropper,
-    list: DragList,
+    list: NodeList,
   },
   mounted() {
-    this.handler.listen(this.$el);
+    const { "$root": root, list }= this;
+    this.handler= new DragHandler(root.dropper, new NodeTable(list)).
+                  listen(this.$el);
   },
   beforeDestroy() {
     this.handler.silence();
+    this.handler= null;
   },
   methods: {
     // generate a vue css class object for an item based on the current highlight settings.
     highlight(idx) {
+      const { "$root": root, list }= this;
       let highlight= false;
       let edge= false;
-      const at = this.dropper.target;
-      const start= this.dropper.start;
-      const atList= at && (at.group === this.group);
-      const startList= start && (start.group === this.group);
+      const at = root.dropper.target;
+      const start= root.dropper.start;
+      const atList= at && (at.list === list);
+      const startList= start && (start.list === list);
       if (atList) {
-        edge= idx === at.edge;
-        highlight=(idx === at.idx) || edge;
+        edge= idx === at.target.edge;
+        highlight=(idx === at.target.idx) || edge;
       }
       const mod= this.classmod;
       const inline= this.list.inline;
@@ -41,14 +42,14 @@ Vue.component('em-table', {
         ["em-row--"+mod] : true,
         "em-drag-mark": highlight,
         "em-drag-highlight": highlight,
-        "em-drag-head": edge && (at.idx < 0),
-        "em-drag-tail": edge && (at.idx > 0),
-        "em-drag-start": startList && ((idx === start.idx) || (inline && idx > start.idx))
+        "em-drag-head": edge && (at.target.idx < 0),
+        "em-drag-tail": edge && (at.target.idx > 0),
+        "em-drag-start": startList && ((idx === start.target.idx) || (inline && idx > start.target.idx))
       }
     }
   },
   template:
-  `<div :class="['em-table', 'em-table--'+classmod]"
+  `<div :class="['em-node-table', 'em-node-table--'+classmod]"
     ><div
       :class="['em-row', 'em-row__header--'+classmod]"
       :data-drag-idx="-1"

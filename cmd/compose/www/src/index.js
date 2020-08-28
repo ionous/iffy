@@ -78,13 +78,15 @@ const app= new Vue({
       return isAtStart? Filters.capitalize: Filters.none;
     },
   },
+  created() {
+    this.redux= redux;
+  },
   computed: {
     story() {
       return this.nodes.root;
     },
   },
   data: {
-    redux: redux,
     nodes: nodes.unroll(getStory()),
     dropper: new Dropper(),
   }

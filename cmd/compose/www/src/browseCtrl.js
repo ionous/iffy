@@ -1,8 +1,54 @@
+// target is from TargetFinder
+class DraggableCommand extends Draggable {
+  constructor(type, target) {
+    super();
+    this.type= type;
+    this.target= target;
+  }
+  getDragData() {
+    return {
+      'text/plain': this.type,
+    };
+  }
+  getDragImage() {
+    return this.target.el;
+  }
+}
+
+class TabHandler{
+  constructor(tabbable) {
+   this.finder= null; // see bind()
+   this.tabbable= tabbable;
+  }
+  // bind a container of items
+  // each el in containerEl should have a data-drag-idx
+  bind(containerEl) {
+    this.finder= containerEl? new TargetFinder(containerEl): false;
+  }
+  // can only drag from
+  dragOver() {
+    return false;
+  }
+  dragStart(el, dt) {
+    let ret;
+    const { items } = this.tabbable;
+    if (items) {
+      const target= this.finder.findIdx(el, true); // { el, idx, edge };
+      if (target) {
+        const item= items[target.idx];
+        if (item) {
+          ret= new DraggableCommand(item.name, target);
+        }
+      }
+    }
+    return ret;
+  }
+}
 
 // a group of tabs, each with their own lists or maps of lists
+// acts as a drag group
 class Tabbable {
   constructor(lists) {
-    this.finder= null; // see bind()
     this.names= Object.keys(lists);
     this.lists= lists;
     this.items= [];// items => [{name, label}]
@@ -18,40 +64,15 @@ class Tabbable {
     } else {
       contents= this._outlineOf(list[item]);
     }
-    return contents.sort((a,b)=> a.label.localeCompare(b.label));
+    this.items= contents.sort((a,b)=> a.label.localeCompare(b.label));
+    return this.items;
   }
   _outlineOf(names) {
     return names.map((k)=> ({
         name:k, label:Types.labelOf( Types.get(k) )
       }));
   }
-  // bind a container of items
-  // each el in containerEl should have a data-drag-idx
-  bind(containerEl) {
-    this.finder= containerEl? new TargetFinder(containerEl): false;
-  }
-  // can only drag from
-  dragOver(start) {
-    return false;
-  }
-  dragStart(el, dt) {
-    let ret;
-    if (this.items) {
-      const start= this.finder && this.finder.findIdx(el, true); // { el, idx, edge };
-      if (start) {
-        const item= this.items[start.idx];
-        start.name= item.name;
-        Dropper.setDragData(dt, el, this._serializeItem(item));
-        ret= start;
-      }
-    }
-    return ret;
-  }
-  _serializeItem(item) {
-    return {
-      'text/plain': item.name,
-    };
-  }
+
 }
 
 // displays the Tabbable commands
@@ -95,7 +116,7 @@ Vue.component('mk-browser', {
       this.tabs= this.tabbable.names;
       this.items= this.tabbable.updateTab(this.tab, this.item)
     });
-    const tab= "groups"; // current tab. changed by the user.
+    const tab= "phrases"; // current tab. changed by the user.
     const item= ""; // current item within a tab.
     return {
       tab,
@@ -155,7 +176,6 @@ Vue.component('mk-browser', {
         }
       }
     }
-
     const phrases= slots["story_statement"];
     const guards= slots["bool_eval"];
     const actions= slots["execute"];
@@ -171,15 +191,14 @@ Vue.component('mk-browser', {
   },
   mounted() {
     const { "$root": root, "$refs": refs, tabbable } = this;
-    const handler= new DragHandler(root.dropper, tabbable);
     root.$on("node-selected", this.onNodeSelected);
-    handler.listen(refs.browserList);
-    //
-    this.handler= handler; // for "silence"
+    this.handler= new DragHandler(root.dropper, new TabHandler(tabbable)).
+                  listen(refs.browserList);
   },
   beforeDestroy() {
     this.$root.$off("node-selected", this.onNodeSelected);
     this.handler.silence();
+    this.handler= null;
   },
   mixins: [bemMixin()],
 });

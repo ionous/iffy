@@ -1,14 +1,21 @@
 // event handler
 class DragHandler {
-  // group is an object with the following optional methods:
-  // bind, dragStart, dragOver, drop, drag, dragLeave, dragEnd.
-  constructor(dropper, group) {
-    this.group= group;
+  // dropper is a global instance of Dropper;
+  // the event sink is an object with the following optional methods:
+  //   - bind(container)
+  //   - dragStart(el, dt) -> returns Draggable
+  //   - dragOver(start, el, evt)
+  //   - dragDrop(start, el, evt)
+  //   - dragUpdate()
+  //   - dragLeave()
+  //   - dragEnd()
+  constructor(dropper, sink) {
     this.dropper= dropper;
+    this.sink= sink;
     this.listeners= false;
   }
   listen(el) {
-    const { listeners, group } = this;
+    const { listeners, sink } = this;
     if (listeners) {
       throw new Error("still listening");
     }
@@ -17,7 +24,7 @@ class DragHandler {
       // triggered on the item in question.
       dragstart: "onDragStart",
       // a dragged item has moved;
-      // triggered on the drag start item, in the original group.
+      // triggered on the drag start item, in the original sink.
       drag:      "onDragUpdate",
       // a dragged item enters a valid drop target;
       // triggered on the target of the drop.
@@ -36,14 +43,15 @@ class DragHandler {
       // triggered on the drag start item
       dragend:   "onDragEnd",
     });
-    if (group.bind) {
-      group.bind(el);
+    if (sink.bind) {
+      sink.bind(el);
     }
+    return this; // for chaining
   }
   silence() {
-    const { listeners, group } = this;
-    if (group.bind) {
-      group.bind(null);
+    const { listeners, sink } = this;
+    if (sink.bind) {
+      sink.bind(null);
     }
     listeners.silence();
     this.listeners= null;
@@ -52,24 +60,22 @@ class DragHandler {
   // the user is attempting to drag,
   // and bubbles up here to the item.
   onDragStart(evt) {
-    const { dropper, group } = this;
-    if (group.dragStart) {
-      const start= group.dragStart(evt.target, evt.dataTransfer);
-      if (start!==undefined) {
-        if (start) {
-          dropper.setSource(group, start);
-        }
+    const { dropper, sink } = this;
+    if (sink.dragStart) {
+      const start= sink.dragStart(evt.target, evt.dataTransfer);
+      if (start) {
+        dropper.setStart(start, evt.dataTransfer);
         evt.stopPropagation();
         this.log(evt)
       }
     }
   }
-  // caught by bubbling in the group that receives the item
+  // caught by bubbling in the sink that receives the item
   onDrop(evt) {
-    const { dropper, group } = this;
+    const { dropper, sink } = this;
     this.log(evt);
-    if (dropper.start && group.drop) {
-      group.drop(dropper.start, evt.target, evt.dataTransfer);
+    if (dropper.start && sink.dragDrop) {
+      sink.dragDrop(dropper.start, evt.target, evt.dataTransfer);
     }
     dropper.reset(true); // clear here b/c we dont always get dragEnd.
     evt.stopPropagation();
@@ -77,12 +83,12 @@ class DragHandler {
   }
   // the drag event targets the same element as drag start
   // and happens periodically as you move the cursor around.
-  // ie. it only happens in the originating group
+  // ie. it only happens in the originating sink
   onDragUpdate(evt) {
     // this.log(evt);
-    const { dropper, group } = this;
-    if (group.drag) {
-      group.drag();
+    const { dropper, sink } = this;
+    if (sink.dragUpdate) {
+      sink.dragUpdate(evt);
     }
     dropper.updateTarget();
     evt.stopPropagation();
@@ -91,9 +97,9 @@ class DragHandler {
   // if the drag start element has been removed, this will never fire.
   onDragEnd(evt) {
     this.log(evt);
-    const { dropper, group } = this;
-    if (group.dragEnd) {
-      group.dragEnd()
+    const { dropper, sink } = this;
+    if (sink.dragEnd) {
+      sink.dragEnd()
     }
     dropper.reset(true);
     evt.stopPropagation();
@@ -101,25 +107,25 @@ class DragHandler {
   }
   onDragLeave(evt) {
     this.log(evt);
-    const { dropper, group } = this;
-    if (group.dragLeave) {
-      group.dragLeave(evt.dataTransfer);
+    const { dropper, sink, target } = this;
+    if (sink.dragLeave) {
+      sink.dragLeave();
     }
-    dropper.leaving= group;
+    dropper.leaving(target);
     evt.stopPropagation();
     evt.preventDefault();
   }
   // called on dragenter, dragover
   onDragEnterOver(evt) {
     this.log(evt);
-    const { dropper, group } = this;
+    const { dropper, sink } = this;
     const { start } = dropper;
-    if (group.dragOver && start)  {
+    if (sink.dragOver && start)  {
       const { target, dataTransfer:dt } = evt;
-      const res= group.dragOver(start, target, evt);
-      if (res !== undefined) {
-        if (res) {
-          dropper.setTarget(group, res);
+      const over= sink.dragOver(start, target, evt);
+      if (over !== undefined) {
+        if (over) {
+          dropper.setTarget(over);
           dt.dropEffect= "copy";
         }
         evt.stopPropagation();
@@ -128,13 +134,13 @@ class DragHandler {
     }
   }
   log(evt) {
-    // return;
+    return;
     const el= evt.target;
     const dt= evt.dataTransfer;
     // const tgt= this.finder.findIdx(el) || {idx:"xxx", edge:false};
     const fx= (dt&&dt.dropEffect)||"???";
     console.log(evt.type, "@", el.nodeName,
-      // "idx:", tgt.idx, "edge:", tgt.edge,
+      // "idx:", tgt.target.idx, "edge:", tgt.target.edge,
       "fx:", fx);
   }
 };

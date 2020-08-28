@@ -1,10 +1,10 @@
-class StatementTable extends NodeTable {
+class StatementNodes extends NodeList {
   constructor(redux, para) {
-    super(redux, para, para.getKid("$STORY_STATEMENT"));
+    super(redux, para, "$STORY_STATEMENT");
     this.inline= true;
   }
   makeBlank() {
-    return this.nodes.newFromType("story_statement");
+    return this.redux.nodes.newFromType("story_statement");
   }
   // when we drag, we re/move everything from a given statement till the end of line.
   // returns a list of statements
@@ -43,10 +43,9 @@ class StatementTable extends NodeTable {
 // u2630 - hamburger heaven
 Vue.component('mk-paragraph-ctrl', {
   template:
-  `<em-table
+  `<em-node-table
       :class="$root.shift && 'em-shift'"
       :list="list"
-      :dropper="dropper"
       :grip="'\u2630'"
   ><template
       v-slot="{item, idx}"
@@ -54,7 +53,7 @@ Vue.component('mk-paragraph-ctrl', {
       :node="item"
     ></mk-switch
     ></template
-  ></em-table>`,
+  ></em-node-table>`,
   props: {
     node: Node,
   },
@@ -62,7 +61,7 @@ Vue.component('mk-paragraph-ctrl', {
     const { node, "$root": root } = this;
     // each item is a story statement slot
     return {
-      list: new StatementTable(root.redux, node),
+      list: new StatementNodes(root.redux, node),
       dropper: root.dropper,
     }
   },

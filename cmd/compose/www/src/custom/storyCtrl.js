@@ -1,10 +1,10 @@
-class ParagraphTable extends NodeTable {
+class ParagraphNodes extends NodeList {
     constructor(redux, story) {
-    super(redux, story, story.getKid("$PARAGRAPH"));
+    super(redux, story, "$PARAGRAPH");
     this.inline= false;
   }
   makeBlank() {
-    return this.nodes.newFromType("paragraph");
+    return this.redux.nodes.newFromType("paragraph");
   }
   // when we drag, we re/move a single paragraph ( a line ) at once.
   // returns a single statement
@@ -46,17 +46,16 @@ class ParagraphTable extends NodeTable {
 
 Vue.component('mk-story-ctrl', {
   template:
-  `<em-table
+  `<em-node-table
       :class="$root.shift && 'em-shift'"
       :list="list"
-      :dropper="dropper"
   ><template
       v-slot="{item, idx}"
     ><mk-switch
       :node="item"
     ></mk-switch
     ></template
-  ></em-table>`,
+  ></em-node-table>`,
   props: {
     node: Node,
   },
@@ -64,7 +63,7 @@ Vue.component('mk-story-ctrl', {
     const { node, "$root": root } = this;
     // each item is a paragraph run
     return {
-      list: new ParagraphTable(root.redux, node),
+      list: new ParagraphNodes(root.redux, node),
       dropper: root.dropper,
     }
   }

@@ -377,7 +377,7 @@ function nodeTests() {
   runTest("add blank story statement", function(test) {
     const para= test.nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    const table= new StatementTable(test.redux, para);
+    const table= new StatementNodes(test.redux, para);
     if (statements.length!==1 || statements[0].id !== "td0") {
       throw new Error(" td0 should start as the first statement");
     }
@@ -404,7 +404,7 @@ function nodeTests() {
   runTest("move story statements", function(test) {
     const para= test.nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    const table= new StatementTable(test.redux, para);
+    const table= new StatementNodes(test.redux, para);
     table.addBlank(0);
     table.addBlank(1);
     table.addBlank(2);
@@ -433,8 +433,8 @@ function nodeTests() {
     const mainStory= nodes.newFromType("story");
     const otherStory= nodes.newFromType("story");
 
-    const ps1= new ParagraphTable(redux, mainStory);
-    const ps2= new ParagraphTable(redux, otherStory);
+    const ps1= new ParagraphNodes(redux, mainStory);
+    const ps2= new ParagraphNodes(redux, otherStory);
     test.expect(ps1.items, "1");
     test.expect(ps2.items, "4");
 
@@ -452,12 +452,12 @@ function nodeTests() {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphTable( redux, mainStory );
+    const ps= new ParagraphNodes( redux, mainStory );
     const p1= ps.items[0];
     const p2= ps.addBlank();
     console.assert(ps.items.length, 2);
-    const ts1= new StatementTable(redux, p1);
-    const ts2= new StatementTable(redux, p2);
+    const ts1= new StatementNodes(redux, p1);
+    const ts2= new StatementNodes(redux, p2);
     ts1.items.splice(0);
     ts2.items.splice(0);
     // p1: c1, c2
@@ -480,12 +480,12 @@ function nodeTests() {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphTable( redux, mainStory );
+    const ps= new ParagraphNodes( redux, mainStory );
     const p1= ps.items[0];
     const p2= ps.addBlank();
     console.assert(ps.items.length, 2);
-    const ts1= new StatementTable(redux, p1);
-    const ts2= new StatementTable(redux, p2);
+    const ts1= new StatementNodes(redux, p1);
+    const ts2= new StatementNodes(redux, p2);
     ts1.items.splice(0);
     ts2.items.splice(0);
     // p1: c1, c2, c3
@@ -509,12 +509,12 @@ function nodeTests() {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphTable( redux, mainStory );
+    const ps= new ParagraphNodes( redux, mainStory );
     const p1= ps.items[0];
     const p2= ps.addBlank();
     console.assert(ps.items.length, 2);
-    const ts1= new StatementTable(redux, p1);
-    const ts2= new StatementTable(redux, p2);
+    const ts1= new StatementNodes(redux, p1);
+    const ts2= new StatementNodes(redux, p2);
     ts1.items.splice(0);
     ts2.items.splice(0);
     // p1: c1, c2, c3
