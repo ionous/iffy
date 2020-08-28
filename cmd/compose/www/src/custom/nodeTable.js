@@ -20,6 +20,7 @@ class DraggableNode extends Draggable {
   }
 }
 
+//
 class DraggableLine extends DraggableNode {
   constructor(list, target) {
     super(list, target, Number.MAX_VALUE);
@@ -42,7 +43,7 @@ class DraggableLine extends DraggableNode {
 // an event sink implementation specific to em-node-table.
 class NodeTable  {
   constructor(list) {
-    this.list= list; // always a DragList
+    this.list= list; // always a NodeList
     this.finder= false;
   }
   bind(containerEl) {
@@ -56,41 +57,74 @@ class NodeTable  {
     const { list } = this;
     return list.inline? new DraggableLine(list, target): new DraggableNode(list, target);
   }
-  dragOver(start, targetEl) {
-    var res;
+  dragOver(from, targetEl) {
+    let ret, okay= false;
     const target= this.finder.findIdx(targetEl);
     if (target) {
-      // dont allow parents to be dropped into their children.
-      // this is lair specific; we would need to check "is parent" more generically.
-      let overStart;
-      if (start.list === this) {
-          overStart= (target.idx === start.target.idx) ||
-                    (this.list.inline && (target.idx > start.target.idx));
-      } else {
-        // bad cases: a, b, c, d
-        // 1. same (inline) list and idx is same (or larger)
-        // 2. the item we are target has the parent of the item being moved.
-        // FIX: dragging a row ( block source ) into the midst of an item.
-        const overItem= this.list.items[target.idx];
-        if (start.list) {
-          const startItem= start.list.items[start.idx];
-          overStart= overItem && overItem.parent === startItem;
+      if (from instanceof DraggableCommand) {
+        const type= allTypes.all[from.type];
+        const spec= type && type.with;
+        if (spec && spec.slots) {
+          if (this.list.type === "paragraph") {
+            if ((from.type=== "paragraph") || (spec.slots.indexOf("story_statement")>=0)) {
+              okay= true;
+            }
+          } else {
+            if (spec.slots.indexOf(this.list.type)>=0) {
+               okay= true;
+            }
+          }
         }
       }
-      res= !overStart ? this.newDraggable( target ): false;
+      else if (from instanceof DraggableNode) {
+        // dont allow parents to be dropped into their children.
+        // this is lair specific; we would need to check "is parent" more generically.
+        if (from.list === this) {
+            const isAtStart= (target.idx === from.target.idx) ||
+                      (this.list.inline && (target.idx > from.target.idx));
+            if (!isAtStart) {
+              okay= true;
+            }
+        } else {
+          // bad cases: a, b, c, d
+          // 1. same (inline) list and idx is same (or larger)
+          // 2. the item we are target has the parent of the item being moved.
+          // FIX: dragging a row ( block source ) into the midst of an item.
+          const overItem= this.list.items[target.idx];
+          if (from.list) {
+            const fromItem= from.list.items[from.idx];
+            const overStart= overItem && overItem.parent === fromItem;
+            if (!overStart) {
+              okay= true;
+            }
+          }
+        }
+      }
     }
-    return res;
+    return okay && this.newDraggable(target);
   }
-  dragDrop(start, targetEl) {
+  dragDrop(from, targetEl) {
     // not sure why, but dt.dropEffect is often 'none' here on chrome;
     // ( even though drag end will be copy )
-    const drop= this.finder.findIdx(targetEl);
-    if (drop) {
-      if (start instanceof DraggableCommand) {
-        console.log("add new", from.type);
+    const target= this.finder.findIdx(targetEl);
+    if (target) {
+      if (from instanceof DraggableCommand) {
+        let newItem= this.list.redux.nodes.newFromType(from.type);
+        const blank= this.list.makeBlank();
+        if (this.list.type !== "paragraph") {
+          blank.kid= newItem;
+          newItem.parent= blank;
+          newItem= blank;
+        } else {
+          const parent= blank.kids["$STORY_STATEMENT"][0];
+          newItem.parent= parent;
+          parent.kid= newItem;
+          newItem= blank;
+        }
+        this.list.addBlank(target.idx, newItem);
       }
-      else if (start instanceof DraggableNode) {
-        this.list.transferTo(drop.idx, start.list, start.target.idx, start.width);
+      else if (from instanceof DraggableNode) {
+        this.list.transferTo(target.idx, from.list, from.target.idx, from.width);
       }
     }
   }

@@ -1,15 +1,17 @@
 
 class NodeList {
-  constructor( redux, node, token ) {
+  // token should target an array of the passed type
+  constructor( redux, node, token, type ) {
     this.redux= redux;
     this.node= node;
     this.token= token;
+    this.type= type
     this.items= node.getKid(token);
     this.inline= false;
   }
   // users should generally call "addBlank"
   makeBlank() {
-    throw new Error("not implemented");
+    return this.redux.nodes.newFromType(this.type);
   }
   newAt(idx, cmd) {
      throw new Error("not implemented");
@@ -48,9 +50,9 @@ class NodeList {
       });
     }
   }
-  addBlank(at=-1) {
+  addBlank(at=-1, newItem=null) {
     const { redux, node, items } = this;
-    const blank= this.makeBlank();
+    const blank= newItem || this.makeBlank();
     if (at<0) {
       at= items.length;
     }

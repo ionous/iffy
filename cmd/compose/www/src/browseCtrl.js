@@ -168,7 +168,8 @@ Vue.component('mk-browser', {
         }
       }
       if (type.uses==='run') {
-        const slotNames = type.with.slots || [];
+        const spec= type.with;
+        const slotNames = spec.slots || [];
         for (const slot of slotNames) {
           const els= slots[slot] || [];
           els.push(typeName);        // add our new type

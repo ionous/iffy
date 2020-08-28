@@ -1,10 +1,7 @@
 class ActivityList extends NodeList {
   constructor(redux, para) {
-    super(redux, para, "$EXE");
+    super(redux, para, "$EXE", "execute");
     this.inline= false;
-  }
-  makeBlank() {
-    return this.redux.nodes.newFromType("execute");
   }
 
   // when we drag, we re/move a single execute ( a line ) at once.

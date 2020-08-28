@@ -1,10 +1,7 @@
 class ParagraphNodes extends NodeList {
     constructor(redux, story) {
-    super(redux, story, "$PARAGRAPH");
+    super(redux, story, "$PARAGRAPH", "paragraph");
     this.inline= false;
-  }
-  makeBlank() {
-    return this.redux.nodes.newFromType("paragraph");
   }
   // when we drag, we re/move a single paragraph ( a line ) at once.
   // returns a single statement

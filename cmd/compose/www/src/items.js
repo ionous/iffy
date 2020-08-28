@@ -57,7 +57,8 @@ class Types {
     for (const typeName in all) {
       const type= all[typeName];
       if (type.uses === 'run') {
-        const slots= type.with.slots;
+        const spec= type.with;
+        const slots= spec.slots;
         if (slots && slots.includes(slotTypeName)) {
           slats.push(type);
         }
@@ -101,7 +102,8 @@ class Types {
     switch (uses) {
       case "run": {
         const data= {};
-        const { params } = type.with;
+        const spec= type.with;
+        const { params } = spec;
         for ( const token in params ) {
           const param= params[token];
           if (!param.optional) {
@@ -135,7 +137,8 @@ class Types {
         // ex. Item("trait", "testing")
         // determine default value
         let defautValue= "";
-        const { tokens, params }= type.with;
+        const spec= type.with;
+        const { tokens, params }= spec;
         if (tokens.length === 1) {
           const t= tokens[0];
           const param= params[t];

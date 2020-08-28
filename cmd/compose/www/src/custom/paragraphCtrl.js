@@ -1,10 +1,7 @@
 class StatementNodes extends NodeList {
   constructor(redux, para) {
-    super(redux, para, "$STORY_STATEMENT");
+    super(redux, para, "$STORY_STATEMENT", "story_statement");
     this.inline= true;
-  }
-  makeBlank() {
-    return this.redux.nodes.newFromType("story_statement");
   }
   // when we drag, we re/move everything from a given statement till the end of line.
   // returns a list of statements
