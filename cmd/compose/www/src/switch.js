@@ -15,7 +15,9 @@ Vue.component('mk-switch', {
       const { itemType } = node;
       if (itemType) {
         // search for a template particular to the item's underlying type.
-        component= `mk-${itemType.name}-ctrl`
+        const name= itemType.name.replace("_","-");
+        component= `mk-${name}-ctrl`;
+
         // if not, use a generic control based on item's role.
         if (!(component in Vue.options.components)) {
           component= `mk-${itemType.uses}-ctrl`;
