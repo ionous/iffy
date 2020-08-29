@@ -1,6 +1,8 @@
 package assembly
 
 import (
+	"strings"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/lang"
 )
@@ -21,7 +23,10 @@ func AssembleAncestry(asm *Assembler, k string) (err error) {
 		// write ancestors
 		for k, v := range kinds.cache {
 			// validate k
-			if lang.ContainsPunct(k) {
+			if strings.ToLower(k) != k {
+				e := errutil.Fmt("BUG: there are issues with mixed case kinds (ex. %q)", k)
+				err = errutil.Append(err, e)
+			} else if lang.ContainsPunct(k) {
 				e := errutil.New("kind shouldn't contain punctuation", k)
 				err = errutil.Append(err, e)
 			} else if e := asm.WriteAncestor(k, v.GetAncestors()); e != nil {
