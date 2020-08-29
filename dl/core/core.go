@@ -20,6 +20,7 @@ var Slots = []composer.Slot{{
 
 var Slats = []composer.Slat{
 	(*Activity)(nil),
+	(*Always)(nil),
 	(*AllTrue)(nil),
 	(*AnyTrue)(nil),
 
@@ -55,8 +56,8 @@ var Slats = []composer.Slat{
 	(*GetField)(nil),
 	(*GetVar)(nil),
 
-	(*Is)(nil),    // transparent pass-through of a bool eval
-	(*IsNot)(nil), // inverts a bool eval
+	(*IsTrue)(nil),    // transparent pass-through of a bool eval
+	(*IsNotTrue)(nil), // inverts a bool eval
 
 	(*Bool)(nil),
 	(*Number)(nil),

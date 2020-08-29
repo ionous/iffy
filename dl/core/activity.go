@@ -13,8 +13,9 @@ type Activity struct {
 
 func (*Activity) Compose() composer.Spec {
 	return composer.Spec{
-		Name: "activity",
-		Spec: "{exe+execute}",
+		Name:  "activity",
+		Group: "hidden",
+		Spec:  "{exe+execute}",
 	}
 }
 

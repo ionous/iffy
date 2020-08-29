@@ -5,7 +5,8 @@ class StatementNodes extends NodeList {
   }
   // when we drag, we re/move everything from a given statement till the end of line.
   // returns a list of statements
-  removeFrom(at, width= Number.MAX_VALUE) {
+  removeFrom(at) {
+    const width= Number.MAX_VALUE;
     return this.items.splice(at, width).map(el=> {
       el.parent= null;
       return el;
@@ -41,7 +42,6 @@ class StatementNodes extends NodeList {
 Vue.component('mk-paragraph-ctrl', {
   template:
   `<em-node-table
-      :class="$root.shift && 'em-shift'"
       :list="list"
       :grip="'\u2630'"
   ><template

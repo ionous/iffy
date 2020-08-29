@@ -51,6 +51,9 @@ const spec = [
     "uses": "slot"
   },
   {
+    "group": [
+      "hidden"
+    ],
     "name": "activity",
     "spec": "{exe+execute}",
     "uses": "run",
@@ -81,6 +84,23 @@ const spec = [
       "tokens": [
         "all true",
         "$TEST"
+      ]
+    }
+  },
+  {
+    "desc": "Always: returns true always.",
+    "group": [
+      "logic"
+    ],
+    "name": "always",
+    "uses": "run",
+    "with": {
+      "params": {},
+      "slots": [
+        "bool_eval"
+      ],
+      "tokens": [
+        "always"
       ]
     }
   },
@@ -847,7 +867,7 @@ const spec = [
       "logic"
     ],
     "name": "is_true",
-    "spec": "{test} is true",
+    "spec": "{test:bool_eval} is true",
     "uses": "run",
     "with": {
       "slots": [
@@ -1574,6 +1594,10 @@ const spec = [
   },
   {
     "name": "format",
+    "uses": "group"
+  },
+  {
+    "name": "hidden",
     "uses": "group"
   },
   {

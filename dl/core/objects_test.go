@@ -24,7 +24,7 @@ func TestObjects(t *testing.T) {
 
 	t.Run("exists", func(t *testing.T) {
 		testTrue(t, &run, this)
-		testTrue(t, &run, &IsNot{nothing})
+		testTrue(t, &run, &IsNotTrue{nothing})
 	})
 	t.Run("kind of", func(t *testing.T) {
 		if cls, e := rt.GetText(&run, &KindOf{this}); e != nil {
@@ -38,13 +38,13 @@ func TestObjects(t *testing.T) {
 		testTrue(t, &run, &IsKindOf{that, base})
 
 		testTrue(t, &run, &IsKindOf{that, derived})
-		testTrue(t, &run, &IsNot{&IsKindOf{this, derived}})
+		testTrue(t, &run, &IsNotTrue{&IsKindOf{this, derived}})
 	})
 	t.Run("is exact kind of", func(t *testing.T) {
 		testTrue(t, &run, &IsExactKindOf{this, base})
-		testTrue(t, &run, &IsNot{&IsExactKindOf{that, base}})
+		testTrue(t, &run, &IsNotTrue{&IsExactKindOf{that, base}})
 		testTrue(t, &run, &IsExactKindOf{that, derived})
-		testTrue(t, &run, &IsNot{&IsExactKindOf{this, derived}})
+		testTrue(t, &run, &IsNotTrue{&IsExactKindOf{this, derived}})
 	})
 }
 

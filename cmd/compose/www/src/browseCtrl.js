@@ -156,10 +156,13 @@ Vue.component('mk-browser', {
 
     for (const typeName in types) {
       const type= types[typeName];
+      const group= type.group;
+      if (group && group === "hidden") {
+        continue;
+      }
       all.push(typeName);
       //
-      const group= type.group;
-      if (group) {
+      if (group && group !== "hidden") {
         const gs= Array.isArray(group)? group: [group];
         for (const g of gs) {
           const els= groups[g] || [];

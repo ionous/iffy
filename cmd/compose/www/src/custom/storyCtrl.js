@@ -1,18 +1,6 @@
 class ParagraphNodes extends NodeList {
     constructor(redux, story) {
     super(redux, story, "$PARAGRAPH", "paragraph");
-    this.inline= false;
-  }
-  // when we drag, we re/move a single paragraph ( a line ) at once.
-  // returns a single statement
-  removeFrom(at) {
-    var one;
-    const rub= this.items.splice(at, 1);
-    if (rub.length) {
-      one= rub[0];
-      one.parent= null;
-     }
-     return one;
   }
   // add a paragraph, or a line of statements
   // at the paragraph targeted.
@@ -43,9 +31,7 @@ class ParagraphNodes extends NodeList {
 
 Vue.component('mk-story-ctrl', {
   template:
-  `<em-node-table
-      :class="$root.shift && 'em-shift'"
-      :list="list"
+  `<em-node-table :list="list"
   ><template
       v-slot="{item, idx}"
     ><mk-switch

@@ -2,10 +2,10 @@
 // one of "paragraphs" ( lines ) and one of "statements" ( line elements )
 Vue.component('em-node-table', {
   data() {
-    const { list }= this;
+    const { list } = this;
     return {
       items: list.items,
-      classmod: list.inline? "inline":"block",
+      classmod: list.inline? "inline": "block",
     };
   },
   props: {
@@ -49,7 +49,9 @@ Vue.component('em-node-table', {
     }
   },
   template:
-  `<div :class="['em-node-table', 'em-node-table--'+classmod]"
+  `<div :class="{'em-node-table':true,
+                'em-node-table--${this.classmod}':true,
+                'em-shift':$root.shift}"
     ><div
       :class="['em-row', 'em-row__header--'+classmod]"
       :data-drag-idx="-1"

@@ -6,28 +6,28 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// Is transparently returns a boolean eval.
+// IsTrue transparently returns a boolean eval.
 // It exists to help smooth the use of command expressions:
 // eg. "is" {some expression}
-type Is struct {
+type IsTrue struct {
 	Test rt.BoolEval
 }
 
-// IsNot returns the opposite of a boolean eval.
-type IsNot struct {
+// IsNotTrue returns the opposite of a boolean eval.
+type IsNotTrue struct {
 	Test rt.BoolEval
 }
 
-func (*Is) Compose() composer.Spec {
+func (*IsTrue) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "is_true",
 		Group: "logic",
 		Desc:  "Is True: Transparently returns the result of a boolean expression.",
-		Spec:  "{test} is true",
+		Spec:  "{test:bool_eval} is true",
 	}
 }
 
-func (op *Is) GetBool(run rt.Runtime) (ret bool, err error) {
+func (op *IsTrue) GetBool(run rt.Runtime) (ret bool, err error) {
 	if val, e := rt.GetBool(run, op.Test); e != nil {
 		err = errutil.New("IsNot.Negate", e)
 	} else {
@@ -36,7 +36,7 @@ func (op *Is) GetBool(run rt.Runtime) (ret bool, err error) {
 	return
 }
 
-func (*IsNot) Compose() composer.Spec {
+func (*IsNotTrue) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "is_not",
 		Group: "logic",
@@ -44,7 +44,7 @@ func (*IsNot) Compose() composer.Spec {
 	}
 }
 
-func (op *IsNot) GetBool(run rt.Runtime) (ret bool, err error) {
+func (op *IsNotTrue) GetBool(run rt.Runtime) (ret bool, err error) {
 	if val, e := rt.GetBool(run, op.Test); e != nil {
 		err = errutil.New("IsNot.Negate", e)
 	} else {

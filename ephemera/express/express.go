@@ -195,8 +195,8 @@ func (c *Converter) buildUnless(cmd interface{}, arity int) (err error) {
 		if a, ok := args[0].Interface().(rt.BoolEval); !ok {
 			err = errutil.New("argument is not a bool")
 		} else {
-			args[0] = r.ValueOf(&core.IsNot{a}) // rewrite the arg.
-			c.stack.push(args...)               //
+			args[0] = r.ValueOf(&core.IsNotTrue{a}) // rewrite the arg.
+			c.stack.push(args...)                   //
 			err = c.buildCommand(cmd, arity)
 		}
 	}

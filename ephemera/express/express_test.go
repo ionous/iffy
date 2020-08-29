@@ -77,7 +77,7 @@ func TestExpressions(t *testing.T) {
 				&core.AnyTrue{[]rt.BoolEval{
 					False,
 					// isNot requires command parsing
-					&core.IsNot{
+					&core.IsNotTrue{
 						True,
 					},
 				}},
@@ -186,7 +186,7 @@ func TestTemplates(t *testing.T) {
 	t.Run("unless", func(t *testing.T) {
 		if e := testTemplate("{unless 7=7}boop{otherwise}beep{end}",
 			&core.ChooseText{
-				If: &core.IsNot{
+				If: &core.IsNotTrue{
 					&core.CompareNum{
 						N(7), &core.EqualTo{}, N(7),
 					}},

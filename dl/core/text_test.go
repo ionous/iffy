@@ -11,13 +11,13 @@ func TestText(t *testing.T) {
 	var run baseRuntime
 
 	t.Run("is", func(t *testing.T) {
-		testTrue(t, &run, &Is{&Bool{true}})
-		testTrue(t, &run, &IsNot{&Bool{false}})
+		testTrue(t, &run, &IsTrue{&Bool{true}})
+		testTrue(t, &run, &IsNotTrue{&Bool{false}})
 	})
 
 	t.Run("isEmpty", func(t *testing.T) {
 		testTrue(t, &run, &IsEmpty{&Text{}})
-		testTrue(t, &run, &IsNot{&IsEmpty{&Text{"xxx"}}})
+		testTrue(t, &run, &IsNotTrue{&IsEmpty{&Text{"xxx"}}})
 	})
 
 	t.Run("includes", func(t *testing.T) {
@@ -25,7 +25,7 @@ func TestText(t *testing.T) {
 			&Text{"full"},
 			&Text{"ll"},
 		})
-		testTrue(t, &run, &IsNot{&Includes{
+		testTrue(t, &run, &IsNotTrue{&Includes{
 			&Text{"full"},
 			&Text{"bull"},
 		}})

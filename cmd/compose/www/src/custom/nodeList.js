@@ -17,12 +17,22 @@ class NodeList {
      throw new Error("not implemented");
   }
   // returns number of elements added
-  addTo(at, elOrEls) {
-    throw new Error("not implemented");
+  addTo(at, exe) {
+    const { node, items } = this;
+    exe.parent= node;
+    items.splice(at, 0, exe);
   }
   // returns the element or elements removed
-  removeFrom(at, width) {
-    throw new Error("not implemented");
+  // when we drag, we re/move a single execute ( a line ) at once.
+  // returns a single statement
+  removeFrom(at) {
+    var one;
+    const rub= this.items.splice(at, 1);
+    if (rub.length) {
+      one= rub[0];
+      one.parent= null;
+     }
+     return one;
   }
   // at:index, from:Draggable
   transferTo(toIdx, fromList, fromIdx, width=1) {
