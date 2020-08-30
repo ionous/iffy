@@ -22,7 +22,11 @@ func TestMissingKinds(t *testing.T) {
 		if e := AssembleAncestry(asm.assembler, "Ts"); e == nil {
 			t.Fatal("expected error")
 		} else if !containsOnly(asm.dilemmas, `missing singular_kind: "R"`) {
-			t.Fatal(asm.dilemmas)
+			if d := asm.dilemmas; d.Len() == 0 {
+				t.Fatal(e)
+			} else {
+				t.Fatal(d)
+			}
 		} else {
 			t.Log("ok:", e)
 		}

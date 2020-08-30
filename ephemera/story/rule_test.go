@@ -45,7 +45,7 @@ func TestPatternActivity(t *testing.T) {
 func TestPatternRule(t *testing.T) {
 	k, db := newTestDecoder(t)
 	defer db.Close()
-	if e := imp_pattern_handler(k, _pattern_handler); e != nil {
+	if e := imp_pattern_actions(k, _pattern_actions); e != nil {
 		t.Fatal(e)
 	} else {
 		var buf strings.Builder
@@ -68,18 +68,32 @@ func TestPatternRule(t *testing.T) {
 	}
 }
 
-var _pattern_handler = map[string]interface{}{
-	"type": "pattern_handler",
+var _pattern_actions = map[string]interface{}{
+	"type": "pattern_actions",
 	"value": map[string]interface{}{
 		"$NAME": map[string]interface{}{
 			"type":  "pattern_name",
 			"value": "example",
 		},
-		"$HOOK": map[string]interface{}{
-			"type": "pattern_hook",
+		"$PATTERN_RULES": map[string]interface{}{
+			"type": "pattern_rules",
 			"value": map[string]interface{}{
-				"$ACTIVITY": _pattern_activity,
-			}}},
+				"$PATTERN_RULE": []interface{}{
+					map[string]interface{}{
+						"type": "pattern_rule",
+						"value": map[string]interface{}{
+							"$GUARD": map[string]interface{}{
+								"type": "bool_eval",
+								"value": map[string]interface{}{
+									"type":  "always",
+									"value": map[string]interface{}{},
+								}},
+
+							"$HOOK": map[string]interface{}{
+								"type": "pattern_hook",
+								"value": map[string]interface{}{
+									"$ACTIVITY": _pattern_activity,
+								}}}}}}}},
 }
 
 var _object_func = map[string]interface{}{

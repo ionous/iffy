@@ -135,122 +135,138 @@ var FactorialPatternDecl = map[string]interface{}{
 }
 
 var FactorialZero = map[string]interface{}{
-	"type": "pattern_handler",
+	"type": "pattern_actions",
 	"value": map[string]interface{}{
 		"$NAME": map[string]interface{}{
 			"type":  "pattern_name",
 			"value": "factorial",
 		},
-		"$HOOK": map[string]interface{}{
-			"type": "pattern_hook",
+		"$PATTERN_RULES": map[string]interface{}{
+			"type": "pattern_rules",
 			"value": map[string]interface{}{
-				"$RESULT": map[string]interface{}{
-					"type": "pattern_return",
-					"value": map[string]interface{}{
-						"$RESULT": map[string]interface{}{
-							"type": "pattern_result",
-							"value": map[string]interface{}{
-								"$PRIMITIVE": map[string]interface{}{
-									"type": "primitive_func",
+				"$PATTERN_RULE": []interface{}{
+					map[string]interface{}{
+						"type": "pattern_rule",
+						"value": map[string]interface{}{
+							"$HOOK": map[string]interface{}{
+								"type": "pattern_hook",
+								"value": map[string]interface{}{
+									"$RESULT": map[string]interface{}{
+										"type": "pattern_return",
+										"value": map[string]interface{}{
+											"$RESULT": map[string]interface{}{
+												"type": "pattern_result",
+												"value": map[string]interface{}{
+													"$PRIMITIVE": map[string]interface{}{
+														"type": "primitive_func",
+														"value": map[string]interface{}{
+															"$NUMBER_EVAL": map[string]interface{}{
+																"type": "number_eval",
+																"value": map[string]interface{}{
+																	"type": "num_value",
+																	"value": map[string]interface{}{
+																		"$NUM": map[string]interface{}{
+																			"type":  "number",
+																			"value": 1.0,
+																		}}}}}}}}}}}},
+							"$GUARD": map[string]interface{}{
+								"type": "bool_eval",
+								"value": map[string]interface{}{
+									"type": "compare_num",
 									"value": map[string]interface{}{
-										"$NUMBER_EVAL": map[string]interface{}{
+										"$A": map[string]interface{}{
+											"type": "number_eval",
+											"value": map[string]interface{}{
+												"type": "get_var",
+												"value": map[string]interface{}{
+													"$NAME": map[string]interface{}{
+														"type":  "text",
+														"value": "num",
+													}}}},
+										"$IS": map[string]interface{}{
+											"type": "comparator",
+											"value": map[string]interface{}{
+												"type":  "equal",
+												"value": map[string]interface{}{},
+											}},
+										"$B": map[string]interface{}{
 											"type": "number_eval",
 											"value": map[string]interface{}{
 												"type": "num_value",
 												"value": map[string]interface{}{
 													"$NUM": map[string]interface{}{
 														"type":  "number",
-														"value": 1.0,
-													}}}}}}}}}}}},
-		"$FILTERS": map[string]interface{}{
-			"type": "pattern_filters",
-			"value": map[string]interface{}{
-				"$FILTER": []interface{}{
-					map[string]interface{}{
-						"type": "bool_eval",
-						"value": map[string]interface{}{
-							"type": "compare_num",
-							"value": map[string]interface{}{
-								"$A": map[string]interface{}{
-									"type": "number_eval",
-									"value": map[string]interface{}{
-										"type": "get_var",
-										"value": map[string]interface{}{
-											"$NAME": map[string]interface{}{
-												"type":  "text",
-												"value": "num",
-											}}}},
-								"$IS": map[string]interface{}{
-									"type": "comparator",
-									"value": map[string]interface{}{
-										"type":  "equal",
-										"value": map[string]interface{}{},
-									}},
-								"$B": map[string]interface{}{
-									"type": "number_eval",
-									"value": map[string]interface{}{
-										"type": "num_value",
-										"value": map[string]interface{}{
-											"$NUM": map[string]interface{}{
-												"type":  "number",
-												"value": 0.0,
-											}}}}}}}}}}},
+														"value": 0.0,
+													}}}}}}}}}}}}},
 }
 
 var FactorialSubtract = map[string]interface{}{
-	"type": "pattern_handler",
+	"type": "pattern_actions",
 	"value": map[string]interface{}{
 		"$NAME": map[string]interface{}{
 			"type":  "pattern_name",
 			"value": "factorial",
 		},
-		"$HOOK": map[string]interface{}{
-			"type": "pattern_hook",
+		"$PATTERN_RULES": map[string]interface{}{
+			"type": "pattern_rules",
 			"value": map[string]interface{}{
-				"$RESULT": map[string]interface{}{
-					"type": "pattern_return",
-					"value": map[string]interface{}{
-						"$RESULT": map[string]interface{}{
-							"type": "pattern_result",
-							"value": map[string]interface{}{
-								"$PRIMITIVE": map[string]interface{}{
-									"type": "primitive_func",
-									"value": map[string]interface{}{
-										"$NUMBER_EVAL": map[string]interface{}{
-											"type": "number_eval",
-											"value": map[string]interface{}{
-												"type": "product_of",
+				"$PATTERN_RULE": []interface{}{
+					map[string]interface{}{
+						"type": "pattern_rule",
+						"value": map[string]interface{}{
+							"$GUARD": map[string]interface{}{
+								"type": "bool_eval",
+								"value": map[string]interface{}{
+									"type":  "always",
+									"value": map[string]interface{}{},
+								}},
+							"$HOOK": map[string]interface{}{
+								"type": "pattern_hook",
+								"value": map[string]interface{}{
+									"$RESULT": map[string]interface{}{
+										"type": "pattern_return",
+										"value": map[string]interface{}{
+											"$RESULT": map[string]interface{}{
+												"type": "pattern_result",
 												"value": map[string]interface{}{
-													"$A": map[string]interface{}{
-														"type": "number_eval",
+													"$PRIMITIVE": map[string]interface{}{
+														"type": "primitive_func",
 														"value": map[string]interface{}{
-															"type": "get_var",
-															"value": map[string]interface{}{
-																"$NAME": map[string]interface{}{
-																	"type":  "text",
-																	"value": "num",
-																}}}},
-													"$B": map[string]interface{}{
-														"type": "number_eval",
-														"value": map[string]interface{}{
-															"type": "diff_of",
-															"value": map[string]interface{}{
-																"$A": map[string]interface{}{
-																	"type": "number_eval",
+															"$NUMBER_EVAL": map[string]interface{}{
+																"type": "number_eval",
+																"value": map[string]interface{}{
+																	"type": "product_of",
 																	"value": map[string]interface{}{
-																		"type": "get_var",
-																		"value": map[string]interface{}{
-																			"$NAME": map[string]interface{}{
-																				"type":  "text",
-																				"value": "num",
-																			}}}},
-																"$B": map[string]interface{}{
-																	"type": "number_eval",
-																	"value": map[string]interface{}{
-																		"type": "num_value",
-																		"value": map[string]interface{}{
-																			"$NUM": map[string]interface{}{
-																				"type":  "number",
-																				"value": 1.0,
-																			}}}}}}}}}}}}}}}}}}},
+																		"$A": map[string]interface{}{
+																			"type": "number_eval",
+																			"value": map[string]interface{}{
+																				"type": "get_var",
+																				"value": map[string]interface{}{
+																					"$NAME": map[string]interface{}{
+																						"type":  "text",
+																						"value": "num",
+																					}}}},
+																		"$B": map[string]interface{}{
+																			"type": "number_eval",
+																			"value": map[string]interface{}{
+																				"type": "diff_of",
+																				"value": map[string]interface{}{
+																					"$A": map[string]interface{}{
+																						"type": "number_eval",
+																						"value": map[string]interface{}{
+																							"type": "get_var",
+																							"value": map[string]interface{}{
+																								"$NAME": map[string]interface{}{
+																									"type":  "text",
+																									"value": "num",
+																								}}}},
+																					"$B": map[string]interface{}{
+																						"type": "number_eval",
+																						"value": map[string]interface{}{
+																							"type": "num_value",
+																							"value": map[string]interface{}{
+																								"$NUM": map[string]interface{}{
+																									"type":  "number",
+																									"value": 1.0,
+																								}}}}}}}}}}}}}}}}}}}}}}}},
 }

@@ -23,7 +23,7 @@ func AssembleAncestry(asm *Assembler, k string) (err error) {
 		// write ancestors
 		for k, v := range kinds.cache {
 			// validate k
-			if strings.ToLower(k) != k {
+			if strings.ToLower(k) != k && len(k) != 2 {
 				e := errutil.Fmt("BUG: there are issues with mixed case kinds (ex. %q)", k)
 				err = errutil.Append(err, e)
 			} else if lang.ContainsPunct(k) {

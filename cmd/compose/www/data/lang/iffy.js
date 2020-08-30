@@ -78,15 +78,6 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
     make.run("pattern_rules", "{+pattern_rule}");
     make.run("pattern_rule", `When {conditions are met%guard:bool_eval}, then: {do%hook:pattern_hook}`);
 
-    // pattern handler
-    // similar to pattern_type, but with statements hooks instead of type declarations
-    make.run("pattern_handler", "story_statement",
-      "To {name:pattern_name}{filters?pattern_filters}: {hook:pattern_hook}",
-      "Pattern Handler: Actions to take when a pattern gets used."
-      );
-
-    make.run("pattern_filters", " when {filter+bool_eval}");
-
     make.opt("pattern_hook", "run an {activity} or return a {result:pattern_return}");
 
     // fix? activity and pattern_return both exist for the sake of appearance only.

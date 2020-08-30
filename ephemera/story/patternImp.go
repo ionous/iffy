@@ -75,47 +75,6 @@ func imp_pattern_rule(k *Importer, patternName ephemera.Named, r reader.Map) (er
 	return
 }
 
-// make.run("pattern_handler", {name:pattern_name}{filters?pattern_filters}: {hook:pattern_hook}
-func imp_pattern_handler(k *Importer, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "pattern_handler"); e != nil {
-		err = e
-	} else if patternName, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
-		err = e
-	} else if rule, e := imp_pattern_hook(k, m.MapOf("$HOOK")); e != nil {
-		err = e
-	} else {
-		if v := m.MapOf("$FILTERS"); len(v) != 0 {
-			err = imp_pattern_filters(k, rule, v)
-		}
-		if err == nil {
-			if patternProg, e := k.NewProg(rule.typeName(), rule.buildRule()); e != nil {
-				err = e
-			} else {
-				k.NewPatternRule(patternName, patternProg)
-			}
-		}
-	}
-	return
-}
-
-//run("pattern_filters", " when {filter+bool_eval}"
-func imp_pattern_filters(k *Importer, rule *ruleBuilder, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "pattern_filters"); e != nil {
-		err = e
-	} else {
-		err = reader.Repeats(m.SliceOf("$FILTER"),
-			func(m reader.Map) (err error) {
-				if i, e := k.DecodeSlot(m, "bool_eval"); e != nil {
-					err = e
-				} else {
-					rule.addFilter(i.(rt.BoolEval))
-				}
-				return
-			})
-	}
-	return
-}
-
 // opt("pattern_hook", "{activity} or {result:pattern_return}");
 func imp_pattern_hook(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
 	err = reader.Option(r, "pattern_hook", reader.ReadMaps{
