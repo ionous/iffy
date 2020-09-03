@@ -22,9 +22,9 @@ func AssemblePatterns(asm *Assembler) (err error) {
 }
 
 // fix: this probably needs work to get parameter ordering sensible
-func copyPatterns(db *sql.DB) error {
+func copyPatterns(db *sql.DB) (err error) {
 	// problem: assumes
-	_, e := db.Exec(
+	if _, e := db.Exec(
 		`insert into mdl_pat 
 		select pattern, param, type, 
 		(case param  
@@ -36,8 +36,10 @@ func copyPatterns(db *sql.DB) error {
 				and ap.ogid > cp.ogid)
 		end) idx
 		from asm_pattern_decl ap
-		order by pattern, idx`)
-	return e
+		order by pattern, idx`); e != nil {
+		err = errutil.New("copyPatterns", e)
+	}
+	return
 }
 
 func checkPatternSetup(db *sql.DB) (err error) {

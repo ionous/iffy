@@ -16,7 +16,7 @@ type Fields struct {
 	pairs mapType
 	valueOf,
 	patternAt,
-	patternBytes,
+	progBytes,
 	countOf,
 	ancestorsOf,
 	kindOf,
@@ -58,13 +58,11 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				order by tier asc nulls last limit 1`),
 		patternAt: ps.Prep(db,
 			`select param from mdl_pat where pattern=? and idx=?`),
-		patternBytes: ps.Prep(db,
+		progBytes: ps.Prep(db,
 			`select bytes 
-				from mdl_rule mr
-				join mdl_prog mp
-				on (mr.idProg = mp.rowid)
-				where mr.pattern = ?
-				and mp.type = ?`),
+				from mdl_prog
+				where name = ?
+				and type = ?`),
 		countOf: ps.Prep(db,
 			`select count() from run_noun where noun=?`),
 		ancestorsOf: ps.Prep(db,
@@ -176,24 +174,26 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 			// searches for an exact name match
 			ret, err = n.getCachingQuery(key, n.countOf, obj)
 
-		case object.BoolRule, object.NumberRule, object.TextRule,
-			object.ExecuteRule, object.NumListRule, object.TextListRule:
-			ret, err = n.getCachingRules(key, obj, field[1:])
-
 		default:
-			// see if the user is asking for the status of a trait
-			if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
-				err = e
-			} else if aspect := a.(string); len(aspect) > 0 {
-				ret, err = n.getCachingStatus(obj, aspect, field)
+			if p, ok := findProgByName(field); ok {
+				ret, err = n.getAggregatedProg(key, p)
 			} else {
-				ret, err = n.getCachingField(key)
+				// see if the user is asking for the status of a trait
+				if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
+					err = e
+				} else if aspect := a.(string); len(aspect) > 0 {
+					ret, err = n.getCachingStatus(obj, aspect, field)
+				} else {
+					ret, err = n.getCachingField(key)
+				}
 			}
 		}
 	}
 	return
 }
 
+// returns the name of a field based on an index
+// ex. especially for resolving positional pattern parameters into names.
 func (n *Fields) GetFieldByIndex(obj string, idx int) (ret string, err error) {
 	if idx <= 0 {
 		err = errutil.New("GetFieldByIndex out of range", idx)

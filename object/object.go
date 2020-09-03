@@ -12,9 +12,8 @@ const Kinds = "$kinds"     // hierarchy of a game object ( a path )
 const Counter = "$counter" // sequence counter
 const Aspect = "$aspect"   // name of aspect for noun.trait
 
-// originally these were just "pattern"
-// it helps to have a type hint to GetField
-// it might be better to pass the out pointer so GetField can do that.
+// asking for the "rule" field of a named pattern
+// returns an aggregated list of "programs" of that type.
 const BoolRule = "$bool_rule"
 const NumberRule = "$number_rule"
 const TextRule = "$text_rule"

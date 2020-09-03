@@ -1,5 +1,6 @@
 package composer
 
+// Spec for display in composer
 type Spec struct {
 	Name, Spec, Group, Desc string
 	Locals                  []string

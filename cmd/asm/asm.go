@@ -52,7 +52,9 @@ func assemble(outFile, inFile string) (err error) {
 			bi, _ := os.Stat(outFile)
 			if !os.SameFile(ai, bi) {
 				s := "attach database '" + inFile + "' as indb;"
-				_, err = db.Exec(s)
+				if _, e := db.Exec(s); e != nil {
+					err = errutil.New("error attaching db", e)
+				}
 			}
 			return
 		}(); e != nil {

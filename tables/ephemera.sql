@@ -2,12 +2,14 @@
 create table eph_alias( idNamedAlias int, idNamedActual int );
 /* collection of related states ( called traits ) */
 create table eph_aspect( idNamedAspect int );
-/* likelyhood that a trait applies to a particular kind */
+/* likelihood that a trait applies to a particular kind */
 create table eph_certainty( certainty text, idNamedTrait int, idNamedKind text );
 /* test programs and the results they are expected to produce */
-create table eph_check( idNamedTest int, idProg int, expect text );
+create table eph_check( idNamedTest int, idProg int );
 /* initial values for the properties of nouns of belonging to the specified kind */
 create table eph_default( idNamedKind int, idNamedProp int, value blob );
+/* test programs and the results they are expected to produce */
+create table eph_expect( idNamedTest int, testType text, expect text );
 /* property name and type associated with a kind of object */
 create table eph_field( primType text, idNamedKind int, idNamedField int );
 /* collection of related nouns, plural named kind, singular named parent
@@ -27,7 +29,7 @@ create table eph_pattern( idNamedPattern int, idNamedParam int, idNamedType int,
 /* rule for the collective name of a singular word */
 create table eph_plural( idNamedPlural int, idNamedSingluar int );
 /* type is the name of the command container for de-serialization of the prog */
-create table eph_prog( idSource int, type text, prog blob );
+create table eph_prog( idSource int, progType text, prog blob );
 /* connection between two kinds of object */
 create table eph_relation( idNamedRelation int, idNamedKind int, idNamedOtherKind int, cardinality text check (cardinality in ('one_one','one_any','any_one','any_any')));
 /* connection between two object instances */	

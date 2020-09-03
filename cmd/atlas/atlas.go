@@ -9,15 +9,18 @@ import (
 
 	"golang.org/x/net/context"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/web"
 	"github.com/ionous/iffy/web/support"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 //go:generate templify -p main -o atlas.gen.go atlas.sql
-func CreateAtlas(db *sql.DB) error {
-	_, e := db.Exec(atlasTemplate())
-	return e
+func CreateAtlas(db *sql.DB) (err error) {
+	if _, e := db.Exec(atlasTemplate()); e != nil {
+		err = errutil.New("CreateAtlas:", e)
+	}
+	return
 }
 
 func main() {

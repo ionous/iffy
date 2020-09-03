@@ -16,7 +16,7 @@ import (
 func ExampleSayMe() {
 	// rules are run in reverse order.
 	run := patternRuntime{patternMap: patternMap{
-		"sayMe": pattern.TextRules{
+		"sayMe": []*pattern.TextRule{
 			{nil, SayIt("Not between 1 and 3.")},
 			{MatchNumber(3), SayIt("San!")},
 			{MatchNumber(3), SayIt("Three!")},
@@ -26,8 +26,8 @@ func ExampleSayMe() {
 
 	// say 4 numbers
 	for i := 1; i <= 4; i++ {
-		det := core.DetermineText{
-			"sayMe", &core.Parameters{[]*core.Parameter{{
+		det := pattern.DetermineText{
+			"sayMe", &pattern.Parameters{[]*pattern.Parameter{{
 				"num",
 				&core.FromNum{
 					&core.Number{float64(i)},

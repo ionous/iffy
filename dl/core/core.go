@@ -32,15 +32,6 @@ var Slats = []composer.Slat{
 	(*FromNumList)(nil),
 	(*FromTextList)(nil),
 
-	(*DetermineAct)(nil),
-	(*DetermineNum)(nil),
-	(*DetermineText)(nil),
-	(*DetermineBool)(nil),
-	(*DetermineNumList)(nil),
-	(*DetermineTextList)(nil),
-	(*Parameters)(nil),
-	(*Parameter)(nil),
-
 	// FIX: Choose scalar/any?
 	(*Choose)(nil),
 	(*ChooseNum)(nil),

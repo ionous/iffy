@@ -13,12 +13,14 @@ func ephemeraTemplate() string {
 		"create table eph_alias( idNamedAlias int, idNamedActual int );\n" +
 		"/* collection of related states ( called traits ) */\n" +
 		"create table eph_aspect( idNamedAspect int );\n" +
-		"/* likelyhood that a trait applies to a particular kind */\n" +
+		"/* likelihood that a trait applies to a particular kind */\n" +
 		"create table eph_certainty( certainty text, idNamedTrait int, idNamedKind text );\n" +
 		"/* test programs and the results they are expected to produce */\n" +
-		"create table eph_check( idNamedTest int, idProg int, expect text );\n" +
+		"create table eph_check( idNamedTest int, idProg int );\n" +
 		"/* initial values for the properties of nouns of belonging to the specified kind */\n" +
 		"create table eph_default( idNamedKind int, idNamedProp int, value blob );\n" +
+		"/* test programs and the results they are expected to produce */\n" +
+		"create table eph_expect( idNamedTest int, testType text, expect text );\n" +
 		"/* property name and type associated with a kind of object */\n" +
 		"create table eph_field( primType text, idNamedKind int, idNamedField int );\n" +
 		"/* collection of related nouns, plural named kind, singular named parent\n" +
@@ -38,7 +40,7 @@ func ephemeraTemplate() string {
 		"/* rule for the collective name of a singular word */\n" +
 		"create table eph_plural( idNamedPlural int, idNamedSingluar int );\n" +
 		"/* type is the name of the command container for de-serialization of the prog */\n" +
-		"create table eph_prog( idSource int, type text, prog blob );\n" +
+		"create table eph_prog( idSource int, progType text, prog blob );\n" +
 		"/* connection between two kinds of object */\n" +
 		"create table eph_relation( idNamedRelation int, idNamedKind int, idNamedOtherKind int, cardinality text check (cardinality in ('one_one','one_any','any_one','any_any')));\n" +
 		"/* connection between two object instances */\t\n" +

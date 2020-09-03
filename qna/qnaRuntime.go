@@ -26,11 +26,19 @@ func NewRuntime(db *sql.DB) *Runner {
 }
 
 type Runner struct {
+	db *sql.DB
 	scope.ScopeStack
 	Randomizer
 	writer.Sink
 	*Fields
 	plurals *Plurals
+}
+
+func (run *Runner) ActivateDomain(domain string, active bool) {
+	e := ActivateDomain(run.db, domain, active)
+	if e != nil {
+		panic(e)
+	}
 }
 
 func (run *Runner) SingularOf(str string) (ret string) {

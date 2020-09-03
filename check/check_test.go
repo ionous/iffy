@@ -1,9 +1,8 @@
-package internal
+package check
 
 import (
 	"testing"
 
-	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
@@ -11,8 +10,10 @@ import (
 )
 
 func TestCheck(t *testing.T) {
-	prog := &check.TestOutput{
-		"hello", core.NewActivity(
+	prog := &CheckOutput{
+		Name:   "hello",
+		Expect: "hello",
+		Prog: core.NewActivity(
 			&core.Choose{
 				If: &core.Bool{Bool: true},
 				True: core.NewActivity(&core.Say{
@@ -28,7 +29,7 @@ func TestCheck(t *testing.T) {
 	}
 }
 
-func runTest(prog check.Testing) (err error) {
+func runTest(prog *CheckOutput) (err error) {
 	var run checkTester
 	run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
 	return prog.RunTest(&run)
@@ -40,4 +41,7 @@ type baseRuntime struct {
 type checkTester struct {
 	baseRuntime
 	writer.Sink
+}
+
+func (c *checkTester) ActivateDomain(string, bool) {
 }

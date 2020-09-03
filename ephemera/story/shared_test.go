@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy"
-	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/tables"
@@ -27,7 +26,6 @@ func newTestDecoder(t *testing.T) (ret *Importer, retDB *sql.DB) {
 	//
 	dec := decode.NewDecoder()
 	dec.AddDefaultCallbacks(core.Slats)
-	dec.AddDefaultCallbacks(check.Slats)
 	return newTestImporterDecoder(t, dec)
 }
 

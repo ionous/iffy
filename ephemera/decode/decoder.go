@@ -59,20 +59,32 @@ func (dec *Decoder) AddDefaultCallbacks(slats []composer.Slat) {
 }
 
 // ReadProg attempts to parse the passed json data as a golang program.
-func (dec *Decoder) ReadProg(m reader.Map) (ret interface{}, err error) {
+func (dec *Decoder) ReadProg(m reader.Map, outPtr interface{}) (err error) {
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
 	if cmd, ok := dec.cmds[itemType]; !ok {
 		err = errutil.Fmt("unknown type %q with reading a program at %s", itemType, reader.At(m))
+	} else if rptr, e := dec.readNew(cmd, itemValue); e != nil {
+		err = e
 	} else {
-		ret, err = dec.readNew(cmd, itemValue)
+		out := r.ValueOf(outPtr).Elem()
+		outType := out.Type()
+		if rtype := rptr.Type(); !rtype.AssignableTo(outType) {
+			err = errutil.New("incompatible types", rtype.String(), "not assignable to", outType.String())
+		} else {
+			out.Set(rptr)
+		}
 	}
 	return
 }
 
-// m is the contents of slotType is a concrete command ( not a ptr to a command )
-func (dec *Decoder) readNew(cmd cmdRec, m reader.Map) (ret interface{}, err error) {
+// m is the contents of slotType is a concrete command; returns a pointer to the command
+func (dec *Decoder) readNew(cmd cmdRec, m reader.Map) (ret r.Value, err error) {
 	if read := cmd.customReader; read != nil {
-		ret, err = read(m)
+		if res, e := read(m); e != nil {
+			err = e
+		} else {
+			ret = r.ValueOf(res)
+		}
 	} else if cmd.elem.Kind() != r.Struct {
 		panic("expected a struct")
 	} else {
@@ -80,7 +92,7 @@ func (dec *Decoder) readNew(cmd cmdRec, m reader.Map) (ret interface{}, err erro
 		if e := dec.readFields(ptr.Elem(), m.MapOf(reader.ItemValue)); e != nil {
 			err = e
 		} else {
-			ret = ptr.Interface()
+			ret = ptr
 		}
 	}
 	return
@@ -125,15 +137,12 @@ func (dec *Decoder) importSlot(m reader.Map, slotType r.Type) (ret r.Value, err 
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
 	if cmd, ok := dec.cmds[itemType]; !ok {
 		err = errutil.Fmt("unknown type %q while importing slot %q at %s", itemType, slotType, reader.At(m))
-	} else if cmd, e := dec.readNew(cmd, itemValue); e != nil {
+	} else if rptr, e := dec.readNew(cmd, itemValue); e != nil {
 		err = e
+	} else if rtype := rptr.Type(); !rtype.AssignableTo(slotType) {
+		err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
 	} else {
-		rval := r.ValueOf(cmd)
-		if rtype := rval.Type(); !rtype.AssignableTo(slotType) {
-			err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
-		} else {
-			ret = rval
-		}
+		ret = rptr
 	}
 	return
 }

@@ -2,6 +2,7 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -17,11 +18,10 @@ func (on objRef) getTextName() rt.TextEval {
 
 func (on objRef) getPrintedName() rt.TextEval {
 	return &core.Buffer{core.NewActivity(
-		&core.DetermineAct{
+		&pattern.DetermineAct{
 			Pattern: "printAName",
-			Parameters: &core.Parameters{[]*core.Parameter{
-				&core.Parameter{
-					Name: "$1",
-					From: &core.FromText{on.name},
-				}}}})}
+			Parameters: &pattern.Parameters{[]*pattern.Parameter{{
+				Name: "$1",
+				From: &core.FromText{on.name},
+			}}}})}
 }

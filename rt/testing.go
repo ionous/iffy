@@ -7,6 +7,9 @@ import (
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
 
+func (Panic) ActivateDomain(name string, enable bool) {
+	panic("Runtime panic")
+}
 func (Panic) GetFieldByIndex(target string, idx int) (string, error) {
 	panic("Runtime panic")
 }

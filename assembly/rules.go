@@ -7,15 +7,18 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-func copyRules(db *sql.DB) error {
-	_, e := db.Exec(
-		`insert into mdl_rule select pattern, idProg from asm_rule`)
-	return e
+func copyRules(db *sql.DB) (err error) {
+	if _, e := db.Exec(
+		`insert into mdl_prog 
+		select pattern as name, type, prog as bytes
+		from asm_rule`); e != nil {
+		err = errutil.New("copyRules", e)
+	}
+	return
 }
 
 func checkRuleSetup(db *sql.DB) (err error) {
 	var pat, patType, ruleType string
-
 	// mismatched
 	if e := tables.QueryAll(db,
 		`select distinct pattern, pt, rt

@@ -10,14 +10,14 @@ import (
 )
 
 func TestTextIteration(t *testing.T) {
-	ps := TextListRules{
+	ps := []*TextListRule{
 		{ListRule{Flags: Infix}, Text("1")},
 		{ListRule{Flags: Postfix}, Text("2")},
 		{ListRule{Flags: Prefix}, Text("3")},
 		{ListRule{Filter: Skip}, Text("0")},
 		{ListRule{Flags: Postfix}, Text("4")},
 	}
-	if inds, e := splitRules(nil, ps, len(ps)); e != nil {
+	if inds, e := splitText(nil, ps); e != nil {
 		t.Fatal(e)
 	} else if cnt := len(inds); cnt != 4 {
 		t.Fatal("expected 4 matching rules")
@@ -60,14 +60,14 @@ func TestTextIteration(t *testing.T) {
 }
 
 func TestNumIteration(t *testing.T) {
-	ps := NumListRules{
+	ps := []*NumListRule{
 		{ListRule{Flags: Infix}, Number(1)},
 		{ListRule{Filter: Skip}, Number(88)},
 		{ListRule{Flags: Postfix}, Number(2)},
 		{ListRule{Flags: Prefix}, Number(3)},
 		{ListRule{Flags: Postfix}, Number(4)},
 	}
-	if inds, e := splitRules(nil, ps, len(ps)); e != nil {
+	if inds, e := splitNumbers(nil, ps); e != nil {
 		t.Fatal(e)
 	} else if cnt := len(inds); cnt != 4 {
 		t.Fatal("expected 4 matching rules")

@@ -45,10 +45,11 @@ func fromSequence(k *Importer, m reader.Map) (ret core.Sequence, err error) {
 	var ps []rt.TextEval
 	if e := reader.Repeats(m.SliceOf("$PARTS"),
 		func(m reader.Map) (err error) {
-			if p, e := k.DecodeSlot(m, "text_eval"); e != nil {
+			var slot rt.TextEval
+			if e := k.DecodeSlot(m, "text_eval", &slot); e != nil {
 				err = e
 			} else {
-				ps = append(ps, p.(rt.TextEval))
+				ps = append(ps, slot)
 			}
 			return
 		}); e != nil {

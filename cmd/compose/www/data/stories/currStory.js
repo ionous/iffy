@@ -547,7 +547,7 @@ function getStory() {
                             },
                             "$HOOK": {
                               "id": "id-17433b055cf-5",
-                              "type": "pattern_hook",
+                              "type": "program_hook",
                               "value": {
                                 "$ACTIVITY": {
                                   "id": "id-17433b055cf-8",
@@ -703,7 +703,7 @@ function getStory() {
                             },
                             "$HOOK": {
                               "id": "id-1743bd78458-13",
-                              "type": "pattern_hook",
+                              "type": "program_hook",
                               "value": {
                                 "$ACTIVITY": {
                                   "id": "id-1743bd78458-26",
@@ -843,7 +843,7 @@ function getStory() {
                             },
                             "$HOOK": {
                               "id": "id-1743bd78458-13",
-                              "type": "pattern_hook",
+                              "type": "program_hook",
                               "value": {
                                 "$ACTIVITY": {
                                   "id": "id-1743bd78458-26",

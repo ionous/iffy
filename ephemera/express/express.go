@@ -7,6 +7,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
@@ -146,12 +147,12 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 	if args, e := c.stack.pop(arity); e != nil {
 		err = e
 	} else {
-		var ps core.Parameters
+		var ps pattern.Parameters
 		for i, arg := range args {
 			if newa, e := newAssignment(arg); e != nil {
 				err = errutil.Append(e)
 			} else {
-				newp := &core.Parameter{
+				newp := &pattern.Parameter{
 					Name: "$" + strconv.Itoa(i+1),
 					From: newa,
 				}
@@ -159,7 +160,7 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 			}
 		}
 		if err == nil {
-			c.buildOne(&core.DetermineText{
+			c.buildOne(&pattern.DetermineText{
 				Pattern:    name,
 				Parameters: &ps,
 			})

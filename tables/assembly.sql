@@ -38,23 +38,24 @@ asm_kind as
  */
 create temp view 
 asm_ancestry as
-select ak.name as parent, nk.name as kid 
+select ak.name as parent, kn.name as kid 
 from eph_kind ek
 join asm_kind ak
 	on (ak.singularId = ek.idNamedParent)
-left join eph_named nk
-where nk.rowid = ek.idNamedKind;
+left join eph_named kn
+where kn.rowid = ek.idNamedKind;
 
-/* resolve test ephemera to strings
+/* resolve rules to programs
  */
 create temp view 
 asm_rule as 
-	select rn.name as pattern, type, prog, idProg
+	select rn.name as pattern, progType as type, prog
 from eph_rule er
-left join eph_named rn
+join eph_named rn
 	on (er.idNamedPattern = rn.rowid)
-left join eph_prog ep
-	on (er.idProg = ep.rowid);
+join eph_prog ep
+	on (er.idProg = ep.rowid)
+order by pattern, type, idProg;
 
 /* patterns and rules with similar names and possibly different types
  */
@@ -74,17 +75,21 @@ and ap.pattern = ar.pattern;
  */
 create temp view
 asm_check as
-	select nk.name as name, idProg, expect 
-from eph_check p join eph_named nk
-	on (p.idNamedTest = nk.rowid);
+	select kn.name as name, progType as type, prog
+from eph_check ek 
+join eph_named kn
+	on (ek.idNamedTest = kn.rowid)
+join eph_prog ep
+	on (ek.idProg = ep.rowid)
+order by name, type, idProg;
 
 /* resolve default ephemera to strings.
  */
 create temp view 
 asm_default as
-	select p.rowid as idEphDefault, nk.name as kind, nf.name as prop, p.value as value
-from eph_default p join eph_named nk
-	on (p.idNamedKind = nk.rowid)
+	select p.rowid as idEphDefault, kn.name as kind, nf.name as prop, p.value as value
+from eph_default p join eph_named kn
+	on (p.idNamedKind = kn.rowid)
 left join eph_named nf
 	on (p.idNamedProp = nf.rowid);
 

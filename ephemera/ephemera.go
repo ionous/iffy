@@ -123,8 +123,12 @@ func (r *Recorder) NewRelative(primary, stem, secondary Named) {
 	r.cache.Must(eph_relative, primary, stem, secondary)
 }
 
-func (r *Recorder) NewTest(test Named, prog Prog, expect string) {
-	r.cache.Must(eph_check, test, prog, expect)
+func (r *Recorder) NewTestProgram(test Named, prog Prog) {
+	r.cache.Must(eph_check, test, prog)
+}
+
+func (r *Recorder) NewTestExpectation(test Named, testType string, expect string) {
+	r.cache.Must(eph_expect, test, testType, expect)
 }
 
 // NewTrait records a member of an aspect and its order ( rank. )
@@ -146,8 +150,9 @@ func (r *Recorder) NewVerb(stem, relation Named, verb string) {
 var eph_alias = tables.Insert("eph_alias", "idNamedAlias", "idNamedActual")
 var eph_aspect = tables.Insert("eph_aspect", "idNamedAspect")
 var eph_certainty = tables.Insert("eph_certainty", "certainty", "idNamedTrait", "idNamedKind")
-var eph_check = tables.Insert("eph_check", "idNamedTest", "idProg", "expect")
+var eph_check = tables.Insert("eph_check", "idNamedTest", "idProg")
 var eph_default = tables.Insert("eph_default", "idNamedKind", "idNamedProp", "value")
+var eph_expect = tables.Insert("eph_expect", "idNamedTest", "testType", "expect")
 var eph_field = tables.Insert("eph_field", "primType", "idNamedKind", "idNamedField")
 var eph_rule = tables.Insert("eph_rule", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
@@ -155,7 +160,7 @@ var eph_named = tables.Insert("eph_named", "name", "og", "category", "domain", "
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")
 var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType", "decl")
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")
-var eph_prog = tables.Insert("eph_prog", "idSource", "type", "prog")
+var eph_prog = tables.Insert("eph_prog", "idSource", "progType", "prog")
 var eph_relation = tables.Insert("eph_relation", "idNamedRelation", "idNamedKind", "idNamedOtherKind", "cardinality")
 var eph_relative = tables.Insert("eph_relative", "idNamedHead", "idNamedStem", "idNamedDependent")
 var eph_source = tables.Insert("eph_source", "src")

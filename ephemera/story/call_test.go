@@ -6,6 +6,7 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/debug"
+	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
@@ -13,8 +14,8 @@ import (
 // test calling a pattern
 // note: the pattern is undefined.
 func TestDetermineNum(t *testing.T) {
-	expect := core.DetermineNum{
-		"factorial", &core.Parameters{[]*core.Parameter{{
+	expect := pattern.DetermineNum{
+		"factorial", &pattern.Parameters{[]*pattern.Parameter{{
 			"num", &core.FromNum{
 				&core.Number{3},
 			}},

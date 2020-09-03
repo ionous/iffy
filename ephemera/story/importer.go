@@ -75,19 +75,20 @@ func (k *Importer) BindRet(cb func(*Importer, reader.Map) (ret interface{}, err 
 }
 
 // read the passed map as if it contained a slot. ex bool_eval, etc.
-func (k *Importer) DecodeSlot(m reader.Map, slotType string) (ret interface{}, err error) {
+func (k *Importer) DecodeSlot(m reader.Map, slotType string, outPtr interface{}) (err error) {
 	if m, e := reader.Unpack(m, slotType); e != nil {
 		err = e // reuses: "slat" to unpack the contained map.
 	} else {
-		ret, err = k.DecodeAny(m)
+		err = k.DecodeAny(m, outPtr)
 	}
 	return
 }
-func (k *Importer) DecodeAny(m reader.Map) (ret interface{}, err error) {
+
+func (k *Importer) DecodeAny(m reader.Map, outPtr interface{}) (err error) {
 	if k.decoder == nil {
 		err = errutil.New("no decoder initialized")
 	} else if m != nil {
-		ret, err = k.decoder.ReadProg(m)
+		err = k.decoder.ReadProg(m, outPtr)
 	}
 	return
 }

@@ -252,13 +252,13 @@ function getStory() {
                                 }
                               },
                               "$HOOK": {
-                                "type": "pattern_hook",
+                                "type": "program_hook",
                                 "value": {
                                   "$RESULT": {
-                                    "type": "pattern_return",
+                                    "type": "program_return",
                                     "value": {
                                       "$RESULT": {
-                                        "type": "pattern_result",
+                                        "type": "program_result",
                                         "value": {
                                           "$PRIMITIVE": {
                                             "type": "primitive_func",
@@ -318,13 +318,13 @@ function getStory() {
                                 }
                               },
                               "$HOOK": {
-                                "type": "pattern_hook",
+                                "type": "program_hook",
                                 "value": {
                                   "$RESULT": {
-                                    "type": "pattern_return",
+                                    "type": "program_return",
                                     "value": {
                                       "$RESULT": {
-                                        "type": "pattern_result",
+                                        "type": "program_result",
                                         "value": {
                                           "$PRIMITIVE": {
                                             "type": "primitive_func",

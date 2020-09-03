@@ -41,7 +41,7 @@ func TestSayMe(t *testing.T) {
 		t.Fatal(e)
 	}
 	m := assembly.NewAssembler(db)
-	if e := WriteRules(m, "sayMe", pattern.TextRules{
+	if e := WriteRules(m, "sayMe", []*pattern.TextRule{
 		{nil, SayIt("Not between 1 and 3.")},
 		{MatchNumber(3), SayIt("San!")},
 		{MatchNumber(3), SayIt("Three!")},
@@ -58,12 +58,12 @@ func TestSayMe(t *testing.T) {
 	run := NewRuntime(db)
 	if p, e := run.GetField("sayMe", object.TextRule); e != nil {
 		t.Fatal(e)
-	} else if _, ok := p.(pattern.TextRules); !ok {
+	} else if _, ok := p.([]*pattern.TextRule); !ok {
 		t.Fatalf("not %T", p)
 	} else {
 		for i, expect := range []string{"One!", "Two!", "Three!", "Not between 1 and 3."} {
-			det := core.DetermineText{
-				"sayMe", &core.Parameters{[]*core.Parameter{{
+			det := pattern.DetermineText{
+				"sayMe", &pattern.Parameters{[]*pattern.Parameter{{
 					"num", &core.FromNum{
 						&core.Number{float64(i + 1)},
 					},
@@ -80,9 +80,9 @@ func TestSayMe(t *testing.T) {
 	}
 }
 
-func WriteRules(m *assembly.Assembler, name string, rules pattern.TextRules) (err error) {
+func WriteRules(m *assembly.Assembler, name string, rules []*pattern.TextRule) (err error) {
 	for _, rl := range rules {
-		if e := WriteRule(m, name, rl); e != nil {
+		if e := WriteRule(m, name, "text_rule", rl); e != nil {
 			err = e
 			break
 		}
@@ -90,24 +90,15 @@ func WriteRules(m *assembly.Assembler, name string, rules pattern.TextRules) (er
 	return
 }
 
-func WriteRule(m *assembly.Assembler, name string, rule pattern.Rule) (err error) {
-	d := rule.RuleDesc()
-	if pid, e := WriteProg(m, d.Name, rule); e != nil {
-		err = e
-	} else {
-		err = m.WriteRule(name, pid)
-	}
-	return
-
-}
-
-func WriteProg(m *assembly.Assembler, typeName string, prog interface{}) (ret int64, err error) {
+// note: typeName ( execute_rule, etc. ) is enough to separate pattern programs from other types.
+// currently, we only need mdl_pat for translating indexed parameters into parameter names.
+func WriteRule(m *assembly.Assembler, patternName, typeName string, rule *pattern.TextRule) (err error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
-	if e := enc.Encode(prog); e != nil {
+	if e := enc.Encode(rule); e != nil {
 		err = e
 	} else {
-		ret, err = m.WriteProg(typeName, buf.Bytes())
+		_, err = m.WriteProg(patternName, typeName, buf.Bytes())
 	}
 	return
 }

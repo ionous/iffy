@@ -58,109 +58,21 @@ func imp_pattern_rules(k *Importer, patternName ephemera.Named, r reader.Map) (e
 }
 
 func imp_pattern_rule(k *Importer, patternName ephemera.Named, r reader.Map) (err error) {
+	var guard rt.BoolEval
 	if op, e := reader.Unpack(r, "pattern_rule"); e != nil {
 		err = e
-	} else if rule, e := imp_pattern_hook(k, op.MapOf("$HOOK")); e != nil {
+	} else if e := k.DecodeSlot(op.MapOf("$GUARD"), "bool_eval", &guard); e != nil {
 		err = e
-	} else if i, e := k.DecodeSlot(op.MapOf("$GUARD"), "bool_eval"); e != nil {
+	} else if slot, e := imp_program_hook(k, op.MapOf("$HOOK")); e != nil {
 		err = e
 	} else {
-		rule.addFilter(i.(rt.BoolEval))
-		if patternProg, e := k.NewProg(rule.typeName(), rule.buildRule()); e != nil {
+		name, rule := slot.NewRule(guard)
+		//
+		if patternProg, e := k.NewProg(name, rule); e != nil {
 			err = e
 		} else {
 			k.NewPatternRule(patternName, patternProg)
 		}
-	}
-	return
-}
-
-// opt("pattern_hook", "{activity} or {result:pattern_return}");
-func imp_pattern_hook(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
-	err = reader.Option(r, "pattern_hook", reader.ReadMaps{
-		"$ACTIVITY": func(m reader.Map) (err error) {
-			if act, e := imp_activity(k, m); e != nil {
-				err = e
-			} else {
-				ret = newExecuteRule(act)
-			}
-			return
-		},
-		"$RESULT": func(m reader.Map) (err error) {
-			ret, err = imp_pattern_return(k, m)
-			return
-		},
-	})
-	return
-}
-
-// run("pattern_return", "return {result:pattern_result}");
-// note: this slat exists for composer formatting reasons only...
-func imp_pattern_return(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
-	if m, e := reader.Unpack(r, "pattern_return"); e != nil {
-		err = e
-	} else {
-		ret, err = imp_pattern_result(k, m.MapOf("$RESULT"))
-	}
-	return
-}
-
-// opt("pattern_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
-func imp_pattern_result(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
-	err = reader.Option(r, "pattern_result", reader.ReadMaps{
-		"$PRIMITIVE": func(m reader.Map) (err error) {
-			ret, err = imp_primitive_func(k, m)
-			return
-		},
-		"$OBJECT": func(m reader.Map) (err error) {
-			ret, err = imp_object_func(k, m)
-			return
-		},
-	})
-	return
-}
-
-// opt("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}")
-func imp_primitive_func(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
-	err = reader.Option(r, "primitive_func", reader.ReadMaps{
-		"$NUMBER_EVAL": func(m reader.Map) (err error) {
-			if i, e := k.DecodeSlot(m, "number_eval"); e != nil {
-				err = e
-			} else {
-				ret = newNumberRule(i.(rt.NumberEval))
-			}
-			return
-		},
-		"$TEXT_EVAL": func(m reader.Map) (err error) {
-			if i, e := k.DecodeSlot(m, "text_eval"); e != nil {
-				err = e
-			} else {
-				ret = newTextRule(i.(rt.TextEval))
-			}
-			return
-		},
-		"$BOOL_EVAL": func(m reader.Map) (err error) {
-			if i, e := k.DecodeSlot(m, "bool_eval"); e != nil {
-				err = e
-			} else {
-				ret = newBoolRule(i.(rt.BoolEval))
-			}
-			return
-		},
-	})
-	return
-}
-
-// run("object_func", "an object named {name%text_eval}");
-func imp_object_func(k *Importer, r reader.Map) (ret *ruleBuilder, err error) {
-	if m, e := reader.Unpack(r, "object_func"); e != nil {
-		err = e
-	} else if i, e := k.DecodeSlot(m, "text_eval"); e != nil {
-		err = e
-	} else {
-		// FIX: we should wrap the text with a runtime "test the object matches" command
-		// and, -- for simple text values -- add ephemera for "name, type"
-		ret = newTextRule(i.(rt.TextEval))
 	}
 	return
 }

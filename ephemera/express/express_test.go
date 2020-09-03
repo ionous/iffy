@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"
@@ -88,8 +89,8 @@ func TestExpressions(t *testing.T) {
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
 			&core.Buffer{core.NewActivity(
-				&core.DetermineAct{"printAName",
-					&core.Parameters{[]*core.Parameter{{
+				&pattern.DetermineAct{"printAName",
+					&pattern.Parameters{[]*pattern.Parameter{{
 						"$1", &core.FromText{O("A", true)},
 					}}}})}); e != nil {
 			t.Fatal(e)
@@ -223,14 +224,13 @@ func TestTemplates(t *testing.T) {
 	})
 	t.Run("indexed", func(t *testing.T) {
 		if e := testTemplate("{'world'|hello!}",
-			&core.DetermineText{
+			&pattern.DetermineText{
 				Pattern: "hello",
-				Parameters: &core.Parameters{[]*core.Parameter{
-					&core.Parameter{
-						Name: "$1",
-						From: &core.FromText{
-							Val: T("world"),
-						}}}}}); e != nil {
+				Parameters: &pattern.Parameters{[]*pattern.Parameter{{
+					Name: "$1",
+					From: &core.FromText{
+						Val: T("world"),
+					}}}}}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -239,12 +239,12 @@ func TestTemplates(t *testing.T) {
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
 				&core.Buffer{core.NewActivity(
-					&core.DetermineAct{"printAName",
-						&core.Parameters{[]*core.Parameter{
-							&core.Parameter{"$1",
-								&core.FromText{
-									O("object", false),
-								}}}}})}}},
+					&pattern.DetermineAct{"printAName",
+						&pattern.Parameters{[]*pattern.Parameter{{
+							Name: "$1",
+							From: &core.FromText{
+								O("object", false),
+							}}}}})}}},
 		); e != nil {
 			t.Fatal(e)
 		}

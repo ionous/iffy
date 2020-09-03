@@ -3,7 +3,6 @@ package iffy
 import (
 	"encoding/gob"
 
-	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/express"
@@ -11,8 +10,8 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-var AllSlots = [][]composer.Slot{rt.Slots, core.Slots, check.Slots}
-var AllSlats = [][]composer.Slat{core.Slats, check.Slats, express.Slats}
+var AllSlots = [][]composer.Slot{rt.Slots, core.Slots}
+var AllSlats = [][]composer.Slat{core.Slats, express.Slats}
 
 func RegisterGobs() {
 	registerGob()

@@ -9,7 +9,7 @@ import (
 // textIterator
 type textIterator struct {
 	run   rt.Runtime
-	rules TextListRules
+	rules []*TextListRule
 	order []int
 	curr  int
 }

@@ -12,11 +12,11 @@ import (
 func TestFactorial(t *testing.T) {
 	// rules are run in reverse order.
 	run := patternRuntime{patternMap: patternMap{
-		"factorial": pattern.NumberRules{{
+		"factorial": []*pattern.NumberRule{{
 			NumberEval: &core.ProductOf{
 				&core.GetVar{"num"},
-				&core.DetermineNum{
-					"factorial", &core.Parameters{[]*core.Parameter{{
+				&pattern.DetermineNum{
+					"factorial", &pattern.Parameters{[]*pattern.Parameter{{
 						"num", &core.FromNum{
 							&core.DiffOf{
 								&core.GetVar{"num"},
@@ -34,8 +34,8 @@ func TestFactorial(t *testing.T) {
 		}}},
 	}
 	// determine the factorial of the number 3
-	det := core.DetermineNum{
-		"factorial", &core.Parameters{[]*core.Parameter{{
+	det := pattern.DetermineNum{
+		"factorial", &pattern.Parameters{[]*pattern.Parameter{{
 			"num", &core.FromNum{
 				&core.Number{3},
 			}}}},

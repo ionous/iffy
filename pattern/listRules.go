@@ -2,12 +2,7 @@ package pattern
 
 import (
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
 )
-
-type NumListRules []*NumListRule
-type TextListRules []*TextListRule
-type ExecRules []*ExecuteRule
 
 // ListRule for any rule which can respond with multiple results.
 type ListRule struct {
@@ -33,27 +28,6 @@ type ExecuteRule struct {
 	rt.Execute
 }
 
-func (*NumListRule) RuleDesc() RuleDesc {
-	return RuleDesc{
-		"num_list_rule",
-		(*NumListRules)(nil),
-	}
-}
-
-func (*TextListRule) RuleDesc() RuleDesc {
-	return RuleDesc{
-		"text_list_rule",
-		(*TextListRules)(nil),
-	}
-}
-
-func (*ExecuteRule) RuleDesc() RuleDesc {
-	return RuleDesc{
-		"execute_rule",
-		(*ExecRules)(nil),
-	}
-}
-
 func (r *ListRule) ApplyByIndex(run rt.Runtime) (ret Flags, err error) {
 	if ok, e := rt.GetOptionalBool(run, r.Filter, true); e != nil {
 		err = e
@@ -61,57 +35,6 @@ func (r *ListRule) ApplyByIndex(run rt.Runtime) (ret Flags, err error) {
 		ret = -1
 	} else {
 		ret = r.Flags
-	}
-	return
-}
-
-// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps NumListRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps[i].ApplyByIndex(run)
-}
-
-func (ps NumListRules) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	if inds, e := splitRules(run, ps, len(ps)); e != nil {
-		err = e
-	} else {
-		it := numIterator{run, ps, inds, 0}
-		ret = stream.NewNumberChain(&it)
-	}
-	return
-}
-
-// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps TextListRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps[i].ApplyByIndex(run)
-}
-
-func (ps TextListRules) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	if inds, e := splitRules(run, ps, len(ps)); e != nil {
-		err = e
-	} else {
-		it := textIterator{run, ps, inds, 0}
-		ret = stream.NewTextChain(&it)
-	}
-	return
-}
-
-// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps ExecRules) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps[i].ApplyByIndex(run)
-}
-
-func (ps ExecRules) Execute(run rt.Runtime) (err error) {
-	if inds, e := splitRules(run, ps, len(ps)); e != nil {
-		err = e
-	} else {
-		for _, i := range inds {
-			if e := rt.RunOne(run, ps[i].Execute); e != nil {
-				err = e
-				break
-			}
-			// NOTE: if we need to differentiate between "ran" and "not found",
-			// "didnt run" should probably become an error code.
-		}
 	}
 	return
 }

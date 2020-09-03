@@ -9,7 +9,7 @@ import (
 // numIterator
 type numIterator struct {
 	run   rt.Runtime
-	rules NumListRules
+	rules []*NumListRule
 	order []int
 	curr  int
 }

@@ -19,6 +19,7 @@ func imp_story_statement(k *Importer, r reader.Map) (err error) {
 		"relative_to_noun":         k.Bind(imp_relative_to_noun),
 		"test_statement":           k.Bind(imp_test_statement),
 		"test_scene":               k.Bind(imp_test_scene),
+		"test_rule":                k.Bind(imp_test_rule),
 		"pattern_actions":          k.Bind(imp_pattern_actions),
 	})
 }

@@ -1,17 +1,17 @@
 package story
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
 )
 
 func imp_determine_act(k *Importer, m reader.Map) (ret interface{}, err error) {
-	var from core.DetermineAct
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
+	var from pattern.DetermineAct
+	if e := fromPattern(k, m, &from, (*pattern.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -19,8 +19,8 @@ func imp_determine_act(k *Importer, m reader.Map) (ret interface{}, err error) {
 	return
 }
 func imp_determine_num(k *Importer, m reader.Map) (ret interface{}, err error) {
-	var from core.DetermineNum
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
+	var from pattern.DetermineNum
+	if e := fromPattern(k, m, &from, (*pattern.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -28,8 +28,8 @@ func imp_determine_num(k *Importer, m reader.Map) (ret interface{}, err error) {
 	return
 }
 func imp_determine_text(k *Importer, m reader.Map) (ret interface{}, err error) {
-	var from core.DetermineText
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
+	var from pattern.DetermineText
+	if e := fromPattern(k, m, &from, (*pattern.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -37,8 +37,8 @@ func imp_determine_text(k *Importer, m reader.Map) (ret interface{}, err error) 
 	return
 }
 func imp_determine_bool(k *Importer, m reader.Map) (ret interface{}, err error) {
-	var from core.DetermineBool
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
+	var from pattern.DetermineBool
+	if e := fromPattern(k, m, &from, (*pattern.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -46,8 +46,8 @@ func imp_determine_bool(k *Importer, m reader.Map) (ret interface{}, err error) 
 	return
 }
 func imp_determine_num_list(k *Importer, m reader.Map) (ret interface{}, err error) {
-	var from core.DetermineNumList
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
+	var from pattern.DetermineNumList
+	if e := fromPattern(k, m, &from, (*pattern.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -55,8 +55,8 @@ func imp_determine_num_list(k *Importer, m reader.Map) (ret interface{}, err err
 	return
 }
 func imp_determine_text_list(k *Importer, m reader.Map) (ret interface{}, err error) {
-	var from core.DetermineTextList
-	if e := fromPattern(k, m, &from, (*core.FromPattern)(&from)); e != nil {
+	var from pattern.DetermineTextList
+	if e := fromPattern(k, m, &from, (*pattern.FromPattern)(&from)); e != nil {
 		err = e
 	} else {
 		ret = &from
@@ -69,7 +69,7 @@ func imp_determine_text_list(k *Importer, m reader.Map) (ret interface{}, err er
 func fromPattern(k *Importer,
 	m reader.Map,
 	spec composer.Slat,
-	from *core.FromPattern) (err error) {
+	from *pattern.FromPattern) (err error) {
 	typeName := spec.Compose().Name
 	if evalType, e := slotName(spec); e != nil {
 		err = e
@@ -90,11 +90,11 @@ func fromPattern(k *Importer,
 	return
 }
 
-func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Parameters, err error) {
+func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *pattern.Parameters, err error) {
 	if m, e := reader.Unpack(r, "parameters"); e != nil {
 		err = e
 	} else {
-		var ps []*core.Parameter
+		var ps []*pattern.Parameter
 		// record the referenced parameters: names, types, pairings
 		if e := reader.Repeats(m.SliceOf("$PARAMS"),
 			func(m reader.Map) (err error) {
@@ -107,13 +107,13 @@ func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Pa
 			}); e != nil {
 			err = e
 		} else {
-			ret = &core.Parameters{ps}
+			ret = &pattern.Parameters{ps}
 		}
 	}
 	return
 }
 
-func imp_parameter(k *Importer, patternName ephemera.Named, r reader.Map) (ret *core.Parameter, err error) {
+func imp_parameter(k *Importer, patternName ephemera.Named, r reader.Map) (ret *pattern.Parameter, err error) {
 	if m, e := reader.Unpack(r, "parameter"); e != nil {
 		err = e
 	} else if paramName, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
@@ -125,19 +125,13 @@ func imp_parameter(k *Importer, patternName ephemera.Named, r reader.Map) (ret *
 	} else {
 		paramType := k.NewName(slotName, tables.NAMED_TYPE, reader.At(m))
 		k.NewPatternRef(patternName, paramName, paramType)
-		ret = &core.Parameter{Name: paramName.String(), From: a}
+		ret = &pattern.Parameter{Name: paramName.String(), From: a}
 	}
 	return
 }
 
 func imp_assignment(k *Importer, m reader.Map) (ret core.Assignment, err error) {
-	if a, e := k.DecodeSlot(m, "assignment"); e != nil {
-		err = e
-	} else if a, ok := a.(core.Assignment); !ok {
-		err = errutil.Fmt("unexpected assignment %T", a)
-	} else {
-		ret = a
-	}
+	err = k.DecodeSlot(m, "assignment", &ret)
 	return
 }
 

@@ -47,6 +47,11 @@ func (m *Assembler) WriteAncestor(kind, path string) (err error) {
 	return e
 }
 
+func (m *Assembler) WriteCheck(name, testType, expect string) error {
+	_, e := m.cache.Exec(mdl_check, name, testType, expect)
+	return e
+}
+
 func (m *Assembler) WriteField(kind, field, fieldType string) error {
 	_, e := m.cache.Exec(mdl_field, kind, field, fieldType)
 	return e
@@ -114,17 +119,12 @@ func (m *Assembler) WritePlural(one, many string) error {
 	return e
 }
 
-func (m *Assembler) WriteProg(typeName string, bytes []byte) (int64, error) {
-	return m.cache.Exec(mdl_prog, typeName, bytes)
+func (m *Assembler) WriteProg(progName, typeName string, bytes []byte) (int64, error) {
+	return m.cache.Exec(mdl_prog, progName, typeName, bytes)
 }
 
 func (m *Assembler) WriteRelation(relation, kind, cardinality, otherKind string) error {
 	_, e := m.cache.Exec(mdl_rel, relation, kind, cardinality, otherKind)
-	return e
-}
-
-func (m *Assembler) WriteRule(name string, prog int64) error {
-	_, e := m.cache.Exec(mdl_rule, name, prog)
 	return e
 }
 
@@ -152,6 +152,7 @@ func (m *Assembler) WriteVerb(relation, verb string) error {
 }
 
 var mdl_aspect = tables.Insert("mdl_aspect", "aspect", "trait", "rank")
+var mdl_check = tables.Insert("mdl_check", "name", "type", "expect")
 var mdl_default = tables.Insert("mdl_default", "kind", "field", "value")
 var mdl_field = tables.Insert("mdl_field", "kind", "field", "type")
 var mdl_kind = tables.Insert("mdl_kind", "kind", "path")
@@ -160,8 +161,7 @@ var mdl_noun = tables.Insert("mdl_noun", "noun", "kind")
 var mdl_pair = tables.Insert("mdl_pair", "noun", "relation", "otherNoun")
 var mdl_pat = tables.Insert("mdl_pat", "pattern", "param", "type", "idx")
 var mdl_plural = tables.Insert("mdl_plural", "one", "many")
-var mdl_prog = tables.Insert("mdl_prog", "type", "bytes")
+var mdl_prog = tables.Insert("mdl_prog", "name", "type", "bytes")
 var mdl_rel = tables.Insert("mdl_rel", "relation", "kind", "cardinality", "otherKind")
-var mdl_rule = tables.Insert("mdl_rule", "pattern", "idProg")
 var mdl_spec = tables.Insert("mdl_spec", "type", "name", "spec")
 var mdl_start = tables.Insert("mdl_start", "noun", "field", "value")

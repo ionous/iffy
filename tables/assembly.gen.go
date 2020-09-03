@@ -49,23 +49,24 @@ func assemblyTemplate() string {
 		" */\n" +
 		"create temp view \n" +
 		"asm_ancestry as\n" +
-		"select ak.name as parent, nk.name as kid \n" +
+		"select ak.name as parent, kn.name as kid \n" +
 		"from eph_kind ek\n" +
 		"join asm_kind ak\n" +
 		"\ton (ak.singularId = ek.idNamedParent)\n" +
-		"left join eph_named nk\n" +
-		"where nk.rowid = ek.idNamedKind;\n" +
+		"left join eph_named kn\n" +
+		"where kn.rowid = ek.idNamedKind;\n" +
 		"\n" +
-		"/* resolve test ephemera to strings\n" +
+		"/* resolve rules to programs\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_rule as \n" +
-		"\tselect rn.name as pattern, type, prog, idProg\n" +
+		"\tselect rn.name as pattern, progType as type, prog\n" +
 		"from eph_rule er\n" +
-		"left join eph_named rn\n" +
+		"join eph_named rn\n" +
 		"\ton (er.idNamedPattern = rn.rowid)\n" +
-		"left join eph_prog ep\n" +
-		"\ton (er.idProg = ep.rowid);\n" +
+		"join eph_prog ep\n" +
+		"\ton (er.idProg = ep.rowid)\n" +
+		"order by pattern, type, idProg;\n" +
 		"\n" +
 		"/* patterns and rules with similar names and possibly different types\n" +
 		" */\n" +
@@ -85,17 +86,21 @@ func assemblyTemplate() string {
 		" */\n" +
 		"create temp view\n" +
 		"asm_check as\n" +
-		"\tselect nk.name as name, idProg, expect \n" +
-		"from eph_check p join eph_named nk\n" +
-		"\ton (p.idNamedTest = nk.rowid);\n" +
+		"\tselect kn.name as name, progType as type, prog\n" +
+		"from eph_check ek \n" +
+		"join eph_named kn\n" +
+		"\ton (ek.idNamedTest = kn.rowid)\n" +
+		"join eph_prog ep\n" +
+		"\ton (ek.idProg = ep.rowid)\n" +
+		"order by name, type, idProg;\n" +
 		"\n" +
 		"/* resolve default ephemera to strings.\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_default as\n" +
-		"\tselect p.rowid as idEphDefault, nk.name as kind, nf.name as prop, p.value as value\n" +
-		"from eph_default p join eph_named nk\n" +
-		"\ton (p.idNamedKind = nk.rowid)\n" +
+		"\tselect p.rowid as idEphDefault, kn.name as kind, nf.name as prop, p.value as value\n" +
+		"from eph_default p join eph_named kn\n" +
+		"\ton (p.idNamedKind = kn.rowid)\n" +
 		"left join eph_named nf\n" +
 		"\ton (p.idNamedProp = nf.rowid);\n" +
 		"\n" +

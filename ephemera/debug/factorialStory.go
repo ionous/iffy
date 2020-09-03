@@ -10,7 +10,11 @@ var FactorialStory = map[string]interface{}{
 					"$STORY_STATEMENT": []interface{}{
 						map[string]interface{}{
 							"type":  "story_statement",
-							"value": FactorialTestStatement,
+							"value": FactorialTestOutput,
+						},
+						map[string]interface{}{
+							"type":  "story_statement",
+							"value": FactorialTestRule,
 						},
 						map[string]interface{}{
 							"type":  "story_statement",
@@ -26,7 +30,7 @@ var FactorialStory = map[string]interface{}{
 						}}}}}},
 }
 
-var FactorialTestStatement = map[string]interface{}{
+var FactorialTestOutput = map[string]interface{}{
 	"type": "test_statement",
 	"value": map[string]interface{}{
 		"$NAME": map[string]interface{}{
@@ -41,25 +45,37 @@ var FactorialTestStatement = map[string]interface{}{
 					"$LINES": map[string]interface{}{
 						"type":  "lines",
 						"value": "6",
-					},
-					"$GO": map[string]interface{}{
-						"type": "activity",
-						"value": map[string]interface{}{
-							"$EXE": []interface{}{
-								map[string]interface{}{
-									"type": "execute",
+					}}}}},
+}
+
+var FactorialTestRule = map[string]interface{}{
+	"type": "test_rule",
+	"value": map[string]interface{}{
+		"$NAME": map[string]interface{}{
+			"type":  "text",
+			"value": "factorial",
+		},
+		"$HOOK": map[string]interface{}{
+			"type": "program_hook",
+			"value": map[string]interface{}{
+				"$ACTIVITY": map[string]interface{}{
+					"type": "activity",
+					"value": map[string]interface{}{
+						"$EXE": []interface{}{
+							map[string]interface{}{
+								"type": "execute",
+								"value": map[string]interface{}{
+									"type": "say_text",
 									"value": map[string]interface{}{
-										"type": "say_text",
-										"value": map[string]interface{}{
-											"$TEXT": map[string]interface{}{
-												"type": "text_eval",
+										"$TEXT": map[string]interface{}{
+											"type": "text_eval",
+											"value": map[string]interface{}{
+												"type": "print_num",
 												"value": map[string]interface{}{
-													"type": "print_num",
-													"value": map[string]interface{}{
-														"$NUM": map[string]interface{}{
-															"type":  "number_eval",
-															"value": FactorialDetermineNum,
-														}}}}}}}}}}}}}},
+													"$NUM": map[string]interface{}{
+														"type":  "number_eval",
+														"value": FactorialDetermineNum,
+													}}}}}}}}}}}}},
 }
 
 // determine num of factorial where num = 3
@@ -149,13 +165,13 @@ var FactorialZero = map[string]interface{}{
 						"type": "pattern_rule",
 						"value": map[string]interface{}{
 							"$HOOK": map[string]interface{}{
-								"type": "pattern_hook",
+								"type": "program_hook",
 								"value": map[string]interface{}{
 									"$RESULT": map[string]interface{}{
-										"type": "pattern_return",
+										"type": "program_return",
 										"value": map[string]interface{}{
 											"$RESULT": map[string]interface{}{
-												"type": "pattern_result",
+												"type": "program_result",
 												"value": map[string]interface{}{
 													"$PRIMITIVE": map[string]interface{}{
 														"type": "primitive_func",
@@ -221,13 +237,13 @@ var FactorialSubtract = map[string]interface{}{
 									"value": map[string]interface{}{},
 								}},
 							"$HOOK": map[string]interface{}{
-								"type": "pattern_hook",
+								"type": "program_hook",
 								"value": map[string]interface{}{
 									"$RESULT": map[string]interface{}{
-										"type": "pattern_return",
+										"type": "program_return",
 										"value": map[string]interface{}{
 											"$RESULT": map[string]interface{}{
-												"type": "pattern_result",
+												"type": "program_result",
 												"value": map[string]interface{}{
 													"$PRIMITIVE": map[string]interface{}{
 														"type": "primitive_func",

@@ -2,20 +2,19 @@ package pattern
 
 import "github.com/ionous/iffy/rt"
 
-type listRule interface {
-	// apply a rule from a list of rules by its index
-	ApplyByIndex(rt.Runtime, int) (ret Flags, err error)
-}
+// apply a rule from a list of rules by its index
+// returns flags if the filters passed, -1 if they did not, error on any error.
+type applyByIndex func(rt.Runtime, int) (ret Flags, err error)
 
 // call apply on each list rule ( in reverse order )
 // we want the last added rules to win over earlier ones
 // and we want to sort "post fix" rules to the end
-func splitRules(run rt.Runtime, list listRule, cnt int) (ret []int, err error) {
+func splitRules(run rt.Runtime, cnt int, apply applyByIndex) (ret []int, err error) {
 	var pre, post int
 	a := make([]int, cnt)
 	//
 	for i := cnt - 1; i >= 0; i-- {
-		if flags, e := list.ApplyByIndex(run, i); e != nil {
+		if flags, e := apply(run, i); e != nil {
 			err = e
 			break
 		} else if flags >= 0 {
@@ -45,4 +44,22 @@ func splitRules(run rt.Runtime, list listRule, cnt int) (ret []int, err error) {
 		}
 	}
 	return
+}
+
+func splitNumbers(run rt.Runtime, rules []*NumListRule) ([]int, error) {
+	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
+		return rules[i].ApplyByIndex(run)
+	})
+}
+
+func splitText(run rt.Runtime, rules []*TextListRule) ([]int, error) {
+	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
+		return rules[i].ApplyByIndex(run)
+	})
+}
+
+func splitExe(run rt.Runtime, rules []*ExecuteRule) ([]int, error) {
+	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
+		return rules[i].ApplyByIndex(run)
+	})
 }

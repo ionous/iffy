@@ -31,6 +31,7 @@ type Fields interface {
 type Runtime interface {
 	Fields
 	VariableStack
+	ActivateDomain(name string, enable bool)
 	// turn single words into their plural variants, and vice-versa
 	PluralOf(single string) string
 	SingularOf(plural string) string

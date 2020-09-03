@@ -15,11 +15,20 @@ function localLang(make) {
 
   make.group("Tests", function() {
     // "testing" is an interface, currently with one implementation type: TestOutput
+    make.slot("testing", "Run a series of tests.");
+
     make.run("test_statement", "story_statement",
       "The test {test name%name:text|quote} {expects%test:testing}");
 
     make.run("test_scene", "story_statement",
       "During the test {test name%name:text|quote}: {+story_statement}");
+
+    make.run("test_rule", "story_statement",
+      "While testing {test name%name:text|quote}: {do%hook:program_hook}");
+
+    make.run("test_output", "testing",
+      "expects the output {lines|quote}."
+      `Test Output: Expect that a test uses 'Say' to print some specific text.`);
   });
 
   make.group("Nouns", function() {
@@ -76,14 +85,14 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
       "Pattern Actions: Actions to take when using a pattern."
       );
     make.run("pattern_rules", "{+pattern_rule}");
-    make.run("pattern_rule", `When {conditions are met%guard:bool_eval}, then: {do%hook:pattern_hook}`);
+    make.run("pattern_rule", `When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}`);
 
-    make.opt("pattern_hook", "run an {activity} or return a {result:pattern_return}");
+    make.opt("program_hook", "run an {activity} or return a {result:program_return}");
 
-    // fix? activity and pattern_return both exist for the sake of appearance only.
-    make.run("pattern_return", "return {result:pattern_result}");
+    // fix? activity and program_return both exist for the sake of appearance only.
+    make.run("program_return", "return {result:program_result}");
 
-    make.opt("pattern_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
+    make.opt("program_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
     make.opt("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}");
     make.run("object_func", "an object named {name%text_eval}");
   });

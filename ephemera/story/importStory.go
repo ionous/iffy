@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/express"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/pattern"
 )
 
 func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
@@ -23,15 +24,15 @@ func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
 	}
 	dec.AddDefaultCallbacks(core.Slats)
 	dec.AddCallbacks([]decode.Override{
-		{(*core.Activity)(nil), k.BindRet(func(i *Importer, m reader.Map) (interface{}, error) {
-			return imp_activity(i, m) // imp_activity returns *Activity, BindRet expects interface{}
-		})},
-		{(*core.DetermineAct)(nil), k.BindRet(imp_determine_act)},
-		{(*core.DetermineNum)(nil), k.BindRet(imp_determine_num)},
-		{(*core.DetermineText)(nil), k.BindRet(imp_determine_text)},
-		{(*core.DetermineBool)(nil), k.BindRet(imp_determine_bool)},
-		{(*core.DetermineNumList)(nil), k.BindRet(imp_determine_num_list)},
-		{(*core.DetermineTextList)(nil), k.BindRet(imp_determine_text_list)},
+		// {(*core.Activity)(nil), k.BindRet(func(i *Importer, m reader.Map) (interface{}, error) {
+		// 	return imp_activity(i, m) // imp_activity returns *Activity, BindRet expects interface{}
+		// })},
+		{(*pattern.DetermineAct)(nil), k.BindRet(imp_determine_act)},
+		{(*pattern.DetermineNum)(nil), k.BindRet(imp_determine_num)},
+		{(*pattern.DetermineText)(nil), k.BindRet(imp_determine_text)},
+		{(*pattern.DetermineBool)(nil), k.BindRet(imp_determine_bool)},
+		{(*pattern.DetermineNumList)(nil), k.BindRet(imp_determine_num_list)},
+		{(*pattern.DetermineTextList)(nil), k.BindRet(imp_determine_text_list)},
 		//
 		{(*core.CycleText)(nil), k.BindRet(imp_cycle_text)},
 		{(*core.ShuffleText)(nil), k.BindRet(imp_shuffle_text)},
