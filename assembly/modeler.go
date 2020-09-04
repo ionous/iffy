@@ -131,10 +131,20 @@ func (m *Assembler) WriteGob(progName string, cmd interface{}) (ret int64, err e
 	enc := gob.NewEncoder(&buf)
 	rval := r.ValueOf(cmd)
 	if e := enc.EncodeValue(rval); e != nil {
-		err = e
+		err = errutil.New("WriteGob, error encoding value", e)
 	} else {
 		typeName := rval.Elem().Type().Name()
 		ret, err = m.WriteProg(progName, typeName, buf.Bytes())
+	}
+	return
+}
+
+func (m *Assembler) WriteGobs(gobs map[string]interface{}) (err error) {
+	for k, v := range gobs {
+		if _, e := m.WriteGob(k, v); e != nil {
+			err = e
+			break
+		}
 	}
 	return
 }

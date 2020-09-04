@@ -1,43 +1,43 @@
 package assembly
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/gob"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
 )
 
 func buildRules(asm *Assembler) (err error) {
-	var name, lastName, typeName string
-	var rule pattern.TextRule
-	//
-	var pats []*pattern.TextPattern
-	gs := tables.NewGobScanner(&rule)
-	if e := tables.QueryAll(asm.cache.DB(),
-		`select pattern, type, prog
-		from asm_rule
-		where type='text_rule'`,
-		func() (err error) {
-			// new pattern
-			if name != lastName {
-				pats = append(pats, &pattern.TextPattern{
-					Name: name,
-				})
-				lastName = name
-			}
-			copy := rule             // new rule
-			pat := pats[len(pats)-1] // last
-			pat.Rules = append(pat.Rules, &copy)
-			return
-		},
-		&name, &typeName, gs); e != nil {
-		err = errutil.New("buildRules", e)
-	}
-	for _, pat := range pats {
-		if _, e := asm.WriteGob(pat.Name, pat); e != nil {
-			errutil.Append(err, e)
+	for _, rule := range rules {
+		if e := buildFromRule(asm, &rule); e != nil {
+			err = e
+			break
 		}
+	}
+	return
+}
+
+func buildFromRule(asm *Assembler, b *BuildRule) (err error) {
+	list := make(map[string]interface{})
+	var name, last string
+	var prog []byte
+	var curr interface{}
+	if e := tables.QueryAll(asm.cache.DB(), b.Query,
+		func() (err error) {
+			if name != last || curr == nil {
+				curr = b.NewContainer(name)
+				list[name] = curr
+				last = name
+			}
+			el := b.NewEl(curr)
+			dec := gob.NewDecoder(bytes.NewBuffer(prog))
+			return dec.Decode(el)
+		}, &name, &prog); e != nil {
+		err = errutil.New("buildRules", e)
+	} else {
+		err = asm.WriteGobs(list)
 	}
 	return
 }
