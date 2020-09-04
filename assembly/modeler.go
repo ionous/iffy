@@ -1,7 +1,10 @@
 package assembly
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/gob"
+	r "reflect"
 	"strings"
 
 	"github.com/ionous/errutil"
@@ -121,6 +124,19 @@ func (m *Assembler) WritePlural(one, many string) error {
 
 func (m *Assembler) WriteProg(progName, typeName string, bytes []byte) (int64, error) {
 	return m.cache.Exec(mdl_prog, progName, typeName, bytes)
+}
+
+func (m *Assembler) WriteGob(progName string, cmd interface{}) (ret int64, err error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	rval := r.ValueOf(cmd)
+	if e := enc.EncodeValue(rval); e != nil {
+		err = e
+	} else {
+		typeName := rval.Elem().Type().Name()
+		ret, err = m.WriteProg(progName, typeName, buf.Bytes())
+	}
+	return
 }
 
 func (m *Assembler) WriteRelation(relation, kind, cardinality, otherKind string) error {

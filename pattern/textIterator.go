@@ -9,7 +9,7 @@ import (
 // textIterator
 type textIterator struct {
 	run   rt.Runtime
-	rules []*TextListRule
+	pat   *TextListPattern
 	order []int
 	curr  int
 }
@@ -25,7 +25,7 @@ func (k *textIterator) GetNext(pv interface{}) (err error) {
 		err = assign.Mismatch("GetNext", pit, pv)
 	} else {
 		ind := k.order[k.curr]
-		if it, e := rt.GetTextStream(k.run, k.rules[ind]); e != nil {
+		if it, e := rt.GetTextStream(k.run, k.pat.Rules[ind]); e != nil {
 			err = e
 		} else {
 			*pit = it

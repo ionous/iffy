@@ -48,18 +48,18 @@ func splitRules(run rt.Runtime, cnt int, apply applyByIndex) (ret []int, err err
 
 func splitNumbers(run rt.Runtime, rules []*NumListRule) ([]int, error) {
 	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
-		return rules[i].ApplyByIndex(run)
+		return rules[i].GetFlags(run)
 	})
 }
 
 func splitText(run rt.Runtime, rules []*TextListRule) ([]int, error) {
 	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
-		return rules[i].ApplyByIndex(run)
+		return rules[i].GetFlags(run)
 	})
 }
 
 func splitExe(run rt.Runtime, rules []*ExecuteRule) ([]int, error) {
 	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
-		return rules[i].ApplyByIndex(run)
+		return rules[i].GetFlags(run)
 	})
 }

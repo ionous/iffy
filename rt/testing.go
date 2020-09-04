@@ -10,6 +10,9 @@ type Panic struct{}
 func (Panic) ActivateDomain(name string, enable bool) {
 	panic("Runtime panic")
 }
+func (Panic) GetEvalByName(string, interface{}) error {
+	panic("Runtime panic")
+}
 func (Panic) GetFieldByIndex(target string, idx int) (string, error) {
 	panic("Runtime panic")
 }

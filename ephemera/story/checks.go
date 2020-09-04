@@ -41,7 +41,7 @@ func imp_test_rule(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else if hook, e := imp_program_hook(k, m.MapOf("$HOOK")); e != nil {
 		err = e
-	} else if prog, e := k.NewProg(hook.SlotType(), hook.CmdPtr()); e != nil {
+	} else if prog, e := k.NewGob(hook.SlotType(), hook.CmdPtr()); e != nil {
 		err = e
 	} else {
 		k.NewTestProgram(testName, prog)

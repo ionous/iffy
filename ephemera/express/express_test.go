@@ -90,9 +90,9 @@ func TestExpressions(t *testing.T) {
 		if e := testExpression(".A",
 			&core.Buffer{core.NewActivity(
 				&pattern.DetermineAct{"printAName",
-					&pattern.Parameters{[]*pattern.Parameter{{
-						"$1", &core.FromText{O("A", true)},
-					}}}})}); e != nil {
+					pattern.NewParams(
+						&core.FromText{O("A", true)},
+					)})}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -225,12 +225,9 @@ func TestTemplates(t *testing.T) {
 	t.Run("indexed", func(t *testing.T) {
 		if e := testTemplate("{'world'|hello!}",
 			&pattern.DetermineText{
-				Pattern: "hello",
-				Parameters: &pattern.Parameters{[]*pattern.Parameter{{
-					Name: "$1",
-					From: &core.FromText{
-						Val: T("world"),
-					}}}}}); e != nil {
+				"hello", pattern.NewParams(
+					&core.FromText{T("world")},
+				)}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -240,11 +237,9 @@ func TestTemplates(t *testing.T) {
 				T("hello "),
 				&core.Buffer{core.NewActivity(
 					&pattern.DetermineAct{"printAName",
-						&pattern.Parameters{[]*pattern.Parameter{{
-							Name: "$1",
-							From: &core.FromText{
-								O("object", false),
-							}}}}})}}},
+						pattern.NewParams(
+							&core.FromText{O("object", false)},
+						)})}}},
 		); e != nil {
 			t.Fatal(e)
 		}

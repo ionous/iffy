@@ -6,15 +6,14 @@ import (
 
 	"github.com/ionous/iffy/assembly"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/pattern"
+	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/tables"
 )
 
 // test that pattern variables are accessible via objectValue's GetField
 func TestPatternFields(t *testing.T) {
-	gob.Register((*pattern.TextRule)(nil))
 	gob.Register((*core.Text)(nil))
-	gob.Register((*MatchNumber)(nil))
+	gob.Register((*debug.MatchNumber)(nil))
 
 	db := newQnaDB(t, memory)
 	defer db.Close()

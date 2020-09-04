@@ -68,7 +68,7 @@ func imp_pattern_rule(k *Importer, patternName ephemera.Named, r reader.Map) (er
 	} else {
 		name, rule := slot.NewRule(guard)
 		//
-		if patternProg, e := k.NewProg(name, rule); e != nil {
+		if patternProg, e := k.NewGob(name, rule); e != nil {
 			err = e
 		} else {
 			k.NewPatternRule(patternName, patternProg)

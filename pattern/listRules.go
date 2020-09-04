@@ -28,7 +28,7 @@ type ExecuteRule struct {
 	rt.Execute
 }
 
-func (r *ListRule) ApplyByIndex(run rt.Runtime) (ret Flags, err error) {
+func (r *ListRule) GetFlags(run rt.Runtime) (ret Flags, err error) {
 	if ok, e := rt.GetOptionalBool(run, r.Filter, true); e != nil {
 		err = e
 	} else if !ok {

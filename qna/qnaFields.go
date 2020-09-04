@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"strconv"
 
+	r "reflect"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
@@ -62,7 +64,8 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 			`select bytes 
 				from mdl_prog
 				where name = ?
-				and type = ?`),
+				and type = ?
+				limit 1`),
 		countOf: ps.Prep(db,
 			`select count() from run_noun where noun=?`),
 		ancestorsOf: ps.Prep(db,
@@ -141,8 +144,37 @@ func newKey(obj, field string) keyType {
 	return keyType{obj, field}
 }
 
+func newKeyForEval(obj, typeName string) keyType {
+	return keyType{obj, typeName}
+}
+
 func newKeyWithIndex(obj string, idx int) keyType {
 	return keyType{obj, "$" + strconv.Itoa(idx)}
+}
+
+// pv is a pointer to a pattern instance, and we copy its contents in.
+func (n *Fields) GetEvalByName(name string, pv interface{}) (err error) {
+	outVal := r.ValueOf(pv).Elem() // outVal is a pattern instance who's members get overwritten
+	rtype := outVal.Type()
+	// note: newKey camelCases, while go types are PascalCase
+	// this automatically keeps them from conflicting.
+	key := newKeyForEval(name, rtype.Name())
+	if val, ok := n.pairs[key]; ok {
+		store := r.ValueOf(val)
+		outVal.Set(store)
+	} else {
+		var store interface{}
+		switch e := n.progBytes.QueryRow(key.owner, key.member).Scan(&tables.GobScanner{outVal}); e {
+		case nil:
+			store = outVal.Interface()
+		case sql.ErrNoRows:
+			err = fieldNotFound{key.owner, key.member}
+		default:
+			err = e
+		}
+		n.pairs[key] = store
+	}
+	return
 }
 
 func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
@@ -175,20 +207,17 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 			ret, err = n.getCachingQuery(key, n.countOf, obj)
 
 		default:
-			if p, ok := findProgByName(field); ok {
-				ret, err = n.getAggregatedProg(key, p)
+			// see if the user is asking for the status of a trait
+			if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
+				err = e
+			} else if aspect := a.(string); len(aspect) > 0 {
+				ret, err = n.getCachingStatus(obj, aspect, field)
 			} else {
-				// see if the user is asking for the status of a trait
-				if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
-					err = e
-				} else if aspect := a.(string); len(aspect) > 0 {
-					ret, err = n.getCachingStatus(obj, aspect, field)
-				} else {
-					ret, err = n.getCachingField(key)
-				}
+				ret, err = n.getCachingField(key)
 			}
 		}
 	}
+
 	return
 }
 

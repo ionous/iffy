@@ -1,10 +1,17 @@
 package assembly
 
 import (
+	"encoding/gob"
+	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/ephemera/debug"
+	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
+	"github.com/kr/pretty"
 )
 
 //
@@ -53,32 +60,53 @@ func TestPatternAsm(t *testing.T) {
 // assemble patterns and rules into the model rules and programs.
 // doesnt check for consistency -- that's up to pattern and rule checking currently.
 func TestRuleAsm(t *testing.T) {
+	gob.Register((*core.Text)(nil))
+	gob.Register((*debug.MatchNumber)(nil))
+	//
 	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
 		t.Run("normal", func(t *testing.T) {
 			cleanPatterns(asm.db)
-			// name, param, type, decl
+			// sayMe return text, and has one number parameter
 			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "true",
-				"put", "", "text_eval", "true")
-			addEphRule(asm.rec,
-				"pat", "number_rule", "some number",
-				"put", "text_rule", "other text",
-				"pat", "number_rule", "other number",
-			)
-			if e := copyRules(asm.db); e != nil {
+				"sayMe", "", "text_eval", "true",
+				"sayMe", "num", "number_eval", "true")
+
+			for i, rule := range debug.SayPattern.Rules {
+				prog, e := asm.rec.NewGob("text_rule", &rule)
+				if e != nil {
+					t.Fatal(e)
+				}
+				asm.rec.NewPatternRule(
+					asm.rec.NewName("sayMe",
+						tables.NAMED_PATTERN,
+						strconv.Itoa(i+1)),
+					prog)
+			}
+			//
+			if e := buildRules(asm.assembler); e != nil {
 				t.Fatal(e)
 			} else {
-				var buf strings.Builder
-				tables.WriteCsv(asm.db, &buf, "select count() from mdl_prog", 1)
-				if have, want := buf.String(), lines(
-					"3",
-				); have != want {
-					t.Fatal(have)
-				} else {
-					t.Log("ok")
+				var visited bool
+				var progName, typeName string
+				var pat pattern.TextPattern
+				if e := tables.QueryAll(asm.db, "select * from mdl_prog",
+					func() (err error) {
+						if visited {
+							err = errutil.New("multiple programs detected")
+						}
+						visited = true
+						return
+					}, &progName, &typeName, tables.NewGobScanner(&pat)); e != nil {
+					t.Fatal(e)
+				} else if progName != "sayMe" || typeName != "TextPattern" {
+					t.Fatal("mismatched columns")
+				} else if diff := pretty.Diff(debug.SayPattern, pat); len(diff) > 0 {
+					pretty.Println("want:", debug.SayPattern)
+					pretty.Println("have:", pat)
+					t.Fatal("error")
 				}
 			}
 		})

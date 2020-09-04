@@ -13,7 +13,7 @@ func AssemblePatterns(asm *Assembler) (err error) {
 		err = e
 	} else if e := checkRuleSetup(db); e != nil {
 		err = e
-	} else if e := copyRules(db); e != nil {
+	} else if e := buildRules(asm); e != nil {
 		err = e
 	} else if e := copyPatterns(db); e != nil {
 		err = e

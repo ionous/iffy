@@ -1,9 +1,7 @@
 package story
 
 import (
-	"bytes"
 	"database/sql"
-	"encoding/gob"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
@@ -89,18 +87,6 @@ func (k *Importer) DecodeAny(m reader.Map, outPtr interface{}) (err error) {
 		err = errutil.New("no decoder initialized")
 	} else if m != nil {
 		err = k.decoder.ReadProg(m, outPtr)
-	}
-	return
-}
-
-// NewProg add the passed cmd ephemera.
-func (k *Importer) NewProg(typeName string, cmd interface{}) (ret ephemera.Prog, err error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	if e := enc.Encode(cmd); e != nil {
-		err = e
-	} else {
-		ret = k.Recorder.NewProg(typeName, buf.Bytes())
 	}
 	return
 }

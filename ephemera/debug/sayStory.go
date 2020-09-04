@@ -3,7 +3,47 @@ package debug
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/pattern"
+	"github.com/ionous/iffy/rt"
 )
+
+func SayIt(s string) rt.TextEval {
+	return &core.Text{s}
+}
+
+type MatchNumber struct {
+	Val int
+}
+
+func (m MatchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
+	if v, e := run.GetVariable("num"); e != nil {
+		err = e
+	} else {
+		n := int(v.(float64))
+		okay = n == int(m.Val)
+	}
+	return
+}
+
+func DetermineSay(i int) *pattern.DetermineText {
+	return &pattern.DetermineText{
+		"sayMe", pattern.NewNamedParams(
+			"num", &core.FromNum{
+				&core.Number{float64(i)},
+			}),
+	}
+}
+
+var SayPattern = pattern.TextPattern{
+	Name: "sayMe",
+	Rules: []*pattern.TextRule{
+		{nil, SayIt("Not between 1 and 3.")},
+		{&MatchNumber{3}, SayIt("San!")},
+		{&MatchNumber{3}, SayIt("Three!")},
+		{&MatchNumber{2}, SayIt("Two!")},
+		{&MatchNumber{1}, SayIt("One!")},
+	},
+}
 
 var SayTest = core.NewActivity(
 	&core.Choose{

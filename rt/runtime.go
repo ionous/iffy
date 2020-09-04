@@ -29,8 +29,15 @@ type Fields interface {
 
 // Runtime environment for an in-progress game.
 type Runtime interface {
+	// various runtime objects (ex. nouns, kinds, etc. ) store data addressed by name.
 	Fields
+	// find a function, test, or pattern addressed by name
+	// pv should be a pointer to a concrete type.
+	GetEvalByName(name string, pv interface{}) error
+	// stacks of scopes for local variables
 	VariableStack
+	// nouns are grouped into potentially hierarchical "domains"
+	// de/activating makes those groups hidden/visible to the runtime.
 	ActivateDomain(name string, enable bool)
 	// turn single words into their plural variants, and vice-versa
 	PluralOf(single string) string

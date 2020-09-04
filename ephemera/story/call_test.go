@@ -15,11 +15,10 @@ import (
 // note: the pattern is undefined.
 func TestDetermineNum(t *testing.T) {
 	expect := pattern.DetermineNum{
-		"factorial", &pattern.Parameters{[]*pattern.Parameter{{
+		"factorial", pattern.NewNamedParams(
 			"num", &core.FromNum{
 				&core.Number{3},
-			}},
-		}}}
+			})}
 	k, db := newTestDecoder(t)
 	defer db.Close()
 	if rule, e := imp_determine_num(k, debug.FactorialDetermineNum); e != nil {

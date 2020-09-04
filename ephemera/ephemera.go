@@ -1,7 +1,9 @@
 package ephemera
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/gob"
 	"strings"
 
 	"github.com/ionous/iffy/lang"
@@ -49,6 +51,19 @@ type Prog struct{ Named }
 func (r *Recorder) NewProg(rootType string, blob []byte) (ret Prog) {
 	id := r.cache.Must(eph_prog, r.srcId, rootType, blob)
 	ret = Prog{Named{id, rootType}}
+	return
+}
+
+// fix:  could this be a function in tables somehow?
+// see also: WriteGob in assembler
+func (r *Recorder) NewGob(typeName string, cmd interface{}) (ret Prog, err error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if e := enc.Encode(cmd); e != nil {
+		err = e
+	} else {
+		ret = r.NewProg(typeName, buf.Bytes())
+	}
 	return
 }
 

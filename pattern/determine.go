@@ -5,10 +5,8 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
-	"github.com/ionous/iffy/rt/stream"
 )
 
 // FromPattern helps runs a pattern
@@ -26,10 +24,9 @@ type DetermineTextList FromPattern
 
 // Stitch finds the pattern, builds the scope, and executes the passed callback to generate a result.
 // It's an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
-func (op *FromPattern) Stitch(run rt.Runtime, patType string, fn func(p interface{}) error) (err error) {
+func (op *FromPattern) Stitch(run rt.Runtime, pv interface{}, fn func() error) (err error) {
 	// find the pattern (p), qna's implementation assembles the rules by querying the db.
-	patName := op.Pattern
-	if pat, e := run.GetField(patName, patType); e != nil {
+	if e := run.GetEvalByName(op.Pattern, pv); e != nil {
 		err = e
 	} else {
 		// bake the parameters down
@@ -38,7 +35,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, patType string, fn func(p interfac
 			// read from each argument
 			for _, param := range op.Parameters.Params {
 				if e := param.From.Assign(run, func(i interface{}) (err error) {
-					if n, e := unpack(run, patName, param.Name); e != nil {
+					if n, e := unpack(run, op.Pattern, param.Name); e != nil {
 						err = e
 					} else {
 						err = parms.SetVariable(n, i)
@@ -51,7 +48,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, patType string, fn func(p interfac
 		}
 		if err == nil {
 			run.PushScope(&parms)
-			err = fn(pat)
+			err = fn()
 			run.PopScope()
 		}
 	}
@@ -79,23 +76,9 @@ func (*DetermineAct) Compose() composer.Spec {
 }
 
 func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
-	err = (*FromPattern)(op).Stitch(run, object.ExecuteRule, func(p interface{}) (err error) {
-		// cast the pattern to an execute
-		// fix: this may require a []cast instead.
-		if rules, ok := p.([]*ExecuteRule); !ok {
-			err = errutil.New("Pattern", op.Pattern, "not an activity")
-		} else if inds, e := splitExe(run, rules); e != nil {
-			err = e
-		} else {
-			for _, i := range inds {
-				if e := rt.RunOne(run, rules[i].Execute); e != nil {
-					err = e
-					break
-				}
-				// NOTE: if we need to differentiate between "ran" and "not found",
-				// "didnt run" should probably become an error code.
-			}
-		}
+	var pat ActivityPattern
+	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+		err = pat.Execute(run)
 		return
 	})
 	return
@@ -112,21 +95,9 @@ func (*DetermineNum) Compose() composer.Spec {
 
 // GetNumber returns the first matching num evaluation.
 func (op *DetermineNum) GetNumber(run rt.Runtime) (ret float64, err error) {
-	err = (*FromPattern)(op).Stitch(run, object.NumberRule, func(p interface{}) (err error) {
-		if rules, ok := p.([]*NumberRule); !ok {
-			err = errutil.New("Pattern", op.Pattern, "not a number")
-		} else {
-			for i, cnt := 0, len(rules); i < cnt; i++ {
-				p := rules[cnt-i-1]
-				if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
-					err = e
-					break
-				} else if matched {
-					ret, err = rt.GetNumber(run, p.NumberEval)
-					break
-				}
-			}
-		}
+	var pat NumberPattern
+	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+		ret, err = pat.GetNumber(run)
 		return
 	})
 	return
@@ -143,21 +114,9 @@ func (*DetermineText) Compose() composer.Spec {
 
 // GetText returns the first matching text evaluation.
 func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
-	err = (*FromPattern)(op).Stitch(run, object.TextRule, func(p interface{}) (err error) {
-		if rules, ok := p.([]*TextRule); !ok {
-			err = errutil.New("Pattern", op.Pattern, "not text")
-		} else {
-			for i, cnt := 0, len(rules); i < cnt; i++ {
-				p := rules[cnt-i-1]
-				if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
-					err = e
-					break
-				} else if matched {
-					ret, err = rt.GetText(run, p.TextEval)
-					break
-				}
-			}
-		}
+	var pat TextPattern
+	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+		ret, err = pat.GetText(run)
 		return
 	})
 	return
@@ -174,21 +133,9 @@ func (*DetermineBool) Compose() composer.Spec {
 
 // GetBool returns the first matching bool evaluation.
 func (op *DetermineBool) GetBool(run rt.Runtime) (ret bool, err error) {
-	err = (*FromPattern)(op).Stitch(run, object.BoolRule, func(p interface{}) (err error) {
-		if rules, ok := p.([]*BoolRule); !ok {
-			err = errutil.New("Pattern", op.Pattern, "not a boolean")
-		} else {
-			for i, cnt := 0, len(rules); i < cnt; i++ {
-				p := rules[cnt-i-1]
-				if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
-					err = e
-					break
-				} else if matched {
-					ret, err = rt.GetBool(run, p.BoolEval)
-					break
-				}
-			}
-		}
+	var pat BoolPattern
+	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+		ret, err = pat.GetBool(run)
 		return
 	})
 	return
@@ -204,15 +151,9 @@ func (*DetermineNumList) Compose() composer.Spec {
 }
 
 func (op *DetermineNumList) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	err = (*FromPattern)(op).Stitch(run, object.NumListRule, func(p interface{}) (err error) {
-		if rules, ok := p.([]*NumListRule); !ok {
-			err = errutil.New("Pattern", op.Pattern, "not a boolean")
-		} else if inds, e := splitNumbers(run, rules); e != nil {
-			err = e
-		} else {
-			it := numIterator{run, rules, inds, 0}
-			ret = stream.NewNumberChain(&it)
-		}
+	var pat NumListPattern
+	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+		ret, err = pat.GetNumberStream(run)
 		return
 	})
 	return
@@ -228,15 +169,9 @@ func (*DetermineTextList) Compose() composer.Spec {
 }
 
 func (op *DetermineTextList) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	err = (*FromPattern)(op).Stitch(run, object.TextListRule, func(p interface{}) (err error) {
-		if rules, ok := p.([]*TextListRule); !ok {
-			err = errutil.New("Pattern", op.Pattern, "not a boolean")
-		} else if inds, e := splitText(run, rules); e != nil {
-			err = e
-		} else {
-			it := textIterator{run, rules, inds, 0}
-			ret = stream.NewTextChain(&it)
-		}
+	var pat TextListPattern
+	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+		ret, err = pat.GetTextStream(run)
 		return
 	})
 	return
