@@ -85,14 +85,17 @@ func assemblyTemplate() string {
 		"/* resolve test ephemera to strings\n" +
 		" */\n" +
 		"create temp view\n" +
-		"asm_check as\n" +
-		"\tselect kn.name as name, progType as type, prog\n" +
+		"asm_check as select * \n" +
 		"from eph_check ek \n" +
 		"join eph_named kn\n" +
-		"\ton (ek.idNamedTest = kn.rowid)\n" +
-		"join eph_prog ep\n" +
-		"\ton (ek.idProg = ep.rowid)\n" +
-		"order by name, type, idProg;\n" +
+		"\ton (ek.idNamedTest = kn.rowid);\n" +
+		"\n" +
+		"create temp view\n" +
+		"asm_expect as select * \n" +
+		"from eph_expect ex \n" +
+		"join eph_named kn\n" +
+		"\ton (ex.idNamedTest = kn.rowid);\n" +
+		"\n" +
 		"\n" +
 		"/* resolve default ephemera to strings.\n" +
 		" */\n" +

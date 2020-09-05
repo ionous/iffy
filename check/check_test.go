@@ -13,7 +13,7 @@ func TestCheck(t *testing.T) {
 	prog := &CheckOutput{
 		Name:   "hello",
 		Expect: "hello",
-		Prog: core.NewActivity(
+		Test: core.NewActivity(
 			&core.Choose{
 				If: &core.Bool{Bool: true},
 				True: core.NewActivity(&core.Say{
@@ -43,5 +43,4 @@ type checkTester struct {
 	writer.Sink
 }
 
-func (c *checkTester) ActivateDomain(string, bool) {
-}
+func (c *checkTester) ActivateDomain(string, bool) {}

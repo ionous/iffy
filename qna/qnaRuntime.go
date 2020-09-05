@@ -16,6 +16,7 @@ func NewRuntime(db *sql.DB) *Runner {
 		panic(e)
 	} else {
 		run = &Runner{
+			db:      db,
 			Fields:  fields,
 			plurals: plurals,
 		}

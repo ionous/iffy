@@ -86,7 +86,7 @@ func TestRuleAsm(t *testing.T) {
 					prog)
 			}
 			//
-			if e := buildRules(asm.assembler); e != nil {
+			if e := buildPatterns(asm.assembler); e != nil {
 				t.Fatal(e)
 			} else {
 				var visited bool

@@ -5,13 +5,14 @@ import (
 	"log"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
 )
 
 type CheckOutput struct {
 	Name, Expect string
-	Prog         rt.Execute
+	Test         *core.Activity
 }
 
 func (t *CheckOutput) RunTest(run rt.Runtime) (err error) {
@@ -23,7 +24,7 @@ func (t *CheckOutput) RunTest(run rt.Runtime) (err error) {
 
 	run.ActivateDomain(t.Name, true)
 	//
-	if e := rt.RunOne(run, t.Prog); e != nil {
+	if e := rt.RunOne(run, t.Test); e != nil {
 		err = errutil.New("encountered error:", e)
 	} else if res := buf.String(); res != t.Expect {
 		err = errutil.New("expected:", res, "got:", t.Expect)

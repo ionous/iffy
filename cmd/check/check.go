@@ -16,16 +16,16 @@ func main() {
 	var inFile string
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")
 	flag.Parse()
-	if e := checkFile(inFile); e != nil {
+	if cnt, e := checkFile(inFile); e != nil {
 		log.Fatalln(e)
 	} else {
-		log.Println("Checked", inFile)
+		log.Println("Checked", cnt, inFile)
 	}
 }
 
 // open db, select tests, de-gob and run them each in turn.
 // print the results, only error on critical errors
-func checkFile(inFile string) (err error) {
+func checkFile(inFile string) (ret int, err error) {
 	if inFile, e := filepath.Abs(inFile); e != nil {
 		err = e
 	} else if db, e := sql.Open("sqlite3", inFile); e != nil {
@@ -39,7 +39,7 @@ func checkFile(inFile string) (err error) {
 		} else if e := qna.ActivateDomain(db, "entireGame", true); e != nil {
 			err = e
 		} else {
-			err = qna.CheckAll(db)
+			ret, err = qna.CheckAll(db)
 		}
 	}
 	return

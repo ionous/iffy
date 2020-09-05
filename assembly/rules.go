@@ -9,23 +9,14 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-func buildRules(asm *Assembler) (err error) {
-	for _, rule := range rules {
-		if e := buildFromRule(asm, &rule); e != nil {
-			err = e
-			break
-		}
-	}
-	return
-}
-
-func buildFromRule(asm *Assembler, b *BuildRule) (err error) {
+// the first parameter should be a *string, the second some *bytes
+func (b *BuildRule) buildFromRule(asm *Assembler, args ...interface{}) (err error) {
 	list := make(map[string]interface{})
-	var name, last string
-	var prog []byte
+	var last string
 	var curr interface{}
 	if e := tables.QueryAll(asm.cache.DB(), b.Query,
 		func() (err error) {
+			name, prog := *args[0].(*string), *args[1].(*[]byte)
 			if name != last || curr == nil {
 				curr = b.NewContainer(name)
 				list[name] = curr
@@ -34,8 +25,8 @@ func buildFromRule(asm *Assembler, b *BuildRule) (err error) {
 			el := b.NewEl(curr)
 			dec := gob.NewDecoder(bytes.NewBuffer(prog))
 			return dec.Decode(el)
-		}, &name, &prog); e != nil {
-		err = errutil.New("buildRules", e)
+		}, args...); e != nil {
+		err = errutil.New("buildPatterns", e)
 	} else {
 		err = asm.WriteGobs(list)
 	}

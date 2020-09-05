@@ -74,14 +74,17 @@ and ap.pattern = ar.pattern;
 /* resolve test ephemera to strings
  */
 create temp view
-asm_check as
-	select kn.name as name, progType as type, prog
+asm_check as select * 
 from eph_check ek 
 join eph_named kn
-	on (ek.idNamedTest = kn.rowid)
-join eph_prog ep
-	on (ek.idProg = ep.rowid)
-order by name, type, idProg;
+	on (ek.idNamedTest = kn.rowid);
+
+create temp view
+asm_expect as select * 
+from eph_expect ex 
+join eph_named kn
+	on (ex.idNamedTest = kn.rowid);
+
 
 /* resolve default ephemera to strings.
  */
