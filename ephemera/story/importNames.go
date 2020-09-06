@@ -53,8 +53,8 @@ func imp_singular_kind(k *Importer, r reader.Map) (ret ephemera.Named, err error
 	return importName(k, r, "singular_kind", "")
 }
 
-func imp_test_text(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "text", "test")
+func imp_named_test(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	return importName(k, r, "test_name", "test")
 }
 
 func imp_trait(k *Importer, r reader.Map) (ret ephemera.Named, err error) {

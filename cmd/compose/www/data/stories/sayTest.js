@@ -6,7 +6,7 @@ function getStory() {
     "value": {
       "$TEST_NAME": {
         "id": "id-0",
-        "type": "text",
+        "type": "test_name",
         "value": "hello, goodbye"
       },
       "$GO": {

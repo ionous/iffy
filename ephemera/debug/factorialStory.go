@@ -31,15 +31,9 @@ var FactorialStory = map[string]interface{}{
 }
 
 var FactoialNamedTest = map[string]interface{}{
-	"type": "test_name",
-	"value": map[string]interface{}{
-		"$NAMED_TEST": map[string]interface{}{
-			"type": "named_test",
-			"value": map[string]interface{}{
-				"$NAME": map[string]interface{}{
-					"type":  "text",
-					"value": "factorial",
-				}}}}}
+	"type":  "test_name",
+	"value": "factorial",
+}
 
 var FactorialTestOutput = map[string]interface{}{
 	"type": "test_statement",

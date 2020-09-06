@@ -49,25 +49,12 @@ func imp_test_rule(k *Importer, r reader.Map) (err error) {
 }
 
 func imp_test_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	err = reader.Option(r, "test_name", reader.ReadMaps{
-		"$CURRENT_TEST": func(m reader.Map) (err error) {
-			// we dont have to parse current test, just its existence is enough
-			ret = k.StoryEnv.Recent.Test
-			return
-		},
-		"$NAMED_TEST": func(m reader.Map) (err error) {
-			ret, err = imp_named_test(k, m)
-			return
-		},
-	})
-	return
-}
-
-func imp_named_test(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	if m, e := reader.Unpack(r, "named_test"); e != nil {
+	if n, e := imp_named_test(k, r); e != nil {
 		err = e
+	} else if str := n.String(); len(str) > 0 && str[0] == '$' {
+		ret = k.StoryEnv.Recent.Test
 	} else {
-		ret, err = imp_test_text(k, m.MapOf("$NAME"))
+		ret = n
 	}
 	return
 }

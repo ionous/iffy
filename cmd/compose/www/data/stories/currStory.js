@@ -94,19 +94,7 @@ function getStory() {
                     "$TEST_NAME": {
                       "id": "id-17464fa730d-0",
                       "type": "test_name",
-                      "value": {
-                        "$NAMED_TEST": {
-                          "id": "id-17464fa730d-1",
-                          "type": "named_test",
-                          "value": {
-                            "$NAME": {
-                              "id": "id-17464fa730d-2",
-                              "type": "text",
-                              "value": "name of a kind"
-                            }
-                          }
-                        }
-                      }
+                      "value": "name of a kind"
                     },
                     "$STORY_STATEMENT": [
                       {
@@ -307,19 +295,7 @@ function getStory() {
                     "$TEST_NAME": {
                       "id": "id-17464fa730d-3",
                       "type": "test_name",
-                      "value": {
-                        "$NAMED_TEST": {
-                          "id": "id-17464fa730d-4",
-                          "type": "named_test",
-                          "value": {
-                            "$NAME": {
-                              "id": "id-17464fa730d-5",
-                              "type": "text",
-                              "value": "name of a kind"
-                            }
-                          }
-                        }
-                      }
+                      "value": "name of a kind"
                     },
                     "$TEST": {
                       "id": "id-a-29",
@@ -349,19 +325,7 @@ function getStory() {
                     "$TEST_NAME": {
                       "id": "id-17464fa730d-6",
                       "type": "test_name",
-                      "value": {
-                        "$NAMED_TEST": {
-                          "id": "id-17464fa730d-7",
-                          "type": "named_test",
-                          "value": {
-                            "$NAME": {
-                              "id": "id-17464fa730d-8",
-                              "type": "text",
-                              "value": "name of a kind"
-                            }
-                          }
-                        }
-                      }
+                      "value": "name of a kind"
                     },
                     "$HOOK": {
                       "id": "id-17460cc7b6c-0",

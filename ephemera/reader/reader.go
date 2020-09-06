@@ -73,14 +73,21 @@ func Slot(r Map, expectedType string, slots ReadMaps) (err error) {
 func Option(r Map, expectedType string, slots ReadMaps) (err error) {
 	if t := r.StrOf(ItemType); t != expectedType {
 		err = BadType("option", expectedType, t, At(r))
-	} else if m := r.MapOf(ItemValue); len(m) != 1 {
-		err = BadValue(t, m, At(r))
 	} else {
-		// only one in the list.
-		for key, value := range m {
+		switch m := r.MapOf(ItemValue); len(m) {
+		default:
+			err = errutil.New("no option specified for", expectedType)
+		case 0:
+			err = errutil.New("multiple options specified for", expectedType)
+		case 1:
+			var key string
+			var val interface{}
+			for k, v := range m { // only expects one value in m (above)
+				key, val = k, v
+			}
 			if fn, ok := slots[key]; !ok {
-				err = BadValue(t, key, At(r))
-			} else if e := fn(Box(value)); e != nil {
+				err = errutil.Fmt("no handler found for option %q in %q", key, expectedType)
+			} else if e := fn(Box(val)); e != nil {
 				err = e
 			}
 			break

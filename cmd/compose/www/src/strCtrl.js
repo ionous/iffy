@@ -1,5 +1,5 @@
 // allows the user to pick from a set of predetermined strings arranged horizontally.
-// once picked, it becomes an autocomplete style dropdown box to mutate the selection.
+// once picked, it becomes an autocomplete style dropdown box to mutate the pick.
 // fix: clicking the a-button causes a "one-frame" blue highlight leading to a visual pop
 //
 Vue.component('mk-str-ctrl', {
@@ -7,7 +7,7 @@ Vue.component('mk-str-ctrl', {
   `<span
       :class="bemBlock()"
       :data-tag="node.type"
-    ><span v-if="prefix"
+    >{{framing.opener}}<span v-if="prefix"
       >{{prefix}}</span
     ><mk-pick-inline
       v-if="!hasPicked && !editing"
@@ -31,9 +31,23 @@ Vue.component('mk-str-ctrl', {
     ></template
     ><span v-if="suffix"
       >{{suffix}}</span
-  ></span>`,
+  >{{framing.closer}}</span>`,
   // -----------------------------------------------------
   computed: {
+    framing() {
+      let opener, closer;
+      const { node, pick } = this; // ex.$TEST_NAME
+      const spec= node.itemType.with;
+      const param= spec.params[pick];
+      const filters = param && param.filters;
+      if (filters) {
+        if (filters.includes("quote")) {
+          opener= `\u201C`;
+          closer= `\u201D`;
+        }
+      }
+      return { opener, closer };
+    },
     hasPicked() {
       // technically, an unpicked value is null
       // but empty strings behave similar
@@ -84,6 +98,9 @@ Vue.component('mk-str-ctrl', {
       return this.mutationFactory? this.mutationFactory():
               this.$root.newMutation( this.node);
     },
+    // FIX! prefix, label, and suffix use node.param, which isnt a thing.
+    // there's this.param, which is the parent's run argument
+    // and the spec of the selected token
     prefix() {
       const { param } = this.node;
       return param && param.prefix;
@@ -98,7 +115,7 @@ Vue.component('mk-str-ctrl', {
     }
   },
   data() {
-    const { node } = this;
+    const { node, token } = this;
     // fix: filtering depends on placement.
     // it is possible that adding an optional element in front of this node could change the filter
     // the only? way to detect that would be to either .watch for it ( somehow ) or track vue index in parent.
@@ -117,10 +134,12 @@ Vue.component('mk-str-ctrl', {
         labelTokens[filteredLabel]= token;
       }
     }
+    const pick= (node.value in spec.params)? node.value: labelTokens[""];
     return {
       editing: false,
       filter,
       labelTokens,
+      pick,
     };
   },
   methods: {
@@ -132,8 +151,14 @@ Vue.component('mk-str-ctrl', {
         const cmd= this.commandMap[choice];
         this.mutation.mutate( cmd );
       } else {
-        if (choice in labelTokens) {
+        const pickedLabel= choice in labelTokens;
+        // use the "anything" token
+        if (!pickedLabel) {
+          this.pick= labelTokens[""];
+        } else {
+          // the token for the specified label
           choice= labelTokens[choice];
+          this.pick= choice;
         }
         this.$root.redux.setPrim( node, choice );
       }
@@ -150,6 +175,7 @@ Vue.component('mk-str-ctrl', {
       if (param.value !== null) {
         this.$root.redux.setPrim( node, token );
       }
+      this.pick= token;
       this.editing= true;
       this.$root.ctrlSelected(this);
     },

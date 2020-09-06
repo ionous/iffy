@@ -30,10 +30,8 @@ function localLang(make) {
       "output {lines|quote}.",
       `Test Output: Expect that a test uses 'Say' to print some specific text.`);
 
-    make.opt("test_name", "the {current%current_test} or {named%named_test} test");
-    make.str("current_test", "{the test%current}");
-    // we use a run here to support quoting the text
-    make.run("named_test", "{test name%name:named_test|quote}");
+    make.str("test_name", "{the test%current_test} {test name%test_name|quote}");
+
   });
 
   make.group("Nouns", function() {
