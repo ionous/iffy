@@ -133,7 +133,7 @@ Vue.component('mk-str-ctrl', {
         this.mutation.mutate( cmd );
       } else {
         if (choice in labelTokens) {
-          choice= lts[choice];
+          choice= labelTokens[choice];
         }
         this.$root.redux.setPrim( node, choice );
       }
