@@ -2,7 +2,7 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/pattern"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/rt"
 )
 

@@ -1,6 +1,6 @@
 package assembly
 
-import "github.com/ionous/iffy/pattern"
+import "github.com/ionous/iffy/dl/pattern"
 
 type BuildRule struct {
 	Query        string

@@ -3,9 +3,9 @@ package story
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
-	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
 )
 

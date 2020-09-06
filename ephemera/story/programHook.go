@@ -1,7 +1,7 @@
 package story
 
 import (
-	"github.com/ionous/iffy/pattern"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/rt"
 )
 

@@ -5,10 +5,10 @@ import (
 
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/express"
 	"github.com/ionous/iffy/ephemera/reader"
-	"github.com/ionous/iffy/pattern"
 )
 
 func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/pattern"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"

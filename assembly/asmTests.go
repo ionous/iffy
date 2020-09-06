@@ -1,7 +1,7 @@
 package assembly
 
 import (
-	"github.com/ionous/iffy/check"
+	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/dl/core"
 )
 

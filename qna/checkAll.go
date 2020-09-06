@@ -8,7 +8,7 @@ import (
 
 	"github.com/ionous/errutil"
 
-	"github.com/ionous/iffy/check"
+	"github.com/ionous/iffy/dl/check"
 	"github.com/ionous/iffy/tables"
 )
 

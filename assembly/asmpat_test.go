@@ -8,8 +8,8 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/debug"
-	"github.com/ionous/iffy/pattern"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
 )
