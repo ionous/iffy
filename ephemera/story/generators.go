@@ -22,12 +22,12 @@ func imp_story(k *Importer, r reader.Map) (err error) {
 	return
 }
 
-// paragraph is a bunch of statements
+// paragraph is a bunch of statements on the same line
 func imp_paragraph(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "paragraph"); e != nil {
 		err = e
 	} else {
-		k.ParagraphEnv = ParagraphEnv{}
+		// k.StoryEnv = StoryEnv{}
 		err = reader.Repeats(m.SliceOf("$STORY_STATEMENT"), k.Bind(imp_story_statement))
 	}
 	return

@@ -18,7 +18,7 @@ type Importer struct {
 	decoder     *decode.Decoder
 	autoCounter int // helper for making auto variables.
 	entireGame  ephemera.Named
-	ParagraphEnv
+	StoryEnv
 }
 
 func NewImporter(srcURI string, db *sql.DB) *Importer {

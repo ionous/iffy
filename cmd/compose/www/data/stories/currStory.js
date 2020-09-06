@@ -91,10 +91,22 @@ function getStory() {
                   "id": "id-1740db6898f-2",
                   "type": "test_scene",
                   "value": {
-                    "$NAME": {
-                      "id": "id-1740db6898f-3",
-                      "type": "text",
-                      "value": "name of a kind"
+                    "$TEST_NAME": {
+                      "id": "id-17464fa730d-0",
+                      "type": "test_name",
+                      "value": {
+                        "$NAMED_TEST": {
+                          "id": "id-17464fa730d-1",
+                          "type": "named_test",
+                          "value": {
+                            "$NAME": {
+                              "id": "id-17464fa730d-2",
+                              "type": "text",
+                              "value": "name of a kind"
+                            }
+                          }
+                        }
+                      }
                     },
                     "$STORY_STATEMENT": [
                       {
@@ -292,10 +304,22 @@ function getStory() {
                   "id": "id-a-30",
                   "type": "test_statement",
                   "value": {
-                    "$NAME": {
-                      "id": "id-a-28",
-                      "type": "text",
-                      "value": "name of a kind"
+                    "$TEST_NAME": {
+                      "id": "id-17464fa730d-3",
+                      "type": "test_name",
+                      "value": {
+                        "$NAMED_TEST": {
+                          "id": "id-17464fa730d-4",
+                          "type": "named_test",
+                          "value": {
+                            "$NAME": {
+                              "id": "id-17464fa730d-5",
+                              "type": "text",
+                              "value": "name of a kind"
+                            }
+                          }
+                        }
+                      }
                     },
                     "$TEST": {
                       "id": "id-a-29",
@@ -322,10 +346,22 @@ function getStory() {
                   "id": "id-17460c01f70-1",
                   "type": "test_rule",
                   "value": {
-                    "$NAME": {
-                      "id": "id-17460c01f70-2",
-                      "type": "text",
-                      "value": "name of a kind"
+                    "$TEST_NAME": {
+                      "id": "id-17464fa730d-6",
+                      "type": "test_name",
+                      "value": {
+                        "$NAMED_TEST": {
+                          "id": "id-17464fa730d-7",
+                          "type": "named_test",
+                          "value": {
+                            "$NAME": {
+                              "id": "id-17464fa730d-8",
+                              "type": "text",
+                              "value": "name of a kind"
+                            }
+                          }
+                        }
+                      }
                     },
                     "$HOOK": {
                       "id": "id-17460cc7b6c-0",

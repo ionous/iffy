@@ -8,7 +8,7 @@ import (
 func imp_test_statement(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "test_statement"); e != nil {
 		err = e
-	} else if n, e := imp_test_name(k, m.MapOf("$NAME")); e != nil {
+	} else if n, e := imp_test_name(k, m.MapOf("$TEST_NAME")); e != nil {
 		err = e
 	} else {
 		err = reader.Slot(m.MapOf("$TEST"), "testing", reader.ReadMaps{
@@ -23,13 +23,12 @@ func imp_test_statement(k *Importer, r reader.Map) (err error) {
 func imp_test_scene(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "test_scene"); e != nil {
 		err = e
-	} else if n, e := imp_test_name(k, m.MapOf("$NAME")); e != nil {
+	} else if n, e := imp_test_name(k, m.MapOf("$TEST_NAME")); e != nil {
 		err = e
 	} else {
-		lastScene := k.Current.Domain
-		k.Current.Domain = n
+		pop := k.SetCurrentTest(n)
 		err = reader.Repeats(m.SliceOf("$STORY_STATEMENT"), k.Bind(imp_story_statement))
-		k.Current.Domain = lastScene
+		pop()
 	}
 	return
 }
@@ -37,7 +36,7 @@ func imp_test_scene(k *Importer, r reader.Map) (err error) {
 func imp_test_rule(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "test_rule"); e != nil {
 		err = e
-	} else if testName, e := imp_test_name(k, m.MapOf("$NAME")); e != nil {
+	} else if testName, e := imp_test_name(k, m.MapOf("$TEST_NAME")); e != nil {
 		err = e
 	} else if hook, e := imp_program_hook(k, m.MapOf("$HOOK")); e != nil {
 		err = e
@@ -45,6 +44,30 @@ func imp_test_rule(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else {
 		k.NewTestProgram(testName, prog)
+	}
+	return
+}
+
+func imp_test_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	err = reader.Option(r, "test_name", reader.ReadMaps{
+		"$CURRENT_TEST": func(m reader.Map) (err error) {
+			// we dont have to parse current test, just its existence is enough
+			ret = k.StoryEnv.Recent.Test
+			return
+		},
+		"$NAMED_TEST": func(m reader.Map) (err error) {
+			ret, err = imp_named_test(k, m)
+			return
+		},
+	})
+	return
+}
+
+func imp_named_test(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	if m, e := reader.Unpack(r, "named_test"); e != nil {
+		err = e
+	} else {
+		ret, err = imp_test_text(k, m.MapOf("$NAME"))
 	}
 	return
 }

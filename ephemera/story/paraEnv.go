@@ -2,15 +2,28 @@ package story
 
 import "github.com/ionous/iffy/ephemera"
 
-type ParagraphEnv struct {
+type StoryEnv struct {
 	Recent struct {
 		// Scene, Aspect, Test string
 		// Nouns[]? Relation, Trait
 		// string or ephemera.Named
 		Nouns Nouns
+		Test  ephemera.Named
 	}
 	Current struct {
+		// eventually, a stack.
 		Domain ephemera.Named
+	}
+}
+
+func (n *StoryEnv) SetCurrentTest(name ephemera.Named) func() {
+	lastScene := n.Current.Domain
+	n.Current.Domain = name
+	// the most recent test might become the last popped test value
+	// ( once domains and tests are stackable )
+	n.Recent.Test = name
+	return func() {
+		n.Current.Domain = lastScene
 	}
 }
 
@@ -19,12 +32,16 @@ type Nouns struct {
 	Objectifying      bool // phrases discuss noun subjects by default
 }
 
+// add to the known recent nouns over the course of the passed function.
+// subjects are the main focus of the sentence, often the ones mentioned first (lhs).
 func (n *Nouns) CollectSubjects(fn func() error) error {
 	n.Subjects = nil
 	n.Objectifying = false
 	return fn()
 }
 
+// add to the known recent nouns over the course of the passed function.
+// objects are the support nouns in a sentence, often mentioned last (rhs).
 func (n *Nouns) CollectObjects(fn func() error) error {
 	n.Objects = nil
 	n.Objectifying = true

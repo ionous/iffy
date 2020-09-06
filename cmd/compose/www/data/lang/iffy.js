@@ -14,21 +14,26 @@ function localLang(make) {
   });
 
   make.group("Tests", function() {
-    // "testing" is an interface, currently with one implementation type: TestOutput
+    // "testing" is an interface, currently with once implementation type: TestOutput
     make.slot("testing", "Run a series of tests.");
 
     make.run("test_statement", "story_statement",
-      "The test {test name%name:text|quote} {expects%test:testing}");
+      "Expect {test_name} to {expectation%test:testing}");
 
     make.run("test_scene", "story_statement",
-      "During the test {test name%name:text|quote}: {+story_statement}");
+      "While testing {test_name}: {+story_statement}");
 
     make.run("test_rule", "story_statement",
-      "While testing {test name%name:text|quote}: {do%hook:program_hook}");
+      "To test {test_name}: {do%hook:program_hook}");
 
     make.run("test_output", "testing",
-      "expects the output {lines|quote}.",
+      "output {lines|quote}.",
       `Test Output: Expect that a test uses 'Say' to print some specific text.`);
+
+    make.opt("test_name", "the {current%current_test} or {named%named_test} test");
+    make.str("current_test", "{the test%current}");
+    // we use a run here to support quoting the text
+    make.run("named_test", "{test name%name:named_test|quote}");
   });
 
   make.group("Nouns", function() {

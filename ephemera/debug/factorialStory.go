@@ -30,13 +30,21 @@ var FactorialStory = map[string]interface{}{
 						}}}}}},
 }
 
+var FactoialNamedTest = map[string]interface{}{
+	"type": "test_name",
+	"value": map[string]interface{}{
+		"$NAMED_TEST": map[string]interface{}{
+			"type": "named_test",
+			"value": map[string]interface{}{
+				"$NAME": map[string]interface{}{
+					"type":  "text",
+					"value": "factorial",
+				}}}}}
+
 var FactorialTestOutput = map[string]interface{}{
 	"type": "test_statement",
 	"value": map[string]interface{}{
-		"$NAME": map[string]interface{}{
-			"type":  "text",
-			"value": "factorial",
-		},
+		"$TEST_NAME": FactoialNamedTest,
 		"$TEST": map[string]interface{}{
 			"type": "testing",
 			"value": map[string]interface{}{
@@ -51,10 +59,7 @@ var FactorialTestOutput = map[string]interface{}{
 var FactorialTestRule = map[string]interface{}{
 	"type": "test_rule",
 	"value": map[string]interface{}{
-		"$NAME": map[string]interface{}{
-			"type":  "text",
-			"value": "factorial",
-		},
+		"$TEST_NAME": FactoialNamedTest,
 		"$HOOK": map[string]interface{}{
 			"type": "program_hook",
 			"value": map[string]interface{}{
