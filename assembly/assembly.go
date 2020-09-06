@@ -1,8 +1,13 @@
 package assembly
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/ionous/iffy"
+)
 
 func AssembleStory(db *sql.DB, baseKind string, reporter IssueReport) (err error) {
+	iffy.RegisterGobs()
 	// [-] adds relations between kinds
 	// [-] creates instances
 	// [-] sets instance properties

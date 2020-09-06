@@ -36,11 +36,6 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "Testing: Run a series of tests.",
-    "name": "testing",
-    "uses": "slot"
-  },
-  {
     "desc": "Texts: Statements which return text.",
     "name": "text_eval",
     "uses": "slot"
@@ -487,104 +482,6 @@ const spec = [
     }
   },
   {
-    "desc": "Determine an activity",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_act",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$PARAMETERS": {
-          "label": "parameters",
-          "type": "parameters"
-        },
-        "$PATTERN": {
-          "label": "pattern",
-          "type": "text"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "determine act",
-        "$PATTERN",
-        "$PARAMETERS"
-      ]
-    }
-  },
-  {
-    "desc": "Determine a true/false value",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_bool",
-    "spec": "the {true/false pattern%name:pattern_name}{?parameters}",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "bool_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Determine a number",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_num",
-    "spec": "the {number pattern%name:pattern_name}{?parameters}",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "number_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Determine a list of numbers",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_num_list",
-    "spec": "the {number list pattern%name:pattern_name}{?parameters}",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "num_list_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Determine some text",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_text",
-    "spec": "the {text pattern%name:pattern_name}{?parameters}",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "text_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Determine a list of text",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_text_list",
-    "spec": "the {text list pattern%name:pattern_name}{?parameters}",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "text_list_eval"
-      ]
-    }
-  },
-  {
     "desc": "Subtract Numbers: Subtract two numbers.",
     "group": [
       "math"
@@ -856,7 +753,7 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "is not",
+        "is not true",
         "$TEST"
       ]
     }
@@ -1018,24 +915,6 @@ const spec = [
         "object_ref"
       ]
     }
-  },
-  {
-    "group": [
-      "patterns"
-    ],
-    "name": "parameter",
-    "spec": "its {name:variable_name} is {from:assignment}",
-    "uses": "run",
-    "with": {}
-  },
-  {
-    "group": [
-      "patterns"
-    ],
-    "name": "parameters",
-    "spec": " when {parameters%params+parameter}",
-    "uses": "run",
-    "with": {}
   },
   {
     "desc": "Pluralize: Returns the plural form of a singular word. (ex.  apples for apple. )",
@@ -1488,20 +1367,6 @@ const spec = [
     }
   },
   {
-    "desc": "Test Output: Run some statements, and expect that their output matches a specific value.",
-    "group": [
-      "tests"
-    ],
-    "name": "test_output",
-    "spec": "expects the output {lines|quote} when running: {go:activity}",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "testing"
-      ]
-    }
-  },
-  {
     "desc": "Length of Text List: Determines the number of text elements in a list.",
     "group": [
       "format"
@@ -1617,19 +1482,11 @@ const spec = [
     "uses": "group"
   },
   {
-    "name": "patterns",
-    "uses": "group"
-  },
-  {
     "name": "printing",
     "uses": "group"
   },
   {
     "name": "strings",
-    "uses": "group"
-  },
-  {
-    "name": "tests",
     "uses": "group"
   },
   {

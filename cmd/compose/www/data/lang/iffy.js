@@ -27,7 +27,7 @@ function localLang(make) {
       "While testing {test name%name:text|quote}: {do%hook:program_hook}");
 
     make.run("test_output", "testing",
-      "expects the output {lines|quote}."
+      "expects the output {lines|quote}.",
       `Test Output: Expect that a test uses 'Say' to print some specific text.`);
   });
 
