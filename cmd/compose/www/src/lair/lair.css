@@ -59,26 +59,18 @@
   min-width: 1ch;
 }
 
-/* this throws off the line padding, but is (currently) necessary for edge detection */
-.em-row__header--block, .em-row__footer--block {
-  line-height: 3px;
-}
-/* highlight upper edge */
-.em-drag-head {
-  box-shadow:inset 0px 3px rgba(0,0,0,0.6);
-}
-/* highlight lower edge */
-.em-drag-tail {
-  box-shadow:inset 0px -3px rgba(0,0,0,0.6);
-}
 /* dragEnter adds, dragLeave removes */
-.em-drag-highlight {
+.em-drag-highlight:not(.em-drag-start) {
+  box-shadow:inset 0px 3px rgba(0,0,0,0.2);
   background-color: lightblue;
   transition: background-color 0.25s ease;
 }
-.em-drag-image {
+.em-drag-image.em-drag-mark {
   color: grey;
   background-color: silver;
+  border: 3px solid white;
+  max-width: 300px;
+  font-size: x-small;
 }
 .em-drag-start:not(.em-drag-image) {
   filter: blur(1px);

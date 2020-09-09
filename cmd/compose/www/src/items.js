@@ -1,3 +1,18 @@
+class Type {
+  constructor({name, desc, uses, "with": spec}) {
+    this.name= name;
+    this.desc= desc;
+    this.uses= uses;
+    this.spec= this.with= spec || {};
+  }
+  isType(typeName) {
+    return this.name === typeName;
+  }
+  implements(typeName) {
+    return (this.name=== typeName) || (this.spec.slots && this.spec.slots.indexOf(typeName)>=0);
+  }
+};
+
 // inner class for Types
 // while a single global Type class simplifies code, it hurts testing.
 // this provides a way to have a mixture of both.
@@ -21,7 +36,7 @@ class TypeSet {
     if (name in this.all) {
       throw new Error(`redefining type ${name}`);
     }
-    this.all[ name ]= type;
+    this.all[ name ]= new Type( type );
     return type;
   }
   newItem(typeName, value) {

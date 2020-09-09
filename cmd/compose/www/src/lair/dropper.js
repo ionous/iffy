@@ -5,6 +5,9 @@ class Dropper {
   constructor() {
     this.reset();
   }
+  get dragging() {
+    return !!this.start;
+  }
   reset(log) {
     if (log && (this.start || this.target || this._leaving)) {
       console.log("dropper reset");
@@ -14,7 +17,7 @@ class Dropper {
     this._leaving= false; // target
   }
   // start is a Draggable
-  setStart(start, dt) {
+  setStart(start, dt, imgClasses= ["em-drag-image", "em-drag-mark"]) {
     console.assert(start instanceof Draggable);
     this.start= start;
     this.target= start;
@@ -22,8 +25,14 @@ class Dropper {
 
     // set drag visuals
     if (start.getDragImage) {
-      const dragImage= start.getDragImage();
-      Dropper.setDragData(dt, dragImage);
+      const el= start.getDragImage();
+      el.classList.add(...imgClasses);
+      const add= !el.parentElement;
+      document.body.append(el); // needed to display
+      dt.setDragImage(el,-10,-10); // fix? maybe should be click relative?
+      setTimeout(() => {
+          el.remove();
+      });
     }
 
     // set drag content
@@ -35,6 +44,7 @@ class Dropper {
       }
     }
     //
+    dt.effectAllowed= 'all';
     console.log("dropper set start", start);
   }
   // called from DragHandler.onDragEnterOver ( @dragenter, @dragover )
@@ -54,23 +64,5 @@ class Dropper {
   // called from DragHandler.onDragLeave (@leave)
   leaving(target) {
     this._leaving= target;
-  }
-  static setDragData(dt, el, imgClasses= ["em-drag-image", "em-drag-mark"]) {
-    const existed= !!el.parentElement;
-    if (!existed) {
-        document.body.append(el);
-    }
-    // set fx
-    dt.effectAllowed= 'all';
-    // set the drag image
-    el.classList.add(...imgClasses);
-    dt.setDragImage(el,-10,-10); // fix? maybe should be click relative?
-    setTimeout(()=>{
-      if (existed) {
-        el.classList.remove(...imgClasses);
-      } else {
-        el.remove();
-      }
-    });
   }
 };

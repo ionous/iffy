@@ -3,6 +3,9 @@ class StatementNodes extends NodeList {
     super(nodes, para, "$STORY_STATEMENT", "story_statement");
     this.inline= true;
   }
+  acceptsBlock() {
+    return false;
+  }
   // when we drag, we re/move everything from a given statement till the end of line.
   // returns a list of statements
   removeFrom(at, width= Number.MAX_VALUE) {

@@ -15,7 +15,7 @@ Vue.component('em-node-table', {
   },
   mounted() {
     const { "$root": root, list }= this;
-    this.handler= new DragHandler(root.dropper, new NodeTable(root.nodes, list)).
+    this.handler= new DragHandler(root.dropper, new NodeTable(list)).
                   listen(this.$el);
   },
   beforeDestroy() {
@@ -26,8 +26,7 @@ Vue.component('em-node-table', {
     tablecls() {
         const { "$root": root, classmod }= this;
         return {'em-node-table':true,
-                [`em-node-table--${classmod}`]:true,
-                'em-shift': root.shift}
+                [`em-node-table--${classmod}`]:true}
     }
   },
   methods: {
@@ -42,10 +41,7 @@ Vue.component('em-node-table', {
       let edge= false;
 
       const start= root.dropper.start;
-      
-      const startList= start && (start.list === list);
-      const atStart= startList && ((idx === start.target.idx) || (inline && idx > start.target.idx))
-
+      const overlaps= start && start.contains && start.contains(list, idx);
 
       // are we the target
       const at = root.dropper.target;
@@ -61,7 +57,7 @@ Vue.component('em-node-table', {
         [mod] : true,
         "em-drag-mark": highlight,
         "em-drag-highlight": highlight,
-        "em-drag-start": atStart,
+        "em-drag-start": overlaps,
         "em-row--ghost": idx === -1,
       };
     }

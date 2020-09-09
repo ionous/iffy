@@ -2,11 +2,21 @@
 // note; target is from TargetFinder
 // it includes: el, idx, edge
 class DraggableNode extends Draggable {
-  constructor( list, target, width = 1) {
+  constructor(list, target, width = 1) {
     super();
     this.list= list;
     this.target= target;
     this.width= width;
+  }
+  // is the passed idx (directly) referenced by this draggable
+  contains(list, idx) {
+    let ret= false;
+    if (this.list === list) {
+      const beg= this.target.idx;
+      const end= beg + this.width;
+      ret = (idx >= beg) && (idx < end);
+    }
+    return ret;
   }
   getDragData() {
     const { list, target } = this;
@@ -16,12 +26,21 @@ class DraggableNode extends Draggable {
     };
   }
   getDragImage() {
-    return this.target.el;
+    return this.target.el.cloneNode(true);
   }
 }
 
-//
-class DraggableLine extends DraggableNode {
+// one node, that may have many children.
+// ex. an action/execute, a paragraph block, a pattern rule.
+class DraggableBlock extends DraggableNode {
+  getNode() {
+    return this.list.items[this.target.idx];
+  }
+}
+
+// a series of nodes all in a row.
+// ex. several story "phrases".
+class DraggableSiblings extends DraggableNode {
   constructor(list, target) {
     super(list, target, Number.MAX_VALUE);
   }
@@ -55,42 +74,32 @@ class NodeTable  {
   }
   newDraggable(target) {
     const { list } = this;
-    return list.inline? new DraggableLine(list, target): new DraggableNode(list, target);
+    return list.inline? new DraggableSiblings(list, target): new DraggableBlock(list, target);
   }
   dragOver(from, targetEl) {
     let ret, okay= false;
     const target= this.finder.findIdx(targetEl);
     if (target) {
+      const { list }= this;
+
       if (from instanceof DraggableCommand) {
-        const type= allTypes.all[from.type];
-        const spec= type && type.with;
-        if (spec && spec.slots) {
-          if (this.list.type === "paragraph") {
-            if ((from.type=== "paragraph") || (spec.slots.indexOf("story_statement")>=0)) {
-              okay= true;
-            }
-          } else {
-            if (spec.slots.indexOf(this.list.type)>=0) {
-               okay= true;
-            }
-          }
-        }
-      }
-      else if (from instanceof DraggableNode) {
+        okay= list.acceptsType(from.itemType);
+        //
+      } else if (from instanceof DraggableBlock) {
+        // does the node match or implement our type or slot.
+        const node= from.getNode();
+        okay= list.acceptsBlock(node.itemType);
+      } else if (from instanceof DraggableSiblings) {
         // dont allow parents to be dropped into their children.
         // this is lair specific; we would need to check "is parent" more generically.
-        if (from.list === this) {
-            const isAtStart= (target.idx === from.target.idx) ||
-                      (this.list.inline && (target.idx > from.target.idx));
-            if (!isAtStart) {
-              okay= true;
-            }
+        if (from.list === list) {
+          okay= !from.contains(list, target.idx);
         } else {
           // bad cases: a, b, c, d
           // 1. same (inline) list and idx is same (or larger)
           // 2. the item we are target has the parent of the item being moved.
           // FIX: dragging a row ( block source ) into the midst of an item.
-          const overItem= this.list.items[target.idx];
+          const overItem= list.items[target.idx];
           if (from.list) {
             const fromItem= from.list.items[from.idx];
             const overStart= overItem && overItem.parent === fromItem;

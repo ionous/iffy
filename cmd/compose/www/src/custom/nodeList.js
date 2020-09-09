@@ -12,12 +12,19 @@ class NodeList {
   get length() {
     return this.items.length;
   }
+  acceptsType(fromType) {
+    const okay= fromType.implements(this.type);
+    return okay;
+  }
+  acceptsBlock(fromType) {
+    const okay= fromType.implements(this.type);
+    return okay;
+  }
   // returns number of elements added
   addTo(at, exe) {
     const { node, items } = this;
     exe.parent= node;
     items.splice(at, 0, exe);
-
   }
   // returns the element or elements removed
   // when we drag, we re/move a single execute ( a line ) at once.
@@ -36,7 +43,7 @@ class NodeList {
     const toList= this;
     //
     if (toList === fromList) {
-      this.move(toIdx, fromIdx, width);
+      this.moveTo(toIdx, fromIdx, width);
     } else {
       Redux.Run({
         added: 0, // inelegant to say the least.
@@ -69,7 +76,7 @@ class NodeList {
     return newItem;
   }
   // move items within this same list
-  move(src, dst, width, nothrow) {
+  moveTo(dst, src, width, nothrow) {
     const { items } = this;
     if ((!width) || (width<0)) {
       const e= new Error("invalid width");
@@ -84,6 +91,7 @@ class NodeList {
     if (src+width> items.length) {
       width= items.length-src;
     }
+    // 0, src:1<-remove and dst needs to slide down, 2, 3, dst:4
     if (dst > src) {
       dst -= width;
     }

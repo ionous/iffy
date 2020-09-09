@@ -412,19 +412,19 @@ function nodeTests() {
     table.insertAt(1, nodes.newFromType(table.type));
     table.insertAt(2, nodes.newFromType(table.type));
     test.expect(statements, "1,2,3", "initially");
-    table.move(1,0,2);
+    table.moveTo(0,1,2);
     test.expect(statements, "2,3,1", "moved src>dst");
     test.redux.undo();
     test.expect(statements, "1,2,3", "undone");
-    table.move(0,3,2);
+    table.moveTo(3,0,2);
     test.expect(statements, "3,1,2", "moved dst>src");
     test.redux.undo();
     test.expect(statements, "1,2,3", "undone again");
     const nothrow= true;
-    const illegalMove= table.move(0,1,3, nothrow);
+    const illegalMove= table.moveTo(1,0,3, nothrow);
     console.assert(illegalMove, "expected illegal move detected")
     test.expect(statements, "1,2,3", "steady state");
-    table.move(2,0,10000);
+    table.moveTo(0,2,10000);
     test.expect(statements, "3,1,2", "width cap");
     test.redux.undo();
     test.expect(statements, "1,2,3", "undone done");

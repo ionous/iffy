@@ -2,6 +2,10 @@ class ParagraphNodes extends NodeList {
   constructor(nodes, story) {
     super(nodes, story, "$PARAGRAPH", "paragraph");
   }
+  // fromType is class Type.
+  acceptsType(fromType) {
+    return fromType.implements(this.type);
+  }
 
   // add a paragraph, or a line of statements
   // at the paragraph targeted.

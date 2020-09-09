@@ -1,9 +1,13 @@
 // target is from TargetFinder
 class DraggableCommand extends Draggable {
+  // type is typeName
   constructor(type, target) {
     super();
     this.type= type;
     this.target= target;
+  }
+  get itemType() {
+    return allTypes.all[this.type];
   }
   getDragData() {
     return {
@@ -11,7 +15,7 @@ class DraggableCommand extends Draggable {
     };
   }
   getDragImage() {
-    return this.target.el;
+    return this.target.el.cloneNode(true);
   }
 }
 
