@@ -31,7 +31,7 @@ Vue.component('mk-repeater-ctrl', {
     },
     commas() {
       const { nodes, param }= this;
-      return nodes.length > 1 && this.commaText(param.filters);
+      return param && nodes.length > 1 && this.commaText(param.filters);
     },
   },
 

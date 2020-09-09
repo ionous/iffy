@@ -27,27 +27,28 @@ Vue.component('em-node-table', {
         const { "$root": root, classmod }= this;
         return {'em-node-table':true,
                 [`em-node-table--${classmod}`]:true}
-    }
+    },
   },
   methods: {
     onGhost() {
       const { "$root": root, list }= this;
       list.insertAt(list.length, root.nodes.newFromType(list.type));
     },
+    dragging(idx) {
+      const { "$root": root, list }= this;
+      const start= root.dropper.dragging;
+      return start && start.contains && start.contains(list, idx);
+    },
     // generate a vue css class object for an item based on the current highlight settings.
     highlight(idx) {
       const { "$root": root, list }= this;
       let highlight= false;
-      let edge= false;
 
-      const start= root.dropper.start;
-      const overlaps= start && start.contains && start.contains(list, idx);
-
-      // are we the target
+      // are we the target?
       const at = root.dropper.target;
       const atList= at && (at.list === list);
       if (atList) {
-        edge= idx === at.target.edge;
+        const edge= idx === at.target.edge;
         highlight=(idx === at.target.idx) || edge;
       }
       const inline= this.list.inline;
@@ -57,7 +58,6 @@ Vue.component('em-node-table', {
         [mod] : true,
         "em-drag-mark": highlight,
         "em-drag-highlight": highlight,
-        "em-drag-start": overlaps,
         "em-row--ghost": idx === -1,
       };
     }
@@ -66,6 +66,7 @@ Vue.component('em-node-table', {
   template:
   `<div :class="tablecls"
     ><div v-for="(item,idx) in items"
+        v-show="!dragging(idx)"
         :class="highlight(idx)"
         :data-drag-idx="idx"
         :key="item.id"

@@ -5,9 +5,6 @@ class Dropper {
   constructor() {
     this.reset();
   }
-  get dragging() {
-    return !!this.start;
-  }
   reset(log) {
     if (log && (this.start || this.target || this._leaving)) {
       console.log("dropper reset");
@@ -15,6 +12,7 @@ class Dropper {
     this.start= false;   // a Draggable
     this.target= false;  // a Draggable
     this._leaving= false; // target
+    this.dragging= false;
   }
   // start is a Draggable
   setStart(start, dt, imgClasses= ["em-drag-image", "em-drag-mark"]) {
@@ -46,6 +44,14 @@ class Dropper {
     //
     dt.effectAllowed= 'all';
     console.log("dropper set start", start);
+
+    const delayed= this;
+    delayed.dragging= null; // pending
+    setTimeout(()=> {
+      if (delayed.dragging === null) {
+        delayed.dragging= start;
+      }
+    });
   }
   // called from DragHandler.onDragEnterOver ( @dragenter, @dragover )
   // target is a Draggable
