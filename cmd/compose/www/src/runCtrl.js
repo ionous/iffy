@@ -14,26 +14,14 @@ Vue.component('mk-run-ctrl', {
         :token="el.token"
         :param="el.param"
       ></mk-switch
-      >{{el.closer}}<mk-a-button
-        v-if="el.ghost"
-        :class="bemElem('ghost')"
-        @activate="$emit('ghost', el.token)"
-      >{{el.ghost}}</mk-a-button
-    ></span
+      >{{el.closer}}</span
     ></span>`,
-  methods: {
-    // when the ghost is clicked, we want to expand it.
-    onGhost(token) {
-      const at= new Cursor(this.node, token);
-      this.$root.redux.newElem(at);
-    },
-  },
   computed: {
     els() {
       let els= [];
       const { node, "$root": root  } = this;
       node.forEach(({token, param, kid})=> {
-        var opener, closer, ghost,plain ;
+        var opener, closer, plain ;
         // plain text doesnt have param
         if (!param) {
           // handle caps for execute statements in a block.
@@ -47,10 +35,6 @@ Vue.component('mk-run-ctrl', {
               opener= `\u201C`;
               closer= `\u201D`;
             }
-            if (filters.includes("ghost")) {
-              const gtype= Types.get(param.type);
-              ghost= Types.labelOf(gtype);
-            }
           }
           plain= token.trim().replace(/ /g, '-').replace(/^\$/, '').toLowerCase();
         }
@@ -61,7 +45,6 @@ Vue.component('mk-run-ctrl', {
           param,
           opener,
           closer,
-          ghost,
         });
       });
       return els;

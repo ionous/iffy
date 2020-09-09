@@ -6,6 +6,7 @@ Vue.component('em-node-table', {
     return {
       items: list.items,
       classmod: list.inline? "inline": "block",
+      ghost: Types.labelOf(Types.get(list.type)),
     };
   },
   props: {
@@ -14,49 +15,60 @@ Vue.component('em-node-table', {
   },
   mounted() {
     const { "$root": root, list }= this;
-    this.handler= new DragHandler(root.dropper, new NodeTable(list)).
+    this.handler= new DragHandler(root.dropper, new NodeTable(root.nodes, list)).
                   listen(this.$el);
   },
   beforeDestroy() {
     this.handler.silence();
     this.handler= null;
   },
+  computed: {
+    tablecls() {
+        const { "$root": root, classmod }= this;
+        return {'em-node-table':true,
+                [`em-node-table--${classmod}`]:true,
+                'em-shift': root.shift}
+    }
+  },
   methods: {
+    onGhost() {
+      const { "$root": root, list }= this;
+      list.insertAt(list.length, root.nodes.newFromType(list.type));
+    },
     // generate a vue css class object for an item based on the current highlight settings.
     highlight(idx) {
       const { "$root": root, list }= this;
       let highlight= false;
       let edge= false;
-      const at = root.dropper.target;
+
       const start= root.dropper.start;
-      const atList= at && (at.list === list);
+      
       const startList= start && (start.list === list);
+      const atStart= startList && ((idx === start.target.idx) || (inline && idx > start.target.idx))
+
+
+      // are we the target
+      const at = root.dropper.target;
+      const atList= at && (at.list === list);
       if (atList) {
         edge= idx === at.target.edge;
         highlight=(idx === at.target.idx) || edge;
       }
-      const mod= this.classmod;
       const inline= this.list.inline;
+      const mod= "em-row--"+this.classmod;
       return {
         "em-row": true,
-        ["em-row--"+mod] : true,
+        [mod] : true,
         "em-drag-mark": highlight,
         "em-drag-highlight": highlight,
-        "em-drag-head": edge && (at.target.idx < 0),
-        "em-drag-tail": edge && (at.target.idx > 0),
-        "em-drag-start": startList && ((idx === start.target.idx) || (inline && idx > start.target.idx))
-      }
+        "em-drag-start": atStart,
+        "em-row--ghost": idx === -1,
+      };
     }
   },
+  mixins: [bemMixin()],
   template:
-  `<div :class="{'em-node-table':true,
-                'em-node-table--${this.classmod}':true,
-                'em-shift':$root.shift}"
-    ><div
-      :class="['em-row', 'em-row__header--'+classmod]"
-      :data-drag-idx="-1"
-      :data-drag-edge="0"
-    >&nbsp;</div
+  `<div :class="tablecls"
     ><div v-for="(item,idx) in items"
         :class="highlight(idx)"
         :data-drag-idx="idx"
@@ -65,20 +77,24 @@ Vue.component('em-node-table', {
         :num="idx+1"
         :grip="grip"
         :max="60+items.length"
-        ></em-gutter
+      ></em-gutter
       ><slot
         :idx="idx"
         :item="item"
       ></slot
-      ></em-gutter
     ></div
-    ><div
-      :class="['em-row', 'em-row__footer--'+classmod]"
-      :data-drag-idx="items.length"
-      :data-drag-edge="items.length-1"
-    ><slot
-        name="footer"
-    >&nbsp;</slot
+    ><div v-if="$root.shift"
+        :class="highlight(-1)"
+        :data-drag-idx="items.length"
+        :data-drag-edge="items.length-1"
+      ><em-gutter
+        v-if="!list.inline"
+        :grip="grip"
+        :max="60+items.length"
+      ></em-gutter
+      ><mk-a-button
+        @activate="onGhost"
+    >+ {{ghost}}</mk-a-button
     ></div
   ></div>`
 });

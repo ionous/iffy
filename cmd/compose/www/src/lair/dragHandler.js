@@ -75,6 +75,8 @@ class DragHandler {
     const { dropper, sink } = this;
     this.log(evt);
     if (dropper.start && sink.dragDrop) {
+      // not sure why, but dt.dropEffect is often 'none' here on chrome;
+      // ( even though drag end will be copy )
       sink.dragDrop(dropper.start, evt.target, evt.dataTransfer);
     }
     dropper.reset(true); // clear here b/c we dont always get dragEnd.

@@ -2,7 +2,7 @@ makeLang(new Make(new Types()));
 
 const events= new Vue(); // global event bus
 const nodes= new Nodes();
-const redux= new Redux(Vue, nodes);
+const redux= new Redux(Vue);
 
 //
 const app= new Vue({
@@ -44,7 +44,7 @@ const app= new Vue({
       //     }
       //   }
       // }
-      return new Mutation(redux, state, extras, after);
+      return new Mutation(nodes, state, extras, after);
     },
     // used to sync context, browser, etc. controls
     ctrlSelected(ctrl) {

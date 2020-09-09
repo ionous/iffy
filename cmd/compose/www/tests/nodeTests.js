@@ -17,7 +17,7 @@ class NodeTest {
   }
   newMutation(node) {
     const state= new MutationState(node);
-    return new Mutation(this.redux, state);
+    return new Mutation(this.nodes, state);
   }
   expect(src, ids, reason) {
     const have= src.map(n => n.id).join(",");
@@ -226,8 +226,9 @@ function nodeTests() {
   });
   //
   runTest("serialization", function(test) {
-    const ogJson= JSON.stringify(test.rootItem,0,2);
-    const nodeJson= test.nodes.root.serialize();
+    const { nodes, rootItem } = test;
+    const ogJson= JSON.stringify(rootItem,0,2);
+    const nodeJson= nodes.root.serialize();
     if (nodeJson !== ogJson) {
       console.log(nodeJson);
       throw new Error("mismatched serialization");
@@ -297,7 +298,7 @@ function nodeTests() {
     }
   },{
       "id": "td1",
-      "type": "story_statements",
+      "type": "paragraph",
       "value": {
         "$STORY_STATEMENT": [{
           "id": "td0",
@@ -375,13 +376,14 @@ function nodeTests() {
   });
   //
   runTest("add blank story statement", function(test) {
-    const para= test.nodes.root;
+    const { nodes } = test;
+    const para= nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    const table= new StatementNodes(test.redux, para);
+    const table= new StatementNodes(nodes, para);
     if (statements.length!==1 || statements[0].id !== "td0") {
       throw new Error(" td0 should start as the first statement");
     }
-    table.addBlank(0);
+    table.insertAt(0, nodes.newFromType(table.type));
     if (statements.length!==2 || statements[1].id !== "td0") {
       throw new Error(" td0 should now be the second statement");
     }
@@ -402,12 +404,13 @@ function nodeTests() {
       "value": {"$STORY_STATEMENT": []}
   };
   runTest("move story statements", function(test) {
-    const para= test.nodes.root;
+    const { nodes } = test;
+    const para= nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    const table= new StatementNodes(test.redux, para);
-    table.addBlank(0);
-    table.addBlank(1);
-    table.addBlank(2);
+    const table= new StatementNodes(nodes, para);
+    table.insertAt(0, nodes.newFromType(table.type));
+    table.insertAt(1, nodes.newFromType(table.type));
+    table.insertAt(2, nodes.newFromType(table.type));
     test.expect(statements, "1,2,3", "initially");
     table.move(1,0,2);
     test.expect(statements, "2,3,1", "moved src>dst");
@@ -433,8 +436,8 @@ function nodeTests() {
     const mainStory= nodes.newFromType("story");
     const otherStory= nodes.newFromType("story");
 
-    const ps1= new ParagraphNodes(redux, mainStory);
-    const ps2= new ParagraphNodes(redux, otherStory);
+    const ps1= new ParagraphNodes(nodes, mainStory);
+    const ps2= new ParagraphNodes(nodes, otherStory);
     test.expect(ps1.items, "1");
     test.expect(ps2.items, "4");
 
@@ -452,12 +455,13 @@ function nodeTests() {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphNodes( redux, mainStory );
+    const ps= new ParagraphNodes(nodes, mainStory);
     const p1= ps.items[0];
-    const p2= ps.addBlank();
+    const p2= ps.insertAt(ps.length, nodes.newFromType(ps.type));
     console.assert(ps.items.length, 2);
-    const ts1= new StatementNodes(redux, p1);
-    const ts2= new StatementNodes(redux, p2);
+
+    const ts1= new StatementNodes(nodes, p1);
+    const ts2= new StatementNodes(nodes, p2);
     ts1.items.splice(0);
     ts2.items.splice(0);
     // p1: c1, c2
@@ -470,22 +474,23 @@ function nodeTests() {
     // p1: x
     // p2: c3, c1, c2, c4
     test.expect(ts2.items, "c3,c4");
+
     ts2.transferTo(1, ps, 0);
     test.expect(ts2.items, "c3,c1,c2,c4");
+
     redux.undo();
     test.expect(ts2.items, "c3,c4");
-
   }, null);
   runTest("drop partial line from p into ps, creating a p", function(test) {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphNodes( redux, mainStory );
+    const ps= new ParagraphNodes(nodes, mainStory );
     const p1= ps.items[0];
-    const p2= ps.addBlank();
+    const p2= ps.insertAt(ps.length, nodes.newFromType(ps.type));
     console.assert(ps.items.length, 2);
-    const ts1= new StatementNodes(redux, p1);
-    const ts2= new StatementNodes(redux, p2);
+    const ts1= new StatementNodes(nodes, p1);
+    const ts2= new StatementNodes(nodes, p2);
     ts1.items.splice(0);
     ts2.items.splice(0);
     // p1: c1, c2, c3
@@ -509,12 +514,12 @@ function nodeTests() {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphNodes( redux, mainStory );
+    const ps= new ParagraphNodes(nodes, mainStory );
     const p1= ps.items[0];
-    const p2= ps.addBlank();
+    const p2= ps.insertAt(ps.length, nodes.newFromType(ps.type));
     console.assert(ps.items.length, 2);
-    const ts1= new StatementNodes(redux, p1);
-    const ts2= new StatementNodes(redux, p2);
+    const ts1= new StatementNodes(nodes, p1);
+    const ts2= new StatementNodes(nodes, p2);
     ts1.items.splice(0);
     ts2.items.splice(0);
     // p1: c1, c2, c3
@@ -530,6 +535,7 @@ function nodeTests() {
     ts2.transferTo(1, ts1, 1);
     test.expect(ts1.items, "c1");
     test.expect(ts2.items, "c4,c2,c3");
+
     redux.undo();
     test.expect(ts1.items, "c1,c2,c3");
     test.expect(ts2.items, "c4");

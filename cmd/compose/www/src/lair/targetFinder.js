@@ -26,7 +26,7 @@ class TargetFinder {
       const idx= TargetFinder.getData(el, "dragIdx");
       if (idx !== undefined) {
         const edge= TargetFinder.getData(el, "dragEdge");
-        ret= { el, idx, edge  };
+        ret= { el, idx, edge };
         break;
       }
     }

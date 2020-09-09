@@ -1,7 +1,6 @@
 // standalone drop handler
 class TrashHandler  {
-  constructor(redux, target) {
-    this.redux= redux;
+  constructor(target) {
     this.target= target;
   }
   dragOver() {
@@ -12,9 +11,8 @@ class TrashHandler  {
     return false;
   }
   dragDrop(from) {
-    const { redux } = this;
     const { list, target: { idx } } = from;
-    redux.doit({
+    Redux.Run({
       paraEls: false, // inelegant to say the least.
       apply() {
         this.paraEls= list.removeFrom(idx);
@@ -47,7 +45,7 @@ Vue.component('mk-trash-can', {
   },
   mounted() {
     const { "$root": root } = this;
-    this.handler= new DragHandler(root.dropper, new TrashHandler(root.redux, this.trashTarget)).
+    this.handler= new DragHandler(root.dropper, new TrashHandler(this.trashTarget)).
                   listen(this.$el);
   },
   beforeDestroy() {

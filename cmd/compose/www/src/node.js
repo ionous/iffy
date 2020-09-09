@@ -115,6 +115,33 @@ class SwapNode extends Node {
       }
     }
   }
+  setSwap(newChoice, newKid) {
+    const node= this;
+    const oldKid= node.kid;
+    const oldChoice= node.choice;
+    Redux.Run({
+      apply() {
+        node.kid= newKid;
+        node.choice= newChoice;
+        if (newKid) {
+          newKid.parent= node;
+        }
+        if (oldKid) {
+          oldKid.parent= null;
+        }
+      },
+      revoke() {
+        node.kid= oldKid;
+        node.choice= oldChoice;
+        if (newKid) {
+          newKid.parent= null;
+        }
+        if (oldKid) {
+          oldKid.parent= node;
+        }
+      }
+    });
+  }
 };
 
 // Pick one node from a (potentially large) set of types.
@@ -136,6 +163,32 @@ class SlotNode extends Node {
       this.kid= kid;
     }
   }
+
+  // fill out the passed slot with a newly created node of typeName
+  setSlot(newKid) {
+    const node= this;
+    const oldKid= node.kid;
+    Redux.Run({
+      apply() {
+        node.kid= newKid;
+        if (newKid) {
+          newKid.parent= node;
+        }
+        if (oldKid) {
+          oldKid.parent= null;
+        }
+      },
+      revoke() {
+        node.kid= oldKid;
+        if (newKid) {
+          newKid.parent= null;
+        }
+        if (oldKid) {
+          oldKid.parent= node;
+        }
+      }
+    });
+  }
 };
 
 // A leaf node representing a concrete value.
@@ -153,6 +206,19 @@ class PrimNode extends Node {
   }
   unroll(nodes, itemValue) {
     this.value= itemValue;
+  }
+  // change a primitive value
+  setPrim(newValue) {
+    const node= this;
+    const oldValue= node.value;
+    Redux.Run({
+      apply(vm) {
+        node.value= newValue;
+      },
+      revoke() {
+        node.value= oldValue;
+      }
+    });
   }
 }
 

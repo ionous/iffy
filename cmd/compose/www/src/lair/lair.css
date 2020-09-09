@@ -28,14 +28,13 @@
 }
 .em-gutter--grip {
   text-align: center;
-  font-weight: bold;
-  /*font-size: smaller;*/
-  color: white;
-  background-color: blue;
-  border-radius: 5px;
+  font-size: small;
+  color: black;
+  /*background-color: blue;*/
   margin-right: 0.5ch;
   margin-left: 0.5ch;
-  border: 1px solid white;
+  line-height: 15px;
+  border: outset;
 }
 .em-gutter.em-gutter--unfilled {
   background-color: inherit;

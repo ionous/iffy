@@ -109,8 +109,8 @@ class NodeTable  {
     const target= this.finder.findIdx(targetEl);
     if (target) {
       if (from instanceof DraggableCommand) {
-        let newItem= this.list.redux.nodes.newFromType(from.type);
-        const blank= this.list.makeBlank();
+        let newItem= this.list.nodes.newFromType(from.type);
+        const blank= this.list.nodes.newFromType(this.list.type);
         if (this.list.type !== "paragraph") {
           blank.kid= newItem;
           newItem.parent= blank;
@@ -121,7 +121,7 @@ class NodeTable  {
           parent.kid= newItem;
           newItem= blank;
         }
-        this.list.addBlank(target.idx, newItem);
+        this.list.insertAt(target.idx, newItem);
       }
       else if (from instanceof DraggableNode) {
         this.list.transferTo(target.idx, from.list, from.target.idx, from.width);

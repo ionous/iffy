@@ -2,3 +2,22 @@
 .em-gutter--digi {
   border-right: 3px double rgb(239, 207, 173); 
 }
+
+.em-row--ghost {
+  color: grey;
+  white-space:nowrap;
+  user-select: none;
+  visibility: hidden;
+}
+
+.em-row--inline.em-row--ghost {
+  display: none;
+}
+
+.em-shift .em-row {
+  visibility: visible;
+}
+
+.em-shift .em-row--inline.em-row--ghost  {
+  display: inline;
+}

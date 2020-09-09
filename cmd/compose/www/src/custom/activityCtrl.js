@@ -1,6 +1,6 @@
 class ActivityList extends NodeList {
-  constructor(redux, para) {
-    super(redux, para, "$EXE", "execute");
+  constructor(nodes, para) {
+    super(nodes, para, "$EXE", "execute");
   }
 }
 
@@ -22,7 +22,7 @@ Vue.component('mk-activity-ctrl', {
     const { node, "$root": root } = this;
     // each item is a story statement slot
     return {
-      list: new ActivityList(root.redux, node),
+      list: new ActivityList(root.nodes, node),
       dropper: root.dropper,
     }
   },

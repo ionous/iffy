@@ -35,6 +35,8 @@ class Restack {
   }
 }
 
+let globalRedux;
+
 // Redux handles undo/redo
 class Redux {
   // vm is a subset of Vue used for triggering change tracking.
@@ -44,6 +46,10 @@ class Redux {
     this.applied= new Restack(max);
     this.revoked= new Restack(max);
     this.changed= 0;
+    globalRedux= this;
+  }
+  static Run(act) {
+    globalRedux.doit(act);
   }
   // throws if the undo stack is empty
   undo(nothrow) {
@@ -73,214 +79,5 @@ class Redux {
     this.revoked.clear();
     ++this.changed;
   }
-  // we can generically create optional members of runs
-  // cursor c, must target a member of a run
-  newAt(at, leftSide= false) {
-    if (!("kids" in at.parent)) {
-      throw new Error("cursor should target the field of a run");
-    }
-    if (at.isRepeatable()) {
-      this._newElem(at, leftSide);
-    } else {
-      this._newField(at);
-    }
-  }
-  // add a new item to a field
-  _newField(at) {
-    if (at.isRepeatable()) {
-      throw new Error(`newField should target a non-repeatable field ${JSON.stringify(at)}`);
-    }
-    const { parent, token, param }= at;
-    const newField= this.nodes.newFromType(param.type);
-    this.doit({
-      apply(vm) {
-        const { kids } = parent;
-        vm.set(kids, token, newField);
-        newField.parent= parent;
-      },
-      revoke(vm) {
-        const { kids } = parent;
-        vm.delete(kids, token);
-        newField.parent= null;
-      }
-    });
-  }
-  _newElem(at, leftSide=false) {
-    if (!at.isRepeatable()) {
-      throw new Error(`newElem should target a repeatable field ${JSON.stringify(at)}`);
-    }
-    const { parent, token, param, index }= at;
-    const newElem= this.nodes.newFromType(param.type);
-    this.doit({
-      apply(vm) {
-        // if the field doesnt exist, add the new node via a new array.
-        const { kids } = parent;
-        const field= kids[token];
-        if (!field) {
-          vm.set(kids, token, [newElem]);
-        } else if (index<0) {
-          field.push(newElem); // no specific element targeted, append.
-        } else {
-          const i= leftSide? index: index+1;
-          field.splice(i, 0, newElem);
-        }
-        newElem.parent= parent;
-      },
-      revoke(vm) {
-        const { kids } = parent;
-        const field= kids[token];
-        if (field.length <= 1) {
-          vm.delete(kids, token);
-        } else {
-          // re-determine the index to avoid left/right side issues.
-          const rub= field.indexOf(newElem);
-          field.splice(rub, 1);
-        }
-        newElem.parent= null;
-      }
-    });
-  }
-  // remove an existing child targeted by the passed cursor
-  // note: this will happily delete non-optional elements.
-  deleteAt(at) {
-    const { parent, token, index }= at;
-    const oldKid= at.target;
-    const oldChoice= parent.choice;
-
-    this.doit({
-      apply(vm) {
-        if (!token) { // no token means swap or slot
-          parent.kid= null;
-          if (oldChoice!== undefined) {
-            parent.choice= null;
-          }
-        } else {
-          const { kids } = parent;
-          const field= kids[token];
-          if (field) {
-            // delete the field, or remove a single element?
-            if ((index >= 0) && (field.length > 1)) {
-              field.splice(index, 1);
-            } else {
-              vm.delete(kids, token);
-            }
-          }
-        }
-      },
-      revoke(vm) {
-        if (!token) { // no token means swap or slot
-          parent.kid= oldKid;
-          if (oldChoice!== undefined) {
-            parent.choice= oldChoice;
-          }
-        } else {
-          const { kids } = parent;
-          if ((index >= 0) && (token in kids)) {
-            const field= kids[token];
-            field.splice(index, 0, oldKid);
-          } else {
-            const value= (index<0)? oldKid: [oldKid];
-            vm.set(kids, token, value);
-          }
-        }
-      }
-    });
-  }
-  // fill out the passed slot with a newly created node of typeName
-  setSlot(node, typeName) {
-    const oldKid= node.kid;
-    const newKid= typeName && this.nodes.newFromType(typeName);
-      this.doit({
-      apply() {
-        node.kid= newKid;
-        if (newKid) {
-          newKid.parent= node;
-        }
-        if (oldKid) {
-          oldKid.parent= null;
-        }
-      },
-      revoke() {
-        node.kid= oldKid;
-        if (newKid) {
-          newKid.parent= null;
-        }
-        if (oldKid) {
-          oldKid.parent= node;
-        }
-      }
-    });
-  }
-  setSwap(node, newChoice, typeName) {
-    const oldKid= node.kid;
-    const oldChoice= node.choice;
-    const newKid= typeName && this.nodes.newFromType(typeName);
-    this.doit({
-      apply() {
-        node.kid= newKid;
-        node.choice= newChoice;
-        if (newKid) {
-          newKid.parent= node;
-        }
-        if (oldKid) {
-          oldKid.parent= null;
-        }
-      },
-      revoke() {
-        node.kid= oldKid;
-        node.choice= oldChoice;
-        if (newKid) {
-          newKid.parent= null;
-        }
-        if (oldKid) {
-          oldKid.parent= node;
-        }
-      }
-    });
-  }
-  // change a primitive value
-  setPrim(node, newValue) {
-    const oldValue= node.value;
-    this.doit({
-      apply(vm) {
-        node.value= newValue;
-      },
-      revoke() {
-        node.value= oldValue;
-      }
-    });
-  }
-
-  // we move node's item and / or the items after it into the newItem's container.
-  // leftSide (aka splitBefore) the els after and including the field.
-  // rightSide (aka splitAfter ) the els after field not including the field.
-  // field.value is the old container
-  // split(node, newItem, leftSide) {
-  //   const field= node.field;
-  //   const parentField= node.parentNode.field;
-  //   this.doit({
-  //     apply() {
-  //       // field.item, ex. "$STORY_STATEMENT": [{ type: "story_statement", value: {} }]
-  //       const { item } = node;
-  //       const { value:oldItems } = field;
-  //       const index= oldItems.indexOf(item) + (leftSide? 0: 1);
-  //       const removed= oldItems.splice(index);
-  //       // newItem.value holds the new container
-  //       // we need to overwrite its placeholder item with our items.
-  //       const newItems= newItem.value[field.token];
-  //       newItems.splice(0, 1, ...removed);
-  //       // and we need to put the newItem after our current group
-  //       // regardless of which side of the item we broke on
-  //       parentField.addRepeat( newItem );
-  //     },
-  //     revoke() {
-  //       const { value:oldItems } = field;
-  //       const newItems= newItem.value[field.token];
-  //       const removed= newItems.splice(0); // remove all the items we added.
-  //       oldItems.splice(oldItems.length, 0, ...removed);
-  //       parentField.removeRepeat();
-  //     }
-  //   });
-  // }
 }
 

@@ -22,14 +22,14 @@ Vue.component('mk-opt-ctrl', {
   },
   methods: {
     onPick(token) {
-      const { node } = this;
       const spec= node.itemType.with;
       if (!token in spec.params) {
         throw new Error(`unknown token picked '${token}'`);
       }
       const param= spec.params[token];
       const typeName= param.type || param; // an opt's param can map straight to their type.
-      this.$root.redux.setSwap(node, token, typeName);
+      const newNode= this.$root.nodes.newFromType(typeName);
+      this.node.setSwap(token, newNode);
     },
   },
   mixins: [bemMixin()],

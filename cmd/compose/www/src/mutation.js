@@ -32,8 +32,8 @@ class CommandMap {
 
 class Mutation {
   // fix? i dont like these extras/afters objects
-  constructor(redux, state, extras=null, after=null) {
-    this.redux= redux;
+  constructor(nodes, state, extras=null, after=null) {
+    this.nodes= nodes;
     this.state= state;
     this.commandMap= CommandMap.NewFromState(state);
     if (extras) {
@@ -45,15 +45,129 @@ class Mutation {
     if (typeof which === 'function') {
       which(this)
     } else {
-      const { redux, state } = this;
+      const { state } = this;
       if (!which) {
-        redux.deleteAt(state.removes);
+        this.deleteAt(state.removes);
       } else {
         const curse= (which<0) ? state.left[-which-1]: state.right[which-1];
         // FIX: probably have to handle terminal injections: starting node == mutation
-        redux.newAt(curse, which<0);
+        this.newAt(curse, which<0);
       }
     }
+  }
+
+  // remove an existing child targeted by the passed cursor
+  // note: this will happily delete non-optional elements.
+  deleteAt(at) {
+    const { parent, token, index }= at;
+    const oldKid= at.target;
+    const oldChoice= parent.choice;
+
+    Redux.Run({
+      apply(vm) {
+        if (!token) { // no token means swap or slot
+          parent.kid= null;
+          if (oldChoice!== undefined) {
+            parent.choice= null;
+          }
+        } else {
+          const { kids } = parent;
+          const field= kids[token];
+          if (field) {
+            // delete the field, or remove a single element?
+            if ((index >= 0) && (field.length > 1)) {
+              field.splice(index, 1);
+            } else {
+              vm.delete(kids, token);
+            }
+          }
+        }
+      },
+      revoke(vm) {
+        if (!token) { // no token means swap or slot
+          parent.kid= oldKid;
+          if (oldChoice!== undefined) {
+            parent.choice= oldChoice;
+          }
+        } else {
+          const { kids } = parent;
+          if ((index >= 0) && (token in kids)) {
+            const field= kids[token];
+            field.splice(index, 0, oldKid);
+          } else {
+            const value= (index<0)? oldKid: [oldKid];
+            vm.set(kids, token, value);
+          }
+        }
+      }
+    });
+  }
+  // we can generically create optional members of runs
+  // cursor c, must target a member of a run
+  newAt(at, leftSide= false) {
+    if (!("kids" in at.parent)) {
+      throw new Error("cursor should target the field of a run");
+    }
+    if (at.isRepeatable()) {
+      this._newElem(at, leftSide);
+    } else {
+      this._newField(at);
+    }
+  }
+  // add a new item to a field
+  _newField(at) {
+    if (at.isRepeatable()) {
+      throw new Error(`newField should target a non-repeatable field ${JSON.stringify(at)}`);
+    }
+    const { parent, token, param }= at;
+    const newField= this.nodes.newFromType(param.type);
+    Redux.Run({
+      apply(vm) {
+        const { kids } = parent;
+        vm.set(kids, token, newField);
+        newField.parent= parent;
+      },
+      revoke(vm) {
+        const { kids } = parent;
+        vm.delete(kids, token);
+        newField.parent= null;
+      }
+    });
+  }
+  _newElem(at, leftSide=false) {
+    if (!at.isRepeatable()) {
+      throw new Error(`newElem should target a repeatable field ${JSON.stringify(at)}`);
+    }
+    const { parent, token, param, index }= at;
+    const newElem= this.nodes.newFromType(param.type);
+    Redux.Run({
+      apply(vm) {
+        // if the field doesnt exist, add the new node via a new array.
+        const { kids } = parent;
+        const field= kids[token];
+        if (!field) {
+          vm.set(kids, token, [newElem]);
+        } else if (index<0) {
+          field.push(newElem); // no specific element targeted, append.
+        } else {
+          const i= leftSide? index: index+1;
+          field.splice(i, 0, newElem);
+        }
+        newElem.parent= parent;
+      },
+      revoke(vm) {
+        const { kids } = parent;
+        const field= kids[token];
+        if (field.length <= 1) {
+          vm.delete(kids, token);
+        } else {
+          // re-determine the index to avoid left/right side issues.
+          const rub= field.indexOf(newElem);
+          field.splice(rub, 1);
+        }
+        newElem.parent= null;
+      }
+    });
   }
 }
 

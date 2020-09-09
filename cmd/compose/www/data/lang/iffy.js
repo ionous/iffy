@@ -1,7 +1,5 @@
 function localLang(make) {
   make.group("Story Statements", function() {
-    make.run("story_statements", "{+story_statement}"); // old
-
     make.run("story", "{+paragraph}");
     make.run("paragraph", "{+story_statement}");
     make.slot("story_statement");

@@ -1,7 +1,8 @@
 class ParagraphNodes extends NodeList {
-    constructor(redux, story) {
-    super(redux, story, "$PARAGRAPH", "paragraph");
+  constructor(nodes, story) {
+    super(nodes, story, "$PARAGRAPH", "paragraph");
   }
+
   // add a paragraph, or a line of statements
   // at the paragraph targeted.
   addTo(at, paraEls) {
@@ -14,7 +15,7 @@ class ParagraphNodes extends NodeList {
     } else {
       const els= paraEls;
       // make a new paragraph...
-      const para= this.makeBlank();
+      const para= this.nodes.newFromType("paragraph");
       // move els into the new paragraph
       const kids= para.getKid("$STORY_STATEMENT");
       // noting: we have to remove the default created els first.
@@ -31,7 +32,8 @@ class ParagraphNodes extends NodeList {
 
 Vue.component('mk-story-ctrl', {
   template:
-  `<em-node-table :list="list"
+  `<em-node-table
+      :list="list"
   ><template
       v-slot="{item, idx}"
     ><mk-switch
@@ -46,7 +48,7 @@ Vue.component('mk-story-ctrl', {
     const { node, "$root": root } = this;
     // each item is a paragraph run
     return {
-      list: new ParagraphNodes(root.redux, node),
+      list: new ParagraphNodes(root.nodes, node),
       dropper: root.dropper,
     }
   }

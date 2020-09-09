@@ -1,12 +1,11 @@
 class StatementNodes extends NodeList {
-  constructor(redux, para) {
-    super(redux, para, "$STORY_STATEMENT", "story_statement");
+  constructor(nodes, para) {
+    super(nodes, para, "$STORY_STATEMENT", "story_statement");
     this.inline= true;
   }
   // when we drag, we re/move everything from a given statement till the end of line.
   // returns a list of statements
-  removeFrom(at) {
-    const width= Number.MAX_VALUE;
+  removeFrom(at, width= Number.MAX_VALUE) {
     return this.items.splice(at, width).map(el=> {
       el.parent= null;
       return el;
@@ -58,7 +57,7 @@ Vue.component('mk-paragraph-ctrl', {
     const { node, "$root": root } = this;
     // each item is a story statement slot
     return {
-      list: new StatementNodes(root.redux, node),
+      list: new StatementNodes(root.nodes, node),
       dropper: root.dropper,
     }
   },

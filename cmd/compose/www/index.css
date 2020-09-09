@@ -137,18 +137,6 @@ body {
   cursor: pointer;
   background-color: #e6de7e;
 }
-.mk-run-ctrl__ghost {
-  text-decoration: underline;
-  color: grey;
-  white-space:nowrap;
-  margin-right: 0.25em;
-  margin-left: 0.25em;
-  user-select: none;
-}
-
-.mk-run-ctrl__ghost::before {
-  content:"\FE62"; /*Small Plus Sign. ﹢ */
-}
 
 .mk-slot-ctrl__item,
 .mk-pick-inline {

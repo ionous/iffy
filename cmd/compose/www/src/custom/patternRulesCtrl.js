@@ -1,6 +1,6 @@
 class PatternRules extends NodeList {
-  constructor(redux, node) {
-    super(redux, node, "$PATTERN_RULE", "pattern_rule");
+  constructor(nodes, node) {
+    super(nodes, node, "$PATTERN_RULE", "pattern_rule");
   }
 }
 
@@ -23,7 +23,7 @@ Vue.component('mk-pattern-rules-ctrl', {
     const { node, "$root": root } = this;
     // each item is a story statement slot
     return {
-      list: new PatternRules(root.redux, node),
+      list: new PatternRules(root.nodes, node),
       dropper: root.dropper,
     }
   },

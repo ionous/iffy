@@ -12,7 +12,7 @@ import (
 // which a switch for parsing "story_statement" slats.
 
 // story is a bunch of paragraphs
-//make.run("story", "{+paragraph|ghost}");
+//make.run("story", "{+paragraph}");
 func imp_story(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "story"); e != nil {
 		err = e

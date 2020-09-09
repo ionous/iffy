@@ -1,26 +1,23 @@
 
 class NodeList {
   // token should target an array of the passed type
-  constructor( redux, node, token, type ) {
-    this.redux= redux;
+  constructor( nodes, node, token, type ) {
+    this.nodes= nodes;
     this.node= node;
     this.token= token;
     this.type= type
     this.items= node.getKid(token);
     this.inline= false;
   }
-  // users should generally call "addBlank"
-  makeBlank() {
-    return this.redux.nodes.newFromType(this.type);
-  }
-  newAt(idx, cmd) {
-     throw new Error("not implemented");
+  get length() {
+    return this.items.length;
   }
   // returns number of elements added
   addTo(at, exe) {
     const { node, items } = this;
     exe.parent= node;
     items.splice(at, 0, exe);
+
   }
   // returns the element or elements removed
   // when we drag, we re/move a single execute ( a line ) at once.
@@ -39,15 +36,9 @@ class NodeList {
     const toList= this;
     //
     if (toList === fromList) {
-      const needBlank= Math.abs(fromIdx - toIdx) === 1;
-      if (needBlank) {
-        this.addBlank(toIdx);
-      } else {
-        this.move(toIdx, fromIdx, width);
-      }
+      this.move(toIdx, fromIdx, width);
     } else {
-      const { redux } = this;
-      redux.doit({
+      Redux.Run({
         added: 0, // inelegant to say the least.
         apply() {
           const paraEls= fromList.removeFrom(fromIdx);
@@ -60,27 +51,26 @@ class NodeList {
       });
     }
   }
-  addBlank(at=-1, newItem=null) {
-    const { redux, node, items } = this;
-    const blank= newItem || this.makeBlank();
+  insertAt(at, newItem) {
+    const { node, items } = this;
     if (at<0) {
       at= items.length;
     }
-    redux.doit({
+    Redux.Run({
       apply() {
-        blank.parent= node;
-        items.splice(at,0,blank);
+        newItem.parent= node;
+        items.splice(at,0,newItem);
       },
       revoke() {
-        blank.parent= null;
+        newItem.parent= null;
         items.splice(at,1);
       },
     });
-    return blank;
+    return newItem;
   }
   // move items within this same list
   move(src, dst, width, nothrow) {
-    const { redux, items } = this;
+    const { items } = this;
     if ((!width) || (width<0)) {
       const e= new Error("invalid width");
       if (nothrow) { console.error(e); return e; }
@@ -97,7 +87,7 @@ class NodeList {
     if (dst > src) {
       dst -= width;
     }
-    redux.doit({
+    Redux.Run({
       apply() {
         const rub= items.splice(src, width);
         items.splice(dst, 0, ...rub);

@@ -57,7 +57,7 @@ Vue.component('mk-num-ctrl', {
       } else {
         const value= parseFloat(choice);
         if (!isNaN(value)) {
-          this.$root.redux.setPrim( this.node, value );
+          this.node.setPrim(value);
         }
       }
       this.editing= false;

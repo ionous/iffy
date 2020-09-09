@@ -15,7 +15,7 @@ class DraggableCommand extends Draggable {
   }
 }
 
-class TabHandler{
+class TabHandler {
   constructor(tabbable) {
    this.finder= null; // see bind()
    this.tabbable= tabbable;
