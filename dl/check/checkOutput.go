@@ -29,7 +29,7 @@ func (t *CheckOutput) RunTest(run rt.Runtime) (err error) {
 	} else if res := buf.String(); res != t.Expect {
 		err = errutil.New("expected:", res, "got:", t.Expect)
 	} else {
-		log.Println("test", t.Name, "got", res)
+		log.Println("test '" + t.Name + "' got '" + res + "'")
 		auto.Target = prev
 	}
 	run.ActivateDomain(t.Name, false)

@@ -26,9 +26,9 @@ func imp_test_scene(k *Importer, r reader.Map) (err error) {
 	} else if n, e := imp_test_name(k, m.MapOf("$TEST_NAME")); e != nil {
 		err = e
 	} else {
-		pop := k.SetCurrentTest(n)
-		err = reader.Repeats(m.SliceOf("$STORY_STATEMENT"), k.Bind(imp_story_statement))
-		pop()
+		err = k.CollectTest(n, func() error {
+			return imp_story(k, m.MapOf("$STORY"))
+		})
 	}
 	return
 }
@@ -51,8 +51,6 @@ func imp_test_rule(k *Importer, r reader.Map) (err error) {
 func imp_test_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	if n, e := imp_named_test(k, r); e != nil {
 		err = e
-	} else if str := n.String(); len(str) > 0 && str[0] == '$' {
-		ret = k.StoryEnv.Recent.Test
 	} else {
 		ret = n
 	}

@@ -54,7 +54,10 @@ func imp_singular_kind(k *Importer, r reader.Map) (ret ephemera.Named, err error
 }
 
 func imp_named_test(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "test_name", "test")
+	k.OverrideNameDuring("$CURRENT_TEST", k.StoryEnv.Recent.Test, func() {
+		ret, err = importName(k, r, "test_name", "test")
+	})
+	return
 }
 
 func imp_trait(k *Importer, r reader.Map) (ret ephemera.Named, err error) {

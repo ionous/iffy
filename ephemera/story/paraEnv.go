@@ -16,15 +16,15 @@ type StoryEnv struct {
 	}
 }
 
-func (n *StoryEnv) SetCurrentTest(name ephemera.Named) func() {
+func (n *StoryEnv) CollectTest(test ephemera.Named, during func() error) (err error) {
 	lastScene := n.Current.Domain
-	n.Current.Domain = name
+	n.Current.Domain = test
 	// the most recent test might become the last popped test value
 	// ( once domains and tests are stackable )
-	n.Recent.Test = name
-	return func() {
-		n.Current.Domain = lastScene
-	}
+	n.Recent.Test = test
+	err = during()
+	n.Current.Domain = lastScene
+	return
 }
 
 type Nouns struct {

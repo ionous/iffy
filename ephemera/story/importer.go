@@ -39,7 +39,7 @@ func (k *Importer) NewName(name, category, ofs string) ephemera.Named {
 	if !domain.IsValid() {
 		domain = k.gameDomain()
 	}
-	return k.Recorder.NewDomainName(domain, name, category, ofs)
+	return k.NewDomainName(domain, name, category, ofs)
 }
 
 func (k *Importer) gameDomain() ephemera.Named {

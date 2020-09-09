@@ -11,14 +11,23 @@ import (
 )
 
 type Recorder struct {
-	srcId int64
-	cache *tables.Cache
+	srcId        int64
+	cache        *tables.Cache
+	nameReplacer nameReplacer
+}
+type nameReplacer struct {
+	key string
+	sub Named
+}
+
+func (n *nameReplacer) matches(s string) bool {
+	return len(s) > 0 && n.key == s
 }
 
 func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 	cache := tables.NewCache(db)
 	srcId := cache.Must(eph_source, srcURI)
-	return &Recorder{srcId, cache}
+	return &Recorder{srcId: srcId, cache: cache}
 }
 
 // NewName records a user-specified string, including a category and location,
@@ -27,6 +36,13 @@ func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
 // The format of the location ofs depends on the data source.
 func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
 	return r.NewDomainName(Named{}, name, category, ofs)
+}
+
+// hack for stubbing names
+func (r *Recorder) OverrideNameDuring(key string, sub Named, during func()) {
+	r.nameReplacer = nameReplacer{key, sub}
+	during()
+	r.nameReplacer = nameReplacer{}
 }
 
 func (r *Recorder) NewDomainName(domain Named, name, category, ofs string) (ret Named) {
@@ -39,7 +55,11 @@ func (r *Recorder) NewDomainName(domain Named, name, category, ofs string) (ret 
 		tables.NAMED_ASPECT,
 		tables.NAMED_TRAIT,
 		tables.NAMED_FIELD:
-		norm = lang.Camelize(norm)
+		if !strings.HasPrefix(norm, "$") {
+			norm = lang.Camelize(norm)
+		} else if norm == r.nameReplacer.key {
+			norm = r.nameReplacer.sub.String()
+		}
 	}
 	namedId := r.cache.Must(eph_named, norm, name, category, domain, r.srcId, ofs)
 	return Named{namedId, norm}

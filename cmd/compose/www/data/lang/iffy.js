@@ -19,7 +19,7 @@ function localLang(make) {
       "Expect {test_name} to {expectation%test:testing}");
 
     make.run("test_scene", "story_statement",
-      "While testing {test_name}: {+story_statement}");
+      "While testing {test_name}: {story}");
 
     make.run("test_rule", "story_statement",
       "To test {test_name}: {do%hook:program_hook}");
