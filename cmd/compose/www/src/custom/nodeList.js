@@ -12,12 +12,19 @@ class NodeList {
   get length() {
     return this.items.length;
   }
+  at(i) {
+    assert(i>=0 && i<this.items.length, "index out of range");
+    return this.items[i];
+  }
+  last() {
+    return this.items[this.items.length-1];
+  }
   acceptsType(fromType) {
-    const okay= fromType.implements(this.type);
+    const okay= fromType && fromType.implements(this.type);
     return okay;
   }
   acceptsBlock(fromType) {
-    const okay= fromType.implements(this.type);
+    const okay= fromType && fromType.implements(this.type);
     return okay;
   }
   // returns number of elements added

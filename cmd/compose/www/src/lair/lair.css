@@ -60,18 +60,16 @@
 }
 
 /* dragEnter adds, dragLeave removes */
-.em-drag-highlight:not(.em-drag-start) {
+.em-drag-highlight  {
   box-shadow:inset 0px 3px rgba(0,0,0,0.2);
   background-color: lightblue;
   transition: background-color 0.25s ease;
 }
-.em-drag-image.em-drag-mark {
+
+.em-drag-image {
   color: grey;
   background-color: silver;
   border: 3px solid white;
   max-width: 300px;
   font-size: x-small;
-}
-.em-drag-start:not(.em-drag-image) {
-  filter: blur(1px);
 }

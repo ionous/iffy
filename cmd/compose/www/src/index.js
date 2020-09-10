@@ -80,6 +80,7 @@ const app= new Vue({
   },
   created() {
     this.redux= redux;
+    this.blockSearch= new BlockSearch("activity","paragraph","pattern_rules");
   },
   computed: {
     story() {

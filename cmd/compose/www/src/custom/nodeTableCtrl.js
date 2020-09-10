@@ -3,95 +3,101 @@
 Vue.component('em-node-table', {
   data() {
     const { list } = this;
+    const classMod= list.inline ? "inline" : "block";
+    // bemStyle
+    const cls= `em-node-table em-node-table--${classMod}`;
+    const rowCls= `em-row em-row--${classMod}`;
+    const rowGhost= rowCls + " em-row--ghost";
+    const ghostText = Types.labelOf(Types.get(list.type));
     return {
       items: list.items,
-      classmod: list.inline? "inline": "block",
-      ghost: Types.labelOf(Types.get(list.type)),
+      cls,
+      rowCls,
+      ghostText,
     };
   },
   props: {
-    grip:String,
+    grip: String,
     list: NodeList,
   },
   mounted() {
-    const { "$root": root, list }= this;
-    this.handler= new DragHandler(root.dropper, new NodeTable(list)).
-                  listen(this.$el);
+    const { "$root": root, list } = this;
+    this.handler = new DragHandler(root.dropper, new NodeTableEvents(list)).
+      listen(this.$el);
   },
   beforeDestroy() {
     this.handler.silence();
-    this.handler= null;
+    this.handler = null;
   },
   computed: {
-    tablecls() {
-        const { "$root": root, classmod }= this;
-        return {'em-node-table':true,
-                [`em-node-table--${classmod}`]:true}
-    },
+    showFooter() {
+      const { "$root": root, list } = this;
+      let okay = false;
+
+      if (root.shift) {
+        okay = true;
+      } else if (root.dropper.dragging) {
+          if (!list.inline || !root.blockSearch.hasBlock(list.last())) {
+            const from = root.dropper.start;
+            okay = list.acceptsType(from.getType());
+          }
+        }
+      return okay;
+    }
   },
   methods: {
     onGhost() {
-      const { "$root": root, list }= this;
+      const { "$root": root, list } = this;
       list.insertAt(list.length, root.nodes.newFromType(list.type));
     },
     dragging(idx) {
-      const { "$root": root, list }= this;
-      const start= root.dropper.dragging;
+      const { "$root": root, list } = this;
+      const start = root.dropper.dragging;
       return start && start.contains && start.contains(list, idx);
     },
     // generate a vue css class object for an item based on the current highlight settings.
     highlight(idx) {
-      const { "$root": root, list }= this;
-      let highlight= false;
-
+      const { "$root": root, list } = this;
+      let highlight = false;
       // are we the target?
       const at = root.dropper.target;
-      const atList= at && (at.list === list);
+      const atList = at && (at.list === list);
       if (atList) {
-        const edge= idx === at.target.edge;
-        highlight=(idx === at.target.idx) || edge;
+        highlight = idx === at.target.idx;
       }
-      const inline= this.list.inline;
-      const mod= "em-row--"+this.classmod;
-      return {
-        "em-row": true,
-        [mod] : true,
-        "em-drag-mark": highlight,
-        "em-drag-highlight": highlight,
-        "em-row--ghost": idx === -1,
-      };
+      return highlight;
     }
   },
-  mixins: [bemMixin()],
   template:
-  `<div :class="tablecls"
+    `<div :class="cls"
     ><div v-for="(item,idx) in items"
         v-show="!dragging(idx)"
-        :class="highlight(idx)"
+        :class="[rowCls, {'em-drag-highlight': highlight(idx)}]"
         :data-drag-idx="idx"
         :key="item.id"
       ><em-gutter
         :num="idx+1"
         :grip="grip"
-        :max="60+items.length"
+        :max="10+items.length"
       ></em-gutter
       ><slot
         :idx="idx"
         :item="item"
       ></slot
     ></div
-    ><div v-if="$root.shift"
-        :class="highlight(-1)"
+    ><div v-show="showFooter"
+        :class="[rowCls, 'em-row--ghost', {'em-drag-highlight': highlight(items.length)}]"
         :data-drag-idx="items.length"
         :data-drag-edge="items.length-1"
       ><em-gutter
         v-if="!list.inline"
         :grip="grip"
-        :max="60+items.length"
+        :num="items.length+1"
+        :max="10+items.length"
       ></em-gutter
       ><mk-a-button
         @activate="onGhost"
-    >+ {{ghost}}</mk-a-button
+    >+ {{ghostText}}</mk-a-button
     ></div
   ></div>`
 });

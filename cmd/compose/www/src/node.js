@@ -1,3 +1,18 @@
+// uses serialization to detect whether some node in a tree includes a type which uses a newline
+// we dont want "inline" elements following elements that have blocks/newlines.
+class BlockSearch {
+  constructor(...blockTypes) {
+    const ts= blockTypes.join("|");
+    this.regexp= new RegExp(`"type":"(?:${ts})"`);
+  }
+  hasBlock(node) {
+    return this.hasText(node.serialize(false));
+  }
+  hasText(txt) {
+    return txt && this.regexp.test(txt);
+  }
+}
+
 // base class for the runtime story model.
 class Node {
   constructor(parent, itemType, itemId) {
@@ -11,8 +26,9 @@ class Node {
       type: this.type,
     };
   }
-  serialize() {
-    return JSON.stringify(this, 0, 2);
+  serialize(pretty=true) {
+    const args= pretty?[0,2]:[];
+    return JSON.stringify(this, ...args);
   }
   unroll(nodes, itemValue) {
     throw new Error("unroll unhandled");

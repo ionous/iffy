@@ -5,7 +5,7 @@ import "github.com/ionous/iffy/dl/composer"
 var Slots = []composer.Slot{{
 	Name: "execute",
 	Type: (*Execute)(nil),
-	Desc: "Execute: Run a series of statements.",
+	Desc: "Action: Run a series of statements.",
 }, {
 	Name: "bool_eval",
 	Type: (*BoolEval)(nil),

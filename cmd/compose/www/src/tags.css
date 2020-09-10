@@ -7,15 +7,6 @@
   color: grey;
   white-space:nowrap;
   user-select: none;
-  visibility: hidden;
-}
-
-.em-row--inline.em-row--ghost {
-  display: none;
-}
-
-.em-shift .em-row {
-  visibility: visible;
 }
 
 .em-shift .em-row--inline.em-row--ghost  {

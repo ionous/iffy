@@ -16,7 +16,7 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "Execute: Run a series of statements.",
+    "desc": "Action: Run a series of statements.",
     "name": "execute",
     "uses": "slot"
   },
