@@ -3,8 +3,11 @@ class ParagraphNodes extends NodeList {
     super(nodes, story, "$PARAGRAPH", "paragraph");
   }
   // fromType is class Type.
+  // returns true for any paragraph or story statement type.
   acceptsType(fromType) {
-    return fromType.implements(this.type);
+    const okay= fromType.implements(this.type) ||
+                fromType.implements("story_statement");
+    return okay;
   }
 
   // add a paragraph, or a line of statements
