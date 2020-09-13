@@ -30,7 +30,7 @@ Vue.component('mk-context', {
   },
   computed: {
     cmd() {
-      const t= allTypes.all[this.currType];
+      const t= allTypes.get(this.currType);
       return t && {
         label: Types.labelOf( t ),
         groups: Types.groupsOf( t ),

@@ -19,13 +19,8 @@ class Cursor  {
     return (index>=0) ? el[index]: el;
   }
   get param() {
-    let ret= null;
-    const { token } = this;
-    if (token) {
-      const spec= this.parent.itemType.with;
-      ret= spec.params[token];
-    }
-    return ret;
+    const { parent, token }= this;
+    return token && parent.getParam(token);
   }
   isPlainText() {
     const { token } = this;

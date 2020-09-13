@@ -22,11 +22,10 @@ Vue.component('mk-opt-ctrl', {
   },
   methods: {
     onPick(token) {
-      const spec= node.itemType.with;
-      if (!token in spec.params) {
+      const param= node.getParam(token);
+      if (!param) {
         throw new Error(`unknown token picked '${token}'`);
       }
-      const param= spec.params[token];
       const typeName= param.type || param; // an opt's param can map straight to their type.
       const newNode= this.$root.nodes.newFromType(typeName);
       this.node.setSwap(token, newNode);

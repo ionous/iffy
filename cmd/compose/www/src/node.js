@@ -67,6 +67,9 @@ class RunNode extends Node {
   getKid(token) {
     return this.kids[token];
   }
+  getParam(field) {
+    return this.itemType.with.params[field];
+  }
   // visit each parameter and argument in turn
   //callback(currentValue [, index [, array]]
   forEach(callback) {
