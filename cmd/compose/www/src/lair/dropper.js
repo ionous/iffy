@@ -15,7 +15,7 @@ class Dropper {
     this.dragging= false;
   }
   // start is a Draggable
-  setStart(start, dt, imgClasses= ["em-drag-image", "em-drag-mark"]) {
+  setStart(start, dt, imgClasses= ["em-drag-image"]) {
     console.assert(start instanceof Draggable);
     this.start= start;
     this.target= start;
