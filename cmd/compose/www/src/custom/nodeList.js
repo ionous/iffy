@@ -6,10 +6,11 @@ class NodeList {
     if (!items) {
       throw new Error(`node ${node.id} has empty child ${token}`);
     }
+    console.assert(node.getParam(token).type == type);
     this.nodes= nodes;
     this.node= node;
     this.token= token;
-    this.type= type // typeName
+    this.type= type; // typeName
     this.items= items;
     this.inline= false;
   }
