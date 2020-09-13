@@ -2,7 +2,8 @@
 // vue components can watch it for changes.
 // DragHandler instances write to it.
 class Dropper {
-  constructor() {
+  constructor(hack) {
+    this.parent= hack; // for shift
     this.reset();
   }
   reset(log) {
@@ -37,7 +38,7 @@ class Dropper {
     if (start.getDragData) {
       const dragData= start.getDragData();
       for (const k in dragData) {
-        const v= dragData[k];
+        const v= dragData[k] || "<missing data>";
         dt.setData(k, v);
       }
     }
@@ -49,6 +50,7 @@ class Dropper {
     delayed.dragging= null; // pending
     setTimeout(()=> {
       if (delayed.dragging === null) {
+        delayed.parent.shift= false; // HACK to turn off shift display while dragging.
         delayed.dragging= start;
       }
     });

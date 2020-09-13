@@ -30,7 +30,7 @@ class DraggableNode extends Draggable {
     const { list, target } = this;
     const item= list.items[target.idx];
     return {
-      'text/plain': item.text,
+      'text/plain': item.type,
     };
   }
   getDragImage() {
@@ -47,7 +47,7 @@ class DraggableBlock extends DraggableNode {
 // ex. several story "phrases".
 class DraggableSiblings extends DraggableNode {
   constructor(list, target) {
-    super(list, target, Number.MAX_VALUE);
+    super(list, target, list.length-target.idx);
   }
   getDragImage() {
     let ret = document.createElement("span");
@@ -82,33 +82,13 @@ class NodeTableEvents  {
     return list.inline? new DraggableSiblings(list, target): new DraggableBlock(list, target);
   }
   dragOver(from, targetEl) {
-    let okay= false;
+    let ret;
     const target= this.finder.findIdx(targetEl);
-    if (target) {
-      const { list }= this;
-      const fromInline= from instanceof DraggableSiblings;
-      if (!fromInline) {
-        okay= list.acceptsType(from.getType());
-      } else {
-        // dont allow parents to be dropped into their children.
-        if (from.list === list) {
-          okay= !from.contains(list, target.idx);
-        } else {
-          // bad cases: a, b, c, d
-          // 1. same (inline) list and idx is same (or larger)
-          // 2. the item we are target has the parent of the item being moved.
-          // FIX: dragging a row ( block source ) into the midst of an item.
-          const fromItem= from.getNode(0);
-          const overItem= list.items[target.idx];
-          const overStart= overItem && overItem.parent === fromItem;
-          if (!overStart) {
-            okay= true;
-          }
-        }
-      }
+    if (target && this.list.acceptsType(from.getType())) {
+      // fix? we return a "draggable" for use by .highlight and .hovering checks
+      ret= this.newDraggable(target)
     }
-    // fix? we return a "draggable" for use by .highlight and .hovering checks
-    return okay && this.newDraggable(target);
+    return ret;
   }
   dragDrop(from, targetEl) {
     // not sure why, but dt.dropEffect is often 'none' here on chrome;

@@ -87,9 +87,11 @@ const app= new Vue({
       return this.nodes.root;
     },
   },
-  data: {
-    nodes: nodes.unroll(getStory()),
-    dropper: new Dropper(),
+  data() {
+    return {
+      nodes: nodes.unroll(getStory()),
+      dropper: new Dropper(this),
+    };
   }
 });
 
