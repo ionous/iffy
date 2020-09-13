@@ -436,8 +436,8 @@ function nodeTests() {
     const mainStory= nodes.newFromType("story");
     const otherStory= nodes.newFromType("story");
 
-    const ps1= new LinesList(nodes, mainStory);
-    const ps2= new LinesList(nodes, otherStory);
+    const ps1= new ParagraphNodes(nodes, mainStory);
+    const ps2= new ParagraphNodes(nodes, otherStory);
     ps1.insertAt(0, ps1.type);
     test.expect(ps1.items, "2");
 
@@ -457,7 +457,7 @@ function nodeTests() {
   runTest("drop p from ps appending to a line", function(test) {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story", 0);
-    const ps= new LinesList(nodes, mainStory);
+    const ps= new ParagraphNodes(nodes, mainStory);
 
     // put two completely blank paragraphs in ps
     ps.insertAt(ps.length, ps.type);
@@ -493,7 +493,7 @@ function nodeTests() {
   runTest("drop partial line from p into ps, creating a p", function(test) {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
-    const ps= new LinesList(nodes, mainStory );
+    const ps= new ParagraphNodes(nodes, mainStory );
 
     // put two completely blank pargraphs in ps
     ps.insertAt(ps.length, ps.type);
@@ -531,7 +531,7 @@ function nodeTests() {
   runTest("drop partial line from p into a line", function(test) {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
-    const ps= new LinesList(nodes, mainStory );
+    const ps= new ParagraphNodes(nodes, mainStory );
 
     // put two completely blank pargraphs in ps
     ps.insertAt(ps.length, ps.type);
