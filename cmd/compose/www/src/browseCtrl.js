@@ -166,12 +166,20 @@ Vue.component('mk-browser', {
       }
       all.push(typeName);
       //
-      if (group && group !== "hidden") {
+      if (group) {
+        let hidden= false;
         const gs= Array.isArray(group)? group: [group];
         for (const g of gs) {
+          if (g === "hidden") {
+            hidden= true;
+            break;
+          }
           const els= groups[g] || [];
           els.push(typeName);
           groups[g]= els;
+        }
+        if (hidden) {
+          continue; // typeName collection
         }
       }
       if (type.uses==='run') {
