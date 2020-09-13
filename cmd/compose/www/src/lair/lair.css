@@ -52,18 +52,20 @@
 .em-max {
   visibility: hidden;
 }
-.em-row__header--inline, .em-row__footer--inline  {
-  display: inline;
-}
-.em-row__header--inline, .em-row__footer--inline {
-  min-width: 1ch;
-}
 
 /* dragEnter adds, dragLeave removes */
 .em-drag-highlight  {
-  box-shadow:inset 0px 3px rgba(0,0,0,0.2);
   background-color: lightblue;
   transition: background-color 0.25s ease;
+}
+
+.em-row--block.em-drag-highlight  {
+  box-shadow:inset 0px 3px rgba(0,0,0,0.2);
+}
+
+.em-row--inline.em-drag-highlight  {
+  padding-left: 5px;
+  box-shadow:inset 3px 0px rgba(0,0,0,0.2);
 }
 
 .em-drag-image {
