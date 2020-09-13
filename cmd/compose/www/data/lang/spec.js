@@ -129,7 +129,7 @@ const spec = [
       "variables"
     ],
     "name": "assign",
-    "spec": "let {name} be {assignment}",
+    "spec": "let {name:variable_name} be {from:assignment}",
     "uses": "run",
     "with": {
       "slots": [

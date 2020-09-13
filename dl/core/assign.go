@@ -51,7 +51,7 @@ func (op *Assign) Execute(run rt.Runtime) (err error) {
 func (*Assign) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign",
-		Spec:  "let {name} be {assignment}",
+		Spec:  "let {name:variable_name} be {from:assignment}",
 		Group: "variables",
 		Desc:  "Assignment: Sets a variable to a value.",
 	}
