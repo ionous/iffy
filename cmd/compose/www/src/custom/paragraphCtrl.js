@@ -1,3 +1,5 @@
+// an inline list of phrases.
+// fix: would "PhraseList" be more meaningful?
 class StatementNodes extends NodeList {
   constructor(nodes, para) {
     super(nodes, para, "$STORY_STATEMENT", "story_statement");

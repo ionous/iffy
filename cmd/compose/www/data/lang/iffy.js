@@ -1,7 +1,7 @@
 function localLang(make) {
   make.group("Story Statements", function() {
-    make.run("story", "{+paragraph}");
-    make.run("paragraph", "{+story_statement}", "Phrases");
+    make.run("story", "{*paragraph}");
+    make.run("paragraph", "{*story_statement}", "Phrases");
     make.slot("story_statement", "Phrase");
     //
     make.run("noun_statement", "story_statement", "{:lede} {*tail} {?summary}",
@@ -85,7 +85,7 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
       "To {pattern name%name:pattern_name}: {pattern_rules}",
       "Pattern Actions: Actions to take when using a pattern."
       );
-    make.run("pattern_rules", "{+pattern_rule}");
+    make.run("pattern_rules", "{*pattern_rule}");
     make.run("pattern_rule",
       `When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}`,
       "Rule");

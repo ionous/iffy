@@ -1,17 +1,3 @@
-class Type {
-  constructor({name, desc, uses, "with": spec}) {
-    this.name= name;
-    this.desc= desc;
-    this.uses= uses;
-    this.spec= this.with= spec || {};
-  }
-  isType(typeName) {
-    return this.name === typeName;
-  }
-  implements(typeName) {
-    return (this.name=== typeName) || (this.spec.slots && this.spec.slots.indexOf(typeName)>=0);
-  }
-};
 
 // inner class for Types
 // while a single global Type class simplifies code, it hurts testing.
@@ -28,6 +14,17 @@ class TypeSet {
   has(typeName) {
     return !!this.get(typeName);
   }
+  // implements but isnt the same type as...
+  implements(doesThis, implementThat) {
+    const t= this.get(doesThis);
+    return t && (t.with && t.with.slots && t.with.slots.indexOf(implementThat)>=0);
+  }
+  // implements or is the stame type as...
+  areCompatible(doesThis, implementThat) {
+    const t= this.get(doesThis);
+    return t && ((t.name === implementThat) ||
+                ((t.with && t.with.slots && t.with.slots.indexOf(implementThat)>=0)));
+  }
   // object { string name; string uses;
   //  union { string; object { label, short, long string } } desc;
   //  object with?; }
@@ -36,7 +33,7 @@ class TypeSet {
     if (name in this.all) {
       throw new Error(`redefining type ${name}`);
     }
-    this.all[ name ]= new Type( type );
+    this.all[ name ]= type;
     return type;
   }
   newItem(typeName, value) {
@@ -109,7 +106,7 @@ class Types {
       throw new Error("expected type string");
     }
     var ret;
-    const type= allTypes.all[ typeName ];
+    const type= allTypes.get( typeName );
     if (!type ) {
        throw new Error(`unknown type '${typeName}'`);
     }
@@ -121,8 +118,8 @@ class Types {
         const { params } = spec;
         for ( const token in params ) {
           const param= params[token];
-          if (!param.optional) {
-            const val= Types.createItem( param.type, {
+          if (!param.optional || param.repeats) {
+            const val= (!param.optional) && Types.createItem( param.type, {
               token: token,
               param: param
             });

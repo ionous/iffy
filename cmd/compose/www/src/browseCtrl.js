@@ -7,7 +7,7 @@ class DraggableCommand extends Draggable {
     this.target= target;
   }
   getType() {
-    return allTypes.all[this.type];
+    return this.type;
   }
   getDragData() {
     return {

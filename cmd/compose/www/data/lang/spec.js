@@ -50,7 +50,7 @@ const spec = [
       "hidden"
     ],
     "name": "activity",
-    "spec": "{exe+execute}",
+    "spec": "{exe*execute}",
     "uses": "run",
     "with": {
       "slots": [

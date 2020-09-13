@@ -33,22 +33,22 @@ Vue.component('em-node-table', {
     showFooter() {
       const { "$root": root, list } = this;
       let okay = false;
-
-      if (root.shift) {
-        okay = true;
-      } else if (root.dropper.dragging) {
-          if (!list.inline || !root.blockSearch.hasBlock(list.last())) {
-            const from = root.dropper.start;
-            okay = list.acceptsType(from.getType());
-          }
+      if (!list.length) {
+        okay= true;
+      } else {
+        const altView= root.shift || root.dropper.dragging;
+        if (altView && (!list.inline || !root.blockSearch.hasBlock(list.at(-1)))) {
+          const from = root.dropper.start;
+          okay = !from || list.acceptsType(from.getType());
         }
+      }
       return okay;
     }
   },
   methods: {
     onGhost() {
-      const { "$root": root, list } = this;
-      list.insertAt(list.length, root.nodes.newFromType(list.type));
+      const { list } = this;
+      list.insertAt(list.length, list.type); // add ghost
     },
     dragging(idx) {
       const { "$root": root, list } = this;

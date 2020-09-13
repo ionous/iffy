@@ -14,7 +14,7 @@ class DraggableNode extends Draggable {
   }
   getType() {
     const node= this.getNode();
-    return node.itemType;
+    return node.type;
   }
   // is the passed idx (directly) referenced by this draggable
   contains(list, idx) {
@@ -122,19 +122,7 @@ class NodeTableEvents  {
     const target= this.finder.findIdx(targetEl);
     if (target) {
       if (from instanceof DraggableCommand) {
-        let newItem= this.list.nodes.newFromType(from.type);
-        const blank= this.list.nodes.newFromType(this.list.type);
-        if (this.list.type !== "paragraph") {
-          blank.kid= newItem;
-          newItem.parent= blank;
-          newItem= blank;
-        } else {
-          const parent= blank.kids["$STORY_STATEMENT"][0];
-          newItem.parent= parent;
-          parent.kid= newItem;
-          newItem= blank;
-        }
-        this.list.insertAt(target.idx, newItem);
+        this.list.insertAt(target.idx, from.type); // add draggable command
       }
       else if (from instanceof DraggableNode) {
         this.list.transferTo(target.idx, from.list, from.target.idx, from.width);

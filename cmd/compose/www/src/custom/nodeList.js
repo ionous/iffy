@@ -2,30 +2,49 @@
 class NodeList {
   // token should target an array of the passed type
   constructor( nodes, node, token, type ) {
+    const items= node.getKid(token);
+    if (!items) {
+      throw new Error(`node ${node.id} has empty child ${token}`);
+    }
     this.nodes= nodes;
     this.node= node;
     this.token= token;
-    this.type= type
-    this.items= node.getKid(token);
+    this.type= type // typeName
+    this.items= items;
     this.inline= false;
   }
   get length() {
     return this.items.length;
   }
   at(i) {
-    assert(i>=0 && i<this.items.length, "index out of range");
-    return this.items[i];
+    const { items } = this;
+    if (i<0) {
+      i= items.length+i;
+    }
+    console.assert(i>=0 && i<items.length, "index out of range");
+    return items[i];
   }
-  last() {
-    return this.items[this.items.length-1];
-  }
-  acceptsType(fromType) {
-    const okay= fromType && fromType.implements(this.type);
+  acceptsType(typeName) {
+    const okay= allTypes.areCompatible(typeName, this.type)
     return okay;
   }
-  acceptsBlock(fromType) {
-    const okay= fromType && fromType.implements(this.type);
+  acceptsBlock(typeName) {
+    const okay= allTypes.areCompatible(typeName, this.type)
     return okay;
+  }
+  // by default assume that list is a list of slots
+  // which means we can insert slots, or slats which implement the slot.
+  insertAt(idx, typeName) {
+    // create the requested item
+    console.assert(allTypes.areCompatible( typeName, this.type ));
+    //
+    let newItem= this.nodes.newFromType(typeName);
+    if (newItem.type !== this.type) {
+      const slot= this.nodes.newFromType(this.type);
+      slot.putSlot(newItem); // asserts if the item isnt compatible.
+      newItem= slot;
+    }
+    this.spliceInto(idx, newItem);
   }
   // returns number of elements added
   addTo(at, exe) {
@@ -65,22 +84,16 @@ class NodeList {
       });
     }
   }
-  insertAt(at, newItem) {
-    const { node, items } = this;
-    if (at<0) {
-      at= items.length;
-    }
+  spliceInto(at, ...newItems) {
+    const { node, token } = this;
     Redux.Run({
       apply() {
-        newItem.parent= node;
-        items.splice(at,0,newItem);
+        node.splices(token, at, 0, ...newItems);
       },
       revoke() {
-        newItem.parent= null;
-        items.splice(at,1);
+        node.splices(token, at, newItems.length);
       },
     });
-    return newItem;
   }
   // move items within this same list
   moveTo(dst, src, width, nothrow) {

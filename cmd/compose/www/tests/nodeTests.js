@@ -383,7 +383,7 @@ function nodeTests() {
     if (statements.length!==1 || statements[0].id !== "td0") {
       throw new Error(" td0 should start as the first statement");
     }
-    table.insertAt(0, nodes.newFromType(table.type));
+    table.insertAt(0, table.type);
     if (statements.length!==2 || statements[1].id !== "td0") {
       throw new Error(" td0 should now be the second statement");
     }
@@ -408,9 +408,9 @@ function nodeTests() {
     const para= nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
     const table= new StatementNodes(nodes, para);
-    table.insertAt(0, nodes.newFromType(table.type));
-    table.insertAt(1, nodes.newFromType(table.type));
-    table.insertAt(2, nodes.newFromType(table.type));
+    table.insertAt(0, table.type);
+    table.insertAt(1, table.type);
+    table.insertAt(2, table.type);
     test.expect(statements, "1,2,3", "initially");
     table.moveTo(0,1,2);
     test.expect(statements, "2,3,1", "moved src>dst");
@@ -436,34 +436,43 @@ function nodeTests() {
     const mainStory= nodes.newFromType("story");
     const otherStory= nodes.newFromType("story");
 
-    const ps1= new ParagraphNodes(nodes, mainStory);
-    const ps2= new ParagraphNodes(nodes, otherStory);
-    test.expect(ps1.items, "1");
-    test.expect(ps2.items, "4");
+    const ps1= new LinesList(nodes, mainStory);
+    const ps2= new LinesList(nodes, otherStory);
+    ps1.insertAt(0, ps1.type);
+    test.expect(ps1.items, "2");
+
+    ps2.insertAt(0, ps1.type);
+    test.expect(ps2.items, "3");
 
     ps2.transferTo(0, ps1, 0);
     test.expect(ps1.items, "");
-    test.expect(ps2.items, "1,4");
+    test.expect(ps2.items, "2,3");
 
     test.redux.undo();
-    test.expect(ps1.items, "1");
-    test.expect(ps2.items, "4");
+    test.expect(ps1.items, "2");
+    test.expect(ps2.items, "3");
   }, null);
   // "comment"
 
   runTest("drop p from ps appending to a line", function(test) {
     const { nodes, redux } = test;
-    const mainStory= nodes.newFromType("story");
-    // put two completely blank pargraphs in ps
-    const ps= new ParagraphNodes(nodes, mainStory);
-    const p1= ps.items[0];
-    const p2= ps.insertAt(ps.length, nodes.newFromType(ps.type));
-    console.assert(ps.items.length, 2);
+    const mainStory= nodes.newFromType("story", 0);
+    const ps= new LinesList(nodes, mainStory);
+
+    // put two completely blank paragraphs in ps
+    ps.insertAt(ps.length, ps.type);
+    ps.insertAt(ps.length, ps.type);
+    console.assert(ps.length===2);
+
+    const p1= ps.at(0);
+    const p2= ps.at(-1);
+    console.assert(p1 !== p2);
 
     const ts1= new StatementNodes(nodes, p1);
     const ts2= new StatementNodes(nodes, p2);
-    ts1.items.splice(0);
-    ts2.items.splice(0);
+    console.assert(ts1.length=== 0);
+    console.assert(ts2.length=== 0);
+
     // p1: c1, c2
     // p2: c3, c4
     const c1= test.addComment(p1, "c1");
@@ -484,15 +493,22 @@ function nodeTests() {
   runTest("drop partial line from p into ps, creating a p", function(test) {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
+    const ps= new LinesList(nodes, mainStory );
+
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphNodes(nodes, mainStory );
-    const p1= ps.items[0];
-    const p2= ps.insertAt(ps.length, nodes.newFromType(ps.type));
-    console.assert(ps.items.length, 2);
+    ps.insertAt(ps.length, ps.type);
+    ps.insertAt(ps.length, ps.type);
+    console.assert(ps.length === 2);
+
+    const p1= ps.at(0);
+    const p2= ps.at(-1);
+    console.assert(p1 !== p2);
+
     const ts1= new StatementNodes(nodes, p1);
     const ts2= new StatementNodes(nodes, p2);
-    ts1.items.splice(0);
-    ts2.items.splice(0);
+    console.assert(ts1.length=== 0);
+    console.assert(ts2.length=== 0);
+
     // p1: c1, c2, c3
     const c1= test.addComment(p1, "c1");
     const c2= test.addComment(p1, "c2");
@@ -501,27 +517,36 @@ function nodeTests() {
     //
     ps.transferTo(1, ts1, 1);
     test.expect(ts1.items, "c1");
-    console.assert(ps.items.length, 3);
+    console.assert(ps.length === 3);
+
     const p3= ps.items[1];
     const p3kids= p3.getKid("$STORY_STATEMENT");
     test.expect(p3kids, "c2,c3");
     redux.undo();
     test.expect(p3kids, "");
-    console.assert(ps.items.length, 2);
+    console.assert(ps.items.length=== 2);
+
     test.expect(ts1.items, "c1,c2,c3");
   });
   runTest("drop partial line from p into a line", function(test) {
     const { nodes, redux } = test;
     const mainStory= nodes.newFromType("story");
+    const ps= new LinesList(nodes, mainStory );
+
     // put two completely blank pargraphs in ps
-    const ps= new ParagraphNodes(nodes, mainStory );
-    const p1= ps.items[0];
-    const p2= ps.insertAt(ps.length, nodes.newFromType(ps.type));
-    console.assert(ps.items.length, 2);
+    ps.insertAt(ps.length, ps.type);
+    ps.insertAt(ps.length, ps.type);
+    console.assert(ps.length=== 2);
+
+    const p1= ps.at(0);
+    const p2= ps.at(-1);
+    console.assert(p1 !== p2);
+
     const ts1= new StatementNodes(nodes, p1);
     const ts2= new StatementNodes(nodes, p2);
-    ts1.items.splice(0);
-    ts2.items.splice(0);
+    console.assert(ts1.length=== 0);
+    console.assert(ts2.length=== 0);
+
     // p1: c1, c2, c3
     // p2: c4
     // --  transfer 2,3 after 4

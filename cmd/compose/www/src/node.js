@@ -20,6 +20,15 @@ class Node {
     this.id= itemId;
     this.itemType= itemType; // Type
   }
+  // return typeName
+  get type() {
+    return this.itemType && this.itemType.name;
+  }
+  // return argument info for runs, swap options, string choices.
+  getParam(token) {
+    const spec= this.itemType.with;
+    return spec && spec.params[token];
+  }
   toJSON() {
     return {
       id: this.id,
@@ -33,11 +42,6 @@ class Node {
   unroll(nodes, itemValue) {
     throw new Error("unroll unhandled");
   }
-  // return typeName
-  get type() {
-    return this.itemType && this.itemType.name;
-  }
-
   static LabelFromParam(param, def= "") {
     let ret= def;
     if (param && param.value !== null) {
@@ -64,23 +68,62 @@ class RunNode extends Node {
       value: this.kids,
     };
   }
-  getKid(token) {
-    return this.kids[token];
+  getKid(field) {
+    return this.kids[field];
   }
-  getParam(field) {
-    return this.itemType.with.params[field];
+  // returns the old kid ( if any )
+  putField(field, newKid, vm=null) {
+    const { kids } = this;
+    const param= this.getParam(field);
+    console.assert( !!param, `missing field ${field}`);
+    console.assert( !newKid || allTypes.areCompatible(newKid.type, param.type), `incompatible field ${field} ${newKid.type}`);
+    //
+    const oldKid= kids[field];
+    if (oldKid) {
+      oldKid.parent= null;
+    }
+    if (vm) {
+      vm.$set(kids, field, newKid);
+    } else {
+      Vue.set(kids, field, newKid);
+    }
+    if (newKid) {
+      newKid.parent= this;
+    }
+    return oldKid;
+  }
+
+  // similar to splice.
+  // the first parameter is the name of the kid
+  // if start is <0, delete count and addition happen from the end
+  splices(field, start, deleteCount, ...newItems) {
+    const param= this.getParam(field);
+    console.assert( param && param.repeats, `missing or non-repeating field ${field}`);
+    //
+    const kids= this.getKid(field);
+    if (start < 0) {
+      start= Math.max(0, kids.length - deleteCount);
+    }
+    const removed=  kids.splice(start, deleteCount, ...newItems).map(el=>{
+      el.parent= null;
+      return el;
+    })
+    // set after clearing in case we have removed items that we are also adding.
+    newItems.forEach(el=>{
+      el.parent= this;
+    });
+    return removed;
   }
   // visit each parameter and argument in turn
   //callback(currentValue [, index [, array]]
   forEach(callback) {
     const spec= this.itemType.with;
-    const kids= this.kids;
-    //
     for (const token of spec.tokens) {
+      const param= this.getParam(token);
       callback({
         token,
-        param: spec.params[token],
-        kid: kids[token],
+        param,
+        kid: this.kids[token],
       });
     }
   };
@@ -134,30 +177,26 @@ class SwapNode extends Node {
       }
     }
   }
+  putSwap(newChoice, newKid) {
+    this.kid= newKid;
+    this.choice= newChoice;
+    if (newKid) {
+      newKid.parent= this;
+    }
+    if (oldKid) {
+      oldKid.parent= null;
+    }
+  }
   setSwap(newChoice, newKid) {
     const node= this;
     const oldKid= node.kid;
     const oldChoice= node.choice;
     Redux.Run({
       apply() {
-        node.kid= newKid;
-        node.choice= newChoice;
-        if (newKid) {
-          newKid.parent= node;
-        }
-        if (oldKid) {
-          oldKid.parent= null;
-        }
+        node.putSwap(newChoice, newKid);
       },
       revoke() {
-        node.kid= oldKid;
-        node.choice= oldChoice;
-        if (newKid) {
-          newKid.parent= null;
-        }
-        if (oldKid) {
-          oldKid.parent= node;
-        }
+        node.putSwap(oldChoice, oldKid);
       }
     });
   }
@@ -182,29 +221,27 @@ class SlotNode extends Node {
       this.kid= kid;
     }
   }
-
   // fill out the passed slot with a newly created node of typeName
+  putSlot(newKid) {
+    const oldKid= this.kid;
+    this.kid= newKid;
+    if (newKid) {
+      newKid.parent= this;
+    }
+    if (oldKid) {
+      oldKid.parent= null;
+    }
+  }
+  // undoable put
   setSlot(newKid) {
     const node= this;
     const oldKid= node.kid;
     Redux.Run({
       apply() {
-        node.kid= newKid;
-        if (newKid) {
-          newKid.parent= node;
-        }
-        if (oldKid) {
-          oldKid.parent= null;
-        }
+        node.putSlot(newKid);
       },
       revoke() {
-        node.kid= oldKid;
-        if (newKid) {
-          newKid.parent= null;
-        }
-        if (oldKid) {
-          oldKid.parent= node;
-        }
+        node.putSlot(oldKid);
       }
     });
   }

@@ -17,6 +17,7 @@ Vue.component('mk-pick-inline', {
   computed: {
     lines() {
       const { node, param } = this;
+      const spec = node.itemType.with;
       // when there's only a single option,
       // use the field's label instead of our own inline label.
       const solo = (spec.tokens.length === 1) && Node.LabelFromParam(param);

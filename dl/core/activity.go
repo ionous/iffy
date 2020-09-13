@@ -15,7 +15,7 @@ func (*Activity) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "activity",
 		Group: "hidden",
-		Spec:  "{exe+execute}",
+		Spec:  "{exe*execute}",
 	}
 }
 
