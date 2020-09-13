@@ -28,10 +28,6 @@ class NodeList {
     const okay= allTypes.areCompatible(typeName, this.type)
     return okay;
   }
-  acceptsBlock(typeName) {
-    const okay= allTypes.areCompatible(typeName, this.type)
-    return okay;
-  }
   // by default assume that list is a list of slots
   // which means we can insert slots, or slats which implement the slot.
   insertAt(idx, typeName) {

@@ -379,7 +379,7 @@ function nodeTests() {
     const { nodes } = test;
     const para= nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    const table= new StatementNodes(nodes, para);
+    const table= new InlinePhraseList(nodes, para);
     if (statements.length!==1 || statements[0].id !== "td0") {
       throw new Error(" td0 should start as the first statement");
     }
@@ -407,7 +407,7 @@ function nodeTests() {
     const { nodes } = test;
     const para= nodes.root;
     const statements= para.getKid("$STORY_STATEMENT");
-    const table= new StatementNodes(nodes, para);
+    const table= new InlinePhraseList(nodes, para);
     table.insertAt(0, table.type);
     table.insertAt(1, table.type);
     table.insertAt(2, table.type);
@@ -468,8 +468,8 @@ function nodeTests() {
     const p2= ps.at(-1);
     console.assert(p1 !== p2);
 
-    const ts1= new StatementNodes(nodes, p1);
-    const ts2= new StatementNodes(nodes, p2);
+    const ts1= new InlinePhraseList(nodes, p1);
+    const ts2= new InlinePhraseList(nodes, p2);
     console.assert(ts1.length=== 0);
     console.assert(ts2.length=== 0);
 
@@ -504,8 +504,8 @@ function nodeTests() {
     const p2= ps.at(-1);
     console.assert(p1 !== p2);
 
-    const ts1= new StatementNodes(nodes, p1);
-    const ts2= new StatementNodes(nodes, p2);
+    const ts1= new InlinePhraseList(nodes, p1);
+    const ts2= new InlinePhraseList(nodes, p2);
     console.assert(ts1.length=== 0);
     console.assert(ts2.length=== 0);
 
@@ -542,8 +542,8 @@ function nodeTests() {
     const p2= ps.at(-1);
     console.assert(p1 !== p2);
 
-    const ts1= new StatementNodes(nodes, p1);
-    const ts2= new StatementNodes(nodes, p2);
+    const ts1= new InlinePhraseList(nodes, p1);
+    const ts2= new InlinePhraseList(nodes, p2);
     console.assert(ts1.length=== 0);
     console.assert(ts2.length=== 0);
 

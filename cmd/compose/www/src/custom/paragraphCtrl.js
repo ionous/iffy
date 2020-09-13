@@ -1,12 +1,8 @@
 // an inline list of phrases.
-// fix: would "PhraseList" be more meaningful?
-class StatementNodes extends NodeList {
+class InlinePhraseList extends NodeList {
   constructor(nodes, para) {
     super(nodes, para, "$STORY_STATEMENT", "story_statement");
     this.inline= true;
-  }
-  acceptsBlock() {
-    return false;
   }
   // when we drag, we re/move everything from a given statement till the end of line.
   // returns a list of statements
@@ -62,7 +58,7 @@ Vue.component('mk-paragraph-ctrl', {
     const { node, "$root": root } = this;
     // each item is a story statement slot
     return {
-      list: new StatementNodes(root.nodes, node),
+      list: new InlinePhraseList(root.nodes, node),
       dropper: root.dropper,
     }
   },

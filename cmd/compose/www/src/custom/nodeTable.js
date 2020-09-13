@@ -39,7 +39,7 @@ class DraggableNode extends Draggable {
 }
 
 // one node, that may have many children.
-// ex. an action/execute, a paragraph block, a pattern rule.
+// ex. an action/execute statement, a paragraph block, a pattern rule.
 class DraggableBlock extends DraggableNode {
 }
 
@@ -82,38 +82,32 @@ class NodeTableEvents  {
     return list.inline? new DraggableSiblings(list, target): new DraggableBlock(list, target);
   }
   dragOver(from, targetEl) {
-    let ret, okay= false;
+    let okay= false;
     const target= this.finder.findIdx(targetEl);
     if (target) {
       const { list }= this;
-      if (from instanceof DraggableCommand) {
+      const fromInline= from instanceof DraggableSiblings;
+      if (!fromInline) {
         okay= list.acceptsType(from.getType());
-        //
-      } else if (from instanceof DraggableBlock) {
-        okay= list.acceptsBlock(from.getType());
-        //
-      } else if (from instanceof DraggableSiblings) {
-        if (target) {
-          // dont allow parents to be dropped into their children.
-          if (from.list === list) {
-            okay= !from.contains(list, target.idx);
-          } else {
-            // bad cases: a, b, c, d
-            // 1. same (inline) list and idx is same (or larger)
-            // 2. the item we are target has the parent of the item being moved.
-            // FIX: dragging a row ( block source ) into the midst of an item.
-            const fromItem= from.getNode(0);
-            const overItem= list.items[target.idx];
-            const overStart= overItem && overItem.parent === fromItem;
-            if (!overStart) {
-              okay= true;
-            }
+      } else {
+        // dont allow parents to be dropped into their children.
+        if (from.list === list) {
+          okay= !from.contains(list, target.idx);
+        } else {
+          // bad cases: a, b, c, d
+          // 1. same (inline) list and idx is same (or larger)
+          // 2. the item we are target has the parent of the item being moved.
+          // FIX: dragging a row ( block source ) into the midst of an item.
+          const fromItem= from.getNode(0);
+          const overItem= list.items[target.idx];
+          const overStart= overItem && overItem.parent === fromItem;
+          if (!overStart) {
+            okay= true;
           }
         }
       }
     }
-    // we return a "draggable" --
-    // this is used by .highlight and .hovering checks
+    // fix? we return a "draggable" for use by .highlight and .hovering checks
     return okay && this.newDraggable(target);
   }
   dragDrop(from, targetEl) {
