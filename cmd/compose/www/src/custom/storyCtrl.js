@@ -8,7 +8,7 @@ class ParagraphNodes extends NodeList {
   // returns true for any paragraph or story statement type.
   acceptsType(typeName) {
     const okay= allTypes.areCompatible(typeName, this.type) ||
-                allTypes.areCompatible("story_statement");
+                allTypes.areCompatible(typeName, "story_statement");
     return okay;
   }
   // can insert a "paragraph", a "story_statement", or any individual phrase
