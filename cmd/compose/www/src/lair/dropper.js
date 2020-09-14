@@ -18,9 +18,6 @@ class Dropper {
   // start is a Draggable
   setStart(start, dt, imgClasses= ["em-drag-image"]) {
     console.assert(start instanceof Draggable);
-    this.start= start;
-    this.target= start;
-    this._leaving= false;
 
     // set drag visuals
     if (start.getDragImage) {
@@ -46,12 +43,16 @@ class Dropper {
     dt.effectAllowed= 'all';
     console.log("dropper set start", start);
 
+    // note: can't modify styles until a frame after drag starts:
+    // otherwise, chrome will (sometimes) cancel the drag.
     const delayed= this;
     delayed.dragging= null; // pending
     setTimeout(()=> {
       if (delayed.dragging === null) {
         delayed.parent.shift= false; // HACK to turn off shift display while dragging.
         delayed.dragging= start;
+        delayed.start= start;
+        delayed.target= start;
       }
     });
   }
