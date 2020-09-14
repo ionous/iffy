@@ -57,13 +57,15 @@ Vue.component('em-node-table', {
     },
     // generate a vue css class object for an item based on the current highlight settings.
     highlight(idx) {
-      const { "$root": root, list } = this;
       let highlight = false;
-      // are we the target?
-      const at = root.dropper.target;
-      const atList = at && (at.list === list);
-      if (atList) {
-        highlight = idx === at.target.idx;
+      const { "$root": root, list } = this;
+      if (root.dropper.dragging) {
+        // are we the target?
+        const at = root.dropper.target;
+        const atList = at && (at.list === list);
+        if (atList) {
+          highlight = idx === at.target.idx;
+        }
       }
       return highlight;
     }
