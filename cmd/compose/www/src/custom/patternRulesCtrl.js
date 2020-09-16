@@ -13,7 +13,9 @@ class PatternRules extends NodeList {
   insertAt(at, typeName) {
     const rule= this.nodes.newFromType("pattern_rule", 0);
     if (typeName !== "pattern_rule") {
-      rule.putField("$GUARD", this.nodes.newFromType(typeName));
+      const slot= this.nodes.newFromType("bool_eval");
+      slot.putSlot(this.nodes.newFromType(typeName));
+      rule.putField("$GUARD", slot);
     }
     this.spliceInto(at, rule);
   }
