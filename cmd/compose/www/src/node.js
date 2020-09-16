@@ -76,7 +76,9 @@ class RunNode extends Node {
     const { kids } = this;
     const param= this.getParam(field);
     console.assert( !!param, `missing field ${field}`);
-    console.assert( !newKid || allTypes.areCompatible(newKid.type, param.type), `incompatible field ${field} ${newKid.type}`);
+    // console.assert( !newKid || allTypes.areCompatible(newKid.type, param.type), `incompatible field ${field} ${newKid.type}`);
+    // the types should be exactly the same, *slots* permit inherited types.
+    console.assert( !newKid || newKid.type === param.type, `incompatible field ${field} ${newKid.type}`);
     //
     const oldKid= kids[field];
     if (oldKid) {
@@ -178,13 +180,14 @@ class SwapNode extends Node {
     }
   }
   putSwap(newChoice, newKid) {
+    const oldKid= this.kid;
+    if (oldKid) { // clear first in case newKid==oldKid
+      oldKid.parent= null;
+    }
     this.kid= newKid;
     this.choice= newChoice;
     if (newKid) {
       newKid.parent= this;
-    }
-    if (oldKid) {
-      oldKid.parent= null;
     }
   }
   setSwap(newChoice, newKid) {
@@ -224,12 +227,12 @@ class SlotNode extends Node {
   // fill out the passed slot with a newly created node of typeName
   putSlot(newKid) {
     const oldKid= this.kid;
+    if (oldKid) { // clear first in case newKid==oldKid
+      oldKid.parent= null;
+    }
     this.kid= newKid;
     if (newKid) {
       newKid.parent= this;
-    }
-    if (oldKid) {
-      oldKid.parent= null;
     }
   }
   // undoable put
