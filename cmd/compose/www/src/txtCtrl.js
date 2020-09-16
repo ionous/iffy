@@ -34,7 +34,8 @@ Vue.component('mk-txt-ctrl', {
     'mk-txt-edit': {
       data() {
         return {
-          currentText: this.initialText,
+          // fix: initalText is sometimes null; can a validator on the prop work?
+          currentText: this.initialText || "",
           closing: false,
         };
       },
@@ -69,7 +70,8 @@ Vue.component('mk-txt-ctrl', {
         }
       },
       mounted() {
-        const { $refs: { textarea:input }, initialText:text } = this;
+        const { $refs: { textarea:input }, initialText } = this;
+        const text= initialText || "";
         input.value= text;
         input.setSelectionRange(text.length, text.length);
         Stretchy.resize(input);
@@ -104,7 +106,7 @@ Vue.component('mk-txt-ctrl', {
       },
       render(createElement) {
         let mod= this.text? "" : "empty";
-        const text= this.text || this.placeholder;
+        const text= this.text || this.placeholder || "";
         const lines= text.split('\n');
         // between every line we have to createElement.
         const els= [lines[0]];
@@ -146,7 +148,7 @@ Vue.component('mk-txt-ctrl', {
       console.log("mk-txt-ctrl: acceptText");
       // ensure that we dont do this twice
       if (this.editing) {
-        this.node.value= text;
+        this.node.value= text || "";
         if (this.editing !== 1)  { // for testing.
           this.editing= false;
         }
