@@ -172,13 +172,15 @@ Vue.component('mk-auto-text', {
     // doesnt check for errors of text.
     changeText(text) {
       console.log("itemInput", this.$vnode.key, "changed", JSON.stringify(text));
-      const nextText= text.startsWith("/")? this.lastText: text.trim();
-      this.lastText= nextText;
-      this.setText(nextText);
-      // testing not selecting ever
-      // alternatively, will have to pass a bool for deselect to not select
-      // this.select();
-      this.$emit('change', text);
+      if (text) {
+        const nextText= text.startsWith("/")? this.lastText: text.trim();
+        this.lastText= nextText;
+        this.setText(nextText);
+        // testing not selecting ever
+        // alternatively, will have to pass a bool for deselect to not select
+        // this.select();
+        this.$emit('change', text);
+      }
     },
     firstIndexOf(text) {
       const choices= this.getChoices();
