@@ -22,6 +22,7 @@ Vue.component('mk-opt-ctrl', {
   },
   methods: {
     onPick(token) {
+      const { node } = this;
       const param= node.getParam(token);
       if (!param) {
         throw new Error(`unknown token picked '${token}'`);
