@@ -46,7 +46,7 @@ const (
 func (*EqualTo) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "equal",
-		Spec:  "=",
+		Spec:  "is",
 		Group: "comparison",
 		Desc:  "Equal: Two values exactly match.",
 	}
@@ -55,7 +55,7 @@ func (*EqualTo) Compose() composer.Spec {
 func (*NotEqualTo) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "unequal",
-		Spec:  "<>",
+		Spec:  "is not",
 		Group: "comparison",
 		Desc:  "Not Equal To: Two values don't match exactly.",
 	}

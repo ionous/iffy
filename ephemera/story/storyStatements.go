@@ -21,7 +21,13 @@ func imp_story_statement(k *Importer, r reader.Map) (err error) {
 		"test_scene":               k.Bind(imp_test_scene),
 		"test_rule":                k.Bind(imp_test_rule),
 		"pattern_actions":          k.Bind(imp_pattern_actions),
+		"comment":                  k.Bind(imp_comment),
 	})
+}
+
+func imp_comment(k *Importer, r reader.Map) (err error) {
+	// do nothing for now.
+	return
 }
 
 //"{plural_kinds} {are_being} {certainty} {trait}.");

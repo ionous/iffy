@@ -518,7 +518,7 @@ const spec = [
       "comparison"
     ],
     "name": "equal",
-    "spec": "=",
+    "spec": "is",
     "uses": "run",
     "with": {
       "slots": [
@@ -639,6 +639,20 @@ const spec = [
     "with": {
       "slots": [
         "comparator"
+      ]
+    }
+  },
+  {
+    "desc": "Has Trait: Return true if the object current is using the named trait.",
+    "group": [
+      "objects"
+    ],
+    "name": "has_trait",
+    "spec": "{object%obj:object_ref} is {trait:text_eval}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval"
       ]
     }
   },
@@ -1433,7 +1447,7 @@ const spec = [
       "comparison"
     ],
     "name": "unequal",
-    "spec": "\u003c\u003e",
+    "spec": "is not",
     "uses": "run",
     "with": {
       "slots": [
