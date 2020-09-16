@@ -36,7 +36,8 @@ Vue.component('em-node-table', {
       if (!list.length) {
         okay= true;
       } else {
-        const altView= root.shift || root.dropper.dragging;
+        // always show?
+        const altView= true; // root.shift || root.dropper.dragging;
         if (altView && (!list.inline || !root.blockSearch.hasBlock(list.at(-1)))) {
           const from = root.dropper.start;
           okay = !from || list.acceptsType(from.getType());
@@ -87,7 +88,8 @@ Vue.component('em-node-table', {
         :item="item"
       ></slot
     ></div
-    ><div v-show="showFooter"
+    ><div
+      v-show="showFooter"
         :class="[rowCls, 'em-row--ghost', {'em-drag-highlight': highlight(items.length)}]"
         :data-drag-idx="items.length"
         :data-drag-edge="items.length-1"
@@ -96,6 +98,7 @@ Vue.component('em-node-table', {
         :grip="grip"
         :num="items.length+1"
         :max="10+items.length"
+        :draggable="false"
       ></em-gutter
       ><mk-a-button
         @activate="onGhost"
