@@ -145,38 +145,38 @@ Vue.component('mk-str-ctrl', {
   methods: {
     // value is text picked or typed.
     // we *only* send along our labels to the completion control
-    onInputChange(choice) {
+    onInputChange(pick) {
       const { node, labelTokens } = this;
-      if (choice.startsWith("/")) {
-        const cmd= this.commandMap[choice];
+      if (pick.startsWith("/")) {
+        const cmd= this.commandMap[pick];
         this.mutation.mutate( cmd );
       } else {
-        const pickedLabel= choice in labelTokens;
         // use the "anything" token
+        const pickedLabel= pick in labelTokens;
         if (!pickedLabel) {
           this.pick= labelTokens[""];
         } else {
           // the token for the specified label
-          choice= labelTokens[choice];
-          this.pick= choice;
+          pick= labelTokens[pick];
+          this.pick= pick;
         }
-        this.node.setPrim(choice);
+        this.node.setPrim(pick);
       }
       this.editing= false;
     },
     // which of the tokens were selected?
     // note: for "recapitulation" the token is the $(NAME_OF_TYPE)
     // and the param value is null; that's true for single entry "type anything" str controls too.
-    onPickInline(token) {
+    onPickInline(pick) {
       // skip setting the user data entry key
       const { node } = this;
       const spec= node.itemType.with;
-      const param= spec.params[token];
+      const param= spec.params[pick];
       if (param.value !== null) {
-        this.node.setPrim(token);
+        this.node.setPrim(pick);
+      } else {
+        this.editing= true;
       }
-      this.pick= token;
-      this.editing= true;
       this.$root.ctrlSelected(this);
     },
     onActivated(yes=true) {
