@@ -16,7 +16,7 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 			field := out.FieldByIndex(path)
 			if f.Type.Kind() != r.Slice {
 				if arg, rest := popArg(f.Type, args); !arg.IsValid() {
-					err = errutil.Fmt("cant assign %T to field %s{ %s %s }",
+					err = errutil.Fmt("cant assign %s to field %s.%s (%s)",
 						args[0].Type(), outType, f.Name, f.Type)
 				} else {
 					field.Set(arg)
