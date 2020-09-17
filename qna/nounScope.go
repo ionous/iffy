@@ -12,10 +12,8 @@ type NounScope struct {
 	fields *Fields
 }
 
-// when asking for a variable named x, first check to see if x is a named noun.
-// ex. maybe the name refers to a local loop counter, "i",
-// or maybe something more specific like "Samwise Gamgee".
-// this checks for the latter ( and returns an object id, ex. maybe $samwise )
+// check for an object with the (partial) name and return its object id
+// ex. from "Gamgee" return #samwise.
 func (ns *NounScope) GetVariable(name string) (interface{}, error) {
 	return ns.fields.GetField(name, object.Id)
 }

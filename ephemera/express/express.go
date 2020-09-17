@@ -256,39 +256,55 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 		if fields := fn.Value(); len(fields) == 0 {
 			err = errutil.New("empty reference")
 		} else {
-			// build a chain of GetFields
-			// to start: we either want the object named "text"
-			// or, we want the object name that's stored in the local variable called "text"
-			//
 			// fix: this should add ephemera that there's an object of name
 			// fix: can this add ephemera that there's a local of name?
-			name := fields[0]
-			dotObject := &core.ObjectName{
-				Name:    &core.Text{name},
-				Exactly: lang.IsCapitalized(name),
-			}
+			firstField := fields[0]
+			name := &core.Text{firstField}
 			if len(fields) == 1 {
-				c.buildOne(dottedName{dotObject})
+				// we dont know yet how .something is being used:
+				// - a command arg, ie. the desired type is known.  ex. struct { *NumEval }...
+				// - a pattern arg, ie. the desired type isnt known.
+				// - a request to print an object name
+				//
+				// the name itself could refer to:
+				// - the name of an object,
+				// - the name of a pattern parameter,
+				// - a loop counter,
+				// - etc.
+				var dots dottedName
+				if lang.IsCapitalized(firstField) {
+					dots.name = &core.ObjectName{name}
+				} else {
+					dots.name = &core.GetVar{name}
+				}
+				c.buildOne(dots)
 			} else {
-				var prevField *core.GetField
+				// a chain of dots indicates we're getting one or more fields of objects
+				// ex. for { .object.fieldContainingAnObject.otherField }
+				var getField *core.GetField
+				var obj *core.ObjectName
+				if lang.IsCapitalized(firstField) {
+					obj = &core.ObjectName{name}
+				} else {
+					// unboxing: get the object from the named variable
+					obj = &core.ObjectName{&core.GetVar{name}}
+				}
 				// .a.b: from the named object a, we want its field b
 				// .a.b.c: after getting the object name in field b, get that object's field c
 				for _, field := range fields[1:] {
-					// the first time through, we already have the dotObject;
-					// otherwise we have to make it out of the previous field.
-					if prevField != nil {
-						dotObject = &core.ObjectName{
-							Name:    prevField,
-							Exactly: true, // assume stored object names are full names
-						}
+					// the first time through, we already have the name referring to the object
+					// on subsequent loops we turn the results of the previous GetField
+					// into a request for that object's name.
+					if getField != nil {
+						obj = &core.ObjectName{getField}
 					}
 					//
-					prevField = &core.GetField{
-						dotObject,
-						&core.Text{field},
+					getField = &core.GetField{
+						Obj:   obj,
+						Field: &core.Text{field},
 					}
 				}
-				c.buildOne(prevField)
+				c.buildOne(getField)
 			}
 		}
 

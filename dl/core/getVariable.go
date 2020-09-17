@@ -6,7 +6,7 @@ import (
 )
 
 // GetVariable reads a value of the specified name from the current scope.
-// ( ex. loop locals )
+// ( ex. loop locals, or -- in a noun scope -- might translate "apple" to "$macintosh" )
 type GetVar struct {
 	Name rt.TextEval // uses text eval to make template expressions easier
 }

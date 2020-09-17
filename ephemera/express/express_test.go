@@ -18,7 +18,11 @@ func N(n float64) rt.NumberEval {
 	return &core.Number{n}
 }
 func O(n string, exact bool) *core.ObjectName {
-	return &core.ObjectName{&core.Text{n}, exact}
+	var name rt.TextEval = &core.Text{n}
+	if !exact {
+		name = &core.GetVar{name}
+	}
+	return &core.ObjectName{name}
 }
 
 var True = &core.Bool{true}
@@ -110,7 +114,6 @@ func TestExpressions(t *testing.T) {
 					Name: &core.GetField{
 						O("a", false),
 						T("b")},
-					Exactly: true,
 				},
 				T("c")}); e != nil {
 			t.Fatal(e)
@@ -236,6 +239,7 @@ func TestTemplates(t *testing.T) {
 		}
 	})
 	// dotted names standing alone in a template become requests to print its friendly name
+	// as a lowercase dotted name, we try to get the actual object name first from a variable named "object"
 	t.Run("object", func(t *testing.T) {
 		if e := testTemplate("hello {.object}",
 			&core.Join{Parts: []rt.TextEval{
@@ -243,7 +247,7 @@ func TestTemplates(t *testing.T) {
 				&core.Buffer{core.NewActivity(
 					&pattern.DetermineAct{"printAName",
 						pattern.NewArgs(
-							&core.FromText{O("object", false)},
+							&core.FromText{&core.GetVar{T("object")}},
 						)})}}},
 		); e != nil {
 			t.Fatal(e)

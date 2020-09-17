@@ -9,19 +9,20 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// ObjectRef checks for an object by name.
-// Implementations also generally implement GetText and GetBool
+// ObjectRef finds an object by name: it supports returning objects by id,
+// or simply testing for their existence.
 type ObjectRef interface {
 	GetObjectRef(run rt.Runtime) (retName string, retExact bool, err error)
 	rt.TextEval // see getObjectId
 	rt.BoolEval // see getObjectExists
 }
 
-// ObjectName implements ObjectRef, searching for an object named exactly as specified.
-// It matches rt.TextEval, exists for differentiation in the composer.
+// ObjectName implements ObjectRef, searching for an object named as specified.
+// ( ie. it doesnt unbox a local variable of the name first )
+// ex. ObjectName{ "target" }  looks for the object named "target",
+// it doesnt look for an object of the named stored in a variable called "target".
 type ObjectName struct {
-	Name    rt.TextEval
-	Exactly bool
+	Name rt.TextEval
 }
 
 // KindOf returns the class of an object.
@@ -47,7 +48,7 @@ func (*ObjectName) Compose() composer.Spec {
 		Name:  "object_name",
 		Group: "objects",
 		Desc:  "ObjectName: Returns a noun's full name, can also be used in true/false statements to determine if the named noun exists.",
-		Spec:  "object named {?exactly} {name:text_eval}",
+		Spec:  "object named {name:text_eval}",
 	}
 }
 
@@ -63,7 +64,7 @@ func (op *ObjectName) GetObjectRef(run rt.Runtime) (ret string, exact bool, err 
 	if name, e := rt.GetText(run, op.Name); e != nil {
 		err = e
 	} else {
-		ret, exact = name, op.Exactly
+		ret, exact = name, true
 	}
 	return
 }
@@ -101,7 +102,7 @@ func getObjectExactly(run rt.Runtime, name string) (ret string, err error) {
 	return
 }
 
-// first look for a variable named "name" in scope, unbox it if need be return the object's id.
+// first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
 func getObjectInexactly(run rt.Runtime, name string) (ret string, err error) {
 	if local, e := run.GetVariable(name); e != nil {
 		err = e

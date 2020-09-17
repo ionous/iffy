@@ -49,7 +49,7 @@ func TestObjects(t *testing.T) {
 }
 
 func named(n string) *ObjectName {
-	return &ObjectName{Name: &Text{n}, Exactly: true}
+	return &ObjectName{Name: &Text{n}}
 }
 
 type modelTest struct {
