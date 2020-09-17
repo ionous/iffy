@@ -85,12 +85,12 @@ var FactorialDetermineNum = map[string]interface{}{
 			"type":  "pattern_name",
 			"value": "factorial",
 		},
-		"$PARAMETERS": map[string]interface{}{
-			"type": "parameters",
+		"$ARGUMENTS": map[string]interface{}{
+			"type": "arguments",
 			"value": map[string]interface{}{
-				"$PARAMS": []interface{}{
+				"$ARGS": []interface{}{
 					map[string]interface{}{
-						"type": "parameter",
+						"type": "argument",
 						"value": map[string]interface{}{
 							"$FROM": map[string]interface{}{
 								"type": "assignment",
@@ -194,10 +194,8 @@ var FactorialZero = map[string]interface{}{
 											"value": map[string]interface{}{
 												"type": "get_var",
 												"value": map[string]interface{}{
-													"$NAME": map[string]interface{}{
-														"type":  "text",
-														"value": "num",
-													}}}},
+													"$NAME": FactorialNum,
+												}}},
 										"$IS": map[string]interface{}{
 											"type": "comparator",
 											"value": map[string]interface{}{
@@ -213,6 +211,19 @@ var FactorialZero = map[string]interface{}{
 														"type":  "number",
 														"value": 0.0,
 													}}}}}}}}}}}}},
+}
+
+var FactorialNum = map[string]interface{}{
+	"type": "text_eval",
+	"value": map[string]interface{}{
+		"type": "text_value",
+		"value": map[string]interface{}{
+			"$TEXT": map[string]interface{}{
+				"type":  "text",
+				"value": "num",
+			},
+		},
+	},
 }
 
 var FactorialSubtract = map[string]interface{}{
@@ -257,10 +268,8 @@ var FactorialSubtract = map[string]interface{}{
 																			"value": map[string]interface{}{
 																				"type": "get_var",
 																				"value": map[string]interface{}{
-																					"$NAME": map[string]interface{}{
-																						"type":  "text",
-																						"value": "num",
-																					}}}},
+																					"$NAME": FactorialNum,
+																				}}},
 																		"$B": map[string]interface{}{
 																			"type": "number_eval",
 																			"value": map[string]interface{}{
@@ -271,10 +280,8 @@ var FactorialSubtract = map[string]interface{}{
 																						"value": map[string]interface{}{
 																							"type": "get_var",
 																							"value": map[string]interface{}{
-																								"$NAME": map[string]interface{}{
-																									"type":  "text",
-																									"value": "num",
-																								}}}},
+																								"$NAME": FactorialNum,
+																								}}},
 																					"$B": map[string]interface{}{
 																						"type": "number_eval",
 																						"value": map[string]interface{}{

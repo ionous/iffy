@@ -26,7 +26,7 @@ func (b *BuildRule) buildFromRule(asm *Assembler, args ...interface{}) (err erro
 			dec := gob.NewDecoder(bytes.NewBuffer(prog))
 			return dec.Decode(el)
 		}, args...); e != nil {
-		err = errutil.New("buildPatterns", e)
+		err = errutil.New("buildFromRule", e)
 	} else {
 		err = asm.WriteGobs(list)
 	}

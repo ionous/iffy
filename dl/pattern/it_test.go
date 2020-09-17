@@ -37,7 +37,7 @@ func TestTextIteration(t *testing.T) {
 		//
 		t.Run("text iteration", func(t *testing.T) {
 			var str string
-			pat := &TextListPattern{"textList", ps}
+			pat := &TextListPattern{CommonPattern{Name: "textList"}, ps}
 			chain := textIterator{pat: pat, order: inds}
 			it := stream.NewTextChain(&chain)
 
@@ -74,7 +74,7 @@ func TestNumIteration(t *testing.T) {
 		t.Fatal("expected 4 matching rules")
 	} else {
 		var fin float64
-		pat := &NumListPattern{"numList", ps}
+		pat := &NumListPattern{CommonPattern{Name: "numList"}, ps}
 		chain := numIterator{pat: pat, order: inds}
 		it := stream.NewNumberChain(&chain)
 		for i := 0; it.HasNext(); i++ {

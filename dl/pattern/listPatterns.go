@@ -6,15 +6,15 @@ import (
 )
 
 type NumListPattern struct {
-	Name  string
+	CommonPattern
 	Rules []*NumListRule
 }
 type TextListPattern struct {
-	Name  string
+	CommonPattern
 	Rules []*TextListRule
 }
 type ActivityPattern struct {
-	Name  string
+	CommonPattern
 	Rules []*ExecuteRule
 }
 

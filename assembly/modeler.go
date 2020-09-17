@@ -112,6 +112,7 @@ func (m *Assembler) WriteNounWithNames(domain, noun, kind string) (err error) {
 	return
 }
 
+// see copyPatterns, mostly this isnt used.
 func (m *Assembler) WritePat(name, paramName, paramType string, idx int64) error {
 	_, e := m.cache.Exec(mdl_pat, name, paramName, paramType, idx)
 	return e

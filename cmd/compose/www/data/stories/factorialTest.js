@@ -63,14 +63,14 @@ function getStory() {
                                                     "type": "pattern_name",
                                                     "value": "factorial"
                                                   },
-                                                  "$PARAMETERS": {
+                                                  "$ARGUMENTS": {
                                                     "id": "id-171c8ccc9f6-18",
-                                                    "type": "parameters",
+                                                    "type": "arguments",
                                                     "value": {
-                                                      "$PARAMS": [
+                                                      "$ARGS": [
                                                         {
                                                           "id": "id-171c8ccc9f6-17",
-                                                          "type": "parameter",
+                                                          "type": "argument",
                                                           "value": {
                                                             "$FROM": {
                                                               "id": "id-171c8ccc9f6-15",

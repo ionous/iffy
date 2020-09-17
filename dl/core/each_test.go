@@ -17,7 +17,7 @@ func ExampleIndex() {
 		&ForEachText{
 			In: &Texts{oneTwoThree},
 			Go: NewActivity(
-				&Say{&PrintNum{&GetVar{"index"}}},
+				&Say{&PrintNum{&GetVar{T("index")}}},
 			),
 		},
 	); e != nil {
@@ -36,12 +36,12 @@ func ExampleChooseText() {
 				In: &Texts{oneTwoThree},
 				Go: NewActivity(
 					&Say{&ChooseText{
-						If:   &GetVar{"last"},
-						True: &Text{"last"},
+						If:   &GetVar{T("last")},
+						True: T("last"),
 						False: &ChooseText{
-							If:    &GetVar{"first"},
-							True:  &Text{"first"},
-							False: &GetVar{"text"},
+							If:    &GetVar{T("first")},
+							True:  T("first"),
+							False: &GetVar{T("text")},
 						},
 					}}),
 			}),
@@ -60,4 +60,8 @@ type forTester struct {
 	strings.Builder
 	scope.ScopeStack
 	writer.Sink
+}
+
+func T(t string) *Text {
+	return &Text{t}
 }

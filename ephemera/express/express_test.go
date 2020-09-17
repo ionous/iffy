@@ -24,7 +24,8 @@ func O(n string, exact bool) *core.ObjectName {
 var True = &core.Bool{true}
 var False = &core.Bool{false}
 
-// TestExpressions single expressions.
+// TestExpressions single expressions within a template.
+// ( the parts that normally appear inside curly brackets {here} ).
 func TestExpressions(t *testing.T) {
 	t.Run("num", func(t *testing.T) {
 		if e := testExpression("5", N(5)); e != nil {
@@ -90,7 +91,7 @@ func TestExpressions(t *testing.T) {
 		if e := testExpression(".A",
 			&core.Buffer{core.NewActivity(
 				&pattern.DetermineAct{"printAName",
-					pattern.NewParams(
+					pattern.NewArgs(
 						&core.FromText{O("A", true)},
 					)})}); e != nil {
 			t.Fatal(e)
@@ -205,6 +206,8 @@ func TestTemplates(t *testing.T) {
 			t.Fatal(e)
 		}
 	})
+	// all of the text in a template gets turned into an expression
+	// plain text between bracketed sections becomes text evals
 	t.Run("span", func(t *testing.T) {
 		if e := testTemplate("{15|printNum!} {if 7=7}boop{end}",
 			&core.Join{
@@ -222,28 +225,31 @@ func TestTemplates(t *testing.T) {
 			t.Fatal(e)
 		}
 	})
+	// parameters to template calls become indexed parameter assignments
 	t.Run("indexed", func(t *testing.T) {
 		if e := testTemplate("{'world'|hello!}",
 			&pattern.DetermineText{
-				"hello", pattern.NewParams(
+				"hello", pattern.NewArgs(
 					&core.FromText{T("world")},
 				)}); e != nil {
 			t.Fatal(e)
 		}
 	})
+	// dotted names standing alone in a template become requests to print its friendly name
 	t.Run("object", func(t *testing.T) {
 		if e := testTemplate("hello {.object}",
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
 				&core.Buffer{core.NewActivity(
 					&pattern.DetermineAct{"printAName",
-						pattern.NewParams(
+						pattern.NewArgs(
 							&core.FromText{O("object", false)},
 						)})}}},
 		); e != nil {
 			t.Fatal(e)
 		}
 	})
+	// dotted names started with capital letters are requests for objects exactly matching that name
 	t.Run("global prop", func(t *testing.T) {
 		if e := testTemplate("{.Object.prop}",
 			&core.GetField{O("Object", true), T("prop")},

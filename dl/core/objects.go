@@ -91,7 +91,9 @@ func getObjectId(run rt.Runtime, ref ObjectRef) (ret string, err error) {
 
 // find an object with the passed partial name; return its id
 func getObjectExactly(run rt.Runtime, name string) (ret string, err error) {
-	if id, e := run.GetField(name, object.Id); e != nil {
+	if strings.HasPrefix(name, "#") {
+		ret = name // ids start with prefix #
+	} else if id, e := run.GetField(name, object.Id); e != nil {
 		err = e
 	} else {
 		ret, err = assign.ToString(id)
@@ -105,12 +107,8 @@ func getObjectInexactly(run rt.Runtime, name string) (ret string, err error) {
 		err = e
 	} else if str, e := assign.ToString(local); e != nil {
 		err = e
-	} else if strings.HasPrefix(str, "#") {
-		ret = str // ids start with prefix #
-	} else if id, e := run.GetField(str, object.Id); e != nil {
-		err = e
 	} else {
-		ret, err = assign.ToString(id)
+		ret, err = getObjectExactly(run, str)
 	}
 	return
 }

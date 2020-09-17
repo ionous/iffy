@@ -5,27 +5,27 @@ import (
 	"github.com/ionous/iffy/dl/core"
 )
 
-type Parameter struct {
-	Name string // parameter name
+type Argument struct {
+	Name string // argument name
 	From core.Assignment
 }
 
-type Parameters struct {
-	Params []*Parameter
+type Arguments struct {
+	Args []*Argument
 }
 
-func (*Parameter) Compose() composer.Spec {
+func (*Argument) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "parameter",
+		Name:  "argument",
 		Spec:  "its {name:variable_name} is {from:assignment}",
 		Group: "patterns",
 	}
 }
 
-func (*Parameters) Compose() composer.Spec {
+func (*Arguments) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "parameters",
-		Spec:  " when {parameters%params+parameter}",
+		Name:  "arguments",
+		Spec:  " when {arguments%args+argument}",
 		Group: "patterns",
 	}
 }

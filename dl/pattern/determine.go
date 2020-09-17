@@ -6,13 +6,13 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/scope"
 )
 
 // FromPattern helps runs a pattern
 type FromPattern struct {
-	Pattern    string      // pattern name, i guess a text eval here would be like a function pointer.
-	Parameters *Parameters // for optional parameters ( and formatting )
+	Pattern   string     // pattern name, i guess a text eval here would be like a function pointer.
+	Arguments *Arguments // arguments passed to the pattern. kept as a pointer for composer formatting...
+	// each is a name targeting some parameter, and an "assignment"
 }
 
 type DetermineAct FromPattern
@@ -24,23 +24,22 @@ type DetermineTextList FromPattern
 
 // Stitch finds the pattern, builds the scope, and executes the passed callback to generate a result.
 // It's an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
-func (op *FromPattern) Stitch(run rt.Runtime, pv interface{}, fn func() error) (err error) {
+func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err error) {
 	// find the pattern (p), qna's implementation assembles the rules by querying the db.
-	if e := run.GetEvalByName(op.Pattern, pv); e != nil {
+	if e := run.GetEvalByName(op.Pattern, pat); e != nil {
 		err = e
 	} else {
 		// bake the parameters down
-		parms := make(scope.Parameters)
-		if op.Parameters != nil {
-			// read from each argument
-			for _, param := range op.Parameters.Params {
-				if e := param.From.Assign(run, func(i interface{}) (err error) {
-					if n, e := unpack(run, op.Pattern, param.Name); e != nil {
-						err = e
-					} else {
-						err = parms.SetVariable(n, i)
-					}
-					return
+		parms := make(Parameters)
+		pat.Prepare(parms)
+
+		// read from each argument
+		if op.Arguments != nil {
+			for _, arg := range op.Arguments.Args {
+				if name, e := getParamName(pat, arg); e != nil {
+					err = errutil.Append(err, e)
+				} else if e := arg.From.Assign(run, func(val interface{}) error {
+					return parms.SetVariable(name, val)
 				}); e != nil {
 					err = errutil.Append(err, e)
 				}
@@ -56,13 +55,15 @@ func (op *FromPattern) Stitch(run rt.Runtime, pv interface{}, fn func() error) (
 }
 
 // change a param name ( which could be an index ) into a valid param name
-func unpack(run rt.Runtime, pattern, param string) (ret string, err error) {
+func getParamName(pat Pattern, arg *Argument) (ret string, err error) {
+	param := arg.Name
 	if usesIndex := len(param) > 1 && param[:1] == "$"; !usesIndex {
 		ret = param
 	} else if idx, e := strconv.Atoi(param[1:]); e != nil {
 		err = e
 	} else {
-		ret, err = run.GetFieldByIndex(pattern, idx)
+		// parameters are 1 indexed right now
+		ret, err = pat.GetParameterName(idx - 1)
 	}
 	return
 }

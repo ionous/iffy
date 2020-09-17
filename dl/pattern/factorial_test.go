@@ -12,22 +12,27 @@ import (
 func TestFactorial(t *testing.T) {
 	// rules are run in reverse order.
 	run := patternRuntime{patternMap: patternMap{
-		"factorial": &pattern.NumberPattern{"factorial",
-			[]*pattern.NumberRule{{
+		"factorial": &pattern.NumberPattern{
+			pattern.CommonPattern{
+				Name: "factorial",
+				Prologue: []pattern.Parameter{
+					&pattern.NumParam{"num"},
+				},
+			}, []*pattern.NumberRule{{
 				NumberEval: &core.ProductOf{
-					&core.GetVar{"num"},
+					&core.GetVar{&core.Text{"num"}},
 					&pattern.DetermineNum{
 						"factorial", pattern.NewNamedParams(
 							"num", &core.FromNum{
 								&core.DiffOf{
-									&core.GetVar{"num"},
+									&core.GetVar{&core.Text{"num"}},
 									&core.Number{1},
 								},
 							},
 						)}},
 			}, {
 				Filter: &core.CompareNum{
-					&core.GetVar{"num"},
+					&core.GetVar{&core.Text{"num"}},
 					&core.EqualTo{},
 					&core.Number{0},
 				},

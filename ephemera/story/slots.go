@@ -11,20 +11,22 @@ import (
 // FIX: some sort of reverse lookup instead?
 // ex. see findTypeName... maybe share via exports?
 func slotName(i interface{}) (ret string, err error) {
-	itype := r.TypeOf(i)
-	found := false
-	for _, slots := range iffy.AllSlots {
-		for _, slot := range slots {
-			rtype := reflect.TypeOf(slot.Type).Elem()
-			if itype.Implements(rtype) {
-				ret = slot.Name
-				found = true
-				break
+	if i != nil { // null happens for FromVar
+		itype := r.TypeOf(i)
+		found := false
+		for _, slots := range iffy.AllSlots {
+			for _, slot := range slots {
+				rtype := reflect.TypeOf(slot.Type).Elem()
+				if itype.Implements(rtype) {
+					ret = slot.Name
+					found = true
+					break
+				}
 			}
 		}
-	}
-	if !found {
-		err = errutil.New("couldnt determine matching slot %T", i)
+		if !found {
+			err = errutil.New("couldnt determine matching slot %T", i)
+		}
 	}
 	return
 }

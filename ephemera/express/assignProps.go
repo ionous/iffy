@@ -47,8 +47,8 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 
 func popArg(elType r.Type, args []r.Value) (ret r.Value, rest []r.Value) {
 	arg := args[0]
-	if on, ok := arg.Interface().(objRef); ok {
-		arg = r.ValueOf(on.getTextName())
+	if on, ok := arg.Interface().(dottedName); ok {
+		arg = r.ValueOf(on.getVariableNamed())
 	}
 	if argType := arg.Type(); argType.AssignableTo(elType) {
 		ret, rest = arg, args[1:] // pop

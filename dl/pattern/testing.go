@@ -6,10 +6,10 @@ import (
 	"github.com/ionous/iffy/dl/core"
 )
 
-func NewParams(from ...core.Assignment) *Parameters {
-	var p Parameters
+func NewArgs(from ...core.Assignment) *Arguments {
+	var p Arguments
 	for i, from := range from {
-		p.Params = append(p.Params, &Parameter{
+		p.Args = append(p.Args, &Argument{
 			Name: "$" + strconv.Itoa(i+1),
 			From: from,
 		})
@@ -17,8 +17,8 @@ func NewParams(from ...core.Assignment) *Parameters {
 	return &p
 }
 
-func NewNamedParams(name string, from core.Assignment) *Parameters {
-	return &Parameters{[]*Parameter{{
+func NewNamedParams(name string, from core.Assignment) *Arguments {
+	return &Arguments{[]*Argument{{
 		name, from,
 	}}}
 }

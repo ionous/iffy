@@ -77,7 +77,7 @@ func fromPattern(k *Importer,
 		err = e
 	} else if patternName, e := imp_pattern_name(k, m.MapOf("$PATTERN")); e != nil {
 		err = e
-	} else if ps, e := imp_parameters(k, patternName, m.MapOf("$PARAMETERS")); e != nil {
+	} else if ps, e := imp_arguments(k, patternName, m.MapOf("$ARGUMENTS")); e != nil {
 		err = e
 	} else {
 		// fix: object type names will need adaption of some sort re plural_kinds
@@ -85,20 +85,20 @@ func fromPattern(k *Importer,
 		k.NewPatternRef(patternName, patternName, patternType)
 		// assign results
 		from.Pattern = patternName.String()
-		from.Parameters = ps
+		from.Arguments = ps
 	}
 	return
 }
 
-func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *pattern.Parameters, err error) {
-	if m, e := reader.Unpack(r, "parameters"); e != nil {
+func imp_arguments(k *Importer, pid ephemera.Named, r reader.Map) (ret *pattern.Arguments, err error) {
+	if m, e := reader.Unpack(r, "arguments"); e != nil {
 		err = e
 	} else {
-		var ps []*pattern.Parameter
-		// record the referenced parameters: names, types, pairings
-		if e := reader.Repeats(m.SliceOf("$PARAMS"),
+		var ps []*pattern.Argument
+		// record the referenced arguments: names, types, pairings
+		if e := reader.Repeats(m.SliceOf("$ARGS"),
 			func(m reader.Map) (err error) {
-				if p, e := imp_parameter(k, pid, m); e != nil {
+				if p, e := imp_argument(k, pid, m); e != nil {
 					err = e
 				} else {
 					ps = append(ps, p)
@@ -107,14 +107,14 @@ func imp_parameters(k *Importer, pid ephemera.Named, r reader.Map) (ret *pattern
 			}); e != nil {
 			err = e
 		} else {
-			ret = &pattern.Parameters{ps}
+			ret = &pattern.Arguments{ps}
 		}
 	}
 	return
 }
 
-func imp_parameter(k *Importer, patternName ephemera.Named, r reader.Map) (ret *pattern.Parameter, err error) {
-	if m, e := reader.Unpack(r, "parameter"); e != nil {
+func imp_argument(k *Importer, patternName ephemera.Named, r reader.Map) (ret *pattern.Argument, err error) {
+	if m, e := reader.Unpack(r, "argument"); e != nil {
 		err = e
 	} else if paramName, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
@@ -123,9 +123,11 @@ func imp_parameter(k *Importer, patternName ephemera.Named, r reader.Map) (ret *
 	} else if slotName, e := slotName(a.GetEval()); e != nil {
 		err = e // ^ its possible this should be the type that the assignment contains.
 	} else {
-		paramType := k.NewName(slotName, tables.NAMED_TYPE, reader.At(m))
-		k.NewPatternRef(patternName, paramName, paramType)
-		ret = &pattern.Parameter{Name: paramName.String(), From: a}
+		if len(slotName) > 0 {
+			paramType := k.NewName(slotName, tables.NAMED_TYPE, reader.At(m))
+			k.NewPatternRef(patternName, paramName, paramType)
+		}
+		ret = &pattern.Argument{Name: paramName.String(), From: a}
 	}
 	return
 }

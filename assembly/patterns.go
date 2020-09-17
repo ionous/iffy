@@ -21,9 +21,10 @@ func AssemblePatterns(asm *Assembler) (err error) {
 	return
 }
 
-// fix: this probably needs work to get parameter ordering sensible
+// fix: this probably needs work to get parameter ordering more sensible
+// we use mdl_pat for GetFieldByIndex. index 0 is the pattern itself.
+// FIX FIX: use the pattern cache instead of another round of db querying
 func copyPatterns(db *sql.DB) (err error) {
-	// problem: assumes
 	if _, e := db.Exec(
 		`insert into mdl_pat 
 		select pattern, param, type, 

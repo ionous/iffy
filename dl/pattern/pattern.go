@@ -20,4 +20,10 @@ var Rules = []interface{}{
 	(*DetermineBool)(nil),
 	(*DetermineNumList)(nil),
 	(*DetermineTextList)(nil),
+	//
+	(*NumParam)(nil),
+	(*BoolParam)(nil),
+	(*TextParam)(nil),
+	(*NumListParam)(nil),
+	(*TextListParam)(nil),
 }

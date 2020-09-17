@@ -31,7 +31,9 @@ func (c *Converter) Convert(xs template.Expression) (ret interface{}, err error)
 		err = e
 	} else if op, e := c.stack.flush(); e != nil {
 		err = e
-	} else if on, ok := op.(objRef); ok {
+	} else if on, ok := op.(dottedName); ok {
+		// if the entire template can be reduced to an dottedName
+		// ex. {.lantern} then we treat it as a request for the friendly name of the object
 		ret = on.getPrintedName()
 	} else {
 		ret = op
@@ -147,32 +149,33 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 	if args, e := c.stack.pop(arity); e != nil {
 		err = e
 	} else {
-		var ps pattern.Parameters
+		var ps pattern.Arguments
 		for i, arg := range args {
 			if newa, e := newAssignment(arg); e != nil {
 				err = errutil.Append(e)
 			} else {
-				newp := &pattern.Parameter{
+				newp := &pattern.Argument{
 					Name: "$" + strconv.Itoa(i+1),
 					From: newa,
 				}
-				ps.Params = append(ps.Params, newp)
+				ps.Args = append(ps.Args, newp)
 			}
 		}
 		if err == nil {
 			c.buildOne(&pattern.DetermineText{
-				Pattern:    name,
-				Parameters: &ps,
+				Pattern:   name,
+				Arguments: &ps,
 			})
 		}
 	}
 	return
 }
 
+// an eval has been passed to a pattern, return the command to assign the eval to an arg.
 func newAssignment(arg r.Value) (ret core.Assignment, err error) {
 	switch arg := arg.Interface().(type) {
-	case objRef:
-		ret = &core.FromText{arg.getTextName()}
+	case dottedName:
+		ret = arg.getFromVar()
 	case rt.BoolEval:
 		ret = &core.FromBool{arg}
 	case rt.NumberEval:
@@ -211,7 +214,10 @@ func (c *Converter) buildSpan(arity int) (err error) {
 		var txts []rt.TextEval
 		for _, el := range args {
 			switch el := el.Interface().(type) {
-			case objRef:
+			// in a list of text evaluations,
+			// for example maybe "{.bennie} and the {.jets}"
+			// single occurrences of dotted names are treated as requests for a friendly name
+			case dottedName:
 				txts = append(txts, el.getPrintedName())
 			case rt.TextEval:
 				txts = append(txts, el)
@@ -262,7 +268,7 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 				Exactly: lang.IsCapitalized(name),
 			}
 			if len(fields) == 1 {
-				c.buildOne(objRef{dotObject})
+				c.buildOne(dottedName{dotObject})
 			} else {
 				var prevField *core.GetField
 				// .a.b: from the named object a, we want its field b

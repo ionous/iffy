@@ -16,6 +16,7 @@ import (
 
 func main() {
 	var inFile, outFile string
+	//errutil.Panic = true
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")
 	flag.StringVar(&outFile, "out", "", "output file name (sqlite3)")
 	flag.Parse()

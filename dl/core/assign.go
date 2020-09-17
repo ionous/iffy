@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// Assignment helps limit variable and parameter assignment to particular contexts
+// Assignment helps limit variable and parameter assignment to particular contexts.
 type Assignment interface {
 	Assign(rt.Runtime, func(interface{}) error) error
 	GetEval() interface{} // fix? for import so we can determine the eval type
@@ -15,6 +15,10 @@ type Assignment interface {
 type Assign struct {
 	Name string // name of variable or parameter we are assigning to.
 	From Assignment
+}
+
+type FromVar struct {
+	Var rt.TextEval // name of the variable or parameter we are assigning from.
 }
 
 type FromBool struct {
@@ -37,16 +41,17 @@ type FromTextList struct {
 	Vals rt.TextListEval
 }
 
-func (op *Assign) Execute(run rt.Runtime) (err error) {
-	if assign := op.From; assign == nil {
-		err = rt.MissingEval("empty assignment")
-	} else {
-		err = assign.Assign(run, func(i interface{}) error {
-			return run.SetVariable(op.Name, i)
-		})
-	}
-	return
-}
+// when is this used?
+// func (op *Assign) Execute(run rt.Runtime) (err error) {
+// 	if assign := op.From; assign == nil {
+// 		err = rt.MissingEval("empty assignment")
+// 	} else {
+// 		err = assign.Assign(run, func(i interface{}) error {
+// 			return run.SetVariable(op.Name, i)
+// 		})
+// 	}
+// 	return
+// }
 
 func (*Assign) Compose() composer.Spec {
 	return composer.Spec{
@@ -55,6 +60,29 @@ func (*Assign) Compose() composer.Spec {
 		Group: "variables",
 		Desc:  "Assignment: Sets a variable to a value.",
 	}
+}
+
+func (*FromVar) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "assign_var",
+		Group: "variables",
+		Desc:  "Assign Variable: Assigns one variable to another.",
+	}
+}
+
+func (op *FromVar) Assign(run rt.Runtime, fn func(interface{}) error) (err error) {
+	if varName, e := rt.GetText(run, op.Var); e != nil {
+		err = e
+	} else if val, e := run.GetVariable(varName); e != nil {
+		err = e
+	} else {
+		err = fn(val)
+	}
+	return
+}
+
+func (op *FromVar) GetEval() interface{} {
+	return nil // unknown
 }
 
 func (*FromBool) Compose() composer.Spec {

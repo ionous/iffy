@@ -35,8 +35,12 @@ func DetermineSay(i int) *pattern.DetermineText {
 }
 
 var SayPattern = pattern.TextPattern{
-	Name: "sayMe",
-	Rules: []*pattern.TextRule{
+	pattern.CommonPattern{
+		Name: "sayMe",
+		Prologue: []pattern.Parameter{
+			&pattern.NumParam{"num"},
+		}},
+	[]*pattern.TextRule{
 		{nil, SayIt("Not between 1 and 3.")},
 		{&MatchNumber{3}, SayIt("San!")},
 		{&MatchNumber{3}, SayIt("Three!")},

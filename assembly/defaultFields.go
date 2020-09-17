@@ -94,17 +94,17 @@ func convertField(fieldType string, value interface{}) (ret interface{}, err err
 		case reflect.Int64:
 			ret = int(v.Int())
 		default:
-			err = errutil.New("can't convert from", k, "to int")
+			err = errutil.Fmt("can't convert [%v](%s) to %s", value, k, fieldType)
 		}
 	case tables.PRIM_TEXT:
 		switch k := v.Kind(); k {
 		case reflect.String:
 			ret = v.String()
 		default:
-			err = errutil.New("can't convert from", k, "to string")
+			err = errutil.Fmt("can't convert [%v](%s) to %s", value, k, fieldType)
 		}
 	default:
-		err = errutil.New("unhandled field type", fieldType)
+		err = errutil.New("convertField: unhandled field type", fieldType)
 	}
 	return
 }

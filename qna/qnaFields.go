@@ -76,6 +76,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				where noun=?`),
 		kindOf: ps.Prep(db,
 			`select kind from mdl_noun where noun=?`),
+		// return the name of the aspect of the specified trait, or the empty string.
 		aspectOf: ps.Prep(db,
 			`select ifnull(max(aspect),"") from mdl_noun_traits 
 				where (noun||'.'||trait)=?`),
@@ -193,7 +194,6 @@ func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
 			ret, err = n.getCachingQuery(key, n.idOf, obj)
 
 		case object.Aspect:
-			// noun.trait; we use "max" in order to always return a value.
 			ret, err = n.getCachingQuery(key, n.aspectOf, obj)
 
 		case object.Kind:
