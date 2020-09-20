@@ -1,6 +1,9 @@
-package stream
+package chain
 
-import "github.com/ionous/iffy/rt"
+import (
+	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
+)
 
 type ChainText struct {
 	evals rt.Iterator // iterate across streams
@@ -16,7 +19,7 @@ func NewTextChain(evals rt.Iterator) rt.Iterator {
 }
 
 func (k *ChainText) HasNext() bool {
-	return k.err != Exceeded
+	return k.err != stream.Exceeded
 }
 
 func (k *ChainText) GetNext(pv interface{}) (err error) {

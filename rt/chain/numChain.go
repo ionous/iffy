@@ -1,6 +1,9 @@
-package stream
+package chain
 
-import "github.com/ionous/iffy/rt"
+import (
+	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/stream"
+)
 
 type ChainNumbers struct {
 	evals rt.Iterator // iterate across streams
@@ -16,7 +19,7 @@ func NewNumberChain(evals rt.Iterator) rt.Iterator {
 }
 
 func (k *ChainNumbers) HasNext() bool {
-	return k.err != Exceeded
+	return k.err != stream.Exceeded
 }
 
 func (k *ChainNumbers) GetNext(pv interface{}) (err error) {

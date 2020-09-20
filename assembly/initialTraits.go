@@ -24,10 +24,7 @@ func assembleInitialTraits(asm *Assembler) (err error) {
 		join mdl_field mf
 			on (mf.type = 'aspect')
 			and (mf.field = mt.aspect)
-		where instr((
-			/* path of the noun's kind should contain the kind which declared the aspect*/
-				select mk.kind || "," || mk.path || ","
-			), mf.kind || ",")
+		where instr(mk.kind || "," || mk.path || ",", mf.kind || ",")
 		order by noun, aspect, trait`,
 		func() (err error) {
 			if !curr.value {
