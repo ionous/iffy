@@ -2,7 +2,7 @@ package assembly
 
 import (
 	"fmt"
-	"reflect"
+	r "reflect"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/tables"
@@ -31,7 +31,7 @@ func assembleDefaultFields(asm *Assembler) (err error) {
 			} else if last.target != curr.target || last.field != curr.field {
 				store.add(last)
 				last, last.value = curr, nv
-			} else if !reflect.DeepEqual(last.value, nv) {
+			} else if !r.DeepEqual(last.value, nv) {
 				err = errutil.Fmt("conflicting defaults: %s != %s:%T", last.String(), curr.String(), nv)
 			}
 			return
@@ -84,22 +84,29 @@ func (store *valueStore) writeInitialFields(asm *Assembler) (err error) {
 	return
 }
 
-// out types are currently: int, float32, or string.
+// convertField normalizes values stored in ephemera, and checks that they are of good type
+// out types are currently: int, float32, string, or []byte ( for programs )
 func convertField(fieldType string, value interface{}) (ret interface{}, err error) {
-	switch v := reflect.ValueOf(value); fieldType {
+	v := r.ValueOf(value)
+	t := v.Type()
+	switch fieldType {
 	case tables.PRIM_DIGI:
-		switch k := v.Kind(); k {
-		case reflect.Float64:
+		switch k := t.Kind(); {
+		case k == r.Float64:
 			ret = float32(v.Float())
-		case reflect.Int64:
+		case k == r.Int64:
 			ret = int(v.Int())
+		case k == r.Slice && t.Elem().Kind() == r.Uint8:
+			ret = v.Bytes()
 		default:
 			err = errutil.Fmt("can't convert [%v](%s) to %s", value, k, fieldType)
 		}
 	case tables.PRIM_TEXT:
-		switch k := v.Kind(); k {
-		case reflect.String:
+		switch k := t.Kind(); {
+		case k == r.String:
 			ret = v.String()
+		case k == r.Slice && t.Elem().Kind() == r.Uint8:
+			ret = v.Bytes()
 		default:
 			err = errutil.Fmt("can't convert [%v](%s) to %s", value, k, fieldType)
 		}
