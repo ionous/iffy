@@ -11,7 +11,7 @@ The flow of story creation is:
 
 Rough versions of the composer, file export, ephemera database, and gamedb exist. 
 
-Current gaols include:
+Current goals include:
 * continue porting individual patterns 
 * handle relation related things; ex. enumerating/changing relations.
 * print the contents of a room. 
