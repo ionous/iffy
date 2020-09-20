@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
@@ -40,7 +39,7 @@ func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if elems, e := rt.GetNumberStream(run, op.Elems); e != nil {
 		err = e
 	} else if l, ok := elems.(rt.StreamCount); !ok {
-		err = assign.Mismatch("unknown number list", l, elems)
+		err = errutil.New("couldnt determine length of number list")
 	} else {
 		ret = float64(l.Remaining())
 	}
@@ -60,7 +59,7 @@ func (op *LenOfTexts) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if elems, e := rt.GetTextStream(run, op.Elems); e != nil {
 		err = e
 	} else if l, ok := elems.(rt.StreamCount); !ok {
-		err = assign.Mismatch("unknown text list", l, elems)
+		err = errutil.New("couldnt determine length of text list")
 	} else {
 		ret = float64(l.Remaining())
 	}
