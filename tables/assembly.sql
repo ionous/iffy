@@ -167,10 +167,10 @@ select
 	*/
 	first.noun as firstNoun, 
 	case when instr((
-	 			select mk.kind || "," || mk.path || ","
+	 			select mk.kind || ',' || mk.path || ','
 				from mdl_kind mk
 				where mk.kind = first.kind
-			),  swapped.firstKind || ",") 
+			),  swapped.firstKind || ',') 
 			then first.kind 
 	end as firstKind,
 
@@ -179,10 +179,10 @@ select
 	 */
 	second.noun as secondNoun,
 	case when instr((
-	 			select mk.kind || "," || mk.path || ","
+	 			select mk.kind || ',' || mk.path || ','
 				from mdl_kind mk
 				where mk.kind = second.kind
-			),  swapped.secondKind || ",") 
+			),  swapped.secondKind || ',') 
 			then second.kind
 	end as secondKind
 from (
