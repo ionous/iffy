@@ -1,14 +1,13 @@
 package core
 
 import (
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
 
 type Sequence struct {
-	Seq   string `if:"internal"`
+	Seq   string `if:"internal"` // generated at import time to provide a unique counter for each sequence
 	Parts []rt.TextEval
 }
 
@@ -36,12 +35,16 @@ func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret i
 	if max := len(op.Parts); max > 0 {
 		if p, e := run.GetField(op.Seq, object.Counter); e != nil {
 			err = e
-		} else if curr, e := assign.ToInt(p); e != nil {
-			err = e
-		} else if e := run.SetField(op.Seq, object.Counter, inc(curr, max)); e != nil {
+		} else if num, e := p.GetNumber(run); e != nil {
 			err = e
 		} else {
-			ret = curr
+			curr := int(num)
+			next := &rt.NumberValue{Value: float64(inc(curr, max))}
+			if e := run.SetField(op.Seq, object.Counter, next); e != nil {
+				err = e
+			} else {
+				ret = curr
+			}
 		}
 	}
 	return

@@ -108,7 +108,9 @@ func imp_kinds_possess_properties(k *Importer, r reader.Map) (err error) {
 func imp_noun_assignment(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "noun_assignment"); e != nil {
 		err = e
-	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
+	} else if lines, e := imp_lines(k, m.MapOf("$LINES")); e != nil {
+		err = e
+	} else if text, e := convert_text_or_template(lines); e != nil {
 		err = e
 	} else if prop, e := imp_property(k, m.MapOf("$PROPERTY")); e != nil {
 		err = e
@@ -118,7 +120,7 @@ func imp_noun_assignment(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else {
 		for _, noun := range k.Recent.Nouns.Subjects {
-			k.NewValue(noun, prop, lines)
+			k.NewValue(noun, prop, text)
 		}
 	}
 	return

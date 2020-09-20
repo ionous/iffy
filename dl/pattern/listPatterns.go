@@ -2,7 +2,7 @@ package pattern
 
 import (
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
+	"github.com/ionous/iffy/rt/chain"
 )
 
 type NumListPattern struct {
@@ -28,7 +28,7 @@ func (ps *NumListPattern) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err 
 		err = e
 	} else {
 		it := numIterator{run, ps, inds, 0}
-		ret = stream.NewNumberChain(&it)
+		ret = chain.NewNumberChain(&it)
 	}
 	return
 }
@@ -43,7 +43,7 @@ func (ps *TextListPattern) GetTextStream(run rt.Runtime) (ret rt.Iterator, err e
 		err = e
 	} else {
 		it := textIterator{run, ps, inds, 0}
-		ret = stream.NewTextChain(&it)
+		ret = chain.NewTextChain(&it)
 	}
 	return
 }

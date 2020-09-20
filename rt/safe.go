@@ -106,6 +106,8 @@ func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, e
 	return
 }
 
+// GetNumberStream returns an new iterator to walk the passed list,
+// or an empty iterator if the value is null.
 func GetNumberStream(run Runtime, eval NumListEval) (ret Iterator, err error) {
 	if eval == nil {
 		ret = EmptyStream(true)
@@ -115,6 +117,8 @@ func GetNumberStream(run Runtime, eval NumListEval) (ret Iterator, err error) {
 	return
 }
 
+// GetTextStream returns an new iterator to walk the passed list,
+// or an empty iterator if the value is null.
 func GetTextStream(run Runtime, eval TextListEval) (ret Iterator, err error) {
 	if eval == nil {
 		ret = EmptyStream(true)
@@ -124,6 +128,8 @@ func GetTextStream(run Runtime, eval TextListEval) (ret Iterator, err error) {
 	return
 }
 
+// GetNumList returns all of the float values the passed eval generates.
+// Not good for evals which generate infinite numbers of values.
 func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
 	if it, e := eval.GetNumberStream(run); e != nil {
 		err = e
@@ -145,6 +151,8 @@ func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
 	return
 }
 
+// GetTextList returns all of the string values the passed eval generates.
+// Not good for evals which generate infinite numbers of values.
 func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 	if it, e := eval.GetTextStream(run); e != nil {
 		err = e

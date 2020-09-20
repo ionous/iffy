@@ -2,22 +2,20 @@ package qna
 
 import (
 	"database/sql"
-	"strconv"
 
 	r "reflect"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
+	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
 
 // Fields implements rt.Fields: key,field,value storage for nouns, kinds, and patterns.
 // It reads its data from the play database and caches the results in memory.
 type Fields struct {
-	pairs mapType
 	valueOf,
-	patternAt,
 	progBytes,
 	countOf,
 	ancestorsOf,
@@ -27,39 +25,16 @@ type Fields struct {
 	idOf *sql.Stmt
 }
 
-type keyType struct {
-	owner, member string
-}
-
-func (k *keyType) dot() string {
-	return k.owner + "." + k.member
-}
-
-type mapType map[keyType]interface{}
-
-type mapTarget struct {
-	key   keyType
-	pairs mapType
-	value interface{}
-}
-
-func (k *mapTarget) Scan(v interface{}) (err error) {
-	// bytes will need special processing ( copies )
-	k.pairs[k.key], k.value = v, v
-	return
-}
-
 func NewFields(db *sql.DB) (ret *Fields, err error) {
 	var ps tables.Prep
 	f := &Fields{
-		pairs: make(mapType),
 		valueOf: ps.Prep(db,
-			`select value 
+			`select value, type
 				from run_value 
 				where noun=? and field=? 
 				order by tier asc nulls last limit 1`),
-		patternAt: ps.Prep(db,
-			`select param from mdl_pat where pattern=? and idx=?`),
+		// patternParamAt: ps.Prep(db,
+		// 	`select param from mdl_pat where pattern=? and idx=?`),
 		progBytes: ps.Prep(db,
 			`select bytes 
 				from mdl_prog
@@ -67,22 +42,22 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				and type = ?
 				limit 1`),
 		countOf: ps.Prep(db,
-			`select count() from run_noun where noun=?`),
+			`select count(), 'bool' from run_noun where noun=?`),
 		ancestorsOf: ps.Prep(db,
-			`select kind || ( case path when '' then ('') else (',' || path) end ) as path
+			`select kind || ( case path when '' then ('') else (',' || path) end ) as path, 'text'
 				from mdl_noun mn 
 				join mdl_kind mk 
 					using (kind)
 				where noun=?`),
 		kindOf: ps.Prep(db,
-			`select kind from mdl_noun where noun=?`),
+			`select kind, 'text' from mdl_noun where noun=?`),
 		// return the name of the aspect of the specified trait, or the empty string.
 		aspectOf: ps.Prep(db,
-			`select ifnull(max(aspect),"") from mdl_noun_traits 
+			`select aspect, 'text' from mdl_noun_traits 
 				where (noun||'.'||trait)=?`),
 		// given an id, find the name
 		nameOf: ps.Prep(db,
-			`select name 
+			`select name, 'text' 
 				from mdl_name
 				join run_noun
 					using (noun)
@@ -91,7 +66,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				limit 1`),
 		// given a name, find the id
 		idOf: ps.Prep(db,
-			`select noun 
+			`select noun, 'text'
 				from mdl_name
 				join run_noun
 					using (noun)
@@ -107,26 +82,33 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 	return
 }
 
-func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
+func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 	if len(field) == 0 || field[0] == object.Prefix || field == object.Name {
 		err = errutil.Fmt("can't change reserved field %q", field)
 	} else {
-		// fix, future: verify type and existence?
-		key := newKey(obj, field)
-		// check if the specified field is a trait
-		if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
-			err = e
-		} else {
-			// no, just set the field normally.
-			if aspect := a.(string); len(aspect) == 0 {
-				n.pairs[key] = v
+		key := makeKey(target, field)
+		// first, check if the specified field refers to a trait
+		switch p, e := n.getField(key.dot(object.Aspect)); e.(type) {
+		default:
+			err = e // there was an unknown error
+		case rt.UnknownField:
+			// didnt refer to a trait, so just set the field normally.
+			err = n.setField(key, val)
+		case nil:
+			// get the name of the aspect
+			if aspect, e := p.GetText(n); e != nil {
+				err = e
 			} else {
-				// yes, then we want to change the aspect not the trait
-				if val, ok := v.(bool); !ok || !val {
-					err = errutil.Fmt("%q can only be set to true; have %T(%v)", key, v, v)
+				// we want to change the aspect not the trait...
+				if val, e := val.GetBool(n); e != nil {
+					err = errutil.Fmt("error setting trait; have %v %v %s", key, val, e)
+				} else if !val {
+					// future: might maintain a table of opposite names ( similar to plurals )
+					err = errutil.Fmt("error setting trait; %q can only be set to true, have %v", key, val)
 				} else {
-					// set
-					err = n.SetField(obj, aspect, field)
+					// recurse...
+					key := keyType{target, aspect}
+					err = n.setField(key, &rt.TextValue{Value: field})
 				}
 			}
 		}
@@ -134,156 +116,139 @@ func (n *Fields) SetField(obj, field string, v interface{}) (err error) {
 	return
 }
 
-func newKey(obj, field string) keyType {
-	// FIX FIX FIX --
-	// operations generating get field should be registering the field as a name
-	// and, as best as possible, relating obj to field for property verification
-	// name translation should be done there.
-	if len(field) > 0 && field[0] != object.Prefix {
-		field = lang.Camelize(field)
+// set field without checking for prefix or aspects
+func (n *Runner) setField(key keyType, val rt.Value) (err error) {
+	if p, e := n.getField(key); e != nil {
+		err = e
+	} else {
+		// note: we dont replace the generic value in the cache
+		// we poke into that "box" and set its internal value.
+		// in the process it validates the incoming data type.
+		err = p.SetValue(n, val)
 	}
-	return keyType{obj, field}
-}
-
-func newKeyForEval(obj, typeName string) keyType {
-	return keyType{obj, typeName}
-}
-
-func newKeyWithIndex(obj string, idx int) keyType {
-	return keyType{obj, "$" + strconv.Itoa(idx)}
+	return
 }
 
 // pv is a pointer to a pattern instance, and we copy its contents in.
-func (n *Fields) GetEvalByName(name string, pv interface{}) (err error) {
-	outVal := r.ValueOf(pv).Elem() // outVal is a pattern instance who's members get overwritten
+func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
+	outVal := r.ValueOf(pv).Elem() // outVal is a pattern instance who's fields get overwritten
 	rtype := outVal.Type()
-	// note: newKey camelCases, while go types are PascalCase
+	// note: makeKey camelCases, while go types are PascalCase
 	// this automatically keeps them from conflicting.
-	key := newKeyForEval(name, rtype.Name())
+	key := makeKeyForEval(name, rtype.Name())
 	if val, ok := n.pairs[key]; ok {
-		store := r.ValueOf(val)
+		store := r.ValueOf(val.FixMe())
 		outVal.Set(store)
 	} else {
 		var store interface{}
-		switch e := n.progBytes.QueryRow(key.owner, key.member).Scan(&tables.GobScanner{outVal}); e {
+		switch e := n.fields.progBytes.QueryRow(key.target, key.field).Scan(&tables.GobScanner{outVal}); e {
 		case nil:
 			store = outVal.Interface()
 		case sql.ErrNoRows:
-			err = fieldNotFound{key.owner, key.member}
+			err = rt.UnknownField{key.target, key.field}
 		default:
 			err = e
 		}
-		n.pairs[key] = store
+		n.pairs[key] = generic.NewValue("", store)
 	}
 	return
 }
 
-func (n *Fields) GetField(obj, field string) (ret interface{}, err error) {
-	key := newKey(obj, field)
+func (n *Runner) GetField(target, field string) (rt.Value, error) {
+	key := makeKey(target, field)
+	ret, err := n.getField(key)
+	return ret, err // for type conversion
+}
+
+// check the cache before asking the database for info
+func (n *Runner) getField(key keyType) (ret *generic.Value, err error) {
 	if val, ok := n.pairs[key]; ok {
 		ret = val
 	} else {
-		// note: uses the normalized member name, not the raw parameter name
-		switch field := key.member; field {
-		case object.Name:
-			// search for the object name using the object's id
-			ret, err = n.getCachingQuery(key, n.nameOf, obj)
+		ret, err = n.cacheField(key)
+	}
+	return
+}
 
-		case object.Id:
-			// search for the object id by a partial object name
-			ret, err = n.getCachingQuery(key, n.idOf, obj)
+// when we know that the field is not a reserved field, and we just want to check the value.
+// ie. for aspects
+func (n *Runner) getValue(key keyType) (ret *generic.Value, err error) {
+	if val, ok := n.pairs[key]; ok {
+		ret = val
+	} else {
+		ret, err = n.cacheQuery(key, n.fields.valueOf, key.target, key.field)
+	}
+	return
+}
 
-		case object.Aspect:
-			ret, err = n.getCachingQuery(key, n.aspectOf, obj)
+var depth = 0
 
-		case object.Kind:
-			ret, err = n.getCachingQuery(key, n.kindOf, obj)
+func (n *Runner) cacheField(key keyType) (ret *generic.Value, err error) {
+	switch target, field := key.target, key.field; field {
+	case object.Name:
+		// search for the object name using the object's id
+		ret, err = n.cacheQuery(key, n.fields.nameOf, target)
 
-		case object.Kinds:
-			ret, err = n.getCachingQuery(key, n.ancestorsOf, obj)
+	case object.Id:
+		// search for the object id by a partial object name
+		ret, err = n.cacheQuery(key, n.fields.idOf, target)
 
-		case object.Exists:
-			// searches for an exact name match
-			ret, err = n.getCachingQuery(key, n.countOf, obj)
+	case object.Aspect:
+		// return the name of an aspect for a trait
+		ret, err = n.cacheQuery(key, n.fields.aspectOf, target)
 
+	case object.Kind:
+		ret, err = n.cacheQuery(key, n.fields.kindOf, target)
+
+	case object.Kinds:
+		ret, err = n.cacheQuery(key, n.fields.ancestorsOf, target)
+
+	case object.Exists:
+		// searches for an id match; never returns UnknownField
+		ret, err = n.cacheQuery(key, n.fields.countOf, target)
+
+	default:
+		// see if the user is asking for the status of a trait
+		switch aspectOfTrait, e := n.getField(key.dot(object.Aspect)); e.(type) {
 		default:
-			// see if the user is asking for the status of a trait
-			if a, e := n.GetField(key.dot(), object.Aspect); e != nil {
+			err = e
+		case rt.UnknownField:
+			ret, err = n.cacheQuery(key, n.fields.valueOf, target, field)
+		case nil:
+			// we found the aspect name from the trait
+			// now we need to ask for the current value of the aspect
+			if aspectName, e := aspectOfTrait.GetText(n); e != nil {
 				err = e
-			} else if aspect := a.(string); len(aspect) > 0 {
-				ret, err = n.getCachingStatus(obj, aspect, field)
 			} else {
-				ret, err = n.getCachingField(key)
+				aspectOfTarget := keyType{target, aspectName}
+				if aspectValue, e := n.getValue(aspectOfTarget); e != nil {
+					err = e
+				} else if trait, e := aspectValue.GetText(n); e != nil {
+					err = errutil.Fmt("unexpected value in aspect '%v.%v' %v", target, aspectName, e)
+				} else {
+					// return true if the object's aspect equals the specified trait.
+					ret = generic.NewValue("bool", trait == field)
+				}
 			}
 		}
 	}
-
 	return
 }
 
-// returns the name of a field based on an index
-// ex. especially for resolving positional pattern parameters into names.
-func (n *Fields) GetFieldByIndex(obj string, idx int) (ret string, err error) {
-	if idx <= 0 {
-		err = errutil.New("GetFieldByIndex out of range", idx)
-	} else {
-		// first, lookup the parameter name
-		key := newKeyWithIndex(obj, idx)
-		// we use the cache to keep $(idx) -> param name.
-		val, ok := n.pairs[key]
-		if !ok {
-			val, err = n.getCachingQuery(key, n.patternAt, obj, idx)
-		}
-		if field, ok := val.(string); !ok {
-			err = fieldNotFound{key.owner, key.member}
-		} else {
-			ret = field
-		}
-	}
-	return
-}
-
-// return true if the object's aspect equals the specified trait.
-func (n *Fields) getCachingStatus(obj, aspect, trait string) (ret bool, err error) {
-	if val, e := n.GetField(obj, aspect); e != nil {
-		err = e
-	} else {
-		ret = val == trait
-	}
-	return
-}
-
-func (n *Fields) GetCachingField(obj, field string) (ret interface{}, err error) {
-	key := newKey(obj, field)
-	return n.getCachingField(key)
-}
-
-func (n *Fields) getCachingField(key keyType) (ret interface{}, err error) {
-	// FIX? needs more work to determine if the field really exists
-	// ex. possibly a union query of class field with a nil value
-	if v, e := n.getCachingQuery(key, n.valueOf, key.owner, key.member); e == nil {
-		ret = v
-	} else if _, ok := e.(fieldNotFound); !ok {
-		err = e
-	} else {
-		n.pairs[key] = nil
-		ret = nil
-	}
-	return
-}
-
-// getCachingQuery uses the rowscanner to write the results of a query into the cache
-func (n *Fields) getCachingQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret interface{}, err error) {
-	tgt := mapTarget{key: key, pairs: n.pairs}
-	switch e := q.QueryRow(args...).Scan(&tgt); e {
+// query the db and store the returned value in the cache.
+// note: all of the queries are expected to return two parts: the value and the typeName.
+func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret *generic.Value, err error) {
+	var v interface{}
+	var t string
+	switch e := q.QueryRow(args...).Scan(&v, &t); e {
 	case nil:
-		ret = tgt.value
+		q := generic.NewValue(t, v)
+		n.pairs[key] = q
+		ret = q
 	case sql.ErrNoRows:
-		err = fieldNotFound{key.owner, key.member}
+		err = rt.UnknownField{key.target, key.field}
 	default:
-		err = e
+		err = errutil.New("runtime error:", e)
 	}
 	return
 }
-
-var notImplemented = errutil.New("not implemented")

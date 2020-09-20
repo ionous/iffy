@@ -7,8 +7,8 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/assembly"
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/object"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -16,10 +16,7 @@ import (
 func TestFieldAccess(t *testing.T) {
 	db := newFieldAccessTest(t, memory)
 	defer db.Close()
-	q, e := NewFields(db)
-	if e != nil {
-		t.Fatal(e)
-	}
+	q := NewRuntime(db)
 
 	// ensure we can ask for object existence
 	t.Run("object exists", func(t *testing.T) {
@@ -40,7 +37,7 @@ func TestFieldAccess(t *testing.T) {
 			name := assembly.DomainNameOf("test", tgt)
 			if p, e := q.GetField(name, object.Exists); e != nil {
 				t.Fatal("existence", name, e)
-			} else if exists, e := assign.ToBool(p); e != nil {
+			} else if exists, e := p.GetBool(nil); e != nil {
 				t.Fatal("assign", e)
 			} else if v.exists != exists {
 				t.Fatal("existence", name, "wanted", v.exists)
@@ -55,7 +52,7 @@ func TestFieldAccess(t *testing.T) {
 			name := assembly.DomainNameOf("test", tgt)
 			if p, e := q.GetField(name, object.Kind); e != nil {
 				t.Fatal(e)
-			} else if kind, e := assign.ToString(p); e != nil {
+			} else if kind, e := p.GetText(nil); e != nil {
 				t.Fatal("assign", e)
 			} else if kind != field {
 				t.Fatal("mismatch", name, field, "got:", kind, "expected:", field)
@@ -74,7 +71,7 @@ func TestFieldAccess(t *testing.T) {
 			// asking for "Kinds" should get us the hierarchy
 			if p, e := q.GetField(name, object.Kinds); e != nil {
 				t.Fatal(e)
-			} else if path, e := assign.ToString(p); e != nil {
+			} else if path, e := p.GetText(nil); e != nil {
 				t.Fatal("assign", e)
 			} else if path != field {
 				t.Fatal("mismatch", name, field, "got:", name, "expected:", field)
@@ -87,15 +84,23 @@ func TestFieldAccess(t *testing.T) {
 	t.Run("get_text", func(t *testing.T) {
 		els := FieldTest.txtValues
 		for i, cnt := 0, len(els); i < cnt; i += 3 {
-			tgt, field, value := els[i].(string), els[i+1].(string), els[i+2].(string)
+			tgt, field, value := els[i].(string), els[i+1].(string), els[i+2]
 			name := assembly.DomainNameOf("test", tgt)
 			for i := 0; i < 2; i++ {
-				if p, e := q.GetField(name, field); e != nil {
+				p, e := q.GetField(name, field)
+				switch e.(type) {
+				default:
 					t.Fatal(e)
-				} else if txt, e := assign.ToString(p); e != nil {
-					t.Fatal("assign", e)
-				} else if txt != value {
-					t.Fatalf("mismatch %s.%s got:%q expected:%q", tgt, field, txt, value)
+				case rt.UnknownField:
+					if value != nil {
+						t.Fatal("got unknown field, but expecting a value")
+					}
+				case nil:
+					if txt, e := p.GetText(nil); e != nil {
+						t.Fatal("assign", e)
+					} else if txt != value {
+						t.Fatalf("mismatch %s.%s got:%q expected:%q", tgt, field, txt, value)
+					}
 				}
 			}
 		}
@@ -108,10 +113,10 @@ func TestFieldAccess(t *testing.T) {
 			for i := 0; i < 2; i++ {
 				if p, e := q.GetField(name, field); e != nil {
 					t.Fatal(e)
-				} else if num, e := assign.ToFloat(p); e != nil {
+				} else if num, e := p.GetNumber(nil); e != nil {
 					t.Fatal("assign", e)
 				} else if num != value {
-					t.Fatal("mismatch", name, num, value)
+					t.Fatal("mismatch", name, "have:", num, "want:", value)
 				}
 			}
 		}
@@ -131,31 +136,37 @@ func TestFieldAccess(t *testing.T) {
 		apple := assembly.DomainNameOf("test", "apple")
 		boat := assembly.DomainNameOf("test", "boat")
 		toyBoat := assembly.DomainNameOf("test", "toy boat")
-		if e := q.SetField(apple, "a", "y"); e != nil {
+		if e := q.SetField(apple, "a", &rt.TextValue{Value: "y"}); e != nil {
 			t.Fatal(e)
 		} else if v, e := q.GetField(apple, "a"); e != nil {
 			t.Fatal(e)
-		} else if str := v.(string); str != "y" {
+		} else if str, e := v.GetText(q); e != nil {
+			t.Fatal(e)
+		} else if str != "y" {
 			t.Fatal("mismatch", str)
 		} else if e := testTraits(q, apple, "y,w,x"); e != nil {
 			t.Fatal(e)
 		}
 		// boat.B has a default value of zz
-		if e := q.SetField(boat, "z", true); e != nil {
+		if e := q.SetField(boat, "z", &rt.BoolValue{Value: true}); e != nil {
 			t.Fatal(e)
 		} else if v, e := q.GetField(boat, "b"); e != nil {
 			t.Fatal(e)
-		} else if str := v.(string); str != "z" {
+		} else if str, e := v.GetText(q); e != nil {
+			t.Fatal(e)
+		} else if str != "z" {
 			t.Fatal("mismatch", str)
 		} else if e := testTraits(q, boat, "z, zz"); e != nil {
 			t.Fatal(e)
 		}
 		// toy boat.A has an initial value of y
-		if e := q.SetField(toyBoat, "w", true); e != nil {
+		if e := q.SetField(toyBoat, "w", &rt.BoolValue{Value: true}); e != nil {
 			t.Fatal(e)
 		} else if v, e := q.GetField(toyBoat, "a"); e != nil {
 			t.Fatal(e)
-		} else if str := v.(string); str != "w" {
+		} else if str, e := v.GetText(q); e != nil {
+			t.Fatal(e)
+		} else if str != "w" {
 			t.Fatal("mismatch", str)
 		} else if e := testTraits(q, toyBoat, "w,x,y"); e != nil {
 			t.Fatal(e)
@@ -194,7 +205,7 @@ func newFieldAccessTest(t *testing.T, dbloc string) (ret *sql.DB) {
 	return
 }
 
-func testTraits(q *Fields, name, csv string) (err error) {
+func testTraits(q *Runner, name, csv string) (err error) {
 	traits := strings.Split(csv, ",")
 	// the first value in the list of traits is supposed to be true
 	for want := true; len(traits) > 0 && err == nil; want = false {
@@ -202,7 +213,7 @@ func testTraits(q *Fields, name, csv string) (err error) {
 		traits = traits[1:]
 		if p, e := q.GetField(name, trait); e != nil {
 			err = errutil.New(e)
-		} else if got, e := assign.ToBool(p); e != nil {
+		} else if got, e := p.GetBool(nil); e != nil {
 			err = errutil.New("assign", e)
 		} else if got != want {
 			err = errutil.New("mismatch", name, trait, "got:", got, "expected:", want)
@@ -292,8 +303,8 @@ var FieldTest = struct {
 
 		// asking for an improper or invalid aspect returns nothing
 		// fix? should it return or log error instead?
-		"apple" /*   */, "b", "",
-		"boat" /*   */, "G", "",
+		"apple" /*   */, "b", nil,
+		"boat" /*   */, "G", nil,
 	},
 	/*numValues*/ []interface{}{
 		"apple", "d", 5.0,

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/chain"
 	"github.com/ionous/iffy/rt/stream"
 	"github.com/ionous/sliceOf"
 )
@@ -38,8 +39,7 @@ func TestTextIteration(t *testing.T) {
 		t.Run("text iteration", func(t *testing.T) {
 			var str string
 			pat := &TextListPattern{CommonPattern{Name: "textList"}, ps}
-			chain := textIterator{pat: pat, order: inds}
-			it := stream.NewTextChain(&chain)
+			it := chain.NewTextChain(&textIterator{pat: pat, order: inds})
 
 			for i := 0; it.HasNext(); i++ {
 				if i >= cnt {
@@ -75,8 +75,7 @@ func TestNumIteration(t *testing.T) {
 	} else {
 		var fin float64
 		pat := &NumListPattern{CommonPattern{Name: "numList"}, ps}
-		chain := numIterator{pat: pat, order: inds}
-		it := stream.NewNumberChain(&chain)
+		it := chain.NewNumberChain(&numIterator{pat: pat, order: inds})
 		for i := 0; it.HasNext(); i++ {
 			if i >= cnt {
 				t.Fatal(stream.Exceeded)
@@ -106,7 +105,7 @@ type Number float64
 
 func (n Number) GetNumberStream(rt.Runtime) (rt.Iterator, error) {
 	v := float64(n)
-	return stream.NewNumberList(sliceOf.Float64(v)), nil
+	return stream.NewNumList(sliceOf.Float64(v)), nil
 }
 
 type Bool bool

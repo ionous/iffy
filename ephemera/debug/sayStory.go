@@ -16,10 +16,12 @@ type MatchNumber struct {
 }
 
 func (m MatchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
-	if v, e := run.GetVariable("num"); e != nil {
+	if a, e := run.GetVariable("num"); e != nil {
+		err = e
+	} else if v, e := a.GetNumber(run); e != nil {
 		err = e
 	} else {
-		n := int(v.(float64))
+		n := int(v)
 		okay = n == int(m.Val)
 	}
 	return

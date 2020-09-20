@@ -25,10 +25,6 @@ func imp_common_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) 
 	return importName(k, r, "common_name", "noun")
 }
 
-func imp_line_expr(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "lines", "expr")
-}
-
 func imp_pattern_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	return importName(k, r, "pattern_name", "")
 }

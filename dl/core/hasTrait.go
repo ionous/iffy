@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -24,22 +23,18 @@ func (*HasTrait) Compose() composer.Spec {
 }
 
 func (op *HasTrait) GetBool(run rt.Runtime) (ret bool, err error) {
-	if name, e := rt.GetText(run, op.Obj); e != nil {
+	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else if trait, e := rt.GetText(run, op.Trait); e != nil {
 		err = e
-	} else {
-		// from the trait, get the name of the aspect
-		if a, e := run.GetField(name+"."+trait, object.Aspect); e != nil {
-			err = e
-		} else if aspect := a.(string); len(aspect) == 0 {
-			err = errutil.New("unknown trait", name, trait)
-		} else if currTrait, e := run.GetField(name, aspect); e != nil {
-			err = e
-		} else {
-			// from the aspect we know the current trait setting, so see if its the one requested.
-			ret = trait == currTrait
-		}
+	} else if p, e := run.GetField(obj+"."+trait, object.Aspect); e != nil {
+		err = e
+	} else if aspect, e := p.GetText(run); e != nil {
+		err = e
+	} else if currTrait, e := run.GetField(obj, aspect); e != nil {
+		err = e
+	} else if currTrait, e := currTrait.GetText(run); e != nil {
+		ret = trait == currTrait
 	}
 	return
 }

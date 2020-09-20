@@ -7,8 +7,10 @@ import (
 
 // Assignment helps limit variable and parameter assignment to particular contexts.
 type Assignment interface {
-	Assign(rt.Runtime, func(interface{}) error) error
-	GetEval() interface{} // fix? for import so we can determine the eval type
+	// write the results of evaluating this into that.
+	GetAssignedValue(rt.Runtime) (rt.Value, error)
+	// fix? for import so we can determine the eval type.
+	GetEval() interface{}
 }
 
 // Assign turns an Assignment a normal statement.
@@ -41,18 +43,6 @@ type FromTextList struct {
 	Vals rt.TextListEval
 }
 
-// when is this used?
-// func (op *Assign) Execute(run rt.Runtime) (err error) {
-// 	if assign := op.From; assign == nil {
-// 		err = rt.MissingEval("empty assignment")
-// 	} else {
-// 		err = assign.Assign(run, func(i interface{}) error {
-// 			return run.SetVariable(op.Name, i)
-// 		})
-// 	}
-// 	return
-// }
-
 func (*Assign) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign",
@@ -70,13 +60,11 @@ func (*FromVar) Compose() composer.Spec {
 	}
 }
 
-func (op *FromVar) Assign(run rt.Runtime, fn func(interface{}) error) (err error) {
-	if varName, e := rt.GetText(run, op.Var); e != nil {
-		err = e
-	} else if val, e := run.GetVariable(varName); e != nil {
+func (op *FromVar) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+	if src, e := rt.GetText(run, op.Var); e != nil {
 		err = e
 	} else {
-		err = fn(val)
+		ret, err = run.GetVariable(src)
 	}
 	return
 }
@@ -93,11 +81,11 @@ func (*FromBool) Compose() composer.Spec {
 	}
 }
 
-func (op *FromBool) Assign(run rt.Runtime, fn func(interface{}) error) (err error) {
+func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = fn(val)
+		ret = &rt.BoolValue{Value: val}
 	}
 	return
 }
@@ -115,11 +103,11 @@ func (*FromNum) Compose() composer.Spec {
 	}
 }
 
-func (op *FromNum) Assign(run rt.Runtime, fn func(interface{}) error) (err error) {
+func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = fn(val)
+		ret = &rt.NumberValue{Value: val}
 	}
 	return
 }
@@ -136,11 +124,11 @@ func (*FromText) Compose() composer.Spec {
 	}
 }
 
-func (op *FromText) Assign(run rt.Runtime, fn func(interface{}) error) (err error) {
+func (op *FromText) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = fn(val)
+		ret = &rt.TextValue{Value: val}
 	}
 	return
 }
@@ -157,11 +145,11 @@ func (*FromNumList) Compose() composer.Spec {
 	}
 }
 
-func (op *FromNumList) Assign(run rt.Runtime, fn func(interface{}) error) (err error) {
+func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = fn(vals)
+		ret = &rt.NumListValue{Value: vals}
 	}
 	return
 }
@@ -178,11 +166,11 @@ func (*FromTextList) Compose() composer.Spec {
 	}
 }
 
-func (op *FromTextList) Assign(run rt.Runtime, fn func(interface{}) error) (err error) {
+func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = fn(vals)
+		ret = &rt.TextListValue{Value: vals}
 	}
 	return
 }

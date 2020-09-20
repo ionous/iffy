@@ -56,7 +56,7 @@ func fromSequence(k *Importer, m reader.Map) (ret core.Sequence, err error) {
 		err = e
 	} else {
 		counter := getCounter(k, m)
-		ret = core.Sequence{counter, ps}
+		ret = core.Sequence{Seq: counter, Parts: ps}
 	}
 	return
 }

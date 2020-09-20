@@ -3,7 +3,7 @@ package scope
 import (
 	"testing"
 
-	"github.com/ionous/iffy/assign"
+	"github.com/ionous/iffy/rt"
 )
 
 func TestScopeStack(t *testing.T) {
@@ -33,14 +33,14 @@ func TestScopeStack(t *testing.T) {
 			switch p, e := stack.GetVariable(name); e.(type) {
 			default:
 				t.Fatal("fatal", e)
-			case UnknownVariable:
+			case rt.UnknownVariable:
 				// t.Log(reason, "loop", i, "asking for", name, "... unknown")
 				have = -1
 			case nil:
-				if v, e := assign.ToInt(p); e != nil {
+				if v, e := p.GetNumber(nil); e != nil {
 					t.Fatal("fatal", e)
 				} else {
-					have = v
+					have = int(v)
 					// t.Log(reason, "loop", i, name, "got", have)
 				}
 			}
@@ -49,11 +49,11 @@ func TestScopeStack(t *testing.T) {
 			if want := count[i]; want != have {
 				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
 			} else {
-				next := have + 1
+				next := &rt.NumberValue{Value: float64(have + 1)}
 				switch e := stack.SetVariable(name, next); e.(type) {
 				default:
 					t.Fatal("fatal", reason, "step", step, name, "set failed", e)
-				case UnknownVariable:
+				case rt.UnknownVariable:
 					if have != -1 {
 						t.Fatal("fatal", "step", step, name, "set failed", e)
 					}
@@ -98,22 +98,24 @@ type mockScope struct {
 	val        int
 }
 
-func (k *mockScope) GetVariable(name string) (ret interface{}, err error) {
+func (k *mockScope) GetVariable(name string) (ret rt.Value, err error) {
 	if name != k.name {
-		err = UnknownVariable(name)
+		err = rt.UnknownVariable(name)
 	} else {
 		k.gets++
-		ret = k.val
+		ret = &rt.NumberValue{Value: float64(k.val)}
 	}
 	return
 }
 
-func (k *mockScope) SetVariable(name string, v interface{}) (err error) {
+func (k *mockScope) SetVariable(name string, v rt.Value) (err error) {
 	if name != k.name {
-		err = UnknownVariable(name)
+		err = rt.UnknownVariable(name)
+	} else if n, e := v.GetNumber(nil); e != nil {
+		err = e
 	} else {
+		k.val = int(n)
 		k.sets++
-		k.val = v.(int)
 	}
 	return
 }

@@ -178,10 +178,10 @@ func assemblyTemplate() string {
 		"\t*/\n" +
 		"\tfirst.noun as firstNoun, \n" +
 		"\tcase when instr((\n" +
-		"\t \t\t\tselect mk.kind || \",\" || mk.path || \",\"\n" +
+		"\t \t\t\tselect mk.kind || ',' || mk.path || ','\n" +
 		"\t\t\t\tfrom mdl_kind mk\n" +
 		"\t\t\t\twhere mk.kind = first.kind\n" +
-		"\t\t\t),  swapped.firstKind || \",\") \n" +
+		"\t\t\t),  swapped.firstKind || ',') \n" +
 		"\t\t\tthen first.kind \n" +
 		"\tend as firstKind,\n" +
 		"\n" +
@@ -190,10 +190,10 @@ func assemblyTemplate() string {
 		"\t */\n" +
 		"\tsecond.noun as secondNoun,\n" +
 		"\tcase when instr((\n" +
-		"\t \t\t\tselect mk.kind || \",\" || mk.path || \",\"\n" +
+		"\t \t\t\tselect mk.kind || ',' || mk.path || ','\n" +
 		"\t\t\t\tfrom mdl_kind mk\n" +
 		"\t\t\t\twhere mk.kind = second.kind\n" +
-		"\t\t\t),  swapped.secondKind || \",\") \n" +
+		"\t\t\t),  swapped.secondKind || ',') \n" +
 		"\t\t\tthen second.kind\n" +
 		"\tend as secondKind\n" +
 		"from (\n" +

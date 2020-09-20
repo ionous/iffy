@@ -29,18 +29,18 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 	if e := run.GetEvalByName(op.Pattern, pat); e != nil {
 		err = e
 	} else {
-		// bake the parameters down
-		parms := make(Parameters)
+		// create variables for all the known parameters
+		parms := Parameters{run: run, values: make(parameterValues)}
 		pat.Prepare(parms)
 
-		// read from each argument
+		// read from each argument and store into the parameters
 		if op.Arguments != nil {
 			for _, arg := range op.Arguments.Args {
-				if name, e := getParamName(pat, arg); e != nil {
+				if name, e := getParamName(pat, arg.Name); e != nil {
 					err = errutil.Append(err, e)
-				} else if e := arg.From.Assign(run, func(val interface{}) error {
-					return parms.SetVariable(name, val)
-				}); e != nil {
+				} else if val, e := arg.From.GetAssignedValue(run); e != nil {
+					err = errutil.Append(err, e)
+				} else if e := parms.SetVariable(name, val); e != nil {
 					err = errutil.Append(err, e)
 				}
 			}
@@ -54,12 +54,11 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 	return
 }
 
-// change a param name ( which could be an index ) into a valid param name
-func getParamName(pat Pattern, arg *Argument) (ret string, err error) {
-	param := arg.Name
-	if usesIndex := len(param) > 1 && param[:1] == "$"; !usesIndex {
-		ret = param
-	} else if idx, e := strconv.Atoi(param[1:]); e != nil {
+// change a argument name ( which could be an index ) into a valid param name
+func getParamName(pat Pattern, arg string) (ret string, err error) {
+	if usesIndex := len(arg) > 1 && arg[:1] == "$"; !usesIndex {
+		ret = arg
+	} else if idx, e := strconv.Atoi(arg[1:]); e != nil {
 		err = e
 	} else {
 		// parameters are 1 indexed right now

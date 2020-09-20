@@ -27,8 +27,6 @@ create table mdl_pair( noun text, relation text, otherNoun text );
 /* maps common and uncommon words to their plurals */
 create table mdl_plural( one text, many text );
 /* stored programs, a work in progress 
- * note: name is not necessarily unique. some programs are stored in parts:
-   for example, patterns and tests. tbd whether the tables should self-describe,
    the connection between tests and patterns and progs are, essentially, application knowledge. */ 
 create table mdl_prog( name text, type text, bytes blob );
 /* declared patterns and their parameters -- 

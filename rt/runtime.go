@@ -4,41 +4,38 @@ import (
 	"github.com/ionous/iffy/rt/writer"
 )
 
-// VariableScope reads from and writes to a pool of named variables;
+// Scope provides access to a pool of named variables;
 // the variables, their names, and initial values depend on the implementation and its context.
-// Often, scopes are arranged in a stack with the newest scope checked for variables first, the oldest last.
-type VariableScope interface {
-	// GetVariable writes the value at 'name' into the value pointed to by 'pv'.
-	GetVariable(name string) (interface{}, error)
-	// SetVariable writes the value of 'v' into the value at 'name'.
-	SetVariable(name string, v interface{}) error
-}
-
-type VariableStack interface {
-	VariableScope
-	PushScope(VariableScope)
-	PopScope()
-}
-
-type Fields interface {
-	GetField(target, field string) (interface{}, error)
-	SetField(target, field string, v interface{}) error
-	// returns the name of the indexed field
-	GetFieldByIndex(taget string, index int) (string, error)
+type Scope interface {
+	// GetVariable returns the value stored at name.
+	GetVariable(name string) (Value, error)
+	// SetVariable attempts to store the passed value at name.
+	// It may return an error if the value is not of a compatible type,
+	// if its considered to be read-only, or if there is no predeclared value of that name.
+	SetVariable(name string, value Value) error
 }
 
 // Runtime environment for an in-progress game.
 type Runtime interface {
 	// various runtime objects (ex. nouns, kinds, etc. ) store data addressed by name.
-	Fields
+	GetField(target, field string) (Value, error)
+	// see also Scope.GetVariable.
+	SetField(target, field string, value Value) error
+	// nouns are grouped into potentially hierarchical "domains"
+	// de/activating makes those groups hidden/visible to the runtime.
+	// Domain hierarchy is defined at assembly time.
+	ActivateDomain(name string, enable bool)
 	// find a function, test, or pattern addressed by name
 	// pv should be a pointer to a concrete type.
 	GetEvalByName(name string, pv interface{}) error
-	// stacks of scopes for local variables
-	VariableStack
-	// nouns are grouped into potentially hierarchical "domains"
-	// de/activating makes those groups hidden/visible to the runtime.
-	ActivateDomain(name string, enable bool)
+	// the runtime behaves as stack of scopes.
+	// if a variable isnt found in the most recently pushed scope
+	// the next most recently pushed scope will be checked and so on.
+	Scope
+	// add a set of variables to the internal stack.
+	PushScope(Scope)
+	// remove the most recently added set of variables from the internal stack.
+	PopScope()
 	// turn single words into their plural variants, and vice-versa
 	PluralOf(single string) string
 	SingularOf(plural string) string

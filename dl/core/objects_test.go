@@ -57,35 +57,37 @@ type modelTest struct {
 	clsMap map[string]string
 }
 
-func (m *modelTest) GetField(target, field string) (ret interface{}, err error) {
+func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
 	switch field {
 	case object.Id:
-		if _, ok := m.clsMap[target]; ok {
-			ret = target
+		if _, ok := m.clsMap[target]; !ok {
+			err = rt.UnknownField{target, field}
+		} else {
+			ret = &rt.TextValue{Value: target}
 		}
 
 	case object.Exists:
 		_, ok := m.clsMap[target]
-		ret = ok
+		ret = &rt.BoolValue{Value: ok}
 
 	case object.Kind:
 		if cls, ok := m.clsMap[target]; !ok {
-			err = errutil.New("modelTest: unknown", target)
+			err = rt.UnknownField{target, field}
 		} else {
-			ret = cls
+			ret = &rt.TextValue{Value: cls}
 		}
 
 	case object.Kinds:
 		if cls, ok := m.clsMap[target]; !ok {
-			err = errutil.New("modelTest: unknown", target)
+			err = rt.UnknownField{target, field}
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
-			ret = path
+			ret = &rt.TextValue{Value: path}
 		}
 
 	default:
-		err = errutil.New("modelTest: unknown field", field, "in", target)
+		err = rt.UnknownField{target, field}
 	}
 	return
 }

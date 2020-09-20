@@ -131,7 +131,7 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 		nounType := k.NewName("common", tables.NAMED_TRAIT, reader.At(r))
 		k.NewValue(noun, nounType, true)
 		//
-		if det[0] != '$' {
+		if usesKeyWord := det[0] == '$'; !usesKeyWord {
 			article := k.NewName("indefinite article", tables.NAMED_FIELD, reader.At(r))
 			k.NewValue(noun, article, det)
 			if once := "common_noun"; k.Once(once) {
@@ -203,7 +203,9 @@ func imp_kind_of_noun(k *Importer, r reader.Map) (err error) {
 func imp_summary(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "summary"); e != nil {
 		err = e
-	} else if lines, e := imp_line_expr(k, m.MapOf("$LINES")); e != nil {
+	} else if lines, e := imp_lines(k, m.MapOf("$LINES")); e != nil {
+		err = e
+	} else if text, e := convert_text_or_template(lines); e != nil {
 		err = e
 	} else {
 		// declare the existence of the field "appearance"
@@ -211,11 +213,11 @@ func imp_summary(k *Importer, r reader.Map) (err error) {
 			domain := k.gameDomain()
 			things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
 			appear := k.NewDomainName(domain, "appearance", tables.NAMED_FIELD, once)
-			k.NewField(things, appear, tables.PRIM_EXPR)
+			k.NewField(things, appear, tables.PRIM_TEXT)
 		}
 		prop := k.NewName("appearance", tables.NAMED_FIELD, reader.At(m))
 		noun := LastNameOf(k.Recent.Nouns.Subjects)
-		k.NewValue(noun, prop, lines)
+		k.NewValue(noun, prop, text)
 	}
 	return
 }

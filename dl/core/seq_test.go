@@ -89,22 +89,23 @@ func (m *seqTest) Random(inclusiveMin, exclusiveMax int) int {
 	return (exclusiveMax-inclusiveMin)/2 + inclusiveMin
 }
 
-func (m *seqTest) GetField(name, field string) (ret interface{}, err error) {
+func (m *seqTest) GetField(target, field string) (ret rt.Value, err error) {
 	if field != object.Counter {
-		err = errutil.New("unknown field", field)
+		err = rt.UnknownField{target, field}
 	} else {
-		ret = m.counters[name]
+		v := m.counters[target]
+		ret = &rt.NumberValue{Value: float64(v)}
 	}
 	return
 }
 
-func (m *seqTest) SetField(name, field string, v interface{}) (err error) {
+func (m *seqTest) SetField(target, field string, value rt.Value) (err error) {
 	if field != object.Counter {
-		err = errutil.New("seqTest: unknown field", field)
-	} else if i, ok := v.(int); !ok {
-		err = errutil.New("seqTest: unknown value", field)
+		err = rt.UnknownField{target, field}
+	} else if v, e := value.GetNumber(nil); e != nil {
+		err = errutil.New("seqTest: unknown value", e)
 	} else {
-		m.counters[name] = i
+		m.counters[target] = int(v)
 	}
 	return
 }

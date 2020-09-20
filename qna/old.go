@@ -1,5 +1,8 @@
 package qna
 
+// patternParamAt: ps.Prep(db,
+// 	`select param from mdl_pat where pattern=? and idx=?`),
+//
 // func makeKeyWithIndex(obj string, idx int) keyType {
 // 	return keyType{obj, "$" + strconv.Itoa(idx)}
 // }

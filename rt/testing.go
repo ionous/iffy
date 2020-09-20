@@ -13,13 +13,10 @@ func (Panic) ActivateDomain(name string, enable bool) {
 func (Panic) GetEvalByName(string, interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) GetFieldByIndex(target string, idx int) (string, error) {
+func (Panic) GetField(target, field string) (Value, error) {
 	panic("Runtime panic")
 }
-func (Panic) GetField(target, field string) (interface{}, error) {
-	panic("Runtime panic")
-}
-func (Panic) SetField(target, field string, v interface{}) error {
+func (Panic) SetField(target, field string, v Value) error {
 	panic("Runtime panic")
 }
 func (Panic) Writer() writer.Output {
@@ -28,13 +25,13 @@ func (Panic) Writer() writer.Output {
 func (Panic) SetWriter(writer.Output) writer.Output {
 	panic("Runtime panic")
 }
-func (Panic) GetVariable(name string) (interface{}, error) {
+func (Panic) GetVariable(name string) (Value, error) {
 	panic("Runtime panic")
 }
-func (Panic) SetVariable(name string, v interface{}) error {
+func (Panic) SetVariable(name string, v Value) error {
 	panic("Runtime panic")
 }
-func (Panic) PushScope(VariableScope) {
+func (Panic) PushScope(Scope) {
 	panic("Runtime panic")
 }
 func (Panic) PopScope() {
@@ -47,5 +44,23 @@ func (Panic) PluralOf(single string) string {
 	panic("Runtime panic")
 }
 func (Panic) SingularOf(plural string) string {
+	panic("Runtime panic")
+}
+
+type PanicValue struct{}
+
+func (PanicValue) GetBool(Runtime) (bool, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetNumber(Runtime) (float64, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetText(Runtime) (string, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetNumberStream(Runtime) (Iterator, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetTextStream(Runtime) (Iterator, error) {
 	panic("Runtime panic")
 }

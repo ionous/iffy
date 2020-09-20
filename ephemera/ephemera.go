@@ -77,12 +77,21 @@ func (r *Recorder) NewProg(rootType string, blob []byte) (ret Prog) {
 // fix:  could this be a function in tables somehow?
 // see also: WriteGob in assembler
 func (r *Recorder) NewGob(typeName string, cmd interface{}) (ret Prog, err error) {
+	if prog, e := EncodeGob(cmd); e != nil {
+		err = e
+	} else {
+		ret = r.NewProg(typeName, prog)
+	}
+	return
+}
+
+func EncodeGob(cmd interface{}) (ret []byte, err error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
 	if e := enc.Encode(cmd); e != nil {
 		err = e
 	} else {
-		ret = r.NewProg(typeName, buf.Bytes())
+		ret = buf.Bytes()
 	}
 	return
 }
@@ -100,21 +109,20 @@ func (r *Recorder) NewAspect(aspect Named) {
 }
 
 // NewCertainty supplies a kind with a default trait.
-// usually fast horses.
 func (r *Recorder) NewCertainty(certainty string, trait, kind Named) {
 	// usually fast horses.
 	r.cache.Must(eph_certainty, certainty, trait, kind)
 }
 
-// NewDefault supplies a kind with a default value.
-// height horses 5.
+// NewDefault supplies a kind with a default value;
+// see also NewValue
 func (r *Recorder) NewDefault(kind, field Named, value interface{}) {
-	// height horses 5.
+	// horses height 5.
 	r.cache.Must(eph_default, kind, field, value)
 }
 
 // NewKind connects a kind (plural) to its parent kind (singular).
-// cats are a kind of animal.
+// ex. cats are a kind of animal.
 func (r *Recorder) NewKind(kind, parent Named) {
 	r.cache.Must(eph_kind, kind, parent)
 }
@@ -173,6 +181,7 @@ func (r *Recorder) NewTrait(trait, aspect Named, rank int) {
 
 // NewValue assigns the property of a noun a value;
 // traits can be assigned by naming the individual trait and setting a true ( or false ) value.
+// see also: NewDefault
 func (r *Recorder) NewValue(noun, prop Named, value interface{}) {
 	r.cache.Must(eph_value, noun, prop, value)
 }

@@ -5,9 +5,6 @@ const (
 	PRIM_TEXT   = "text"   // string
 	PRIM_DIGI   = "digi"   // number
 	PRIM_BOOL   = "bool"   // boolean (rare, more usually aspect)
-	PRIM_EXPR   = "expr"   // text expression
-	PRIM_COMP   = "comp"   // number computation
-	PRIM_PROG   = "prog"   // program, activity
 	PRIM_ASPECT = "aspect" // string
 	PRIM_TRAIT  = "trait"  // string
 )

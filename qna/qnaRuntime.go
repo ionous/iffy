@@ -17,11 +17,11 @@ func NewRuntime(db *sql.DB) *Runner {
 	} else {
 		run = &Runner{
 			db:      db,
-			Fields:  fields,
+			fields:  fields,
 			plurals: plurals,
+			pairs:   make(valueMap),
 		}
 		run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
-		run.PushScope(&NounScope{fields: fields})
 	}
 	return run
 }
@@ -31,8 +31,9 @@ type Runner struct {
 	scope.ScopeStack
 	Randomizer
 	writer.Sink
-	*Fields
+	fields  *Fields
 	plurals *Plurals
+	pairs   valueMap
 }
 
 func (run *Runner) ActivateDomain(domain string, active bool) {

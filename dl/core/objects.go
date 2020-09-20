@@ -3,7 +3,6 @@ package core
 import (
 	"strings"
 
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -70,10 +69,15 @@ func (op *ObjectName) GetObjectRef(run rt.Runtime) (ret string, exact bool, err 
 }
 
 func getObjectExists(run rt.Runtime, ref ObjectRef) (okay bool, err error) {
-	if n, e := getObjectId(run, ref); e != nil {
+	// checking for object.Exists only searches by object id
+	// we want to check for the object by friendly name, and possibly by looking in scope
+	switch _, e := getObjectId(run, ref); e.(type) {
+	case nil:
+		okay = true
+	case rt.UnknownField:
+		okay = false
+	default:
 		err = e
-	} else {
-		okay = len(n) > 0
 	}
 	return
 }
@@ -97,19 +101,29 @@ func getObjectExactly(run rt.Runtime, name string) (ret string, err error) {
 	} else if id, e := run.GetField(name, object.Id); e != nil {
 		err = e
 	} else {
-		ret, err = assign.ToString(id)
+		ret, err = id.GetText(run)
 	}
 	return
 }
 
 // first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
 func getObjectInexactly(run rt.Runtime, name string) (ret string, err error) {
-	if local, e := run.GetVariable(name); e != nil {
-		err = e
-	} else if str, e := assign.ToString(local); e != nil {
+	if p, e := run.GetVariable(name); e != nil {
 		err = e
 	} else {
-		ret, err = getObjectExactly(run, str)
+		switch e.(type) {
+		// if there's no such variable, the inexact search then checks if there's an object of that name.
+		case rt.UnknownVariable:
+			ret, err = getObjectExactly(run, name)
+		case nil:
+			// if we found such a variable, get its contents and look up the referenced object.
+			if unboxedName, e := p.GetText(run); e != nil {
+				err = e
+			} else {
+				ret, err = getObjectExactly(run, unboxedName)
+			}
+		}
+
 	}
 	return
 }
@@ -129,7 +143,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 	} else if p, e := run.GetField(obj, object.Kind); e != nil {
 		err = e
 	} else {
-		ret, err = assign.ToString(p)
+		ret, err = p.GetText(run)
 	}
 	return
 }
@@ -150,7 +164,7 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = e
 	} else if p, e := run.GetField(obj, object.Kinds); e != nil {
 		err = e
-	} else if fullPath, e := assign.ToString(p); e != nil {
+	} else if fullPath, e := p.GetText(run); e != nil {
 		err = e
 	} else {
 		ret = strings.Contains(fullPath+",", tgtKind+",")
@@ -173,7 +187,7 @@ func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = e
 	} else if p, e := run.GetField(obj, object.Kind); e != nil {
 		err = e
-	} else if objKind, e := assign.ToString(p); e != nil {
+	} else if objKind, e := p.GetText(run); e != nil {
 		err = e
 	} else {
 		ret = objKind == tgtKind

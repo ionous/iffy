@@ -36,7 +36,7 @@ func TestExpressions(t *testing.T) {
 			t.Fatal(e)
 		}
 	})
-	t.Run("txt", func(t *testing.T) {
+	t.Run("text", func(t *testing.T) {
 		if e := testExpression("'5'", T("5")); e != nil {
 			t.Fatal(e)
 		}

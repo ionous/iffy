@@ -20,7 +20,5 @@ func (*Render) Compose() composer.Spec {
 
 // RunTest returns an error on failure.
 func (op *Render) GetText(run rt.Runtime) (ret string, err error) {
-	// FIX: scope for GetVar fallback to test object exists
-	ret, err = rt.GetText(run, op.Expression)
-	return
+	return rt.GetText(run, op.Expression)
 }

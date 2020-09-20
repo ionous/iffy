@@ -46,7 +46,7 @@ func (a *AllTrue) GetBool(run rt.Runtime) (okay bool, err error) {
 	eval := a.Test
 	i, cnt := 0, len(eval)
 	for ; i < cnt; i++ {
-		if ok, e := GetBool(run, eval[i]); e != nil {
+		if ok, e := rt.GetBool(run, eval[i]); e != nil {
 			err = e
 			break
 		} else if !ok {

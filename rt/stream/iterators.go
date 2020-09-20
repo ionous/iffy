@@ -7,7 +7,7 @@ import (
 
 const Exceeded errutil.Error = "stream exceeded"
 
-type NumberList struct {
+type NumList struct {
 	i    int
 	list []float64
 }
@@ -17,19 +17,20 @@ type TextList struct {
 	list []string
 }
 
-func NewNumberList(list []float64) *NumberList {
-	return &NumberList{list: list}
+// implements rt.Iterator for a slice of float64
+func NewNumList(list []float64) *NumList {
+	return &NumList{list: list}
 }
 
-func (it *NumberList) Remaining() int {
+func (it *NumList) Remaining() int {
 	return len(it.list) - it.i
 }
 
-func (it *NumberList) HasNext() bool {
+func (it *NumList) HasNext() bool {
 	return it.i < len(it.list)
 }
 
-func (it *NumberList) GetNext(pv interface{}) (err error) {
+func (it *NumList) GetNext(pv interface{}) (err error) {
 	if !it.HasNext() {
 		err = Exceeded
 	} else if e := assign.FloatPtr(pv, it.list[it.i]); e != nil {
@@ -40,6 +41,7 @@ func (it *NumberList) GetNext(pv interface{}) (err error) {
 	return
 }
 
+// implements rt.Iterator for a slice of string.
 func NewTextList(list []string) *TextList {
 	return &TextList{list: list}
 }

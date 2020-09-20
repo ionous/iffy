@@ -39,13 +39,13 @@ type SetFieldTextList struct {
 // 	Obj, State rt.TextEval
 // }
 
-func (op *SetField) setPrim(run rt.Runtime, v interface{}) (err error) {
+func (op *SetField) setPrim(run rt.Runtime, val rt.Value) (err error) {
 	if obj, e := rt.GetText(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
 	} else {
-		err = run.SetField(obj, field, v)
+		err = run.SetField(obj, field, val)
 	}
 	return
 }
@@ -62,7 +62,7 @@ func (op *SetFieldBool) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, val)
+		err = op.setPrim(run, &rt.BoolValue{Value: val})
 	}
 	return
 }
@@ -79,7 +79,7 @@ func (op *SetFieldNum) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, val)
+		err = op.setPrim(run, &rt.NumberValue{Value: val})
 	}
 	return
 }
@@ -95,7 +95,7 @@ func (op *SetFieldText) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, val)
+		err = op.setPrim(run, &rt.TextValue{Value: val})
 	}
 	return
 }
@@ -112,7 +112,7 @@ func (op *SetFieldNumList) Execute(run rt.Runtime) (err error) {
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, vals)
+		err = op.setPrim(run, &rt.NumListValue{Value: vals})
 	}
 	return
 }
@@ -128,7 +128,7 @@ func (op *SetFieldTextList) Execute(run rt.Runtime) (err error) {
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, vals)
+		err = op.setPrim(run, &rt.TextListValue{Value: vals})
 	}
 	return
 }

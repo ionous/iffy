@@ -3,10 +3,10 @@ package scope
 import "github.com/ionous/iffy/rt"
 
 type ScopeStack struct {
-	stack []rt.VariableScope
+	stack []rt.Scope
 }
 
-func (k *ScopeStack) PushScope(scope rt.VariableScope) {
+func (k *ScopeStack) PushScope(scope rt.Scope) {
 	if len(k.stack) > 25 {
 		panic("stack overflow")
 	}
@@ -22,8 +22,8 @@ func (k *ScopeStack) PopScope() {
 }
 
 // GetVariable returns the value at 'name'
-func (k *ScopeStack) GetVariable(name string) (ret interface{}, err error) {
-	err = k.visit(name, func(scope rt.VariableScope) (err error) {
+func (k *ScopeStack) GetVariable(name string) (ret rt.Value, err error) {
+	err = k.visit(name, func(scope rt.Scope) (err error) {
 		if v, e := scope.GetVariable(name); e != nil {
 			err = e
 		} else {
@@ -35,19 +35,18 @@ func (k *ScopeStack) GetVariable(name string) (ret interface{}, err error) {
 }
 
 // SetVariable writes the value of 'v' into the value at 'name'.
-func (k *ScopeStack) SetVariable(name string, v interface{}) (err error) {
-	return k.visit(name, func(scope rt.VariableScope) error {
+func (k *ScopeStack) SetVariable(name string, v rt.Value) (err error) {
+	return k.visit(name, func(scope rt.Scope) error {
 		return scope.SetVariable(name, v)
 	})
 }
-
-func (k *ScopeStack) visit(name string, visitor func(rt.VariableScope) error) (err error) {
+func (k *ScopeStack) visit(name string, visitor func(rt.Scope) error) (err error) {
 	for i := len(k.stack) - 1; i >= 0; i-- {
 		switch e := visitor(k.stack[i]); e.(type) {
 		case nil:
 			// no error? we're done.
 			goto Done
-		case UnknownVariable:
+		case rt.UnknownVariable:
 			// didn't find? keep looking...
 		default:
 			// other error? done.
@@ -55,7 +54,7 @@ func (k *ScopeStack) visit(name string, visitor func(rt.VariableScope) error) (e
 			goto Done
 		}
 	}
-	err = UnknownVariable(name)
+	err = rt.UnknownVariable(name)
 Done:
 	return
 }

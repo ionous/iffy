@@ -1,6 +1,10 @@
 package pattern
 
-import "github.com/ionous/iffy/rt/scope"
+import (
+	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/tables"
+)
 
 type NumParam struct {
 	Name string
@@ -31,7 +35,7 @@ func (n *NumParam) String() string {
 }
 func (n *NumParam) Prepare(p Parameters) {
 	var v float64
-	p[n.Name] = v
+	p.values[n.Name] = generic.NewValue(tables.PRIM_DIGI, v)
 }
 
 func (n *BoolParam) String() string {
@@ -39,7 +43,7 @@ func (n *BoolParam) String() string {
 }
 func (n *BoolParam) Prepare(p Parameters) {
 	var v bool
-	p[n.Name] = v
+	p.values[n.Name] = generic.NewValue(tables.PRIM_BOOL, v)
 }
 
 func (n *TextParam) String() string {
@@ -47,7 +51,7 @@ func (n *TextParam) String() string {
 }
 func (n *TextParam) Prepare(p Parameters) {
 	var v string
-	p[n.Name] = v
+	p.values[n.Name] = generic.NewValue(tables.PRIM_TEXT, v)
 }
 
 func (n *NumListParam) String() string {
@@ -55,7 +59,7 @@ func (n *NumListParam) String() string {
 }
 func (n *NumListParam) Prepare(p Parameters) {
 	var v []float64
-	p[n.Name] = v
+	p.values[n.Name] = generic.NewValue("num_list", v)
 }
 
 func (n *TextListParam) String() string {
@@ -63,20 +67,24 @@ func (n *TextListParam) String() string {
 }
 func (n *TextListParam) Prepare(p Parameters) {
 	var v []string
-	p[n.Name] = v
+	p.values[n.Name] = generic.NewValue("text_list", v)
 }
 
-// Parameters implements a VariableScope mapping names to specified parameters.
+// Parameters implements a Scope mapping names to specified parameters.
 // The only current user is pattern.FromPattern::Stitch()
 // It stores values from indexed and key name arguments ( originally specified as evals. )
 // Its pushed into scope so the names can be used as a source of values for rt.Runtime::GetVariable().
 // ( ex. For use with the commands GetVar{},  CommonNoun{}, ProperNoun{}, ObjectName{}, ... )
-type Parameters map[string]interface{}
+type Parameters struct {
+	run    rt.Runtime
+	values parameterValues
+}
+type parameterValues map[string]*generic.Value
 
 // GetVariable returns the value at 'name', the caller is responsible for determining the type.
-func (p Parameters) GetVariable(name string) (ret interface{}, err error) {
-	if i, ok := p[name]; !ok {
-		err = scope.UnknownVariable(name)
+func (ps *Parameters) GetVariable(name string) (ret rt.Value, err error) {
+	if i, ok := ps.values[name]; !ok {
+		err = rt.UnknownVariable(name)
 	} else {
 		ret = i
 	}
@@ -84,12 +92,12 @@ func (p Parameters) GetVariable(name string) (ret interface{}, err error) {
 }
 
 // SetVariable writes the value of 'v' into the value at 'name'.
-func (p Parameters) SetVariable(name string, v interface{}) (err error) {
+func (ps *Parameters) SetVariable(name string, val rt.Value) (err error) {
 	// FIX: any sort of validation? ex. ensure the value is baked ( ie. some sort of primitive or slice of primitives. )
-	if _, ok := p[name]; !ok {
-		err = scope.UnknownVariable(name)
+	if p, ok := ps.values[name]; !ok {
+		err = rt.UnknownVariable(name)
 	} else {
-		p[name] = v
+		err = p.SetValue(ps.run, val)
 	}
 	return
 }

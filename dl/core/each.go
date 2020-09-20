@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
@@ -49,14 +48,12 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 	if it, e := rt.GetNumberStream(run, f.In); e != nil {
 		err = e
 	} else {
-		err = loop(run, it, f.Go, f.Else, func() (ret scope.ReadOnly, err error) {
+		err = loop(run, it, f.Go, f.Else, func() (retn string, retv rt.Value, err error) {
 			var num float64
 			if e := it.GetNext(&num); e != nil {
 				err = e
 			} else {
-				ret = &readOnlyValue{"num", func(pv interface{}) error {
-					return assign.FloatPtr(pv, num)
-				}}
+				retn, retv = "num", &rt.NumberValue{Value: num}
 			}
 			return
 		})
@@ -77,12 +74,12 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	if it, e := rt.GetTextStream(run, f.In); e != nil {
 		err = e
 	} else {
-		err = loop(run, it, f.Go, f.Else, func() (ret scope.ReadOnly, err error) {
-			var txt string
-			if e := it.GetNext(&txt); e != nil {
+		err = loop(run, it, f.Go, f.Else, func() (retn string, retv rt.Value, err error) {
+			var text string
+			if e := it.GetNext(&text); e != nil {
 				err = e
 			} else {
-				ret = &readOnlyValue{"text", txt}
+				retn, retv = "text", &rt.TextValue{Value: text}
 			}
 			return
 		})
@@ -90,25 +87,12 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-type readOnlyValue struct {
-	name  string
-	value interface{}
-}
-
-func (h *readOnlyValue) GetVariable(n string) (ret interface{}, err error) {
-	if n == h.name {
-		ret = h.value
-	} else {
-		err = scope.UnknownVariable(n)
-	}
-	return
-}
-
+// iterate over the go and else statements; introduce the loop counter
 func loop(
 	run rt.Runtime,
 	it interface{ HasNext() bool },
 	Run, Else *Activity,
-	next func() (scope.ReadOnly, error),
+	next func() (string, rt.Value, error),
 ) (err error) {
 	if !it.HasNext() {
 		if e := rt.RunOne(run, Else); e != nil {
@@ -117,12 +101,12 @@ func loop(
 	} else {
 		var lf scope.LoopFactory
 		for it.HasNext() {
-			if varscope, e := next(); e != nil {
+			if name, val, e := next(); e != nil {
 				err = e
 				break
 			} else {
 				// brings the names of an object's properties into scope for the duration of fn.
-				run.PushScope(lf.NextScope(varscope, it.HasNext()))
+				run.PushScope(lf.NextScope(name, val, it.HasNext()))
 				e := rt.RunOne(run, Run)
 				run.PopScope()
 				if e != nil {

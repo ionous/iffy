@@ -38,8 +38,6 @@ func modelTemplate() string {
 		"/* maps common and uncommon words to their plurals */\n" +
 		"create table mdl_plural( one text, many text );\n" +
 		"/* stored programs, a work in progress \n" +
-		" * note: name is not necessarily unique. some programs are stored in parts:\n" +
-		"   for example, patterns and tests. tbd whether the tables should self-describe,\n" +
 		"   the connection between tests and patterns and progs are, essentially, application knowledge. */ \n" +
 		"create table mdl_prog( name text, type text, bytes blob );\n" +
 		"/* declared patterns and their parameters -- \n" +

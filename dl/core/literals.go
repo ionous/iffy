@@ -136,7 +136,7 @@ func (*Numbers) Compose() composer.Spec {
 }
 
 func (l *Numbers) GetNumberStream(rt.Runtime) (rt.Iterator, error) {
-	return stream.NewNumberList(l.Values), nil
+	return stream.NewNumList(l.Values), nil
 }
 
 func (*Texts) Compose() composer.Spec {
