@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 type SetField struct {
@@ -62,7 +63,7 @@ func (op *SetFieldBool) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, &rt.BoolValue{Value: val})
+		err = op.setPrim(run, &generic.Bool{Value: val})
 	}
 	return
 }
@@ -79,7 +80,7 @@ func (op *SetFieldNum) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, &rt.NumberValue{Value: val})
+		err = op.setPrim(run, &generic.Float{Value: val})
 	}
 	return
 }
@@ -95,7 +96,7 @@ func (op *SetFieldText) Execute(run rt.Runtime) (err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, &rt.TextValue{Value: val})
+		err = op.setPrim(run, &generic.String{Value: val})
 	}
 	return
 }
@@ -112,7 +113,7 @@ func (op *SetFieldNumList) Execute(run rt.Runtime) (err error) {
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, &rt.NumListValue{Value: vals})
+		err = op.setPrim(run, &generic.FloatList{Value: vals})
 	}
 	return
 }
@@ -128,7 +129,7 @@ func (op *SetFieldTextList) Execute(run rt.Runtime) (err error) {
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, &rt.TextListValue{Value: vals})
+		err = op.setPrim(run, &generic.StringList{Value: vals})
 	}
 	return
 }

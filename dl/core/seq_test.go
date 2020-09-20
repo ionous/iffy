@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 func TestSequences(t *testing.T) {
@@ -94,7 +95,7 @@ func (m *seqTest) GetField(target, field string) (ret rt.Value, err error) {
 		err = rt.UnknownField{target, field}
 	} else {
 		v := m.counters[target]
-		ret = &rt.NumberValue{Value: float64(v)}
+		ret = &generic.Int{Value: v}
 	}
 	return
 }

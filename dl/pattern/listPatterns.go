@@ -28,7 +28,7 @@ func (ps *NumListPattern) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err 
 		err = e
 	} else {
 		it := numIterator{run, ps, inds, 0}
-		ret = chain.NewNumberChain(&it)
+		ret = chain.NewStreamOfStreams(&it)
 	}
 	return
 }
@@ -43,7 +43,7 @@ func (ps *TextListPattern) GetTextStream(run rt.Runtime) (ret rt.Iterator, err e
 		err = e
 	} else {
 		it := textIterator{run, ps, inds, 0}
-		ret = chain.NewTextChain(&it)
+		ret = chain.NewStreamOfStreams(&it)
 	}
 	return
 }

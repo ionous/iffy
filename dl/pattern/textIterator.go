@@ -1,12 +1,10 @@
 package pattern
 
 import (
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
 )
 
-// textIterator
+// implements chain.StreamIterator for multiple streams of text
 type textIterator struct {
 	run   rt.Runtime
 	pat   *TextListPattern
@@ -14,21 +12,19 @@ type textIterator struct {
 	curr  int
 }
 
-func (k *textIterator) HasNext() bool {
+func (k *textIterator) HasNextStream() bool {
 	return k.curr < len(k.order)
 }
 
-func (k *textIterator) GetNext(pv interface{}) (err error) {
-	if !k.HasNext() {
-		err = stream.Exceeded
-	} else if pit, ok := pv.(*rt.Iterator); !ok {
-		err = assign.Mismatch("GetNext", pit, pv)
+func (k *textIterator) GetNextStream() (ret rt.Iterator, err error) {
+	if !k.HasNextStream() {
+		err = rt.StreamExceeded
 	} else {
 		ind := k.order[k.curr]
 		if it, e := rt.GetTextStream(k.run, k.pat.Rules[ind]); e != nil {
 			err = e
 		} else {
-			*pit = it
+			ret = it
 			k.curr++
 		}
 	}

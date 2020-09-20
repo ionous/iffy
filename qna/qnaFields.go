@@ -108,7 +108,7 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 				} else {
 					// recurse...
 					key := keyType{target, aspect}
-					err = n.setField(key, &rt.TextValue{Value: field})
+					err = n.setField(key, &generic.String{Value: field})
 				}
 			}
 		}

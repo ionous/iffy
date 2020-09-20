@@ -8,7 +8,6 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -171,7 +170,7 @@ func (q *Value) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
 		case nil:
 			ret = rt.EmptyStream(true)
 		case []float64:
-			ret = stream.NewNumList(vs)
+			ret = SliceFloats(vs)
 		case rt.NumListEval:
 			ret, err = vs.GetNumberStream(run)
 		case []byte:
@@ -197,7 +196,7 @@ func (q *Value) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
 		case nil:
 			ret = rt.EmptyStream(true)
 		case []string:
-			ret = stream.NewTextList(vs)
+			ret = SliceStrings(vs)
 		case rt.TextListEval:
 			ret, err = vs.GetTextStream(run)
 		case []byte:

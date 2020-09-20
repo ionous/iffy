@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 type Sequence struct {
@@ -39,7 +40,7 @@ func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret i
 			err = e
 		} else {
 			curr := int(num)
-			next := &rt.NumberValue{Value: float64(inc(curr, max))}
+			next := &generic.Int{Value: inc(curr, max)}
 			if e := run.SetField(op.Seq, object.Counter, next); e != nil {
 				err = e
 			} else {

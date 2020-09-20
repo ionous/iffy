@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 // Range generates a series of integers r[i] = (start + step*i) where i>=0
@@ -101,16 +101,12 @@ func (it *rangeIt) HasNext() (okay bool) {
 }
 
 // GetNumber advances the iterator.
-func (it *rangeIt) GetNext(pv interface{}) (err error) {
+func (it *rangeIt) GetNext() (ret rt.Value, err error) {
 	if !it.HasNext() {
-		err = stream.Exceeded
+		err = rt.StreamExceeded
 	} else {
-		now, next := it.next, it.next+it.step
-		if e := assign.FloatPtr(pv, float64(now)); e != nil {
-			err = e
-		} else {
-			it.next = next
-		}
+		ret = &generic.Int{Value: it.next}
+		it.next = it.next + it.step
 	}
 	return
 }

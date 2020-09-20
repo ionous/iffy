@@ -48,15 +48,7 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 	if it, e := rt.GetNumberStream(run, f.In); e != nil {
 		err = e
 	} else {
-		err = loop(run, it, f.Go, f.Else, func() (retn string, retv rt.Value, err error) {
-			var num float64
-			if e := it.GetNext(&num); e != nil {
-				err = e
-			} else {
-				retn, retv = "num", &rt.NumberValue{Value: num}
-			}
-			return
-		})
+		err = scope.LoopOver(run, "num", it, f.Go, f.Else)
 	}
 	return
 }
@@ -74,47 +66,7 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	if it, e := rt.GetTextStream(run, f.In); e != nil {
 		err = e
 	} else {
-		err = loop(run, it, f.Go, f.Else, func() (retn string, retv rt.Value, err error) {
-			var text string
-			if e := it.GetNext(&text); e != nil {
-				err = e
-			} else {
-				retn, retv = "text", &rt.TextValue{Value: text}
-			}
-			return
-		})
-	}
-	return
-}
-
-// iterate over the go and else statements; introduce the loop counter
-func loop(
-	run rt.Runtime,
-	it interface{ HasNext() bool },
-	Run, Else *Activity,
-	next func() (string, rt.Value, error),
-) (err error) {
-	if !it.HasNext() {
-		if e := rt.RunOne(run, Else); e != nil {
-			err = e
-		}
-	} else {
-		var lf scope.LoopFactory
-		for it.HasNext() {
-			if name, val, e := next(); e != nil {
-				err = e
-				break
-			} else {
-				// brings the names of an object's properties into scope for the duration of fn.
-				run.PushScope(lf.NextScope(name, val, it.HasNext()))
-				e := rt.RunOne(run, Run)
-				run.PopScope()
-				if e != nil {
-					err = e
-					break
-				}
-			}
-		}
+		err = scope.LoopOver(run, "text", it, f.Go, f.Else)
 	}
 	return
 }

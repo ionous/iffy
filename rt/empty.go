@@ -10,6 +10,6 @@ func (EmptyStream) HasNext() bool {
 	return false
 }
 
-func (EmptyStream) GetNext(pv interface{}) error {
+func (EmptyStream) GetNext() (Value, error) {
 	panic("Attempted to advance an empty stream.")
 }

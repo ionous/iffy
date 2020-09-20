@@ -19,7 +19,7 @@ func TestLoop(t *testing.T) {
 			cap := cap[i]
 			count := i + 1
 			atEnd := count == cnt
-			s := lf.NextScope("", &generic.Value{}, !atEnd)
+			s := lf.NextScope(&generic.Value{}, !atEnd)
 
 			if p, e := s.GetVariable("index"); e != nil {
 				t.Fatal("loop", i, e)

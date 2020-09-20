@@ -6,7 +6,7 @@ import (
 
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/chain"
-	"github.com/ionous/iffy/rt/stream"
+	"github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/sliceOf"
 )
 
@@ -39,14 +39,15 @@ func TestTextIteration(t *testing.T) {
 		t.Run("text iteration", func(t *testing.T) {
 			var str string
 			pat := &TextListPattern{CommonPattern{Name: "textList"}, ps}
-			it := chain.NewTextChain(&textIterator{pat: pat, order: inds})
+			it := chain.NewStreamOfStreams(&textIterator{pat: pat, order: inds})
 
 			for i := 0; it.HasNext(); i++ {
 				if i >= cnt {
-					t.Fatal(stream.Exceeded)
+					t.Fatal(rt.StreamExceeded)
 				} else {
-					var txt string
-					if e := it.GetNext(&txt); e != nil {
+					if txt, e := it.GetNext(); e != nil {
+						t.Fatal(e)
+					} else if txt, e := txt.GetText(nil); e != nil {
 						t.Fatal(e)
 					} else {
 						str += txt
@@ -75,18 +76,18 @@ func TestNumIteration(t *testing.T) {
 	} else {
 		var fin float64
 		pat := &NumListPattern{CommonPattern{Name: "numList"}, ps}
-		it := chain.NewNumberChain(&numIterator{pat: pat, order: inds})
+		it := chain.NewStreamOfStreams(&numIterator{pat: pat, order: inds})
 		for i := 0; it.HasNext(); i++ {
 			if i >= cnt {
-				t.Fatal(stream.Exceeded)
+				t.Fatal(rt.StreamExceeded)
+			} else if num, e := it.GetNext(); e != nil {
+				t.Fatal(e)
+			} else if num, e := num.GetNumber(nil); e != nil {
+				t.Fatal(e)
 			} else {
-				var num float64
-				if e := it.GetNext(&num); e != nil {
-					t.Fatal(e)
-				} else {
-					fin += num * math.Pow10(cnt-i-1)
-				}
+				fin += num * math.Pow10(cnt-i-1)
 			}
+
 		}
 		if fin != 3124 {
 			t.Fatal("mismatched", fin)
@@ -97,15 +98,15 @@ func TestNumIteration(t *testing.T) {
 type Text string
 
 func (t Text) GetTextStream(rt.Runtime) (rt.Iterator, error) {
-	v := string(t)
-	return stream.NewTextList(sliceOf.String(v)), nil
+	v := string(t) // for testing we return a slice of one string
+	return generic.SliceStrings(sliceOf.String(v)), nil
 }
 
 type Number float64
 
 func (n Number) GetNumberStream(rt.Runtime) (rt.Iterator, error) {
-	v := float64(n)
-	return stream.NewNumList(sliceOf.Float64(v)), nil
+	v := float64(n) // for testing we return a slice of one number
+	return generic.SliceFloats(sliceOf.Float64(v)), nil
 }
 
 type Bool bool

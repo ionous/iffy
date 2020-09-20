@@ -16,8 +16,10 @@ func TestRange(t *testing.T) {
 		} else {
 			cnt, total := it.(rt.StreamCount).Remaining(), 0
 			for it.HasNext() {
-				var n float64
-				if e := it.GetNext(&n); e != nil {
+				if n, e := it.GetNext(); e != nil {
+					err = e
+					break
+				} else if n, e := n.GetNumber(&run); e != nil {
 					err = e
 					break
 				} else {

@@ -1,12 +1,10 @@
 package pattern
 
 import (
-	"github.com/ionous/iffy/assign"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/stream"
 )
 
-// numIterator
+// implements chain.StreamIterator for multiple streams of numbers
 type numIterator struct {
 	run   rt.Runtime
 	pat   *NumListPattern
@@ -14,21 +12,19 @@ type numIterator struct {
 	curr  int
 }
 
-func (k *numIterator) HasNext() bool {
+func (k *numIterator) HasNextStream() bool {
 	return k.curr < len(k.order)
 }
 
-func (k *numIterator) GetNext(pv interface{}) (err error) {
-	if !k.HasNext() {
-		err = stream.Exceeded
-	} else if pit, ok := pv.(*rt.Iterator); !ok {
-		err = assign.Mismatch("GetNext", pit, pv)
+func (k *numIterator) GetNextStream() (ret rt.Iterator, err error) {
+	if !k.HasNextStream() {
+		err = rt.StreamExceeded
 	} else {
 		ind := k.order[k.curr]
 		if it, e := rt.GetNumberStream(k.run, k.pat.Rules[ind]); e != nil {
 			err = e
 		} else {
-			*pit = it
+			ret = it
 			k.curr++
 		}
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 // test some simple functionality of the object commands using a mock runtime
@@ -63,18 +64,18 @@ func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
 		if _, ok := m.clsMap[target]; !ok {
 			err = rt.UnknownField{target, field}
 		} else {
-			ret = &rt.TextValue{Value: target}
+			ret = &generic.String{Value: target}
 		}
 
 	case object.Exists:
 		_, ok := m.clsMap[target]
-		ret = &rt.BoolValue{Value: ok}
+		ret = &generic.Bool{Value: ok}
 
 	case object.Kind:
 		if cls, ok := m.clsMap[target]; !ok {
 			err = rt.UnknownField{target, field}
 		} else {
-			ret = &rt.TextValue{Value: cls}
+			ret = &generic.String{Value: cls}
 		}
 
 	case object.Kinds:
@@ -83,7 +84,7 @@ func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
-			ret = &rt.TextValue{Value: path}
+			ret = &generic.String{Value: path}
 		}
 
 	default:

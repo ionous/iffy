@@ -36,7 +36,7 @@ type Iterator interface {
 	// HasNext returns true if the iterator can be safely advanced.
 	HasNext() bool
 	// GetNext returns the next value in the stream and advances the iterator.
-	GetNext(pv interface{}) error
+	GetNext() (Value, error)
 }
 
 // StreamCount optionally implemented for iterators to determine the length of remaining stream.

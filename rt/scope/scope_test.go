@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 func TestScopeStack(t *testing.T) {
@@ -49,7 +50,7 @@ func TestScopeStack(t *testing.T) {
 			if want := count[i]; want != have {
 				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
 			} else {
-				next := &rt.NumberValue{Value: float64(have + 1)}
+				next := &generic.Int{Value: have + 1}
 				switch e := stack.SetVariable(name, next); e.(type) {
 				default:
 					t.Fatal("fatal", reason, "step", step, name, "set failed", e)
@@ -103,7 +104,7 @@ func (k *mockScope) GetVariable(name string) (ret rt.Value, err error) {
 		err = rt.UnknownVariable(name)
 	} else {
 		k.gets++
-		ret = &rt.NumberValue{Value: float64(k.val)}
+		ret = &generic.Int{Value: k.val}
 	}
 	return
 }

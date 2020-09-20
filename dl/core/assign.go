@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 // Assignment helps limit variable and parameter assignment to particular contexts.
@@ -85,7 +86,7 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = e
 	} else {
-		ret = &rt.BoolValue{Value: val}
+		ret = &generic.Bool{Value: val}
 	}
 	return
 }
@@ -107,7 +108,7 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = e
 	} else {
-		ret = &rt.NumberValue{Value: val}
+		ret = &generic.Float{Value: val}
 	}
 	return
 }
@@ -128,7 +129,7 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = e
 	} else {
-		ret = &rt.TextValue{Value: val}
+		ret = &generic.String{Value: val}
 	}
 	return
 }
@@ -149,7 +150,7 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		ret = &rt.NumListValue{Value: vals}
+		ret = &generic.FloatList{Value: vals}
 	}
 	return
 }
@@ -170,7 +171,7 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err erro
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		ret = &rt.TextListValue{Value: vals}
+		ret = &generic.StringList{Value: vals}
 	}
 	return
 }

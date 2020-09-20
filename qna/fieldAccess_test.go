@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/iffy/assembly"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -136,7 +137,7 @@ func TestFieldAccess(t *testing.T) {
 		apple := assembly.DomainNameOf("test", "apple")
 		boat := assembly.DomainNameOf("test", "boat")
 		toyBoat := assembly.DomainNameOf("test", "toy boat")
-		if e := q.SetField(apple, "a", &rt.TextValue{Value: "y"}); e != nil {
+		if e := q.SetField(apple, "a", &generic.String{Value: "y"}); e != nil {
 			t.Fatal(e)
 		} else if v, e := q.GetField(apple, "a"); e != nil {
 			t.Fatal(e)
@@ -148,7 +149,7 @@ func TestFieldAccess(t *testing.T) {
 			t.Fatal(e)
 		}
 		// boat.B has a default value of zz
-		if e := q.SetField(boat, "z", &rt.BoolValue{Value: true}); e != nil {
+		if e := q.SetField(boat, "z", &generic.Bool{Value: true}); e != nil {
 			t.Fatal(e)
 		} else if v, e := q.GetField(boat, "b"); e != nil {
 			t.Fatal(e)
@@ -160,7 +161,7 @@ func TestFieldAccess(t *testing.T) {
 			t.Fatal(e)
 		}
 		// toy boat.A has an initial value of y
-		if e := q.SetField(toyBoat, "w", &rt.BoolValue{Value: true}); e != nil {
+		if e := q.SetField(toyBoat, "w", &generic.Bool{Value: true}); e != nil {
 			t.Fatal(e)
 		} else if v, e := q.GetField(toyBoat, "a"); e != nil {
 			t.Fatal(e)

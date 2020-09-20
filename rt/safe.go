@@ -136,8 +136,10 @@ func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
 	} else {
 		var vals []float64
 		for it.HasNext() {
-			var v float64
-			if e := it.GetNext(&v); e != nil {
+			if n, e := it.GetNext(); e != nil {
+				err = e
+				break
+			} else if v, e := n.GetNumber(run); e != nil {
 				err = e
 				break
 			} else {
@@ -159,8 +161,10 @@ func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 	} else {
 		var vals []string
 		for it.HasNext() {
-			var v string
-			if e := it.GetNext(&v); e != nil {
+			if n, e := it.GetNext(); e != nil {
+				err = e
+				break
+			} else if v, e := n.GetText(run); e != nil {
 				err = e
 				break
 			} else {
