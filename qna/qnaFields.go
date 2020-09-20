@@ -145,7 +145,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 		case nil:
 			store = outVal.Interface()
 		case sql.ErrNoRows:
-			err = rt.UnknownField{key.target, key.field}
+			err = key.unknown()
 		default:
 			err = e
 		}
@@ -162,10 +162,12 @@ func (n *Runner) GetField(target, field string) (rt.Value, error) {
 
 // check the cache before asking the database for info
 func (n *Runner) getField(key keyType) (ret *generic.Value, err error) {
-	if val, ok := n.pairs[key]; ok {
-		ret = val
-	} else {
+	if val, ok := n.pairs[key]; !ok {
 		ret, err = n.cacheField(key)
+	} else if val == nil {
+		err = key.unknown()
+	} else {
+		ret = val
 	}
 	return
 }
@@ -173,10 +175,12 @@ func (n *Runner) getField(key keyType) (ret *generic.Value, err error) {
 // when we know that the field is not a reserved field, and we just want to check the value.
 // ie. for aspects
 func (n *Runner) getValue(key keyType) (ret *generic.Value, err error) {
-	if val, ok := n.pairs[key]; ok {
-		ret = val
-	} else {
+	if val, ok := n.pairs[key]; !ok {
 		ret, err = n.cacheQuery(key, n.fields.valueOf, key.target, key.field)
+	} else if val == nil {
+		err = key.unknown()
+	} else {
+		ret = val
 	}
 	return
 }
@@ -246,7 +250,8 @@ func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret 
 		n.pairs[key] = q
 		ret = q
 	case sql.ErrNoRows:
-		err = rt.UnknownField{key.target, key.field}
+		n.pairs[key] = nil
+		err = key.unknown()
 	default:
 		err = errutil.New("runtime error:", e)
 	}

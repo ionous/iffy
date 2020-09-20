@@ -3,11 +3,16 @@ package qna
 import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
 )
 
 type keyType struct {
 	target, field string
+}
+
+func (k *keyType) unknown() error {
+	return rt.UnknownField{k.target, k.field}
 }
 
 func (k *keyType) dot(subField string) keyType {
