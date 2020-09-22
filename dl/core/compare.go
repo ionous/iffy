@@ -1,6 +1,8 @@
 package core
 
 import (
+	"strings"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
@@ -33,15 +35,19 @@ func (comp *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
 	} else if tgt, e := rt.GetNumber(run, comp.B); e != nil {
 		err = errutil.New("CompareNum.B", e)
 	} else {
-		d := src - tgt
-		switch cmp := comp.Is.Compare(); {
-		case d == 0:
-			ret = (cmp & Compare_EqualTo) != 0
-		case d < 0:
-			ret = (cmp & Compare_LessThan) != 0
-		case d > 0:
-			ret = (cmp & Compare_GreaterThan) != 0
-		}
+		ret = compare(comp.Is, int(src-tgt))
+	}
+	return
+}
+
+func compare(comp Comparator, d int) (ret bool) {
+	switch cmp := comp.Compare(); {
+	case d == 0:
+		ret = (cmp & Compare_EqualTo) != 0
+	case d < 0:
+		ret = (cmp & Compare_LessThan) != 0
+	case d > 0:
+		ret = (cmp & Compare_GreaterThan) != 0
 	}
 	return
 }
@@ -61,20 +67,7 @@ func (comp *CompareText) GetBool(run rt.Runtime) (ret bool, err error) {
 	} else if tgt, e := rt.GetText(run, comp.B); e != nil {
 		err = errutil.New("CompareText.B", e)
 	} else {
-		switch cmp := comp.Is.Compare(); cmp {
-		case Compare_EqualTo:
-			ret = src == tgt
-		case Compare_LessThan:
-			ret = src < tgt
-		case Compare_GreaterThan:
-			ret = src > tgt
-		case Compare_GreaterThan | Compare_EqualTo:
-			ret = src >= tgt
-		case Compare_LessThan | Compare_EqualTo:
-			ret = src <= tgt
-		default:
-			err = errutil.New("CompareText.Is", cmp, "unknown operand")
-		}
+		ret = compare(comp.Is, strings.Compare(src, tgt))
 	}
 	return
 }
