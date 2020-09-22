@@ -137,6 +137,17 @@ func imp_assignment(k *Importer, m reader.Map) (ret core.Assignment, err error) 
 	return
 }
 
-func imp_text(k *Importer, m reader.Map) (ret string, err error) {
-	return reader.String(m, "text")
+func imp_text_value(k *Importer, m reader.Map) (ret interface{}, err error) {
+	if m, e := reader.Unpack(m, "text_value"); e != nil {
+		err = e
+	} else if str, e := reader.String(m.MapOf("$TEXT"), "text"); e != nil {
+		err = e
+	} else {
+		out := &core.Text{}
+		if str != "$EMPTY" {
+			out.Text = str
+		}
+		ret = out
+	}
+	return
 }

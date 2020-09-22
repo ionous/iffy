@@ -34,6 +34,7 @@ func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
 		{(*pattern.DetermineNumList)(nil), k.BindRet(imp_determine_num_list)},
 		{(*pattern.DetermineTextList)(nil), k.BindRet(imp_determine_text_list)},
 		//
+		{(*core.Text)(nil), k.BindRet(imp_text_value)},
 		{(*core.CycleText)(nil), k.BindRet(imp_cycle_text)},
 		{(*core.ShuffleText)(nil), k.BindRet(imp_shuffle_text)},
 		{(*core.StoppingText)(nil), k.BindRet(imp_stopping_text)},
