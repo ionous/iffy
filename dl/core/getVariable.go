@@ -1,6 +1,9 @@
 package core
 
 import (
+	"strings"
+
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
@@ -9,6 +12,10 @@ import (
 // ( ex. loop locals, or -- in a noun scope -- might translate "apple" to "$macintosh" )
 type GetVar struct {
 	Name rt.TextEval // uses text eval to make template expressions easier
+	// if true, and the command is being used to get some text
+	// and no variable can be found in the current context of the requested name,
+	// see if the requested name is an object instead.
+	TryTextAsObject bool `if:"internal"`
 }
 
 // Compose implements composer.Slat
@@ -22,10 +29,10 @@ func (*GetVar) Compose() composer.Spec {
 }
 
 func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
-	if p, e := op.getVar(run); e != nil {
-		err = CmdError{op, e}
+	if _, p, e := op.getVariableByName(run); e != nil {
+		err = cmdError(op, e)
 	} else if v, e := p.GetBool(run); e != nil {
-		err = CmdError{op, e}
+		err = cmdError(op, e)
 	} else {
 		ret = v
 	}
@@ -33,10 +40,10 @@ func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
 }
 
 func (op *GetVar) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if p, e := op.getVar(run); e != nil {
-		err = CmdError{op, e}
+	if _, p, e := op.getVariableByName(run); e != nil {
+		err = cmdError(op, e)
 	} else if v, e := p.GetNumber(run); e != nil {
-		err = CmdError{op, e}
+		err = cmdError(op, e)
 	} else {
 		ret = v
 	}
@@ -44,21 +51,48 @@ func (op *GetVar) GetNumber(run rt.Runtime) (ret float64, err error) {
 }
 
 func (op *GetVar) GetText(run rt.Runtime) (ret string, err error) {
-	if p, e := op.getVar(run); e != nil {
-		err = CmdError{op, e}
-	} else if v, e := p.GetText(run); e != nil {
-		err = CmdError{op, e}
+	switch n, p, e := op.getVariableByName(run); e.(type) {
+	default:
+		err = cmdError(op, e)
+	case nil:
+		if v, e := p.GetText(run); e != nil {
+			err = cmdError(op, e)
+		} else {
+			ret = v
+		}
+	case rt.UnknownVariable:
+		if !op.TryTextAsObject {
+			err = cmdError(op, e)
+		} else if id, e := getObjectExactly(run, n); e != nil {
+			err = cmdError(op, e)
+		} else {
+			ret = id
+		}
+	}
+	return
+}
+
+// allows us to use GetVar directly in things that take an object.
+// in this case, we unbox the variable and assume the text in it is an object id.
+func (op *GetVar) GetObjectRef(run rt.Runtime) (retId string, err error) {
+	if _, p, e := op.getVariableByName(run); e != nil {
+		err = cmdError(op, e)
+	} else if str, e := p.GetText(run); e != nil {
+		err = cmdError(op, e)
+	} else if !strings.HasPrefix(str, "#") {
+		e := errutil.New("stored name isnt an object", str)
+		err = cmdError(op, e)
 	} else {
-		ret = v
+		retId = str
 	}
 	return
 }
 
 func (op *GetVar) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	if p, e := op.getVar(run); e != nil {
-		err = CmdError{op, e}
+	if _, p, e := op.getVariableByName(run); e != nil {
+		err = cmdError(op, e)
 	} else if v, e := p.GetNumberStream(run); e != nil {
-		err = CmdError{op, e}
+		err = cmdError(op, e)
 	} else {
 		ret = v
 	}
@@ -66,21 +100,25 @@ func (op *GetVar) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
 }
 
 func (op *GetVar) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	if p, e := op.getVar(run); e != nil {
-		err = CmdError{op, e}
+	if _, p, e := op.getVariableByName(run); e != nil {
+		err = cmdError(op, e)
 	} else if v, e := p.GetTextStream(run); e != nil {
-		err = CmdError{op, e}
+		err = cmdError(op, e)
 	} else {
 		ret = v
 	}
 	return
 }
 
-func (op *GetVar) getVar(run rt.Runtime) (ret rt.Value, err error) {
+// GetVar asks for a variable using a text eval;
+// we first need to determine which actual variable name they mean.
+func (op *GetVar) getVariableByName(run rt.Runtime) (retName string, retValue rt.Value, err error) {
+	// first resolve the requested variable name into text
 	if n, e := rt.GetText(run, op.Name); e != nil {
 		err = e
 	} else {
-		ret, err = run.GetVariable(n)
+		retName = n // then try to get the variable of that name
+		retValue, err = run.GetVariable(n)
 	}
 	return
 }

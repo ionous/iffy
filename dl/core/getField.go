@@ -68,12 +68,12 @@ func (op *GetField) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
 }
 
 func (op *GetField) getValue(run rt.Runtime) (ret rt.Value, err error) {
-	if name, e := rt.GetText(run, op.Obj); e != nil {
+	if id, e := GetObjectRef(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
 	} else {
-		ret, err = run.GetField(name, field)
+		ret, err = run.GetField(id, field)
 	}
 	return
 }

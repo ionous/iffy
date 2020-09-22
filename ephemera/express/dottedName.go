@@ -18,9 +18,10 @@ type dottedName struct {
 // 		ex. {numAsWords: .count}
 // we cant know the type of the variable .count without keeping a name stack during compilation
 // but we can use the existing command GetVar which implements every eval type.
-func (on dottedName) getVariableNamed() *core.GetVar {
+func (on *dottedName) getVariableNamed() *core.GetVar {
 	return &core.GetVar{
-		on.name,
+		Name:            on.name,
+		TryTextAsObject: true,
 	}
 }
 
@@ -28,18 +29,21 @@ func (on dottedName) getVariableNamed() *core.GetVar {
 // 		ex. {printPluralName: .target}
 // we dont know the type of "target" ahead of time
 // so we just pass it around behind the scenes as an interface.
-func (on dottedName) getFromVar() core.Assignment {
+func (on *dottedName) getFromVar() core.Assignment {
 	return &core.FromVar{
-		on.name,
+		Name:            on.name,
+		TryTextAsObject: true,
 	}
 }
 
 // when dotted names are used directly:
 // 		ex {.lantern}
-func (on dottedName) getPrintedName() rt.TextEval {
+func (on *dottedName) getPrintedName() rt.TextEval {
 	return &core.Buffer{core.NewActivity(
 		&pattern.DetermineAct{
 			"printAName",
+			// on.name is already setup with an object id lookup
+			// so from text is being given and object.
 			pattern.NewArgs(&core.FromText{on.name}),
 		})}
 }

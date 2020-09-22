@@ -45,11 +45,15 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 	return
 }
 
-func popArg(elType r.Type, args []r.Value) (ret r.Value, rest []r.Value) {
-	arg := args[0]
-	if on, ok := arg.Interface().(dottedName); ok {
+func unpackArg(arg r.Value) r.Value {
+	if on, ok := arg.Interface().(*dottedName); ok {
 		arg = r.ValueOf(on.getVariableNamed())
 	}
+	return arg
+}
+
+func popArg(elType r.Type, args []r.Value) (ret r.Value, rest []r.Value) {
+	arg := unpackArg(args[0])
 	if argType := arg.Type(); argType.AssignableTo(elType) {
 		ret, rest = arg, args[1:] // pop
 	}

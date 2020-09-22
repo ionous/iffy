@@ -17,12 +17,14 @@ func T(s string) rt.TextEval {
 func N(n float64) rt.NumberEval {
 	return &core.Number{n}
 }
-func O(n string, exact bool) *core.ObjectName {
-	var name rt.TextEval = &core.Text{n}
+func O(n string, exact bool) (ret core.ObjectRef) {
+	name := T(n)
 	if !exact {
-		name = &core.GetVar{name}
+		ret = &core.GetVar{Name: name, TryTextAsObject: true}
+	} else {
+		ret = &core.ObjectName{name}
 	}
-	return &core.ObjectName{name}
+	return ret
 }
 
 var True = &core.Bool{true}
@@ -96,7 +98,7 @@ func TestExpressions(t *testing.T) {
 			&core.Buffer{core.NewActivity(
 				&pattern.DetermineAct{"printAName",
 					pattern.NewArgs(
-						&core.FromText{O("A", true)},
+						&core.FromText{&core.ObjectName{T("A")}},
 					)})}); e != nil {
 			t.Fatal(e)
 		}
@@ -247,7 +249,10 @@ func TestTemplates(t *testing.T) {
 				&core.Buffer{core.NewActivity(
 					&pattern.DetermineAct{"printAName",
 						pattern.NewArgs(
-							&core.FromText{&core.GetVar{T("object")}},
+							&core.FromText{&core.GetVar{
+								Name:            T("object"),
+								TryTextAsObject: true,
+							}},
 						)})}}},
 		); e != nil {
 			t.Fatal(e)

@@ -31,7 +31,7 @@ func (c *Converter) Convert(xs template.Expression) (ret interface{}, err error)
 		err = e
 	} else if op, e := c.stack.flush(); e != nil {
 		err = e
-	} else if on, ok := op.(dottedName); ok {
+	} else if on, ok := op.(*dottedName); ok {
 		// if the entire template can be reduced to an dottedName
 		// ex. {.lantern} then we treat it as a request for the friendly name of the object
 		ret = on.getPrintedName()
@@ -79,17 +79,19 @@ func (c *Converter) buildCompare(cmp core.Comparator) (err error) {
 		err = e
 	} else {
 		var ptr r.Value
-		switch a, b := args[0], args[1]; {
+		a, b := unpackArg(args[0]), unpackArg(args[1])
+		an, bn := a.String(), b.String() // here for debugging
+		switch {
 		case implements(a, b, typeNumEval):
 			ptr = r.New(compareNum)
 		case implements(a, b, typeTextEval):
 			ptr = r.New(compareText)
 		default:
-			err = errutil.New("unknown commands")
+			err = errutil.Fmt("unknown commands %v %v", an, bn)
 		}
 		if err == nil {
 			cmp := r.ValueOf(cmp)
-			args = []r.Value{args[0], cmp, args[1]}
+			args = []r.Value{a, cmp, b}
 			if e := assignProps(ptr.Elem(), args); e != nil {
 				err = e
 			} else {
@@ -106,6 +108,7 @@ func (c *Converter) buildSequence(cmd rt.TextEval, seq *core.Sequence, count int
 	} else {
 		var parts []rt.TextEval
 		for i, a := range args {
+			a := unpackArg(a)
 			if text, ok := a.Interface().(rt.TextEval); !ok {
 				err = errutil.Fmt("couldn't convert sequence part %d to text", i)
 				break
@@ -174,7 +177,7 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 // an eval has been passed to a pattern, return the command to assign the eval to an arg.
 func newAssignment(arg r.Value) (ret core.Assignment, err error) {
 	switch arg := arg.Interface().(type) {
-	case dottedName:
+	case *dottedName:
 		ret = arg.getFromVar()
 	case rt.BoolEval:
 		ret = &core.FromBool{arg}
@@ -196,7 +199,8 @@ func (c *Converter) buildUnless(cmd interface{}, arity int) (err error) {
 	if args, e := c.stack.pop(arity); e != nil {
 		err = e
 	} else if len(args) > 0 {
-		if a, ok := args[0].Interface().(rt.BoolEval); !ok {
+		arg := unpackArg(args[0])
+		if a, ok := arg.Interface().(rt.BoolEval); !ok {
 			err = errutil.New("argument is not a bool")
 		} else {
 			args[0] = r.ValueOf(&core.IsNotTrue{a}) // rewrite the arg.
@@ -217,7 +221,7 @@ func (c *Converter) buildSpan(arity int) (err error) {
 			// in a list of text evaluations,
 			// for example maybe "{.bennie} and the {.jets}"
 			// single occurrences of dotted names are treated as requests for a friendly name
-			case dottedName:
+			case *dottedName:
 				txts = append(txts, el.getPrintedName())
 			case rt.TextEval:
 				txts = append(txts, el)
@@ -260,10 +264,22 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 			// fix: can this add ephemera that there's a local of name?
 			firstField := fields[0]
 			name := &core.Text{firstField}
+			//
+			var obj core.ObjectRef
+			if lang.IsCapitalized(firstField) {
+				obj = &core.ObjectName{name}
+			} else {
+				// unboxing: get the object id from the variable named by the first dot
+				// its possible though that the name requested is actually an object in the first place
+				// ex. could be .ringBearer, or could be .samWise
+				// lets assume for now, that if a variable holds text referring to an object....
+				// then it needs to hold the object id, ie. we dont have to resolve the name of the object again.
+				obj = &core.GetVar{Name: name, TryTextAsObject: true}
+			}
 			if len(fields) == 1 {
-				// we dont know yet how .something is being used:
-				// - a command arg, ie. the desired type is known.  ex. struct { *NumEval }...
-				// - a pattern arg, ie. the desired type isnt known.
+				// we dont know yet how { .name.... } is being used:
+				// - a command arg, so the desired type is known.
+				// - a pattern arg, so the desired type isn't known.
 				// - a request to print an object name
 				//
 				// the name itself could refer to:
@@ -275,24 +291,18 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 				if lang.IsCapitalized(firstField) {
 					dots.name = &core.ObjectName{name}
 				} else {
-					dots.name = &core.GetVar{name}
+					dots.name = &core.GetVar{Name: name, TryTextAsObject: true}
 				}
-				c.buildOne(dots)
+				c.buildOne(&dots)
 			} else {
 				// a chain of dots indicates we're getting one or more fields of objects
 				// ex. for { .object.fieldContainingAnObject.otherField }
 				var getField *core.GetField
-				var obj *core.ObjectName
-				if lang.IsCapitalized(firstField) {
-					obj = &core.ObjectName{name}
-				} else {
-					// unboxing: get the object from the named variable
-					obj = &core.ObjectName{&core.GetVar{name}}
-				}
+
 				// .a.b: from the named object a, we want its field b
 				// .a.b.c: after getting the object name in field b, get that object's field c
 				for _, field := range fields[1:] {
-					// the first time through, we already have the name referring to the object
+					// the first time through, we already have an object id
 					// on subsequent loops we turn the results of the previous GetField
 					// into a request for that object's name.
 					if getField != nil {

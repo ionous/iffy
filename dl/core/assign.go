@@ -21,7 +21,8 @@ type Assign struct {
 }
 
 type FromVar struct {
-	Var rt.TextEval // name of the variable or parameter we are assigning from.
+	Name            rt.TextEval // name of the variable or object.
+	TryTextAsObject bool        `if:"internal"` // see also: GetVar
 }
 
 type FromBool struct {
@@ -57,15 +58,32 @@ func (*FromVar) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_var",
 		Group: "variables",
-		Desc:  "Assign Variable: Assigns one variable to another.",
+		Desc: `Assign Variable: Assigns one variable or object to another.
+		Used internally for pattern calls in templates. ex. { pattern: .something }.`,
 	}
 }
 
 func (op *FromVar) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
-	if src, e := rt.GetText(run, op.Var); e != nil {
+	// first resolve the requested variable name into text
+	if name, e := rt.GetText(run, op.Name); e != nil {
 		err = e
 	} else {
-		ret, err = run.GetVariable(src)
+		// get the variable of that name
+		switch v, e := run.GetVariable(name); e.(type) {
+		case nil:
+			ret = v
+		default:
+			err = e
+		// or... maybe get the object (id) of that name
+		case rt.UnknownVariable:
+			if !op.TryTextAsObject {
+				err = e
+			} else if id, e := getObjectExactly(run, name); e != nil {
+				err = e
+			} else {
+				ret = &generic.String{Value: id}
+			}
+		}
 	}
 	return
 }

@@ -24,8 +24,8 @@ func TestObjects(t *testing.T) {
 	}}
 
 	t.Run("exists", func(t *testing.T) {
-		testTrue(t, &run, this)
-		testTrue(t, &run, &IsNotTrue{nothing})
+		testTrue(t, &run, &ObjectExists{this})
+		testTrue(t, &run, &IsNotTrue{&ObjectExists{nothing}})
 	})
 	t.Run("kind of", func(t *testing.T) {
 		if cls, e := rt.GetText(&run, &KindOf{this}); e != nil {

@@ -41,12 +41,12 @@ type SetFieldTextList struct {
 // }
 
 func (op *SetField) setPrim(run rt.Runtime, val rt.Value) (err error) {
-	if obj, e := rt.GetText(run, op.Obj); e != nil {
+	if id, e := GetObjectRef(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
 	} else {
-		err = run.SetField(obj, field, val)
+		err = run.SetField(id, field, val)
 	}
 	return
 }

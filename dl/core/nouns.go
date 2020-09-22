@@ -34,17 +34,13 @@ func (*CommonNoun) Compose() composer.Spec {
 	}
 }
 
+// can be used as text, returns the object.id
 func (op *CommonNoun) GetText(run rt.Runtime) (ret string, err error) {
-	return getObjectId(run, op)
+	return op.GetObjectRef(run)
 }
 
-func (op *CommonNoun) GetBool(run rt.Runtime) (ret bool, err error) {
-	return getObjectExists(run, op)
-}
-
-func (op *CommonNoun) GetObjectRef(run rt.Runtime) (ret string, exact bool, err error) {
-	ret, exact = string(op.Name), false
-	return
+func (op *CommonNoun) GetObjectRef(run rt.Runtime) (retId string, err error) {
+	return getObjectInexactly(run, string(op.Name))
 }
 
 // internal because, currently, iffy.js defines the spec.
@@ -56,40 +52,11 @@ func (*ProperNoun) Compose() composer.Spec {
 	}
 }
 
+// can be used as text, returns the object.id
 func (op *ProperNoun) GetText(run rt.Runtime) (ret string, err error) {
-	return getObjectId(run, op)
+	return op.GetObjectRef(run)
 }
 
-func (op *ProperNoun) GetBool(run rt.Runtime) (ret bool, err error) {
-	return getObjectExists(run, op)
+func (op *ProperNoun) GetObjectRef(run rt.Runtime) (retId string, err error) {
+	return getObjectInexactly(run, string(op.Name))
 }
-
-func (op *ProperNoun) GetObjectRef(run rt.Runtime) (ret string, exact bool, err error) {
-	ret, exact = string(op.Name), false
-	return
-}
-
-// note: we dont support primitive type specs yet; and even if we did,
-// we'd have to move these and the rest of iffy.js into go specs.
-
-// func (Determiner) Compose() Spec {
-// 	return Spec{
-// 		Desc: `A qualifying word preceding a noun.
-// 		For example: the definite article ( the ), or an indefinite article ( an, some ).`,
-// 		Spec: "{a}, {an}, {the}, or {other determiner%determiner}",
-// 	}
-// }
-
-// func (ProperName) Compose() Spec {
-// 	return Spec{
-// 		Desc: `Proper Name: A name given to some specific person, place, or thing.
-// Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or 'Toronto'.`,
-// 	}
-// }
-
-// func (CommonName) Compose() Spec {
-// 	return Spec{
-// 		Desc: `Common Name: A generalized name given to some specific item, place, or thing.
-//     Common names are usually not capitalized. For example, maybe: 'table', 'chair', or 'dog park'.`,
-// 	}
-// }
