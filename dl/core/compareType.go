@@ -21,7 +21,7 @@ func (*EqualTo) Compare() CompareType {
 	return Compare_EqualTo
 }
 func (*NotEqualTo) Compare() CompareType {
-	return 0
+	return Compare_GreaterThan | Compare_LessThan
 }
 func (*GreaterThan) Compare() CompareType {
 	return Compare_GreaterThan

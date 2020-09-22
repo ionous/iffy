@@ -135,12 +135,13 @@ func (dec *Decoder) readFields(out r.Value, in reader.Map) (err error) {
 // returns a ptr r.Value
 func (dec *Decoder) importSlot(m reader.Map, slotType r.Type) (ret r.Value, err error) {
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
+	slotName := slotType.Name() // here for debugging; ex. "Comparator"
 	if cmd, ok := dec.cmds[itemType]; !ok {
-		err = errutil.Fmt("unknown type %q while importing slot %q at %s", itemType, slotType, reader.At(m))
+		err = errutil.Fmt("unknown type %q while importing slot %q at %s", itemType, slotName, reader.At(m))
 	} else if rptr, e := dec.readNew(cmd, itemValue); e != nil {
 		err = e
 	} else if rtype := rptr.Type(); !rtype.AssignableTo(slotType) {
-		err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotType.String())
+		err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotName)
 	} else {
 		ret = rptr
 	}
@@ -255,9 +256,12 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 func unpack(inVal interface{}, setter func(interface{}) error) (err error) {
 	if item, ok := inVal.(map[string]interface{}); !ok {
 		err = errutil.New("expected an item, got:", inVal)
-	} else if e := setter(item[reader.ItemValue]); e != nil {
-		id, _ := item[reader.ItemId].(string)
-		err = errutil.New("couldnt unpack", id, e)
+	} else {
+		id := item[reader.ItemId]
+		val := item[reader.ItemValue]
+		if e := setter(val); e != nil {
+			err = errutil.New("couldnt unpack", id, val, e)
+		}
 	}
 	return
 }
