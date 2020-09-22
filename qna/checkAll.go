@@ -39,7 +39,7 @@ func CheckAll(db *sql.DB) (ret int, err error) {
 		// FIX: we have to cache the statements b/c we cant use them during QueryAll
 		for _, t := range tests {
 			if e := t.RunTest(run); e != nil {
-				err = errutil.New("unexpected failure", t.Name, err)
+				err = errutil.New("unexpected failure", t.Name, e)
 				break
 			}
 			ret++
