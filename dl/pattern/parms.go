@@ -15,6 +15,9 @@ type BoolParam struct {
 type TextParam struct {
 	Name string
 }
+type ObjectParam struct {
+	Name, Kind string
+}
 type NumListParam struct {
 	Name string
 }
@@ -50,6 +53,14 @@ func (n *TextParam) String() string {
 	return n.Name
 }
 func (n *TextParam) Prepare(p Parameters) {
+	var v string
+	p.values[n.Name] = generic.NewValue(tables.PRIM_TEXT, v)
+}
+
+func (n *ObjectParam) String() string {
+	return n.Name
+}
+func (n *ObjectParam) Prepare(p Parameters) {
 	var v string
 	p.values[n.Name] = generic.NewValue(tables.PRIM_TEXT, v)
 }

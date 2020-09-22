@@ -26,13 +26,21 @@ func assemblyTemplate() string {
 		"left join eph_named tn\n" +
 		"\ton (ep.idNamedType = tn.rowid);\n" +
 		"\n" +
+		"/**\n" +
+		" * link declared patterns to the successfully modeled types\n" +
+		" */\n" +
 		"create temp view \n" +
 		"asm_pattern_decl as \n" +
-		"\tselect pattern, param, type, ogid \n" +
-		"\tfrom asm_pattern \n" +
-		"\twhere decl = 1 \n" +
-		"\tgroup by pattern, param\n" +
-		"\torder by ogid;\n" +
+		"select pattern, param, type, ogid,\n" +
+		"\t( select mk.kind\n" +
+		"\tfrom mdl_kind mk \n" +
+		"\tjoin mdl_plural mp\n" +
+		"\twhere mp.one = type\n" +
+		"\tand mp.many=mk.kind ) as kind\n" +
+		"from asm_pattern \n" +
+		"where decl = 1 \n" +
+		"group by pattern, param\n" +
+		"order by ogid;\n" +
 		"\n" +
 		"/**\n" +
 		" * using plurals table, convert singular named kinds to plural kinds.\n" +

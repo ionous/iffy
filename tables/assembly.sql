@@ -15,13 +15,21 @@ left join eph_named kn
 left join eph_named tn
 	on (ep.idNamedType = tn.rowid);
 
+/**
+ * link declared patterns to the successfully modeled types
+ */
 create temp view 
 asm_pattern_decl as 
-	select pattern, param, type, ogid 
-	from asm_pattern 
-	where decl = 1 
-	group by pattern, param
-	order by ogid;
+select pattern, param, type, ogid,
+	( select mk.kind
+	from mdl_kind mk 
+	join mdl_plural mp
+	where mp.one = type
+	and mp.many=mk.kind ) as kind
+from asm_pattern 
+where decl = 1 
+group by pattern, param
+order by ogid;
 
 /**
  * using plurals table, convert singular named kinds to plural kinds.

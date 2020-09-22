@@ -1,6 +1,8 @@
 package assembly
 
 import (
+	"database/sql"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/tables"
@@ -29,9 +31,10 @@ func buildPatternCache(asm *Assembler) (ret patternCache, err error) {
 	// build the pattern cache
 	out := make(patternCache)
 	var patternName, paramName, typeName string
+	var kind sql.NullString
 	var last *patternEntry
 	if e := tables.QueryAll(asm.cache.DB(),
-		`select pattern, param, type from asm_pattern_decl`,
+		`select pattern, param, type, kind from asm_pattern_decl`,
 		func() (err error) {
 			if last == nil || last.name != patternName {
 				if patternName != paramName {
@@ -52,12 +55,18 @@ func buildPatternCache(asm *Assembler) (ret patternCache, err error) {
 				case "bool_eval":
 					last.AddParam(&pattern.BoolParam{paramName})
 				default:
-					err = errutil.New("unknown parameter type", patternName, paramName, typeName)
+					// the type might be some sort of kind...
+					if kind := kind.String; len(kind) > 0 {
+						last.AddParam(&pattern.ObjectParam{paramName, kind})
+					} else {
+						err = errutil.Fmt("pattern %q parameter %q has unknown type %q ( expected an eval .)",
+							patternName, paramName, typeName)
+					}
 				}
 			}
 			return
 		},
-		&patternName, &paramName, &typeName); e != nil {
+		&patternName, &paramName, &typeName, &kind); e != nil {
 		err = e
 	} else {
 		ret = out

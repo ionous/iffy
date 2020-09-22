@@ -24,6 +24,7 @@ var Rules = []interface{}{
 	(*NumParam)(nil),
 	(*BoolParam)(nil),
 	(*TextParam)(nil),
+	(*ObjectParam)(nil),
 	(*NumListParam)(nil),
 	(*TextListParam)(nil),
 }
