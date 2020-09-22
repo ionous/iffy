@@ -14,7 +14,7 @@ import (
 
 // CheckAll tests stored in the passed db.
 // It logs the results of running the tests, and only returns error on critical errors.
-func CheckAll(db *sql.DB) (ret int, err error) {
+func CheckAll(db *sql.DB, actuallyJustThisOne string) (ret int, err error) {
 	run := NewRuntime(db)
 	var name string
 	var prog []byte
@@ -25,21 +25,25 @@ func CheckAll(db *sql.DB) (ret int, err error) {
 		where type='CheckOutput'
 		order by name`,
 		func() (err error) {
-			var curr check.CheckOutput
-			dec := gob.NewDecoder(bytes.NewBuffer(prog))
-			if e := dec.Decode(&curr); e != nil {
-				log.Println(e)
-			} else {
-				tests = append(tests, curr)
+			if len(actuallyJustThisOne) == 0 || actuallyJustThisOne == name {
+				var curr check.CheckOutput
+				dec := gob.NewDecoder(bytes.NewBuffer(prog))
+				if e := dec.Decode(&curr); e != nil {
+					log.Println(e)
+				} else {
+					tests = append(tests, curr)
+				}
 			}
-			return
+			return nil // we log rather than return error
 		}, &name, &prog); e != nil {
 		err = e
+	} else if len(tests) == 0 {
+		err = errutil.New("no matching tests found")
 	} else {
 		// FIX: we have to cache the statements b/c we cant use them during QueryAll
 		for _, t := range tests {
 			if e := t.RunTest(run); e != nil {
-				err = errutil.New("unexpected failure", t.Name, e)
+				err = e
 				break
 			}
 			ret++

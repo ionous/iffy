@@ -12,11 +12,13 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
+// ex. go run check.go -in /Users/ionous/Documents/Iffy/3ruwyfdnk4umh/play.db
 func main() {
-	var inFile string
+	var inFile, testName string
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")
+	flag.StringVar(&testName, "run", "", "optional specific test ( in camelcase )")
 	flag.Parse()
-	if cnt, e := checkFile(inFile); e != nil {
+	if cnt, e := checkFile(inFile, testName); e != nil {
 		log.Fatalln(e)
 	} else {
 		log.Println("Checked", cnt, inFile)
@@ -25,7 +27,7 @@ func main() {
 
 // open db, select tests, de-gob and run them each in turn.
 // print the results, only error on critical errors
-func checkFile(inFile string) (ret int, err error) {
+func checkFile(inFile, testName string) (ret int, err error) {
 	if inFile, e := filepath.Abs(inFile); e != nil {
 		err = e
 	} else if db, e := sql.Open("sqlite3", inFile); e != nil {
@@ -39,7 +41,7 @@ func checkFile(inFile string) (ret int, err error) {
 		} else if e := qna.ActivateDomain(db, "entireGame", true); e != nil {
 			err = e
 		} else {
-			ret, err = qna.CheckAll(db)
+			ret, err = qna.CheckAll(db, testName)
 		}
 	}
 	return

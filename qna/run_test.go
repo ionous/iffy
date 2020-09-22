@@ -39,7 +39,7 @@ func testAll(inFile string, db *sql.DB, m reader.Map) (ret int, err error) {
 	} else if len(ds) > 0 {
 		err = errutil.New("issues assembling", ds.Err())
 	} else {
-		ret, err = CheckAll(db)
+		ret, err = CheckAll(db, "")
 	}
 	return
 }

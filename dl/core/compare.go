@@ -3,7 +3,6 @@ package core
 import (
 	"strings"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
@@ -29,25 +28,15 @@ func (*CompareNum) Compose() composer.Spec {
 	}
 }
 
-func (comp *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
-	if src, e := rt.GetNumber(run, comp.A); e != nil {
-		err = errutil.New("CompareNum.A", e)
-	} else if tgt, e := rt.GetNumber(run, comp.B); e != nil {
-		err = errutil.New("CompareNum.B", e)
+func (op *CompareNum) GetBool(run rt.Runtime) (ret bool, err error) {
+	if src, e := rt.GetNumber(run, op.A); e != nil {
+		err = cmdErrorCtx(op, "A", e)
+	} else if tgt, e := rt.GetNumber(run, op.B); e != nil {
+		err = cmdErrorCtx(op, "B", e)
+	} else if is := op.Is; is == nil {
+		err = cmdErrorCtx(op, "comparator is nil", nil)
 	} else {
-		ret = compare(comp.Is, int(src-tgt))
-	}
-	return
-}
-
-func compare(comp Comparator, d int) (ret bool) {
-	switch cmp := comp.Compare(); {
-	case d == 0:
-		ret = (cmp & Compare_EqualTo) != 0
-	case d < 0:
-		ret = (cmp & Compare_LessThan) != 0
-	case d > 0:
-		ret = (cmp & Compare_GreaterThan) != 0
+		ret = compare(is, int(src-tgt))
 	}
 	return
 }
@@ -61,13 +50,27 @@ func (*CompareText) Compose() composer.Spec {
 	}
 }
 
-func (comp *CompareText) GetBool(run rt.Runtime) (ret bool, err error) {
-	if src, e := rt.GetText(run, comp.A); e != nil {
-		err = errutil.New("CompareText.A", e)
-	} else if tgt, e := rt.GetText(run, comp.B); e != nil {
-		err = errutil.New("CompareText.B", e)
+func (op *CompareText) GetBool(run rt.Runtime) (ret bool, err error) {
+	if src, e := rt.GetText(run, op.A); e != nil {
+		err = cmdErrorCtx(op, "A", e)
+	} else if tgt, e := rt.GetText(run, op.B); e != nil {
+		err = cmdErrorCtx(op, "B", e)
+	} else if is := op.Is; is == nil {
+		err = cmdErrorCtx(op, "comparator is nil", nil)
 	} else {
-		ret = compare(comp.Is, strings.Compare(src, tgt))
+		ret = compare(is, strings.Compare(src, tgt))
+	}
+	return
+}
+
+func compare(is Comparator, d int) (ret bool) {
+	switch cmp := is.Compare(); {
+	case d == 0:
+		ret = (cmp & Compare_EqualTo) != 0
+	case d < 0:
+		ret = (cmp & Compare_LessThan) != 0
+	case d > 0:
+		ret = (cmp & Compare_GreaterThan) != 0
 	}
 	return
 }

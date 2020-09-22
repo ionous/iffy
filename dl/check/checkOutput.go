@@ -25,9 +25,9 @@ func (t *CheckOutput) RunTest(run rt.Runtime) (err error) {
 	run.ActivateDomain(t.Name, true)
 	//
 	if e := rt.RunOne(run, t.Test); e != nil {
-		err = errutil.New("Test", t.Name, "encountered error:", e)
+		err = errutil.New("test", t.Name, "encountered error:", e)
 	} else if res := buf.String(); res != t.Expect {
-		err = errutil.New("Test", t.Name, "expected:", res, "got:", t.Expect)
+		err = errutil.Fmt("test %s expected: %q, got: %q", t.Name, t.Expect, res)
 	} else {
 		log.Println("test '" + t.Name + "' got '" + res + "'")
 		auto.Target = prev
