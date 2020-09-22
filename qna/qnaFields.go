@@ -137,7 +137,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	// this automatically keeps them from conflicting.
 	key := makeKeyForEval(name, rtype.Name())
 	if val, ok := n.pairs[key]; ok {
-		store := r.ValueOf(val.FixMe())
+		store := r.ValueOf(val.Interface())
 		outVal.Set(store)
 	} else {
 		var store interface{}

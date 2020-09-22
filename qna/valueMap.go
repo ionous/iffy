@@ -22,10 +22,11 @@ func (k *keyType) dot(subField string) keyType {
 type valueMap map[keyType]*generic.Value
 
 func makeKey(obj, field string) keyType {
-	// FIX FIX FIX --
+	// FIX?
 	// operations generating get field should be registering the field as a name
 	// and, as best as possible, relating obj to field for property verification
 	// name translation should be done there.
+	// we'd have to mark up things like text evaluations ( ex. HasTrait )
 	if len(field) > 0 && field[0] != object.Prefix {
 		field = lang.Camelize(field)
 	}

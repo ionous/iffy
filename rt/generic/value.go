@@ -18,8 +18,12 @@ type Value struct {
 	value    interface{}
 }
 
+func (q *Value) TypeName() string {
+	return q.typeName
+}
+
 // fix: in theory can change pattern management to remove this.
-func (q *Value) FixMe() interface{} {
+func (q *Value) Interface() interface{} {
 	return q.value
 }
 
@@ -67,7 +71,7 @@ func (q *Value) SetValue(run rt.Runtime, val rt.Value) (err error) {
 			q.value = vs
 		}
 	case "text_list":
-		if vs, e := rt.GetNumList(run, val); e != nil {
+		if vs, e := rt.GetTextList(run, val); e != nil {
 			err = e
 		} else {
 			q.value = vs
