@@ -165,10 +165,15 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 			}
 		}
 		if err == nil {
-			c.buildOne(&pattern.DetermineText{
+			// printing is generally an activity b/c say is an activity
+			// and we want the ability to say several things in series.
+			// expressions are text patterns... so for now adapt via text
+			// expressions would ideally adapt based on the pattern type
+			// the assembler probably needs to work directly on tokens...
+			c.buildOne(&core.Buffer{core.NewActivity(&pattern.DetermineAct{
 				Pattern:   name,
 				Arguments: &ps,
-			})
+			})})
 		}
 	}
 	return

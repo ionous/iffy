@@ -96,7 +96,7 @@ func TestExpressions(t *testing.T) {
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
 			&core.Buffer{core.NewActivity(
-				&pattern.DetermineAct{"printAName",
+				&pattern.DetermineAct{"printName",
 					pattern.NewArgs(
 						&core.FromText{&core.ObjectName{T("A")}},
 					)})}); e != nil {
@@ -233,10 +233,11 @@ func TestTemplates(t *testing.T) {
 	// parameters to template calls become indexed parameter assignments
 	t.Run("indexed", func(t *testing.T) {
 		if e := testTemplate("{'world'|hello!}",
-			&pattern.DetermineText{
-				"hello", pattern.NewArgs(
-					&core.FromText{T("world")},
-				)}); e != nil {
+			&core.Buffer{core.NewActivity(
+				&pattern.DetermineAct{
+					"hello", pattern.NewArgs(
+						&core.FromText{T("world")},
+					)})}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -247,7 +248,7 @@ func TestTemplates(t *testing.T) {
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
 				&core.Buffer{core.NewActivity(
-					&pattern.DetermineAct{"printAName",
+					&pattern.DetermineAct{"printName",
 						pattern.NewArgs(
 							&core.FromText{&core.GetVar{
 								Name:            T("object"),

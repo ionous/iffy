@@ -41,7 +41,7 @@ func (on *dottedName) getFromVar() core.Assignment {
 func (on *dottedName) getPrintedName() rt.TextEval {
 	return &core.Buffer{core.NewActivity(
 		&pattern.DetermineAct{
-			"printAName",
+			"printName",
 			// on.name is already setup with an object id lookup
 			// so from text is being given and object.
 			pattern.NewArgs(&core.FromText{on.name}),

@@ -158,7 +158,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-a-3",
                     "type": "pattern_name",
-                    "value": "Print a name"
+                    "value": "print name"
                   },
                   "$TYPE": {
                     "id": "id-a-4",
@@ -450,7 +450,7 @@ function getStory() {
                   "$LINES": {
                     "id": "id-1748e3a6edf-7",
                     "type": "lines",
-                    "value": "The story engine automagically uses the pattern \"print a name\" when the name of an object is used without modification in a template. "
+                    "value": "The story engine automagically uses the pattern \"print name\" when the name of an object is used without modification in a template. "
                   }
                 }
               }
@@ -527,7 +527,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-1743bd78458-9",
                     "type": "pattern_name",
-                    "value": "print a name"
+                    "value": "print name"
                   },
                   "$PATTERN_RULES": {
                     "id": "id-1743bd78458-10",
@@ -911,7 +911,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-1748e116bbd-3",
                     "type": "pattern_name",
-                    "value": "Print a plural name"
+                    "value": "print plural name"
                   },
                   "$TYPE": {
                     "id": "id-1748e116bbd-4",
@@ -993,7 +993,7 @@ function getStory() {
                   "$NAME": {
                     "id": "id-1748e116bbd-16",
                     "type": "pattern_name",
-                    "value": "print a plural name"
+                    "value": "print plural name"
                   },
                   "$PATTERN_RULES": {
                     "id": "id-1748e116bbd-17",
