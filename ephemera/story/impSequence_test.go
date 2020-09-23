@@ -9,13 +9,13 @@ import (
 )
 
 func TestImportSequence(t *testing.T) {
-	k, db := newTestDecoder(t)
+	k, db := newTestDecoder(t, memory)
 	defer db.Close()
 	if cmd, e := imp_cycle_text(k, _cycle_text); e != nil {
 		t.Fatal(e)
 	} else if diff := pretty.Diff(cmd, &core.CycleText{
 		Sequence: core.Sequence{
-			Seq: "autoimp1",
+			Seq: "seq#1",
 			Parts: []rt.TextEval{
 				&core.Text{Text: "a"},
 				&core.Text{Text: "b"},

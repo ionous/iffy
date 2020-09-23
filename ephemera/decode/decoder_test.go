@@ -16,9 +16,9 @@ func TestDecode(t *testing.T) {
   dec.AddDefaultCallbacks(core.Slats)
   // read say story data
   var prog rt.Execute
-  if e := dec.ReadProg(debug.SayStory, &prog); e != nil {
+  if e := dec.ReadProg(debug.SayHelloGoodbyeData, &prog); e != nil {
     t.Fatal(e)
-  } else if diff := pretty.Diff(debug.SayTest, prog); len(diff) > 0 {
+  } else if diff := pretty.Diff(debug.SayHelloGoodbye, prog); len(diff) > 0 {
     t.Fatal(diff)
   } else {
     t.Log(pretty.Sprint(prog))

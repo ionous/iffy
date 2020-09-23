@@ -1,9 +1,13 @@
 package story
 
 import (
+	"unicode"
+	"unicode/utf8"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -38,7 +42,7 @@ func imp_lede(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "lede"); e != nil {
 		err = e
 	} else if e := k.Recent.Nouns.CollectSubjects(func() error {
-		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+		return reader.Repeats(m.SliceOf("$NOUNS"), k.Bind(imp_named_noun))
 	}); e != nil {
 		err = e
 	} else if e := imp_noun_phrase(k, m.MapOf("$NOUN_PHRASE")); e != nil {
@@ -88,7 +92,7 @@ func imp_noun_relation(k *Importer, r reader.Map) (err error) {
 	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
 		err = e
 	} else if e := k.Recent.Nouns.CollectObjects(func() error {
-		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+		return reader.Repeats(m.SliceOf("$NOUNS"), k.Bind(imp_named_noun))
 	}); e != nil {
 		err = e
 	} else {
@@ -101,43 +105,82 @@ func imp_noun_relation(k *Importer, r reader.Map) (err error) {
 	return
 }
 
-// noun: "{proper_noun} or {common_noun}"
-func imp_noun(k *Importer, r reader.Map) (err error) {
+// run: "{determiner} {noun_name}"
+func imp_named_noun(k *Importer, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
-		k.NewImplicitAspect("nounTypes", "things", "common", "proper")
+		k.NewImplicitAspect("nounTypes", "things", "common", "proper", "counted")
 		// whether a player can refer to an object by its name.
 		k.NewImplicitAspect("privateNames", "things", "publiclyNamed", "privatelyNamed")
 	}
-	return reader.Option(r, "noun", reader.ReadMaps{
-		"$PROPER_NOUN": k.Bind(imp_proper_noun),
-		"$COMMON_NOUN": k.Bind(imp_common_noun),
-	})
-}
-
-// run: "{determiner} {common_name}"
-func imp_common_noun(k *Importer, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "common_noun"); e != nil {
+	//
+	if m, e := reader.Unpack(r, "named_noun"); e != nil {
 		err = e
 	} else if det, e := imp_determiner(k, m.MapOf("$DETERMINER")); e != nil {
 		err = e
-	} else if noun, e := imp_common_name(k, m.MapOf("$NAME")); e != nil {
+	} else {
+		name := m.MapOf("$NAME")
+		if cnt, ok := lang.WordsToNum(det); !ok {
+			err = read_named_noun(k, det, name)
+		} else {
+			err = read_counted_noun(k, cnt, name)
+		}
+	}
+	return
+}
+
+func read_counted_noun(k *Importer, cnt int, r reader.Map) (err error) {
+	kind := "singular_kind"
+	if cnt > 1 {
+		kind = "plural_kinds"
+	}
+	if countedKind, e := importName(k, r, "noun_name", kind); e != nil {
+		err = e
+	} else {
+		typeTrait := k.NewName("counted", tables.NAMED_TRAIT, reader.At(r))
+		nameTrait := k.NewName("privatelyNamed", tables.NAMED_TRAIT, reader.At(r))
+		// this isnt right.
+		// even with an in memory map its not quite right because technically ephemera can come from multiple sources
+		// fix: something something noun stacks, not individually duplicated nouns
+		baseName := countedKind.String()
+		for i := 0; i < cnt; i++ {
+			countedNoun := k.autoCounter.next(baseName)
+			noun := k.NewName(countedNoun, "noun", reader.At(r))
+			k.Recent.Nouns.Add(noun)
+			k.NewValue(noun, nameTrait, true)
+			k.NewValue(noun, typeTrait, true)
+		}
+	}
+	return
+}
+
+func read_named_noun(k *Importer, det string, r reader.Map) (err error) {
+	if noun, e := imp_noun_name(k, r); e != nil {
 		err = e
 	} else {
 		k.Recent.Nouns.Add(noun)
+		// pick common or proper based on noun capitalization.
+		// fix: implicitly generated facts should be considered preliminary
+		// so that authors can override them.
+		traitStr := "common"
+		if first, _ := utf8.DecodeRuneInString(noun.String()); unicode.ToUpper(first) == first {
+			traitStr = "proper"
+		}
+		typeTrait := k.NewName(traitStr, tables.NAMED_TRAIT, reader.At(r))
+		k.NewValue(noun, typeTrait, true)
 
-		// set common nounType to true ( implicitly defined by "noun" )
-		nounType := k.NewName("common", tables.NAMED_TRAIT, reader.At(r))
-		k.NewValue(noun, nounType, true)
-		//
+		// record any custom determiner
 		if usesKeyWord := det[0] == '$'; !usesKeyWord {
+			// set the indefinite article field
 			article := k.NewName("indefinite article", tables.NAMED_FIELD, reader.At(r))
 			k.NewValue(noun, article, det)
-			if once := "common_noun"; k.Once(once) {
+
+			// create a "indefinite article" field for all "things"
+			if once := "named_noun"; k.Once(once) {
 				domain := k.gameDomain()
-				indefinite := k.NewDomainName(domain, "indefinite article", tables.NAMED_FIELD, once)
 				things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
+				indefinite := k.NewDomainName(domain, "indefinite article", tables.NAMED_FIELD, once)
 				k.NewField(things, indefinite, tables.PRIM_TEXT)
 			}
 		}
@@ -145,24 +188,9 @@ func imp_common_noun(k *Importer, r reader.Map) (err error) {
 	return
 }
 
+// set proper nounType to true ( implicitly defined by "noun" )
 func imp_determiner(k *Importer, r reader.Map) (ret string, err error) {
 	return reader.String(r, "determiner")
-}
-
-// run: "{proper_name}"
-// common / proper setting
-func imp_proper_noun(k *Importer, r reader.Map) (err error) {
-	if m, e := reader.Unpack(r, "proper_noun"); e != nil {
-		err = e
-	} else if noun, e := imp_proper_name(k, m.MapOf("$NAME")); e != nil {
-		err = e
-	} else {
-		k.Recent.Nouns.Add(noun)
-		// set proper nounType to true ( implicitly defined by "noun" )
-		nounType := k.NewName("proper", tables.NAMED_TRAIT, reader.At(m))
-		k.NewValue(noun, nounType, true)
-	}
-	return
 }
 
 // run: "{are_an} {*trait:*trait} {kind:singular_kind} {?noun_relation}"

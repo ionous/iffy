@@ -51,7 +51,7 @@ var SayPattern = pattern.TextPattern{
 	},
 }
 
-var SayTest = core.NewActivity(
+var SayHelloGoodbye = core.NewActivity(
 	&core.Choose{
 		If: &core.Bool{true},
 		True: core.NewActivity(&core.Say{
@@ -62,7 +62,7 @@ var SayTest = core.NewActivity(
 		}),
 	})
 
-var SayStory = reader.Map{
+var SayHelloGoodbyeData = reader.Map{
 	"type": "activity",
 	"value": map[string]interface{}{
 		"$EXE": []interface{}{

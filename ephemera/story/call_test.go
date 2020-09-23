@@ -19,7 +19,7 @@ func TestDetermineNum(t *testing.T) {
 			"num", &core.FromNum{
 				&core.Number{3},
 			})}
-	k, db := newTestDecoder(t)
+	k, db := newTestDecoder(t, memory)
 	defer db.Close()
 	if rule, e := imp_determine_num(k, debug.FactorialDetermineNum); e != nil {
 		t.Fatal(e)

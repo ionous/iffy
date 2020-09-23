@@ -9,7 +9,7 @@ import (
 
 // import an object type description
 func TestObjectType(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if n, e := imp_object_type(k, _object_type); e != nil {
 		t.Fatal(e)
@@ -20,7 +20,7 @@ func TestObjectType(t *testing.T) {
 
 // import a variable type description
 func TestVariableTypePrimitive(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if varType, e := imp_variable_type(k, _variable_type); e != nil {
 		t.Fatal(e)
@@ -31,7 +31,7 @@ func TestVariableTypePrimitive(t *testing.T) {
 
 // import a variable declaration
 func TestVariableDeclObject(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if varName, typeName, e := imp_variable_decl(k, _variable_decl); e != nil {
 		t.Fatal(e)
@@ -43,7 +43,7 @@ func TestVariableDeclObject(t *testing.T) {
 }
 
 func TestPatternVariablesDecl(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if e := imp_pattern_variables_decl(k, _pattern_variables_decl); e != nil {
 		t.Fatal(e)
@@ -65,7 +65,7 @@ func TestPatternVariablesDecl(t *testing.T) {
 }
 
 func TestPrimitiveType(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if typ, e := imp_primitive_var(k, _primitive_type); e != nil {
 		t.Fatal(e)
@@ -75,7 +75,7 @@ func TestPrimitiveType(t *testing.T) {
 }
 
 func TestPatternType_Activity(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if typ, e := imp_pattern_type(k, _pattern_type_activity); e != nil {
 		t.Fatal(e)
@@ -85,7 +85,7 @@ func TestPatternType_Activity(t *testing.T) {
 }
 
 func TestPatternType_Primitive(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if typ, e := imp_pattern_type(k, _pattern_type_primitive); e != nil {
 		t.Fatal(e)
@@ -95,7 +95,7 @@ func TestPatternType_Primitive(t *testing.T) {
 }
 
 func TestPatternName(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if n, e := imp_pattern_name(k, _pattern_name); e != nil {
 		t.Fatal(e)
@@ -105,7 +105,7 @@ func TestPatternName(t *testing.T) {
 }
 
 func TestPatternDecl(t *testing.T) {
-	k, db := newTestImporter(t)
+	k, db := newTestImporter(t, memory)
 	defer db.Close()
 	if e := imp_pattern_decl(k, _pattern_decl); e != nil {
 		t.Fatal(e)

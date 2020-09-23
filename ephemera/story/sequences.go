@@ -1,8 +1,6 @@
 package story
 
 import (
-	"strconv"
-
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/rt"
@@ -55,18 +53,19 @@ func fromSequence(k *Importer, m reader.Map) (ret core.Sequence, err error) {
 		}); e != nil {
 		err = e
 	} else {
-		counter := getCounter(k, m)
+		counter := getCounter(k, "seq", m)
 		ret = core.Sequence{Seq: counter, Parts: ps}
 	}
 	return
 }
 
-func getCounter(k *Importer, m reader.Map) (ret string) {
+// generate a unique name for the counter --
+// preferring an existing id in the source
+func getCounter(k *Importer, name string, m reader.Map) (ret string) {
 	if at := reader.At(m); len(at) > 0 {
-		ret = at
+		ret = name + "#" + at
 	} else {
-		k.autoCounter++
-		ret = "autoimp" + strconv.Itoa(k.autoCounter)
+		ret = k.autoCounter.next(name)
 	}
 	return
 }

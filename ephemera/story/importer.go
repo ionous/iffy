@@ -2,6 +2,7 @@ package story
 
 import (
 	"database/sql"
+	"strconv"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
@@ -16,9 +17,18 @@ type Importer struct {
 	// sometimes the importer needs to define a singleton like type or instance
 	oneTime     map[string]bool
 	decoder     *decode.Decoder
-	autoCounter int // helper for making auto variables.
+	autoCounter autoCounter
 	entireGame  ephemera.Named
 	StoryEnv
+}
+
+// helper for making auto variables.
+type autoCounter map[string]uint64
+
+func (m *autoCounter) next(name string) string {
+	c := (*m)[name] + 1
+	(*m)[name] = c
+	return name + "#" + strconv.FormatUint(c, 36)
 }
 
 func NewImporter(srcURI string, db *sql.DB) *Importer {
@@ -28,9 +38,10 @@ func NewImporter(srcURI string, db *sql.DB) *Importer {
 func NewImporterDecoder(srcURI string, db *sql.DB, dec *decode.Decoder) *Importer {
 	rec := ephemera.NewRecorder(srcURI, db)
 	return &Importer{
-		Recorder: rec,
-		oneTime:  make(map[string]bool),
-		decoder:  dec,
+		Recorder:    rec,
+		oneTime:     make(map[string]bool),
+		decoder:     dec,
+		autoCounter: make(autoCounter),
 	}
 }
 

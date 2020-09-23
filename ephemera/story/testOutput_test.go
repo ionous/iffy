@@ -5,10 +5,11 @@ import (
 )
 
 // read simple unit test story into sqlite, extract as a golang struct
-func xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxTestProcessProg(t *testing.T) {
-	// k, db := newTestDecoder(t)
+// fix.... tests require not just output but rules now.
+func xTestProcessProg(t *testing.T) {
+	// k, db := newTestDecoder(t, memory)
 	// defer db.Close()
-	// if e := imp_test_output(k, k.NewName("test", t.Name(), ""), debug.SayStory); e != nil {
+	// if e := imp_test_output(k, k.NewName("test", t.Name(), ""), debug.SayHelloGoodbyeData); e != nil {
 	// 	t.Fatal(e)
 	// } else {
 	// 	var testName string
@@ -30,7 +31,7 @@ func xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxTestProcessProg(t *testing.T) {
 	// 			dec := gob.NewDecoder(bytes.NewBuffer(prog))
 	// 			if e := dec.Decode(&res); e != nil {
 	// 				t.Fatal(e)
-	// 			} else if diff := pretty.Diff(&debug.SayTest, res); len(diff) > 0 {
+	// 			} else if diff := pretty.Diff(&debug.SayHelloGoodbye, res); len(diff) > 0 {
 	// 				t.Fatal(diff)
 	// 			}
 	// 		}

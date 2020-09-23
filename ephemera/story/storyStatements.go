@@ -115,7 +115,7 @@ func imp_noun_assignment(k *Importer, r reader.Map) (err error) {
 	} else if prop, e := imp_property(k, m.MapOf("$PROPERTY")); e != nil {
 		err = e
 	} else if e := k.Recent.Nouns.CollectSubjects(func() error {
-		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+		return reader.Repeats(m.SliceOf("$NOUNS"), k.Bind(imp_named_noun))
 	}); e != nil {
 		err = e
 	} else {
@@ -218,11 +218,11 @@ func imp_relative_to_noun(k *Importer, r reader.Map) (err error) {
 	} else if relation, e := imp_relation(k, m.MapOf("$RELATION")); e != nil {
 		err = e
 	} else if e := k.Recent.Nouns.CollectObjects(func() error {
-		return reader.Repeats(m.SliceOf("$NOUN"), k.Bind(imp_noun))
+		return reader.Repeats(m.SliceOf("$NOUNS"), k.Bind(imp_named_noun))
 	}); e != nil {
 		err = e
 	} else if e := k.Recent.Nouns.CollectSubjects(func() error {
-		return reader.Repeats(m.SliceOf("$NOUN1"), k.Bind(imp_noun))
+		return reader.Repeats(m.SliceOf("$NOUNS1"), k.Bind(imp_named_noun))
 	}); e != nil {
 		err = e
 	} else {

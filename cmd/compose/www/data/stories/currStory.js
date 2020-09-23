@@ -256,48 +256,36 @@ function getStory() {
                                       "id": "id-a-56",
                                       "type": "lede",
                                       "value": {
-                                        "$NOUN": [
+                                        "$NOUNS": [
                                           {
-                                            "id": "id-a-54",
-                                            "type": "noun",
+                                            "id": "id-a-60",
+                                            "type": "named_noun",
                                             "value": {
-                                              "$COMMON_NOUN": {
-                                                "id": "id-a-60",
-                                                "type": "common_noun",
-                                                "value": {
-                                                  "$DETERMINER": {
-                                                    "id": "id-a-58",
-                                                    "type": "determiner",
-                                                    "value": "$THE"
-                                                  },
-                                                  "$NAME": {
-                                                    "id": "id-a-59",
-                                                    "type": "common_name",
-                                                    "value": "named object"
-                                                  }
-                                                }
+                                              "$DETERMINER": {
+                                                "id": "id-a-58",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-a-59",
+                                                "type": "noun_name",
+                                                "value": "named object"
                                               }
                                             }
                                           },
                                           {
                                             "id": "id-17460cc7b6c-2",
-                                            "type": "noun",
+                                            "type": "named_noun",
                                             "value": {
-                                              "$COMMON_NOUN": {
-                                                "id": "id-17460cc7b6c-3",
-                                                "type": "common_noun",
-                                                "value": {
-                                                  "$DETERMINER": {
-                                                    "id": "id-17460cc7b6c-4",
-                                                    "type": "determiner",
-                                                    "value": "$THE"
-                                                  },
-                                                  "$NAME": {
-                                                    "id": "id-17460cc7b6c-5",
-                                                    "type": "common_name",
-                                                    "value": "unnamed object"
-                                                  }
-                                                }
+                                              "$DETERMINER": {
+                                                "id": "id-17460cc7b6c-4",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-17460cc7b6c-5",
+                                                "type": "noun_name",
+                                                "value": "unnamed object"
                                               }
                                             }
                                           }
@@ -340,26 +328,20 @@ function getStory() {
                                       "id": "id-172fbf04bb4-3",
                                       "type": "lede",
                                       "value": {
-                                        "$NOUN": [
+                                        "$NOUNS": [
                                           {
-                                            "id": "id-172fbf04bb4-1",
-                                            "type": "noun",
+                                            "id": "id-172fbf04bb4-7",
+                                            "type": "named_noun",
                                             "value": {
-                                              "$COMMON_NOUN": {
-                                                "id": "id-172fbf04bb4-7",
-                                                "type": "common_noun",
-                                                "value": {
-                                                  "$DETERMINER": {
-                                                    "id": "id-172fbf04bb4-5",
-                                                    "type": "determiner",
-                                                    "value": "$THE"
-                                                  },
-                                                  "$NAME": {
-                                                    "id": "id-172fbf04bb4-6",
-                                                    "type": "common_name",
-                                                    "value": "unnamed object"
-                                                  }
-                                                }
+                                              "$DETERMINER": {
+                                                "id": "id-172fbf04bb4-5",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-172fbf04bb4-6",
+                                                "type": "noun_name",
+                                                "value": "unnamed object"
                                               }
                                             }
                                           }
@@ -582,7 +564,7 @@ function getStory() {
                                                           "type": "object_ref",
                                                           "value": {
                                                             "id": "id-1743bd78458-5",
-                                                            "type": "common_noun",
+                                                            "type": "named_noun",
                                                             "value": {
                                                               "$DETERMINER": {
                                                                 "id": "id-1743bd78458-6",
@@ -591,7 +573,7 @@ function getStory() {
                                                               },
                                                               "$NAME": {
                                                                 "id": "id-1743bd78458-7",
-                                                                "type": "common_name",
+                                                                "type": "noun_name",
                                                                 "value": "target"
                                                               }
                                                             }
@@ -629,7 +611,7 @@ function getStory() {
                                     "type": "object_ref",
                                     "value": {
                                       "id": "id-17494737044-6",
-                                      "type": "common_noun",
+                                      "type": "named_noun",
                                       "value": {
                                         "$DETERMINER": {
                                           "id": "id-17494737044-7",
@@ -638,7 +620,7 @@ function getStory() {
                                         },
                                         "$NAME": {
                                           "id": "id-17494737044-8",
-                                          "type": "common_name",
+                                          "type": "noun_name",
                                           "value": "target"
                                         }
                                       }
@@ -705,7 +687,7 @@ function getStory() {
                                                     "type": "object_ref",
                                                     "value": {
                                                       "id": "id-1743bd78458-35",
-                                                      "type": "common_noun",
+                                                      "type": "named_noun",
                                                       "value": {
                                                         "$DETERMINER": {
                                                           "id": "id-1743bd78458-36",
@@ -714,7 +696,7 @@ function getStory() {
                                                         },
                                                         "$NAME": {
                                                           "id": "id-1743bd78458-37",
-                                                          "type": "common_name",
+                                                          "type": "noun_name",
                                                           "value": "target"
                                                         }
                                                       }
@@ -771,7 +753,7 @@ function getStory() {
                                           "type": "object_ref",
                                           "value": {
                                             "id": "id-174941fde22-20",
-                                            "type": "common_noun",
+                                            "type": "named_noun",
                                             "value": {
                                               "$DETERMINER": {
                                                 "id": "id-174941fde22-21",
@@ -780,7 +762,7 @@ function getStory() {
                                               },
                                               "$NAME": {
                                                 "id": "id-174941fde22-22",
-                                                "type": "common_name",
+                                                "type": "noun_name",
                                                 "value": "target"
                                               }
                                             }
@@ -859,7 +841,7 @@ function getStory() {
                                                     "type": "object_ref",
                                                     "value": {
                                                       "id": "id-173f8fba4ff-31",
-                                                      "type": "common_noun",
+                                                      "type": "named_noun",
                                                       "value": {
                                                         "$DETERMINER": {
                                                           "id": "id-173f8fba4ff-32",
@@ -868,7 +850,7 @@ function getStory() {
                                                         },
                                                         "$NAME": {
                                                           "id": "id-173f8fba4ff-33",
-                                                          "type": "common_name",
+                                                          "type": "noun_name",
                                                           "value": "target"
                                                         }
                                                       }
@@ -1102,7 +1084,7 @@ function getStory() {
                                           "type": "object_ref",
                                           "value": {
                                             "id": "id-17494737044-28",
-                                            "type": "common_noun",
+                                            "type": "named_noun",
                                             "value": {
                                               "$DETERMINER": {
                                                 "id": "id-17494737044-29",
@@ -1111,7 +1093,7 @@ function getStory() {
                                               },
                                               "$NAME": {
                                                 "id": "id-17494737044-30",
-                                                "type": "common_name",
+                                                "type": "noun_name",
                                                 "value": "target"
                                               }
                                             }
@@ -1235,70 +1217,52 @@ function getStory() {
                                       "id": "id-17494a3a882-18",
                                       "type": "lede",
                                       "value": {
-                                        "$NOUN": [
+                                        "$NOUNS": [
                                           {
-                                            "id": "id-17494a3a882-19",
-                                            "type": "noun",
+                                            "id": "id-17494a3a882-23",
+                                            "type": "named_noun",
                                             "value": {
-                                              "$COMMON_NOUN": {
-                                                "id": "id-17494a3a882-23",
-                                                "type": "common_noun",
-                                                "value": {
-                                                  "$DETERMINER": {
-                                                    "id": "id-17494a3a882-24",
-                                                    "type": "determiner",
-                                                    "value": "$THE"
-                                                  },
-                                                  "$NAME": {
-                                                    "id": "id-17494a3a882-25",
-                                                    "type": "common_name",
-                                                    "value": "flowerpot"
-                                                  }
-                                                }
+                                              "$DETERMINER": {
+                                                "id": "id-17494a3a882-24",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-17494a3a882-25",
+                                                "type": "noun_name",
+                                                "value": "flowerpot"
                                               }
                                             }
                                           },
                                           {
                                             "id": "id-17494a3a882-26",
-                                            "type": "noun",
+                                            "type": "named_noun",
                                             "value": {
-                                              "$COMMON_NOUN": {
-                                                "id": "id-17494a3a882-27",
-                                                "type": "common_noun",
-                                                "value": {
-                                                  "$DETERMINER": {
-                                                    "id": "id-17494a3a882-28",
-                                                    "type": "determiner",
-                                                    "value": "$THE"
-                                                  },
-                                                  "$NAME": {
-                                                    "id": "id-17494a3a882-29",
-                                                    "type": "common_name",
-                                                    "value": "dishes"
-                                                  }
-                                                }
+                                              "$DETERMINER": {
+                                                "id": "id-17494a3a882-28",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-17494a3a882-29",
+                                                "type": "noun_name",
+                                                "value": "dishes"
                                               }
                                             }
                                           },
                                           {
                                             "id": "id-17494ab71d0-9",
-                                            "type": "noun",
+                                            "type": "named_noun",
                                             "value": {
-                                              "$COMMON_NOUN": {
-                                                "id": "id-17494ab71d0-10",
-                                                "type": "common_noun",
-                                                "value": {
-                                                  "$DETERMINER": {
-                                                    "id": "id-17494ab71d0-11",
-                                                    "type": "determiner",
-                                                    "value": "$THE"
-                                                  },
-                                                  "$NAME": {
-                                                    "id": "id-17494ab71d0-12",
-                                                    "type": "common_name",
-                                                    "value": "spoon"
-                                                  }
-                                                }
+                                              "$DETERMINER": {
+                                                "id": "id-17494ab71d0-11",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-17494ab71d0-12",
+                                                "type": "noun_name",
+                                                "value": "spoon"
                                               }
                                             }
                                           }
@@ -1344,26 +1308,20 @@ function getStory() {
                                       "type": "property",
                                       "value": "printed plural name"
                                     },
-                                    "$NOUN": [
+                                    "$NOUNS": [
                                       {
                                         "id": "id-17494ab71d0-3",
-                                        "type": "noun",
+                                        "type": "named_noun",
                                         "value": {
-                                          "$COMMON_NOUN": {
-                                            "id": "id-17494ab71d0-6",
-                                            "type": "common_noun",
-                                            "value": {
-                                              "$DETERMINER": {
-                                                "id": "id-17494ab71d0-7",
-                                                "type": "determiner",
-                                                "value": "$THE"
-                                              },
-                                              "$NAME": {
-                                                "id": "id-17494ab71d0-8",
-                                                "type": "common_name",
-                                                "value": "flowerpot"
-                                              }
-                                            }
+                                          "$DETERMINER": {
+                                            "id": "id-17494ab71d0-7",
+                                            "type": "determiner",
+                                            "value": "$THE"
+                                          },
+                                          "$NAME": {
+                                            "id": "id-17494ab71d0-8",
+                                            "type": "noun_name",
+                                            "value": "flowerpot"
                                           }
                                         }
                                       }

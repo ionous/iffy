@@ -13,7 +13,7 @@ import (
 
 // import an object type description
 func TestObjectFunc(t *testing.T) {
-	k, db := newTestDecoder(t)
+	k, db := newTestDecoder(t, memory)
 	defer db.Close()
 	if rule, e := imp_object_func(k, _object_func); e != nil {
 		t.Fatal(e)
@@ -25,7 +25,7 @@ func TestObjectFunc(t *testing.T) {
 }
 
 func TestPatternActivity(t *testing.T) {
-	k, db := newTestDecoder(t)
+	k, db := newTestDecoder(t, memory)
 	defer db.Close()
 	var exe rt.Execute
 	if e := k.DecodeAny(_pattern_activity, &exe); e != nil {
@@ -44,7 +44,7 @@ func TestPatternActivity(t *testing.T) {
 }
 
 func TestPatternRule(t *testing.T) {
-	k, db := newTestDecoder(t)
+	k, db := newTestDecoder(t, memory)
 	defer db.Close()
 	if e := imp_pattern_actions(k, _pattern_actions); e != nil {
 		t.Fatal(e)

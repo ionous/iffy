@@ -8,55 +8,31 @@ import (
 // these definitions mirror modeling statements in iffy.js
 // right now, common noun and proper noun implement ObjectRef directly.
 // it'd be nice to make them swaps just like they are in the modeling section.
-// future: make.opt("noun", "{proper_noun} or {common_noun}");
+// future: make.opt("noun", "{proper_noun} or {named_noun}");
 
-// CommonNoun implements ObjectRef
-type CommonNoun struct {
+// SimpleNoun implements ObjectRef
+type SimpleNoun struct {
 	Determiner Determiner // determiners are used for modeling hints
-	Name       CommonName
+	Name       NounName
 }
 
-// ProperNoun implements ObjectRef
-type ProperNoun struct {
-	Name ProperName
-}
-
-type ProperName string
-type CommonName string
 type Determiner string
+type NounName string
 
 // internal because, currently, iffy.js defines the spec.
-func (*CommonNoun) Compose() composer.Spec {
+func (*SimpleNoun) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "common_noun",
-		Spec:  "{determiner} {name%common_name}",
+		Name:  "named_noun",
+		Spec:  "{determiner} {name%noun_name}",
 		Group: "internal",
 	}
 }
 
 // can be used as text, returns the object.id
-func (op *CommonNoun) GetText(run rt.Runtime) (ret string, err error) {
+func (op *SimpleNoun) GetText(run rt.Runtime) (ret string, err error) {
 	return op.GetObjectRef(run)
 }
 
-func (op *CommonNoun) GetObjectRef(run rt.Runtime) (retId string, err error) {
-	return getObjectInexactly(run, string(op.Name))
-}
-
-// internal because, currently, iffy.js defines the spec.
-func (*ProperNoun) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "proper_noun",
-		Spec:  "{name%proper_name}",
-		Group: "internal",
-	}
-}
-
-// can be used as text, returns the object.id
-func (op *ProperNoun) GetText(run rt.Runtime) (ret string, err error) {
-	return op.GetObjectRef(run)
-}
-
-func (op *ProperNoun) GetObjectRef(run rt.Runtime) (retId string, err error) {
+func (op *SimpleNoun) GetObjectRef(run rt.Runtime) (retId string, err error) {
 	return getObjectInexactly(run, string(op.Name))
 }

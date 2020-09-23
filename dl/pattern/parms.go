@@ -85,7 +85,7 @@ func (n *TextListParam) Prepare(p Parameters) {
 // The only current user is pattern.FromPattern::Stitch()
 // It stores values from indexed and key name arguments ( originally specified as evals. )
 // Its pushed into scope so the names can be used as a source of values for rt.Runtime::GetVariable().
-// ( ex. For use with the commands GetVar{},  CommonNoun{}, ProperNoun{}, ObjectName{}, ... )
+// ( ex. For use with the commands GetVar{},  SimpleNoun{}, ProperNoun{}, ObjectName{}, ... )
 type Parameters struct {
 	run    rt.Runtime
 	values parameterValues

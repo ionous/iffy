@@ -29,11 +29,10 @@ function localLang(make) {
       `Test Output: Expect that a test uses 'Say' to print some specific text.`);
 
     make.str("test_name", "{the test%current_test} {test name%test_name|quote}");
-
   });
 
   make.group("Nouns", function() {
-    make.run("lede", "{+noun|comma-and} {noun_phrase}.",
+    make.run("lede", "{nouns+named_noun|comma-and} {noun_phrase}.",
               "Leading statement: Describes one or more nouns.");
 
     make.run("tail", "{pronoun} {noun_phrase}.",
@@ -48,17 +47,22 @@ function localLang(make) {
     // fix: think this should always be "are" never "is"
     make.run("kind_of_noun", "{are_an} {trait*trait|comma-and} {kind:singular_kind} {?noun_relation}");
 
-    make.opt("noun", "{proper_noun} or {common_noun}");
-    make.run("common_noun", "object_ref", "{determiner} {name:common_name}");
-    make.run("proper_noun", "object_ref", "{name:proper_name}");
-
     make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 
-    make.str("proper_name", `Proper Name: A name given to some specific person, place, or thing.
-Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or 'Toronto'.`);
+    make.run("named_noun", "object_ref", "{determiner} {name:noun_name}");
 
-    make.str("common_name", `Common Name: A generalized name given to some specific item, place, or thing.
-    Common names are usually not capitalized. For example, maybe: 'table', 'chair', or 'dog park'.`);
+    make.str("determiner", "{a}, {an}, {the}, or {other determiner%determiner}",
+      `Determiners: modify a word they are associated to designate specificity or, sometimes, a count.
+        For instance: "some" fish hooks, "a" pineapple, "75" triangles, "our" Trevor.`  );
+
+    make.str("noun_name",
+      `Noun name: Some specific person, place, or thing; or, more rarely, a kind.
+        Proper names are usually capitalized:  For example, maybe: 'Haruki', 'Jane', or 'Toronto'.
+        Common names are usually not capitalized. For example, maybe: 'table', 'chair', or 'dog park'.
+        A set of duplicate object uses their kind. For instance: twelve 'cats'.`);
+
+    make.str("pronoun",  "{it}, {they}, or {pronoun}");
+
   });
 
   make.group("Patterns", function() {
@@ -101,16 +105,15 @@ Proper names are usually capitalized. For example, maybe: 'Haruki', 'Jane', or '
   });
 
   make.group("Relations", function() {
-    make.run("noun_relation",  "{?are_being} {relation} {+noun|comma-and}");
+    make.run("noun_relation",  "{?are_being} {relation} {nouns+named_noun|comma-and}");
 
     make.run("relative_to_noun", "story_statement",
-            "{relation} {+noun} {are_being} {+noun}.");
+            "{relation} {nouns+named_noun} {are_being} {nouns+named_noun}.");
 
     make.str("relation");
   });
 
   make.group("Kinds", function() {
-
     make.run("kinds_of_kind", "story_statement",
          "{plural_kinds} are a kind of {singular_kind}.");
 
@@ -149,7 +152,7 @@ For example: animals, containers, etc.`);
     // ex. The description of the nets is xxx
     make.run("noun_assignment", "story_statement",
             // "The {property} of {+noun} is the {[text]:: %lines}",
-            "The {property} of {+noun} is {the text%lines|summary}",
+            "The {property} of {nouns+named_noun} is {the text%lines|summary}",
             "Noun Assignment: Assign text. Gives a noun one or more lines of text.");
 
     make.opt("property_phrase", "{primitive_phrase} or {aspect_phrase}");
@@ -191,8 +194,6 @@ See also: text.`);
   });
 
  make.group("Helper Types", function() {
-    make.str("determiner", "{a}, {an}, {the}, or {other determiner%determiner}");
-    make.str("pronoun",  "{it}, {they}, or {pronoun}");
     make.str("an", "{a} or {an}");
     make.str("are_being",  "{are} or {is}");
     make.str("are_an",  "{are}, {are a%area}, {are an%arean}, {is}, {is a%isa}, {is an%isan}");

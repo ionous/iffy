@@ -17,20 +17,20 @@ func lines(s ...string) string {
 	return strings.Join(s, "\n") + "\n"
 }
 
-func newTestImporter(t *testing.T) (ret *Importer, retDB *sql.DB) {
-	return newTestImporterDecoder(t, nil)
+func newTestImporter(t *testing.T, where string) (ret *Importer, retDB *sql.DB) {
+	return newTestImporterDecoder(t, nil, where)
 }
 
-func newTestDecoder(t *testing.T) (ret *Importer, retDB *sql.DB) {
+func newTestDecoder(t *testing.T, where string) (ret *Importer, retDB *sql.DB) {
 	iffy.RegisterGobs()
 	//
 	dec := decode.NewDecoder()
 	dec.AddDefaultCallbacks(core.Slats)
-	return newTestImporterDecoder(t, dec)
+	return newTestImporterDecoder(t, dec, where)
 }
 
-func newTestImporterDecoder(t *testing.T, dec *decode.Decoder) (ret *Importer, retDB *sql.DB) {
-	db := newImportDB(t, memory)
+func newTestImporterDecoder(t *testing.T, dec *decode.Decoder, where string) (ret *Importer, retDB *sql.DB) {
+	db := newImportDB(t, where)
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create ephemera", e)
 	} else {
@@ -56,6 +56,7 @@ func newImportDB(t *testing.T, where string) (ret *sql.DB) {
 	if db, e := sql.Open("sqlite3", source); e != nil {
 		t.Fatal(e)
 	} else {
+		t.Log("opened db", source)
 		ret = db
 	}
 	return

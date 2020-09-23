@@ -59,13 +59,13 @@ function nodeTests() {
               "id": "td4",
               "type": "lede",
               "value": {
-                "$NOUN": [{
+                "$NOUNS": [{
                   "id": "td2",
                   "type": "noun",
                   "value": {
                      "$COMMON_NOUN": {
                         "id": "td8",
-                        "type": "common_noun",
+                        "type": "named_noun",
                         "value": {
                           "$DETERMINER": {
                             "id": "td6",
@@ -75,7 +75,7 @@ function nodeTests() {
                           },
                           "$NAME": {
                             "id": "td7",
-                            "type": "common_name",
+                            "type": "noun_name",
                             "value": "box"
                           }}}}}],
                 "$NOUN_PHRASE": {
@@ -136,7 +136,7 @@ function nodeTests() {
     // insert a noun,
     left: [{
       "parent": "td4",
-      "token": "$NOUN",
+      "token": "$NOUNS",
       "item": "td2",
     },{
       "parent": "td1",
@@ -161,7 +161,7 @@ function nodeTests() {
     // right - append a noun
     right: [{
       "parent": "td4",
-      "token": "$NOUN",
+      "token": "$NOUNS",
       "item": "td2",
     }],
     // delete the common noun
@@ -179,7 +179,7 @@ function nodeTests() {
       // to the left of the phrase is a repeating noun slot ( filled a common noun "the box" )
       // so we should be able to add a noun to the end of that array.
       "parent": "td4",
-      "token": "$NOUN",
+      "token": "$NOUNS",
       "item": "td2" // note: previously, null would indicate a terminal addition.
     }],
     right: [{
@@ -250,11 +250,11 @@ function nodeTests() {
   //
   runTest("test appending to an existing (required) list", function(test) {
     const lede= test.all.td4;
-    if (lede.getKid("$NOUN").length!== 1) {
+    if (lede.getKid("$NOUNS").length!== 1) {
         throw new Error("expected one initial noun");
     }
     test.newMutation( test.all.td9 ).mutate(-1);
-    if (lede.getKid("$NOUN").length!== 2) {
+    if (lede.getKid("$NOUNS").length!== 2) {
         throw new Error("expected a new noun");
     }
   });

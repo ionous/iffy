@@ -21,8 +21,12 @@ func imp_aspect(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	return importName(k, r, "aspect", "")
 }
 
-func imp_common_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "common_name", "noun")
+func imp_noun_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	return importName(k, r, "noun_name", "noun")
+}
+
+func imp_counted_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+	return importName(k, r, "noun_name", "singular_kind")
 }
 
 func imp_pattern_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
@@ -35,10 +39,6 @@ func imp_plural_kinds(k *Importer, r reader.Map) (ret ephemera.Named, err error)
 
 func imp_property(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	return importName(k, r, "property", "field")
-}
-
-func imp_proper_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "proper_name", "noun")
 }
 
 func imp_relation(k *Importer, r reader.Map) (ret ephemera.Named, err error) {

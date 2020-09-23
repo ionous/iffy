@@ -3,8 +3,8 @@ package core
 import (
 	"strconv"
 
-	"github.com/divan/num2words"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -51,7 +51,7 @@ func (*PrintNumWord) Compose() composer.Spec {
 func (p *PrintNumWord) GetText(run rt.Runtime) (ret string, err error) {
 	if n, e := rt.GetNumber(run, p.Num); e != nil {
 		err = e
-	} else if s := num2words.Convert(int(n)); len(s) > 0 {
+	} else if s, ok := lang.NumToWords(int(n)); ok {
 		ret = s
 	} else {
 		ret = "<num>"
