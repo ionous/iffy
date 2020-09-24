@@ -1,6 +1,8 @@
 package story
 
 import (
+	"log"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/express"
@@ -17,12 +19,15 @@ func imp_render_template(k *Importer, r reader.Map) (ret interface{}, err error)
 		err = e
 	} else if xs, e := template.Parse(str); e != nil {
 		err = e
-	} else if got, e := express.Convert(xs); e != nil {
-		err = errutil.New(e, xs)
-	} else if eval, ok := got.(rt.TextEval); !ok {
-		err = errutil.Fmt("render template has unknown expression %T", got)
 	} else {
-		ret = &express.Render{eval}
+		log.Println("imported template:", xs)
+		if got, e := express.Convert(xs); e != nil {
+			err = errutil.New(e, xs)
+		} else if eval, ok := got.(rt.TextEval); !ok {
+			err = errutil.Fmt("render template has unknown expression %T", got)
+		} else {
+			ret = &express.Render{eval}
+		}
 	}
 	return
 }
