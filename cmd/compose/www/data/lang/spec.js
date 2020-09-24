@@ -131,11 +131,7 @@ const spec = [
     "name": "assign",
     "spec": "let {name:variable_name} be {from:assignment}",
     "uses": "run",
-    "with": {
-      "slots": [
-        "execute"
-      ]
-    }
+    "with": {}
   },
   {
     "desc": "Assign Boolean: Assigns the passed boolean value.",
@@ -240,6 +236,29 @@ const spec = [
       "tokens": [
         "from text list",
         "$VALS"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Variable: Assigns one variable or object to another.\n\t\tUsed internally for pattern calls in templates. ex. { pattern: .something }.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_var",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from var",
+        "$NAME"
       ]
     }
   },
@@ -616,7 +635,7 @@ const spec = [
       "variables"
     ],
     "name": "get_var",
-    "spec": "the {name:text}",
+    "spec": "the {name:text_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -624,7 +643,8 @@ const spec = [
         "number_eval",
         "text_eval",
         "num_list_eval",
-        "text_list_eval"
+        "text_list_eval",
+        "object_ref"
       ]
     }
   },
@@ -643,7 +663,7 @@ const spec = [
     }
   },
   {
-    "desc": "Has Trait: Return true if the object current is using the named trait.",
+    "desc": "Has Trait: Return true if noun is currently in the requested state.",
     "group": [
       "objects"
     ],
@@ -911,22 +931,6 @@ const spec = [
       "tokens": [
         "numbers",
         "$VALUES"
-      ]
-    }
-  },
-  {
-    "desc": "ObjectName: Returns a noun's full name, can also be used in true/false statements to determine if the named noun exists.",
-    "group": [
-      "objects"
-    ],
-    "name": "object_name",
-    "spec": "object named {?exactly} {name:text_eval}",
-    "uses": "run",
-    "with": {
-      "slots": [
-        "bool_eval",
-        "text_eval",
-        "object_ref"
       ]
     }
   },

@@ -28,7 +28,8 @@ function localLang(make) {
       "output {lines|quote}.",
       `Test Output: Expect that a test uses 'Say' to print some specific text.`);
 
-    make.str("test_name", "{the test%current_test} {test name%test_name|quote}");
+    // would like just "<author's test name>" to be quoted, and not the current_test determiner.
+    make.str("test_name", "{the test%current_test}, or {test name%test_name}");
   });
 
   make.group("Nouns", function() {
@@ -51,7 +52,7 @@ function localLang(make) {
 
     make.run("named_noun", "object_ref", "{determiner} {name:noun_name}");
 
-    make.str("determiner", "{a}, {an}, {the}, or {other determiner%determiner}",
+    make.str("determiner", "{a}, {an}, {the}, {our}, or {other determiner%determiner}",
       `Determiners: modify a word they are associated to designate specificity or, sometimes, a count.
         For instance: "some" fish hooks, "a" pineapple, "75" triangles, "our" Trevor.`  );
 
