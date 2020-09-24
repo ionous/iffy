@@ -2,6 +2,7 @@ package lang
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/divan/num2words"
 )
@@ -41,6 +42,7 @@ func WordsToNum(s string) (ret int, okay bool) {
 			"nineteen",
 			"twenty",
 		}
+		s = strings.ToLower(s)
 		for i, n := range smallNumbers {
 			if s == n {
 				ret, okay = i+1, true
