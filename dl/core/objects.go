@@ -121,22 +121,17 @@ func getObjectExactly(run rt.Runtime, name string) (retId string, err error) {
 // that function tries to find the value of a variable or object id named "something"
 // this tries to resolve the name "something" into an object.
 func getObjectInexactly(run rt.Runtime, name string) (retId string, err error) {
-	if p, e := run.GetVariable(name); e != nil {
-		err = e
-	} else {
-		switch e.(type) {
-		// if there's no such variable, the inexact search then checks if there's an object of that name.
-		case rt.UnknownVariable:
-			retId, err = getObjectExactly(run, name)
-		case nil:
-			// if we found such a variable, get its contents and look up the referenced object.
-			if unboxedName, e := p.GetText(run); e != nil {
-				err = e
-			} else {
-				retId, err = getObjectExactly(run, unboxedName)
-			}
+	switch p, e := run.GetVariable(name); e.(type) {
+	// if there's no such variable, the inexact search then checks if there's an object of that name.
+	case rt.UnknownVariable:
+		retId, err = getObjectExactly(run, name)
+	case nil:
+		// if we found such a variable, get its contents and look up the referenced object.
+		if unboxedName, e := p.GetText(run); e != nil {
+			err = e
+		} else {
+			retId, err = getObjectExactly(run, unboxedName)
 		}
-
 	}
 	return
 }
