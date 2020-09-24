@@ -29,7 +29,7 @@ func (p *IdentParser) NewRune(r rune) (ret State) {
 // subsequent characters can be letters or numbers
 // noting that fields are separated by dots "."
 func (p *IdentParser) body(r rune) (ret State) {
-	if isLetter(r) || isNumber(r) {
+	if isLetter(r) || isNumber(r) || isQualifier(r) {
 		ret = p.runes.Accept(r, Statement("ident body", p.body)) // loop...
 	}
 	return
