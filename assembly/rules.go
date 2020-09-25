@@ -28,6 +28,7 @@ func (b *BuildRule) buildFromRule(asm *Assembler, args ...interface{}) (err erro
 		}, args...); e != nil {
 		err = errutil.New("buildFromRule", e)
 	} else {
+		// write the passed list of gobs into the assembler db
 		err = asm.WriteGobs(list)
 	}
 	return
@@ -35,7 +36,7 @@ func (b *BuildRule) buildFromRule(asm *Assembler, args ...interface{}) (err erro
 
 func checkRuleSetup(db *sql.DB) (err error) {
 	var pat, patType, ruleType string
-	// mismatched
+	// mismatched pattern return and rule return
 	if e := tables.QueryAll(db,
 		`select distinct pattern, pt, rt
 		from asm_rule_match am
@@ -50,13 +51,13 @@ func checkRuleSetup(db *sql.DB) (err error) {
 		&pat, &patType, &ruleType); e != nil {
 		err = e
 	} else {
-		// missing
+		// pattern exists but has no rules missing
 		if e := tables.QueryAll(db,
 			`select distinct pattern
-		from asm_pattern
-		where decl = 1
-		and pattern not in 
-		(select pattern from asm_rule_match am
+			from asm_pattern
+			where decl = 1
+			and pattern not in 
+			(select pattern from asm_rule_match am
 			where am.matched=1)`,
 			func() error {
 				e := errutil.Fmt("pattern %q has no valid rules", pat)

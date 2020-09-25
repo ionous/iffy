@@ -16,9 +16,9 @@ type BuildRule struct {
 
 // map name to pattern interface
 type patternEntry struct {
-	name        string
-	patternType string
-	prologue    []pattern.Parameter //
+	patternName string              // name of the pattern
+	patternType string              // "return" type of the pattern
+	prologue    []pattern.Parameter // list of all parameters sent to the pattern
 }
 
 func (pat *patternEntry) AddParam(param pattern.Parameter) {
@@ -27,20 +27,21 @@ func (pat *patternEntry) AddParam(param pattern.Parameter) {
 
 type patternCache map[string]*patternEntry
 
-func buildPatternCache(asm *Assembler) (ret patternCache, err error) {
+// read pattern declarations from the ephemera db
+func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 	// build the pattern cache
 	out := make(patternCache)
 	var patternName, paramName, typeName string
 	var kind sql.NullString
 	var last *patternEntry
-	if e := tables.QueryAll(asm.cache.DB(),
+	if e := tables.QueryAll(db,
 		`select pattern, param, type, kind from asm_pattern_decl`,
 		func() (err error) {
-			if last == nil || last.name != patternName {
+			if last == nil || last.patternName != patternName {
 				if patternName != paramName {
 					err = errutil.New("expected the first param was is the pattern return type", patternName, paramName, typeName)
 				} else {
-					last = &patternEntry{patternName, typeName, nil}
+					last = &patternEntry{patternName: patternName, patternType: typeName}
 					out[patternName] = last
 				}
 			}
@@ -74,8 +75,9 @@ func buildPatternCache(asm *Assembler) (ret patternCache, err error) {
 	return
 }
 
+// collect the rules of all the various patterns and write them into the assembly
 func buildPatterns(asm *Assembler) (err error) {
-	if patterns, e := buildPatternCache(asm); e != nil {
+	if patterns, e := buildPatternCache(asm.cache.DB()); e != nil {
 		err = e
 	} else {
 		err = buildPatternRules(asm, patterns)

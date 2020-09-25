@@ -7,6 +7,7 @@ import (
 	"github.com/ionous/errutil"
 )
 
+// Prep accumulates any errors that occur when creating a series of sql prepared statements.
 type Prep []*prepErr
 
 type prepErr struct {

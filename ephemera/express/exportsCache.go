@@ -5,12 +5,16 @@ import (
 	"github.com/ionous/iffy/lang"
 )
 
+// maps cmd spec name to a nii pointer to the cmd type in question
+// ( nil ptr can be used for reflecting on types )
 type nameCache struct {
 	els map[string]interface{}
 }
 
+// the singleton cache of core commands
 var coreCache nameCache
 
+//
 func (k *nameCache) get(n string) (ret interface{}, okay bool) {
 	if len(k.els) == 0 {
 		els := make(map[string]interface{})
