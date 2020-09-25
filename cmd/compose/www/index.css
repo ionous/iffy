@@ -113,6 +113,10 @@ body {
   background-image:  -o-repeating-linear-gradient(top, transparent 0%, transparent 24px, rgba(239, 207, 173, 0.7) 24px, rgba(239, 207, 173, 0.7) 25px);
 }
 
+.mk-breathing-space {
+  min-height: 50vh;
+}
+
 .mk-trash-can {
   position: absolute;
   right: 5px;
