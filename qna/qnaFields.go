@@ -33,13 +33,13 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				from run_value 
 				where noun=? and field=? 
 				order by tier asc nulls last limit 1`),
-		// patternParamAt: ps.Prep(db,
-		// 	`select param from mdl_pat where pattern=? and idx=?`),
 		progBytes: ps.Prep(db,
+			// performs case preferred matching
 			`select bytes 
 				from mdl_prog
-				where name = ?
-				and type = ?
+				where UPPER(name) = UPPER(?1)
+				and type = ?2
+				order by (name != ?1)
 				limit 1`),
 		countOf: ps.Prep(db,
 			`select count(), 'bool' from run_noun where noun=?`),

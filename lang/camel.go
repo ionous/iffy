@@ -6,8 +6,18 @@ import (
 	"unicode"
 )
 
-//
-func Camelize(name string) (ret string) {
+// Camelize turns spaces, dashes, and underscores into words, capitalizing all but the first word,
+// and lowercasing the rest of the string. likeThisIGuess.
+func Camelize(name string) string {
+	return combineCase(name, true)
+}
+
+// CombineCase is almost exactly like Camelize, only doesnt touch the case of the first rune of the first word.
+func CombineCase(name string) string {
+	return combineCase(name, false)
+}
+
+func combineCase(name string, changeFirst bool) (ret string) {
 	type word int
 	const (
 		noword word = iota
@@ -16,13 +26,12 @@ func Camelize(name string) (ret string) {
 	)
 	var parts parts
 	inword, wasUpper := noword, false
-
+	changeCase := changeFirst
 	for _, r := range name {
 		if r == '-' || r == '_' || r == '=' || unicode.IsSpace(r) {
 			inword = noword
 			continue
 		}
-
 		if unicode.IsDigit(r) {
 			if sameWord := inword == number; !sameWord {
 				parts.flush()
@@ -34,9 +43,11 @@ func Camelize(name string) (ret string) {
 			currUpper := unicode.IsUpper(r)
 			// classify some common word changes
 			sameWord := (inword == letter) && ((wasUpper == currUpper) || (wasUpper && !currUpper))
-			if currUpper {
+			// everything gets lowered
+			if currUpper && changeCase {
 				r = unicode.ToLower(r)
 			}
+			changeCase = true
 			if !sameWord {
 				parts.flush()
 				// hack for camelCasing.

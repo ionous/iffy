@@ -46,19 +46,25 @@ func (r *Recorder) OverrideNameDuring(key string, sub Named, during func()) {
 }
 
 func (r *Recorder) NewDomainName(domain Named, name, category, ofs string) (ret Named) {
-	norm := strings.TrimSpace(name)
+	// normalize names in an attempt to simplify lookup of some names
 	// many tests would have to be adjusted to be able to handle normalization wholesale
 	// so for now make this opt-in.
-	switch category {
-	case tables.NAMED_TEST,
-		tables.NAMED_PATTERN,
-		tables.NAMED_ASPECT,
-		tables.NAMED_TRAIT,
-		tables.NAMED_FIELD:
-		if !strings.HasPrefix(norm, "$") {
+	norm := strings.TrimSpace(name)
+	// replace things like $CURRENT_TEST with the name of the current test.
+	if norm == r.nameReplacer.key {
+		norm = r.nameReplacer.sub.String()
+	} else if !strings.HasPrefix(norm, "$") {
+		//
+		switch category {
+		case tables.NAMED_PATTERN:
+			// we want patterns to be at least leading case aware
+			norm = lang.CombineCase(norm)
+
+		case tables.NAMED_TEST,
+			tables.NAMED_ASPECT,
+			tables.NAMED_TRAIT,
+			tables.NAMED_FIELD:
 			norm = lang.Camelize(norm)
-		} else if norm == r.nameReplacer.key {
-			norm = r.nameReplacer.sub.String()
 		}
 	}
 	namedId := r.cache.Must(eph_named, norm, name, category, domain, r.srcId, ofs)

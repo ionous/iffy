@@ -19,7 +19,7 @@ func isNumber(r rune) bool {
 
 // we use qualifiers within identifier names for custom counters, etc.
 func isQualifier(r rune) bool {
-	return r == '#'
+	return r == '#' || r == '-'
 }
 
 // https://golang.org/ref/spec#hex_digit
