@@ -17,6 +17,7 @@ func main() {
 	var inFile, testName string
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")
 	flag.StringVar(&testName, "run", "", "optional specific test ( in camelcase )")
+	flag.BoolVar(&errutil.Panic, "panic", false, "panic on error?")
 	flag.Parse()
 	if cnt, e := checkFile(inFile, testName); e != nil {
 		log.Fatalln(e)

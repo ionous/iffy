@@ -16,9 +16,9 @@ import (
 
 func main() {
 	var inFile, outFile string
-	//errutil.Panic = true
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")
 	flag.StringVar(&outFile, "out", "", "output file name (sqlite3)")
+	flag.BoolVar(&errutil.Panic, "panic", false, "panic on error?")
 	flag.Parse()
 	if len(outFile) == 0 {
 		dir, _ := filepath.Split(inFile)

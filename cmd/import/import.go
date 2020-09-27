@@ -23,6 +23,7 @@ func main() {
 	var inFile, outFile string
 	flag.StringVar(&inFile, "in", "", "input file name (json)")
 	flag.StringVar(&outFile, "out", "", "output file name (sqlite3)")
+	flag.BoolVar(&errutil.Panic, "panic", false, "panic on error?")
 	flag.Parse()
 	if len(outFile) == 0 {
 		dir, _ := filepath.Split(inFile)
