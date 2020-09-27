@@ -124,6 +124,24 @@ const spec = [
     }
   },
   {
+    "group": [
+      "patterns"
+    ],
+    "name": "argument",
+    "spec": "its {name:variable_name} is {from:assignment}",
+    "uses": "run",
+    "with": {}
+  },
+  {
+    "group": [
+      "patterns"
+    ],
+    "name": "arguments",
+    "spec": " when {arguments%args+argument}",
+    "uses": "run",
+    "with": {}
+  },
+  {
     "desc": "Assignment: Sets a variable to a value.",
     "group": [
       "variables"
@@ -501,6 +519,104 @@ const spec = [
     }
   },
   {
+    "desc": "Determine an activity",
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_act",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$ARGUMENTS": {
+          "label": "arguments",
+          "type": "arguments"
+        },
+        "$PATTERN": {
+          "label": "pattern",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "determine act",
+        "$PATTERN",
+        "$ARGUMENTS"
+      ]
+    }
+  },
+  {
+    "desc": "Determine a true/false value",
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_bool",
+    "spec": "the {true/false pattern%name:pattern_name}{?arguments}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Determine a number",
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_num",
+    "spec": "the {number pattern%name:pattern_name}{?arguments}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Determine a list of numbers",
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_num_list",
+    "spec": "the {number list pattern%name:pattern_name}{?arguments}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "num_list_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Determine some text",
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_text",
+    "spec": "the {text pattern%name:pattern_name}{?arguments}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Determine a list of text",
+    "group": [
+      "patterns"
+    ],
+    "name": "determine_text_list",
+    "spec": "the {text list pattern%name:pattern_name}{?arguments}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_list_eval"
+      ]
+    }
+  },
+  {
     "desc": "Subtract Numbers: Subtract two numbers.",
     "group": [
       "math"
@@ -872,6 +988,90 @@ const spec = [
     "spec": "{lines|quote}",
     "uses": "run",
     "with": {}
+  },
+  {
+    "desc": "Lowercase: returns new text, with every letter turned into lowercase. \n\t\tFor example, \"shout\" from \"SHOUT\".",
+    "group": [
+      "format"
+    ],
+    "name": "make_lowercase",
+    "spec": "{text:text_eval} in lowercase",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Sentence case: returns new text, starting each sentence with a capital letter. \n\t\tFor example, \"Empire Apple.\" from \"Empire apple.\".",
+    "group": [
+      "format"
+    ],
+    "name": "make_sentencecase",
+    "spec": "{text:text_eval} in sentence-case",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Title case: returns new text, starting each word with a capital letter. \n\t\tFor example, \"Empire Apple\" from \"empire apple\".",
+    "group": [
+      "format"
+    ],
+    "name": "make_titlecase",
+    "spec": "{text:text_eval} in title-case",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Uppercase: returns new text, with every letter turned into uppercase. \n\t\tFor example, \"APPLE\" from \"apple\".",
+    "group": [
+      "format"
+    ],
+    "name": "make_uppercase",
+    "spec": "{text:text_eval} in uppercase",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Like: Determine whether the specified text is similar to the specified pattern.\n\t\tMatching is case-insensitive ( meaning, \"A\" matches \"a\" ) and there are two symbols with special meaning. \n\t\tA percent sign (\"%\") in the pattern matches any series of zero or more characters in the original text, \n\t\twhile an underscore matches (\"_\") any one single character. ",
+    "group": [
+      "matching"
+    ],
+    "name": "match_like",
+    "spec": "{text:text_eval} is like {pattern:text_eval}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Matches: Determine whether the specified text is similar to the specified regular expression.",
+    "group": [
+      "matching"
+    ],
+    "name": "matches",
+    "spec": "{text:text_eval} matches {pattern:text}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval"
+      ]
+    }
   },
   {
     "desc": "Number Value: Specify a particular number.",
@@ -1492,11 +1692,19 @@ const spec = [
     "uses": "group"
   },
   {
+    "name": "matching",
+    "uses": "group"
+  },
+  {
     "name": "math",
     "uses": "group"
   },
   {
     "name": "objects",
+    "uses": "group"
+  },
+  {
+    "name": "patterns",
     "uses": "group"
   },
   {

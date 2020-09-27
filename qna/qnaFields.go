@@ -22,7 +22,8 @@ type Fields struct {
 	kindOf,
 	aspectOf,
 	nameOf,
-	idOf *sql.Stmt
+	idOf,
+	isLike *sql.Stmt
 }
 
 func NewFields(db *sql.DB) (ret *Fields, err error) {
@@ -73,6 +74,9 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				where name=?
 				order by rank
 				limit 1`),
+		// use the sqlite like function to match
+		isLike: ps.Prep(db,
+			`select ? like ?`),
 	}
 	if e := ps.Err(); e != nil {
 		err = e
@@ -82,6 +86,10 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 	return
 }
 
+func (n *Runner) IsLike(a, b string) (ret bool, err error) {
+	err = n.fields.isLike.QueryRow(a, b).Scan(&ret)
+	return
+}
 func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 	if len(field) == 0 || field[0] == object.Prefix || field == object.Name {
 		err = errutil.Fmt("can't change reserved field %q", field)

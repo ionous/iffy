@@ -30,3 +30,37 @@ func TestStripArticle(t *testing.T) {
 		t.Fatal("article")
 	}
 }
+
+// ensure package.inflect works as expected for a few cases....
+// fix: they dont really work they way id expect.
+func TestInflect(t *testing.T) {
+	p := []struct {
+		test, want string
+		format     func(s string) string
+	}{
+		{
+			"boop",
+			"Boop",
+			Capitalize,
+		},
+		{
+			"BOOP",
+			"Boop",
+			Capitalize,
+		}, {
+			"another day. at SEA.... oh my.",
+			"Another Day. At S E A.... Oh My.",
+			Titlecase,
+		}, {
+			"another day. at SEA.... oh my.",
+			"Another day. At sea.... Oh my.",
+			SentenceCase,
+		},
+	}
+	for i, p := range p {
+		got := p.format(p.test)
+		if got != p.want {
+			t.Fatalf("test %v failed, got %q", i, got)
+		}
+	}
+}

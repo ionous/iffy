@@ -89,6 +89,13 @@ var Slats = []composer.Slat{
 
 	(*MakeSingular)(nil),
 	(*MakePlural)(nil),
+	(*MakeUppercase)(nil),
+	(*MakeLowercase)(nil),
+	(*MakeTitleCase)(nil),
+	(*MakeSentenceCase)(nil),
+
+	(*Matches)(nil),
+	(*MatchLike)(nil),
 
 	(*CycleText)(nil),
 	(*ShuffleText)(nil),

@@ -64,9 +64,26 @@ func IsPlural(s string) bool {
 // Capitalize returns a new string, starting the first word with a capital.
 func Capitalize(s string) (ret string) {
 	if len(s) > 0 {
-		ret = inflect.Capitalize(s)
+		// fix? capitalize doesnt handle leading spaces well.
+		// what should it do?
+		var lead string
+		if i := strings.IndexFunc(s, func(u rune) bool {
+			return !unicode.IsSpace(u)
+		}); i >= 0 {
+			lead, s = s[:i], s[i:]
+		}
+		ret = lead + inflect.Capitalize(strings.ToLower(s))
 	}
 	return
+}
+
+// SentenceCase returns the passed string in lowercase, starting new sentences with capital letters.
+func SentenceCase(s string) string {
+	sentences := strings.Split(s, ". ")
+	for i, s := range sentences {
+		sentences[i] = Capitalize(s)
+	}
+	return strings.Join(sentences, ". ")
 }
 
 // IsCapitalized returns true if the passed string starts with an upper case letter
