@@ -13,15 +13,19 @@
 		<body>
 			<div id="app" 
 				class="mk-container"
-				:class="bemBlock(hideBrowser?'nosidebar':false)"
+				:class="bemBlock(sidebar||'nosidebar')"
 				><mk-navigator
+					:tabs="['Commands', 'Files', 'Tests', '(x)']"
 					@navigate="navigate"
 				></mk-navigator>
     		<mk-tools
     		></mk-tools
-				><mk-browser
-					:hidden="hideBrowser"
-				></mk-browser
+					><mk-browser v-if="sidebar==='Commands'"
+					></mk-browser
+					><mk-finder v-else-if="sidebar==='Files'"
+					></mk-finder
+					><mk-tester v-else-if="sidebar==='Tests'"
+					></mk-tester
 				><div class="mk-composer"
 					:class="{'em-shift': $root.shift}"
 					><mk-switch
@@ -60,6 +64,8 @@
 			<script src="src/browseCtrl.js"></script>
 			<script src="src/contextCtrl.js"></script>
 			<script src="src/toolsCtrl.js"></script>
+			<script src="src/finderCtrl.js"></script>
+			<script src="src/testCtrl.js"></script>
 			<script src="src/trashCan.js"></script>
 				<!-- composer controls  -->
 			<script src="src/pickInline.js"></script>

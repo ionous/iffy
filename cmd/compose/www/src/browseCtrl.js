@@ -82,7 +82,6 @@ class Tabbable {
 Vue.component('mk-browser', {
   template:
   `<div class="mk-aux" :class="bemBlock()"
-    v-if="!hidden"
   ><div :class="bemElem('nav')"
     ><span v-for="(x,i) in tabs"
       ><template v-if="i"
@@ -143,9 +142,6 @@ Vue.component('mk-browser', {
     onNodeSelected(node, param, token) {
       // FIX: synchronize browser display
     },
-  },
-  props: {
-    hidden: Boolean,
   },
   created() {
     const types= allTypes.all;

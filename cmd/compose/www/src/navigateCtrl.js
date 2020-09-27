@@ -24,7 +24,7 @@ Vue.component('mk-nav-button', {
 
 Vue.component('mk-navigator', {
   template:
-  `<div class="mk-nav"
+  `<div class="mk-nav mk-aux"
    ><mk-nav-button
      v-for="(name,i) in tabs"
      :key=i
@@ -42,10 +42,12 @@ Vue.component('mk-navigator', {
       }
     }
   },
+  props: {
+    tabs: Array,
+  },
   data() {
     return {
       tab: 0,
-      tabs: ["Commands", "Files", "Tests", "(x)"],
     };
   },
   mixins: [bemMixin()],

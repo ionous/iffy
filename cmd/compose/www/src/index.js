@@ -44,7 +44,7 @@ const app= new Vue({
       return isAtStart? Filters.capitalize: Filters.none;
     },
     navigate(name) {
-      this.hideBrowser= !name;
+      this.sidebar= name;
     }
   },
   created() {
@@ -63,7 +63,7 @@ const app= new Vue({
   },
   data() {
     return {
-      hideBrowser: false,
+      sidebar: "Commands", // ugh.
       nodes: nodes.unroll(getStory()),
       dropper: new Dropper(this),
       shift: false,
