@@ -76,22 +76,20 @@ class Tabbable {
         name:k, label:Types.labelOf( Types.get(k) )
       }));
   }
-
 }
 
 // displays the Tabbable commands
 Vue.component('mk-browser', {
   template:
-  `<div :class="cls.win"
-  ><div class="mk-aux__title mk-aux__title--right"
-     >commands</div
+  `<div class="mk-aux" :class="bemBlock()"
+    v-if="!hidden"
   ><div :class="bemElem('nav')"
     ><span v-for="(x,i) in tabs"
       ><template v-if="i"
       >, </template
       ><mk-a-button
-          :class="[ bemElem('btn'), tab===x?cls.btnSel:false ]"
-          @activate="onTab(x)"
+        :class="bemElem('btn', tab===x?'sel':false)"
+        @activate="onTab(x)"
       >{{x| capitalize}}</mk-a-button
     ></span
   >.</div
@@ -127,11 +125,6 @@ Vue.component('mk-browser', {
       item,
       tabs: [],
       items: [],
-      // css class helper
-      cls: {
-        win: [ this.bemBlock(), 'mk-aux' ],
-        btnSel: this.bemElem('btn', 'sel'),
-      },
     };
   },
   methods: {
@@ -150,6 +143,9 @@ Vue.component('mk-browser', {
     onNodeSelected(node, param, token) {
       // FIX: synchronize browser display
     },
+  },
+  props: {
+    hidden: Boolean,
   },
   created() {
     const types= allTypes.all;

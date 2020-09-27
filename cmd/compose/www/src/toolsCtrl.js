@@ -1,6 +1,6 @@
 Vue.component('mk-tools', {
   template:
-  `<div class="mk-buttons-form">
+  `<div class="mk-tools mk-aux">
       <button disabled>Play</button>
       <button :disabled="!allow.testing" @click="onTest">Check</button>
       <span v-if="copying">copying...</span>

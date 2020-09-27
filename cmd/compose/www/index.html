@@ -11,13 +11,16 @@
 				<script src="lib/vue.js"></script>
 		</head>
 		<body>
-			<div id="app" class="mk-container"
-				><div class="mk-header">
-					<span>Iffy Composer</span>
-    		</div>
-    		<mk-tools class="mk-buttons mk-aux"
+			<div id="app" 
+				class="mk-container"
+				:class="bemBlock(hideBrowser?'nosidebar':false)"
+				><mk-navigator
+					@navigate="navigate"
+				></mk-navigator>
+    		<mk-tools
     		></mk-tools
 				><mk-browser
+					:hidden="hideBrowser"
 				></mk-browser
 				><div class="mk-composer"
 					:class="{'em-shift': $root.shift}"
@@ -53,6 +56,7 @@
 			<script src="src/node.js"></script>
 			<script src="src/mutation.js"></script>
 			<!--  -->
+			<script src="src/navigateCtrl.js"></script>
 			<script src="src/browseCtrl.js"></script>
 			<script src="src/contextCtrl.js"></script>
 			<script src="src/toolsCtrl.js"></script>

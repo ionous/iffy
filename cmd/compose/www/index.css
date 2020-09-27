@@ -10,35 +10,45 @@ body {
   grid-gap: 10px;
   height: 100%;
   grid-template-areas: 
-    "header buttons"
+    "navigator tools"
     "sidebar editor"
     "sidebar context";
+}
+.mk-container--nosidebar {
+  grid-template-areas: 
+    "navigator tools"
+    "editor editor"
+    "context context";
 }
 .mk-aux {
   color: #404040;
   background-color: #f4f5f7; /* ~solitude */
 }
-.mk-header {
-  grid-area: header;
-  padding: 5px;
-  font-family: sans-serif;
-  font-style: italic;
-  align-self: center;
+.mk-nav {
+  grid-area: navigator;
+  font-family: monospace;
+  border-bottom: 1px solid grey;
+  display: flex;
+  justify-content: space-evenly;
 }
-.mk-buttons-form {
-  overflow: visible;
-  /*float: right;
-  clear: both;*/
-  margin-right: 3px;
-  margin-left: 3px;
-  padding-top: 5px;
+.mk-nav__btn {
+  display: inline-block;
+  align-self: flex-end;
+  cursor: pointer;
+  outline: none !important;
 }
-.mk-buttons {
-  grid-area: buttons;
+.mk-nav__btn--selected {
+  border-bottom: 2px solid orange;
+  margin-bottom: -2px;
 }
-.mk-header button {
-  margin-left: 5em;
+.mk-tools {
+  grid-area: tools;
+  font-family: monospace;
+  display: flex;
 }
+.mk-tools button {
+  margin:3px;
+  }
 .mk-browser {
   grid-area: sidebar;
   overflow-y: scroll;
@@ -85,6 +95,7 @@ body {
   padding-left: 0.5rem;
 }
 .mk-browser__btn {
+  font-family: monospace;
   font-size: small;
   text-decoration: underline;
   color: #0366d6;
@@ -228,7 +239,7 @@ body {
 
 .mk-auto-text__input:focus,
 .mk-txt-edit__input:focus {
-  outline: none !important; 
+  outline: none !important;
 }
 
 .mk-auto-text__input:invalid {

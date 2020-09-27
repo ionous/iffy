@@ -10,39 +10,6 @@ const app= new Vue({
   methods: {
     newMutation(node, extras={}, after={}) {
       const state= new MutationState(node);
-      // REFACTOR
-      // fix: ways to make this more generic?
-      // fix -- this exists to create paragraphs,
-      // changing this and the node hierarchy to handle drag and drop
-      // const sides= [{
-      //   side: "left",
-      //   label: "/break before",
-      // },{
-      //   side: "right",
-      //   label: "/break after"
-      // }];
-      // for (let k=0; k< sides.length; ++k) {
-      //   const {side, label} = sides[k];
-      //   const fields= state[side];
-      //   for (let i=0; i< fields.length; ++i) {
-      //     const field= fields[i];
-      //     const { item } = field;
-      //     if (item && item.type==="story_statement") {
-      //       if (Sibling.HasAdjacentEls(item, field, k*2-1)) {
-      //         let target= node;
-      //         while (target.id !== item.id) {
-      //           target= target.parentNode;
-      //         }
-      //         after[label]= () => {
-      //           // note: the new item has a blank entry which gets overwritten.
-      //           const containerType= target.parentNode.type;
-      //           const para= Types.createItem(containerType); // ex. paragraph
-      //           redux.split( target, para, !k );
-      //         };
-      //       }
-      //     }
-      //   }
-      // }
       return new Mutation(nodes, state, extras, after);
     },
     // used to sync context, browser, etc. controls
@@ -76,17 +43,19 @@ const app= new Vue({
       }
       return isAtStart? Filters.capitalize: Filters.none;
     },
+    navigate(name) {
+      this.hideBrowser= !name;
+    }
   },
   created() {
     this.redux= redux;
     this.blockSearch= new BlockSearch("activity","paragraph","pattern_rules");
     this.events= events;
   },
-  beforeDestroy() {
-  },
   mounted() {
     this.$on("mk-button-activated", () => this.copier.cancel("button"));
   },
+  mixins: [bemMixin("mk-container")],
   computed: {
     story() {
       return this.nodes.root;
@@ -94,6 +63,7 @@ const app= new Vue({
   },
   data() {
     return {
+      hideBrowser: false,
       nodes: nodes.unroll(getStory()),
       dropper: new Dropper(this),
       shift: false,
