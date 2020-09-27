@@ -320,7 +320,7 @@ function getStory() {
                                   "$PATTERN": {
                                     "id": "id-174cdb223ae-37",
                                     "type": "text",
-                                    "value": "^(?:HEIR|HERB|HOMAGE|HONEST|HONOR|HONOUR|HORS|HOUR)"
+                                    "value": "^(?i:HEIR|HERB|HOMAGE|HONEST|HONOR|HONOUR|HORS|HOUR)"
                                   }
                                 }
                               }
@@ -402,7 +402,7 @@ function getStory() {
                         "$LINES": {
                           "id": "id-174cdb223ae-61",
                           "type": "lines",
-                          "value": null
+                          "value": "ok"
                         }
                       }
                     }
@@ -537,10 +537,362 @@ function getStory() {
                                               "$TEXT": {
                                                 "id": "id-174cdd39e3a-13",
                                                 "type": "text",
-                                                "value": "ok"
+                                                "value": "$EMPTY"
                                               }
                                             }
                                           }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "id": "id-174d0e35aff-0",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-174d0e35aff-1",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-174d0e35aff-2",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174d0e35aff-3",
+                                      "type": "choose_text",
+                                      "value": {
+                                        "$IF": {
+                                          "id": "id-174d0e35aff-4",
+                                          "type": "bool_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-5",
+                                            "type": "determine_bool",
+                                            "value": {
+                                              "$NAME": {
+                                                "id": "id-174d0e35aff-6",
+                                                "type": "pattern_name",
+                                                "value": "starts with vowel"
+                                              },
+                                              "$ARGUMENTS": {
+                                                "id": "id-174d0e35aff-7",
+                                                "type": "arguments",
+                                                "value": {
+                                                  "$ARGS": [
+                                                    {
+                                                      "id": "id-174d0e35aff-8",
+                                                      "type": "argument",
+                                                      "value": {
+                                                        "$NAME": {
+                                                          "id": "id-174d0e35aff-9",
+                                                          "type": "variable_name",
+                                                          "value": "text"
+                                                        },
+                                                        "$FROM": {
+                                                          "id": "id-174d0e35aff-10",
+                                                          "type": "assignment",
+                                                          "value": {
+                                                            "id": "id-174d0e35aff-11",
+                                                            "type": "assign_text",
+                                                            "value": {
+                                                              "$VAL": {
+                                                                "id": "id-174d0e35aff-12",
+                                                                "type": "text_eval",
+                                                                "value": {
+                                                                  "id": "id-174d0e35aff-13",
+                                                                  "type": "text_value",
+                                                                  "value": {
+                                                                    "$TEXT": {
+                                                                      "id": "id-174d0e35aff-14",
+                                                                      "type": "text",
+                                                                      "value": "hour"
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "$TRUE": {
+                                          "id": "id-174d0e35aff-15",
+                                          "type": "text_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-16",
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "id": "id-174d0e35aff-17",
+                                                "type": "text",
+                                                "value": "$EMPTY"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "$FALSE": {
+                                          "id": "id-174d0e35aff-18",
+                                          "type": "text_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-19",
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "id": "id-174d0e35aff-20",
+                                                "type": "text",
+                                                "value": "error: hour starts with a vowel sound"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "id": "id-174d0e35aff-31",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-174d0e35aff-32",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-174d0e35aff-33",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174d0e35aff-34",
+                                      "type": "choose_text",
+                                      "value": {
+                                        "$IF": {
+                                          "id": "id-174d0e35aff-35",
+                                          "type": "bool_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-36",
+                                            "type": "determine_bool",
+                                            "value": {
+                                              "$NAME": {
+                                                "id": "id-174d0e35aff-37",
+                                                "type": "pattern_name",
+                                                "value": "starts with vowel"
+                                              },
+                                              "$ARGUMENTS": {
+                                                "id": "id-174d0e35aff-38",
+                                                "type": "arguments",
+                                                "value": {
+                                                  "$ARGS": [
+                                                    {
+                                                      "id": "id-174d0e35aff-39",
+                                                      "type": "argument",
+                                                      "value": {
+                                                        "$NAME": {
+                                                          "id": "id-174d0e35aff-40",
+                                                          "type": "variable_name",
+                                                          "value": "text"
+                                                        },
+                                                        "$FROM": {
+                                                          "id": "id-174d0e35aff-41",
+                                                          "type": "assignment",
+                                                          "value": {
+                                                            "id": "id-174d0e35aff-42",
+                                                            "type": "assign_text",
+                                                            "value": {
+                                                              "$VAL": {
+                                                                "id": "id-174d0e35aff-43",
+                                                                "type": "text_eval",
+                                                                "value": {
+                                                                  "id": "id-174d0e35aff-44",
+                                                                  "type": "text_value",
+                                                                  "value": {
+                                                                    "$TEXT": {
+                                                                      "id": "id-174d0e35aff-45",
+                                                                      "type": "text",
+                                                                      "value": "beta"
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "$TRUE": {
+                                          "id": "id-174d0e35aff-46",
+                                          "type": "text_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-47",
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "id": "id-174d0e35aff-48",
+                                                "type": "text",
+                                                "value": "error: beta doesn't start with a vowel"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "$FALSE": {
+                                          "id": "id-174d0e35aff-49",
+                                          "type": "text_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-50",
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "id": "id-174d0e35aff-51",
+                                                "type": "text",
+                                                "value": "$EMPTY"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "id": "id-174d0e35aff-52",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-174d0e35aff-53",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-174d0e35aff-54",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174d0e35aff-55",
+                                      "type": "choose_text",
+                                      "value": {
+                                        "$IF": {
+                                          "id": "id-174d0e35aff-56",
+                                          "type": "bool_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-57",
+                                            "type": "determine_bool",
+                                            "value": {
+                                              "$NAME": {
+                                                "id": "id-174d0e35aff-58",
+                                                "type": "pattern_name",
+                                                "value": "starts with vowel"
+                                              },
+                                              "$ARGUMENTS": {
+                                                "id": "id-174d0e35aff-59",
+                                                "type": "arguments",
+                                                "value": {
+                                                  "$ARGS": [
+                                                    {
+                                                      "id": "id-174d0e35aff-60",
+                                                      "type": "argument",
+                                                      "value": {
+                                                        "$NAME": {
+                                                          "id": "id-174d0e35aff-61",
+                                                          "type": "variable_name",
+                                                          "value": "text"
+                                                        },
+                                                        "$FROM": {
+                                                          "id": "id-174d0e35aff-62",
+                                                          "type": "assignment",
+                                                          "value": {
+                                                            "id": "id-174d0e35aff-63",
+                                                            "type": "assign_text",
+                                                            "value": {
+                                                              "$VAL": {
+                                                                "id": "id-174d0e35aff-64",
+                                                                "type": "text_eval",
+                                                                "value": {
+                                                                  "id": "id-174d0e35aff-65",
+                                                                  "type": "text_value",
+                                                                  "value": {
+                                                                    "$TEXT": {
+                                                                      "id": "id-174d0e35aff-66",
+                                                                      "type": "text",
+                                                                      "value": "alpha"
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "$TRUE": {
+                                          "id": "id-174d0e35aff-67",
+                                          "type": "text_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-68",
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "id": "id-174d0e35aff-69",
+                                                "type": "text",
+                                                "value": "$EMPTY"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "$FALSE": {
+                                          "id": "id-174d0e35aff-70",
+                                          "type": "text_eval",
+                                          "value": {
+                                            "id": "id-174d0e35aff-71",
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "id": "id-174d0e35aff-72",
+                                                "type": "text",
+                                                "value": "alpha starts with a vowel"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "id": "id-174d0e35aff-26",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-174d0e35aff-27",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-174d0e35aff-28",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174d0e35aff-29",
+                                      "type": "text_value",
+                                      "value": {
+                                        "$TEXT": {
+                                          "id": "id-174d0e35aff-30",
+                                          "type": "text",
+                                          "value": "ok"
                                         }
                                       }
                                     }
