@@ -75,7 +75,7 @@ func fromPattern(k *Importer,
 		err = e
 	} else if m, e := reader.Unpack(m, typeName); e != nil {
 		err = e
-	} else if patternName, e := imp_pattern_name(k, m.MapOf("$PATTERN")); e != nil {
+	} else if patternName, e := imp_pattern_name(k, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else if ps, e := imp_arguments(k, patternName, m.MapOf("$ARGUMENTS")); e != nil {
 		err = e

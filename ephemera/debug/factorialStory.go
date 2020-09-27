@@ -81,7 +81,7 @@ var FactorialTestRule = map[string]interface{}{
 var FactorialDetermineNum = map[string]interface{}{
 	"type": "determine_num",
 	"value": map[string]interface{}{
-		"$PATTERN": map[string]interface{}{
+		"$NAME": map[string]interface{}{
 			"type":  "pattern_name",
 			"value": "factorial",
 		},
@@ -281,7 +281,7 @@ var FactorialSubtract = map[string]interface{}{
 																							"type": "get_var",
 																							"value": map[string]interface{}{
 																								"$NAME": FactorialNum,
-																								}}},
+																							}}},
 																					"$B": map[string]interface{}{
 																						"type": "number_eval",
 																						"value": map[string]interface{}{

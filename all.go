@@ -11,7 +11,7 @@ import (
 )
 
 var AllSlots = [][]composer.Slot{rt.Slots, core.Slots}
-var AllSlats = [][]composer.Slat{core.Slats, express.Slats}
+var AllSlats = [][]composer.Slat{core.Slats, express.Slats, pattern.Slats}
 
 func RegisterGobs() {
 	registerGob()
@@ -31,7 +31,7 @@ func registerGob() {
 				gob.Register(cmd)
 			}
 		}
-		for _, rule := range pattern.Rules {
+		for _, rule := range pattern.Support {
 			gob.Register(rule)
 		}
 		registeredGob = true

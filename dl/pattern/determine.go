@@ -87,7 +87,7 @@ func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
 func (*DetermineNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_num",
-		Spec:  "the {number pattern%name:pattern_name}{?parameters}",
+		Spec:  "the {number pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a number",
 	}
@@ -106,7 +106,7 @@ func (op *DetermineNum) GetNumber(run rt.Runtime) (ret float64, err error) {
 func (*DetermineText) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_text",
-		Spec:  "the {text pattern%name:pattern_name}{?parameters}",
+		Spec:  "the {text pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine some text",
 	}
@@ -125,7 +125,7 @@ func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
 func (*DetermineBool) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_bool",
-		Spec:  "the {true/false pattern%name:pattern_name}{?parameters}",
+		Spec:  "the {true/false pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a true/false value",
 	}
@@ -144,7 +144,7 @@ func (op *DetermineBool) GetBool(run rt.Runtime) (ret bool, err error) {
 func (*DetermineNumList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_num_list",
-		Spec:  "the {number list pattern%name:pattern_name}{?parameters}",
+		Spec:  "the {number list pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a list of numbers",
 	}
@@ -162,7 +162,7 @@ func (op *DetermineNumList) GetNumberStream(run rt.Runtime) (ret rt.Iterator, er
 func (*DetermineTextList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_text_list",
-		Spec:  "the {text list pattern%name:pattern_name}{?parameters}",
+		Spec:  "the {text list pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a list of text",
 	}
