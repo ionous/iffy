@@ -15,6 +15,7 @@ Vue.component('mk-a-button', {
       ></a>`,
   methods: {
     onActivated() {
+      this.$root.events.$emit("mk-button-activated");
       this.$emit('activate');
     }
   },

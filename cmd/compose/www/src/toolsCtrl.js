@@ -3,6 +3,7 @@ Vue.component('mk-tools', {
   `<div class="mk-buttons-form">
       <button disabled>Play</button>
       <button :disabled="!allow.testing" @click="onTest">Check</button>
+      <span v-if="copying">copying...</span>
       <span v-if="msg">{{msg}}</span>
     </div>`,
   data() {
@@ -11,6 +12,12 @@ Vue.component('mk-tools', {
       allow: {
         testing: true,
       },
+    }
+  },
+  computed: {
+    copying() {
+      const { copier } = this.$root;
+      return copier.active;
     }
   },
   methods: {

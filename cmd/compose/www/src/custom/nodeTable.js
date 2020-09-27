@@ -66,9 +66,10 @@ class DraggableSiblings extends DraggableNode {
 
 // an event sink implementation specific to em-node-table.
 class NodeTableEvents  {
-  constructor(list) {
+  constructor(list, copier) {
     this.list= list; // always a NodeList
     this.finder= false;
+    this.copier= copier; // FIX! probably should be handled by the dropper and use drag effect
   }
   bind(containerEl) {
     this.finder= containerEl? new TargetFinder(containerEl): false;
@@ -91,15 +92,31 @@ class NodeTableEvents  {
     return ret;
   }
   dragDrop(from, targetEl) {
+    const copying= this.copier.active;
+    this.copier.active= false; // ugh.
     // not sure why, but dt.dropEffect is often 'none' here on chrome;
     // ( even though drag end will be copy )
     const target= this.finder.findIdx(targetEl);
     if (target) {
+      const { list } = this;
+
       if (from instanceof DraggableCommand) {
-        this.list.insertAt(target.idx, from.type); // add draggable command
+        list.insertAt(target.idx, from.type); // add draggable command
       }
       else if (from instanceof DraggableNode) {
-        this.list.transferTo(target.idx, from.list, from.target.idx, from.width);
+        if (!copying) {
+          list.transferTo(target.idx, from.list, from.target.idx, from.width);
+        } else {
+          let newList=[];
+          for (let at=from.target.idx; newList.length< from.width; ++at) {
+            const src= from.list.at(at).serialize(false);
+            const noids= src.replace(/"id":"[^"]*"[,]?/g, '');
+            const newData= JSON.parse(noids);
+            const newNodes= list.nodes.newFromItem(null, newData);
+            newList.push(newNodes);
+          }
+          list.spliceInto(target.idx, ...newList);
+        }
       }
     }
   }

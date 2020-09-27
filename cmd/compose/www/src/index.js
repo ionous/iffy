@@ -7,7 +7,6 @@ const redux= new Redux(Vue);
 //
 const app= new Vue({
   el: '#app',
-  mixins: [shiftMixin()],
   methods: {
     newMutation(node, extras={}, after={}) {
       const state= new MutationState(node);
@@ -81,6 +80,12 @@ const app= new Vue({
   created() {
     this.redux= redux;
     this.blockSearch= new BlockSearch("activity","paragraph","pattern_rules");
+    this.events= events;
+  },
+  beforeDestroy() {
+  },
+  mounted() {
+    this.$on("mk-button-activated", () => this.copier.cancel("button"));
   },
   computed: {
     story() {
@@ -91,6 +96,18 @@ const app= new Vue({
     return {
       nodes: nodes.unroll(getStory()),
       dropper: new Dropper(this),
+      shift: false,
+      copier: {
+        active: false,
+        cancel(reason) {
+          this.active= false;
+          console.log("copier deactivated", reason);
+        },
+        start(reason) {
+          this.active= true;
+          console.log("copier activated", reason);
+        },
+      },
     };
   }
 });

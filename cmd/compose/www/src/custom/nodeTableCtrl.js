@@ -22,7 +22,7 @@ Vue.component('em-node-table', {
   },
   mounted() {
     const { "$root": root, list } = this;
-    this.handler = new DragHandler(root.dropper, new NodeTableEvents(list)).
+    this.handler = new DragHandler(root.dropper, new NodeTableEvents(list,root.copier)).
       listen(this.$el);
   },
   beforeDestroy() {
@@ -53,7 +53,7 @@ Vue.component('em-node-table', {
     },
     dragging(idx) {
       const { "$root": root, list } = this;
-      const start = root.dropper.dragging;
+      const start = root.dropper.dragging && !root.copier.active;
       return start && start.contains && start.contains(list, idx);
     },
     // generate a vue css class object for an item based on the current highlight settings.
