@@ -1,5 +1,4 @@
-// app stores a folder `{ name, contents: [] }`
-// where elements of contents are either strings, or the same {} pair structure;
+// interacts with the list of all story files and folders
 Vue.component('mk-catalog', {
   template:
   `<div
@@ -11,31 +10,29 @@ Vue.component('mk-catalog', {
       :backcat="backcat"
     ></mk-folder-ctrl
   ></div>`,
+  props: {
+    catalog: Cataloger,
+  },
   mounted() {
     const { catalog } = this;
     catalog.getFiles(this.folder);
-  },
-  created() {
-    const { "$root": root  } = this;
-    if (!root._catalogSingleton) {
-      root._catalogSingleton= new MockCatalog();
-    }
-    this.catalog= root._catalogSingleton;
   },
   data() {
     const that = this;
     return {
       backcat: {
-        onFolder(parent,folder) {
+        onFolder(parent, folder) {
           if (folder.contents) {
             folder.contents= false;
           } else {
-            // this injects the list of sub-files into the passed folder
+            // injects the list of sub-files into the passed folder
             that.catalog.getFiles(folder);
           }
         },
-        onFile(parent,file) {
-          // open the file.
+        onFile(parent, file) {
+          // injects the story data into the passed file
+          that.catalog.loadFile(file);
+          that.$emit("opened-file", {file});
         },
       },
       folder: new CatalogFolder(""),

@@ -1,5 +1,5 @@
 class NodeTest {
-  constructor(rootItem) {
+  constructor(testData) {
     this.all= {};
     this.nodes= new Nodes( this.all, "" );
     this.redux= new Redux({
@@ -10,10 +10,8 @@ class NodeTest {
         delete tgt[field];
       },
     }, this.nodes, 100);
-    if (rootItem){
-      this.nodes.unroll(rootItem);
-    }
-    this.rootItem= rootItem
+    this.testData= testData;
+    this.rootNode= testData && this.nodes.unroll(testData);
   }
   newMutation(node) {
     const state= new MutationState(node);
@@ -113,7 +111,7 @@ function nodeTests() {
   }
   function testMutation(name, expected) {
     runTest(`mutation ${name}`, function(test) {
-      const before= JSON.stringify(test.rootItem, 0, 2);
+      const before= JSON.stringify(test.testData, 0, 2);
       const node= test.all[name];
       const mutation= test.newMutation(node);
       const have= JSON.stringify(mutation.state,0,2);
@@ -123,7 +121,7 @@ function nodeTests() {
         console.log("want:", want);
         throw new Error(`${node.id} mismatched`);
       }
-      const after= JSON.stringify(test.rootItem, 0, 2);
+      const after= JSON.stringify(test.testData, 0, 2);
       if (before !== after) {
         console.log("have:", after);
         throw new Error(`original data changed?!`);
@@ -226,9 +224,9 @@ function nodeTests() {
   });
   //
   runTest("serialization", function(test) {
-    const { nodes, rootItem } = test;
-    const ogJson= JSON.stringify(rootItem,0,2);
-    const nodeJson= nodes.root.serialize();
+    const { testData, rootNode } = test;
+    const ogJson= JSON.stringify(testData,0,2);
+    const nodeJson= rootNode.serialize();
     if (nodeJson !== ogJson) {
       console.log(nodeJson);
       throw new Error("mismatched serialization");
@@ -376,8 +374,7 @@ function nodeTests() {
   });
   //
   runTest("add blank story statement", function(test) {
-    const { nodes } = test;
-    const para= nodes.root;
+    const { nodes, rootNode: para } = test;
     const statements= para.getKid("$STORY_STATEMENT");
     const table= new InlinePhraseList(nodes, para);
     if (statements.length!==1 || statements[0].id !== "td0") {
@@ -404,8 +401,7 @@ function nodeTests() {
       "value": {"$STORY_STATEMENT": []}
   };
   runTest("move story statements", function(test) {
-    const { nodes } = test;
-    const para= nodes.root;
+    const { nodes, rootNode: para } = test;
     const statements= para.getKid("$STORY_STATEMENT");
     const table= new InlinePhraseList(nodes, para);
     table.insertAt(0, table.type);

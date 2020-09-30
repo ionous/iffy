@@ -63,23 +63,22 @@ body {
 }
 .mk-folder-ctrl {
   list-style-type: none;
-  padding-left: 10px;
+  padding-inline-start: 0px;
 }
-.mk-file-item:hover,
-.mk-file-item a:hover,
-.mk-folder-item:hover,
-.mk-folder-item a:hover {
-  background-color: white;
-}
-.mk-file-item a,
-.mk-folder-item a {
-  width: 100%;
-  }
-.mk-folder-item--closed::before {
+
+.mk-folder-item__button--closed::before {
    content: "\1F4C1"; 
 }
-.mk-folder-item--open::before {
+.mk-folder-item__button--open::before {
    content: "\1F4C2"; 
+}
+.mk-cat-button  {
+  display: block;
+}
+.mk-cat-button:hover {
+  background-color: white;
+  color: #0366d6;
+  cursor: pointer;
 }
 /**
  * mk-tester

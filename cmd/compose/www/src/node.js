@@ -298,14 +298,11 @@ class Ids {
 class Nodes {
   constructor(pool, idNamespace=false) {
     this.pool= pool;
-    this.root= null; //
     this.ids= new Ids(idNamespace);
   }
   unroll(item) {
     // newFromItem "unrolls" the item data.
-    const root= this.newFromItem(null, item);
-    this.root= root;
-    return this;
+    return this.newFromItem(null, item);
   }
   newFromType(typeName) {
     const item= Types.createItem(typeName);

@@ -35,9 +35,12 @@ const app= new Vue({
           break;
         }
         // elements exist to the left?
-        const includePlainText= true;
-        if (Cursor.At(node).step(-1, includePlainText)) {
-          break;
+        const c= Cursor.At(node);
+        if (c) { // cursor can be null if parent is null.
+          const includePlainText= true;
+          if (c.step(-1, includePlainText)) {
+            break;
+          }
         }
         node= node.parent;
       }
@@ -48,15 +51,13 @@ const app= new Vue({
     this.redux= redux;
     this.blockSearch= new BlockSearch("activity","paragraph","pattern_rules");
     this.events= events;
-  },
-  computed: {
-    story() {
-      return this.nodes.root;
-    },
+    this.catalog= (typeof MockCatalog !== "undefined")?
+                new MockCatalog(nodes):
+                new RemoteCatalog(nodes);
   },
   data() {
     return {
-      nodes: nodes.unroll(getStory()),
+      nodes: nodes,
       dropper: new Dropper(this),
       shift: false,
       copier: {

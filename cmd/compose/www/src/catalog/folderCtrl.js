@@ -7,22 +7,29 @@ Vue.component('mk-folder-ctrl', {
       v-for="item in folders"
       :key="item.fullpath"
       :item="item"
+      :depth="depth"
       @activated="onFolder(item)"
       ><mk-folder-ctrl
         :folder="item"
         :backcat="backcat"
+        :depth="depth+1"
       ></mk-folder-ctrl
     ></mk-folder-item
     ><mk-file-item
       v-for="item in files"
       :key="item.fullpath"
       :item="item"
+      :depth="depth"
       @activated="onFile(item)"
     ></mk-file-item
   ></ol>`,
   props: {
     folder: Object,
     backcat: Object,
+    depth: {
+      type: Number,
+      default: 0
+    },
   },
   computed: {
     folders() {

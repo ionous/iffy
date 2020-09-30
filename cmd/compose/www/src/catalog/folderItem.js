@@ -1,12 +1,19 @@
 Vue.component('mk-folder-item', {
-  template:`<li
-    :class="bemBlock(open?'open':'closed')"
-    ><mk-a-button
+  template:
+  `<li
+    ><mk-cat-button
+      :class="bemElem('button', open?'open':'closed')"
+      :depth="depth"
       @activate="onActivated"
-    >{{name}}</mk-a-button
+    >{{name}}</mk-cat-button
     ><slot
     ></slot
   ></li>`,
+  mixins: [bemMixin()],
+  props: {
+    item: CatalogFolder,
+    depth: Number
+  },
   computed: {
     name() {
       const { item }= this;
@@ -17,13 +24,9 @@ Vue.component('mk-folder-item', {
       return item && item.contents;
     }
   },
-  props: {
-    item: CatalogItem,
-  },
   methods: {
     onActivated() {
       this.$emit("activated", this.name);
     },
   },
-  mixins: [bemMixin()],
 });
