@@ -9,12 +9,16 @@ import (
 // Config contains paths to the standalone console utils.
 // Rather than creating one big app, for now, iffy is split into a bunch of separate commands.
 type Config struct {
-	Import    string
-	Assemble  string
-	Check     string
-	Play      string
-	Documents string
-	Port      int
+	Import   string
+	Assemble string
+	Check    string
+	Play     string
+	Root     string
+	Port     int
+}
+
+func (c *Config) Scratch(hash, file string) string {
+	return path.Join(c.Root, ".scratch", hash, file)
 }
 
 // DevConfig creates a reasonable(?) config based on the developer go path.
@@ -28,11 +32,11 @@ func DevConfig(base string) *Config {
 	}
 	i, a, c, p := "import", "asm", "check", "play"
 	return &Config{
-		Import:    path.Join(base, bin, i),
-		Assemble:  path.Join(base, bin, a),
-		Check:     path.Join(base, bin, c),
-		Play:      path.Join(base, bin, p),
-		Documents: dir,
-		Port:      3000,
+		Import:   path.Join(base, bin, i),
+		Assemble: path.Join(base, bin, a),
+		Check:    path.Join(base, bin, c),
+		Play:     path.Join(base, bin, p),
+		Root:     dir,
+		Port:     3000,
 	}
 }

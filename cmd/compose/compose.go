@@ -15,7 +15,7 @@ func main() {
 	//
 	cfg := composer.DevConfig(build.Default.GOPATH)
 	if len(dir) > 0 {
-		cfg.Documents = dir
+		cfg.Root = dir
 	}
 	composer.Compose(cfg)
 }
