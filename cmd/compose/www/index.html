@@ -11,13 +11,11 @@
 				<script src="lib/vue.js"></script>
 		</head>
 		<body>
-			<div id="app"
-				><mk-composer
-					:copier="copier"
-					:catalog="catalog"
-				></mk-composer
-			></div>
-			<script src="src/lair/eventGroup.js"></script>
+			<mk-composer id="app"
+				:copier="copier"
+				:catalog="catalog"
+			></mk-composer
+			><script src="src/lair/eventGroup.js"></script>
 			<script src="src/lair/draggable.js"></script>
 			<script src="src/lair/dragHandler.js"></script>
 			<script src="src/lair/dropper.js"></script>
