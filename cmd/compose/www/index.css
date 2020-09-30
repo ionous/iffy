@@ -7,7 +7,7 @@ body {
   display: grid;
   grid-template-columns: 200px auto;
   grid-template-rows: 2rem auto 20%;
-  grid-gap: 10px;
+  grid-gap: 0px 10px;
   height: 100%;
   grid-template-areas: 
     "navigator tools"
@@ -24,6 +24,9 @@ body {
   color: #404040;
   background-color: #f4f5f7; /* ~solitude */
 }
+/**
+ * mk-nav
+ */
 .mk-nav {
   grid-area: navigator;
   font-family: monospace;
@@ -41,6 +44,9 @@ body {
   border-bottom: 2px solid orange;
   margin-bottom: -2px;
 }
+/**
+ * mk-tools
+ */
 .mk-tools {
   grid-area: tools;
   font-family: monospace;
@@ -48,12 +54,50 @@ body {
 }
 .mk-tools button {
   margin:3px;
+}
+/**
+ * mk-catalog
+ */
+.mk-catalog {
+  grid-area: sidebar;
+}
+.mk-folder-ctrl {
+  list-style-type: none;
+  padding-left: 10px;
+}
+.mk-file-item:hover,
+.mk-file-item a:hover,
+.mk-folder-item:hover,
+.mk-folder-item a:hover {
+  background-color: white;
+}
+.mk-file-item a,
+.mk-folder-item a {
+  width: 100%;
   }
+.mk-folder-item--closed::before {
+   content: "\1F4C1"; 
+}
+.mk-folder-item--open::before {
+   content: "\1F4C2"; 
+}
+/**
+ * mk-tester
+ */
+.mk-tester {
+  grid-area: sidebar;
+} 
+/**
+ * mk-browser
+ */
 .mk-browser {
   grid-area: sidebar;
   overflow-y: scroll;
   border-top-right-radius: 5px;
 }
+/**
+ * mk-context
+ */
 .mk-context {
   grid-area: context;
   border-top-left-radius: 5px;

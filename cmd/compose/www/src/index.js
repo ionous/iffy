@@ -42,9 +42,6 @@ const app= new Vue({
         node= node.parent;
       }
       return isAtStart? Filters.capitalize: Filters.none;
-    },
-    navigate(name) {
-      this.sidebar= name;
     }
   },
   created() {
@@ -52,10 +49,6 @@ const app= new Vue({
     this.blockSearch= new BlockSearch("activity","paragraph","pattern_rules");
     this.events= events;
   },
-  mounted() {
-    this.$on("mk-button-activated", () => this.copier.cancel("button"));
-  },
-  mixins: [bemMixin("mk-container")],
   computed: {
     story() {
       return this.nodes.root;
@@ -63,7 +56,6 @@ const app= new Vue({
   },
   data() {
     return {
-      sidebar: "Commands", // ugh.
       nodes: nodes.unroll(getStory()),
       dropper: new Dropper(this),
       shift: false,

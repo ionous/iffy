@@ -11,33 +11,11 @@
 				<script src="lib/vue.js"></script>
 		</head>
 		<body>
-			<div id="app" 
-				class="mk-container"
-				:class="bemBlock(sidebar||'nosidebar')"
-				><mk-navigator
-					:tabs="['Commands', 'Files', 'Tests', '(x)']"
-					@navigate="navigate"
-				></mk-navigator>
-    		<mk-tools
-    		></mk-tools
-					><mk-browser v-if="sidebar==='Commands'"
-					></mk-browser
-					><mk-finder v-else-if="sidebar==='Files'"
-					></mk-finder
-					><mk-tester v-else-if="sidebar==='Tests'"
-					></mk-tester
-				><div class="mk-composer"
-					:class="{'em-shift': $root.shift}"
-					><mk-switch
-							:node="story"
-					></mk-switch
-					><mk-trash-can
-					></mk-trash-can
-					><div class="mk-breathing-space"
-					></div
-				></div
-				><mk-context
-				></mk-context
+			<div id="app"
+				><mk-composer
+					:copier="copier"
+					:story="story"
+				></mk-composer
 			></div>
 			<script src="src/lair/eventGroup.js"></script>
 			<script src="src/lair/draggable.js"></script>
@@ -60,13 +38,19 @@
 			<script src="src/node.js"></script>
 			<script src="src/mutation.js"></script>
 			<!--  -->
+			<script src="src/catalog/remoteCatalog.js"></script>
+			<script src="src/catalog/folderItem.js"></script>
+			<script src="src/catalog/fileItem.js"></script>
+			<script src="src/catalog/folderCtrl.js"></script>
+			<script src="src/catalog/catalogCtrl.js"></script>
+			<!--  -->
 			<script src="src/navigateCtrl.js"></script>
 			<script src="src/browseCtrl.js"></script>
 			<script src="src/contextCtrl.js"></script>
 			<script src="src/toolsCtrl.js"></script>
-			<script src="src/finderCtrl.js"></script>
 			<script src="src/testCtrl.js"></script>
 			<script src="src/trashCan.js"></script>
+			<script src="src/composeCtrl.js"></script>
 				<!-- composer controls  -->
 			<script src="src/pickInline.js"></script>
 			<script src="src/numCtrl.js"></script>

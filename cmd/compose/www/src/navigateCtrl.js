@@ -1,8 +1,7 @@
 
 Vue.component('mk-nav-button', {
   template:
-  `<a tabindex="0"
-    :class="bemBlock(selected?'selected':false)"
+  `<a :class="bemBlock(selected?'selected':false)"
     @click="onActivated"
     @keydown.prevent.space="onActivated"
     @keydown.prevent.enter="onActivated"
@@ -44,10 +43,12 @@ Vue.component('mk-navigator', {
   },
   props: {
     tabs: Array,
+    initialTab: String,
   },
   data() {
+    const tab= this.tabs.indexOf(this.initialTab);
     return {
-      tab: 0,
+      tab,
     };
   },
   mixins: [bemMixin()],
