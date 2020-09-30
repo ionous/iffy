@@ -51,9 +51,11 @@ const app= new Vue({
     this.redux= redux;
     this.blockSearch= new BlockSearch("activity","paragraph","pattern_rules");
     this.events= events;
-    this.catalog= (typeof MockCatalog !== "undefined")?
+    const catalog= (typeof MockCatalog !== "undefined")?
                 new MockCatalog(nodes):
                 new RemoteCatalog(nodes);
+    this.shortcuts= new Shortcuts(redux, catalog, this.copier);
+    this.catalog= catalog;
   },
   data() {
     return {
@@ -74,6 +76,3 @@ const app= new Vue({
     };
   }
 });
-
-const shortcuts= new Shortcuts(redux);
-

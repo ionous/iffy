@@ -1,11 +1,15 @@
+// fix? shift into a component with an empty render() function
+// for redux, to avoid getting watched, possibly set an internal property on created
+// then fill it after creation
 class Shortcuts {
-  constructor(redux) {
+  constructor(redux, catalog, copier) {
     const trap= new Mousetrap();
     this.mousetrap = trap;
     //
     var shifty= false;
     function changeShift(x) {
       if (x!== shifty) {
+        // ugh.
         app.shift= shifty= x;
       }
     }
@@ -43,14 +47,7 @@ class Shortcuts {
             (el.contentEditable && el.contentEditable == 'true');
     };
     trap.bind('mod+s', function(e) {
-      const { story } = app;
-      // its confusing to not have things save when you explicitly ask
-      if (true /*redux.changed*/) {
-        const serial = story.serialize();
-        localStorage.setItem("save", serial);
-        redux.changed = 0;
-        console.log("saved", serial);
-      }
+      catalog.saveFiles();
       return false;
     });
     trap.bind('mod+z', function(e) {
@@ -66,12 +63,10 @@ class Shortcuts {
       return false;
     });
     trap.bind('esc', function(e) {
-      const { copier } = app;
       copier.cancel("escape");
       return false;
     });
     trap.bind('mod+c', function(e) {
-      const { copier } = app;
       copier.start("shortcut");
       return false;
     });

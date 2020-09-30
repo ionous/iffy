@@ -40,9 +40,8 @@ let globalRedux;
 // Redux handles undo/redo
 class Redux {
   // vm is a subset of Vue used for triggering change tracking.
-  constructor(vm, nodes, max=500) {
+  constructor(vm, max=500) {
     this.vm= vm;
-    this.nodes= nodes;
     this.applied= new Restack(max);
     this.revoked= new Restack(max);
     this.changed= 0;

@@ -28,6 +28,12 @@ class MockCatalog extends Cataloger {
     super();
     this.store= new CatalogStore(nodes);
   }
+  // maybe takes a string, list, or none
+  // if none saves all.
+  saveFiles() {
+    const json= JSON.stringify(this.store, 0,2);
+    console.log("SAVED:", json);
+  }
   // injects the real contents of the targeted file
   // into the passed CatalogFile object.
   loadFile(file) {

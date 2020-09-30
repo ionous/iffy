@@ -1,5 +1,7 @@
 class Cataloger {}
 
+
+// catalog store tracks individual files.
 class CatalogStore {
   constructor(nodes) {
     this.nodes= nodes;
@@ -13,5 +15,15 @@ class CatalogStore {
     const story= nodes.unroll(storyData);
     cache[path]= story;
     return story;
+  }
+  toJSON() {
+    const { cache } = this;
+    return Object.keys(cache).map(path=> {
+      const story= cache[path];
+      return {
+        path,
+        story,
+      };
+    });
   }
 }

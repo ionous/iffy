@@ -9,7 +9,7 @@ class NodeTest {
       "delete": (tgt, field) => {
         delete tgt[field];
       },
-    }, this.nodes, 100);
+    }, 100);
     this.testData= testData;
     this.rootNode= testData && this.nodes.unroll(testData);
   }
