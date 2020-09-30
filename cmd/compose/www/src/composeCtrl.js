@@ -52,6 +52,7 @@ Vue.component('mk-composer', {
     },
     onOpenedFile(file) {
       this.currentFile= file;
+      window.document.title= `${file.name.slice(0,-6)} - Iffy Composer - ${file.fullpath}`;
     }
   },
   mounted() {
