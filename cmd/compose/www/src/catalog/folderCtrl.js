@@ -5,7 +5,7 @@ Vue.component('mk-folder-ctrl', {
   `<ol class="mk-folder-ctrl"
     ><mk-folder-item
       v-for="item in folders"
-      :key="item.fullpath"
+      :key="item.path"
       :item="item"
       :depth="depth"
       @activated="onFolder(item)"
@@ -17,7 +17,7 @@ Vue.component('mk-folder-ctrl', {
     ></mk-folder-item
     ><mk-file-item
       v-for="item in files"
-      :key="item.fullpath"
+      :key="item.path"
       :item="item"
       :depth="depth"
       @activated="onFile(item)"
@@ -44,7 +44,7 @@ Vue.component('mk-folder-ctrl', {
       const { folder } = this;
       return folder.contents? folder.contents.filter((el)=> {
         return (el instanceof CatalogFolder) === isFolder;
-      }): [];
+      }).sort((a,b)=> a.name.localeCompare(b.name)): [];
     },
     onFolder(item) {
       const { backcat, folder } = this;

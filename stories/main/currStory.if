@@ -1,5 +1,4 @@
-function getStory() {
-  return {
+{
   "id": "id-a-2",
   "type": "story",
   "value": {
@@ -160,6 +159,17 @@ function getStory() {
                     "type": "pattern_name",
                     "value": "print name"
                   },
+                  "$TYPE": {
+                    "id": "id-a-4",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-a-6",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
+                    }
+                  },
                   "$OPTVARS": {
                     "id": "id-a-10",
                     "type": "pattern_variables_tail",
@@ -169,11 +179,6 @@ function getStory() {
                           "id": "id-a-9",
                           "type": "variable_decl",
                           "value": {
-                            "$NAME": {
-                              "id": "id-a-8",
-                              "type": "variable_name",
-                              "value": "target"
-                            },
                             "$TYPE": {
                               "id": "id-a-7",
                               "type": "variable_type",
@@ -195,21 +200,15 @@ function getStory() {
                                   }
                                 }
                               }
+                            },
+                            "$NAME": {
+                              "id": "id-a-8",
+                              "type": "variable_name",
+                              "value": "target"
                             }
                           }
                         }
                       ]
-                    }
-                  },
-                  "$TYPE": {
-                    "id": "id-a-4",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-a-6",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
                     }
                   }
                 }
@@ -230,6 +229,11 @@ function getStory() {
                 "id": "id-1740db6898f-2",
                 "type": "test_scene",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-17464fa730d-0",
+                    "type": "test_name",
+                    "value": "name of a kind"
+                  },
                   "$STORY": {
                     "id": "id-1748e116bbd-0",
                     "type": "story",
@@ -375,11 +379,6 @@ function getStory() {
                         }
                       ]
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-17464fa730d-0",
-                    "type": "test_name",
-                    "value": "name of a kind"
                   }
                 }
               }
@@ -399,6 +398,11 @@ function getStory() {
                 "id": "id-a-30",
                 "type": "test_statement",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-17464fa730d-3",
+                    "type": "test_name",
+                    "value": "name of a kind"
+                  },
                   "$TEST": {
                     "id": "id-a-29",
                     "type": "testing",
@@ -413,11 +417,6 @@ function getStory() {
                         }
                       }
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-17464fa730d-3",
-                    "type": "test_name",
-                    "value": "name of a kind"
                   }
                 }
               }
@@ -444,6 +443,11 @@ function getStory() {
                 "id": "id-17460c01f70-1",
                 "type": "test_rule",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-17464fa730d-6",
+                    "type": "test_name",
+                    "value": "name of a kind"
+                  },
                   "$HOOK": {
                     "id": "id-17460cc7b6c-0",
                     "type": "program_hook",
@@ -482,11 +486,6 @@ function getStory() {
                         }
                       }
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-17464fa730d-6",
-                    "type": "test_name",
-                    "value": "name of a kind"
                   }
                 }
               }
@@ -771,6 +770,15 @@ function getStory() {
                                       }
                                     }
                                   },
+                                  "$IS": {
+                                    "id": "id-174941fde22-5",
+                                    "type": "comparator",
+                                    "value": {
+                                      "id": "id-174941fde22-23",
+                                      "type": "unequal",
+                                      "value": {}
+                                    }
+                                  },
                                   "$B": {
                                     "id": "id-174941fde22-6",
                                     "type": "text_eval",
@@ -784,15 +792,6 @@ function getStory() {
                                           "value": "$EMPTY"
                                         }
                                       }
-                                    }
-                                  },
-                                  "$IS": {
-                                    "id": "id-174941fde22-5",
-                                    "type": "comparator",
-                                    "value": {
-                                      "id": "id-174941fde22-23",
-                                      "type": "unequal",
-                                      "value": {}
                                     }
                                   }
                                 }
@@ -895,6 +894,17 @@ function getStory() {
                     "type": "pattern_name",
                     "value": "print plural name"
                   },
+                  "$TYPE": {
+                    "id": "id-1748e116bbd-4",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-1748e116bbd-7",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
+                    }
+                  },
                   "$OPTVARS": {
                     "id": "id-1748e116bbd-8",
                     "type": "pattern_variables_tail",
@@ -904,11 +914,6 @@ function getStory() {
                           "id": "id-1748e116bbd-9",
                           "type": "variable_decl",
                           "value": {
-                            "$NAME": {
-                              "id": "id-1748e116bbd-11",
-                              "type": "variable_name",
-                              "value": "target"
-                            },
                             "$TYPE": {
                               "id": "id-1748e116bbd-10",
                               "type": "variable_type",
@@ -930,21 +935,15 @@ function getStory() {
                                   }
                                 }
                               }
+                            },
+                            "$NAME": {
+                              "id": "id-1748e116bbd-11",
+                              "type": "variable_name",
+                              "value": "target"
                             }
                           }
                         }
                       ]
-                    }
-                  },
-                  "$TYPE": {
-                    "id": "id-1748e116bbd-4",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-1748e116bbd-7",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
                     }
                   }
                 }
@@ -1102,6 +1101,15 @@ function getStory() {
                                       }
                                     }
                                   },
+                                  "$IS": {
+                                    "id": "id-17494737044-17",
+                                    "type": "comparator",
+                                    "value": {
+                                      "id": "id-17494737044-31",
+                                      "type": "unequal",
+                                      "value": {}
+                                    }
+                                  },
                                   "$B": {
                                     "id": "id-17494737044-18",
                                     "type": "text_eval",
@@ -1115,15 +1123,6 @@ function getStory() {
                                           "value": "$EMPTY"
                                         }
                                       }
-                                    }
-                                  },
-                                  "$IS": {
-                                    "id": "id-17494737044-17",
-                                    "type": "comparator",
-                                    "value": {
-                                      "id": "id-17494737044-31",
-                                      "type": "unequal",
-                                      "value": {}
                                     }
                                   }
                                 }
@@ -1191,6 +1190,11 @@ function getStory() {
                 "id": "id-17494a3a882-0",
                 "type": "test_scene",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-17494a3a882-1",
+                    "type": "test_name",
+                    "value": "plural name printing"
+                  },
                   "$STORY": {
                     "id": "id-17494a3a882-2",
                     "type": "story",
@@ -1275,12 +1279,12 @@ function getStory() {
                                                   "type": "are_an",
                                                   "value": "$ARE"
                                                 },
+                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-17494a3a882-32",
                                                   "type": "singular_kind",
                                                   "value": "things"
-                                                },
-                                                "$TRAIT": []
+                                                }
                                               }
                                             }
                                           }
@@ -1298,10 +1302,10 @@ function getStory() {
                                   "id": "id-17494ab71d0-1",
                                   "type": "noun_assignment",
                                   "value": {
-                                    "$LINES": {
-                                      "id": "id-17494ab71d0-4",
-                                      "type": "lines",
-                                      "value": "broken flower pots"
+                                    "$PROPERTY": {
+                                      "id": "id-17494ab71d0-2",
+                                      "type": "property",
+                                      "value": "printed plural name"
                                     },
                                     "$NOUNS": [
                                       {
@@ -1321,10 +1325,10 @@ function getStory() {
                                         }
                                       }
                                     ],
-                                    "$PROPERTY": {
-                                      "id": "id-17494ab71d0-2",
-                                      "type": "property",
-                                      "value": "printed plural name"
+                                    "$LINES": {
+                                      "id": "id-17494ab71d0-4",
+                                      "type": "lines",
+                                      "value": "broken flower pots"
                                     }
                                   }
                                 }
@@ -1334,11 +1338,6 @@ function getStory() {
                         }
                       ]
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-17494a3a882-1",
-                    "type": "test_name",
-                    "value": "plural name printing"
                   }
                 }
               }
@@ -1358,6 +1357,11 @@ function getStory() {
                 "id": "id-17494ab71d0-13",
                 "type": "test_statement",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-17494ab71d0-14",
+                    "type": "test_name",
+                    "value": "plural name printing"
+                  },
                   "$TEST": {
                     "id": "id-17494ab71d0-15",
                     "type": "testing",
@@ -1372,11 +1376,6 @@ function getStory() {
                         }
                       }
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-17494ab71d0-14",
-                    "type": "test_name",
-                    "value": "plural name printing"
                   }
                 }
               }
@@ -1388,6 +1387,11 @@ function getStory() {
                 "id": "id-17494ab71d0-24",
                 "type": "test_rule",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-17494ab71d0-25",
+                    "type": "test_name",
+                    "value": "$CURRENT_TEST"
+                  },
                   "$HOOK": {
                     "id": "id-17494ab71d0-26",
                     "type": "program_hook",
@@ -1426,11 +1430,6 @@ function getStory() {
                         }
                       }
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-17494ab71d0-25",
-                    "type": "test_name",
-                    "value": "$CURRENT_TEST"
                   }
                 }
               }
@@ -1455,6 +1454,17 @@ function getStory() {
                     "type": "pattern_name",
                     "value": "Print several"
                   },
+                  "$TYPE": {
+                    "id": "id-17494873906-7",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-17494873906-10",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
+                    }
+                  },
                   "$OPTVARS": {
                     "id": "id-17494873906-11",
                     "type": "pattern_variables_tail",
@@ -1464,11 +1474,6 @@ function getStory() {
                           "id": "id-17494873906-12",
                           "type": "variable_decl",
                           "value": {
-                            "$NAME": {
-                              "id": "id-17494873906-14",
-                              "type": "variable_name",
-                              "value": "group size"
-                            },
                             "$TYPE": {
                               "id": "id-17494873906-13",
                               "type": "variable_type",
@@ -1479,21 +1484,15 @@ function getStory() {
                                   "value": "$NUMBER"
                                 }
                               }
+                            },
+                            "$NAME": {
+                              "id": "id-17494873906-14",
+                              "type": "variable_name",
+                              "value": "group size"
                             }
                           }
                         }
                       ]
-                    }
-                  },
-                  "$TYPE": {
-                    "id": "id-17494873906-7",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-17494873906-10",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
                     }
                   }
                 }
@@ -1570,7 +1569,7 @@ function getStory() {
                                                   "$TEMPLATE": {
                                                     "id": "id-174949649ef-13",
                                                     "type": "lines",
-                                                    "value": "{printNumWord: .groupSize} other {if .groupSize \u003e 1}{ printPluralName: .target}{else}{printName: .target}{end}"
+                                                    "value": "{printNumWord: .groupSize} other {if .groupSize > 1}{ printPluralName: .target}{else}{printName: .target}{end}"
                                                   }
                                                 }
                                               }
@@ -1606,6 +1605,11 @@ function getStory() {
                 "id": "id-174bd1dc16a-0",
                 "type": "test_scene",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174bd1dc16a-1",
+                    "type": "test_name",
+                    "value": "thingaverse"
+                  },
                   "$STORY": {
                     "id": "id-174bd1dc16a-2",
                     "type": "story",
@@ -1738,12 +1742,12 @@ function getStory() {
                                                   "type": "are_an",
                                                   "value": "$ARE"
                                                 },
+                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-31",
                                                   "type": "singular_kind",
                                                   "value": "things"
-                                                },
-                                                "$TRAIT": []
+                                                }
                                               }
                                             }
                                           }
@@ -1816,12 +1820,12 @@ function getStory() {
                                                   "type": "are_an",
                                                   "value": "$ISA"
                                                 },
+                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-47",
                                                   "type": "singular_kind",
                                                   "value": "container"
-                                                },
-                                                "$TRAIT": []
+                                                }
                                               }
                                             }
                                           }
@@ -1874,12 +1878,12 @@ function getStory() {
                                                   "type": "are_an",
                                                   "value": "$ISAN"
                                                 },
+                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-57",
                                                   "type": "singular_kind",
                                                   "value": "actor"
-                                                },
-                                                "$TRAIT": []
+                                                }
                                               }
                                             }
                                           }
@@ -2036,12 +2040,12 @@ function getStory() {
                                                   "type": "are_an",
                                                   "value": "$ARE"
                                                 },
+                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-87",
                                                   "type": "singular_kind",
                                                   "value": "scrabble tiles"
-                                                },
-                                                "$TRAIT": []
+                                                }
                                               }
                                             }
                                           }
@@ -2059,10 +2063,10 @@ function getStory() {
                                   "id": "id-174bd1dc16a-89",
                                   "type": "noun_assignment",
                                   "value": {
-                                    "$LINES": {
-                                      "id": "id-174bd1dc16a-94",
-                                      "type": "lines",
-                                      "value": "empire apple"
+                                    "$PROPERTY": {
+                                      "id": "id-174bd1dc16a-90",
+                                      "type": "property",
+                                      "value": "printed name"
                                     },
                                     "$NOUNS": [
                                       {
@@ -2082,10 +2086,10 @@ function getStory() {
                                         }
                                       }
                                     ],
-                                    "$PROPERTY": {
-                                      "id": "id-174bd1dc16a-90",
-                                      "type": "property",
-                                      "value": "printed name"
+                                    "$LINES": {
+                                      "id": "id-174bd1dc16a-94",
+                                      "type": "lines",
+                                      "value": "empire apple"
                                     }
                                   }
                                 }
@@ -2095,11 +2099,6 @@ function getStory() {
                         }
                       ]
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-174bd1dc16a-1",
-                    "type": "test_name",
-                    "value": "thingaverse"
                   }
                 }
               }
@@ -2119,6 +2118,11 @@ function getStory() {
                 "id": "id-174bd1dc16a-95",
                 "type": "test_rule",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174bd1dc16a-96",
+                    "type": "test_name",
+                    "value": "thingaverse"
+                  },
                   "$HOOK": {
                     "id": "id-174bd1dc16a-97",
                     "type": "program_hook",
@@ -2160,21 +2164,6 @@ function getStory() {
                                 "id": "id-174bd1dc16a-107",
                                 "type": "set_field_text",
                                 "value": {
-                                  "$FIELD": {
-                                    "id": "id-174bd1dc16a-109",
-                                    "type": "text_eval",
-                                    "value": {
-                                      "id": "id-174bd1dc16a-114",
-                                      "type": "text_value",
-                                      "value": {
-                                        "$TEXT": {
-                                          "id": "id-174bd1dc16a-115",
-                                          "type": "text",
-                                          "value": "printed plural name"
-                                        }
-                                      }
-                                    }
-                                  },
                                   "$OBJ": {
                                     "id": "id-174bd1dc16a-108",
                                     "type": "object_ref",
@@ -2191,6 +2180,21 @@ function getStory() {
                                           "id": "id-174bd1dc16a-113",
                                           "type": "noun_name",
                                           "value": "apple"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "$FIELD": {
+                                    "id": "id-174bd1dc16a-109",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174bd1dc16a-114",
+                                      "type": "text_value",
+                                      "value": {
+                                        "$TEXT": {
+                                          "id": "id-174bd1dc16a-115",
+                                          "type": "text",
+                                          "value": "printed plural name"
                                         }
                                       }
                                     }
@@ -2242,11 +2246,6 @@ function getStory() {
                         }
                       }
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-174bd1dc16a-96",
-                    "type": "test_name",
-                    "value": "thingaverse"
                   }
                 }
               }
@@ -2266,6 +2265,11 @@ function getStory() {
                 "id": "id-174bd1dc16a-128",
                 "type": "test_statement",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174bd1dc16a-129",
+                    "type": "test_name",
+                    "value": "thingaverse"
+                  },
                   "$TEST": {
                     "id": "id-174bd1dc16a-130",
                     "type": "testing",
@@ -2280,11 +2284,260 @@ function getStory() {
                         }
                       }
                     }
-                  },
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-174bd6c1fac-4",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-174bd6c1fac-3",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174bd6c1fac-0",
+                "type": "test_scene",
+                "value": {
                   "$TEST_NAME": {
-                    "id": "id-174bd1dc16a-129",
+                    "id": "id-174bd6c1fac-1",
                     "type": "test_name",
-                    "value": "thingaverse"
+                    "value": "articles"
+                  },
+                  "$STORY": {
+                    "id": "id-174bd6c1fac-2",
+                    "type": "story",
+                    "value": {
+                      "$PARAGRAPH": [
+                        {
+                          "id": "id-174bd6c1fac-12",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
+                              {
+                                "id": "id-174bd6c1fac-11",
+                                "type": "story_statement",
+                                "value": {
+                                  "id": "id-174bd6c1fac-5",
+                                  "type": "noun_statement",
+                                  "value": {
+                                    "$LEDE": {
+                                      "id": "id-174bd6c1fac-6",
+                                      "type": "lede",
+                                      "value": {
+                                        "$NOUNS": [
+                                          {
+                                            "id": "id-174bd6c1fac-7",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-174bd6c1fac-8",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-174bd6c1fac-9",
+                                                "type": "noun_name",
+                                                "value": "lamp-post"
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "id": "id-174bd6c1fac-16",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-174bd6c1fac-17",
+                                                "type": "determiner",
+                                                "value": "some"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-174bd6c1fac-18",
+                                                "type": "noun_name",
+                                                "value": "soldiers"
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "id": "id-174bd6c1fac-19",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-174bd6c1fac-20",
+                                                "type": "determiner",
+                                                "value": "$OUR"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-174bd6c1fac-21",
+                                                "type": "noun_name",
+                                                "value": "Trevor"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "$NOUN_PHRASE": {
+                                          "id": "id-174bd6c1fac-10",
+                                          "type": "noun_phrase",
+                                          "value": {
+                                            "$KIND_OF_NOUN": {
+                                              "id": "id-174bd6c1fac-13",
+                                              "type": "kind_of_noun",
+                                              "value": {
+                                                "$ARE_AN": {
+                                                  "id": "id-174bd6c1fac-14",
+                                                  "type": "are_an",
+                                                  "value": "$ARE"
+                                                },
+                                                "$TRAIT": [],
+                                                "$KIND": {
+                                                  "id": "id-174bd6c1fac-15",
+                                                  "type": "singular_kind",
+                                                  "value": "things"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "$TAIL": []
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-174bd6c1fac-22",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-174bd6c1fac-27",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174bd6c1fac-24",
+                "type": "test_statement",
+                "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174bd6c1fac-25",
+                    "type": "test_name",
+                    "value": "articles"
+                  },
+                  "$TEST": {
+                    "id": "id-174bd6c1fac-26",
+                    "type": "testing",
+                    "value": {
+                      "id": "id-174bd6c1fac-28",
+                      "type": "test_output",
+                      "value": {
+                        "$LINES": {
+                          "id": "id-174bd6c1fac-29",
+                          "type": "lines",
+                          "value": "You can only just make out a lamp-post.\nYou can only just make out Trevor.\nYou can only just make out some soldiers.\nA lamp-post can be made out in the mist.\nTrevor can be made out in the mist.\nSome soldiers can be made out in the mist.\nYou can only just make out the lamp-post.\nYou can only just make out Trevor.\nYou can only just make out the soldiers.\nThe lamp-post may be a trick of the mist.\nTrevor may be a trick of the mist.\nThe soldiers may be a trick of the mist."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-174bdd86f84-4",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-174bdd86f84-3",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174bdd86f84-0",
+                "type": "test_rule",
+                "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174bdd86f84-1",
+                    "type": "test_name",
+                    "value": "articles"
+                  },
+                  "$HOOK": {
+                    "id": "id-174bdd86f84-2",
+                    "type": "program_hook",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-174bdd86f84-5",
+                        "type": "activity",
+                        "value": {
+                          "$EXE": [
+                            {
+                              "id": "id-174bdd86f84-8",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-174bdd86f84-6",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-174bdd86f84-7",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174bdd86f84-9",
+                                      "type": "render_template",
+                                      "value": {
+                                        "$TEMPLATE": {
+                                          "id": "id-174bdd86f84-10",
+                                          "type": "lines",
+                                          "value": "You can only just make out {a: .lampPost}.\nYou can only just make out {a: .Trevor}.\nYou can only just make out {a: .soldiers}.\n{A: .lampPost} can be made out in the mist.\n{A: .Trevor} can be made out in the mist.\n{A: .soldiers} can be made out in the mist.\nYou can only just make out {the: .lampPost}.\nYou can only just make out {the: .trevor}.\nYou can only just make out {the: .soldiers}.\n{The: lampPost} may be a trick of the mist.\n{The: .trevor} may be a trick of the mist.\n{The. soldiers} may be a trick of the mist."
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "id": "id-174bdd86f84-11",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-174bdd86f84-12",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-174bdd86f84-13",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174bdd86f84-14",
+                                      "type": "render_template",
+                                      "value": {
+                                        "$TEMPLATE": {
+                                          "id": "id-174bdd86f84-15",
+                                          "type": "lines",
+                                          "value": "You can only just make out {a: .Trevor}\"."
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -2294,5 +2547,4 @@ function getStory() {
       }
     ]
   }
-}
 }

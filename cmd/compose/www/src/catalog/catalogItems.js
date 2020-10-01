@@ -1,25 +1,26 @@
 
 class CatalogItem {
-  constructor( name, path ) {
+  constructor( name, dir ) {
     this.name= name;
-    this.path= path; // ex. curr/sub
+    this.dir= dir; // ex. curr/sub
   }
-  get fullpath() {
-    const { path, name } = this;
-    return path? `${path}/${name}`: name;
+  // ex. "", "curr", "curr/sub"
+  get path() {
+    const { dir, name } = this;
+    return dir? `${dir}/${name}`: name;
   }
 }
 
 class CatalogFolder extends CatalogItem {
-  constructor( name, path ) {
-    super(name, path);
+  constructor( name, dir ) {
+    super(name, dir);
     this.contents= false;
   }
 }
 
 class CatalogFile extends CatalogItem {
-  constructor( name, path ) {
-    super(name, path);
+  constructor( name, dir ) {
+    super(name, dir);
     this.story= false;
   }
 }

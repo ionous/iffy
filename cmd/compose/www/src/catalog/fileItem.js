@@ -15,7 +15,8 @@ Vue.component('mk-file-item', {
   computed: {
     name() {
       const { item }= this;
-      return item && item.name.slice(0, item.name.length-6);
+      const ext= ".if";
+      return item && item.name.slice(0, -ext.length);
     },
   },
   methods: {

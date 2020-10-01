@@ -1,4 +1,8 @@
-class Cataloger {}
+class Cataloger {
+  // saveStories(future: string, list, or none)
+  // loadStory(fileItem) -> read file and inject into the passed object.
+  // loadFolder(folderItem) -> read the directory and inject into the passed object.
+}
 
 
 // catalog store tracks individual files.
@@ -7,10 +11,10 @@ class CatalogStore {
     this.nodes= nodes;
     this.cache= {};
   }
-  getFile(path) {
+  getStory(path) {
     return this.cache[path];
   }
-  loadFile(path, storyData) {
+  storeStory(path, storyData) {
     const { nodes, cache } = this;
     const story= nodes.unroll(storyData);
     cache[path]= story;

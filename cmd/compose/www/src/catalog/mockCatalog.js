@@ -1,24 +1,24 @@
 
 const mockCatalog= [{
   "curr": [
-    "currStory.if.js", {
+    "currStory.if", {
       "alt": [
-        "fileA.if.js",
-        "fileB.if.js"
+        "fileA.if",
+        "fileB.if"
       ],
       "sub": [
-        "fileC.if.js",
-        "fileD.if.js",
-        "fileE.if.js"
+        "fileC.if",
+        "fileD.if",
+        "fileE.if"
       ],
     },
   ],
   "proj": [
-    "fileA.if.js",
-    "fileB.if.js",
-    "fileC.if.js",
-    "fileD.if.js",
-    "fileE.if.js"
+    "fileA.if",
+    "fileB.if",
+    "fileC.if",
+    "fileD.if",
+    "fileE.if"
   ],
   "empty": []
 }];
@@ -30,30 +30,30 @@ class MockCatalog extends Cataloger {
   }
   // maybe takes a string, list, or none
   // if none saves all.
-  saveFiles() {
+  saveStories() {
     const json= JSON.stringify(this.store, 0,2);
     console.log("SAVED:", json);
   }
   // injects the real contents of the targeted file
   // into the passed CatalogFile object.
-  loadFile(file) {
-    const path= file.fullpath;
-    let story= this.store.getFile(path);
+  loadStory(file) {
+    const path= file.path;
+    let story= this.store.getStory(path);
     if (!story) {
       const pick= Types.slats("story_statement");
       const order= path.split("").reduce((a,v)=>(a+v.charCodeAt(0)), 0);
       // const type= pick[ Math.floor(Math.random() * pick.length) ];
       const type= pick[order%pick.length];
       const storyData= Types.createItem(type.name);
-      story= this.store.loadFile(path, storyData);
+      story= this.store.storeStory(path, storyData);
     }
     file.story= story;
   }
   // injects the real contents of the targeted folder
   // into the passed CatalogFolder object.
-  getFiles(folder) {
+  loadFolder(folder) {
     let mockFolder= mockCatalog;
-    const path= folder.fullpath;
+    const path= folder.path;
     if (path.length) {
       // advance through the mockup data
       path.split("/").forEach((part)=>{

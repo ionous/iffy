@@ -16,7 +16,7 @@ func Compose(cfg *Config) {
 	})
 	http.Handle("/compose/", http.StripPrefix("/compose/", http.FileServer(http.Dir("./www"))))
 	http.HandleFunc("/story/", web.HandleResource(StoryApi(cfg)))
-	http.HandleFunc("/files/", web.HandleResource(FilesApi(cfg)))
+	http.HandleFunc("/stories/", web.HandleResource(FilesApi(cfg)))
 
 	log.Println("Composer using", cfg.Root)
 	log.Println("Listening on port", strconv.Itoa(cfg.Port)+"...")

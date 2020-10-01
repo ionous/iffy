@@ -15,7 +15,7 @@ Vue.component('mk-catalog', {
   },
   mounted() {
     const { catalog } = this;
-    catalog.getFiles(this.folder);
+    catalog.loadFolder(this.folder);
   },
   data() {
     const that = this;
@@ -26,12 +26,12 @@ Vue.component('mk-catalog', {
             folder.contents= false;
           } else {
             // injects the list of sub-files into the passed folder
-            that.catalog.getFiles(folder);
+            that.catalog.loadFolder(folder);
           }
         },
         onFile(parent, file) {
           // injects the story data into the passed file
-          that.catalog.loadFile(file);
+          that.catalog.loadStory(file);
           that.$emit("opened-file", {file});
         },
       },

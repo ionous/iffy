@@ -65,12 +65,18 @@ body {
   list-style-type: none;
   padding-inline-start: 0px;
 }
-
+.mk-file-item__button::before {
+   content: "\1F4F0"; 
+   font-size: smaller;
+   padding-right: 3px;
+}
 .mk-folder-item__button--closed::before {
    content: "\1F4C1"; 
+   padding-right: 3px;
 }
 .mk-folder-item__button--open::before {
    content: "\1F4C2"; 
+   padding-right: 3px;
 }
 .mk-cat-button  {
   display: block;

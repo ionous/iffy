@@ -47,7 +47,7 @@ class Shortcuts {
             (el.contentEditable && el.contentEditable == 'true');
     };
     trap.bind('mod+s', function(e) {
-      catalog.saveFiles();
+      catalog.saveStories();
       return false;
     });
     trap.bind('mod+z', function(e) {
