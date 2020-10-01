@@ -61,10 +61,11 @@ func distill(outFile, inFile string) (err error) {
 }
 
 func readJson(filePath string) (ret reader.Map, err error) {
-	if fp, e := os.Open(filePath); e != nil {
+	if f, e := os.Open(filePath); e != nil {
 		err = e
 	} else {
-		dec := json.NewDecoder(fp)
+		defer f.Close()
+		dec := json.NewDecoder(f)
 		if e := dec.Decode(&ret); e != nil && e != io.EOF {
 			err = e
 		}

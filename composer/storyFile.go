@@ -21,6 +21,7 @@ func (d storyFile) Get(ctx context.Context, w http.ResponseWriter) (err error) {
 	if f, e := os.Open(string(d)); e != nil {
 		err = e
 	} else {
+		defer f.Close()
 		w.Header().Set("Content-Type", "application/json")
 		_, err = io.Copy(w, f)
 	}
@@ -33,6 +34,7 @@ func (d storyFile) Put(ctx context.Context, r io.Reader, w http.ResponseWriter) 
 	if f, e := os.Create(string(d)); e != nil {
 		err = e
 	} else {
+		defer f.Close()
 		_, err = io.Copy(f, r)
 	}
 	return

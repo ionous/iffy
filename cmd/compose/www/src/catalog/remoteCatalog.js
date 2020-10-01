@@ -52,7 +52,7 @@ class RemoteCatalog extends Cataloger {
     const url= this.base+path;
     console.log("xml http request:", method, url);
     var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", ()=>cb(JSON.parse(xhr.response)));
+    xhr.addEventListener("load", ()=>cb(xhr.response? JSON.parse(xhr.response): true));
     xhr.addEventListener("abort", ()=>cb(false));
     xhr.addEventListener("error", ()=>cb(false));
     xhr.open(method, url);
