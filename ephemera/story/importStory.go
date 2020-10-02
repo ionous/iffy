@@ -12,6 +12,10 @@ import (
 )
 
 func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
+	return ImportStories(src, db, []reader.Map{m})
+}
+
+func ImportStories(src string, db *sql.DB, ms []reader.Map) (err error) {
 	iffy.RegisterGobs()
 	dec := decode.NewDecoder()
 	k := NewImporterDecoder(src, db, dec)
@@ -42,5 +46,11 @@ func ImportStory(src string, db *sql.DB, m reader.Map) (err error) {
 		{(*express.Render)(nil), k.BindRet(imp_render_template)},
 	})
 	//
-	return imp_story(k, m)
+	for _, m := range ms {
+		if e := imp_story(k, m); e != nil {
+			err = e
+			break
+		}
+	}
+	return
 }

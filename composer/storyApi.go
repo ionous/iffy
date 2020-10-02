@@ -2,48 +2,17 @@ package composer
 
 import (
 	"encoding/json"
-	"hash/fnv"
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/web"
 	"golang.org/x/net/context"
 )
-
-func StoryApi(cfg *Config) web.Resource {
-	return &web.Wrapper{
-		Finds: func(name string) (ret web.Resource) {
-			switch name {
-			case "story":
-				ret = &web.Wrapper{
-					Finds: func(name string) (ret web.Resource) {
-						switch name {
-						case "check":
-							ret = &web.Wrapper{
-								Puts: func(ctx context.Context, in io.Reader, out http.ResponseWriter) (err error) {
-									if e := tempTest(ctx, cfg, in); e != nil {
-										err = e
-									}
-									return
-								},
-							}
-						}
-						return
-					},
-				}
-			}
-			return
-		},
-	}
-}
 
 // write the contents to the passed filename but only if the file doesnt already exist
 func ensureFile(fullPath string, contents map[string]interface{}) (err error) {
@@ -64,27 +33,33 @@ func ensureFile(fullPath string, contents map[string]interface{}) (err error) {
 	return
 }
 
-// uses the command line tool versions
-func tempTest(ctx context.Context, cfg *Config, in io.Reader) (err error) {
-	hash := fnv.New64a()
-	d := make(map[string]interface{})
-	// all reads from "in" (via tee) are written to hash.
-	tee := io.TeeReader(in, hash)
-	dec := json.NewDecoder(tee)
-	if e := dec.Decode(&d); e != nil && e != io.EOF {
-		err = e
+// uses the command line tool versions for now....
+func tempTest(ctx context.Context, file string, in io.Reader) (err error) {
+	cfg := ctx.Value(configKey).(*Config)
+	base := cfg.PathTo("stories")
+	if !strings.HasPrefix(file, base) {
+		err = errutil.New("unexpected path", file, "from", base)
 	} else {
-		const tab = "\t"
-		hashed := strconv.FormatUint(hash.Sum64(), 36)
-		inFile := cfg.Scratch(hashed, "story.js")
-		log.Println("Saving", inFile+"...")
-		if e := ensureFile(inFile, d); e != nil {
-			log.Println(tab, "Save error", e)
-			err = e
-		} else if ephFile, e := runImport(ctx, cfg, inFile, hashed); e != nil {
+		// note: .Split keeps a trailing slash, .Dir does not.
+		dir, _ := path.Split(file[len(base)+1:])
+		const shared = "shared/"
+		const stories = "stories/"
+		// we'll always include the shared files in our build
+		src := cfg.PathTo(stories, shared)
+		if strings.HasPrefix(dir, shared) {
+			dir = shared
+		} else {
+			// get the first part of the name -- that's the project name
+			i := strings.Index(dir, "/")
+			dir = dir[0:i] // the project relative dir
+			src += "," + cfg.PathTo(stories, dir)
+		}
+		// src is now one or two absolute paths to project directories
+		// dir is a relative dir
+		if ephFile, e := runImport(ctx, cfg, src, dir); e != nil {
 			log.Println(tab, "Import error", cfg.Import, exitError(e))
 			err = e
-		} else if playFile, e := runAsm(ctx, cfg, ephFile, hashed); e != nil {
+		} else if playFile, e := runAsm(ctx, cfg, ephFile, dir); e != nil {
 			log.Println(tab, "Assembly error", cfg.Assemble, exitError(e))
 			err = e
 		} else if e := runCheck(ctx, cfg, playFile); e != nil {
@@ -95,10 +70,12 @@ func tempTest(ctx context.Context, cfg *Config, in io.Reader) (err error) {
 	return
 }
 
+const tab = '\t'
+
 // note: for now, these read from CombinedOutput to grab any log/println traces...
-func runImport(ctx context.Context, cfg *Config, inFile, hashed string) (ret string, err error) {
+func runImport(ctx context.Context, cfg *Config, inFile, path string) (ret string, err error) {
 	log.Println("Importing", inFile+"...")
-	ephFile := cfg.Scratch(hashed, "ephemera.db")
+	ephFile := cfg.Scratch(path, "ephemera.db")
 	log.Println(">", cfg.Import, "-in", inFile, "-out", ephFile)
 	imported, e := exec.CommandContext(ctx, cfg.Import, "-in", inFile, "-out", ephFile).CombinedOutput()
 	if e != nil {
@@ -110,9 +87,9 @@ func runImport(ctx context.Context, cfg *Config, inFile, hashed string) (ret str
 	return
 }
 
-func runAsm(ctx context.Context, cfg *Config, ephFile, hashed string) (ret string, err error) {
+func runAsm(ctx context.Context, cfg *Config, ephFile, path string) (ret string, err error) {
 	log.Println("Assembling", ephFile+"...")
-	inFile, playFile := ephFile, cfg.Scratch(hashed, "play.db")
+	inFile, playFile := ephFile, cfg.Scratch(path, "play.db")
 	log.Println(">", cfg.Assemble, "-in", inFile, "-out", playFile)
 	assembled, e := exec.CommandContext(ctx, cfg.Assemble, "-in", inFile, "-out", playFile).CombinedOutput()
 	if e != nil {

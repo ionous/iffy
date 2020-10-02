@@ -42,6 +42,10 @@ class RemoteCatalog extends Cataloger {
       });
     }
   }
+  run(action, file, options, cb) {
+    const { path } = file;
+    this._send("POST", `${path}/${action}`, cb, options);
+  }
   _get(path, cb) {
     this._send("GET", path, cb);
   }
@@ -52,7 +56,18 @@ class RemoteCatalog extends Cataloger {
     const url= this.base+path;
     console.log("xml http request:", method, url);
     var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", ()=>cb(xhr.response? JSON.parse(xhr.response): true));
+    xhr.addEventListener("load", ()=>{
+      console.log("xml http response:", method, url, xhr.statusText);
+      let data= true;
+      if (xhr.response) {
+        try {
+          data= JSON.parse(xhr.response);
+        } catch (e) {
+          data= false;
+        }
+      }
+      cb(data);
+    });
     xhr.addEventListener("abort", ()=>cb(false));
     xhr.addEventListener("error", ()=>cb(false));
     xhr.open(method, url);

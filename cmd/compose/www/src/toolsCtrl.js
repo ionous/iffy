@@ -1,57 +1,46 @@
 Vue.component('mk-tools', {
   template:
   `<div class="mk-tools mk-aux">
-      <button disabled>Play</button>
-      <button :disabled="!allow.testing" @click="onTest">Check</button>
-      <span v-if="copying">copying...</span>
-      <span v-if="msg">{{msg}}</span>
+      <button :class="bemElem('btn')"  disabled>Play</button>
+      <button :class="bemElem('btn')" :disabled="!allowTesting" @click="onTest">Check</button>
+      <span :class="bemElem('msg')" v-if="copying">copying...</span>
+      <span :class="bemElem('msg')" v-if="msg">{{msg}}</span>
     </div>`,
+  mixins: [bemMixin()],
+  props: {
+    catalog: Cataloger,
+    currentFile: CatalogFile,
+  },
   data() {
     return {
       msg: "",
-      allow: {
-        testing: true,
-      },
+      testing: false,
     }
   },
   computed: {
     copying() {
       const { copier } = this.$root;
       return copier.active;
+    },
+    allowTesting() {
+      return this.currentFile && !this.testing;
     }
   },
   methods: {
     onTest() {
-      // https://xhr.spec.whatwg.org/#events
-      // load: any success
-      // progress: etc.
-      // timeout: only if the timeout is set
-      // abort:  ex the client called XMLHttpRequest.abort().
-      // loadend: any completion
-      const xhr = new XMLHttpRequest();
-      //
-      xhr.addEventListener("loadend", () => {
-        this.allow.testing= true;
-      });
-      xhr.addEventListener("load", (evt) => {
-        this.msg ="";
-      });
-      xhr.addEventListener("error", (evt) => {
-        this.msg= "An unknown error occurred.";
-        console.log(xhr.statusText);
-      });
+      const { currentFile } = this;
+      if (!currentFile) {
+        throw new Error("nothing to test");
+      }
       this.msg= "Connecting...";
-      this.allow.testing= false;
-      const { story } = this.$root;
-      const serial = story.serialize();
-      // console.log("testing", serial);
-      xhr.open("PUT", "/story/check");
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.send(serial);
-    },
+      this.testing= true;
 
+      this.catalog.run("check", currentFile, {}, (ok)=>{
+        this.testing= false;
+        this.msg= ok? "": "An unknown error occurred.";
+      });
+    },
   },
-  mixins: [bemMixin()],
 });
 
 

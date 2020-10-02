@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/ionous/iffy/web"
+	"golang.org/x/net/context"
 )
 
 // Compose starts the composer server, this function doesnt return.
@@ -15,8 +16,9 @@ func Compose(cfg *Config) {
 		http.Redirect(w, r, "/compose/index.html", http.StatusMovedPermanently)
 	})
 	http.Handle("/compose/", http.StripPrefix("/compose/", http.FileServer(http.Dir("./www"))))
-	http.HandleFunc("/story/", web.HandleResource(StoryApi(cfg)))
-	http.HandleFunc("/stories/", web.HandleResource(FilesApi(cfg)))
+	http.HandleFunc("/stories/", web.HandleResourceWithContext(FilesApi(cfg), func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, configKey, cfg)
+	}))
 
 	log.Println("Composer using", cfg.Root)
 	log.Println("Listening on port", strconv.Itoa(cfg.Port)+"...")
@@ -24,3 +26,7 @@ func Compose(cfg *Config) {
 		log.Fatal(e)
 	}
 }
+
+type key int
+
+var configKey key

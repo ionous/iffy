@@ -52,8 +52,11 @@ body {
   font-family: monospace;
   display: flex;
 }
-.mk-tools button {
+.mk-tools__btn {
   margin:3px;
+}
+.mk-tools__msg {
+  align-self: center;
 }
 /**
  * mk-catalog

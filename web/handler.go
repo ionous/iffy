@@ -6,31 +6,47 @@ import (
 	"strings"
 
 	"github.com/ionous/errutil"
+	"golang.org/x/net/context"
 )
 
 // HandleResource turns a Resource into an http.HandlerFunc;
 // providing responses to http get and post requests.
 func HandleResource(root Resource) http.HandlerFunc {
+	return HandleResourceWithContext(root, func(ctx context.Context) context.Context {
+		return ctx
+	})
+}
+
+// HandleResource turns a Resource into an http.HandlerFunc;
+// providing responses to http get and post requests.
+func HandleResourceWithContext(root Resource, xform func(context.Context) context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("( handling", r.URL.Path, r.Method, ")")
-		if e := handleResponse(w, r, root); e != nil {
+		if e := handleResponse(w, r, root, xform); e != nil {
 			log.Println(e)
 		}
 	}
 }
 
 // NOTE: the error, if any, is automatically passed to http.Error
-func handleResponse(w http.ResponseWriter, r *http.Request, root Resource) (err error) {
+func handleResponse(w http.ResponseWriter, r *http.Request,
+	root Resource, xform func(context.Context) context.Context,
+) (err error) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	// chop off the leading and trailing slash. wise? i dont know.
 	if res, e := FindResource(root, strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/"), "/")); e != nil {
 		http.NotFound(w, r)
 		err = e
 	} else {
-		ctx := r.Context()
+		ctx := xform(r.Context())
 		switch r.Method {
 		case "GET":
 			if e := res.Get(ctx, w); e != nil {
+				http.Error(w, e.Error(), http.StatusInternalServerError)
+				err = e
+			}
+		case "POST":
+			if e := res.Post(ctx, r.Body, w); e != nil {
 				http.Error(w, e.Error(), http.StatusInternalServerError)
 				err = e
 			}

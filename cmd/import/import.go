@@ -8,7 +8,9 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera/reader"
@@ -21,8 +23,8 @@ import (
 // It uses package export's list of commands for parsing program statements.
 func main() {
 	var inFile, outFile string
-	flag.StringVar(&inFile, "in", "", "input file name (json)")
-	flag.StringVar(&outFile, "out", "", "output file name (sqlite3)")
+	flag.StringVar(&inFile, "in", "", "input file or directory name (json)")
+	flag.StringVar(&outFile, "out", "", "optional output filename (sqlite3)")
 	flag.BoolVar(&errutil.Panic, "panic", false, "panic on error?")
 	flag.Parse()
 	if len(outFile) == 0 {
@@ -43,18 +45,25 @@ func distill(outFile, inFile string) (err error) {
 		err = e
 	} else if outFile, e := filepath.Abs(outFile); e != nil {
 		err = e
-	} else if inData, e := readJson(inFile); e != nil {
+	} else if inData, e := readPath(inFile); e != nil {
 		err = errutil.New("couldn't read file", inFile, e)
 	} else if e := os.Remove(outFile); e != nil && !os.IsNotExist(e) {
 		err = errutil.New("couldn't clean output file", outFile, e)
-	} else if outDB, e := sql.Open("sqlite3", outFile); e != nil {
-		err = errutil.New("couldn't create output file", outFile, e)
 	} else {
-		defer outDB.Close()
-		if e := tables.CreateEphemera(outDB); e != nil {
-			err = errutil.New("couldn't create tables", outFile, e)
-		} else if e := story.ImportStory(inFile, outDB, inData); e != nil {
-			err = errutil.New("couldn't import story", e)
+		// 0755 -> readable by all but only writable by the user
+		// 0700 -> read/writable by user
+		// 0777 -> ModePerm ... read/writable by all
+		os.MkdirAll(path.Dir(outFile), os.ModePerm)
+		//
+		if outDB, e := sql.Open("sqlite3", outFile); e != nil {
+			err = errutil.New("couldn't create output file", outFile, e)
+		} else {
+			defer outDB.Close()
+			if e := tables.CreateEphemera(outDB); e != nil {
+				err = errutil.New("couldn't create tables", outFile, e)
+			} else if e := story.ImportStories(inFile, outDB, inData); e != nil {
+				err = errutil.New("couldn't import story", e)
+			}
 		}
 	}
 	return
@@ -70,5 +79,41 @@ func readJson(filePath string) (ret reader.Map, err error) {
 			err = e
 		}
 	}
+	return
+}
+
+// read a comma-separated list of files and directories
+func readPath(filePaths string) (ret []reader.Map, err error) {
+	split := strings.Split(filePaths, ",")
+	for _, filePath := range split {
+		if info, e := os.Stat(filePath); e != nil {
+			err = e
+		} else if info.IsDir() {
+			ret, err = readDir(filePath)
+		} else if one, e := readJson(filePath); e != nil {
+			err = e
+		} else {
+			ret = append(ret, one)
+		}
+	}
+	return
+}
+
+func readDir(path string) (ret []reader.Map, err error) {
+	if !strings.HasSuffix(path, "/") {
+		path += "/" // for opening symbolic directories
+	}
+	err = filepath.Walk(path, func(path string, info os.FileInfo, e error) (err error) {
+		if e != nil {
+			err = e
+		} else if !info.IsDir() {
+			if one, e := readJson(path); e != nil {
+				err = e
+			} else {
+				ret = append(ret, one)
+			}
+		}
+		return
+	})
 	return
 }

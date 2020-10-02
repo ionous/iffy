@@ -17,8 +17,12 @@ type Config struct {
 	Port     int
 }
 
-func (c *Config) Scratch(hash, file string) string {
-	return path.Join(c.Root, ".scratch", hash, file)
+func (c *Config) Scratch(parts ...string) string {
+	return path.Join(append([]string{c.Root, "scratch"}, parts...)...)
+}
+
+func (c *Config) PathTo(parts ...string) string {
+	return path.Join(append([]string{c.Root}, parts...)...)
 }
 
 // DevConfig creates a reasonable(?) config based on the developer go path.

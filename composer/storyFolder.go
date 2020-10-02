@@ -14,13 +14,15 @@ import (
 	"golang.org/x/net/context"
 )
 
+// a directory of .if files
 type storyFolder string
 
+// String name of the folder.
 func (d storyFolder) String() string {
 	return string(d)
 }
 
-// Return the named sub-resource
+// Find the named child resource.
 func (d storyFolder) Find(sub string) (ret web.Resource) {
 	base := string(d)
 	path := filepath.Join(base, sub)
@@ -39,7 +41,7 @@ func (d storyFolder) Find(sub string) (ret web.Resource) {
 	return
 }
 
-// Write the resource
+// Get the contents of this resource.
 func (d storyFolder) Get(ctx context.Context, w http.ResponseWriter) (err error) {
 	if files, e := listDirectory(string(d)); e != nil {
 		err = e
@@ -52,7 +54,12 @@ func (d storyFolder) Get(ctx context.Context, w http.ResponseWriter) (err error)
 	return
 }
 
-// Receive a resource
+// Post a modification to this resource
+func (d storyFolder) Post(context.Context, io.Reader, http.ResponseWriter) error {
+	return errutil.New("unsupported post", d)
+}
+
+// Put new resource data in our place
 func (d storyFolder) Put(context.Context, io.Reader, http.ResponseWriter) error {
 	return errutil.New("unsupported put", d)
 }
