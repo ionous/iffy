@@ -88,12 +88,20 @@ func readPath(filePaths string) (ret []reader.Map, err error) {
 	for _, filePath := range split {
 		if info, e := os.Stat(filePath); e != nil {
 			err = e
-		} else if info.IsDir() {
-			ret, err = readDir(filePath)
-		} else if one, e := readJson(filePath); e != nil {
-			err = e
 		} else {
-			ret = append(ret, one)
+			if !info.IsDir() {
+				if one, e := readJson(filePath); e != nil {
+					err = e
+				} else {
+					ret = append(ret, one)
+				}
+			} else {
+				if many, e := readDir(filePath); e != nil {
+					err = e
+				} else {
+					ret = append(ret, many...)
+				}
+			}
 		}
 	}
 	return
@@ -106,9 +114,9 @@ func readDir(path string) (ret []reader.Map, err error) {
 	err = filepath.Walk(path, func(path string, info os.FileInfo, e error) (err error) {
 		if e != nil {
 			err = e
-		} else if !info.IsDir() {
+		} else if !info.IsDir() && filepath.Ext(path) == ".if" {
 			if one, e := readJson(path); e != nil {
-				err = e
+				err = errutil.New("error reading", path, e)
 			} else {
 				ret = append(ret, one)
 			}
