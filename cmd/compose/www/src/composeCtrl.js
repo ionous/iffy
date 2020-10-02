@@ -12,6 +12,8 @@ Vue.component('mk-composer', {
         @navigate="navigate"
       ></mk-navigator>
       <mk-tools
+        :catalog="catalog"
+        :currentFile="currentFile"
       ></mk-tools
         ><mk-browser v-if="sidebar==='Compose'"
         ></mk-browser
@@ -53,7 +55,7 @@ Vue.component('mk-composer', {
     onOpenedFile(file) {
       this.currentFile= file;
       const ext= ".if";
-      window.document.title= `${file.name.slice(0, ext.length)} - Iffy Composer - ${file.path}`;
+      window.document.title= `${file.name.slice(0, -ext.length)} - Iffy Composer - ${file.path}`;
     }
   },
   mounted() {
