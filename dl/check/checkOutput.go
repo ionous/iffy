@@ -25,7 +25,7 @@ func (t *CheckOutput) RunTest(run rt.Runtime) (err error) {
 	run.ActivateDomain(t.Name, true)
 	//
 	if e := rt.RunOne(run, t.Test); e != nil {
-		err = errutil.New("ng! test %s encountered error:", e)
+		err = errutil.Fmt("ng! test %s encountered error: %s", e)
 	} else if res := buf.String(); res != t.Expect {
 		err = errutil.Fmt("ng! test %s expected: %q, got: %q", t.Name, t.Expect, res)
 	} else {
