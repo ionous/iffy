@@ -11,6 +11,9 @@ func TestSubdir(t *testing.T) {
 	if e := testSub(t, "{call: .a .b}", "a b CALL/2"); e != nil {
 		t.Fatal(e)
 	}
+	if e := testSub(t, `{call: .a "b"}`, `a "b" CALL/2`); e != nil {
+		t.Fatal(e)
+	}
 	if e := testSub(t, "{quest?}", "QUEST/0"); e != nil {
 		t.Fatal(e)
 	}
