@@ -4,9 +4,12 @@ class RemoteCatalog extends Cataloger {
     this.store= new CatalogStore(nodes);
     this.base= "/stories/";
     this._saving= false;
+    this._pending= false; // a pending CatalogFile
+    // fix: really we should have a global statemachine with states like
+    // loading, saving, and editing.
   }
-  get saving() {
-    return this._saving;
+  get busy() {
+    return this._saving || this._pending;
   }
   saveStories() {
     if (!this._saving) {
@@ -29,17 +32,28 @@ class RemoteCatalog extends Cataloger {
   }
   // inject a story file into folder.
   loadStory(file) {
-    const { path } = file;
-    let story= this.store.getStory(path);
-    if (story) {
-      file.story= story;
+    // if we are already loading something
+    // set the desired thing to load as the new thing
+    // for use when load completes.
+    if (this._pending) {
+      this._pending= file;
     } else {
-      this._get(path, (storyData)=>{
-        if (storyData) {
-          story= this.store.storeStory(path, storyData);
-          file.story= story;
-        }
-      });
+      const { path } = file;
+      let story= this.store.getStory(path);
+      if (story) {
+        file.story= story;
+      } else {
+        this._pending= file;
+        this._get(path, (storyData)=>{
+          if (storyData) {
+            story= this.store.storeStory(path, storyData);
+            file.story= story;
+            const reload= this._pending;
+            this._pending= false;
+            this.loadStory(reload);
+          }
+        });
+      }
     }
   }
   run(action, file, options, cb) {

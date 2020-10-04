@@ -27,7 +27,8 @@ Vue.component('mk-composer', {
       ><div class="mk-composer"
         :class="{'em-shift': $root.shift}"
         ><mk-switch
-          :node="currentStory"
+          :node="currentFile && currentFile.story"
+          :key="currentFile && currentFile.path"
         ></mk-switch
         ><mk-trash-can
         ></mk-trash-can
@@ -41,12 +42,6 @@ Vue.component('mk-composer', {
   props: {
     copier: Object,
     catalog: Cataloger,
-  },
-  computed: {
-    currentStory() {
-      const { currentFile } = this;
-      return currentFile && currentFile.story;
-    },
   },
   methods: {
     navigate(name) {
