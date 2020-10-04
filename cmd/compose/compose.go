@@ -7,7 +7,8 @@ import (
 	"github.com/ionous/iffy/composer"
 )
 
-// ex. go run compose.go -dir /Users/ionous/Documents/Iffy/stories
+// ex. go run compose.go -dir /Users/ionous/Documents/Iffy
+// needs a subdirectory "stories"
 func main() {
 	var dir string
 	flag.StringVar(&dir, "dir", "", "directory for processing iffy files.")
