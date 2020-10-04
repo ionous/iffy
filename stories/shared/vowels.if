@@ -80,7 +80,7 @@
                   "$LINES": {
                     "id": "id-174cdb223ae-26",
                     "type": "lines",
-                    "value": "Determine if text starts with a vowel or vowel sound."
+                    "value": "Determine if text starts with a vowel or vowel sound. This method is from mudconnect.com"
                   }
                 }
               }
