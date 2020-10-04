@@ -1008,7 +1008,7 @@ const spec = [
     "group": [
       "format"
     ],
-    "name": "make_sentencecase",
+    "name": "make_sentence_case",
     "spec": "{text:text_eval} in sentence-case",
     "uses": "run",
     "with": {
@@ -1022,7 +1022,7 @@ const spec = [
     "group": [
       "format"
     ],
-    "name": "make_titlecase",
+    "name": "make_title_case",
     "spec": "{text:text_eval} in title-case",
     "uses": "run",
     "with": {

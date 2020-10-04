@@ -62,9 +62,13 @@ type MakeUppercase struct {
 type MakeLowercase struct {
 	Text rt.TextEval
 }
+
+// Start each word with a capital letter.
 type MakeTitleCase struct {
 	Text rt.TextEval
 }
+
+// Start each sentence with a capital letter.
 type MakeSentenceCase struct {
 	Text rt.TextEval
 }
@@ -94,7 +98,7 @@ func (*MakeLowercase) Compose() composer.Spec {
 // Compose defines a spec for the composer editor.
 func (*MakeTitleCase) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "make_titlecase",
+		Name:  "make_title_case",
 		Group: "format",
 		Desc: `Title case: returns new text, starting each word with a capital letter. 
 		For example, "Empire Apple" from "empire apple".`,
@@ -105,9 +109,9 @@ func (*MakeTitleCase) Compose() composer.Spec {
 // Compose defines a spec for the composer editor.
 func (*MakeSentenceCase) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "make_sentencecase",
+		Name:  "make_sentence_case",
 		Group: "format",
-		Desc: `Sentence case: returns new text, starting each sentence with a capital letter. 
+		Desc: `Sentence case: returns new text, start each sentence with a capital letter. 
 		For example, "Empire Apple." from "Empire apple.".`,
 		Spec: "{text:text_eval} in sentence-case",
 	}
