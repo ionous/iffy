@@ -39,7 +39,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 		func() (err error) {
 			if last == nil || last.patternName != patternName {
 				if patternName != paramName {
-					err = errutil.New("expected the first param was is the pattern return type", patternName, paramName, typeName)
+					err = errutil.New("expected the first param should be the pattern return type", patternName, paramName, typeName)
 				} else {
 					last = &patternEntry{patternName: patternName, patternType: typeName}
 					out[patternName] = last
