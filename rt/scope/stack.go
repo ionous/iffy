@@ -1,6 +1,9 @@
 package scope
 
-import "github.com/ionous/iffy/rt"
+import (
+	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/rt"
+)
 
 type ScopeStack struct {
 	stack []rt.Scope
@@ -23,8 +26,9 @@ func (k *ScopeStack) PopScope() {
 
 // GetVariable returns the value at 'name'
 func (k *ScopeStack) GetVariable(name string) (ret rt.Value, err error) {
+	norm := lang.Camelize(name)
 	err = k.visit(name, func(scope rt.Scope) (err error) {
-		if v, e := scope.GetVariable(name); e != nil {
+		if v, e := scope.GetVariable(norm); e != nil {
 			err = e
 		} else {
 			ret = v
@@ -36,8 +40,9 @@ func (k *ScopeStack) GetVariable(name string) (ret rt.Value, err error) {
 
 // SetVariable writes the value of 'v' into the value at 'name'.
 func (k *ScopeStack) SetVariable(name string, v rt.Value) (err error) {
+	norm := lang.Camelize(name)
 	return k.visit(name, func(scope rt.Scope) error {
-		return scope.SetVariable(name, v)
+		return scope.SetVariable(norm, v)
 	})
 }
 func (k *ScopeStack) visit(name string, visitor func(rt.Scope) error) (err error) {

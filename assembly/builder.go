@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -48,6 +49,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 			if err == nil && paramName != patternName {
 				// fix: these should probably be tables.PRIM_ names
 				// ie. "text" not "text_eval" -- tests and other things have to be adjusted
+				paramName := lang.Camelize(paramName)
 				switch typeName {
 				case "text_eval":
 					last.AddParam(&pattern.TextParam{paramName})

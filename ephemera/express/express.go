@@ -247,39 +247,38 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 	switch fn := fn.(type) {
 	case types.Quote:
 		txt := fn.Value()
-		c.buildOne(&core.Text{txt})
+		c.buildOne(T(txt))
 
 	case types.Number:
 		num := fn.Value()
-		c.buildOne(&core.Number{num})
+		c.buildOne(N(num))
 
 	case types.Bool:
 		b := fn.Value()
-		c.buildOne(&core.Bool{b})
+		c.buildOne(B(b))
 
 	case types.Command: // see decode
 		err = c.buildExport(fn.CommandName, fn.CommandArity)
 
 	case types.Reference:
-		// fields are an array of strings a.b.c
+		// fields are an array of strings .a.b.c
 		if fields := fn.Value(); len(fields) == 0 {
 			err = errutil.New("empty reference")
 		} else {
 			// fix: this should add ephemera that there's an object of name
 			// fix: can this add ephemera that there's a local of name?
 			firstField := fields[0]
-			name := &core.Text{firstField}
 			//
 			var obj core.ObjectRef
 			if lang.IsCapitalized(firstField) {
-				obj = &core.ObjectName{name}
+				obj = &core.ObjectName{T(firstField)}
 			} else {
 				// unboxing: get the object id from the variable named by the first dot
 				// its possible though that the name requested is actually an object in the first place
 				// ex. could be .ringBearer, or could be .samWise
 				// lets assume for now, that if a variable holds text referring to an object....
 				// then it needs to hold the object id, ie. we dont have to resolve the name of the object again.
-				obj = &core.GetVar{Name: name, TryTextAsObject: true}
+				obj = &core.GetVar{Name: T(firstField), TryTextAsObject: true}
 			}
 			if len(fields) == 1 {
 				// we dont know yet how { .name.... } is being used:
@@ -292,18 +291,11 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 				// - the name of a pattern parameter,
 				// - a loop counter,
 				// - etc.
-				var dots dottedName
-				if lang.IsCapitalized(firstField) {
-					dots.name = &core.ObjectName{name}
-				} else {
-					dots.name = &core.GetVar{Name: name, TryTextAsObject: true}
-				}
-				c.buildOne(&dots)
+				c.buildOne(&dottedName{firstField})
 			} else {
 				// a chain of dots indicates we're getting one or more fields of objects
 				// ex. for { .object.fieldContainingAnObject.otherField }
 				var getField *core.GetField
-
 				// .a.b: from the named object a, we want its field b
 				// .a.b.c: after getting the object name in field b, get that object's field c
 				for _, field := range fields[1:] {
@@ -316,7 +308,7 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 					//
 					getField = &core.GetField{
 						Obj:   obj,
-						Field: &core.Text{field},
+						Field: T(field),
 					}
 				}
 				c.buildOne(getField)

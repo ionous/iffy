@@ -3,15 +3,17 @@ package express
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 )
+
+// var dots dottedName
 
 // used for switching between the automatic printing of an object's name
 // and a request for an object of a particular name.
 // ex. {.lantern} vs. {kindOf: .lantern}
 type dottedName struct {
-	name rt.TextEval // searches for an object by name and returns an id.
-	// the Name might be a chain of text evals: .my.lastQuip
+	name string
 }
 
 // when dotted names are used as arguments to concrete functions
@@ -20,7 +22,7 @@ type dottedName struct {
 // but we can use the existing command GetVar which implements every eval type.
 func (on *dottedName) getVariableNamed() *core.GetVar {
 	return &core.GetVar{
-		Name:            on.name,
+		Name:            on.getName(false),
 		TryTextAsObject: true,
 	}
 }
@@ -31,7 +33,7 @@ func (on *dottedName) getVariableNamed() *core.GetVar {
 // so we just pass it around behind the scenes as an interface.
 func (on *dottedName) getFromVar() core.Assignment {
 	return &core.FromVar{
-		Name:            on.name,
+		Name:            on.getName(false),
 		TryTextAsObject: true,
 	}
 }
@@ -43,7 +45,18 @@ func (on *dottedName) getPrintedName() rt.TextEval {
 		&pattern.DetermineAct{
 			"printName",
 			// on.name is already setup with an object id lookup
-			// so from text is being given and object.
-			pattern.NewArgs(&core.FromText{on.name}),
+			// so from text is being given an object.
+			pattern.NewArgs(&core.FromText{on.getName(true)}),
 		})}
+}
+
+func (on *dottedName) getName(b bool) (ret rt.TextEval) {
+	if t := on.name; lang.IsCapitalized(t) {
+		ret = &core.ObjectName{T(t)}
+	} else if b {
+		ret = on.getVariableNamed()
+	} else {
+		ret = T(t)
+	}
+	return
 }

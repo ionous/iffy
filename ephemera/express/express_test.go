@@ -11,24 +11,8 @@ import (
 	"github.com/kr/pretty"
 )
 
-func T(s string) rt.TextEval {
-	return &core.Text{s}
-}
-func N(n float64) rt.NumberEval {
-	return &core.Number{n}
-}
-func O(n string, exact bool) (ret core.ObjectRef) {
-	name := T(n)
-	if !exact {
-		ret = &core.GetVar{Name: name, TryTextAsObject: true}
-	} else {
-		ret = &core.ObjectName{name}
-	}
-	return ret
-}
-
-var True = &core.Bool{true}
-var False = &core.Bool{false}
+var True = B(true)
+var False = B(false)
 
 // TestExpressions single expressions within a template.
 // ( the parts that normally appear inside curly brackets {here} ).
@@ -145,6 +129,17 @@ func testExpression(str string, want interface{}) (err error) {
 
 // test full templates
 func TestTemplates(t *testing.T) {
+	t.Run("print", func(t *testing.T) {
+		if e := testTemplate("{printNumWord: .groupSize}",
+			&core.PrintNumWord{
+				Num: &core.GetVar{
+					Name:            &core.Text{Text: "groupSize"},
+					TryTextAsObject: true,
+				},
+			}); e != nil {
+			t.Fatal(e)
+		}
+	})
 	t.Run("cycle", func(t *testing.T) {
 		if e := testTemplate("{cycle}a{or}b{or}c{end}",
 			&core.CycleText{Sequence: core.Sequence{
@@ -274,7 +269,8 @@ func testTemplate(str string, want interface{}) (err error) {
 	} else if got, e := Convert(xs); e != nil {
 		err = errutil.New(e, xs)
 	} else if diff := pretty.Diff(got, want); len(diff) > 0 {
-		err = errutil.New("mismatch:", pretty.Sprint(got))
+		err = errutil.New("mismatch:", "got", pretty.Sprint(got),
+			"want", pretty.Sprint(want))
 	}
 	return
 }

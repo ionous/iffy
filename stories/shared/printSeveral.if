@@ -1,0 +1,394 @@
+{
+  "id": "id-174f629fe91-0",
+  "type": "story",
+  "value": {
+    "$PARAGRAPH": [
+      {
+        "id": "id-174f629fe91-1",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-174f629fe91-2",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f629fe91-3",
+                "type": "pattern_decl",
+                "value": {
+                  "$NAME": {
+                    "id": "id-174f629fe91-4",
+                    "type": "pattern_name",
+                    "value": "print several"
+                  },
+                  "$TYPE": {
+                    "id": "id-174f629fe91-5",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-174f629fe91-6",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
+                    }
+                  },
+                  "$OPTVARS": {
+                    "id": "id-174f629fe91-7",
+                    "type": "pattern_variables_tail",
+                    "value": {
+                      "$VARIABLE_DECL": [
+                        {
+                          "id": "id-174f629fe91-29",
+                          "type": "variable_decl",
+                          "value": {
+                            "$TYPE": {
+                              "id": "id-174f629fe91-30",
+                              "type": "variable_type",
+                              "value": {
+                                "$OBJECT": {
+                                  "id": "id-174f629fe91-32",
+                                  "type": "object_type",
+                                  "value": {
+                                    "$AN": {
+                                      "id": "id-174f629fe91-33",
+                                      "type": "an",
+                                      "value": "$A"
+                                    },
+                                    "$KIND": {
+                                      "id": "id-174f629fe91-34",
+                                      "type": "singular_kind",
+                                      "value": "thing"
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "$NAME": {
+                              "id": "id-174f629fe91-31",
+                              "type": "variable_name",
+                              "value": "target"
+                            }
+                          }
+                        },
+                        {
+                          "id": "id-174f629fe91-8",
+                          "type": "variable_decl",
+                          "value": {
+                            "$TYPE": {
+                              "id": "id-174f629fe91-9",
+                              "type": "variable_type",
+                              "value": {
+                                "$PRIMITIVE": {
+                                  "id": "id-174f629fe91-10",
+                                  "type": "primitive_type",
+                                  "value": "$NUMBER"
+                                }
+                              }
+                            },
+                            "$NAME": {
+                              "id": "id-174f629fe91-11",
+                              "type": "variable_name",
+                              "value": "group size"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-174f629fe91-12",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f629fe91-13",
+                "type": "comment",
+                "value": {
+                  "$LINES": {
+                    "id": "id-174f629fe91-14",
+                    "type": "lines",
+                    "value": "Provides a way to describe a generic group of objects. By default, it prints the group size in words, then prints the plural name of the target. It's similar to Inform's \"Printing a number of something.\""
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-174f629fe91-15",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f629fe91-16",
+                "type": "pattern_actions",
+                "value": {
+                  "$NAME": {
+                    "id": "id-174f629fe91-17",
+                    "type": "pattern_name",
+                    "value": "print several"
+                  },
+                  "$PATTERN_RULES": {
+                    "id": "id-174f629fe91-18",
+                    "type": "pattern_rules",
+                    "value": {
+                      "$PATTERN_RULE": [
+                        {
+                          "id": "id-174f629fe91-19",
+                          "type": "pattern_rule",
+                          "value": {
+                            "$GUARD": {
+                              "id": "id-174f629fe91-20",
+                              "type": "bool_eval",
+                              "value": {
+                                "id": "id-174f629fe91-21",
+                                "type": "always",
+                                "value": {}
+                              }
+                            },
+                            "$HOOK": {
+                              "id": "id-174f629fe91-22",
+                              "type": "program_hook",
+                              "value": {
+                                "$ACTIVITY": {
+                                  "id": "id-174f629fe91-23",
+                                  "type": "activity",
+                                  "value": {
+                                    "$EXE": [
+                                      {
+                                        "id": "id-174f629fe91-24",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-174f629fe91-25",
+                                          "type": "say_text",
+                                          "value": {
+                                            "$TEXT": {
+                                              "id": "id-174f629fe91-26",
+                                              "type": "text_eval",
+                                              "value": {
+                                                "id": "id-174f629fe91-27",
+                                                "type": "render_template",
+                                                "value": {
+                                                  "$TEMPLATE": {
+                                                    "id": "id-174f629fe91-28",
+                                                    "type": "lines",
+                                                    "value": "{printNumWord: .groupSize} other {if .groupSize > 1}{ printPluralName: .target}{else}{printName: .target}{end}"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-174f629fe91-50",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-174f629fe91-49",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f629fe91-46",
+                "type": "test_scene",
+                "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174f629fe91-47",
+                    "type": "test_name",
+                    "value": "print several"
+                  },
+                  "$STORY": {
+                    "id": "id-174f629fe91-48",
+                    "type": "story",
+                    "value": {
+                      "$PARAGRAPH": [
+                        {
+                          "id": "id-174f629fe91-51",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
+                              {
+                                "id": "id-174f629fe91-52",
+                                "type": "story_statement",
+                                "value": {
+                                  "id": "id-174f629fe91-53",
+                                  "type": "noun_statement",
+                                  "value": {
+                                    "$LEDE": {
+                                      "id": "id-174f629fe91-54",
+                                      "type": "lede",
+                                      "value": {
+                                        "$NOUNS": [
+                                          {
+                                            "id": "id-174f629fe91-55",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-174f629fe91-56",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-174f629fe91-57",
+                                                "type": "noun_name",
+                                                "value": "books"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "$NOUN_PHRASE": {
+                                          "id": "id-174f629fe91-58",
+                                          "type": "noun_phrase",
+                                          "value": {
+                                            "$KIND_OF_NOUN": {
+                                              "id": "id-174f629fe91-59",
+                                              "type": "kind_of_noun",
+                                              "value": {
+                                                "$ARE_AN": {
+                                                  "id": "id-174f629fe91-60",
+                                                  "type": "are_an",
+                                                  "value": "$AREA"
+                                                },
+                                                "$TRAIT": [],
+                                                "$KIND": {
+                                                  "id": "id-174f629fe91-61",
+                                                  "type": "singular_kind",
+                                                  "value": "thing"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "$TAIL": []
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-174f629fe91-39",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-174f629fe91-38",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f629fe91-35",
+                "type": "test_rule",
+                "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174f629fe91-36",
+                    "type": "test_name",
+                    "value": "print several"
+                  },
+                  "$HOOK": {
+                    "id": "id-174f629fe91-37",
+                    "type": "program_hook",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-174f629fe91-40",
+                        "type": "activity",
+                        "value": {
+                          "$EXE": [
+                            {
+                              "id": "id-174f629fe91-41",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-174f629fe91-42",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-174f629fe91-43",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174f629fe91-44",
+                                      "type": "render_template",
+                                      "value": {
+                                        "$TEMPLATE": {
+                                          "id": "id-174f629fe91-45",
+                                          "type": "lines",
+                                          "value": "{printSeveral: .books}\n{printSeveral: .books 5}"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-174f629fe91-71",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-174f629fe91-70",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f629fe91-67",
+                "type": "test_statement",
+                "value": {
+                  "$TEST_NAME": {
+                    "id": "id-174f629fe91-68",
+                    "type": "test_name",
+                    "value": "print several"
+                  },
+                  "$TEST": {
+                    "id": "id-174f629fe91-69",
+                    "type": "testing",
+                    "value": {
+                      "id": "id-174f629fe91-72",
+                      "type": "test_output",
+                      "value": {
+                        "$LINES": {
+                          "id": "id-174f629fe91-73",
+                          "type": "lines",
+                          "value": "zero other books\nfive other books"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
