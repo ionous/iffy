@@ -51,14 +51,14 @@ order by noun collate nocase, trait`, 2)
 		// we're not actually doing anything with those names.
 		"0",
 		//
-		"apple,common",
+		"apple,commonNamed",
 		"apple,indefiniteArticle",
-		"robot sheep,common",
+		"robot sheep,commonNamed",
 		"robot sheep,indefiniteArticle",
 		"square#1,counted",
 		"square#1,privatelyNamed",
 		"Trevor,indefiniteArticle",
-		"Trevor,proper",
+		"Trevor,properNamed",
 		"triangles#1,counted",
 		"triangles#1,privatelyNamed",
 		"triangles#2,counted",
@@ -74,15 +74,14 @@ order by noun collate nocase, trait`, 2)
 		"our",
 		// implicitly generated aspects
 		// listed in rank order (default first)
-		"common,nounTypes",
-		"proper,nounTypes",
+		"commonNamed,nounTypes",
+		"properNamed,nounTypes",
 		"counted,nounTypes",
 		"publiclyNamed,privateNames",
 		"privatelyNamed,privateNames",
 		//
 	)
 	if diff := pretty.Diff(have, want); len(diff) > 0 {
-		t.Log(diff)
 		t.Fatal(have)
 	}
 
