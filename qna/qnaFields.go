@@ -71,7 +71,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				from mdl_name
 				join run_noun
 					using (noun)
-				where name=?
+				where UPPER(name)=UPPER(?)
 				order by rank
 				limit 1`),
 		// use the sqlite like function to match

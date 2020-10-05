@@ -27,7 +27,7 @@ func reportMissingKinds(asm *Assembler) (err error) {
 func reportMissingNouns(asm *Assembler) error {
 	return reportMissing(asm, "noun",
 		`select 1 from mdl_name me
-			where named= me.name`)
+			where UPPER(named)= UPPER(me.name)`)
 }
 
 // reports named fields which don't have a defined property.

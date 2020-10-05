@@ -46,7 +46,7 @@ function localLang(make) {
     make.opt("noun_phrase", "{kind_of_noun}, {noun_traits}, or {noun_relation}");
 
     // fix: think this should always be "are" never "is"
-    make.run("kind_of_noun", "{are_an} {trait*trait|comma-and} {kind:singular_kind} {?noun_relation}");
+    make.run("kind_of_noun", "{are_an} {trait*trait|comma-and} kind of {kind:singular_kind} {?noun_relation}");
 
     make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 

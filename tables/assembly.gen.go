@@ -134,7 +134,7 @@ func assemblyTemplate() string {
 		"\tselect *, ( \n" +
 		"\t\tselect me.noun \n" +
 		"\t\tfrom mdl_name as me\n" +
-		"\t\twhere asm.name = me.name \n" +
+		"\t\twhere UPPER(asm.name) = UPPER(me.name)\n" +
 		"\t \torder by me.rank limit 1 \n" +
 		"\t) as noun\n" +
 		"from asm_value as asm;\n" +

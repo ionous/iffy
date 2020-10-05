@@ -66,8 +66,10 @@ func imp_certainty(k *Importer, r reader.Map) (ret string, err error) {
 func imp_kinds_of_aspect(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "kinds_of_aspect"); e != nil {
 		err = e
-	} else if _, e := imp_aspect(k, m.MapOf("$ASPECT")); e != nil {
+	} else if a, e := imp_aspect(k, m.MapOf("$ASPECT")); e != nil {
 		err = e
+	} else {
+		k.NewAspect(a)
 	}
 	return
 }
@@ -198,7 +200,7 @@ func imp_pattern_variables_decl(k *Importer, r reader.Map) (err error) {
 func imp_aspect_traits(k *Importer, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "aspect_traits"); e != nil {
 		err = e
-	} else if aspect, e := imp_aspect(k, r.MapOf("$ASPECT")); e != nil {
+	} else if aspect, e := imp_aspect(k, m.MapOf("$ASPECT")); e != nil {
 		err = e
 	} else if traits, e := imp_trait_phrase(k, m.MapOf("$TRAIT_PHRASE")); e != nil {
 		err = e

@@ -68,6 +68,7 @@ func assemble(outFile, inFile string) (err error) {
 			if len(ds) > 0 {
 				e := errutil.New("issues assembling", ds.Err())
 				err = errutil.Append(err, e)
+				assembly.PrintDilemmas(log.Writer(), ds)
 			}
 		}
 	}

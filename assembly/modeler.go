@@ -96,15 +96,27 @@ func (m *Assembler) WriteNounWithNames(domain, noun, kind string) (err error) {
 	id := DomainNameOf(domain, noun)
 	if e := m.WriteNoun(id, kind); e != nil {
 		err = errutil.Append(err, e)
-	} else if e := m.WriteName(id, noun, 0); e != nil {
-		err = errutil.Append(err, e)
 	} else {
-		split := strings.Fields(noun)
-		if cnt := len(split); cnt > 1 {
-			for i, k := range split {
-				rank := cnt - i
-				if e := m.WriteName(id, k, rank); e != nil {
+		lower := strings.ToLower(noun)
+		if e := m.WriteName(id, lower, 0); e != nil {
+			err = errutil.Append(err, e)
+		} else {
+			var ofs int
+			camel := lang.Camelize(noun)
+			if camel != lower {
+				if e := m.WriteName(id, camel, 1); e != nil {
 					err = errutil.Append(err, e)
+				}
+				ofs++
+			}
+			split := lang.Fields(noun)
+			if cnt := len(split); cnt > 1 {
+				cnt += ofs
+				for i, k := range split {
+					rank := cnt - i
+					if e := m.WriteName(id, strings.ToLower(k), rank); e != nil {
+						err = errutil.Append(err, e)
+					}
 				}
 			}
 		}

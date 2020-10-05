@@ -59,6 +59,96 @@
                   }
                 }
               }
+            },
+            {
+              "id": "id-174f12b5cd5-19",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f12b5cd5-15",
+                "type": "kinds_possess_properties",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-174f12b5cd5-16",
+                    "type": "plural_kinds",
+                    "value": " things"
+                  },
+                  "$DETERMINER": {
+                    "id": "id-174f12b5cd5-17",
+                    "type": "determiner",
+                    "value": "$A"
+                  },
+                  "$PROPERTY_PHRASE": {
+                    "id": "id-174f12b5cd5-18",
+                    "type": "property_phrase",
+                    "value": {
+                      "$ASPECT_PHRASE": {
+                        "id": "id-174f12b5cd5-20",
+                        "type": "aspect_phrase",
+                        "value": {
+                          "$ASPECT": {
+                            "id": "id-174f12b5cd5-21",
+                            "type": "aspect",
+                            "value": "pluralization"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-174f12b5cd5-13",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f12b5cd5-8",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-174f12b5cd5-9",
+                    "type": "aspect",
+                    "value": " pluralization"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-174f12b5cd5-10",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-174f12b5cd5-11",
+                        "type": "are_either",
+                        "value": "$CANBE"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-174f12b5cd5-14",
+                          "type": "trait",
+                          "value": "singular named"
+                        },
+                        {
+                          "id": "id-174f12b5cd5-12",
+                          "type": "trait",
+                          "value": "plural named"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-174f2020d9d-2",
+              "type": "story_statement",
+              "value": {
+                "id": "id-174f2020d9d-0",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-174f2020d9d-1",
+                    "type": "aspect",
+                    "value": " pluralization"
+                  }
+                }
+              }
             }
           ]
         }
@@ -162,13 +252,13 @@
                                                 "$ARE_AN": {
                                                   "id": "id-174f06d08a4-21",
                                                   "type": "are_an",
-                                                  "value": "$ARE"
+                                                  "value": "$AREA"
                                                 },
                                                 "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174f06d08a4-22",
                                                   "type": "singular_kind",
-                                                  "value": "things"
+                                                  "value": "thing"
                                                 }
                                               }
                                             }
@@ -235,32 +325,7 @@
                                         "$TEMPLATE": {
                                           "id": "id-174f06d08a4-33",
                                           "type": "lines",
-                                          "value": "You can only just make out {a: .lampPost}.\nYou can only just make out {a: .Trevor}.\nYou can only just make out {a: .soldiers}.\n{A: .lampPost} can be made out in the mist.\n{A: .Trevor} can be made out in the mist.\n{A: .soldiers} can be made out in the mist.\nYou can only just make out {the: .lampPost}.\nYou can only just make out {the: .trevor}.\nYou can only just make out {the: .soldiers}.\n{The: .lampPost} may be a trick of the mist.\n{The: .trevor} may be a trick of the mist.\n{The: .soldiers} may be a trick of the mist."
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            {
-                              "id": "id-174f06d08a4-34",
-                              "type": "execute",
-                              "value": {
-                                "id": "id-174f06d08a4-35",
-                                "type": "say_text",
-                                "value": {
-                                  "$TEXT": {
-                                    "id": "id-174f06d08a4-36",
-                                    "type": "text_eval",
-                                    "value": {
-                                      "id": "id-174f06d08a4-37",
-                                      "type": "render_template",
-                                      "value": {
-                                        "$TEMPLATE": {
-                                          "id": "id-174f06d08a4-38",
-                                          "type": "lines",
-                                          "value": "You can only just make out {a: .Trevor}\"."
+                                          "value": "You can only just make out {a: .lampPost}.\nYou can only just make out {a: .Trevor}.\nYou can only just make out {a: .soldiers}.\n{A: .lampPost} can be made out in the mist.\n{A: .Trevor} can be made out in the mist.\n{A: .soldiers} can be made out in the mist.\nYou can only just make out {the: .lampPost}.\nYou can only just make out {the: .trevor}.\nYou can only just make out {the: .soldiers}.\n{The: .lampPost} may be a trick of the mist.\n{The: .trevor} may be a trick of the mist.\n{The: .soldiers} may be a trick of the mist.\nYou can only just make out {a: .Trevor}."
                                         }
                                       }
                                     }
@@ -313,7 +378,7 @@
                         "$LINES": {
                           "id": "id-174f06d08a4-45",
                           "type": "lines",
-                          "value": "You can only just make out a lamp-post.\nYou can only just make out Trevor.\nYou can only just make out some soldiers.\nA lamp-post can be made out in the mist.\nTrevor can be made out in the mist.\nSome soldiers can be made out in the mist.\nYou can only just make out the lamp-post.\nYou can only just make out Trevor.\nYou can only just make out the soldiers.\nThe lamp-post may be a trick of the mist.\nTrevor may be a trick of the mist.\nThe soldiers may be a trick of the mist."
+                          "value": "You can only just make out a lamp-post.\nYou can only just make out Trevor.\nYou can only just make out some soldiers.\nA lamp-post can be made out in the mist.\nTrevor can be made out in the mist.\nSome soldiers can be made out in the mist.\nYou can only just make out the lamp-post.\nYou can only just make out Trevor.\nYou can only just make out the soldiers.\nThe lamp-post may be a trick of the mist.\nTrevor may be a trick of the mist.\nThe soldiers may be a trick of the mist.\nYou can only just make out Trevor.\n"
                         }
                       }
                     }
@@ -1514,7 +1579,102 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f0910998-122",
                                                     "type": "lines",
-                                                    "value": "{.target.article} {.target}"
+                                                    "value": "{getVar: \"article\"} {.target}"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "id": "id-174f2020d9d-28",
+                          "type": "pattern_rule",
+                          "value": {
+                            "$GUARD": {
+                              "id": "id-174f2020d9d-29",
+                              "type": "bool_eval",
+                              "value": {
+                                "id": "id-174f2020d9d-30",
+                                "type": "has_trait",
+                                "value": {
+                                  "$OBJ": {
+                                    "id": "id-174f2020d9d-31",
+                                    "type": "object_ref",
+                                    "value": {
+                                      "id": "id-174f2020d9d-32",
+                                      "type": "get_var",
+                                      "value": {
+                                        "$NAME": {
+                                          "id": "id-174f2020d9d-33",
+                                          "type": "text_eval",
+                                          "value": {
+                                            "id": "id-174f2020d9d-34",
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "id": "id-174f2020d9d-35",
+                                                "type": "text",
+                                                "value": "target"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "$TRAIT": {
+                                    "id": "id-174f2020d9d-36",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-174f2020d9d-37",
+                                      "type": "text_value",
+                                      "value": {
+                                        "$TEXT": {
+                                          "id": "id-174f2020d9d-38",
+                                          "type": "text",
+                                          "value": "proper named"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "$HOOK": {
+                              "id": "id-174f2020d9d-39",
+                              "type": "program_hook",
+                              "value": {
+                                "$ACTIVITY": {
+                                  "id": "id-174f2020d9d-40",
+                                  "type": "activity",
+                                  "value": {
+                                    "$EXE": [
+                                      {
+                                        "id": "id-174f2020d9d-41",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-174f2020d9d-42",
+                                          "type": "say_text",
+                                          "value": {
+                                            "$TEXT": {
+                                              "id": "id-174f2020d9d-43",
+                                              "type": "text_eval",
+                                              "value": {
+                                                "id": "id-174f2020d9d-44",
+                                                "type": "render_template",
+                                                "value": {
+                                                  "$TEMPLATE": {
+                                                    "id": "id-174f2020d9d-45",
+                                                    "type": "lines",
+                                                    "value": "{printName: .target|makeTitleCase!}"
                                                   }
                                                 }
                                               }

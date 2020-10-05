@@ -27,6 +27,8 @@ func init() {
 // build list of plurals
 // currently this is just from singular kinds
 // eventually it would be from pluralization modeling statements
+// fix: add a check that the same word doesnt appear as both a singular and plural
+// ( can happen if the author uses a singular in the place of a plural, etc. )
 func AssemblePlurals(asm *Assembler) (err error) {
 	_, e := asm.cache.DB().Exec(
 		`insert into mdl_plural

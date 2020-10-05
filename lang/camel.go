@@ -9,15 +9,28 @@ import (
 // Camelize turns spaces, dashes, and underscores into words, capitalizing all but the first word,
 // and lowercasing the rest of the string. likeThisIGuess.
 func Camelize(name string) string {
-	return combineCase(name, true)
+	p := combineCase(name, true, true)
+	return p.join()
 }
 
 // CombineCase is almost exactly like Camelize, only doesnt touch the case of the first rune of the first word.
 func CombineCase(name string) string {
-	return combineCase(name, false)
+	p := combineCase(name, false, true)
+	return p.join()
 }
 
-func combineCase(name string, changeFirst bool) (ret string) {
+// Fields is similar to strings.Fields except this splits on dashes, case changes, spaces, and the like:
+// the same rules as Camelize
+func Fields(name string) []string {
+	p := combineCase(name, false, false)
+	return p.flush()
+}
+
+// fix. this horrible algorithm sure needs to change
+// itd be fine i think to split first and then combine with word rules even
+// possibly worth considering ditching camelCasing anyway:
+// only support de-camelization into lower fields for template matching.
+func combineCase(name string, changeFirst, changeAny bool) parts {
 	type word int
 	const (
 		noword word = iota
@@ -51,7 +64,7 @@ func combineCase(name string, changeFirst bool) (ret string) {
 			if !sameWord {
 				parts.flush()
 				// hack for camelCasing.
-				if len(parts.arr) > 0 {
+				if len(parts.arr) > 0 && changeAny {
 					r = unicode.ToUpper(r)
 				}
 			}
@@ -60,7 +73,7 @@ func combineCase(name string, changeFirst bool) (ret string) {
 			inword = letter
 		}
 	}
-	return strings.Join(parts.flush(), "")
+	return parts
 }
 
 type parts struct {
@@ -74,4 +87,8 @@ func (p *parts) flush() []string {
 		p.Reset()
 	}
 	return p.arr
+}
+
+func (p *parts) join() string {
+	return strings.Join(p.flush(), "")
 }

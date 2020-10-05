@@ -117,13 +117,14 @@ left join eph_named np
 
 /* resolve value ephemera to nouns.
 	matches nouns by partial name, albeit in a preliminary way.
+	fix? could do a search where asm_noun.noun is NULL to determine missing matches.
  */
 create temp view
 asm_noun as 
 	select *, ( 
 		select me.noun 
 		from mdl_name as me
-		where asm.name = me.name 
+		where UPPER(asm.name) = UPPER(me.name)
 	 	order by me.rank limit 1 
 	) as noun
 from asm_value as asm;

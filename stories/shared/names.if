@@ -231,7 +231,7 @@
                                                 "$KIND": {
                                                   "id": "id-a-62",
                                                   "type": "singular_kind",
-                                                  "value": "things"
+                                                  "value": "thing"
                                                 }
                                               }
                                             }

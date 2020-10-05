@@ -110,7 +110,7 @@ func imp_named_noun(k *Importer, r reader.Map) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
-		k.NewImplicitAspect("nounTypes", "things", "common", "proper", "counted")
+		k.NewImplicitAspect("nounTypes", "things", "commonNamed", "properNamed", "counted")
 		// whether a player can refer to an object by its name.
 		k.NewImplicitAspect("privateNames", "things", "publiclyNamed", "privatelyNamed")
 	}
@@ -163,9 +163,9 @@ func read_named_noun(k *Importer, det string, r reader.Map) (err error) {
 		// pick common or proper based on noun capitalization.
 		// fix: implicitly generated facts should be considered preliminary
 		// so that authors can override them.
-		traitStr := "common"
+		traitStr := "commonNamed"
 		if first, _ := utf8.DecodeRuneInString(noun.String()); unicode.ToUpper(first) == first {
-			traitStr = "proper"
+			traitStr = "properNamed"
 		}
 		typeTrait := k.NewName(traitStr, tables.NAMED_TRAIT, reader.At(r))
 		k.NewValue(noun, typeTrait, true)
@@ -272,14 +272,18 @@ func imp_noun_traits(k *Importer, r reader.Map) (err error) {
 
 // fix... part of class traits
 func imp_trait_phrase(k *Importer, r reader.Map) (ret []ephemera.Named, err error) {
-	err = reader.Repeats(r.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
-		if trait, e := imp_trait(k, el); e != nil {
-			err = e
-		} else {
-			ret = append(ret, trait)
-		}
-		return
-	})
+	if m, e := reader.Unpack(r, "trait_phrase"); e != nil {
+		err = e
+	} else {
+		err = reader.Repeats(m.SliceOf("$TRAIT"), func(el reader.Map) (err error) {
+			if trait, e := imp_trait(k, el); e != nil {
+				err = e
+			} else {
+				ret = append(ret, trait)
+			}
+			return
+		})
+	}
 	return
 }
 
