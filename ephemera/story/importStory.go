@@ -43,7 +43,7 @@ func ImportStories(src string, db *sql.DB, ms []reader.Map) (err error) {
 		{(*core.ShuffleText)(nil), k.BindRet(imp_shuffle_text)},
 		{(*core.StoppingText)(nil), k.BindRet(imp_stopping_text)},
 		//
-		{(*express.Render)(nil), k.BindRet(imp_render_template)},
+		{(*express.RenderTemplate)(nil), k.BindRet(imp_render_template)},
 	})
 	//
 	for _, m := range ms {

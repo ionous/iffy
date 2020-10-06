@@ -79,11 +79,7 @@ func TestExpressions(t *testing.T) {
 	})
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
-			&core.Buffer{core.NewActivity(
-				&pattern.DetermineAct{"printName",
-					pattern.NewArgs(
-						&core.FromText{&core.ObjectName{T("A")}},
-					)})}); e != nil {
+			&RenderName{"A"}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -242,18 +238,12 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("hello {.object}",
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
-				&core.Buffer{core.NewActivity(
-					&pattern.DetermineAct{"printName",
-						pattern.NewArgs(
-							&core.FromText{&core.GetVar{
-								Name:            T("object"),
-								TryTextAsObject: true,
-							}},
-						)})}}},
+				&RenderName{"object"}}},
 		); e != nil {
 			t.Fatal(e)
 		}
 	})
+
 	// dotted names started with capital letters are requests for objects exactly matching that name
 	t.Run("global prop", func(t *testing.T) {
 		if e := testTemplate("{.Object.prop}",

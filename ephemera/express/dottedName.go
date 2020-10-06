@@ -2,7 +2,6 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 )
@@ -22,7 +21,7 @@ type dottedName struct {
 // but we can use the existing command GetVar which implements every eval type.
 func (on *dottedName) getVariableNamed() *core.GetVar {
 	return &core.GetVar{
-		Name:            on.getName(false),
+		Name:            on.getName(),
 		TryTextAsObject: true,
 	}
 }
@@ -33,30 +32,24 @@ func (on *dottedName) getVariableNamed() *core.GetVar {
 // so we just pass it around behind the scenes as an interface.
 func (on *dottedName) getFromVar() core.Assignment {
 	return &core.FromVar{
-		Name:            on.getName(false),
+		Name:            on.getName(),
 		TryTextAsObject: true,
 	}
 }
 
-// when dotted names are used directly:
-// 		ex {.lantern}
-func (on *dottedName) getPrintedName() rt.TextEval {
-	return &core.Buffer{core.NewActivity(
-		&pattern.DetermineAct{
-			"printName",
-			// on.name is already setup with an object id lookup
-			// so from text is being given an object.
-			pattern.NewArgs(&core.FromText{on.getName(true)}),
-		})}
-}
-
-func (on *dottedName) getName(b bool) (ret rt.TextEval) {
-	if t := on.name; lang.IsCapitalized(t) {
-		ret = &core.ObjectName{T(t)}
-	} else if b {
-		ret = on.getVariableNamed()
+func (on *dottedName) getName() (ret rt.TextEval) {
+	if name := on.name; lang.IsCapitalized(name) {
+		ret = &core.ObjectName{T(name)}
 	} else {
-		ret = T(t)
+		ret = T(name)
 	}
 	return
+}
+
+// when dotted names are used directly:
+// 		ex {.lantern}
+// first attempting to read from the name as a variable,
+// and if that fails, attempting to render the name as an object.
+func (on *dottedName) getPrintedName() (ret rt.TextEval) {
+	return &RenderName{on.name}
 }

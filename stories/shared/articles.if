@@ -1579,7 +1579,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f0910998-122",
                                                     "type": "lines",
-                                                    "value": "{getVar: \"article\"} {.target}"
+                                                    "value": "{.article} {.target}"
                                                   }
                                                 }
                                               }

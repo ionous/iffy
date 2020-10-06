@@ -26,9 +26,3 @@ func cmdError(op composer.Slat, e error) error {
 func cmdErrorCtx(op composer.Slat, Ctx string, e error) error {
 	return errutil.Append(&CommandError{Cmd: op, Ctx: Ctx}, e)
 }
-
-type UnknownObject string
-
-func (e UnknownObject) Error() string {
-	return errutil.Sprintf("Unknown object %q", string(e))
-}

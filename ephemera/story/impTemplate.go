@@ -10,6 +10,7 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/types"
+	"github.com/kr/pretty"
 )
 
 func imp_render_template(k *Importer, r reader.Map) (ret interface{}, err error) {
@@ -26,7 +27,8 @@ func imp_render_template(k *Importer, r reader.Map) (ret interface{}, err error)
 		} else if eval, ok := got.(rt.TextEval); !ok {
 			err = errutil.Fmt("render template has unknown expression %T", got)
 		} else {
-			ret = &express.Render{eval}
+			ret = &express.RenderTemplate{eval}
+			pretty.Println(eval)
 		}
 	}
 	return
@@ -42,7 +44,7 @@ func convert_text_or_template(str string) (ret interface{}, err error) {
 			err = errutil.New(e, xs)
 		} else if eval, ok := got.(rt.TextEval); !ok {
 			err = errutil.Fmt("render template has unknown expression %T", got)
-		} else if prog, e := ephemera.EncodeGob(&express.Render{eval}); e != nil {
+		} else if prog, e := ephemera.EncodeGob(&express.RenderTemplate{eval}); e != nil {
 			err = e // note: we dont have to encode into render but maybe its nice to have a consistent root type
 		} else {
 			ret = prog // okay; return bytes.

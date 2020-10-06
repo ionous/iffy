@@ -20,6 +20,8 @@ type ObjectName struct {
 	Name rt.TextEval
 }
 
+// tbd: this isnt currently exposed....
+// this also could be done by IsKindOf("kind")
 type ObjectExists struct {
 	Obj ObjectRef
 }
@@ -91,7 +93,7 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
 	switch _, e := GetObjectRef(run, op.Obj); e.(type) {
 	case nil:
 		okay = true
-	case UnknownObject:
+	case rt.UnknownObject:
 		okay = false
 	default:
 		err = cmdError(op, e)
@@ -106,7 +108,7 @@ func getObjectExactly(run rt.Runtime, name string) (retId string, err error) {
 	} else {
 		switch id, e := run.GetField(name, object.Id); e.(type) {
 		case rt.UnknownField:
-			err = UnknownObject(name)
+			err = rt.UnknownObject(name)
 		default:
 			err = e
 		case nil:

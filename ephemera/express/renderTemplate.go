@@ -5,11 +5,11 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-type Render struct {
+type RenderTemplate struct {
 	Expression rt.TextEval `if:"internal"`
 }
 
-func (*Render) Compose() composer.Spec {
+func (*RenderTemplate) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "render_template",
 		Spec:  "the template {lines%template:lines|quote}",
@@ -19,6 +19,6 @@ func (*Render) Compose() composer.Spec {
 }
 
 // RunTest returns an error on failure.
-func (op *Render) GetText(run rt.Runtime) (ret string, err error) {
+func (op *RenderTemplate) GetText(run rt.Runtime) (ret string, err error) {
 	return rt.GetText(run, op.Expression)
 }
