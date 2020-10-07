@@ -36,7 +36,7 @@ func TestFieldAccess(t *testing.T) {
 		for _, v := range els {
 			tgt := v.name
 			name := assembly.DomainNameOf("test", tgt)
-			if p, e := q.GetField(name, object.Exists); e != nil {
+			if p, e := q.GetField(object.Exists, name); e != nil {
 				t.Fatal("existence", name, e)
 			} else if exists, e := p.GetBool(nil); e != nil {
 				t.Fatal("assign", e)
@@ -51,7 +51,7 @@ func TestFieldAccess(t *testing.T) {
 		for i, cnt := 0, len(els); i < cnt; i += 2 {
 			tgt, field := els[i], els[i+1]
 			name := assembly.DomainNameOf("test", tgt)
-			if p, e := q.GetField(name, object.Kind); e != nil {
+			if p, e := q.GetField(object.Kind, name); e != nil {
 				t.Fatal(e)
 			} else if kind, e := p.GetText(nil); e != nil {
 				t.Fatal("assign", e)
@@ -59,7 +59,7 @@ func TestFieldAccess(t *testing.T) {
 				t.Fatal("mismatch", name, field, "got:", kind, "expected:", field)
 			}
 		}
-		if k, e := q.GetField("speedboat", object.Kind); e == nil {
+		if k, e := q.GetField(object.Kind, "speedboat"); e == nil {
 			t.Fatal("expected error; got", k)
 		}
 	})
@@ -70,7 +70,7 @@ func TestFieldAccess(t *testing.T) {
 			tgt, field := els[i], els[i+1]
 			name := assembly.DomainNameOf("test", tgt)
 			// asking for "Kinds" should get us the hierarchy
-			if p, e := q.GetField(name, object.Kinds); e != nil {
+			if p, e := q.GetField(object.Kinds, name); e != nil {
 				t.Fatal(e)
 			} else if path, e := p.GetText(nil); e != nil {
 				t.Fatal("assign", e)
@@ -78,7 +78,7 @@ func TestFieldAccess(t *testing.T) {
 				t.Fatal("mismatch", name, field, "got:", name, "expected:", field)
 			}
 		}
-		if path, e := q.GetField("speedboat", object.Kinds); e == nil {
+		if path, e := q.GetField(object.Kinds, "speedboat"); e == nil {
 			t.Fatal("expected error; got", path)
 		}
 	})
@@ -132,7 +132,7 @@ func TestFieldAccess(t *testing.T) {
 			}
 		}
 	})
-	t.Run("change traits", func(t *testing.T) {
+	t.Run("change_traits", func(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
 		apple := assembly.DomainNameOf("test", "apple")
 		boat := assembly.DomainNameOf("test", "boat")
@@ -148,6 +148,7 @@ func TestFieldAccess(t *testing.T) {
 		} else if e := testTraits(q, apple, "y,w,x"); e != nil {
 			t.Fatal(e)
 		}
+		// b is an aspect with traits "z" and "zz"
 		// boat.B has a default value of zz
 		if e := q.SetField(boat, "z", &generic.Bool{Value: true}); e != nil {
 			t.Fatal(e)

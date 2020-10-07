@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -40,7 +41,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 					err = errutil.Append(err, e)
 				} else if val, e := arg.From.GetAssignedValue(run); e != nil {
 					err = errutil.Append(err, e)
-				} else if e := parms.SetVariable(name, val); e != nil {
+				} else if e := parms.SetField(object.Variables, name, val); e != nil {
 					err = errutil.Append(err, e)
 				}
 			}

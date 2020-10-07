@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -60,7 +61,7 @@ func (op *GetVar) GetText(run rt.Runtime) (ret string, err error) {
 		} else {
 			ret = v
 		}
-	case rt.UnknownVariable:
+	case rt.UnknownTarget, rt.UnknownField:
 		if !op.TryTextAsObject {
 			err = cmdError(op, e)
 		} else if id, e := getObjectExactly(run, n); e != nil {
@@ -118,7 +119,7 @@ func (op *GetVar) getVariableByName(run rt.Runtime) (retName string, retValue rt
 		err = e
 	} else {
 		retName = n // then try to get the variable of that name
-		retValue, err = run.GetVariable(n)
+		retValue, err = run.GetField(object.Variables, n)
 	}
 	return
 }

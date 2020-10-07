@@ -24,11 +24,11 @@ func (k *ScopeStack) PopScope() {
 	}
 }
 
-// GetVariable returns the value at 'name'
-func (k *ScopeStack) GetVariable(name string) (ret rt.Value, err error) {
-	norm := lang.Camelize(name)
-	err = k.visit(name, func(scope rt.Scope) (err error) {
-		if v, e := scope.GetVariable(norm); e != nil {
+// GetField returns the value at 'name'
+func (k *ScopeStack) GetField(target, field string) (ret rt.Value, err error) {
+	norm := lang.Camelize(field)
+	err = k.visit(target, field, func(scope rt.Scope) (err error) {
+		if v, e := scope.GetField(target, norm); e != nil {
 			err = e
 		} else {
 			ret = v
@@ -38,20 +38,20 @@ func (k *ScopeStack) GetVariable(name string) (ret rt.Value, err error) {
 	return
 }
 
-// SetVariable writes the value of 'v' into the value at 'name'.
-func (k *ScopeStack) SetVariable(name string, v rt.Value) (err error) {
-	norm := lang.Camelize(name)
-	return k.visit(name, func(scope rt.Scope) error {
-		return scope.SetVariable(norm, v)
+// SetField writes the value of 'v' into the value at 'name'.
+func (k *ScopeStack) SetField(target, field string, v rt.Value) (err error) {
+	norm := lang.Camelize(field)
+	return k.visit(target, field, func(scope rt.Scope) error {
+		return scope.SetField(target, norm, v)
 	})
 }
-func (k *ScopeStack) visit(name string, visitor func(rt.Scope) error) (err error) {
+func (k *ScopeStack) visit(target, field string, visitor func(rt.Scope) error) (err error) {
 	for i := len(k.stack) - 1; i >= 0; i-- {
 		switch e := visitor(k.stack[i]); e.(type) {
 		case nil:
 			// no error? we're done.
 			goto Done
-		case rt.UnknownVariable:
+		case rt.UnknownTarget, rt.UnknownField:
 			// didn't find? keep looking...
 		default:
 			// other error? done.
@@ -59,7 +59,7 @@ func (k *ScopeStack) visit(name string, visitor func(rt.Scope) error) (err error
 			goto Done
 		}
 	}
-	err = rt.UnknownVariable(name)
+	err = rt.UnknownField{target, field}
 Done:
 	return
 }

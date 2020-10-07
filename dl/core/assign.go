@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
 )
@@ -69,13 +70,13 @@ func (op *FromVar) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 		err = e
 	} else {
 		// get the variable of that name
-		switch v, e := run.GetVariable(name); e.(type) {
+		switch v, e := run.GetField(object.Variables, name); e.(type) {
 		case nil:
 			ret = v
 		default:
 			err = e
 		// or... maybe get the object (id) of that name
-		case rt.UnknownVariable:
+		case rt.UnknownTarget, rt.UnknownField:
 			if !op.TryTextAsObject {
 				err = e
 			} else if id, e := getObjectExactly(run, name); e != nil {

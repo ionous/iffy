@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -16,7 +17,7 @@ type MatchNumber struct {
 }
 
 func (m MatchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
-	if a, e := run.GetVariable("num"); e != nil {
+	if a, e := run.GetField(object.Variables, "num"); e != nil {
 		err = e
 	} else if v, e := a.GetNumber(run); e != nil {
 		err = e

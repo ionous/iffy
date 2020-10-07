@@ -2,6 +2,7 @@ package scope
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
 )
@@ -56,30 +57,38 @@ type loopScope struct {
 	hasNext   bool
 }
 
-// GetVariable returns values for the iterator variables (index,first,last) and anything up-
-func (l *loopScope) GetVariable(n string) (ret rt.Value, err error) {
-	switch n {
-	case l.varName:
-		ret = l.varValue
-	case "index":
-		ret = &generic.Int{Value: l.currIndex}
-	case "first":
-		ret = &generic.Bool{Value: l.currIndex == 1}
-	case "last":
-		ret = &generic.Bool{Value: !l.hasNext}
-	default:
-		err = rt.UnknownVariable(n)
+// GetField returns values for the iterator variables (index,first,last) and anything up-
+func (l *loopScope) GetField(target, field string) (ret rt.Value, err error) {
+	if target != object.Variables {
+		err = rt.UnknownTarget{target}
+	} else {
+		switch field {
+		case l.varName:
+			ret = l.varValue
+		case "index":
+			ret = &generic.Int{Value: l.currIndex}
+		case "first":
+			ret = &generic.Bool{Value: l.currIndex == 1}
+		case "last":
+			ret = &generic.Bool{Value: !l.hasNext}
+		default:
+			err = rt.UnknownField{target, field}
+		}
 	}
 	return
 }
 
-// SetVariable always returns an rt.UnknownVariable error; iterator variables are not writable.
-func (l *loopScope) SetVariable(n string, v rt.Value) (err error) {
-	switch n {
-	case l.varName, "index", "first", "last":
-		err = errutil.New("loop counters cant be changed")
-	default:
-		err = rt.UnknownVariable(n)
+// note: iterator variables are not (currently) writable.
+func (l *loopScope) SetField(target, field string, v rt.Value) (err error) {
+	if target != object.Variables {
+		err = rt.UnknownTarget{target}
+	} else {
+		switch field {
+		case l.varName, "index", "first", "last":
+			err = errutil.New("loop counters cant be changed")
+		default:
+			err = rt.UnknownField{target, field}
+		}
 	}
 	return
 }

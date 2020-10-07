@@ -91,22 +91,22 @@ func (m *seqTest) Random(inclusiveMin, exclusiveMax int) int {
 }
 
 func (m *seqTest) GetField(target, field string) (ret rt.Value, err error) {
-	if field != object.Counter {
+	if target != object.Counter {
 		err = rt.UnknownField{target, field}
 	} else {
-		v := m.counters[target]
+		v := m.counters[field]
 		ret = &generic.Int{Value: v}
 	}
 	return
 }
 
 func (m *seqTest) SetField(target, field string, value rt.Value) (err error) {
-	if field != object.Counter {
+	if target != object.Counter {
 		err = rt.UnknownField{target, field}
 	} else if v, e := value.GetNumber(nil); e != nil {
 		err = errutil.New("seqTest: unknown value", e)
 	} else {
-		m.counters[target] = int(v)
+		m.counters[field] = int(v)
 	}
 	return
 }

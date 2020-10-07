@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -32,10 +33,10 @@ func (op *RenderName) GetText(run rt.Runtime) (ret string, err error) {
 		ret, err = op.getPrintedNamedOf(run, name)
 	} else {
 		// first check if there's a variable of the requested name
-		switch v, e := run.GetVariable(op.Name); e.(type) {
+		switch v, e := run.GetField(object.Variables, op.Name); e.(type) {
 		default:
 			err = cmdError(op, e)
-		case rt.UnknownVariable:
+		case rt.UnknownTarget, rt.UnknownField:
 			// if there was no such variable, then it's probably an object name
 			ret, err = op.getPrintedNamedOf(run, name)
 		case nil:

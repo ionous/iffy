@@ -34,14 +34,14 @@ type StoppingText struct {
 // if persistence wasn't necessary, we could use in-memory private fields of the commands
 func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret int, err error) {
 	if max := len(op.Parts); max > 0 {
-		if p, e := run.GetField(op.Seq, object.Counter); e != nil {
+		if p, e := run.GetField(object.Counter, op.Seq); e != nil {
 			err = e
 		} else if num, e := p.GetNumber(run); e != nil {
 			err = e
 		} else {
 			curr := int(num)
 			next := &generic.Int{Value: inc(curr, max)}
-			if e := run.SetField(op.Seq, object.Counter, next); e != nil {
+			if e := run.SetField(object.Counter, op.Seq, next); e != nil {
 				err = e
 			} else {
 				ret = curr

@@ -59,27 +59,27 @@ type modelTest struct {
 }
 
 func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
-	switch field {
+	switch target {
 	case object.Id:
-		if _, ok := m.clsMap[target]; !ok {
+		if _, ok := m.clsMap[field]; !ok {
 			err = rt.UnknownField{target, field}
 		} else {
-			ret = &generic.String{Value: target}
+			ret = &generic.String{Value: field}
 		}
 
 	case object.Exists:
-		_, ok := m.clsMap[target]
+		_, ok := m.clsMap[field]
 		ret = &generic.Bool{Value: ok}
 
 	case object.Kind:
-		if cls, ok := m.clsMap[target]; !ok {
+		if cls, ok := m.clsMap[field]; !ok {
 			err = rt.UnknownField{target, field}
 		} else {
 			ret = &generic.String{Value: cls}
 		}
 
 	case object.Kinds:
-		if cls, ok := m.clsMap[target]; !ok {
+		if cls, ok := m.clsMap[field]; !ok {
 			err = rt.UnknownField{target, field}
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)

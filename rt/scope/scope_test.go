@@ -3,6 +3,7 @@ package scope
 import (
 	"testing"
 
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
 )
@@ -31,10 +32,10 @@ func TestScopeStack(t *testing.T) {
 		count := counts[step]
 		for i, name := range names {
 			var have int
-			switch p, e := stack.GetVariable(name); e.(type) {
+			switch p, e := stack.GetField(object.Variables, name); e.(type) {
 			default:
 				t.Fatal("fatal", e)
-			case rt.UnknownVariable:
+			case rt.UnknownTarget, rt.UnknownField:
 				// t.Log(reason, "loop", i, "asking for", name, "... unknown")
 				have = -1
 			case nil:
@@ -51,10 +52,10 @@ func TestScopeStack(t *testing.T) {
 				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
 			} else {
 				next := &generic.Int{Value: have + 1}
-				switch e := stack.SetVariable(name, next); e.(type) {
+				switch e := stack.SetField(object.Variables, name, next); e.(type) {
 				default:
 					t.Fatal("fatal", reason, "step", step, name, "set failed", e)
-				case rt.UnknownVariable:
+				case rt.UnknownField:
 					if have != -1 {
 						t.Fatal("fatal", "step", step, name, "set failed", e)
 					}
@@ -99,9 +100,11 @@ type mockScope struct {
 	val        int
 }
 
-func (k *mockScope) GetVariable(name string) (ret rt.Value, err error) {
-	if name != k.name {
-		err = rt.UnknownVariable(name)
+func (k *mockScope) GetField(target, field string) (ret rt.Value, err error) {
+	if target != object.Variables {
+		err = rt.UnknownTarget{target}
+	} else if field != k.name {
+		err = rt.UnknownField{target, field}
 	} else {
 		k.gets++
 		ret = &generic.Int{Value: k.val}
@@ -109,9 +112,11 @@ func (k *mockScope) GetVariable(name string) (ret rt.Value, err error) {
 	return
 }
 
-func (k *mockScope) SetVariable(name string, v rt.Value) (err error) {
-	if name != k.name {
-		err = rt.UnknownVariable(name)
+func (k *mockScope) SetField(target, field string, v rt.Value) (err error) {
+	if target != object.Variables {
+		err = rt.UnknownTarget{target}
+	} else if field != k.name {
+		err = rt.UnknownField{target, field}
 	} else if n, e := v.GetNumber(nil); e != nil {
 		err = e
 	} else {

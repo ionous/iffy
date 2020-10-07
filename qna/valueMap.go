@@ -2,7 +2,6 @@ package qna
 
 import (
 	"github.com/ionous/iffy/lang"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
 )
@@ -15,22 +14,23 @@ func (k *keyType) unknown() error {
 	return rt.UnknownField{k.target, k.field}
 }
 
+// subField should be one of the package object prefixes
 func (k *keyType) dot(subField string) keyType {
-	return keyType{k.target + "." + k.field, subField}
+	return keyType{subField, k.target + "." + k.field}
 }
 
 type valueMap map[keyType]*generic.Value
 
-func makeKey(obj, field string) keyType {
+func makeKey(target, field string) keyType {
 	// FIX?
 	// operations generating get field should be registering the field as a name
 	// and, as best as possible, relating obj to field for property verification
 	// name translation should be done there.
 	// we'd have to mark up things like text evaluations ( ex. HasTrait )
-	if len(field) > 0 && field[0] != object.Prefix {
+	if len(field) > 0 && field[0] != '#' {
 		field = lang.Camelize(field)
 	}
-	return keyType{obj, field}
+	return keyType{target, field}
 }
 
 func makeKeyForEval(obj, typeName string) keyType {

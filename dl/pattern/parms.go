@@ -1,6 +1,7 @@
 package pattern
 
 import (
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
@@ -84,7 +85,7 @@ func (n *TextListParam) Prepare(p Parameters) {
 // Parameters implements a Scope mapping names to specified parameters.
 // The only current user is pattern.FromPattern::Stitch()
 // It stores values from indexed and key name arguments ( originally specified as evals. )
-// Its pushed into scope so the names can be used as a source of values for rt.Runtime::GetVariable().
+// Its pushed into scope so the names can be used as a source of values for rt.Runtime::GetField().
 // ( ex. For use with the commands GetVar{},  SimpleNoun{}, ProperNoun{}, ObjectName{}, ... )
 type Parameters struct {
 	run    rt.Runtime
@@ -93,9 +94,11 @@ type Parameters struct {
 type parameterValues map[string]*generic.Value
 
 // GetVariable returns the value at 'name', the caller is responsible for determining the type.
-func (ps *Parameters) GetVariable(name string) (ret rt.Value, err error) {
-	if i, ok := ps.values[name]; !ok {
-		err = rt.UnknownVariable(name)
+func (ps *Parameters) GetField(target, field string) (ret rt.Value, err error) {
+	if target != object.Variables {
+		err = rt.UnknownTarget{target}
+	} else if i, ok := ps.values[field]; !ok {
+		err = rt.UnknownField{target, field}
 	} else {
 		ret = i
 	}
@@ -103,10 +106,11 @@ func (ps *Parameters) GetVariable(name string) (ret rt.Value, err error) {
 }
 
 // SetVariable writes the value of 'v' into the value at 'name'.
-func (ps *Parameters) SetVariable(name string, val rt.Value) (err error) {
-	// FIX: any sort of validation? ex. ensure the value is baked ( ie. some sort of primitive or slice of primitives. )
-	if p, ok := ps.values[name]; !ok {
-		err = rt.UnknownVariable(name)
+func (ps *Parameters) SetField(target, field string, val rt.Value) (err error) {
+	if target != object.Variables {
+		err = rt.UnknownTarget{target}
+	} else if p, ok := ps.values[field]; !ok {
+		err = rt.UnknownField{target, field}
 	} else {
 		err = p.SetValue(ps.run, val)
 	}

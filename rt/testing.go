@@ -25,12 +25,6 @@ func (Panic) Writer() writer.Output {
 func (Panic) SetWriter(writer.Output) writer.Output {
 	panic("Runtime panic")
 }
-func (Panic) GetVariable(name string) (Value, error) {
-	panic("Runtime panic")
-}
-func (Panic) SetVariable(name string, v Value) error {
-	panic("Runtime panic")
-}
 func (Panic) PushScope(Scope) {
 	panic("Runtime panic")
 }

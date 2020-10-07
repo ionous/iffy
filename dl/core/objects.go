@@ -106,7 +106,7 @@ func getObjectExactly(run rt.Runtime, name string) (retId string, err error) {
 	if strings.HasPrefix(name, "#") {
 		retId = name // ids start with prefix #
 	} else {
-		switch id, e := run.GetField(name, object.Id); e.(type) {
+		switch id, e := run.GetField(object.Id, name); e.(type) {
 		case rt.UnknownField:
 			err = rt.UnknownObject(name)
 		default:
@@ -123,9 +123,9 @@ func getObjectExactly(run rt.Runtime, name string) (retId string, err error) {
 // that function tries to find the value of a variable or object id named "something"
 // this tries to resolve the name "something" into an object.
 func getObjectInexactly(run rt.Runtime, name string) (retId string, err error) {
-	switch p, e := run.GetVariable(name); e.(type) {
+	switch p, e := run.GetField(object.Variables, name); e.(type) {
 	// if there's no such variable, the inexact search then checks if there's an object of that name.
-	case rt.UnknownVariable:
+	case rt.UnknownTarget, rt.UnknownField:
 		retId, err = getObjectExactly(run, name)
 	case nil:
 		// if we found such a variable, get its contents and look up the referenced object.
@@ -150,7 +150,7 @@ func (*KindOf) Compose() composer.Spec {
 func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := GetObjectRef(run, op.Obj); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(obj, object.Kind); e != nil {
+	} else if p, e := run.GetField(object.Kind, obj); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret, err = p.GetText(run)
@@ -172,7 +172,7 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(obj, object.Kinds); e != nil {
+	} else if p, e := run.GetField(object.Kinds, obj); e != nil {
 		err = cmdError(op, e)
 	} else if fullPath, e := p.GetText(run); e != nil {
 		err = cmdError(op, e)
@@ -195,7 +195,7 @@ func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(obj, object.Kind); e != nil {
+	} else if p, e := run.GetField(object.Kind, obj); e != nil {
 		err = cmdError(op, e)
 	} else if objKind, e := p.GetText(run); e != nil {
 		err = cmdError(op, e)
