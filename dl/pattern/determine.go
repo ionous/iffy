@@ -31,24 +31,34 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 		err = e
 	} else {
 		// create variables for all the known parameters
-		parms := Parameters{run: run, values: make(parameterValues)}
-		pat.Prepare(parms)
-
-		// read from each argument and store into the parameters
-		if op.Arguments != nil {
-			for _, arg := range op.Arguments.Args {
-				if name, e := getParamName(pat, arg.Name); e != nil {
-					err = errutil.Append(err, e)
-				} else if val, e := arg.From.GetAssignedValue(run); e != nil {
-					err = errutil.Append(err, e)
-				} else if e := parms.SetField(object.Variables, name, val); e != nil {
-					err = errutil.Append(err, e)
+		parms := Parameters{run: run}
+		if e := pat.Prepare(run, &parms); e != nil {
+			err = e
+		} else {
+			// read from each argument and store into the parameters
+			if op.Arguments != nil {
+				for _, arg := range op.Arguments.Args {
+					if name, e := getParamName(pat, arg.Name); e != nil {
+						err = errutil.Append(err, e)
+					} else if val, e := arg.From.GetAssignedValue(run); e != nil {
+						err = errutil.Append(err, e)
+					} else if e := parms.SetField(object.Variables, name, val); e != nil {
+						err = errutil.Append(err, e)
+					}
 				}
 			}
 		}
 		if err == nil {
 			run.PushScope(&parms)
-			err = fn()
+			// fix_ not sure that i love the double map creation, double scope....
+			locals := Parameters{run: run}
+			if e := pat.ComputeLocals(run, &locals); e != nil {
+				err = e
+			} else {
+				run.PushScope(&locals)
+				err = fn()
+				run.PopScope()
+			}
 			run.PopScope()
 		}
 	}

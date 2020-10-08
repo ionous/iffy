@@ -9,21 +9,27 @@ import (
 
 type NumParam struct {
 	Name string
+	Init rt.NumberEval
 }
 type BoolParam struct {
 	Name string
+	Init rt.BoolEval
 }
 type TextParam struct {
 	Name string
+	Init rt.TextEval
 }
 type ObjectParam struct {
 	Name, Kind string
+	Init       rt.TextEval
 }
 type NumListParam struct {
 	Name string
+	Init rt.NumListEval
 }
 type TextListParam struct {
 	Name string
+	Init rt.TextListEval
 }
 
 // parameters in the future might have defaults...
@@ -31,55 +37,85 @@ type TextListParam struct {
 // we could also -- in some far future land -- code generate things.
 type Parameter interface {
 	String() string
-	Prepare(Parameters)
+	Prepare(rt.Runtime, *Parameters) error
 }
 
 func (n *NumParam) String() string {
 	return n.Name
 }
-func (n *NumParam) Prepare(p Parameters) {
-	var v float64
-	p.values[n.Name] = generic.NewValue(tables.PRIM_DIGI, v)
+
+func (n *NumParam) Prepare(run rt.Runtime, p *Parameters) (err error) {
+	if v, e := rt.GetOptionalNumber(run, n.Init, 0); e != nil {
+		err = e
+	} else {
+		p.write(n.Name, tables.PRIM_DIGI, v)
+	}
+	return
 }
 
 func (n *BoolParam) String() string {
 	return n.Name
 }
-func (n *BoolParam) Prepare(p Parameters) {
-	var v bool
-	p.values[n.Name] = generic.NewValue(tables.PRIM_BOOL, v)
+
+func (n *BoolParam) Prepare(run rt.Runtime, p *Parameters) (err error) {
+	if v, e := rt.GetOptionalBool(run, n.Init, false); e != nil {
+		err = e
+	} else {
+		p.write(n.Name, tables.PRIM_BOOL, v)
+	}
+	return
 }
 
 func (n *TextParam) String() string {
 	return n.Name
 }
-func (n *TextParam) Prepare(p Parameters) {
-	var v string
-	p.values[n.Name] = generic.NewValue(tables.PRIM_TEXT, v)
+
+func (n *TextParam) Prepare(run rt.Runtime, p *Parameters) (err error) {
+	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
+		err = e
+	} else {
+		p.write(n.Name, tables.PRIM_TEXT, v)
+	}
+	return
 }
 
 func (n *ObjectParam) String() string {
 	return n.Name
 }
-func (n *ObjectParam) Prepare(p Parameters) {
-	var v string
-	p.values[n.Name] = generic.NewValue(tables.PRIM_TEXT, v)
+
+func (n *ObjectParam) Prepare(run rt.Runtime, p *Parameters) (err error) {
+	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
+		err = e
+	} else {
+		p.write(n.Name, tables.PRIM_TEXT, v)
+	}
+	return
 }
 
 func (n *NumListParam) String() string {
 	return n.Name
 }
-func (n *NumListParam) Prepare(p Parameters) {
-	var v []float64
-	p.values[n.Name] = generic.NewValue("num_list", v)
+
+func (n *NumListParam) Prepare(run rt.Runtime, p *Parameters) (err error) {
+	if vs, e := rt.GetOptionalNumbers(run, n.Init, nil); e != nil {
+		err = e
+	} else {
+		p.write(n.Name, "num_list", vs)
+	}
+	return
 }
 
 func (n *TextListParam) String() string {
 	return n.Name
 }
-func (n *TextListParam) Prepare(p Parameters) {
-	var v []string
-	p.values[n.Name] = generic.NewValue("text_list", v)
+
+func (n *TextListParam) Prepare(run rt.Runtime, p *Parameters) (err error) {
+	if vs, e := rt.GetOptionalTexts(run, n.Init, nil); e != nil {
+		err = e
+	} else {
+		p.write(n.Name, "text_list", vs)
+	}
+	return
 }
 
 // Parameters implements a Scope mapping names to specified parameters.
@@ -92,6 +128,13 @@ type Parameters struct {
 	values parameterValues
 }
 type parameterValues map[string]*generic.Value
+
+func (ps *Parameters) write(name string, typeName string, value interface{}) {
+	if ps.values == nil {
+		ps.values = make(parameterValues)
+	}
+	ps.values[name] = generic.NewValue(typeName, value)
+}
 
 // GetVariable returns the value at 'name', the caller is responsible for determining the type.
 func (ps *Parameters) GetField(target, field string) (ret rt.Value, err error) {

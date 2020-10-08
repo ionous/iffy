@@ -106,6 +106,30 @@ func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, e
 	return
 }
 
+// GetOptionalNumber runs the optionally specified eval.
+func GetOptionalNumbers(run Runtime, eval NumListEval, fallback []float64) (ret []float64, err error) {
+	if eval == nil {
+		ret = fallback
+	} else if vs, e := GetNumberStream(run, eval); e != nil {
+		err = e
+	} else {
+		ret, err = CompactNumbers(run, vs)
+	}
+	return
+}
+
+// GetOptionalText runs the optionally specified eval.
+func GetOptionalTexts(run Runtime, eval TextListEval, fallback []string) (ret []string, err error) {
+	if eval == nil {
+		ret = fallback
+	} else if vs, e := GetTextStream(run, eval); e != nil {
+		err = e
+	} else {
+		ret, err = CompactTexts(run, vs)
+	}
+	return
+}
+
 // GetNumberStream returns an new iterator to walk the passed list,
 // or an empty iterator if the value is null.
 func GetNumberStream(run Runtime, eval NumListEval) (ret Iterator, err error) {
@@ -134,21 +158,26 @@ func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
 	if it, e := eval.GetNumberStream(run); e != nil {
 		err = e
 	} else {
-		var vals []float64
-		for it.HasNext() {
-			if n, e := it.GetNext(); e != nil {
-				err = e
-				break
-			} else if v, e := n.GetNumber(run); e != nil {
-				err = e
-				break
-			} else {
-				vals = append(vals, v)
-			}
+		ret, err = CompactNumbers(run, it)
+	}
+	return
+}
+
+func CompactNumbers(run Runtime, it Iterator) (ret []float64, err error) {
+	var vals []float64
+	for it.HasNext() {
+		if n, e := it.GetNext(); e != nil {
+			err = e
+			break
+		} else if v, e := n.GetNumber(run); e != nil {
+			err = e
+			break
+		} else {
+			vals = append(vals, v)
 		}
-		if err == nil {
-			ret = vals
-		}
+	}
+	if err == nil {
+		ret = vals
 	}
 	return
 }
@@ -159,21 +188,26 @@ func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 	if it, e := eval.GetTextStream(run); e != nil {
 		err = e
 	} else {
-		var vals []string
-		for it.HasNext() {
-			if n, e := it.GetNext(); e != nil {
-				err = e
-				break
-			} else if v, e := n.GetText(run); e != nil {
-				err = e
-				break
-			} else {
-				vals = append(vals, v)
-			}
+		ret, err = CompactTexts(run, it)
+	}
+	return
+}
+
+func CompactTexts(run Runtime, it Iterator) (ret []string, err error) {
+	var vals []string
+	for it.HasNext() {
+		if n, e := it.GetNext(); e != nil {
+			err = e
+			break
+		} else if v, e := n.GetText(run); e != nil {
+			err = e
+			break
+		} else {
+			vals = append(vals, v)
 		}
-		if err == nil {
-			ret = vals
-		}
+	}
+	if err == nil {
+		ret = vals
 	}
 	return
 }

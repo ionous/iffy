@@ -288,10 +288,10 @@ func imp_trait_phrase(k *Importer, r reader.Map) (ret []ephemera.Named, err erro
 }
 
 // "{type:variable_type} ( called {name:variable_name|quote} )"
-func imp_variable_decl(k *Importer, r reader.Map) (retName, retType ephemera.Named, err error) {
+func imp_variable_decl(k *Importer, cat string, r reader.Map) (retName, retType ephemera.Named, err error) {
 	if m, e := reader.Unpack(r, "variable_decl"); e != nil {
 		err = e
-	} else if n, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
+	} else if n, e := imp_variable_name(k, cat, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else if t, e := imp_variable_type(k, m.MapOf("$TYPE")); e != nil {
 		err = e

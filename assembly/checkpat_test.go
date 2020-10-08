@@ -214,14 +214,22 @@ func cleanPatterns(db *sql.DB) {
 // adds rows of 4 values to the database of test ephemera
 func addEphPattern(rec *ephemera.Recorder, els ...string) {
 	for i := 0; i < len(els); i += 4 {
+		dec, _ := strconv.ParseBool(els[i+3])
+		var category string
+		if dec {
+			category = tables.NAMED_PARAMETER
+		} else {
+			category = tables.NAMED_ARGUMENT
+		}
+
 		pat := rec.NewName(els[i+0], tables.NAMED_PATTERN, strconv.Itoa(i))
 		arg := pat
 		if n := els[i+1]; len(n) > 0 {
-			arg = rec.NewName(els[i+1], tables.NAMED_VARIABLE, strconv.Itoa(i))
+			arg = rec.NewName(els[i+1], category, strconv.Itoa(i))
 		}
 		typ := rec.NewName(els[i+2], tables.NAMED_TYPE, strconv.Itoa(i))
 
-		if dec, _ := strconv.ParseBool(els[i+3]); dec {
+		if dec {
 			rec.NewPatternDecl(pat, arg, typ)
 		} else {
 			rec.NewPatternRef(pat, arg, typ)

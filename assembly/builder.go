@@ -20,6 +20,7 @@ type patternEntry struct {
 	patternName string              // name of the pattern
 	patternType string              // "return" type of the pattern
 	prologue    []pattern.Parameter // list of all parameters sent to the pattern
+	locals      []pattern.Parameter // ...
 }
 
 func (pat *patternEntry) AddParam(param pattern.Parameter) {
@@ -27,6 +28,16 @@ func (pat *patternEntry) AddParam(param pattern.Parameter) {
 }
 
 type patternCache map[string]*patternEntry
+
+func (cache patternCache) init(name, patternType string) (ret pattern.CommonPattern, okay bool) {
+	if c, ok := (cache)[name]; ok && c.patternType == patternType {
+		ret.Name = name
+		ret.Prologue = c.prologue
+		ret.Locals = c.locals
+		okay = true
+	}
+	return
+}
 
 // read pattern declarations from the ephemera db
 func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
@@ -52,15 +63,15 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				paramName := lang.Camelize(paramName)
 				switch typeName {
 				case "text_eval":
-					last.AddParam(&pattern.TextParam{paramName})
+					last.AddParam(&pattern.TextParam{Name: paramName})
 				case "number_eval":
-					last.AddParam(&pattern.NumParam{paramName})
+					last.AddParam(&pattern.NumParam{Name: paramName})
 				case "bool_eval":
-					last.AddParam(&pattern.BoolParam{paramName})
+					last.AddParam(&pattern.BoolParam{Name: paramName})
 				default:
 					// the type might be some sort of kind...
 					if kind := kind.String; len(kind) > 0 {
-						last.AddParam(&pattern.ObjectParam{paramName, kind})
+						last.AddParam(&pattern.ObjectParam{Name: paramName, Kind: kind})
 					} else {
 						err = errutil.Fmt("pattern %q parameter %q has unknown type %q ( expected an eval .)",
 							patternName, paramName, typeName)
@@ -91,11 +102,8 @@ func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
 	var rules = []BuildRule{{
 		Query: `select pattern, prog from asm_rule where type='bool_rule'`,
 		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns[name]; ok && c.patternType == "bool_eval" {
-				var pat pattern.BoolPattern
-				pat.Name = name
-				pat.Prologue = c.prologue
-				ret = &pat
+			if c, ok := patterns.init(name, "bool_eval"); ok {
+				ret = &pattern.BoolPattern{CommonPattern: c}
 			}
 			return
 		},
@@ -107,11 +115,8 @@ func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
 	}, {
 		Query: `select pattern, prog from asm_rule where type='number_rule'`,
 		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns[name]; ok && c.patternType == "number_eval" {
-				var pat pattern.NumberPattern
-				pat.Name = name
-				pat.Prologue = c.prologue
-				ret = &pat
+			if c, ok := patterns.init(name, "number_eval"); ok {
+				ret = &pattern.NumberPattern{CommonPattern: c}
 			}
 			return
 		},
@@ -123,11 +128,8 @@ func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
 	}, {
 		Query: `select pattern, prog from asm_rule where type='text_rule'`,
 		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns[name]; ok && c.patternType == "text_eval" {
-				var pat pattern.TextPattern
-				pat.Name = name
-				pat.Prologue = c.prologue
-				ret = &pat
+			if c, ok := patterns.init(name, "text_eval"); ok {
+				ret = &pattern.TextPattern{CommonPattern: c}
 			}
 			return
 		},
@@ -139,11 +141,8 @@ func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
 	}, {
 		Query: `select pattern, prog from asm_rule where type='num_list_rule'`,
 		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns[name]; ok && c.patternType == "num_list_eval" {
-				var pat pattern.NumListPattern
-				pat.Name = name
-				pat.Prologue = c.prologue
-				ret = &pat
+			if c, ok := patterns.init(name, "num_list_eval"); ok {
+				ret = &pattern.NumListPattern{CommonPattern: c}
 			}
 			return
 		},
@@ -155,11 +154,8 @@ func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
 	}, {
 		Query: `select pattern, prog from asm_rule where type='text_list_rule'`,
 		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns[name]; ok && c.patternType == "text_list_eval" {
-				var pat pattern.TextListPattern
-				pat.Name = name
-				pat.Prologue = c.prologue
-				ret = &pat
+			if c, ok := patterns.init(name, "text_list_eval"); ok {
+				ret = &pattern.TextListPattern{CommonPattern: c}
 			}
 			return
 		},
@@ -171,11 +167,8 @@ func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
 	}, {
 		Query: `select pattern, prog from asm_rule where type='execute_rule'`,
 		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns[name]; ok && c.patternType == "execute" {
-				var pat pattern.ActivityPattern
-				pat.Name = name
-				pat.Prologue = c.prologue
-				ret = &pat
+			if c, ok := patterns.init(name, "execute"); ok {
+				ret = &pattern.ActivityPattern{CommonPattern: c}
 			}
 			return
 		},

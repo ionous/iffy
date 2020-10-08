@@ -3,6 +3,7 @@ package story
 import (
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/tables"
 )
 
 func importName(k *Importer, r reader.Map, readType, storeType string) (ret ephemera.Named, err error) {
@@ -18,48 +19,48 @@ func importName(k *Importer, r reader.Map, readType, storeType string) (ret ephe
 }
 
 func imp_aspect(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "aspect", "")
+	return importName(k, r, "aspect", tables.NAMED_ASPECT)
 }
 
 func imp_noun_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "noun_name", "noun")
+	return importName(k, r, "noun_name", tables.NAMED_NOUN)
 }
 
 func imp_counted_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "noun_name", "singular_kind")
+	return importName(k, r, "noun_name", tables.NAMED_KIND)
 }
 
 func imp_pattern_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "pattern_name", "")
+	return importName(k, r, "pattern_name", tables.NAMED_PATTERN)
 }
 
 func imp_plural_kinds(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "plural_kinds", "")
+	return importName(k, r, "plural_kinds", tables.NAMED_PLURAL_KINDS)
 }
 
 func imp_property(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "property", "field")
+	return importName(k, r, "property", tables.NAMED_FIELD)
 }
 
 func imp_relation(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "relation", "verb")
+	return importName(k, r, "relation", tables.NAMED_VERB)
 }
 
 func imp_singular_kind(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "singular_kind", "")
+	return importName(k, r, "singular_kind", tables.NAMED_KIND)
 }
 
 func imp_named_test(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
 	k.OverrideNameDuring("$CURRENT_TEST", k.StoryEnv.Recent.Test, func() {
-		ret, err = importName(k, r, "test_name", "test")
+		ret, err = importName(k, r, "test_name", tables.NAMED_TEST)
 	})
 	return
 }
 
 func imp_trait(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "trait", "")
+	return importName(k, r, "trait", tables.NAMED_TRAIT)
 }
 
-func imp_variable_name(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
-	return importName(k, r, "variable_name", "")
+func imp_variable_name(k *Importer, cat string, r reader.Map) (ret ephemera.Named, err error) {
+	return importName(k, r, "variable_name", cat)
 }

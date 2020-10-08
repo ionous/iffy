@@ -33,7 +33,7 @@ func TestVariableTypePrimitive(t *testing.T) {
 func TestVariableDeclObject(t *testing.T) {
 	k, db := newTestImporter(t, memory)
 	defer db.Close()
-	if varName, typeName, e := imp_variable_decl(k, _variable_decl); e != nil {
+	if varName, typeName, e := imp_variable_decl(k, tables.NAMED_PARAMETER, _variable_decl); e != nil {
 		t.Fatal(e)
 	} else if varName.String() != "pet" {
 		t.Fatal(varName)
@@ -53,7 +53,7 @@ func TestPatternVariablesDecl(t *testing.T) {
 		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
 		if have, want := buf.String(), lines(
 			"corral,pattern_name",  // 1
-			"pet,variable_name",    // 2
+			"pet,parameter",        // 2
 			"animal,singular_kind", // 3
 			"2,3,4,1",              // NewPatternDecl
 		); have != want {

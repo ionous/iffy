@@ -41,7 +41,7 @@ var SayPattern = pattern.TextPattern{
 	pattern.CommonPattern{
 		Name: "sayMe",
 		Prologue: []pattern.Parameter{
-			&pattern.NumParam{"num"},
+			&pattern.NumParam{Name: "num"},
 		}},
 	[]*pattern.TextRule{
 		{nil, SayIt("Not between 1 and 3.")},

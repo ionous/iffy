@@ -116,7 +116,7 @@ func imp_arguments(k *Importer, pid ephemera.Named, r reader.Map) (ret *pattern.
 func imp_argument(k *Importer, patternName ephemera.Named, r reader.Map) (ret *pattern.Argument, err error) {
 	if m, e := reader.Unpack(r, "argument"); e != nil {
 		err = e
-	} else if paramName, e := imp_variable_name(k, m.MapOf("$NAME")); e != nil {
+	} else if paramName, e := imp_variable_name(k, tables.NAMED_ARGUMENT, m.MapOf("$NAME")); e != nil {
 		err = e
 	} else if a, e := imp_assignment(k, m.MapOf("$FROM")); e != nil {
 		err = e

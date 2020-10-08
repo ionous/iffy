@@ -1,16 +1,42 @@
 package pattern
 
-import "github.com/ionous/errutil"
+import (
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/rt"
+)
 
 type Pattern interface {
-	Prepare(ps Parameters)
+	// setup the runtime parameter info with our stored parameter info
+	Prepare(rt.Runtime, *Parameters) error
+	ComputeLocals(rt.Runtime, *Parameters) error
 	GetParameterName(int) (string, error)
 }
 
-func (ps *CommonPattern) Prepare(parms Parameters) {
-	for _, n := range ps.Prologue {
-		n.Prepare(parms)
+// fix: the duplication of this and the name, prologue parameters indicates that
+// the structure is inverted -- there should probably be one common pattern struct
+// with a rules interface implemented by lists of Text, etc rules.
+type CommonPattern struct {
+	Name     string
+	Prologue []Parameter
+	Locals   []Parameter
+}
+
+// setup the runtime parameter info with our stored parameter inf
+func (ps *CommonPattern) Prepare(run rt.Runtime, parms *Parameters) (err error) {
+	return prepareList(run, ps.Prologue, parms)
+}
+
+func (ps *CommonPattern) ComputeLocals(run rt.Runtime, parms *Parameters) (err error) {
+	return prepareList(run, ps.Locals, parms)
+}
+
+func prepareList(run rt.Runtime, list []Parameter, parms *Parameters) (err error) {
+	for _, n := range list {
+		if e := n.Prepare(run, parms); e != nil {
+			err = errutil.Append(err, e)
+		}
 	}
+	return
 }
 
 func (ps *CommonPattern) GetParameterName(idx int) (ret string, err error) {
@@ -23,12 +49,4 @@ func (ps *CommonPattern) GetParameterName(idx int) (ret string, err error) {
 		ret = p.String()
 	}
 	return
-}
-
-// fix: the duplication of this and the name, prologue parameters indicates that
-// the structure is inverted -- there should probably be one common pattern struct
-// with a rules interface implemented by lists of Text, etc rules.
-type CommonPattern struct {
-	Name     string
-	Prologue []Parameter
 }

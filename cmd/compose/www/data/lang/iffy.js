@@ -96,7 +96,7 @@ function localLang(make) {
 
     make.run("pattern_locals", "{*local_decl}");
     make.run("local_decl",  "Where {variable_decl} = {value%program_result}",
-      "Local");
+      "Local: local variables can use the parameters of a pattern to compute temporary values.");
 
     make.opt("program_hook", "run an {activity} or return a {result:program_return}");
 

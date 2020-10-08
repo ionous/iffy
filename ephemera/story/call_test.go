@@ -43,7 +43,7 @@ func TestDetermineNum(t *testing.T) {
 			"2,2,5,0", // from NewPatternRef -> "determine num" indicates factorial returns a number eval
 			//
 			"factorial,pattern_name", // 1.
-			"num,variable_name",      // 2.
+			"num,argument",           // 2.
 			"number_eval,type",       // 3.
 			"number_eval,type",       // 4.
 		); have != want {

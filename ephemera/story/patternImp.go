@@ -39,9 +39,40 @@ func imp_pattern_actions(k *Importer, r reader.Map) (err error) {
 		err = e
 	} else if patternName, e := imp_pattern_name(k, op.MapOf("$NAME")); e != nil {
 		err = e
-	} else {
-		err = imp_pattern_rules(k, patternName, op.MapOf("$PATTERN_RULES"))
+	} else if e := imp_pattern_rules(k, patternName, op.MapOf("$PATTERN_RULES")); e != nil {
+		err = e
+	} else if l := op.MapOf("$PATTERN_LOCALS"); len(l) > 0 {
+		err = imp_pattern_locals(k, patternName, l)
 	}
+	return
+}
+
+func imp_pattern_locals(k *Importer, patternName ephemera.Named, r reader.Map) (err error) {
+	if op, e := reader.Unpack(r, "pattern_locals"); e != nil {
+		err = e
+	} else {
+		err = reader.Repeats(op.SliceOf("$LOCAL_DECL"),
+			func(el reader.Map) (err error) {
+				return imp_pattern_local(k, patternName, el)
+			})
+	}
+	return
+}
+
+// read a single local_decl from a pattern action block
+func imp_pattern_local(k *Importer, patternName ephemera.Named, r reader.Map) (err error) {
+	// xxxxxxxxxxxxxxxxxxxxxxx
+	// if op, e := reader.Unpack(r, "local_decl"); e != nil {
+	// 	err = e
+	// } else if localName, localType, e := imp_variable_decl(k, tables.NAMED_LOCAL, op.MapOf("$VARIABLE_DECL")); e != nil {
+	// 	err = e
+	// } else if hook, e := imp_program_hook(k, op.MapOf("$PROGRAM_RESULT")); e != nil {
+	// 	err = e
+	// } else if prog, e := k.NewGob(hook.SlotType(), hook.CmdPtr()); e != nil {
+	// 	err = e // turn the result generator into a storable program.
+	// } else {
+	// 	// 	k.NewPatternRule(patternName, patternProg)
+	// }
 	return
 }
 

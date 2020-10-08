@@ -3,6 +3,7 @@ package story
 import (
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/tables"
 )
 
 func imp_story_statement(k *Importer, r reader.Map) (err error) {
@@ -160,21 +161,21 @@ func imp_pattern_decl(k *Importer, r reader.Map) (err error) {
 	return
 }
 
-// `Pattern variables: Storage for values used during the execution of a pattern.`)
+// fix: shouldnt this be called pattern parameters?
 // {+variable_decl|comma-and}.",
 func imp_pattern_variables_tail(k *Importer, patternName ephemera.Named, r reader.Map) (err error) {
 	if m, e := reader.Unpack(r, "pattern_variables_tail"); e != nil {
 		err = e
 	} else {
-		err = rep_variable_decl(k, patternName, m)
+		err = rep_parameter_decl(k, patternName, m)
 	}
 	return
 }
 
-func rep_variable_decl(k *Importer, patternName ephemera.Named, r reader.Map) error {
+func rep_parameter_decl(k *Importer, patternName ephemera.Named, r reader.Map) error {
 	return reader.Repeats(r.SliceOf("$VARIABLE_DECL"),
 		func(m reader.Map) (err error) {
-			if paramName, paramType, e := imp_variable_decl(k, m); e != nil {
+			if paramName, paramType, e := imp_variable_decl(k, tables.NAMED_PARAMETER, m); e != nil {
 				err = e
 			} else {
 				k.NewPatternDecl(patternName, paramName, paramType)
@@ -190,7 +191,7 @@ func imp_pattern_variables_decl(k *Importer, r reader.Map) (err error) {
 	} else if patternName, e := imp_pattern_name(k, m.MapOf("$PATTERN_NAME")); e != nil {
 		err = e
 	} else {
-		err = rep_variable_decl(k, patternName, m)
+		err = rep_parameter_decl(k, patternName, m)
 	}
 	return
 }

@@ -16,7 +16,7 @@ func TestFactorial(t *testing.T) {
 			pattern.CommonPattern{
 				Name: "factorial",
 				Prologue: []pattern.Parameter{
-					&pattern.NumParam{"num"},
+					&pattern.NumParam{Name: "num"},
 				},
 			}, []*pattern.NumberRule{{
 				NumberEval: &core.ProductOf{

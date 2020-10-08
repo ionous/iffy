@@ -33,8 +33,9 @@ func TestFactorialStory(t *testing.T) {
 			"factorial,pattern_name", // we declared the named pattern
 			"kinds,kind",
 			"name,field",
-			"num,variable_name", // we referenced the variable named
-			"number_eval,type",  // we evaluated the pattern
+			"num,argument",     // we referenced the param
+			"num,parameter",    // we declared the param
+			"number_eval,type", // we evaluated the pattern
 		); have != want {
 			t.Fatal(have)
 		}
