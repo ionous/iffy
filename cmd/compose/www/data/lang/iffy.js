@@ -87,13 +87,16 @@ function localLang(make) {
     make.str("pattern_name");
 
     make.run("pattern_actions", "story_statement",
-      "To {pattern name%name:pattern_name}: {pattern_rules}",
-      "Pattern Actions: Actions to take when using a pattern."
-      );
+      "To {pattern name%name:pattern_name}: {?pattern_locals} {pattern_rules}",
+      "Pattern Actions: Actions to take when using a pattern.");
+
     make.run("pattern_rules", "{*pattern_rule}");
-    make.run("pattern_rule",
-      `When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}`,
+    make.run("pattern_rule", `When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}`,
       "Rule");
+
+    make.run("pattern_locals", "{*local_decl}");
+    make.run("local_decl",  "Where {variable_decl} = {value%program_result}",
+      "Local");
 
     make.opt("program_hook", "run an {activity} or return a {result:program_return}");
 
@@ -128,11 +131,10 @@ For example: an animal, a container, etc.`);
     make.str("plural_kinds",
       `Kinds: The plural name of a type of similar nouns.
 For example: animals, containers, etc.`);
-
   });
 
   make.group("Variables", function() {
-    make.run("variable_decl", "{type:variable_type} called {name:variable_name|quote}");
+    make.run("variable_decl", "{type:variable_type} called {name:variable_name}");
     make.str("variable_name");
 
     make.opt("variable_type", "a {simple value%primitive:primitive_type} or an {object:object_type}");

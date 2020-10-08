@@ -59,27 +59,3 @@ class ParagraphNodes extends NodeList {
     return 1;
   }
 }
-
-Vue.component('mk-story-ctrl', {
-  template:
-  `<em-node-table
-      :list="list"
-  ><template
-      v-slot="{item, idx}"
-    ><mk-switch
-      :node="item"
-    ></mk-switch
-    ></template
-  ></em-node-table>`,
-  props: {
-    node: Node,
-  },
-  data() {
-    const { node, "$root": root } = this;
-    // each item is a paragraph run
-    return {
-      list: new ParagraphNodes(root.nodes, node),
-      dropper: root.dropper,
-    }
-  }
-});

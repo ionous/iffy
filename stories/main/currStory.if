@@ -700,6 +700,115 @@
             }
           ]
         }
+      },
+      {
+        "id": "id-175089f6c06-0",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-175089f6c06-1",
+              "type": "story_statement",
+              "value": {
+                "id": "id-175089f6c06-2",
+                "type": "pattern_actions",
+                "value": {
+                  "$NAME": {
+                    "id": "id-175089f6c06-3",
+                    "type": "pattern_name",
+                    "value": null
+                  },
+                  "$PATTERN_LOCALS": {
+                    "id": "id-17508aaaa0b-0",
+                    "type": "pattern_locals",
+                    "value": {
+                      "$LOCAL_DECL": [
+                        {
+                          "id": "id-17508aaaa0b-2",
+                          "type": "local_decl",
+                          "value": {
+                            "$VARIABLE_DECL": {
+                              "id": "id-17508aaaa0b-3",
+                              "type": "variable_decl",
+                              "value": {
+                                "$TYPE": {
+                                  "id": "id-17508aaaa0b-4",
+                                  "type": "variable_type",
+                                  "value": null
+                                },
+                                "$NAME": {
+                                  "id": "id-17508aaaa0b-5",
+                                  "type": "variable_name",
+                                  "value": null
+                                }
+                              }
+                            },
+                            "$PROGRAM_RESULT": {
+                              "id": "id-17508aaaa0b-6",
+                              "type": "program_result",
+                              "value": null
+                            }
+                          }
+                        },
+                        {
+                          "id": "id-17508aaaa0b-7",
+                          "type": "local_decl",
+                          "value": {
+                            "$VARIABLE_DECL": {
+                              "id": "id-17508aaaa0b-8",
+                              "type": "variable_decl",
+                              "value": {
+                                "$TYPE": {
+                                  "id": "id-17508aaaa0b-9",
+                                  "type": "variable_type",
+                                  "value": null
+                                },
+                                "$NAME": {
+                                  "id": "id-17508aaaa0b-10",
+                                  "type": "variable_name",
+                                  "value": null
+                                }
+                              }
+                            },
+                            "$PROGRAM_RESULT": {
+                              "id": "id-17508aaaa0b-11",
+                              "type": "program_result",
+                              "value": null
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "$PATTERN_RULES": {
+                    "id": "id-175089f6c06-4",
+                    "type": "pattern_rules",
+                    "value": {
+                      "$PATTERN_RULE": [
+                        {
+                          "id": "id-17508aea3f0-0",
+                          "type": "pattern_rule",
+                          "value": {
+                            "$GUARD": {
+                              "id": "id-17508aea3f0-1",
+                              "type": "bool_eval",
+                              "value": null
+                            },
+                            "$HOOK": {
+                              "id": "id-17508aea3f0-2",
+                              "type": "program_hook",
+                              "value": null
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     ]
   }
