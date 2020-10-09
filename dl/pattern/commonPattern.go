@@ -2,13 +2,14 @@ package pattern
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/rt"
 )
 
 type Pattern interface {
 	// setup the runtime parameter info with our stored parameter info
-	Prepare(rt.Runtime, *Parameters) error
-	ComputeLocals(rt.Runtime, *Parameters) error
+	Prepare(rt.Runtime, *term.Terms) error
+	ComputeLocals(rt.Runtime, *term.Terms) error
 	GetParameterName(int) (string, error)
 }
 
@@ -17,20 +18,20 @@ type Pattern interface {
 // with a rules interface implemented by lists of Text, etc rules.
 type CommonPattern struct {
 	Name     string
-	Prologue []Parameter
-	Locals   []Parameter
+	Prologue []term.Preparer
+	Locals   []term.Preparer
 }
 
 // setup the runtime parameter info with our stored parameter inf
-func (ps *CommonPattern) Prepare(run rt.Runtime, parms *Parameters) (err error) {
+func (ps *CommonPattern) Prepare(run rt.Runtime, parms *term.Terms) (err error) {
 	return prepareList(run, ps.Prologue, parms)
 }
 
-func (ps *CommonPattern) ComputeLocals(run rt.Runtime, parms *Parameters) (err error) {
+func (ps *CommonPattern) ComputeLocals(run rt.Runtime, parms *term.Terms) (err error) {
 	return prepareList(run, ps.Locals, parms)
 }
 
-func prepareList(run rt.Runtime, list []Parameter, parms *Parameters) (err error) {
+func prepareList(run rt.Runtime, list []term.Preparer, parms *term.Terms) (err error) {
 	for _, n := range list {
 		if e := n.Prepare(run, parms); e != nil {
 			err = errutil.Append(err, e)

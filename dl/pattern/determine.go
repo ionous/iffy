@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
@@ -31,7 +32,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 		err = e
 	} else {
 		// create variables for all the known parameters
-		parms := Parameters{run: run}
+		parms := term.MakeTerms(run)
 		if e := pat.Prepare(run, &parms); e != nil {
 			err = e
 		} else {
@@ -51,7 +52,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 		if err == nil {
 			run.PushScope(&parms)
 			// fix_ not sure that i love the double map creation, double scope....
-			locals := Parameters{run: run}
+			locals := term.MakeTerms(run)
 			if e := pat.ComputeLocals(run, &locals); e != nil {
 				err = e
 			} else {

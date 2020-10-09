@@ -7,6 +7,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 )
@@ -19,14 +20,14 @@ type BuildRule struct {
 
 // map name to pattern interface
 type patternEntry struct {
-	patternName string              // name of the pattern
-	patternType string              // "return" type of the pattern
-	prologue    []pattern.Parameter // list of all parameters sent to the pattern
-	locals      []pattern.Parameter // ...
+	patternName string          // name of the pattern
+	patternType string          // "return" type of the pattern
+	prologue    []term.Preparer // list of all parameters sent to the pattern
+	locals      []term.Preparer // ...
 }
 
 // fix? should
-func (pat *patternEntry) AddParam(cat string, param pattern.Parameter) (err error) {
+func (pat *patternEntry) AddParam(cat string, param term.Preparer) (err error) {
 	switch cat {
 	case tables.NAMED_PARAMETER:
 		pat.prologue = append(pat.prologue, param)
@@ -81,21 +82,21 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				//
 				switch typeName {
 				case "text_eval":
-					p := pattern.TextParam{Name: paramName}
+					p := term.Text{Name: paramName}
 					if e := decode(prog, &p.Init); e != nil {
 						err = errutil.New("couldnt decode", patternName, paramName, e)
 					} else {
 						err = last.AddParam(category, &p)
 					}
 				case "number_eval":
-					p := pattern.NumParam{Name: paramName}
+					p := term.Number{Name: paramName}
 					if e := decode(prog, &p.Init); e != nil {
 						err = errutil.New("couldnt decode", patternName, paramName, e)
 					} else {
 						err = last.AddParam(category, &p)
 					}
 				case "bool_eval":
-					p := pattern.BoolParam{Name: paramName}
+					p := term.Bool{Name: paramName}
 					if e := decode(prog, &p.Init); e != nil {
 						err = errutil.New("couldnt decode", patternName, paramName, e)
 					} else {
@@ -104,7 +105,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				default:
 					// the type might be some sort of kind...
 					if kind := kind.String; len(kind) > 0 {
-						p := pattern.ObjectParam{Name: paramName, Kind: kind}
+						p := term.Object{Name: paramName, Kind: kind}
 						if e := decode(prog, &p.Init); e != nil {
 							err = errutil.New("couldnt decode", patternName, paramName, e)
 						} else {

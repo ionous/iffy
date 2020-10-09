@@ -1,6 +1,9 @@
 package pattern
 
-import "github.com/ionous/iffy/dl/composer"
+import (
+	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/term"
+)
 
 // Rules contained by this package.
 // fix: would it be better to list rule sets?
@@ -13,14 +16,14 @@ var Support = []interface{}{
 	(*TextListRule)(nil),
 	(*ExecuteRule)(nil),
 	//
-	(*Parameters)(nil),
-	(*Parameter)(nil),
-	(*NumParam)(nil),
-	(*BoolParam)(nil),
-	(*TextParam)(nil),
-	(*ObjectParam)(nil),
-	(*NumListParam)(nil),
-	(*TextListParam)(nil),
+	//(*term.Preparer)(nil),
+	(*term.Terms)(nil),
+	(*term.Number)(nil),
+	(*term.Bool)(nil),
+	(*term.Text)(nil),
+	(*term.Object)(nil),
+	(*term.NumList)(nil),
+	(*term.TextList)(nil),
 }
 
 var Slats = []composer.Slat{

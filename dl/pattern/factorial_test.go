@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -15,8 +16,8 @@ func TestFactorial(t *testing.T) {
 		"factorial": &pattern.NumberPattern{
 			pattern.CommonPattern{
 				Name: "factorial",
-				Prologue: []pattern.Parameter{
-					&pattern.NumParam{Name: "num"},
+				Prologue: []term.Preparer{
+					&term.Number{Name: "num"},
 				},
 			}, []*pattern.NumberRule{{
 				NumberEval: &core.ProductOf{

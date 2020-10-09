@@ -3,6 +3,7 @@ package debug
 import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -40,8 +41,8 @@ func DetermineSay(i int) *pattern.DetermineText {
 var SayPattern = pattern.TextPattern{
 	pattern.CommonPattern{
 		Name: "sayMe",
-		Prologue: []pattern.Parameter{
-			&pattern.NumParam{Name: "num"},
+		Prologue: []term.Preparer{
+			&term.Number{Name: "num"},
 		}},
 	[]*pattern.TextRule{
 		{nil, SayIt("Not between 1 and 3.")},
