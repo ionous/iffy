@@ -25,8 +25,11 @@ create table eph_noun( idNamedNoun int, idNamedKind int );
 /* declarations and references to pattern parameter and pattern return types.
 if idNamedPattern is idNamedParam it indicates a return type.
 idNamedParam can be in the kind category, or one of the predefined eval types .
-decl indicates whether the ephemera was a declaration or a reference */
-create table eph_pattern( idNamedPattern int, idNamedParam int, idNamedType int, decl int );
+idProg holds program initialization for locals ( and possibly default parameter values )
+for now idProg < 0 is a pattern or pattern parameter reference;
+the "category" of idNamedParam also indicates reference vs. declaration
+*/
+create table eph_pattern( idNamedPattern int, idNamedParam int, idNamedType int, idProg int );
 /* rule for the collective name of a singular word */
 create table eph_plural( idNamedPlural int, idNamedSingluar int );
 /* type is the name of the command container for de-serialization of the prog

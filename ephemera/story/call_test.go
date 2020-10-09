@@ -39,13 +39,13 @@ func TestDetermineNum(t *testing.T) {
 			// no rules b/c the pattern is called but not implemented.
 			"0",
 			// eph_pattern
-			"2,3,4,0", // from NewPatternRef -> "determine num" takes a parameter that is from a number eval
-			"2,2,5,0", // from NewPatternRef -> "determine num" indicates factorial returns a number eval
+			"2,3,4,-1", // from NewPatternRef -> "determine num" takes a parameter that is from a number eval
+			"2,2,5,-1", // from NewPatternRef -> "determine num" indicates factorial returns a number eval
 			//
-			"factorial,pattern_name", // 1.
-			"num,argument",           // 2.
-			"number_eval,type",       // 3.
-			"number_eval,type",       // 4.
+			"factorial,pattern", // 1.
+			"num,argument",      // 2.
+			"number_eval,type",  // 3.
+			"number_eval,type",  // 4.
 		); have != want {
 			t.Fatal(have)
 		}

@@ -51,8 +51,10 @@ func checkPatternSetup(db *sql.DB) (err error) {
 	var declaredReturn string
 
 	// find where variable names and pattern names conflict
+	// FIX: this had been pretending to query multiple parameters...
+	// but it only actually looks at the pattern name....
 	if e := tables.QueryAll(db,
-		`select distinct pn.name 
+		`select distinct pn.name
 		from eph_pattern ep
 		left join eph_named pn
 			on (ep.idNamedPattern = pn.rowid)
@@ -65,7 +67,7 @@ func checkPatternSetup(db *sql.DB) (err error) {
 			last = now
 			return e
 		},
-		&now.pat, &now.arg, &now.typ, &now.decl); e != nil {
+		&now.pat /*, &now.arg, &now.typ, &now.decl */); e != nil {
 		err = e
 	} else {
 		// search for other conflicts

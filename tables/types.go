@@ -20,7 +20,7 @@ const (
 	NAMED_PLURAL_KINDS = "plural_kinds"
 	NAMED_PROPERTY     = "prop" // field, trait, or aspect
 	NAMED_NOUN         = "noun"
-	NAMED_PATTERN      = "pattern_name"
+	NAMED_PATTERN      = "pattern"
 	NAMED_LOCAL        = "local"
 	NAMED_PARAMETER    = "parameter"
 	NAMED_ARGUMENT     = "argument"

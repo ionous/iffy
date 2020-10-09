@@ -153,7 +153,7 @@ func imp_pattern_decl(k *Importer, r reader.Map) (err error) {
 	} else if patternType, e := imp_pattern_type(k, m.MapOf("$TYPE")); e != nil {
 		err = e
 	} else {
-		k.NewPatternDecl(patternName, patternName, patternType)
+		k.NewPatternDecl(patternName, patternName, patternType, ephemera.Prog{})
 		if tail := m.MapOf("$OPTVARS"); len(tail) > 0 {
 			err = imp_pattern_variables_tail(k, patternName, tail)
 		}
@@ -178,7 +178,7 @@ func rep_parameter_decl(k *Importer, patternName ephemera.Named, r reader.Map) e
 			if paramName, paramType, e := imp_variable_decl(k, tables.NAMED_PARAMETER, m); e != nil {
 				err = e
 			} else {
-				k.NewPatternDecl(patternName, paramName, paramType)
+				k.NewPatternDecl(patternName, paramName, paramType, ephemera.Prog{})
 			}
 			return
 		})

@@ -29,8 +29,8 @@ func TestFactorialStory(t *testing.T) {
 			"3", // e@h_prog -- 1 test program, 2 rules
 			"4", // eph_pattern specifies types - (1 pattern, 1 parameter) * (1 decl, 1 call)
 			// eph_named
-			"factorial,test",         // name of the test
-			"factorial,pattern_name", // we declared the named pattern
+			"factorial,test",    // name of the test
+			"factorial,pattern", // we declared the named pattern
 			"kinds,kind",
 			"name,field",
 			"num,argument",     // we referenced the param

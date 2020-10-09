@@ -1,7 +1,9 @@
 package assembly
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/gob"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/pattern"
@@ -45,10 +47,15 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 	out := make(patternCache)
 	var patternName, paramName, typeName string
 	var kind sql.NullString
+	var prog []byte
 	var last *patternEntry
 	if e := tables.QueryAll(db,
-		`select pattern, param, type, kind from asm_pattern_decl`,
+		`select ap.pattern, ap.param, ap.type, ap.kind, ep.prog 
+		from asm_pattern_decl ap
+		left join eph_prog ep
+		on (ep.rowid = ap.idProg)`,
 		func() (err error) {
+			// fix: need to handle conflicting prog definitions
 			if last == nil || last.patternName != patternName {
 				if patternName != paramName {
 					err = errutil.New("expected the first param should be the pattern return type", patternName, paramName, typeName)
@@ -61,17 +68,38 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				// fix: these should probably be tables.PRIM_ names
 				// ie. "text" not "text_eval" -- tests and other things have to be adjusted
 				paramName := lang.Camelize(paramName)
+				//
 				switch typeName {
 				case "text_eval":
-					last.AddParam(&pattern.TextParam{Name: paramName})
+					p := pattern.TextParam{Name: paramName}
+					if e := decode(prog, &p.Init); e != nil {
+						err = errutil.New("couldnt decode", patternName, paramName, e)
+					} else {
+						last.AddParam(&p)
+					}
 				case "number_eval":
-					last.AddParam(&pattern.NumParam{Name: paramName})
+					p := pattern.NumParam{Name: paramName}
+					if e := decode(prog, &p.Init); e != nil {
+						err = errutil.New("couldnt decode", patternName, paramName, e)
+					} else {
+						last.AddParam(&p)
+					}
 				case "bool_eval":
-					last.AddParam(&pattern.BoolParam{Name: paramName})
+					p := pattern.BoolParam{Name: paramName}
+					if e := decode(prog, &p.Init); e != nil {
+						err = errutil.New("couldnt decode", patternName, paramName, e)
+					} else {
+						last.AddParam(&p)
+					}
 				default:
 					// the type might be some sort of kind...
 					if kind := kind.String; len(kind) > 0 {
-						last.AddParam(&pattern.ObjectParam{Name: paramName, Kind: kind})
+						p := pattern.ObjectParam{Name: paramName, Kind: kind}
+						if e := decode(prog, &p.Init); e != nil {
+							err = errutil.New("couldnt decode", patternName, paramName, e)
+						} else {
+							last.AddParam(&p)
+						}
 					} else {
 						err = errutil.Fmt("pattern %q parameter %q has unknown type %q ( expected an eval .)",
 							patternName, paramName, typeName)
@@ -80,10 +108,18 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 			}
 			return
 		},
-		&patternName, &paramName, &typeName, &kind); e != nil {
+		&patternName, &paramName, &typeName, &kind, &prog); e != nil {
 		err = e
 	} else {
 		ret = out
+	}
+	return
+}
+
+func decode( prog []byte, out interface{}) (err error) {
+	if len(prog) > 0 {
+		dec := gob.NewDecoder(bytes.NewBuffer(prog))
+		err = dec.Decode(out)
 	}
 	return
 }

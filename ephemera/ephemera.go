@@ -139,13 +139,13 @@ func (r *Recorder) NewNoun(noun, kind Named) {
 }
 
 // declare a pattern or pattern parameter
-func (r *Recorder) NewPatternDecl(pattern, param, patternType Named) {
-	r.cache.Must(eph_pattern, pattern, param, patternType, true)
+func (r *Recorder) NewPatternDecl(pattern, param, patternType Named, handler Prog) {
+	r.cache.Must(eph_pattern, pattern, param, patternType, handler)
 }
 
 //
 func (r *Recorder) NewPatternRef(pattern, param, patternType Named) {
-	r.cache.Must(eph_pattern, pattern, param, patternType, false)
+	r.cache.Must(eph_pattern, pattern, param, patternType, -1)
 }
 
 func (r *Recorder) NewPatternRule(pattern Named, handler Prog) {
@@ -208,7 +208,7 @@ var eph_rule = tables.Insert("eph_rule", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
 var eph_named = tables.Insert("eph_named", "name", "og", "category", "domain", "idSource", "offset")
 var eph_noun = tables.Insert("eph_noun", "idNamedNoun", "idNamedKind")
-var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType", "decl")
+var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam", "idNamedType", "idProg")
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")
 var eph_prog = tables.Insert("eph_prog", "idSource", "progType", "prog")
 var eph_relation = tables.Insert("eph_relation", "idNamedRelation", "idNamedKind", "idNamedOtherKind", "cardinality")

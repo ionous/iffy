@@ -13,11 +13,12 @@ func assemblyTemplate() string {
 		" */\n" +
 		"create temp view \n" +
 		"asm_pattern as \n" +
-		"\tselect pn.name as pattern, \n" +
+		"\tselect pn.name as pattern,\n" +
 		"\tkn.name as param, \n" +
 		"\ttn.name as type, \n" +
-		"\tep.decl, \n" +
-		"\tep.rowid as ogid\n" +
+		"\tep.idProg >=0 as decl, \n" +
+		"\tep.rowid as ogid,\n" +
+		"\tep.idProg\n" +
 		"from eph_pattern ep\n" +
 		"left join eph_named pn\n" +
 		"\ton (ep.idNamedPattern = pn.rowid)\n" +
@@ -36,7 +37,8 @@ func assemblyTemplate() string {
 		"\tfrom mdl_kind mk \n" +
 		"\tjoin mdl_plural mp\n" +
 		"\twhere mp.one = type\n" +
-		"\tand mp.many=mk.kind ) as kind\n" +
+		"\tand mp.many=mk.kind ) as kind, \n" +
+		"\tidProg\n" +
 		"from asm_pattern \n" +
 		"where decl = 1 \n" +
 		"group by pattern, param\n" +
@@ -128,6 +130,7 @@ func assemblyTemplate() string {
 		"\n" +
 		"/* resolve value ephemera to nouns.\n" +
 		"\tmatches nouns by partial name, albeit in a preliminary way.\n" +
+		"\tfix? could do a search where asm_noun.noun is NULL to determine missing matches.\n" +
 		" */\n" +
 		"create temp view\n" +
 		"asm_noun as \n" +

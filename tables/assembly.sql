@@ -2,11 +2,12 @@
  */
 create temp view 
 asm_pattern as 
-	select pn.name as pattern, 
+	select pn.name as pattern,
 	kn.name as param, 
 	tn.name as type, 
-	ep.decl, 
-	ep.rowid as ogid
+	ep.idProg >=0 as decl, 
+	ep.rowid as ogid,
+	ep.idProg
 from eph_pattern ep
 left join eph_named pn
 	on (ep.idNamedPattern = pn.rowid)
@@ -25,7 +26,8 @@ select pattern, param, type, ogid,
 	from mdl_kind mk 
 	join mdl_plural mp
 	where mp.one = type
-	and mp.many=mk.kind ) as kind
+	and mp.many=mk.kind ) as kind, 
+	idProg
 from asm_pattern 
 where decl = 1 
 group by pattern, param

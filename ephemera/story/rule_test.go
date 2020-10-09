@@ -61,7 +61,7 @@ func TestPatternRule(t *testing.T) {
 		tables.WriteCsv(db, &buf, "select idNamedPattern, idProg from eph_rule", 2)
 		if have, want := buf.String(), lines(
 			"execute_rule",
-			"example,pattern_name",
+			"example,pattern",
 			"0", // eph_pattern -- rules are recorded via eph_prog,
 			"2,1",
 		); have != want {
