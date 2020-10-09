@@ -7,6 +7,7 @@ asm_pattern as
 	tn.name as type, 
 	ep.idProg >=0 as decl, 
 	ep.rowid as ogid,
+	kn.category as cat,
 	ep.idProg
 from eph_pattern ep
 left join eph_named pn
@@ -27,7 +28,8 @@ select pattern, param, type, ogid,
 	join mdl_plural mp
 	where mp.one = type
 	and mp.many=mk.kind ) as kind, 
-	idProg
+	idProg, 
+	cat
 from asm_pattern 
 where decl = 1 
 group by pattern, param

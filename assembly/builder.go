@@ -25,8 +25,17 @@ type patternEntry struct {
 	locals      []pattern.Parameter // ...
 }
 
-func (pat *patternEntry) AddParam(param pattern.Parameter) {
-	pat.prologue = append(pat.prologue, param)
+// fix? should
+func (pat *patternEntry) AddParam(cat string, param pattern.Parameter) (err error) {
+	switch cat {
+	case tables.NAMED_PARAMETER:
+		pat.prologue = append(pat.prologue, param)
+	case tables.NAMED_LOCAL:
+		pat.locals = append(pat.locals, param)
+	default:
+		err = errutil.New("unknown category", cat)
+	}
+	return
 }
 
 type patternCache map[string]*patternEntry
@@ -45,17 +54,18 @@ func (cache patternCache) init(name, patternType string) (ret pattern.CommonPatt
 func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 	// build the pattern cache
 	out := make(patternCache)
-	var patternName, paramName, typeName string
+	var patternName, paramName, category, typeName string
 	var kind sql.NullString
 	var prog []byte
 	var last *patternEntry
 	if e := tables.QueryAll(db,
-		`select ap.pattern, ap.param, ap.type, ap.kind, ep.prog 
+		`select ap.pattern, ap.param, ap.cat, ap.type, ap.kind, ep.prog
 		from asm_pattern_decl ap
 		left join eph_prog ep
 		on (ep.rowid = ap.idProg)`,
 		func() (err error) {
 			// fix: need to handle conflicting prog definitions
+			// fix: should probably watch for locals which shadow parameter names
 			if last == nil || last.patternName != patternName {
 				if patternName != paramName {
 					err = errutil.New("expected the first param should be the pattern return type", patternName, paramName, typeName)
@@ -75,21 +85,21 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 					if e := decode(prog, &p.Init); e != nil {
 						err = errutil.New("couldnt decode", patternName, paramName, e)
 					} else {
-						last.AddParam(&p)
+						err = last.AddParam(category, &p)
 					}
 				case "number_eval":
 					p := pattern.NumParam{Name: paramName}
 					if e := decode(prog, &p.Init); e != nil {
 						err = errutil.New("couldnt decode", patternName, paramName, e)
 					} else {
-						last.AddParam(&p)
+						err = last.AddParam(category, &p)
 					}
 				case "bool_eval":
 					p := pattern.BoolParam{Name: paramName}
 					if e := decode(prog, &p.Init); e != nil {
 						err = errutil.New("couldnt decode", patternName, paramName, e)
 					} else {
-						last.AddParam(&p)
+						err = last.AddParam(category, &p)
 					}
 				default:
 					// the type might be some sort of kind...
@@ -98,7 +108,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 						if e := decode(prog, &p.Init); e != nil {
 							err = errutil.New("couldnt decode", patternName, paramName, e)
 						} else {
-							last.AddParam(&p)
+							err = last.AddParam(category, &p)
 						}
 					} else {
 						err = errutil.Fmt("pattern %q parameter %q has unknown type %q ( expected an eval .)",
@@ -108,7 +118,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 			}
 			return
 		},
-		&patternName, &paramName, &typeName, &kind, &prog); e != nil {
+		&patternName, &paramName, &category, &typeName, &kind, &prog); e != nil {
 		err = e
 	} else {
 		ret = out
@@ -116,7 +126,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 	return
 }
 
-func decode( prog []byte, out interface{}) (err error) {
+func decode(prog []byte, out interface{}) (err error) {
 	if len(prog) > 0 {
 		dec := gob.NewDecoder(bytes.NewBuffer(prog))
 		err = dec.Decode(out)

@@ -18,6 +18,7 @@ func assemblyTemplate() string {
 		"\ttn.name as type, \n" +
 		"\tep.idProg >=0 as decl, \n" +
 		"\tep.rowid as ogid,\n" +
+		"\tkn.category as cat,\n" +
 		"\tep.idProg\n" +
 		"from eph_pattern ep\n" +
 		"left join eph_named pn\n" +
@@ -38,7 +39,8 @@ func assemblyTemplate() string {
 		"\tjoin mdl_plural mp\n" +
 		"\twhere mp.one = type\n" +
 		"\tand mp.many=mk.kind ) as kind, \n" +
-		"\tidProg\n" +
+		"\tidProg, \n" +
+		"\tcat\n" +
 		"from asm_pattern \n" +
 		"where decl = 1 \n" +
 		"group by pattern, param\n" +
