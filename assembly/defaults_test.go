@@ -159,7 +159,7 @@ func TestDefaultConflict(t *testing.T) {
 
 // TestDefaultBadValue to verify that modeling requires appropriate values for defaults based on type
 func TestDefaultBadValue(t *testing.T) {
-	//- for now, we only allow text and number [ text and digi ]
+	//- for now, we only allow text and number [ text and number ]
 	// - later we could add ambiguity for conversion [ 4 -> "4" ]
 	testInvalid := func(t *testing.T, vals ...interface{}) (err error) {
 		if asm, e := newDefaultsTest(t, memory, vals...); e != nil {

@@ -14,6 +14,7 @@ import (
 // Value implements a read and writable version of rt.Value.
 // It can store ( and degob ) program byte arrays.
 type Value struct {
+	Nothing
 	typeName string
 	value    interface{}
 }
@@ -30,7 +31,7 @@ func (q *Value) Interface() interface{} {
 // one of tables.PRIM_
 // a prim, a byte array to degob and cache, or the cached eval.
 func NewValue(typeName string, value interface{}) *Value {
-	return &Value{typeName, value}
+	return &Value{typeName: typeName, value: value}
 }
 
 func (q *Value) checkStored(typeName string) (err error) {
@@ -64,18 +65,18 @@ func (q *Value) SetValue(run rt.Runtime, val rt.Value) (err error) {
 		} else {
 			q.value = v
 		}
-	case "num_list":
-		if vs, e := rt.GetNumList(run, val); e != nil {
-			err = e
-		} else {
-			q.value = vs
-		}
-	case "text_list":
-		if vs, e := rt.GetTextList(run, val); e != nil {
-			err = e
-		} else {
-			q.value = vs
-		}
+	// case "num_list":
+	// 	if vs, e := rt.GetNumList(run, val); e != nil {
+	// 		err = e
+	// 	} else {
+	// 		q.value = vs
+	// 	}
+	// case "text_list":
+	// 	if vs, e := rt.GetTextList(run, val); e != nil {
+	// 		err = e
+	// 	} else {
+	// 		q.value = vs
+	// 	}
 	default:
 		err = q.unexpectedValue(q.typeName)
 	}

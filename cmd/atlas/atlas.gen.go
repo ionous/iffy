@@ -43,7 +43,7 @@ func atlasTemplate() string {
 		"\t\t\torder by rank desc\n" +
 		"\t\t\tlimit 1\n" +
 		"\t\t)\n" +
-		"\t\twhen 'digi' then '0'\n" +
+		"\t\twhen 'number' then '0'\n" +
 		"\t\twhen 'text' then '\"\"'\n" +
 		"\t\telse '???'||mf.type\n" +
 		"\tend)\n" +

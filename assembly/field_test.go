@@ -107,7 +107,7 @@ func TestFieldLca(t *testing.T) {
 }
 
 // TestFieldTypeMismatch verifies that ephemera with conflicting primitive types generates an error
-// ex. T.a:text, T.a:digi
+// ex. T.a:text, T.a:number
 func TestFieldTypeMismatch(t *testing.T) {
 	if asm, e := newAssemblyTest(t, memory); e != nil {
 		t.Fatal(e)

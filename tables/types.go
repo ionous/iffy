@@ -3,7 +3,7 @@ package tables
 // primType
 const (
 	PRIM_TEXT   = "text"   // string
-	PRIM_DIGI   = "digi"   // number
+	PRIM_DIGI   = "number" // number
 	PRIM_BOOL   = "bool"   // boolean (rare, more usually aspect)
 	PRIM_ASPECT = "aspect" // string
 	PRIM_TRAIT  = "trait"  // string

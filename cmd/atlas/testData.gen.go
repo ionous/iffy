@@ -21,7 +21,7 @@ func testDataTemplate() string {
 		"insert into mdl_field(kind, field, type) values\n" +
 		"\t('things', 'brief', 'text'),\n" +
 		"\t('vehicles', 'flightiness', 'aspect'),\n" +
-		"\t('cars', 'num wheels', 'digi');\n" +
+		"\t('cars', 'num wheels', 'number');\n" +
 		"\n" +
 		"insert into mdl_default(kind, field, value) values\n" +
 		"\t('cars', 'flightiness', 'flightless'),\n" +

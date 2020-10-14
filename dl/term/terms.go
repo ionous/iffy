@@ -33,10 +33,10 @@ func (ps *Terms) write(name string, typeName string, value interface{}) {
 func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
-	} else if i, ok := ps.values[field]; !ok {
+	} else if v, ok := ps.values[field]; !ok {
 		err = rt.UnknownField{target, field}
 	} else {
-		ret = i
+		ret = v
 	}
 	return
 }
