@@ -113,7 +113,7 @@ func GetOptionalNumbers(run Runtime, eval NumListEval, fallback []float64) (ret 
 	} else if vs, e := GetNumberStream(run, eval); e != nil {
 		err = e
 	} else {
-		ret, err = CompactNumbers(run, vs)
+		ret, err = CompactNumbers(run, vs, nil)
 	}
 	return
 }
@@ -125,7 +125,7 @@ func GetOptionalTexts(run Runtime, eval TextListEval, fallback []string) (ret []
 	} else if vs, e := GetTextStream(run, eval); e != nil {
 		err = e
 	} else {
-		ret, err = CompactTexts(run, vs)
+		ret, err = CompactTexts(run, vs, nil)
 	}
 	return
 }
@@ -158,13 +158,12 @@ func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
 	if it, e := eval.GetNumberStream(run); e != nil {
 		err = e
 	} else {
-		ret, err = CompactNumbers(run, it)
+		ret, err = CompactNumbers(run, it, nil)
 	}
 	return
 }
 
-func CompactNumbers(run Runtime, it Iterator) (ret []float64, err error) {
-	var vals []float64
+func CompactNumbers(run Runtime, it Iterator, vals []float64) (ret []float64, err error) {
 	for it.HasNext() {
 		if n, e := it.GetNext(); e != nil {
 			err = e
@@ -188,13 +187,12 @@ func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 	if it, e := eval.GetTextStream(run); e != nil {
 		err = e
 	} else {
-		ret, err = CompactTexts(run, it)
+		ret, err = CompactTexts(run, it, nil)
 	}
 	return
 }
 
-func CompactTexts(run Runtime, it Iterator) (ret []string, err error) {
-	var vals []string
+func CompactTexts(run Runtime, it Iterator, vals []string) (ret []string, err error) {
 	for it.HasNext() {
 		if n, e := it.GetNext(); e != nil {
 			err = e
