@@ -1,8 +1,9 @@
 package term
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 type Number struct {
@@ -38,7 +39,7 @@ func (n *Number) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalNumber(run, n.Init, 0); e != nil {
 		err = e
 	} else {
-		p.write(n.Name, tables.PRIM_DIGI, v)
+		p.addTerm(n.Name, affine.Number, &generic.Float{Value: v})
 	}
 	return
 }
@@ -51,7 +52,7 @@ func (n *Bool) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalBool(run, n.Init, false); e != nil {
 		err = e
 	} else {
-		p.write(n.Name, tables.PRIM_BOOL, v)
+		p.addTerm(n.Name, affine.Bool, &generic.Bool{Value: v})
 	}
 	return
 }
@@ -64,7 +65,7 @@ func (n *Text) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
 		err = e
 	} else {
-		p.write(n.Name, tables.PRIM_TEXT, v)
+		p.addTerm(n.Name, affine.Text, &generic.String{Value: v})
 	}
 	return
 }
@@ -77,7 +78,7 @@ func (n *Object) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
 		err = e
 	} else {
-		p.write(n.Name, tables.PRIM_TEXT, v)
+		p.addTerm(n.Name, affine.Text, &generic.String{Value: v})
 	}
 	return
 }
@@ -90,7 +91,7 @@ func (n *NumList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalNumbers(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.write(n.Name, "num_list", vs)
+		p.addTerm(n.Name, affine.NumList, &generic.FloatSlice{Value: vs})
 	}
 	return
 }
@@ -103,7 +104,7 @@ func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalTexts(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.write(n.Name, "text_list", vs)
+		p.addTerm(n.Name, affine.TextList, &generic.StringSlice{Value: vs})
 	}
 	return
 }

@@ -3,7 +3,6 @@ package qna
 import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
 )
 
 type keyType struct {
@@ -19,7 +18,7 @@ func (k *keyType) dot(subField string) keyType {
 	return keyType{subField, k.target + "." + k.field}
 }
 
-type valueMap map[keyType]*generic.Value
+type valueMap map[keyType]*qnaValue
 
 func makeKey(target, field string) keyType {
 	// FIX?

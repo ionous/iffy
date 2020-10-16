@@ -23,7 +23,7 @@ type relStore struct {
 	list []relInfo
 }
 
-func (store *relStore) write(m *Assembler) (err error) {
+func (store *relStore) addTerm(m *Assembler) (err error) {
 	for _, p := range store.list {
 		if !p.kind.valid || !p.otherKind.valid {
 			e := errutil.New("couldnt determine valid lowest common relation")
@@ -90,7 +90,7 @@ func AssembleRelations(asm *Assembler) (err error) {
 		err = e
 	} else {
 		last.flush(&store)
-		err = store.write(asm)
+		err = store.addTerm(asm)
 	}
 	return
 }

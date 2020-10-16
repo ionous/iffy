@@ -27,12 +27,12 @@ type String struct {
 	Value string
 }
 
-type FloatList struct {
+type FloatSlice struct {
 	Nothing
 	Value []float64
 }
 
-type StringList struct {
+type StringSlice struct {
 	Nothing
 	Value []string
 }
@@ -87,11 +87,11 @@ func (n *String) GetText(rt.Runtime) (ret string, err error) {
 	ret = n.Value
 	return
 }
-func (n *FloatList) GetNumberStream(rt.Runtime) (ret rt.Iterator, err error) {
+func (n *FloatSlice) GetNumberStream(rt.Runtime) (ret rt.Iterator, err error) {
 	ret = SliceFloats(n.Value)
 	return
 }
-func (n *StringList) GetTextStream(rt.Runtime) (ret rt.Iterator, err error) {
+func (n *StringSlice) GetTextStream(rt.Runtime) (ret rt.Iterator, err error) {
 	ret = SliceStrings(n.Value)
 	return
 }

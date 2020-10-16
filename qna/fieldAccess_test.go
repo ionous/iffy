@@ -87,7 +87,7 @@ func TestFieldAccess(t *testing.T) {
 		for i, cnt := 0, len(els); i < cnt; i += 3 {
 			tgt, field, value := els[i].(string), els[i+1].(string), els[i+2]
 			name := assembly.DomainNameOf("test", tgt)
-			for i := 0; i < 2; i++ {
+			for n := 0; n < 2; n++ {
 				p, e := q.GetField(name, field)
 				switch e.(type) {
 				default:
@@ -97,7 +97,9 @@ func TestFieldAccess(t *testing.T) {
 						t.Fatal("got unknown field, but expecting a value")
 					}
 				case nil:
-					if txt, e := p.GetText(nil); e != nil {
+					if p == nil {
+						t.Fatal("value and error are both nil for", name, field)
+					} else if txt, e := p.GetText(nil); e != nil {
 						t.Fatal("assign", e)
 					} else if txt != value {
 						t.Fatalf("mismatch %s.%s got:%q expected:%q", tgt, field, txt, value)

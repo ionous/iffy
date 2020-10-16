@@ -113,7 +113,7 @@ func (op *SetFieldNumList) Execute(run rt.Runtime) (err error) {
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, &generic.FloatList{Value: vals})
+		err = op.setPrim(run, &generic.FloatSlice{Value: vals})
 	}
 	return
 }
@@ -129,7 +129,7 @@ func (op *SetFieldTextList) Execute(run rt.Runtime) (err error) {
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		err = op.setPrim(run, &generic.StringList{Value: vals})
+		err = op.setPrim(run, &generic.StringSlice{Value: vals})
 	}
 	return
 }

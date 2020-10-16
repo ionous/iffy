@@ -6,6 +6,7 @@ import (
 	r "reflect"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
@@ -130,13 +131,14 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 		}
 	case rt.UnknownField:
 		// didnt refer to a trait, so just set the field normally.
-		if p, e := n.getField(key); e != nil {
+		if q, e := n.cacheField(key); e != nil {
 			err = e
+		} else if nv, e := generic.CopyValue(n, q.affinity, val); e != nil {
+			err = e // unpack validates the incoming data type.
 		} else {
-			// note: we dont replace the generic value in the cache
-			// we poke into that "box" and set its internal value.
-			// in the process it validates the incoming data type.
-			err = p.SetValue(n, val)
+			// note: replaces the value in the cache
+			// we dont poke into the value and set its internal value.
+			q.value = nv
 		}
 	}
 	return
@@ -149,8 +151,9 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	// note: makeKey camelCases, while go types are PascalCase
 	// this automatically keeps them from conflicting.
 	key := makeKeyForEval(name, rtype.Name())
-	if val, ok := n.pairs[key]; ok {
-		store := r.ValueOf(val.Interface())
+	if q, ok := n.pairs[key]; ok {
+		eval := q.value.(*evalValue).eval
+		store := r.ValueOf(eval)
 		outVal.Set(store)
 	} else {
 		var store interface{}
@@ -162,7 +165,9 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 		default:
 			err = e
 		}
-		n.pairs[key] = generic.NewValue("", store)
+		// see notes: in theory GetEvalByName with
+		var rtval rt.Value = &evalValue{run: n, eval: store}
+		n.pairs[key] = &qnaValue{value: rtval}
 	}
 	return
 }
@@ -180,33 +185,36 @@ func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
 }
 
 // check the cache before asking the database for info
-func (n *Runner) getField(key keyType) (ret *generic.Value, err error) {
-	if val, ok := n.pairs[key]; !ok {
-		ret, err = n.cacheField(key)
-	} else if val == nil {
+func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
+	if q, ok := n.pairs[key]; !ok {
+		if q, e := n.cacheField(key); e != nil {
+			err = e
+		} else {
+			ret = q.value
+		}
+	} else if q == nil {
 		err = key.unknown()
 	} else {
-		ret = val
+		ret = q.value
 	}
 	return
+
 }
 
 // when we know that the field is not a reserved field, and we just want to check the value.
 // ie. for aspects
-func (n *Runner) getValue(key keyType) (ret *generic.Value, err error) {
-	if val, ok := n.pairs[key]; !ok {
+func (n *Runner) getValue(key keyType) (ret *qnaValue, err error) {
+	if q, ok := n.pairs[key]; !ok {
 		ret, err = n.cacheQuery(key, n.fields.valueOf, key.target, key.field)
-	} else if val == nil {
+	} else if q == nil {
 		err = key.unknown()
 	} else {
-		ret = val
+		ret = q
 	}
 	return
 }
 
-var depth = 0
-
-func (n *Runner) cacheField(key keyType) (ret *generic.Value, err error) {
+func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 	switch target, field := key.target, key.field; target {
 	case object.Name:
 		// search for the object name using the object's id
@@ -244,13 +252,14 @@ func (n *Runner) cacheField(key keyType) (ret *generic.Value, err error) {
 				err = e
 			} else {
 				aspectOfTarget := keyType{target, aspectName}
-				if aspectValue, e := n.getValue(aspectOfTarget); e != nil {
+				if q, e := n.getValue(aspectOfTarget); e != nil {
 					err = e
-				} else if trait, e := aspectValue.GetText(n); e != nil {
+				} else if trait, e := q.value.GetText(n); e != nil {
 					err = errutil.Fmt("unexpected value in aspect '%v.%v' %v", target, aspectName, e)
 				} else {
-					// return true if the object's aspect equals the specified trait.
-					ret = generic.NewValue("bool", trait == field)
+					// return whether the object's aspect equals the specified trait.
+					// ( we dont cache this value because multiple things can change it )
+					ret = &qnaValue{affine.Bool, &generic.Bool{Value: trait == field}}
 				}
 			}
 		}
@@ -260,14 +269,18 @@ func (n *Runner) cacheField(key keyType) (ret *generic.Value, err error) {
 
 // query the db and store the returned value in the cache.
 // note: all of the queries are expected to return two parts: the value and the typeName.
-func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret *generic.Value, err error) {
-	var v interface{}
-	var t string
-	switch e := q.QueryRow(args...).Scan(&v, &t); e {
+func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret *qnaValue, err error) {
+	var raw interface{}
+	var a affine.Affinity
+	switch e := q.QueryRow(args...).Scan(&raw, &a); e {
 	case nil:
-		q := generic.NewValue(t, v)
-		n.pairs[key] = q
-		ret = q
+		if v, e := newValue(n, a, raw); e != nil {
+			err = e
+		} else {
+			q := &qnaValue{a, v}
+			n.pairs[key] = q
+			ret = q
+		}
 	case sql.ErrNoRows:
 		n.pairs[key] = nil
 		err = key.unknown()
