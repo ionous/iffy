@@ -19,9 +19,6 @@ func ImportStories(src string, db *sql.DB, ms []reader.Map) (err error) {
 	iffy.RegisterGobs()
 	dec := decode.NewDecoder()
 	k := NewImporterDecoder(src, db, dec)
-	// fix: this is a bit ugly b/c it assumes "AssembleStory" uses the same base kind.
-	// and "name" gets used by qna's runtime implementation.
-	k.NewImplicitField("name", "kinds", "reserved")
 	//
 	for _, slats := range iffy.AllSlats {
 		dec.AddDefaultCallbacks(slats)

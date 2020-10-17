@@ -93,7 +93,7 @@ func (n *Runner) IsLike(a, b string) (ret bool, err error) {
 }
 
 func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
-	if len(target) == 0 || target == object.Name || (target[0] == object.Prefix && target != object.Variables) {
+	if len(target) == 0 || (target[0] == object.Prefix && target != object.Variables) {
 		err = errutil.Fmt("can't change reserved field '%s.%s'", target, field)
 	} else {
 		switch e := n.ScopeStack.SetField(target, field, val); e.(type) {

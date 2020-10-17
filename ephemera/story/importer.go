@@ -102,15 +102,15 @@ func (k *Importer) DecodeAny(m reader.Map, outPtr interface{}) (err error) {
 	return
 }
 
-// NewImplicitField declares an assembler specified field
-func (k *Importer) NewImplicitField(field, kind, fieldType string) {
-	if src := "implicit " + kind + "." + field; k.Once(src) {
-		domain := k.gameDomain()
-		kKind := k.NewDomainName(domain, kind, tables.NAMED_KINDS, src)
-		kField := k.NewDomainName(domain, field, tables.NAMED_FIELD, src)
-		k.NewField(kKind, kField, fieldType)
-	}
-}
+// // NewImplicitField declares an assembler specified field
+// func (k *Importer) NewImplicitField(field, kind, fieldType string) {
+// 	if src := "implicit " + kind + "." + field; k.Once(src) {
+// 		domain := k.gameDomain()
+// 		kKind := k.NewDomainName(domain, kind, tables.NAMED_KINDS, src)
+// 		kField := k.NewDomainName(domain, field, tables.NAMED_FIELD, src)
+// 		k.NewField(kKind, kField, fieldType)
+// 	}
+// }
 
 // NewImplicitAspect declares an assembler specified aspect and its traits
 func (k *Importer) NewImplicitAspect(aspect, kind string, traits ...string) {

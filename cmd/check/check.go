@@ -24,7 +24,9 @@ func main() {
 		for _, x := range strings.Split(e.Error(), "\\n") {
 			log.Println(x)
 		}
-		log.Panic()
+		if errutil.Panic {
+			log.Panic("mismatched")
+		}
 	} else {
 		log.Println("Checked", cnt, inFile)
 	}

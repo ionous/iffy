@@ -16,6 +16,8 @@ type ObjectRef interface {
 
 // ObjectName implements ObjectRef, searching for an object named as specified.
 // ex. ObjectName{ "target" }  looks for the object named "target".
+// this is an internal command, used by express.... fix: maybe it should live there.
+// and maybe rename to something like "Get/FindObjectId"
 type ObjectName struct {
 	Name rt.TextEval
 }
@@ -23,6 +25,12 @@ type ObjectName struct {
 // tbd: this isnt currently exposed....
 // this also could be done by IsKindOf("kind")
 type ObjectExists struct {
+	Obj ObjectRef
+}
+
+// NameOf returns the full name of an object as written by the author when declared.
+// The name cannot be changed at runtime, instead use the "printed name" property.
+type NameOf struct {
 	Obj ObjectRef
 }
 
@@ -134,6 +142,26 @@ func getObjectInexactly(run rt.Runtime, name string) (retId string, err error) {
 		} else {
 			retId, err = getObjectExactly(run, unboxedName)
 		}
+	}
+	return
+}
+
+func (*NameOf) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "name_of",
+		Group: "objects",
+		Desc:  "Name Of: Full name of the object.",
+		Spec:  "name of {object%obj:object_ref}",
+	}
+}
+
+func (op *NameOf) GetText(run rt.Runtime) (ret string, err error) {
+	if obj, e := GetObjectRef(run, op.Obj); e != nil {
+		err = cmdError(op, e)
+	} else if p, e := run.GetField(object.Name, obj); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret, err = p.GetText(run)
 	}
 	return
 }

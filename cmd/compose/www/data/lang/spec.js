@@ -1004,7 +1004,7 @@ const spec = [
     }
   },
   {
-    "desc": "Sentence case: returns new text, starting each sentence with a capital letter. \n\t\tFor example, \"Empire Apple.\" from \"Empire apple.\".",
+    "desc": "Sentence case: returns new text, start each sentence with a capital letter. \n\t\tFor example, \"Empire Apple.\" from \"Empire apple.\".",
     "group": [
       "format"
     ],
@@ -1070,6 +1070,20 @@ const spec = [
     "with": {
       "slots": [
         "bool_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Name Of: Full name of the object.",
+    "group": [
+      "objects"
+    ],
+    "name": "name_of",
+    "spec": "name of {object%obj:object_ref}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
       ]
     }
   },

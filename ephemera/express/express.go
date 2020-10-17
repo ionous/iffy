@@ -303,6 +303,8 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 					// on subsequent loops we turn the results of the previous GetField
 					// into a request for that object's name.
 					if getField != nil {
+						// fix? the stored name should be an id so
+						// this is going to be a non-op, we could add a command that's just "return id"
 						obj = &core.ObjectName{getField}
 					}
 					//

@@ -589,46 +589,28 @@
                                               "id": "id-1743bd78458-29",
                                               "type": "text_eval",
                                               "value": {
-                                                "id": "id-1743bd78458-30",
-                                                "type": "get_field",
-                                                "value": {
-                                                  "$FIELD": {
-                                                    "id": "id-1743bd78458-31",
-                                                    "type": "text_eval",
-                                                    "value": {
-                                                      "id": "id-1743bd78458-33",
-                                                      "type": "text_value",
+                                                  "type": "name_of",
+                                                  "value": {
+                                                    "$OBJ": {
+                                                      "type": "object_ref",
                                                       "value": {
-                                                        "$TEXT": {
-                                                          "id": "id-1743bd78458-34",
-                                                          "type": "text",
-                                                          "value": "name"
-                                                        }
-                                                      }
-                                                    }
-                                                  },
-                                                  "$OBJ": {
-                                                    "id": "id-1743bd78458-32",
-                                                    "type": "object_ref",
-                                                    "value": {
-                                                      "id": "id-1743bd78458-35",
-                                                      "type": "named_noun",
-                                                      "value": {
-                                                        "$DETERMINER": {
-                                                          "id": "id-1743bd78458-36",
-                                                          "type": "determiner",
-                                                          "value": "$THE"
-                                                        },
-                                                        "$NAME": {
-                                                          "id": "id-1743bd78458-37",
-                                                          "type": "noun_name",
-                                                          "value": "target"
+                                                        "type": "named_noun",
+                                                        "value": {
+                                                          "$DETERMINER": {
+                                                            "type": "determiner",
+                                                            "value": "$THE"
+                                                          },
+                                                          "$NAME": {
+                                                            "type": "noun_name",
+                                                            "value": "target"
+                                                          }
                                                         }
                                                       }
                                                     }
                                                   }
                                                 }
-                                              }
+
+
                                             }
                                           }
                                         }

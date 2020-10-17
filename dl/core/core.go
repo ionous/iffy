@@ -67,6 +67,7 @@ var Slats = []composer.Slat{
 
 	(*SimpleNoun)(nil),
 	(*ObjectName)(nil),
+	(*NameOf)(nil),
 	(*KindOf)(nil),
 	(*IsKindOf)(nil),
 	(*IsExactKindOf)(nil),
