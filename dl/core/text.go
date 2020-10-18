@@ -95,7 +95,7 @@ func (op *Join) GetText(run rt.Runtime) (ret string, err error) {
 
 // if sep, e := rt.GetOptionalText(run, op.Sep, ""); e != nil {
 // 	err = e
-// } else if it, e := rt.GetTextStream(run, op.Parts); e != nil {
+// } else if it, e := rt.GetTextList(run, op.Parts); e != nil {
 // 	err = e
 // } else {
 // 	var buf bytes.Buffer

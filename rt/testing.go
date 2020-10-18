@@ -52,9 +52,9 @@ func (PanicValue) GetNumber(Runtime) (float64, error) {
 func (PanicValue) GetText(Runtime) (string, error) {
 	panic("Runtime panic")
 }
-func (PanicValue) GetNumberStream(Runtime) (Iterator, error) {
+func (PanicValue) GetNumList(Runtime) (Iterator, error) {
 	panic("Runtime panic")
 }
-func (PanicValue) GetTextStream(Runtime) (Iterator, error) {
+func (PanicValue) GetTextList(Runtime) (Iterator, error) {
 	panic("Runtime panic")
 }

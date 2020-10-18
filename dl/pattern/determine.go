@@ -162,10 +162,10 @@ func (*DetermineNumList) Compose() composer.Spec {
 	}
 }
 
-func (op *DetermineNumList) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
+func (op *DetermineNumList) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	var pat NumListPattern
 	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
-		ret, err = pat.GetNumberStream(run)
+		ret, err = pat.GetNumList(run)
 		return
 	})
 	return
@@ -180,10 +180,10 @@ func (*DetermineTextList) Compose() composer.Spec {
 	}
 }
 
-func (op *DetermineTextList) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
+func (op *DetermineTextList) GetTextList(run rt.Runtime) (ret []string, err error) {
 	var pat TextListPattern
 	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
-		ret, err = pat.GetTextStream(run)
+		ret, err = pat.GetTextList(run)
 		return
 	})
 	return

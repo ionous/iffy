@@ -2,6 +2,7 @@ package pattern
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 // implements chain.StreamIterator for multiple streams of numbers
@@ -21,10 +22,10 @@ func (k *numIterator) GetNextStream() (ret rt.Iterator, err error) {
 		err = rt.StreamExceeded
 	} else {
 		ind := k.order[k.curr]
-		if it, e := rt.GetNumberStream(k.run, k.pat.Rules[ind]); e != nil {
+		if vs, e := rt.GetNumList(k.run, k.pat.Rules[ind]); e != nil {
 			err = e
 		} else {
-			ret = it
+			ret = generic.SliceFloats(vs)
 			k.curr++
 		}
 	}

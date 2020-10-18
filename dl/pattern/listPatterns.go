@@ -23,12 +23,14 @@ func (ps *NumListPattern) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err er
 	return ps.Rules[i].GetFlags(run)
 }
 
-func (ps *NumListPattern) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
+func (ps *NumListPattern) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	if inds, e := splitNumbers(run, ps.Rules); e != nil {
 		err = e
 	} else {
+		// fix: simplify this, doesnt need the iterators
 		it := numIterator{run, ps, inds, 0}
-		ret = chain.NewStreamOfStreams(&it)
+		x := chain.NewStreamOfStreams(&it)
+		ret, err = rt.CompactNumbers(run, x, nil)
 	}
 	return
 }
@@ -38,12 +40,14 @@ func (ps *TextListPattern) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err e
 	return ps.Rules[i].GetFlags(run)
 }
 
-func (ps *TextListPattern) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
+func (ps *TextListPattern) GetTextList(run rt.Runtime) (ret []string, err error) {
 	if inds, e := splitText(run, ps.Rules); e != nil {
 		err = e
 	} else {
 		it := textIterator{run, ps, inds, 0}
-		ret = chain.NewStreamOfStreams(&it)
+		// fix: simplify this, doesnt need the iterators
+		x := chain.NewStreamOfStreams(&it)
+		ret, err = rt.CompactTexts(run, x, nil)
 	}
 	return
 }

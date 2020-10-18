@@ -22,12 +22,12 @@ type TextEval interface {
 
 // NumListEval returns or generates a series of numbers.
 type NumListEval interface {
-	GetNumberStream(Runtime) (Iterator, error)
+	GetNumList(Runtime) ([]float64, error)
 }
 
-// NumListEval returns or generates a series of strings.
+// TextListEval returns or generates a series of strings.
 type TextListEval interface {
-	GetTextStream(Runtime) (Iterator, error)
+	GetTextList(Runtime) ([]string, error)
 }
 
 // Iterator provides a way to iterate over a stream of values.
@@ -42,4 +42,5 @@ type Iterator interface {
 // StreamCount optionally implemented for iterators to determine the length of remaining stream.
 type StreamCount interface {
 	Remaining() int
+	GetTextList(Runtime) ([]string, error)
 }

@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
 )
 
@@ -45,9 +46,10 @@ func (*ForEachNum) Compose() composer.Spec {
 }
 
 func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
-	if it, e := rt.GetNumberStream(run, f.In); e != nil {
+	if vs, e := rt.GetNumList(run, f.In); e != nil {
 		err = e
 	} else {
+		it := generic.SliceFloats(vs)
 		err = scope.LoopOver(run, "num", it, f.Go, f.Else)
 	}
 	return
@@ -63,9 +65,10 @@ func (*ForEachText) Compose() composer.Spec {
 }
 
 func (f *ForEachText) Execute(run rt.Runtime) (err error) {
-	if it, e := rt.GetTextStream(run, f.In); e != nil {
+	if vs, e := rt.GetTextList(run, f.In); e != nil {
 		err = e
 	} else {
+		it := generic.SliceStrings(vs)
 		err = scope.LoopOver(run, "text", it, f.Go, f.Else)
 	}
 	return

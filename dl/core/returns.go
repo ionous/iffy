@@ -38,12 +38,12 @@ func (op *Returns) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 
-func (op *Returns) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
+func (op *Returns) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	err = returnNotImplemented
 	return
 }
 
-func (op *Returns) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
+func (op *Returns) GetTextList(run rt.Runtime) (ret []string, err error) {
 	err = returnNotImplemented
 	return
 }

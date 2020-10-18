@@ -75,9 +75,8 @@ var Slats = []composer.Slat{
 	(*PrintNum)(nil),
 	(*PrintNumWord)(nil),
 
-	// FIX: take "List" generically
-	(*LenOfNumbers)(nil),
-	(*LenOfTexts)(nil),
+	// (*LenOfNumbers)(nil),
+	// (*LenOfTexts)(nil),
 	(*Range)(nil),
 
 	// FIX: should take a speaker, and we should have a default speaker

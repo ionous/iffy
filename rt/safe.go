@@ -110,10 +110,8 @@ func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, e
 func GetOptionalNumbers(run Runtime, eval NumListEval, fallback []float64) (ret []float64, err error) {
 	if eval == nil {
 		ret = fallback
-	} else if vs, e := GetNumberStream(run, eval); e != nil {
-		err = e
 	} else {
-		ret, err = CompactNumbers(run, vs, nil)
+		ret, err = GetNumList(run, eval)
 	}
 	return
 }
@@ -122,43 +120,26 @@ func GetOptionalNumbers(run Runtime, eval NumListEval, fallback []float64) (ret 
 func GetOptionalTexts(run Runtime, eval TextListEval, fallback []string) (ret []string, err error) {
 	if eval == nil {
 		ret = fallback
-	} else if vs, e := GetTextStream(run, eval); e != nil {
-		err = e
 	} else {
-		ret, err = CompactTexts(run, vs, nil)
+		ret, err = GetTextList(run, eval)
 	}
 	return
 }
 
-// GetNumberStream returns an new iterator to walk the passed list,
+// GetNumList returns an new iterator to walk the passed list,
 // or an empty iterator if the value is null.
-func GetNumberStream(run Runtime, eval NumListEval) (ret Iterator, err error) {
-	if eval == nil {
-		ret = EmptyStream(true)
-	} else {
-		ret, err = eval.GetNumberStream(run)
-	}
-	return
-}
-
-// GetTextStream returns an new iterator to walk the passed list,
-// or an empty iterator if the value is null.
-func GetTextStream(run Runtime, eval TextListEval) (ret Iterator, err error) {
-	if eval == nil {
-		ret = EmptyStream(true)
-	} else {
-		ret, err = eval.GetTextStream(run)
-	}
-	return
-}
-
-// GetNumList returns all of the float values the passed eval generates.
-// Not good for evals which generate infinite numbers of values.
 func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
-	if it, e := eval.GetNumberStream(run); e != nil {
-		err = e
-	} else {
-		ret, err = CompactNumbers(run, it, nil)
+	if eval != nil {
+		ret, err = eval.GetNumList(run)
+	}
+	return
+}
+
+// GetTextList returns an new iterator to walk the passed list,
+// or an empty iterator if the value is null.
+func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
+	if eval != nil {
+		ret, err = eval.GetTextList(run)
 	}
 	return
 }
@@ -177,17 +158,6 @@ func CompactNumbers(run Runtime, it Iterator, vals []float64) (ret []float64, er
 	}
 	if err == nil {
 		ret = vals
-	}
-	return
-}
-
-// GetTextList returns all of the string values the passed eval generates.
-// Not good for evals which generate infinite numbers of values.
-func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
-	if it, e := eval.GetTextStream(run); e != nil {
-		err = e
-	} else {
-		ret, err = CompactTexts(run, it, nil)
 	}
 	return
 }

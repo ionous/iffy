@@ -169,7 +169,7 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		ret = &generic.FloatSlice{Value: vals}
+		ret = &generic.FloatSlice{Values: vals}
 	}
 	return
 }
@@ -190,7 +190,7 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err erro
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = e
 	} else {
-		ret = &generic.StringSlice{Value: vals}
+		ret = &generic.StringSlice{Values: vals}
 	}
 	return
 }

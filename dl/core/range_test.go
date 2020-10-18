@@ -3,7 +3,6 @@ package core
 import (
 	"testing"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
 	"github.com/kr/pretty"
 )
@@ -11,27 +10,7 @@ import (
 func TestRange(t *testing.T) {
 	list := func(eval rt.NumListEval) (ret []float64, err error) {
 		var run baseRuntime
-		if it, e := rt.GetNumberStream(&run, eval); e != nil {
-			err = e
-		} else {
-			cnt, total := it.(rt.StreamCount).Remaining(), 0
-			for it.HasNext() {
-				if n, e := it.GetNext(); e != nil {
-					err = e
-					break
-				} else if n, e := n.GetNumber(&run); e != nil {
-					err = e
-					break
-				} else {
-					ret = append(ret, n)
-				}
-				total++
-			}
-			if err == nil && cnt != total {
-				err = errutil.New("reported count", cnt, "actual count", total)
-			}
-		}
-		return
+		return rt.GetNumList(&run, eval)
 	}
 	t.Run("range(10)", func(t *testing.T) {
 		want := []float64{
@@ -142,5 +121,4 @@ func TestRange(t *testing.T) {
 			t.Log(have)
 		}
 	})
-
 }

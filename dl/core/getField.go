@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 )
@@ -50,23 +49,21 @@ func (op *GetField) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 
-func (op *GetField) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	// if p, e := op.getValue(run); e != nil {
-	// 	err = e
-	// } else {
-	// 	ret, err = p.GetNumberStream(run)
-	// }
-	err = errutil.New("unimplemented")
+func (op *GetField) GetNumList(run rt.Runtime) (ret []float64, err error) {
+	if p, e := op.getValue(run); e != nil {
+		err = e
+	} else {
+		ret, err = p.GetNumList(run)
+	}
 	return
 }
 
-func (op *GetField) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	// if p, e := op.getValue(run); e != nil {
-	// 	err = e
-	// } else {
-	// 	ret, err = p.GetTextStream(run)
-	// }
-	err = errutil.New("unimplemented")
+func (op *GetField) GetTextList(run rt.Runtime) (ret []string, err error) {
+	if p, e := op.getValue(run); e != nil {
+		err = e
+	} else {
+		ret, err = p.GetTextList(run)
+	}
 	return
 }
 

@@ -6,7 +6,6 @@ import (
 
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/chain"
-	"github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/sliceOf"
 )
 
@@ -97,16 +96,16 @@ func TestNumIteration(t *testing.T) {
 
 type Text string
 
-func (t Text) GetTextStream(rt.Runtime) (rt.Iterator, error) {
+func (t Text) GetTextList(rt.Runtime) ([]string, error) {
 	v := string(t) // for testing we return a slice of one string
-	return generic.SliceStrings(sliceOf.String(v)), nil
+	return sliceOf.String(v), nil
 }
 
 type Number float64
 
-func (n Number) GetNumberStream(rt.Runtime) (rt.Iterator, error) {
+func (n Number) GetNumList(rt.Runtime) ([]float64, error) {
 	v := float64(n) // for testing we return a slice of one number
-	return generic.SliceFloats(sliceOf.Float64(v)), nil
+	return sliceOf.Float64(v), nil
 }
 
 type Bool bool

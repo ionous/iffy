@@ -89,27 +89,25 @@ func (op *GetVar) GetObjectRef(run rt.Runtime) (retId string, err error) {
 	return
 }
 
-func (op *GetVar) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	// if _, p, e := op.getVariableByName(run); e != nil {
-	// 	err = cmdError(op, e)
-	// } else if v, e := p.GetNumberStream(run); e != nil {
-	// 	err = cmdError(op, e)
-	// } else {
-	// 	ret = v
-	// }
-	err = errutil.New("not implemented")
+func (op *GetVar) GetNumList(run rt.Runtime) (ret []float64, err error) {
+	if _, p, e := op.getVariableByName(run); e != nil {
+		err = cmdError(op, e)
+	} else if vs, e := p.GetNumList(run); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = vs
+	}
 	return
 }
 
-func (op *GetVar) GetTextStream(run rt.Runtime) (ret rt.Iterator, err error) {
-	// if _, p, e := op.getVariableByName(run); e != nil {
-	// 	err = cmdError(op, e)
-	// } else if v, e := p.GetTextStream(run); e != nil {
-	// 	err = cmdError(op, e)
-	// } else {
-	// 	ret = v
-	// }
-	err = errutil.New("not implemented")
+func (op *GetVar) GetTextList(run rt.Runtime) (ret []string, err error) {
+	if _, p, e := op.getVariableByName(run); e != nil {
+		err = cmdError(op, e)
+	} else if vs, e := p.GetTextList(run); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = vs
+	}
 	return
 }
 

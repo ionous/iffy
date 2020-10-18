@@ -5,7 +5,6 @@ import (
 
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
 )
 
 // Bool specifies a simple true/false value.
@@ -135,8 +134,9 @@ func (*Numbers) Compose() composer.Spec {
 	}
 }
 
-func (l *Numbers) GetNumberStream(rt.Runtime) (rt.Iterator, error) {
-	return generic.SliceFloats(l.Values), nil
+func (l *Numbers) GetNumList(rt.Runtime) (ret []float64, _ error) {
+	ret = l.Values
+	return
 }
 
 func (*Texts) Compose() composer.Spec {
@@ -147,6 +147,7 @@ func (*Texts) Compose() composer.Spec {
 	}
 }
 
-func (l *Texts) GetTextStream(rt.Runtime) (rt.Iterator, error) {
-	return generic.SliceStrings(l.Values), nil
+func (l *Texts) GetTextList(rt.Runtime) (ret []string, _ error) {
+	ret = l.Values
+	return
 }

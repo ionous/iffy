@@ -2,6 +2,7 @@ package pattern
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 )
 
 // implements chain.StreamIterator for multiple streams of text
@@ -21,10 +22,10 @@ func (k *textIterator) GetNextStream() (ret rt.Iterator, err error) {
 		err = rt.StreamExceeded
 	} else {
 		ind := k.order[k.curr]
-		if it, e := rt.GetTextStream(k.run, k.pat.Rules[ind]); e != nil {
+		if vs, e := rt.GetTextList(k.run, k.pat.Rules[ind]); e != nil {
 			err = e
 		} else {
-			ret = it
+			ret = generic.SliceStrings(vs)
 			k.curr++
 		}
 	}

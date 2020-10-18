@@ -35,7 +35,7 @@ func (ps *Terms) addTerm(field string, affinity affine.Affinity, value rt.Value)
 	ps.values[field] = &termValue{affinity, value}
 }
 
-// GetVariable returns the value at 'name', the caller is responsible for determining the type.
+// GetField returns the value at 'name', the caller is responsible for determining the type.
 func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
@@ -47,7 +47,7 @@ func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
 	return
 }
 
-// SetVariable writes (a copy of) the passed value into the term at 'name'.
+// SetField writes (a copy of) the passed value into the term at 'name'.
 func (ps *Terms) SetField(target, field string, val rt.Value) (err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}

@@ -18,54 +18,6 @@ type Range struct {
 	Start, Stop, Step rt.NumberEval
 }
 
-type LenOfNumbers struct {
-	Elems rt.NumListEval
-}
-
-type LenOfTexts struct {
-	Elems rt.TextListEval
-}
-
-func (*LenOfNumbers) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "number_list_count",
-		Group: "format",
-		Desc:  "Length of Number List: Determines the number of elements in a list of numbers.",
-	}
-}
-
-func (op *LenOfNumbers) GetNumber(run rt.Runtime) (ret float64, err error) {
-	// FIX? maybe the evals themselves should implement Count and not the activated stream.
-	if elems, e := rt.GetNumberStream(run, op.Elems); e != nil {
-		err = e
-	} else if l, ok := elems.(rt.StreamCount); !ok {
-		err = errutil.New("couldnt determine length of number list")
-	} else {
-		ret = float64(l.Remaining())
-	}
-	return
-}
-
-func (*LenOfTexts) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "text_list_count",
-		Group: "format",
-		Desc:  "Length of Text List: Determines the number of text elements in a list.",
-	}
-}
-
-func (op *LenOfTexts) GetNumber(run rt.Runtime) (ret float64, err error) {
-	// FIX? maybe the evals themselves should implement Count and not the activated stream.
-	if elems, e := rt.GetTextStream(run, op.Elems); e != nil {
-		err = e
-	} else if l, ok := elems.(rt.StreamCount); !ok {
-		err = errutil.New("couldnt determine length of text list")
-	} else {
-		ret = float64(l.Remaining())
-	}
-	return
-}
-
 func (*Range) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "range_over",
@@ -74,7 +26,7 @@ func (*Range) Compose() composer.Spec {
 	}
 }
 
-func (op *Range) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
+func (op *Range) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	if start, e := rt.GetOptionalNumber(run, op.Start, 1); e != nil {
 		err = e
 	} else if stop, e := rt.GetOptionalNumber(run, op.Stop, start); e != nil {
@@ -84,7 +36,8 @@ func (op *Range) GetNumberStream(run rt.Runtime) (ret rt.Iterator, err error) {
 	} else if step == 0 {
 		err = errutil.New("Range error, step cannot be zero")
 	} else {
-		ret = &rangeIt{int(start), int(stop), int(step)}
+		it := &rangeIt{int(start), int(stop), int(step)}
+		ret, err = rt.CompactNumbers(run, it, nil)
 	}
 	return
 }

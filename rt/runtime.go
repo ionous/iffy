@@ -4,22 +4,21 @@ import (
 	"github.com/ionous/iffy/rt/writer"
 )
 
-// Scope provides access to a pool of named variables.
-// The variables, their names, and initial values depend on implementation and context.
-// See package object for a variety of common targets.
+// Scope provides access to a pool of named objects.
+// Various runtime objects (ex. nouns, kinds, etc. ) store data addressed by name.
+// The objects and their fields depend on implementation and context.
+// See package object for a variety of common objects.
 type Scope interface {
-	// return the value indexed by field in target.
-	// various runtime objects (ex. nouns, kinds, etc. ) store data addressed by name.
-	GetField(target, field string) (Value, error)
-	// Store, or at least attempt to store, the passed value at name.
+	GetField(object, field string) (Value, error)
+	// Store, or at least attempt to store, the passed value at the named field in the named object.
 	// It may return an error if the value is not of a compatible type,
 	// if its considered to be read-only, or if there is no predeclared value of that name.
-	SetField(target, field string, value Value) error
+	SetField(object, field string, value Value) error
 }
 
 // Runtime environment for an in-progress game.
 type Runtime interface {
-	// nouns are grouped into potentially hierarchical "domains"
+	// objects are grouped into potentially hierarchical "domains"
 	// de/activating makes those groups hidden/visible to the runtime.
 	// Domain hierarchy is defined at assembly time.
 	ActivateDomain(name string, enable bool)

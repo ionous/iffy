@@ -91,7 +91,7 @@ func (n *NumList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalNumbers(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.addTerm(n.Name, affine.NumList, &generic.FloatSlice{Value: vs})
+		p.addTerm(n.Name, affine.NumList, &generic.FloatSlice{Values: vs})
 	}
 	return
 }
@@ -104,7 +104,7 @@ func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalTexts(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.addTerm(n.Name, affine.TextList, &generic.StringSlice{Value: vs})
+		p.addTerm(n.Name, affine.TextList, &generic.StringSlice{Values: vs})
 	}
 	return
 }
