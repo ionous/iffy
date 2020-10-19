@@ -133,7 +133,7 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 		// didnt refer to a trait, so just set the field normally.
 		if q, e := n.cacheField(key); e != nil {
 			err = e
-		} else if nv, e := generic.CopyValue(n, q.affinity, val); e != nil {
+		} else if nv, e := generic.CopyValue(q.affinity, val); e != nil {
 			err = e // unpack validates the incoming data type.
 		} else {
 			// note: replaces the value in the cache
@@ -187,15 +187,10 @@ func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
 // check the cache before asking the database for info
 func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
 	if q, ok := n.pairs[key]; !ok {
-		if q, e := n.cacheField(key); e != nil {
-			err = e
-		} else {
-			ret = q.value
-		}
-	} else if q == nil {
-		err = key.unknown()
-	} else {
-		ret = q.value
+		q, err = n.cacheField(key)
+	}
+	if err == nil {
+		ret, err = generic.CopyValue(q.affinity, q.value)
 	}
 	return
 

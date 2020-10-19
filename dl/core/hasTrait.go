@@ -28,7 +28,7 @@ func (op *HasTrait) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = cmdError(op, e)
 	} else if p, e := run.GetField(id, trait); e != nil {
 		err = cmdError(op, e)
-	} else if ok, e := p.GetBool(run); e != nil {
+	} else if ok, e := p.GetBool(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = ok

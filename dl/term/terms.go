@@ -42,7 +42,7 @@ func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
 	} else if p, ok := ps.values[field]; !ok {
 		err = rt.UnknownField{target, field}
 	} else {
-		ret = p.value
+		ret, err = generic.CopyValue(p.affinity, p.value)
 	}
 	return
 }
@@ -53,7 +53,7 @@ func (ps *Terms) SetField(target, field string, val rt.Value) (err error) {
 		err = rt.UnknownTarget{target}
 	} else if p, ok := ps.values[field]; !ok {
 		err = rt.UnknownField{target, field}
-	} else if v, e := generic.CopyValue(ps.run, p.affinity, val); e != nil {
+	} else if v, e := generic.CopyValue(p.affinity, val); e != nil {
 		err = e
 	} else {
 		p.value = v

@@ -120,7 +120,7 @@ func getObjectExactly(run rt.Runtime, name string) (retId string, err error) {
 		default:
 			err = e
 		case nil:
-			retId, err = id.GetText(run)
+			retId, err = id.GetText()
 		}
 	}
 	return
@@ -137,7 +137,7 @@ func getObjectInexactly(run rt.Runtime, name string) (retId string, err error) {
 		retId, err = getObjectExactly(run, name)
 	case nil:
 		// if we found such a variable, get its contents and look up the referenced object.
-		if unboxedName, e := p.GetText(run); e != nil {
+		if unboxedName, e := p.GetText(); e != nil {
 			err = e
 		} else {
 			retId, err = getObjectExactly(run, unboxedName)
@@ -161,7 +161,7 @@ func (op *NameOf) GetText(run rt.Runtime) (ret string, err error) {
 	} else if p, e := run.GetField(object.Name, obj); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret, err = p.GetText(run)
+		ret, err = p.GetText()
 	}
 	return
 }
@@ -181,7 +181,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 	} else if p, e := run.GetField(object.Kind, obj); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret, err = p.GetText(run)
+		ret, err = p.GetText()
 	}
 	return
 }
@@ -202,7 +202,7 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = cmdError(op, e)
 	} else if p, e := run.GetField(object.Kinds, obj); e != nil {
 		err = cmdError(op, e)
-	} else if fullPath, e := p.GetText(run); e != nil {
+	} else if fullPath, e := p.GetText(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = strings.Contains(fullPath+",", tgtKind+",")
@@ -225,7 +225,7 @@ func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = cmdError(op, e)
 	} else if p, e := run.GetField(object.Kind, obj); e != nil {
 		err = cmdError(op, e)
-	} else if objKind, e := p.GetText(run); e != nil {
+	} else if objKind, e := p.GetText(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = objKind == tgtKind

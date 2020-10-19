@@ -6,8 +6,6 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// var dots dottedName
-
 // used for switching between the automatic printing of an object's name
 // and a request for an object of a particular name.
 // ex. {.lantern} vs. {kindOf: .lantern}

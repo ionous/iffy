@@ -2,6 +2,7 @@ package generic
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -10,9 +11,15 @@ type FloatSlice struct {
 	Values []float64
 }
 
+func (l *FloatSlice) Affinity() affine.Affinity { return affine.NumList }
+func (l *FloatSlice) GetNumList() (ret []float64, _ error) {
+	ret = l.Values
+	return
+}
+
 // GetLen returns the number of elements in the underlying value if it's a slice,
 // otherwise this returns an error.
-func (l *FloatSlice) GetLen(rt.Runtime) (ret int, _ error) {
+func (l *FloatSlice) GetLen() (ret int, _ error) {
 	ret = len(l.Values)
 	return
 
@@ -20,7 +27,7 @@ func (l *FloatSlice) GetLen(rt.Runtime) (ret int, _ error) {
 
 // GetIndex returns the nth element of the underlying slice, where 0 is the first value;
 // otherwise this returns an error.
-func (l *FloatSlice) GetIndex(_ rt.Runtime, i int) (ret rt.Value, err error) {
+func (l *FloatSlice) GetIndex(i int) (ret rt.Value, err error) {
 	if vs := l.Values; i < 0 || i >= len(vs) {
 		err = OutOfRange(i)
 	} else {

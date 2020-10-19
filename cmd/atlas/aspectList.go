@@ -11,7 +11,7 @@ import (
 func listOfAspects(w io.Writer, db *sql.DB) (err error) {
 	// originally used a channel, but the template iterates over the same elements multiple times
 	var aspects []Aspect
-	var aname, aspec string
+	var aname, aspect string
 
 	//var name, kind, spec string
 	if e := tables.QueryAll(db, `
@@ -53,14 +53,14 @@ func listOfAspects(w io.Writer, db *sql.DB) (err error) {
 					aspects = append(aspects,
 						Aspect{
 							Name:   aname,
-							Spec:   aspec,
+							Spec:   aspect,
 							Kinds:  kinds,
 							Traits: traits,
 						})
 				}
 			}
 			return
-		}, &aname, &aspec); e != nil {
+		}, &aname, &aspect); e != nil {
 		err = e
 	} else {
 		err = templates.ExecuteTemplate(w, "aspectList", aspects)

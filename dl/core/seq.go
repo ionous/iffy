@@ -36,7 +36,7 @@ func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret i
 	if max := len(op.Parts); max > 0 {
 		if p, e := run.GetField(object.Counter, op.Seq); e != nil {
 			err = e
-		} else if num, e := p.GetNumber(run); e != nil {
+		} else if num, e := p.GetNumber(); e != nil {
 			err = e
 		} else {
 			curr := int(num)

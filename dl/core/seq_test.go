@@ -103,7 +103,7 @@ func (m *seqTest) GetField(target, field string) (ret rt.Value, err error) {
 func (m *seqTest) SetField(target, field string, value rt.Value) (err error) {
 	if target != object.Counter {
 		err = rt.UnknownField{target, field}
-	} else if v, e := value.GetNumber(nil); e != nil {
+	} else if v, e := value.GetNumber(); e != nil {
 		err = errutil.New("seqTest: unknown value", e)
 	} else {
 		m.counters[field] = int(v)

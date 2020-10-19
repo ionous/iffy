@@ -37,7 +37,7 @@ func (op *Range) GetNumList(run rt.Runtime) (ret []float64, err error) {
 		err = errutil.New("Range error, step cannot be zero")
 	} else {
 		it := &rangeIt{int(start), int(stop), int(step)}
-		ret, err = rt.CompactNumbers(run, it, nil)
+		ret, err = rt.CompactNumbers(it, nil)
 	}
 	return
 }

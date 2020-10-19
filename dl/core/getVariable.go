@@ -32,7 +32,7 @@ func (*GetVar) Compose() composer.Spec {
 func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
 	if _, p, e := op.getVariableByName(run); e != nil {
 		err = cmdError(op, e)
-	} else if v, e := p.GetBool(run); e != nil {
+	} else if v, e := p.GetBool(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -43,7 +43,7 @@ func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
 func (op *GetVar) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if _, p, e := op.getVariableByName(run); e != nil {
 		err = cmdError(op, e)
-	} else if v, e := p.GetNumber(run); e != nil {
+	} else if v, e := p.GetNumber(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -56,7 +56,7 @@ func (op *GetVar) GetText(run rt.Runtime) (ret string, err error) {
 	default:
 		err = cmdError(op, e)
 	case nil:
-		if v, e := p.GetText(run); e != nil {
+		if v, e := p.GetText(); e != nil {
 			err = cmdError(op, e)
 		} else {
 			ret = v
@@ -78,7 +78,7 @@ func (op *GetVar) GetText(run rt.Runtime) (ret string, err error) {
 func (op *GetVar) GetObjectRef(run rt.Runtime) (retId string, err error) {
 	if _, p, e := op.getVariableByName(run); e != nil {
 		err = cmdError(op, e)
-	} else if str, e := p.GetText(run); e != nil {
+	} else if str, e := p.GetText(); e != nil {
 		err = cmdError(op, e)
 	} else if !strings.HasPrefix(str, "#") {
 		e := errutil.New("stored name isnt an object", str)
@@ -92,7 +92,7 @@ func (op *GetVar) GetObjectRef(run rt.Runtime) (retId string, err error) {
 func (op *GetVar) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	if _, p, e := op.getVariableByName(run); e != nil {
 		err = cmdError(op, e)
-	} else if vs, e := p.GetNumList(run); e != nil {
+	} else if vs, e := p.GetNumList(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = vs
@@ -103,7 +103,7 @@ func (op *GetVar) GetNumList(run rt.Runtime) (ret []float64, err error) {
 func (op *GetVar) GetTextList(run rt.Runtime) (ret []string, err error) {
 	if _, p, e := op.getVariableByName(run); e != nil {
 		err = cmdError(op, e)
-	} else if vs, e := p.GetTextList(run); e != nil {
+	} else if vs, e := p.GetTextList(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = vs

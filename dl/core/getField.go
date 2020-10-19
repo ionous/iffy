@@ -26,7 +26,7 @@ func (op *GetField) GetBool(run rt.Runtime) (ret bool, err error) {
 	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
-		ret, err = p.GetBool(run)
+		ret, err = p.GetBool()
 	}
 	return
 }
@@ -35,7 +35,7 @@ func (op *GetField) GetNumber(run rt.Runtime) (ret float64, err error) {
 	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
-		ret, err = p.GetNumber(run)
+		ret, err = p.GetNumber()
 	}
 	return
 }
@@ -44,7 +44,7 @@ func (op *GetField) GetText(run rt.Runtime) (ret string, err error) {
 	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
-		ret, err = p.GetText(run)
+		ret, err = p.GetText()
 	}
 	return
 }
@@ -53,7 +53,7 @@ func (op *GetField) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
-		ret, err = p.GetNumList(run)
+		ret, err = p.GetNumList()
 	}
 	return
 }
@@ -62,7 +62,7 @@ func (op *GetField) GetTextList(run rt.Runtime) (ret []string, err error) {
 	if p, e := op.getValue(run); e != nil {
 		err = e
 	} else {
-		ret, err = p.GetTextList(run)
+		ret, err = p.GetTextList()
 	}
 	return
 }

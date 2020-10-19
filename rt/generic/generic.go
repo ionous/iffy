@@ -1,7 +1,7 @@
 package generic
 
 import (
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/affine"
 )
 
 type Bool struct {
@@ -24,20 +24,26 @@ type String struct {
 	Value string
 }
 
-//
-func (n *Bool) GetBool(rt.Runtime) (ret bool, err error) {
+func (n *Bool) Affinity() affine.Affinity { return affine.Bool }
+func (n *Bool) GetBool() (ret bool, err error) {
 	ret = n.Value
 	return
 }
-func (n *Float) GetNumber(rt.Runtime) (ret float64, err error) {
+
+func (n *Float) Affinity() affine.Affinity { return affine.Number }
+func (n *Float) GetNumber() (ret float64, err error) {
 	ret = n.Value
 	return
 }
-func (n *Int) GetNumber(rt.Runtime) (ret float64, err error) {
+
+func (n *Int) Affinity() affine.Affinity { return affine.Number }
+func (n *Int) GetNumber() (ret float64, err error) {
 	ret = float64(n.Value)
 	return
 }
-func (n *String) GetText(rt.Runtime) (ret string, err error) {
+
+func (n *String) Affinity() affine.Affinity { return affine.Text }
+func (n *String) GetText() (ret string, err error) {
 	ret = n.Value
 	return
 }
