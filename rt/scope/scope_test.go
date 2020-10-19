@@ -39,7 +39,7 @@ func TestScopeStack(t *testing.T) {
 				// t.Log(reason, "loop", i, "asking for", name, "... unknown")
 				have = -1
 			case nil:
-				if v, e := p.GetNumber(nil); e != nil {
+				if v, e := p.GetNumber(); e != nil {
 					t.Fatal("fatal", e)
 				} else {
 					have = int(v)
@@ -117,7 +117,7 @@ func (k *mockScope) SetField(target, field string, v rt.Value) (err error) {
 		err = rt.UnknownTarget{target}
 	} else if field != k.name {
 		err = rt.UnknownField{target, field}
-	} else if n, e := v.GetNumber(nil); e != nil {
+	} else if n, e := v.GetNumber(); e != nil {
 		err = e
 	} else {
 		k.val = int(n)

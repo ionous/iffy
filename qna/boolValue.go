@@ -9,7 +9,7 @@ import (
 type boolEval struct{ evalValue }
 
 // GetBool, or error if the underlying value isn't a bool
-func (q *boolEval) GetBool(rt.Runtime) (bool, error) {
+func (q *boolEval) GetBool() (bool, error) {
 	return rt.GetBool(q.run, q.eval.(rt.BoolEval))
 }
 

@@ -41,7 +41,7 @@ func (op *RenderName) GetText(run rt.Runtime) (ret string, err error) {
 			ret, err = op.getPrintedNamedOf(run, name)
 		case nil:
 			// get the text from the variable
-			if n, e := v.GetText(run); e != nil {
+			if n, e := v.GetText(); e != nil {
 				err = cmdError(op, e)
 			} else if strings.HasPrefix(n, "#") {
 				// if its an object id, get its printed name

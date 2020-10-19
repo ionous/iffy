@@ -24,17 +24,17 @@ func TestLoop(t *testing.T) {
 
 			if p, e := s.GetField(object.Variables, "index"); e != nil {
 				t.Fatal("loop", i, e)
-			} else if fidx, e := p.GetNumber(nil); e != nil || fidx != float64(count) {
+			} else if fidx, e := p.GetNumber(); e != nil || fidx != float64(count) {
 				t.Fatal("index error", fidx, "at", c, i, e)
 			} else if fidx != float64(count) {
 				t.Fatal("loop", i, fidx, "!=", count)
 			} else if p, e := s.GetField(object.Variables, "first"); e != nil {
 				t.Fatal(e)
-			} else if first, e := p.GetBool(nil); e != nil || first != cap.first {
+			} else if first, e := p.GetBool(); e != nil || first != cap.first {
 				t.Fatal("first error", first, "at", c, i, e)
 			} else if p, e := s.GetField(object.Variables, "last"); e != nil {
 				t.Fatal(e)
-			} else if last, e := p.GetBool(nil); e != nil || last != cap.last {
+			} else if last, e := p.GetBool(); e != nil || last != cap.last {
 				t.Fatal("last error", last, "at", c, i, e)
 			} else {
 				_, e := s.GetField(object.Variables, "nothing")

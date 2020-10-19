@@ -46,7 +46,7 @@ func TestTextIteration(t *testing.T) {
 				} else {
 					if txt, e := it.GetNext(); e != nil {
 						t.Fatal(e)
-					} else if txt, e := txt.GetText(nil); e != nil {
+					} else if txt, e := txt.GetText(); e != nil {
 						t.Fatal(e)
 					} else {
 						str += txt
@@ -81,7 +81,7 @@ func TestNumIteration(t *testing.T) {
 				t.Fatal(rt.StreamExceeded)
 			} else if num, e := it.GetNext(); e != nil {
 				t.Fatal(e)
-			} else if num, e := num.GetNumber(nil); e != nil {
+			} else if num, e := num.GetNumber(); e != nil {
 				t.Fatal(e)
 			} else {
 				fin += num * math.Pow10(cnt-i-1)

@@ -9,7 +9,7 @@ import (
 type textEval struct{ evalValue }
 
 // GetText, or error if the underlying value isn't represented by a string.
-func (q *textEval) GetText(rt.Runtime) (string, error) {
+func (q *textEval) GetText() (string, error) {
 	return rt.GetText(q.run, q.eval.(rt.TextEval))
 }
 

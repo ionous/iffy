@@ -109,18 +109,18 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 
 func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 	// first, check if the specified field refers to a trait
-	switch p, e := n.getField(key.dot(object.Aspect)); e.(type) {
+	switch q, e := n.getField(key.dot(object.Aspect)); e.(type) {
 	default:
 		err = e // there was an unknown error
 	case nil:
 		// get the name of the aspect
-		if aspect, e := p.GetText(n); e != nil {
+		if aspect, e := q.value.GetText(); e != nil {
 			err = e
 		} else {
 			// we want to change the aspect not the trait...
-			if val, e := val.GetBool(n); e != nil {
+			if b, e := val.GetBool(); e != nil {
 				err = errutil.Fmt("error setting trait; have %v %v %s", key, val, e)
-			} else if !val {
+			} else if !b {
 				// future: might maintain a table of opposite names ( similar to plurals )
 				err = errutil.Fmt("error setting trait; %q can only be set to true, have %v", key, val)
 			} else {
@@ -179,18 +179,23 @@ func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
 	case nil:
 		ret = v
 	case rt.UnknownTarget, rt.UnknownField:
-		ret, err = n.getField(makeKey(target, field))
+		if q, e := n.getField(makeKey(target, field)); e != nil {
+			err = e
+		} else {
+			ret, err = generic.CopyValue(q.affinity, q.value)
+		}
 	}
 	return
 }
 
 // check the cache before asking the database for info
-func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
+func (n *Runner) getField(key keyType) (ret *qnaValue, err error) {
 	if q, ok := n.pairs[key]; !ok {
-		q, err = n.cacheField(key)
-	}
-	if err == nil {
-		ret, err = generic.CopyValue(q.affinity, q.value)
+		ret, err = n.cacheField(key)
+	} else if q == nil {
+		err = key.unknown()
+	} else {
+		ret = q
 	}
 	return
 
@@ -243,13 +248,13 @@ func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 		case nil:
 			// we found the aspect name from the trait
 			// now we need to ask for the current value of the aspect
-			if aspectName, e := aspectOfTrait.GetText(n); e != nil {
+			if aspectName, e := aspectOfTrait.value.GetText(); e != nil {
 				err = e
 			} else {
 				aspectOfTarget := keyType{target, aspectName}
 				if q, e := n.getValue(aspectOfTarget); e != nil {
 					err = e
-				} else if trait, e := q.value.GetText(n); e != nil {
+				} else if trait, e := q.value.GetText(); e != nil {
 					err = errutil.Fmt("unexpected value in aspect '%v.%v' %v", target, aspectName, e)
 				} else {
 					// return whether the object's aspect equals the specified trait.

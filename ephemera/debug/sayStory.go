@@ -20,7 +20,7 @@ type MatchNumber struct {
 func (m MatchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
 	if a, e := run.GetField(object.Variables, "num"); e != nil {
 		err = e
-	} else if v, e := a.GetNumber(run); e != nil {
+	} else if v, e := a.GetNumber(); e != nil {
 		err = e
 	} else {
 		n := int(v)

@@ -38,7 +38,7 @@ func TestFieldAccess(t *testing.T) {
 			name := assembly.DomainNameOf("test", tgt)
 			if p, e := q.GetField(object.Exists, name); e != nil {
 				t.Fatal("existence", name, e)
-			} else if exists, e := p.GetBool(nil); e != nil {
+			} else if exists, e := p.GetBool(); e != nil {
 				t.Fatal("assign", e)
 			} else if v.exists != exists {
 				t.Fatal("existence", name, "wanted", v.exists)
@@ -53,7 +53,7 @@ func TestFieldAccess(t *testing.T) {
 			name := assembly.DomainNameOf("test", tgt)
 			if p, e := q.GetField(object.Kind, name); e != nil {
 				t.Fatal(e)
-			} else if kind, e := p.GetText(nil); e != nil {
+			} else if kind, e := p.GetText(); e != nil {
 				t.Fatal("assign", e)
 			} else if kind != field {
 				t.Fatal("mismatch", name, field, "got:", kind, "expected:", field)
@@ -72,7 +72,7 @@ func TestFieldAccess(t *testing.T) {
 			// asking for "Kinds" should get us the hierarchy
 			if p, e := q.GetField(object.Kinds, name); e != nil {
 				t.Fatal(e)
-			} else if path, e := p.GetText(nil); e != nil {
+			} else if path, e := p.GetText(); e != nil {
 				t.Fatal("assign", e)
 			} else if path != field {
 				t.Fatal("mismatch", name, field, "got:", name, "expected:", field)
@@ -99,7 +99,7 @@ func TestFieldAccess(t *testing.T) {
 				case nil:
 					if p == nil {
 						t.Fatal("value and error are both nil for", name, field)
-					} else if txt, e := p.GetText(nil); e != nil {
+					} else if txt, e := p.GetText(); e != nil {
 						t.Fatal("assign", e)
 					} else if txt != value {
 						t.Fatalf("mismatch %s.%s got:%q expected:%q", tgt, field, txt, value)
@@ -116,7 +116,7 @@ func TestFieldAccess(t *testing.T) {
 			for i := 0; i < 2; i++ {
 				if p, e := q.GetField(name, field); e != nil {
 					t.Fatal(e)
-				} else if num, e := p.GetNumber(nil); e != nil {
+				} else if num, e := p.GetNumber(); e != nil {
 					t.Fatal("assign", e)
 				} else if num != value {
 					t.Fatal("mismatch", name, "have:", num, "want:", value)
@@ -143,7 +143,7 @@ func TestFieldAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if v, e := q.GetField(apple, "a"); e != nil {
 			t.Fatal(e)
-		} else if str, e := v.GetText(q); e != nil {
+		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
 		} else if str != "y" {
 			t.Fatal("mismatch", str)
@@ -156,7 +156,7 @@ func TestFieldAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if v, e := q.GetField(boat, "b"); e != nil {
 			t.Fatal(e)
-		} else if str, e := v.GetText(q); e != nil {
+		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
 		} else if str != "z" {
 			t.Fatal("mismatch", str)
@@ -168,7 +168,7 @@ func TestFieldAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if v, e := q.GetField(toyBoat, "a"); e != nil {
 			t.Fatal(e)
-		} else if str, e := v.GetText(q); e != nil {
+		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
 		} else if str != "w" {
 			t.Fatal("mismatch", str)
@@ -217,7 +217,7 @@ func testTraits(q *Runner, name, csv string) (err error) {
 		traits = traits[1:]
 		if p, e := q.GetField(name, trait); e != nil {
 			err = errutil.New(e)
-		} else if got, e := p.GetBool(nil); e != nil {
+		} else if got, e := p.GetBool(); e != nil {
 			err = errutil.New("assign", e)
 		} else if got != want {
 			err = errutil.New("mismatch", name, trait, "got:", got, "expected:", want)
