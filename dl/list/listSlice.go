@@ -1,6 +1,8 @@
 package list
 
 import (
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -29,15 +31,29 @@ func (*Slice) Compose() composer.Spec {
 	}
 }
 
+func (op *Slice) Execute(run rt.Runtime) (err error) {
+	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+		err = cmdError(op, e)
+	} else {
+		switch a := vs.Affinity(); a {
+		case affine.NumList:
+			_, err = op.sliceNumbers(run, vs)
+		case affine.TextList:
+			_, err = op.sliceText(run, vs)
+		default:
+			err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)
+		}
+	}
+	return
+}
+
 func (op *Slice) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = cmdError(op, e)
-	} else if els, e := vs.GetNumList(); e != nil {
+	} else if vals, e := op.sliceNumbers(run, vs); e != nil {
 		err = cmdError(op, e)
-	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
-		err = cmdError(op, e)
-	} else if i >= 0 && j >= i {
-		ret = els[i:j]
+	} else {
+		ret = vals
 	}
 	return
 }
@@ -45,10 +61,30 @@ func (op *Slice) GetNumList(run rt.Runtime) (ret []float64, err error) {
 func (op *Slice) GetTextList(run rt.Runtime) (ret []string, err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = cmdError(op, e)
-	} else if els, e := vs.GetTextList(); e != nil {
+	} else if vals, e := op.sliceText(run, vs); e != nil {
 		err = cmdError(op, e)
+	} else {
+		ret = vals
+	}
+	return
+}
+
+func (op *Slice) sliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err error) {
+	if els, e := vs.GetNumList(); e != nil {
+		err = e
 	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
-		err = cmdError(op, e)
+		err = e
+	} else if i >= 0 && j >= i {
+		ret = els[i:j]
+	}
+	return
+}
+
+func (op *Slice) sliceText(run rt.Runtime, vs rt.Value) (ret []string, err error) {
+	if els, e := vs.GetTextList(); e != nil {
+		err = e
+	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
+		err = e
 	} else if i >= 0 && j >= i {
 		ret = els[i:j]
 	}

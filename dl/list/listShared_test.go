@@ -1,6 +1,7 @@
 package list_test
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/ionous/errutil"
@@ -18,8 +19,23 @@ type listTime struct {
 func I(i int) rt.NumberEval {
 	return &core.Number{float64(i)}
 }
-func FromTs(vs []string) core.Assignment {
-	return &core.FromTextList{&core.Texts{vs}}
+
+func FromTs(vs []string) (ret core.Assignment) {
+	if len(vs) == 1 {
+		ret = &core.FromText{&core.Text{vs[0]}}
+	} else {
+		ret = &core.FromTextList{&core.Texts{vs}}
+	}
+	return
+}
+
+func getNum(run rt.Runtime, op rt.NumberEval) (ret string) {
+	if v, e := op.GetNumber(run); e != nil {
+		ret = e.Error()
+	} else {
+		ret = strconv.FormatFloat(v, 'g', -1, 64)
+	}
+	return
 }
 
 func joinText(run rt.Runtime, op rt.TextListEval) (ret string) {

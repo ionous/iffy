@@ -11,6 +11,7 @@ var Slats = []composer.Slat{
 	(*Len)(nil),
 	(*Slice)(nil),
 	(*Splice)(nil),
+	(*Push)(nil),
 }
 
 func cmdError(op composer.Slat, e error) error {
