@@ -121,7 +121,7 @@ func imp_argument(k *Importer, patternName ephemera.Named, r reader.Map) (ret *p
 	} else if a, e := imp_assignment(k, m.MapOf("$FROM")); e != nil {
 		err = e
 	} else if slotName, e := slotName(a.GetEval()); e != nil {
-		err = e // ^ its possible this should be the type that the assignment contains.
+		err = e // ^ fix: ideally would remove GetEval(); probably this should be the type that the assignment contains.
 	} else {
 		if len(slotName) > 0 {
 			paramType := k.NewName(slotName, tables.NAMED_TYPE, reader.At(m))

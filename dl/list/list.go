@@ -7,16 +7,16 @@ import (
 )
 
 var Slats = []composer.Slat{
-	(*Len)(nil),
 	(*At)(nil),
+	(*Len)(nil),
+	(*Slice)(nil),
+	(*Splice)(nil),
 }
 
 func cmdError(op composer.Slat, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }
 
-// slice: chop out a new list
-// splice: one or many, changes the original array, returns the removed elements
 // push back
 // pop back
 // push front

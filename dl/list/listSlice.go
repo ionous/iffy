@@ -36,7 +36,7 @@ func (op *Slice) GetNumList(run rt.Runtime) (ret []float64, err error) {
 		err = cmdError(op, e)
 	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
 		err = cmdError(op, e)
-	} else if i >= 0 && i <= j {
+	} else if i >= 0 && j >= i {
 		ret = els[i:j]
 	}
 	return
@@ -49,7 +49,7 @@ func (op *Slice) GetTextList(run rt.Runtime) (ret []string, err error) {
 		err = cmdError(op, e)
 	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
 		err = cmdError(op, e)
-	} else if i >= 0 && i <= j {
+	} else if i >= 0 && j >= i {
 		ret = els[i:j]
 	}
 	return
@@ -57,34 +57,13 @@ func (op *Slice) GetTextList(run rt.Runtime) (ret []string, err error) {
 
 // reti is < 0 to indicate an empty list
 func (op *Slice) getIndices(run rt.Runtime, cnt int) (reti, retj int, err error) {
-	if i, e := rt.GetNumber(run, op.Start); e != nil {
+	if i, e := rt.GetOptionalNumber(run, op.Start, 0); e != nil {
 		err = e
-	} else if j, e := rt.GetNumber(run, op.End); e != nil {
+	} else if j, e := rt.GetOptionalNumber(run, op.End, 0); e != nil {
 		err = e
 	} else {
-		i, j := int(i), int(j)
-		if i == 0 {
-			reti = 0 // unspecified: start at the front of the list
-		} else if i > cnt {
-			reti = -1 // negative return means an empty list
-		} else if i > 0 {
-			reti = i - 1 // one based indicies
-		} else if ofs := cnt + i; ofs > 0 {
-			// offset from the end: slice(-2) extracts the last two elements in the sequence.
-			reti = ofs
-		} else {
-			reti = 0
-		}
-
-		if j > cnt {
-			retj = cnt
-		} else if j > 0 {
-			retj = j - 1
-		} else if ofs := cnt + j; ofs > 0 {
-			retj = ofs
-		} else {
-			reti = -1 // negative return means an empty list
-		}
+		reti = clipStart(int(i), cnt)
+		retj = clipEnd(int(j), cnt)
 	}
 	return
 }
