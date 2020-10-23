@@ -9,19 +9,15 @@ import (
 var Slats = []composer.Slat{
 	(*At)(nil),
 	(*Len)(nil),
+	(*Pop)(nil),
+	(*Push)(nil),
 	(*Slice)(nil),
 	(*Splice)(nil),
-	(*Push)(nil),
 }
 
 func cmdError(op composer.Slat, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }
 
-// push back
-// pop back
-// push front
-// pop front
-// concat list
 // for each
 // sort ( w/ pattern )

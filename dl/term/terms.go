@@ -28,7 +28,7 @@ type termValue struct {
 	value    rt.Value
 }
 
-func (ps *Terms) addTerm(field string, affinity affine.Affinity, value rt.Value) {
+func (ps *Terms) AddTerm(field string, affinity affine.Affinity, value rt.Value) {
 	if ps.values == nil {
 		ps.values = make(termValues)
 	}

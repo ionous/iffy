@@ -40,7 +40,7 @@ func (*ForEachNum) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "for_each_num",
 		Group:  "exec",
-		Desc:   "For Each Number: Loops over the passed list of numbers, or runs the 'else' statement if empty.",
+		Desc:   "For Each Number: Loops over the passed list of numbers, or runs the 'else' activity if empty.",
 		Locals: []string{"index", "first", "last", "num"},
 	}
 }
@@ -59,7 +59,7 @@ func (*ForEachText) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "for_each_text",
 		Group:  "exec",
-		Desc:   "For Each Text: Loops over the passed list of text, or runs the 'else' statement if empty.",
+		Desc:   "For Each Text: Loops over the passed list of text, or runs the 'else' activity if empty.",
 		Locals: []string{"index", "first", "last", "text"},
 	}
 }
