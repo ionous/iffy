@@ -1,7 +1,6 @@
 package term
 
 import (
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
@@ -21,18 +20,15 @@ func MakeTerms(run rt.Runtime) Terms {
 	return Terms{run: run} // delay creating the map
 }
 
-type termValues map[string]*termValue
+type termValues map[string]*Value
 
-type termValue struct {
-	affinity affine.Affinity // alt: if needed might point back to the original term structure
-	value    rt.Value
-}
-
-func (ps *Terms) AddTerm(field string, affinity affine.Affinity, value rt.Value) {
+func (ps *Terms) AddTerm(field string, value rt.Value) *Value {
 	if ps.values == nil {
 		ps.values = make(termValues)
 	}
-	ps.values[field] = &termValue{affinity, value}
+	v := &Value{value}
+	ps.values[field] = v
+	return v
 }
 
 // GetField returns the value at 'name', the caller is responsible for determining the type.
@@ -42,7 +38,7 @@ func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
 	} else if p, ok := ps.values[field]; !ok {
 		err = rt.UnknownField{target, field}
 	} else {
-		ret, err = generic.CopyValue(p.affinity, p.value)
+		ret, err = generic.CopyValue(p.value.Affinity(), p.value)
 	}
 	return
 }
@@ -53,7 +49,7 @@ func (ps *Terms) SetField(target, field string, val rt.Value) (err error) {
 		err = rt.UnknownTarget{target}
 	} else if p, ok := ps.values[field]; !ok {
 		err = rt.UnknownField{target, field}
-	} else if v, e := generic.CopyValue(p.affinity, val); e != nil {
+	} else if v, e := generic.CopyValue(p.value.Affinity(), val); e != nil {
 		err = e
 	} else {
 		p.value = v
