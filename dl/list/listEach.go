@@ -11,13 +11,12 @@ import (
 	"github.com/ionous/iffy/rt/generic"
 )
 
-type ForEach struct {
+type Each struct {
 	List     string // variable name
-	Front    FrontOrBack
 	Go, Else *core.Activity
 }
 
-func (op *ForEach) Compose() composer.Spec {
+func (op *Each) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "list_each",
 		Group:  "list",
@@ -26,14 +25,14 @@ func (op *ForEach) Compose() composer.Spec {
 	}
 }
 
-func (op *ForEach) Execute(run rt.Runtime) (err error) {
+func (op *Each) Execute(run rt.Runtime) (err error) {
 	if e := op.execute(run); e != nil {
 		err = cmdError(op, e)
 	}
 	return
 }
 
-func (op *ForEach) execute(run rt.Runtime) (err error) {
+func (op *Each) execute(run rt.Runtime) (err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = e
 	} else if cnt, e := vs.GetLen(); e != nil {

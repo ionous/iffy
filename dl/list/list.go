@@ -8,6 +8,7 @@ import (
 
 var Slats = []composer.Slat{
 	(*At)(nil),
+	(*Each)(nil),
 	(*Len)(nil),
 	(*Pop)(nil),
 	(*Push)(nil),

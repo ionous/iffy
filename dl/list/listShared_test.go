@@ -4,16 +4,24 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/scope"
 )
 
-type listTime struct {
+type panicTime struct {
 	rt.Panic
+}
+type listTime struct {
+	panicTime
 	strings []string
+	scope.ScopeStack
+}
+
+func T(i string) rt.TextEval {
+	return &core.Text{i}
 }
 
 func I(i int) rt.NumberEval {
@@ -25,6 +33,22 @@ func FromTs(vs []string) (ret core.Assignment) {
 		ret = &core.FromText{&core.Text{vs[0]}}
 	} else {
 		ret = &core.FromTextList{&core.Texts{vs}}
+	}
+	return
+}
+
+// cmd to collect some text into a list of strings.
+type Write struct {
+	out  *[]string
+	Text rt.TextEval
+}
+
+// Execute writes text to the runtime's current writer.
+func (op *Write) Execute(run rt.Runtime) (err error) {
+	if t, e := op.Text.GetText(run); e != nil {
+		err = e
+	} else {
+		(*op.out) = append((*op.out), t)
 	}
 	return
 }
@@ -57,10 +81,8 @@ func joinStrings(vs []string) (ret string) {
 }
 
 func (g *listTime) GetField(target, field string) (ret rt.Value, err error) {
-	if target != object.Variables {
-		err = errutil.New("unexpected target", target)
-	} else if field != "strings" {
-		err = errutil.New("unexpected field", field)
+	if target != object.Variables || field != "strings" {
+		ret, err = g.ScopeStack.GetField(target, field)
 	} else {
 		ret = &generic.StringSlice{Values: g.strings}
 	}
@@ -68,10 +90,8 @@ func (g *listTime) GetField(target, field string) (ret rt.Value, err error) {
 }
 
 func (g *listTime) SetField(target, field string, value rt.Value) (err error) {
-	if target != object.Variables {
-		err = errutil.New("unexpected target", target)
-	} else if field != "strings" {
-		err = errutil.New("unexpected field", field)
+	if target != object.Variables || field != "strings" {
+		err = g.ScopeStack.SetField(target, field, value)
 	} else if vs, e := value.GetTextList(); e != nil {
 		err = e
 	} else {
