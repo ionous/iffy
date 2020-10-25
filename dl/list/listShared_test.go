@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
@@ -18,15 +19,12 @@ type listTime struct {
 	panicTime
 	strings []string
 	scope.ScopeStack
+	sort *pattern.BoolPattern
 }
 
-func T(i string) rt.TextEval {
-	return &core.Text{i}
-}
-
-func I(i int) rt.NumberEval {
-	return &core.Number{float64(i)}
-}
+func B(i bool) rt.BoolEval   { return &core.Bool{i} }
+func I(i int) rt.NumberEval  { return &core.Number{float64(i)} }
+func T(i string) rt.TextEval { return &core.Text{i} }
 
 func FromTs(vs []string) (ret core.Assignment) {
 	if len(vs) == 1 {
@@ -96,6 +94,14 @@ func (g *listTime) SetField(target, field string, value rt.Value) (err error) {
 		err = e
 	} else {
 		g.strings = vs
+	}
+	return
+}
+
+func (g *listTime) GetEvalByName(name string, pv interface{}) (err error) {
+	if name == "sort" {
+		ptr := pv.(*pattern.BoolPattern)
+		(*ptr) = *g.sort
 	}
 	return
 }

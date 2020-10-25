@@ -32,7 +32,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 		err = e
 	} else {
 		// create variables for all the known parameters
-		parms := term.MakeTerms(run)
+		var parms term.Terms
 		if e := pat.Prepare(run, &parms); e != nil {
 			err = e
 		} else {
@@ -52,7 +52,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 		if err == nil {
 			run.PushScope(&parms)
 			// fix_ not sure that i love the double map creation, double scope....
-			locals := term.MakeTerms(run)
+			var locals term.Terms
 			if e := pat.ComputeLocals(run, &locals); e != nil {
 				err = e
 			} else {

@@ -54,7 +54,6 @@ func (m *patternRuntime) GetEvalByName(name string, pv interface{}) (err error) 
 		stored := r.ValueOf(patternPtr).Elem()
 		outVal := r.ValueOf(pv).Elem()
 		outVal.Set(stored)
-
 	} else {
 		err = errutil.New("patternRuntime: unknown pattern", name)
 	}

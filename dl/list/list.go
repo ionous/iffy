@@ -13,12 +13,10 @@ var Slats = []composer.Slat{
 	(*Pop)(nil),
 	(*Push)(nil),
 	(*Slice)(nil),
+	(*Sort)(nil),
 	(*Splice)(nil),
 }
 
 func cmdError(op composer.Slat, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }
-
-// for each
-// sort ( w/ pattern )

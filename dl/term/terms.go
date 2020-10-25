@@ -12,12 +12,7 @@ import (
 // Its pushed into scope so the names can be used as a source of values for rt.Runtime::GetField().
 // ( ex. For use with the commands GetVar{},  SimpleNoun{}, ProperNoun{}, ObjectName{}, ... )
 type Terms struct {
-	run    rt.Runtime
 	values termValues
-}
-
-func MakeTerms(run rt.Runtime) Terms {
-	return Terms{run: run} // delay creating the map
 }
 
 type termValues map[string]*Value
