@@ -12,10 +12,20 @@ type Assignment interface {
 	// write the results of evaluating this into that.
 	GetAssignedValue(rt.Runtime) (rt.Value, error)
 	// fix? for import so we can determine the eval type.
+	// maybe at least change to affinity
 	GetEval() interface{}
 }
 
-// Assign turns an Assignment a normal statement.
+func GetAssignedValue(run rt.Runtime, a Assignment) (ret rt.Value, err error) {
+	if a == nil {
+		err = rt.MissingEval("empty assignment")
+	} else {
+		ret, err = a.GetAssignedValue(run)
+	}
+	return
+}
+
+// Assign a value to a local variable.
 type Assign struct {
 	Name string // name of variable or parameter we are assigning to.
 	From Assignment

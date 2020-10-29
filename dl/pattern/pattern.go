@@ -33,6 +33,4 @@ var Slats = []composer.Slat{
 	(*DetermineBool)(nil),
 	(*DetermineNumList)(nil),
 	(*DetermineTextList)(nil),
-	(*Arguments)(nil),
-	(*Argument)(nil),
 }

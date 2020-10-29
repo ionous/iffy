@@ -3,24 +3,25 @@ package affine
 type Affinity string
 
 const (
-	// value types
-	Bool     Affinity = "bool"
-	Number   Affinity = "number"
-	Text     Affinity = "text"
-	NumList  Affinity = "num_list"
-	TextList Affinity = "text_list"
+	Bool       Affinity = "bool"
+	Number     Affinity = "number"
+	NumList    Affinity = "num_list"
+	Text       Affinity = "text"
+	TextList   Affinity = "text_list"
+	Record     Affinity = "record"
+	RecordList Affinity = "record_list"
 
-	// extended types
-	Aspect      Affinity = "aspect"
-	Check       Affinity = "check"
-	Kind        Affinity = "singular_kind"
-	Kinds       Affinity = "kind"
-	PluralKinds Affinity = "plural_kinds"
-	Noun        Affinity = "noun"
-	Pattern     Affinity = "pattern"
-	Primitive   Affinity = "primitive"
-	Relation    Affinity = "relation"
-	Verb        Affinity = "verb"
-	Scene       Affinity = "scene"
-	Trait       Affinity = "trait"
+	// extended text types
+	// Aspect      Affinity = "aspect"
+	// Check       Affinity = "check"
+	// Kind        Affinity = "singular_kind"
+	// Kinds       Affinity = "kind"
+	// Noun        Affinity = "noun"
+	// Pattern     Affinity = "pattern"
+	// PluralKinds Affinity = "plural_kinds"
+	// Primitive   Affinity = "primitive"
+	// Relation    Affinity = "relation"
+	// Scene       Affinity = "scene"
+	// Trait       Affinity = "trait"
+	// Verb        Affinity = "verb"
 )

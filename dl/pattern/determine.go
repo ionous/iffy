@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -12,8 +13,8 @@ import (
 
 // FromPattern helps runs a pattern
 type FromPattern struct {
-	Pattern   string     // pattern name, i guess a text eval here would be like a function pointer.
-	Arguments *Arguments // arguments passed to the pattern. kept as a pointer for composer formatting...
+	Pattern   string          // pattern name, i guess a text eval here would be like a function pointer.
+	Arguments *core.Arguments // arguments passed to the pattern. kept as a pointer for composer formatting...
 	// each is a name targeting some parameter, and an "assignment"
 }
 
@@ -51,7 +52,7 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 		}
 		if err == nil {
 			run.PushScope(&parms)
-			// fix_ not sure that i love the double map creation, double scope....
+			// fix: not sure that i love the double map creation, double scope....
 			var locals term.Terms
 			if e := pat.ComputeLocals(run, &locals); e != nil {
 				err = e

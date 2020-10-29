@@ -51,7 +51,7 @@ var Slats = []composer.Slat{
 
 	(*IsTrue)(nil),    // transparent pass-through of a bool eval
 	(*IsNotTrue)(nil), // inverts a bool eval
-
+	// literals
 	(*Bool)(nil),
 	(*Number)(nil),
 	(*Text)(nil),
@@ -86,27 +86,22 @@ var Slats = []composer.Slat{
 	(*Bracket)(nil),
 	(*Slash)(nil),
 	(*Commas)(nil),
-
+	// text transforms
 	(*MakeSingular)(nil),
 	(*MakePlural)(nil),
 	(*MakeUppercase)(nil),
 	(*MakeLowercase)(nil),
 	(*MakeTitleCase)(nil),
 	(*MakeSentenceCase)(nil),
-
+	//
 	(*Matches)(nil),
 	(*MatchLike)(nil),
-
+	// sequences
 	(*CycleText)(nil),
 	(*ShuffleText)(nil),
 	(*StoppingText)(nil),
 
-	// FIX: set any; with the type picked during assembly
-	(*SetFieldBool)(nil),
-	(*SetFieldNum)(nil),
-	(*SetFieldText)(nil),
-	(*SetFieldNumList)(nil),
-	(*SetFieldTextList)(nil),
+	(*SetField)(nil),
 
 	(*IsEmpty)(nil),
 	(*Includes)(nil),
@@ -119,4 +114,10 @@ var Slats = []composer.Slat{
 	(*LessThan)(nil),
 	(*GreaterOrEqual)(nil),
 	(*LessOrEqual)(nil),
+
+	//
+
+	// (*MakeRecord)(nil),
+	(*Arguments)(nil),
+	(*Argument)(nil),
 }

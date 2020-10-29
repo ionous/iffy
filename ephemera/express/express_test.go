@@ -226,7 +226,7 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("{'world'|hello!}",
 			&core.Buffer{core.NewActivity(
 				&pattern.DetermineAct{
-					"hello", pattern.NewArgs(
+					"hello", core.NewArgs(
 						&core.FromText{T("world")},
 					)})}); e != nil {
 			t.Fatal(e)

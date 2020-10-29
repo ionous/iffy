@@ -152,12 +152,12 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 	if args, e := c.stack.pop(arity); e != nil {
 		err = e
 	} else {
-		var ps pattern.Arguments
+		var ps core.Arguments
 		for i, arg := range args {
 			if newa, e := newAssignment(arg); e != nil {
 				err = errutil.Append(e)
 			} else {
-				newp := &pattern.Argument{
+				newp := &core.Argument{
 					Name: "$" + strconv.Itoa(i+1),
 					From: newa,
 				}

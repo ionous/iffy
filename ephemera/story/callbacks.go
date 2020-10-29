@@ -90,11 +90,11 @@ func fromPattern(k *Importer,
 	return
 }
 
-func imp_arguments(k *Importer, pid ephemera.Named, r reader.Map) (ret *pattern.Arguments, err error) {
+func imp_arguments(k *Importer, pid ephemera.Named, r reader.Map) (ret *core.Arguments, err error) {
 	if m, e := reader.Unpack(r, "arguments"); e != nil {
 		err = e
 	} else {
-		var ps []*pattern.Argument
+		var ps []*core.Argument
 		// record the referenced arguments: names, types, pairings
 		if e := reader.Repeats(m.SliceOf("$ARGS"),
 			func(m reader.Map) (err error) {
@@ -107,13 +107,13 @@ func imp_arguments(k *Importer, pid ephemera.Named, r reader.Map) (ret *pattern.
 			}); e != nil {
 			err = e
 		} else {
-			ret = &pattern.Arguments{ps}
+			ret = &core.Arguments{ps}
 		}
 	}
 	return
 }
 
-func imp_argument(k *Importer, patternName ephemera.Named, r reader.Map) (ret *pattern.Argument, err error) {
+func imp_argument(k *Importer, patternName ephemera.Named, r reader.Map) (ret *core.Argument, err error) {
 	if m, e := reader.Unpack(r, "argument"); e != nil {
 		err = e
 	} else if paramName, e := imp_variable_name(k, tables.NAMED_ARGUMENT, m.MapOf("$NAME")); e != nil {
@@ -127,7 +127,7 @@ func imp_argument(k *Importer, patternName ephemera.Named, r reader.Map) (ret *p
 			paramType := k.NewName(slotName, tables.NAMED_TYPE, reader.At(m))
 			k.NewPatternRef(patternName, paramName, paramType)
 		}
-		ret = &pattern.Argument{Name: paramName.String(), From: a}
+		ret = &core.Argument{Name: paramName.String(), From: a}
 	}
 	return
 }

@@ -6,6 +6,7 @@ import "github.com/ionous/iffy/affine"
 // While a raw interface{} would work as well
 // this helps internalize and standardize error codes.
 type Value interface {
+	// type category
 	Affinity() affine.Affinity
 	// GetBool, or error if the underlying value isn't a bool
 	GetBool() (bool, error)
@@ -25,4 +26,6 @@ type Value interface {
 	GetIndex(int) (Value, error)
 	// GetFieldByName for values representing objects ( nouns or records ), errors otherwise.
 	GetFieldByName(string) (Value, error)
+	// name of the specific underlying type
+	Type() string
 }

@@ -99,8 +99,8 @@ func (op *Sort) sortText(run rt.Runtime, src []string) (err error) {
 func makeDet(name string, first, second core.Assignment) rt.BoolEval {
 	return &pattern.DetermineBool{
 		Pattern: name,
-		Arguments: &pattern.Arguments{
-			Args: []*pattern.Argument{{
+		Arguments: &core.Arguments{
+			Args: []*core.Argument{{
 				Name: "$1",
 				From: first,
 			}, {

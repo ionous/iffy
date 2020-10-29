@@ -1,13 +1,12 @@
-package pattern
+package core
 
 import (
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/dl/core"
 )
 
 type Argument struct {
 	Name string // argument name
-	From core.Assignment
+	From Assignment
 }
 
 type Arguments struct {

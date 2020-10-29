@@ -11,7 +11,7 @@ type At struct {
 	Index int
 }
 
-// future: lists of lists?
+// future: lists of lists? probably through lists of records containing lists.
 func (*At) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "list_at",

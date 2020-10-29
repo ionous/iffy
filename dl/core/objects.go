@@ -8,14 +8,14 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// ObjectRef finds an object by name, it returns an id.
+// ObjectRef provides a way to find an object's id.
 type ObjectRef interface {
 	// returns UnknownObject when successfully determining there is no such object
 	GetObjectRef(run rt.Runtime) (retId string, err error)
 }
 
 // ObjectName implements ObjectRef, searching for an object named as specified.
-// ex. ObjectName{ "target" }  looks for the object named "target".
+// ex. ObjectName{ "target" } looks for the object named "target".
 // this is an internal command, used by express.... fix: maybe it should live there.
 // and maybe rename to something like "Get/FindObjectId"
 type ObjectName struct {

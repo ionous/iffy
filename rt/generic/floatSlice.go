@@ -12,6 +12,7 @@ type FloatSlice struct {
 }
 
 func (l *FloatSlice) Affinity() affine.Affinity { return affine.NumList }
+func (l *FloatSlice) Type() string              { return "[]float64" }
 func (l *FloatSlice) GetNumList() (ret []float64, _ error) {
 	ret = l.Values
 	return

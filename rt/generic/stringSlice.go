@@ -11,6 +11,7 @@ type StringSlice struct {
 }
 
 func (l *StringSlice) Affinity() affine.Affinity { return affine.TextList }
+func (l *StringSlice) Type() string              { return "[]string" }
 func (l *StringSlice) GetTextList() (ret []string, _ error) {
 	ret = l.Values
 	return

@@ -43,3 +43,6 @@ func (n Nothing) GetFieldByName(string) (_ rt.Value, err error) {
 	err = errutil.New("value is not an object")
 	return
 }
+func (n Nothing) Type() string {
+	return ""
+}
