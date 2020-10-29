@@ -3,6 +3,8 @@ package qna
 import (
 	"database/sql"
 
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/writer"
@@ -41,6 +43,14 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 	if e != nil {
 		panic(e)
 	}
+}
+
+func (run *Runner) MakeRecord(kind string) (ret rt.Value, err error) {
+	err = errutil.Fmt("couldn't create record of kind %q", kind)
+	// fields := make(map[string]rt.Value)
+	// ret = generic.NewRecord(op.kind, fields)
+
+	return
 }
 
 func (run *Runner) SingularOf(str string) (ret string) {

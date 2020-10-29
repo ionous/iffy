@@ -29,6 +29,9 @@ type Runtime interface {
 	// if a variable isnt found in the most recently pushed scope
 	// the next most recently pushed scope will be checked and so on.
 	Scope
+	// create a new field set from the named kind.
+	// an implementation might only support the creation of some kinds.
+	MakeRecord(kind string) (Value, error)
 	// add a set of variables to the internal stack.
 	PushScope(Scope)
 	// remove the most recently added set of variables from the internal stack.

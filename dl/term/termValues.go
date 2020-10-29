@@ -30,6 +30,11 @@ type TextList struct {
 	Init rt.TextListEval
 }
 
+// type RecordList struct {
+// 	Name, Kind string
+// 	// possibly with an initial size generating a zero list.
+// }
+
 func (n *Number) String() string {
 	return n.Name
 }
@@ -107,3 +112,12 @@ func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	}
 	return
 }
+
+// func (n *RecordList) String() string {
+// 	return n.Name
+// }
+
+// func (n *RecordList) Prepare(run rt.Runtime, p *Terms) (err error) {
+// 	p.AddTerm(n.Name, &generic.NewRecordSlice(n.Kind))
+// 	return
+// }

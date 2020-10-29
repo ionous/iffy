@@ -31,6 +31,9 @@ func (Panic) PushScope(Scope) {
 func (Panic) PopScope() {
 	panic("Runtime panic")
 }
+func (Panic) MakeRecord(kind string) (Value, error) {
+	panic("Runtime panic")
+}
 func (Panic) Random(inclusiveMin, exclusiveMax int) int {
 	panic("Runtime panic")
 }
