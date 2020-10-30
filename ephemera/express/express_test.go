@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/dl/render"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/kr/pretty"
@@ -79,7 +80,7 @@ func TestExpressions(t *testing.T) {
 	})
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
-			&RenderName{"A"}); e != nil {
+			&render.Name{"A"}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -129,8 +130,8 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("{printNumWord: .groupSize}",
 			&core.PrintNumWord{
 				Num: &core.GetVar{
-					Name:            &core.Text{Text: "groupSize"},
-					TryTextAsObject: true,
+					Name:  &core.Text{Text: "groupSize"},
+					Flags: core.TryAsBoth,
 				},
 			}); e != nil {
 			t.Fatal(e)
@@ -238,7 +239,7 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("hello {.object}",
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
-				&RenderName{"object"}}},
+				&render.Name{"object"}}},
 		); e != nil {
 			t.Fatal(e)
 		}

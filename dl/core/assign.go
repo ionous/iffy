@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
 )
@@ -32,8 +31,8 @@ type Assign struct {
 }
 
 type FromVar struct {
-	Name            rt.TextEval // name of the variable or object.
-	TryTextAsObject bool        `if:"internal"` // see also: GetVar
+	Name  rt.TextEval // name of the variable or object.
+	Flags TryAsNoun   `if:"internal"`
 }
 
 type FromBool struct {
@@ -75,25 +74,24 @@ func (*FromVar) Compose() composer.Spec {
 }
 
 func (op *FromVar) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
-	// first resolve the requested variable name into text
-	if name, e := rt.GetText(run, op.Name); e != nil {
-		err = e
+	if v, e := op.getAssignedValue(run); e != nil {
+		err = cmdError(op, e)
 	} else {
-		// get the variable of that name
-		switch v, e := run.GetField(object.Variables, name); e.(type) {
-		case nil:
-			ret = v
-		default:
-			err = e
-		// or... maybe get the object (id) of that name
-		case rt.UnknownTarget, rt.UnknownField:
-			if !op.TryTextAsObject {
-				err = e
-			} else if id, e := getObjectExactly(run, name); e != nil {
-				err = e
-			} else {
-				ret = &generic.String{Value: id}
-			}
+		ret = v
+	}
+	return
+}
+
+func (op *FromVar) getAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+	local, e := getVariableByName(run, op.Name, op.Flags)
+	switch e := e.(type) {
+	case nil:
+		ret = local
+	default:
+		err = e
+	case UnknownVariable:
+		if op.Flags.tryObject() {
+			ret, err = getObjectExactly(run, string(e))
 		}
 	}
 	return
@@ -113,7 +111,7 @@ func (*FromBool) Compose() composer.Spec {
 
 func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
-		err = e
+		err = cmdError(op, e)
 	} else {
 		ret = &generic.Bool{Value: val}
 	}
@@ -135,7 +133,7 @@ func (*FromNum) Compose() composer.Spec {
 
 func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
-		err = e
+		err = cmdError(op, e)
 	} else {
 		ret = &generic.Float{Value: val}
 	}
@@ -156,7 +154,7 @@ func (*FromText) Compose() composer.Spec {
 
 func (op *FromText) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
-		err = e
+		err = cmdError(op, e)
 	} else {
 		ret = &generic.String{Value: val}
 	}
@@ -177,7 +175,7 @@ func (*FromNumList) Compose() composer.Spec {
 
 func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
-		err = e
+		err = cmdError(op, e)
 	} else {
 		ret = &generic.FloatSlice{Values: vals}
 	}
@@ -198,7 +196,7 @@ func (*FromTextList) Compose() composer.Spec {
 
 func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
-		err = e
+		err = cmdError(op, e)
 	} else {
 		ret = &generic.StringSlice{Values: vals}
 	}

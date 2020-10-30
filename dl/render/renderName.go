@@ -1,4 +1,4 @@
-package express
+package render
 
 import (
 	"strings"
@@ -12,22 +12,22 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// RenderName handles changing a template like {.boombip} into text.
+// Name handles changing a template like {.boombip} into text.
 // if the name is a variable containing an object name: return the printed object name.
 // if the name is a variable with some other text: return that text.
 // if the name isn't a variable but refers to some object: return that object's printed object name.
 // otherwise, its an error.
-type RenderName struct {
+type Name struct {
 	Name string
 }
 
-func (op *RenderName) Compose() composer.Spec {
+func (op *Name) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "render_name",
 		Group: "internal",
 	}
 }
-func (op *RenderName) GetText(run rt.Runtime) (ret string, err error) {
+func (op *Name) GetText(run rt.Runtime) (ret string, err error) {
 	// uppercase names are assumed to be requests for object names.
 	if name := op.Name; lang.IsCapitalized(name) {
 		ret, err = op.getPrintedNamedOf(run, name)
@@ -55,11 +55,13 @@ func (op *RenderName) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 
-func (op *RenderName) getPrintedNamedOf(run rt.Runtime, objectName string) (ret string, err error) {
+func (op *Name) getPrintedNamedOf(run rt.Runtime, objectName string) (ret string, err error) {
 	if printedName, e := rt.GetText(run, &core.Buffer{core.NewActivity(
 		&pattern.DetermineAct{
 			"printName",
-			core.NewArgs(&core.FromText{&core.ObjectName{T(objectName)}}),
+			core.NewArgs(&core.FromVar{
+				Name:  &core.Text{objectName},
+				Flags: 0}),
 		})}); e != nil {
 		err = cmdError(op, e)
 	} else {

@@ -36,7 +36,7 @@ package core
 // 		for _, a := range op.Arguments.Args {
 // 			if val, e := a.GetAssignedValue(run); e != nil {
 // 				err = errutil.Append(err, e)
-// 			} else if e := fixme.SetFieldByName(field, val); e != nil {
+// 			} else if e := fixme.SetField(field, val); e != nil {
 // 				err = errutil.Append(err, e)
 // 			}
 // 		}

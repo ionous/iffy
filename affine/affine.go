@@ -8,6 +8,7 @@ const (
 	NumList    Affinity = "num_list"
 	Text       Affinity = "text"
 	TextList   Affinity = "text_list"
+	Object     Affinity = "object"
 	Record     Affinity = "record"
 	RecordList Affinity = "record_list"
 

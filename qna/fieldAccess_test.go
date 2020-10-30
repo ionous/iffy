@@ -20,7 +20,7 @@ func TestFieldAccess(t *testing.T) {
 	q := NewRuntime(db)
 
 	// ensure we can ask for object existence
-	t.Run("object exists", func(t *testing.T) {
+	t.Run("object_exists", func(t *testing.T) {
 		// whether a name exists
 		existence := []struct {
 			name   string
@@ -34,24 +34,30 @@ func TestFieldAccess(t *testing.T) {
 		}
 		els := existence
 		for _, v := range els {
-			tgt := v.name
-			name := assembly.DomainNameOf("test", tgt)
-			if p, e := q.GetField(object.Exists, name); e != nil {
-				t.Fatal("existence", name, e)
-			} else if exists, e := p.GetBool(); e != nil {
+			name := v.name
+			switch _, e := q.GetField(object.Value, name); e.(type) {
+			default:
 				t.Fatal("assign", e)
-			} else if v.exists != exists {
-				t.Fatal("existence", name, "wanted", v.exists)
+
+			case rt.UnknownObject:
+				if v.exists {
+					t.Fatal("wanted to exist and it doesnt", name)
+				}
+			case nil:
+				if !v.exists {
+					t.Fatal("didnt want to exist and it does", name)
+				}
 			}
 		}
 	})
 	// ensure queries for kinds work
-	t.Run("object kind", func(t *testing.T) {
+	t.Run("object_kind", func(t *testing.T) {
 		els := FieldTest.kindsOfNoun
 		for i, cnt := 0, len(els); i < cnt; i += 2 {
-			tgt, field := els[i], els[i+1]
-			name := assembly.DomainNameOf("test", tgt)
-			if p, e := q.GetField(object.Kind, name); e != nil {
+			name, field := els[i], els[i+1]
+			if obj, e := q.GetField(object.Value, name); e != nil {
+				t.Fatal(e)
+			} else if p, e := obj.GetField(object.Kind); e != nil {
 				t.Fatal(e)
 			} else if kind, e := p.GetText(); e != nil {
 				t.Fatal("assign", e)
@@ -59,18 +65,16 @@ func TestFieldAccess(t *testing.T) {
 				t.Fatal("mismatch", name, field, "got:", kind, "expected:", field)
 			}
 		}
-		if k, e := q.GetField(object.Kind, "speedboat"); e == nil {
-			t.Fatal("expected error; got", k)
-		}
 	})
 	// ensure queries for paths work
-	t.Run("object kinds", func(t *testing.T) {
+	t.Run("object_kinds", func(t *testing.T) {
 		els := FieldTest.pathsOfNoun
 		for i, cnt := 0, len(els); i < cnt; i += 2 {
-			tgt, field := els[i], els[i+1]
-			name := assembly.DomainNameOf("test", tgt)
+			name, field := els[i], els[i+1]
 			// asking for "Kinds" should get us the hierarchy
-			if p, e := q.GetField(object.Kinds, name); e != nil {
+			if obj, e := q.GetField(object.Value, name); e != nil {
+				t.Fatal(e)
+			} else if p, e := obj.GetField(object.Kinds); e != nil {
 				t.Fatal(e)
 			} else if path, e := p.GetText(); e != nil {
 				t.Fatal("assign", e)
@@ -78,31 +82,31 @@ func TestFieldAccess(t *testing.T) {
 				t.Fatal("mismatch", name, field, "got:", name, "expected:", field)
 			}
 		}
-		if path, e := q.GetField(object.Kinds, "speedboat"); e == nil {
-			t.Fatal("expected error; got", path)
-		}
 	})
 	t.Run("get_text", func(t *testing.T) {
 		els := FieldTest.txtValues
 		for i, cnt := 0, len(els); i < cnt; i += 3 {
-			tgt, field, value := els[i].(string), els[i+1].(string), els[i+2]
-			name := assembly.DomainNameOf("test", tgt)
+			name, field, value := els[i].(string), els[i+1].(string), els[i+2]
 			for n := 0; n < 2; n++ {
-				p, e := q.GetField(name, field)
-				switch e.(type) {
-				default:
+				if obj, e := q.GetField(object.Value, name); e != nil {
 					t.Fatal(e)
-				case rt.UnknownField:
-					if value != nil {
-						t.Fatal("got unknown field, but expecting a value")
-					}
-				case nil:
-					if p == nil {
-						t.Fatal("value and error are both nil for", name, field)
-					} else if txt, e := p.GetText(); e != nil {
-						t.Fatal("assign", e)
-					} else if txt != value {
-						t.Fatalf("mismatch %s.%s got:%q expected:%q", tgt, field, txt, value)
+				} else {
+					p, e := obj.GetField(field)
+					switch e.(type) {
+					default:
+						t.Fatal(e)
+					case rt.UnknownField:
+						if value != nil {
+							t.Fatal("got unknown field, but expecting a value")
+						}
+					case nil:
+						if p == nil {
+							t.Fatal("value and error are both nil for", name, field)
+						} else if txt, e := p.GetText(); e != nil {
+							t.Fatal("assign", e)
+						} else if txt != value {
+							t.Fatalf("mismatch %s.%s got:%q expected:%q", name, field, txt, value)
+						}
 					}
 				}
 			}
@@ -111,10 +115,11 @@ func TestFieldAccess(t *testing.T) {
 	t.Run("get_numbers", func(t *testing.T) {
 		els := FieldTest.numValues
 		for i, cnt := 0, len(els); i < cnt; i += 3 {
-			tgt, field, value := els[i].(string), els[i+1].(string), els[i+2].(float64)
-			name := assembly.DomainNameOf("test", tgt)
+			name, field, value := els[i].(string), els[i+1].(string), els[i+2].(float64)
 			for i := 0; i < 2; i++ {
-				if p, e := q.GetField(name, field); e != nil {
+				if obj, e := q.GetField(object.Value, name); e != nil {
+					t.Fatal(e)
+				} else if p, e := obj.GetField(field); e != nil {
 					t.Fatal(e)
 				} else if num, e := p.GetNumber(); e != nil {
 					t.Fatal("assign", e)
@@ -127,52 +132,56 @@ func TestFieldAccess(t *testing.T) {
 	t.Run("get_traits", func(t *testing.T) {
 		els := FieldTest.boolValues
 		for i, cnt := 0, len(els); i < cnt; i += 2 {
-			tgt, csv := els[i].(string), els[i+1].(string)
-			name := assembly.DomainNameOf("test", tgt)
-			if e := testTraits(q, name, csv); e != nil {
+			name, csv := els[i].(string), els[i+1].(string)
+			if obj, e := q.GetField(object.Value, name); e != nil {
+				t.Fatal(e)
+			} else if e := testTraits(obj, csv); e != nil {
 				t.Fatal(e)
 			}
 		}
 	})
 	t.Run("change_traits", func(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
-		apple := assembly.DomainNameOf("test", "apple")
-		boat := assembly.DomainNameOf("test", "boat")
-		toyBoat := assembly.DomainNameOf("test", "toy boat")
-		if e := q.SetField(apple, "a", &generic.String{Value: "y"}); e != nil {
+		if apple, e := q.GetField(object.Value, "apple"); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField(apple, "a"); e != nil {
+		} else if e := apple.SetField("a", &generic.String{Value: "y"}); e != nil {
+			t.Fatal(e)
+		} else if v, e := apple.GetField("a"); e != nil {
 			t.Fatal(e)
 		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
 		} else if str != "y" {
 			t.Fatal("mismatch", str)
-		} else if e := testTraits(q, apple, "y,w,x"); e != nil {
+		} else if e := testTraits(apple, "y,w,x"); e != nil {
 			t.Fatal(e)
 		}
 		// b is an aspect with traits "z" and "zz"
 		// boat.B has a default value of zz
-		if e := q.SetField(boat, "z", &generic.Bool{Value: true}); e != nil {
+		if boat, e := q.GetField(object.Value, "boat"); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField(boat, "b"); e != nil {
+		} else if e := boat.SetField("z", &generic.Bool{Value: true}); e != nil {
+			t.Fatal(e)
+		} else if v, e := boat.GetField("b"); e != nil {
 			t.Fatal(e)
 		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
 		} else if str != "z" {
 			t.Fatal("mismatch", str)
-		} else if e := testTraits(q, boat, "z, zz"); e != nil {
+		} else if e := testTraits(boat, "z, zz"); e != nil {
 			t.Fatal(e)
 		}
 		// toy boat.A has an initial value of y
-		if e := q.SetField(toyBoat, "w", &generic.Bool{Value: true}); e != nil {
+		if toyBoat, e := q.GetField(object.Value, "toyBoat"); e != nil {
 			t.Fatal(e)
-		} else if v, e := q.GetField(toyBoat, "a"); e != nil {
+		} else if e := toyBoat.SetField("w", &generic.Bool{Value: true}); e != nil {
+			t.Fatal(e)
+		} else if v, e := toyBoat.GetField("a"); e != nil {
 			t.Fatal(e)
 		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
 		} else if str != "w" {
 			t.Fatal("mismatch", str)
-		} else if e := testTraits(q, toyBoat, "w,x,y"); e != nil {
+		} else if e := testTraits(toyBoat, "w,x,y"); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -209,18 +218,18 @@ func newFieldAccessTest(t *testing.T, dbloc string) (ret *sql.DB) {
 	return
 }
 
-func testTraits(q *Runner, name, csv string) (err error) {
+func testTraits(obj rt.Value, csv string) (err error) {
 	traits := strings.Split(csv, ",")
 	// the first value in the list of traits is supposed to be true
 	for want := true; len(traits) > 0 && err == nil; want = false {
 		trait := traits[0]
 		traits = traits[1:]
-		if p, e := q.GetField(name, trait); e != nil {
+		if p, e := obj.GetField(trait); e != nil {
 			err = errutil.New(e)
 		} else if got, e := p.GetBool(); e != nil {
 			err = errutil.New("assign", e)
 		} else if got != want {
-			err = errutil.New("mismatch", name, trait, "got:", got, "expected:", want)
+			err = errutil.New("mismatch", trait, "got:", got, "expected:", want)
 		}
 	}
 	return

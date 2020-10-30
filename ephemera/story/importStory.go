@@ -6,8 +6,8 @@ import (
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/dl/render"
 	"github.com/ionous/iffy/ephemera/decode"
-	"github.com/ionous/iffy/ephemera/express"
 	"github.com/ionous/iffy/ephemera/reader"
 )
 
@@ -40,7 +40,7 @@ func ImportStories(src string, db *sql.DB, ms []reader.Map) (err error) {
 		{(*core.ShuffleText)(nil), k.BindRet(imp_shuffle_text)},
 		{(*core.StoppingText)(nil), k.BindRet(imp_stopping_text)},
 		//
-		{(*express.RenderTemplate)(nil), k.BindRet(imp_render_template)},
+		{(*render.Template)(nil), k.BindRet(imp_render_template)},
 	})
 	//
 	for _, m := range ms {

@@ -61,3 +61,15 @@ func (PanicValue) GetNumList(Runtime) (Iterator, error) {
 func (PanicValue) GetTextList(Runtime) (Iterator, error) {
 	panic("Runtime panic")
 }
+func (PanicValue) GetLen() (int, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetIndex(int) (Value, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetField(string) (Value, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) SetField(string, Value) error {
+	panic("Runtime panic")
+}

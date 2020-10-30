@@ -23,7 +23,7 @@ type Fields struct {
 	kindOf,
 	aspectOf,
 	nameOf,
-	idOf,
+	objOf,
 	isLike *sql.Stmt
 }
 
@@ -43,8 +43,8 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				and type = ?2
 				order by (name != ?1)
 				limit 1`),
-		countOf: ps.Prep(db,
-			`select count(), 'bool' from run_noun where noun=?`),
+		// countOf: ps.Prep(db,
+		// 	`select count(), 'bool' from run_noun where noun=?`),
 		ancestorsOf: ps.Prep(db,
 			`select kind || ( case path when '' then ('') else (',' || path) end ) as path, 'text'
 				from mdl_noun mn 
@@ -67,8 +67,8 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				order by rank
 				limit 1`),
 		// given a name, find the id
-		idOf: ps.Prep(db,
-			`select noun, 'text'
+		objOf: ps.Prep(db,
+			`select noun, 'object'
 				from mdl_name
 				join run_noun
 					using (noun)
@@ -93,7 +93,11 @@ func (n *Runner) IsLike(a, b string) (ret bool, err error) {
 }
 
 func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
-	if len(target) == 0 || (target[0] == object.Prefix && target != object.Variables) {
+	if len(target) == 0 {
+		err = errutil.Fmt("no target specified for field %q", field)
+	} else if writable := target[0] != object.Prefix ||
+		target == object.Variables ||
+		target == object.Counter; !writable {
 		err = errutil.Fmt("can't change reserved field '%s.%s'", target, field)
 	} else {
 		switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
@@ -220,9 +224,14 @@ func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 		// search for the object name using the object's id
 		ret, err = n.cacheQuery(key, n.fields.nameOf, field)
 
-	case object.Id:
-		// search for the object id by a partial object name
-		ret, err = n.cacheQuery(key, n.fields.idOf, field)
+	case object.Value:
+		switch v, e := n.cacheQuery(key, n.fields.objOf, field); e.(type) {
+		default:
+			ret, err = v, e
+		case rt.UnknownField:
+			err = rt.UnknownObject(field)
+		}
+		//
 
 	case object.Aspect:
 		// return the name of an aspect for a trait
@@ -233,10 +242,6 @@ func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 
 	case object.Kinds:
 		ret, err = n.cacheQuery(key, n.fields.ancestorsOf, field)
-
-	case object.Exists:
-		// searches for an id match; never returns UnknownField
-		ret, err = n.cacheQuery(key, n.fields.countOf, field)
 
 	default:
 		// see if the user is asking for the status of a trait

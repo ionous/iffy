@@ -17,12 +17,13 @@ type evalValue struct {
 	eval            interface{}
 }
 
+//  cached value
 type qnaValue struct {
 	affinity affine.Affinity
 	value    rt.Value
 }
 
-func newValue(run rt.Runtime, a affine.Affinity, v interface{}) (ret rt.Value, err error) {
+func newValue(run *Runner, a affine.Affinity, v interface{}) (ret rt.Value, err error) {
 	switch a {
 	case affine.Bool:
 		ret, err = newBoolValue(run, v)
@@ -30,6 +31,8 @@ func newValue(run rt.Runtime, a affine.Affinity, v interface{}) (ret rt.Value, e
 		ret, err = newNumValue(run, v)
 	case affine.Text:
 		ret, err = newTextValue(run, v)
+	case affine.Object:
+		ret, err = newObjectValue(run, v)
 	default:
 		err = errutil.Fmt("unknown affinity %q", a)
 	}

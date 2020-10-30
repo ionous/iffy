@@ -8,13 +8,13 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// ObjectRef provides a way to find an object's id.
-type ObjectRef interface {
-	// returns UnknownObject when successfully determining there is no such object
-	GetObjectRef(run rt.Runtime) (retId string, err error)
+// ObjectEval provides a way to access an object.
+type ObjectEval interface {
+	// returns UnknownObject error when successfully determining there is no such object
+	GetObjectValue(run rt.Runtime) (rt.Value, error)
 }
 
-// ObjectName implements ObjectRef, searching for an object named as specified.
+// ObjectName implements ObjectEval, searching for an object named as specified.
 // ex. ObjectName{ "target" } looks for the object named "target".
 // this is an internal command, used by express.... fix: maybe it should live there.
 // and maybe rename to something like "Get/FindObjectId"
@@ -25,40 +25,38 @@ type ObjectName struct {
 // tbd: this isnt currently exposed....
 // this also could be done by IsKindOf("kind")
 type ObjectExists struct {
-	Obj ObjectRef
+	Obj ObjectEval
 }
 
 // NameOf returns the full name of an object as written by the author when declared.
 // The name cannot be changed at runtime, instead use the "printed name" property.
 type NameOf struct {
-	Obj ObjectRef
+	Obj ObjectEval
 }
 
 // KindOf returns the class of an object.
 type KindOf struct {
-	Obj ObjectRef
+	Obj ObjectEval
 }
 
 // IsKindOf is less about caring, and more about sharing;
 // it returns true when the object is compatible with the named kind.
 type IsKindOf struct {
-	Obj  ObjectRef
+	Obj  ObjectEval
 	Kind rt.TextEval
 }
 
 // IsExactKindOf returns true when the object is of exactly the named kind.
 type IsExactKindOf struct {
-	Obj  ObjectRef
+	Obj  ObjectEval
 	Kind rt.TextEval
 }
 
-func GetObjectRef(run rt.Runtime, ref ObjectRef) (retId string, err error) {
-	if ref == nil {
+func GetObjectValue(run rt.Runtime, eval ObjectEval) (ret rt.Value, err error) {
+	if eval == nil {
 		err = rt.MissingEval("empty object ref")
-	} else if id, e := ref.GetObjectRef(run); e != nil {
-		err = e
 	} else {
-		retId = id
+		ret, err = eval.GetObjectValue(run)
 	}
 	return
 }
@@ -73,15 +71,15 @@ func (*ObjectName) Compose() composer.Spec {
 }
 
 // can be used as text, returns the object id.
-func (op *ObjectName) GetText(run rt.Runtime) (ret string, err error) {
-	return op.GetObjectRef(run)
-}
+// func (op *ObjectName) GetText(run rt.Runtime) (ret string, err error) {
+// 	return op.GetObjectValue(run)
+// }
 
-func (op *ObjectName) GetObjectRef(run rt.Runtime) (retId string, err error) {
+func (op *ObjectName) GetObjectValue(run rt.Runtime) (ret rt.Value, err error) {
 	if name, e := rt.GetText(run, op.Name); e != nil {
 		err = e
 	} else {
-		retId, err = getObjectExactly(run, name)
+		ret, err = getObjectExactly(run, name)
 	}
 	return
 }
@@ -98,7 +96,7 @@ func (*ObjectExists) Compose() composer.Spec {
 func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
 	// checking for object.Exists only searches by object id
 	// we want to check for the object by friendly name, and possibly by looking in scope
-	switch _, e := GetObjectRef(run, op.Obj); e.(type) {
+	switch _, e := GetObjectValue(run, op.Obj); e.(type) {
 	case nil:
 		okay = true
 	case rt.UnknownObject:
@@ -109,39 +107,27 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
 	return
 }
 
-// find an object with the passed partial name; return its id
-func getObjectExactly(run rt.Runtime, name string) (retId string, err error) {
-	if strings.HasPrefix(name, "#") {
-		retId = name // ids start with prefix #
-	} else {
-		switch id, e := run.GetField(object.Id, name); e.(type) {
-		case rt.UnknownField:
-			err = rt.UnknownObject(name)
-		default:
-			err = e
-		case nil:
-			retId, err = id.GetText()
-		}
+// find an object with the passed partial name
+func getObjectExactly(run rt.Runtime, name string) (ret rt.Value, err error) {
+	switch v, e := run.GetField(object.Value, name); e.(type) {
+	case rt.UnknownField:
+		err = rt.UnknownObject(name)
+	default:
+		ret, err = v, e
 	}
 	return
 }
 
 // first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
-// this differs from GetVariableOrObject.
-// that function tries to find the value of a variable or object id named "something"
-// this tries to resolve the name "something" into an object.
-func getObjectInexactly(run rt.Runtime, name string) (retId string, err error) {
-	switch p, e := run.GetField(object.Variables, name); e.(type) {
-	// if there's no such variable, the inexact search then checks if there's an object of that name.
+func getObjectInexactly(run rt.Runtime, name string) (ret rt.Value, err error) {
+	switch local, e := run.GetField(object.Variables, name); e.(type) {
+	default:
+		err = e
+	// if there's no such variable, check if there's an object of that name.
 	case rt.UnknownTarget, rt.UnknownField:
-		retId, err = getObjectExactly(run, name)
+		ret, err = getObjectExactly(run, name)
 	case nil:
-		// if we found such a variable, get its contents and look up the referenced object.
-		if unboxedName, e := p.GetText(); e != nil {
-			err = e
-		} else {
-			retId, err = getObjectExactly(run, unboxedName)
-		}
+		ret = local
 	}
 	return
 }
@@ -156,9 +142,9 @@ func (*NameOf) Compose() composer.Spec {
 }
 
 func (op *NameOf) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, e := GetObjectRef(run, op.Obj); e != nil {
+	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(object.Name, obj); e != nil {
+	} else if p, e := obj.GetField(object.Name); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret, err = p.GetText()
@@ -176,9 +162,9 @@ func (*KindOf) Compose() composer.Spec {
 }
 
 func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, e := GetObjectRef(run, op.Obj); e != nil {
+	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(object.Kind, obj); e != nil {
+	} else if p, e := obj.GetField(object.Kind); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret, err = p.GetText()
@@ -196,11 +182,11 @@ func (*IsKindOf) Compose() composer.Spec {
 }
 
 func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
-	if obj, e := GetObjectRef(run, op.Obj); e != nil {
+	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(object.Kinds, obj); e != nil {
+	} else if p, e := obj.GetField(object.Kinds); e != nil {
 		err = cmdError(op, e)
 	} else if fullPath, e := p.GetText(); e != nil {
 		err = cmdError(op, e)
@@ -219,11 +205,11 @@ func (*IsExactKindOf) Compose() composer.Spec {
 }
 
 func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
-	if obj, e := GetObjectRef(run, op.Obj); e != nil {
+	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(object.Kind, obj); e != nil {
+	} else if p, e := obj.GetField(object.Kind); e != nil {
 		err = cmdError(op, e)
 	} else if objKind, e := p.GetText(); e != nil {
 		err = cmdError(op, e)

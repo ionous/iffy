@@ -11,6 +11,9 @@ type Nothing struct{}
 func (n Nothing) Affinity() affine.Affinity {
 	return ""
 }
+func (n Nothing) Type() string {
+	return ""
+}
 func (n Nothing) GetBool() (_ bool, err error) {
 	err = errutil.New("value is not a bool")
 	return
@@ -39,10 +42,11 @@ func (n Nothing) GetIndex(int) (_ rt.Value, err error) {
 	err = errutil.New("value is not indexable")
 	return
 }
-func (n Nothing) GetFieldByName(string) (_ rt.Value, err error) {
+func (n Nothing) GetField(string) (_ rt.Value, err error) {
 	err = errutil.New("value is not an object")
 	return
 }
-func (n Nothing) Type() string {
-	return ""
+func (n Nothing) SetField(string, rt.Value) (err error) {
+	err = errutil.New("value is not writable")
+	return
 }

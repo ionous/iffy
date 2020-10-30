@@ -6,8 +6,10 @@ import "github.com/ionous/iffy/affine"
 // While a raw interface{} would work as well
 // this helps internalize and standardize error codes.
 type Value interface {
-	// type category
+	// Affinity identifies the general category
 	Affinity() affine.Affinity
+	// Type name of the specific underlying
+	Type() string
 	// GetBool, or error if the underlying value isn't a bool
 	GetBool() (bool, error)
 	// GetNumber, or error if the underlying value isn't a number
@@ -24,8 +26,9 @@ type Value interface {
 	// GetIndex returns the nth element of the underlying slice, where 0 is the first value;
 	// otherwise this returns an error.
 	GetIndex(int) (Value, error)
-	// GetFieldByName for values representing objects ( nouns or records ), errors otherwise.
-	GetFieldByName(string) (Value, error)
-	// name of the specific underlying type
-	Type() string
+	// GetField for values representing objects, errors otherwise ( or if the field doesnt exit ).
+	GetField(string) (Value, error)
+	// SetField to write values back into objects,
+	// errors if the affinities dont match. if the field doesnt exist, or if the value doesnt represent an object.
+	SetField(string, Value) error
 }

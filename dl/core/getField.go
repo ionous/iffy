@@ -7,7 +7,7 @@ import (
 
 // GetField a property value from an object by name.
 type GetField struct {
-	Obj   ObjectRef
+	Obj   ObjectEval
 	Field rt.TextEval
 }
 
@@ -68,12 +68,12 @@ func (op *GetField) GetTextList(run rt.Runtime) (ret []string, err error) {
 }
 
 func (op *GetField) getValue(run rt.Runtime) (ret rt.Value, err error) {
-	if id, e := GetObjectRef(run, op.Obj); e != nil {
+	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
 	} else {
-		ret, err = run.GetField(id, field)
+		ret, err = obj.GetField(field)
 	}
 	return
 }

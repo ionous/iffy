@@ -18,7 +18,7 @@ type UnknownField struct {
 }
 
 func (e UnknownObject) Error() string {
-	return errutil.Sprintf("Unknown object %q", string(e))
+	return errutil.Sprintf("unknown object %q", string(e))
 }
 
 func (e UnknownTarget) Error() string {

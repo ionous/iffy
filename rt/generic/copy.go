@@ -31,8 +31,10 @@ func CopyValue(a affine.Affinity, val rt.Value) (ret rt.Value, err error) {
 			} else {
 				ret = &String{Value: v}
 			}
+		case affine.Object:
+			ret = val // fix: we shouldnt be trying to copy objects.
 		default:
-			err = errutil.New("failed to copy value, expected %s got %v(%T)", a, val, val)
+			err = errutil.Fmt("failed to copy value, expected %s got %v(%T)", a, val, val)
 		}
 	}
 	return

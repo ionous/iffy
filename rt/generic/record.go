@@ -27,7 +27,7 @@ func (r *Record) Type() string {
 	return r.kind
 }
 
-func (r *Record) GetFieldByName(field string) (ret rt.Value, err error) {
+func (r *Record) GetField(field string) (ret rt.Value, err error) {
 	if v, ok := r.fields[field]; !ok {
 		err = rt.UnknownField{r.kind, field}
 	} else {
@@ -36,7 +36,7 @@ func (r *Record) GetFieldByName(field string) (ret rt.Value, err error) {
 	return
 }
 
-func (r *Record) SetFieldByName(field string, val rt.Value) (err error) {
+func (r *Record) SetField(field string, val rt.Value) (err error) {
 	if v, ok := r.fields[field]; !ok {
 		err = rt.UnknownField{r.kind, field}
 	} else if newv, e := CopyValue(v.Affinity(), val); e != nil {

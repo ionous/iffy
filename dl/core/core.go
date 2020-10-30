@@ -14,7 +14,7 @@ var Slots = []composer.Slot{{
 	Desc: "Assignments: Helper used when setting variables.",
 }, {
 	Name: "object_ref",
-	Type: (*ObjectRef)(nil),
+	Type: (*ObjectEval)(nil),
 	Desc: "Object Reference: Helper used when referring to objects.",
 }}
 
@@ -118,6 +118,7 @@ var Slats = []composer.Slat{
 	//
 
 	// (*MakeRecord)(nil),
+
 	(*Arguments)(nil),
 	(*Argument)(nil),
 }

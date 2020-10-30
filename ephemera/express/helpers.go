@@ -14,10 +14,10 @@ func N(n float64) rt.NumberEval {
 func B(b bool) rt.BoolEval {
 	return &core.Bool{b}
 }
-func O(n string, exact bool) (ret core.ObjectRef) {
+func O(n string, exact bool) (ret core.ObjectEval) {
 	name := T(n)
 	if !exact {
-		ret = &core.GetVar{Name: name, TryTextAsObject: true}
+		ret = &core.GetVar{Name: name, Flags: core.TryAsBoth}
 	} else {
 		ret = &core.ObjectName{name}
 	}

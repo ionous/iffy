@@ -7,7 +7,7 @@ import (
 
 // HasTrait a property value from an object by name.
 type HasTrait struct {
-	Obj   ObjectRef
+	Obj   ObjectEval
 	Trait rt.TextEval
 }
 
@@ -22,11 +22,11 @@ func (*HasTrait) Compose() composer.Spec {
 }
 
 func (op *HasTrait) GetBool(run rt.Runtime) (ret bool, err error) {
-	if id, e := GetObjectRef(run, op.Obj); e != nil {
+	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = cmdError(op, e)
 	} else if trait, e := rt.GetText(run, op.Trait); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := run.GetField(id, trait); e != nil {
+	} else if p, e := obj.GetField(trait); e != nil {
 		err = cmdError(op, e)
 	} else if ok, e := p.GetBool(); e != nil {
 		err = cmdError(op, e)

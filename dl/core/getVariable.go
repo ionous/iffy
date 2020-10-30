@@ -1,8 +1,6 @@
 package core
 
 import (
-	"strings"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
@@ -12,11 +10,14 @@ import (
 // GetVariable reads a value of the specified name from the current scope.
 // ( ex. loop locals, or -- in a noun scope -- might translate "apple" to "$macintosh" )
 type GetVar struct {
-	Name rt.TextEval // uses text eval to make template expressions easier
-	// if true, and the command is being used to get some text
-	// and no variable can be found in the current context of the requested name,
-	// see if the requested name is an object instead.
-	TryTextAsObject bool `if:"internal"`
+	Name  rt.TextEval // uses text eval to make template expressions easier
+	Flags TryAsNoun   `if:"internal"`
+}
+
+type UnknownVariable string
+
+func (e UnknownVariable) Error() string {
+	return errutil.Sprintf("Unknown variable %q", string(e))
 }
 
 // Compose implements composer.Slat
@@ -30,9 +31,9 @@ func (*GetVar) Compose() composer.Spec {
 }
 
 func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
-	if _, p, e := op.getVariableByName(run); e != nil {
+	if local, e := getVariableByName(run, op.Name, op.Flags); e != nil {
 		err = cmdError(op, e)
-	} else if v, e := p.GetBool(); e != nil {
+	} else if v, e := local.GetBool(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -41,9 +42,9 @@ func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
 }
 
 func (op *GetVar) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if _, p, e := op.getVariableByName(run); e != nil {
+	if local, e := getVariableByName(run, op.Name, op.Flags); e != nil {
 		err = cmdError(op, e)
-	} else if v, e := p.GetNumber(); e != nil {
+	} else if v, e := local.GetNumber(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -52,47 +53,46 @@ func (op *GetVar) GetNumber(run rt.Runtime) (ret float64, err error) {
 }
 
 func (op *GetVar) GetText(run rt.Runtime) (ret string, err error) {
-	switch n, p, e := op.getVariableByName(run); e.(type) {
-	default:
+	if local, e := getVariableByName(run, op.Name, op.Flags); e != nil {
 		err = cmdError(op, e)
-	case nil:
-		if v, e := p.GetText(); e != nil {
-			err = cmdError(op, e)
-		} else {
-			ret = v
-		}
-	case rt.UnknownTarget, rt.UnknownField:
-		if !op.TryTextAsObject {
-			err = cmdError(op, e)
-		} else if id, e := getObjectExactly(run, n); e != nil {
-			err = cmdError(op, e)
-		} else {
-			ret = id
-		}
+	} else if vs, e := local.GetText(); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = vs
+	}
+	return
+
+}
+
+// allows us to use GetVar directly in things that take an object.
+func (op *GetVar) GetObjectValue(run rt.Runtime) (ret rt.Value, err error) {
+	if v, e := op.getObjectValue(run); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = v
 	}
 	return
 }
 
-// allows us to use GetVar directly in things that take an object.
-// in this case, we unbox the variable and assume the text in it is an object id.
-func (op *GetVar) GetObjectRef(run rt.Runtime) (retId string, err error) {
-	if _, p, e := op.getVariableByName(run); e != nil {
-		err = cmdError(op, e)
-	} else if str, e := p.GetText(); e != nil {
-		err = cmdError(op, e)
-	} else if !strings.HasPrefix(str, "#") {
-		e := errutil.New("stored name isnt an object", str)
-		err = cmdError(op, e)
-	} else {
-		retId = str
+func (op *GetVar) getObjectValue(run rt.Runtime) (ret rt.Value, err error) {
+	local, e := getVariableByName(run, op.Name, op.Flags)
+	switch e := e.(type) {
+	case nil:
+		ret = local
+	default:
+		err = e
+	case UnknownVariable:
+		if op.Flags.tryObject() {
+			ret, err = getObjectExactly(run, string(e))
+		}
 	}
 	return
 }
 
 func (op *GetVar) GetNumList(run rt.Runtime) (ret []float64, err error) {
-	if _, p, e := op.getVariableByName(run); e != nil {
+	if local, e := getVariableByName(run, op.Name, op.Flags); e != nil {
 		err = cmdError(op, e)
-	} else if vs, e := p.GetNumList(); e != nil {
+	} else if vs, e := local.GetNumList(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = vs
@@ -101,9 +101,9 @@ func (op *GetVar) GetNumList(run rt.Runtime) (ret []float64, err error) {
 }
 
 func (op *GetVar) GetTextList(run rt.Runtime) (ret []string, err error) {
-	if _, p, e := op.getVariableByName(run); e != nil {
+	if local, e := getVariableByName(run, op.Name, op.Flags); e != nil {
 		err = cmdError(op, e)
-	} else if vs, e := p.GetTextList(); e != nil {
+	} else if vs, e := local.GetTextList(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = vs
@@ -113,13 +113,23 @@ func (op *GetVar) GetTextList(run rt.Runtime) (ret []string, err error) {
 
 // GetVar asks for a variable using a text eval;
 // we first need to determine which actual variable name they mean.
-func (op *GetVar) getVariableByName(run rt.Runtime) (retName string, retValue rt.Value, err error) {
+func getVariableByName(run rt.Runtime, text rt.TextEval, flags TryAsNoun) (ret rt.Value, err error) {
 	// first resolve the requested variable name into text
-	if n, e := rt.GetText(run, op.Name); e != nil {
+	if n, e := rt.GetText(run, text); e != nil {
 		err = e
 	} else {
-		retName = n // then try to get the variable of that name
-		retValue, err = run.GetField(object.Variables, n)
+		if !flags.tryVariable() {
+			err = UnknownVariable(n)
+		} else {
+			switch v, e := run.GetField(object.Variables, n); e.(type) {
+			case nil:
+				ret = v
+			default:
+				err = e
+			case rt.UnknownTarget, rt.UnknownField:
+				err = UnknownVariable(n)
+			}
+		}
 	}
 	return
 }

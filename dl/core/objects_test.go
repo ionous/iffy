@@ -27,21 +27,21 @@ func TestObjects(t *testing.T) {
 		testTrue(t, &run, &ObjectExists{this})
 		testTrue(t, &run, &IsNotTrue{&ObjectExists{nothing}})
 	})
-	t.Run("kind of", func(t *testing.T) {
+	t.Run("kind_of", func(t *testing.T) {
 		if cls, e := rt.GetText(&run, &KindOf{this}); e != nil {
 			t.Fatal(e)
 		} else if cls != base.Text {
 			t.Fatal("unexpected", cls)
 		}
 	})
-	t.Run("is kind of", func(t *testing.T) {
+	t.Run("is_kind_of", func(t *testing.T) {
 		testTrue(t, &run, &IsKindOf{this, base})
 		testTrue(t, &run, &IsKindOf{that, base})
 
 		testTrue(t, &run, &IsKindOf{that, derived})
 		testTrue(t, &run, &IsNotTrue{&IsKindOf{this, derived}})
 	})
-	t.Run("is exact kind of", func(t *testing.T) {
+	t.Run("is_exact_kind_of", func(t *testing.T) {
 		testTrue(t, &run, &IsExactKindOf{this, base})
 		testTrue(t, &run, &IsNotTrue{&IsExactKindOf{that, base}})
 		testTrue(t, &run, &IsExactKindOf{that, derived})
@@ -60,27 +60,36 @@ type modelTest struct {
 
 func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
 	switch target {
-	case object.Id:
+	case object.Value:
 		if _, ok := m.clsMap[field]; !ok {
-			err = rt.UnknownField{target, field}
+			err = rt.UnknownObject(field)
 		} else {
-			ret = &generic.String{Value: field}
+			ret = &objTest{model: m, name: field}
 		}
+	default:
+		err = rt.UnknownField{target, field}
+	}
+	return
+}
 
-	case object.Exists:
-		_, ok := m.clsMap[field]
-		ret = &generic.Bool{Value: ok}
+type objTest struct {
+	generic.Nothing
+	model *modelTest
+	name  string
+}
 
+func (j *objTest) GetField(field string) (ret rt.Value, err error) {
+	switch m := j.model; field {
 	case object.Kind:
-		if cls, ok := m.clsMap[field]; !ok {
-			err = rt.UnknownField{target, field}
+		if cls, ok := m.clsMap[j.name]; !ok {
+			err = rt.UnknownField{j.name, field}
 		} else {
 			ret = &generic.String{Value: cls}
 		}
 
 	case object.Kinds:
-		if cls, ok := m.clsMap[field]; !ok {
-			err = rt.UnknownField{target, field}
+		if cls, ok := m.clsMap[j.name]; !ok {
+			err = rt.UnknownField{j.name, field}
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
@@ -88,7 +97,7 @@ func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
 		}
 
 	default:
-		err = rt.UnknownField{target, field}
+		err = rt.UnknownField{j.name, field}
 	}
 	return
 }

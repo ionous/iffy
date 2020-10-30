@@ -47,7 +47,7 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 
 func unpackArg(arg r.Value) r.Value {
 	if on, ok := arg.Interface().(*dottedName); ok {
-		arg = r.ValueOf(on.getVariableNamed())
+		arg = r.ValueOf(on.getValueNamed())
 	}
 	return arg
 }
