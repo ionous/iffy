@@ -20,10 +20,10 @@ func assembleDefaultFields(asm *Assembler) (err error) {
  			and (mf.type != 'aspect')
  		/* is the field's declared kind in the path of the user specified kind */		
  		where instr((
- 			select mk.kind || "," || mk.path || ","
+ 			select mk.kind || ',' || mk.path || ','
 			from mdl_kind mk 
 			where mk.kind = asm.kind
-		),  mf.kind || ",")
+		),  mf.kind || ',')
 		order by asm.kind, mf.field`,
 		func() (err error) {
 			if nv, e := convertField(curr.fieldType, curr.value); e != nil {

@@ -27,7 +27,7 @@ func assembleDefaultTraits(asm *Assembler) (err error) {
 		join mdl_field mf
 			on (mf.type = 'aspect')
 			and (mf.field = mt.aspect)
-		where instr(mk.kind || "," || mk.path || ",", mf.kind || ",")
+		where instr(mk.kind || ',' || mk.path || ',', mf.kind || ',')
 		order by asm.kind, mt.aspect, mt.trait`,
 		func() (err error) {
 			if !curr.value {

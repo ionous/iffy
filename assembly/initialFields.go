@@ -18,12 +18,12 @@ func assembleInitialFields(asm *Assembler) (err error) {
 			on (asm.prop = mf.field)
 			and (mf.type != 'aspect')
 		where instr((
-			select mk.kind || "," || mk.path || ","
+			select mk.kind || ',' || mk.path || ','
 			from mdl_kind mk 
 			join mdl_noun mn
 			using (kind)
 			where (mn.noun = asm.noun)
-		), mf.kind || ",")
+		), mf.kind || ',')
 		order by noun, field, type`,
 		func() (err error) {
 			if nv, e := convertField(curr.fieldType, curr.value); e != nil {
