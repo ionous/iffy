@@ -1,9 +1,9 @@
 package term
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
 )
 
 // Terms implements a Scope mapping names to specified parameters.
@@ -33,7 +33,7 @@ func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
 	} else if p, ok := ps.values[field]; !ok {
 		err = rt.UnknownField{target, field}
 	} else {
-		ret, err = generic.CopyValue(p.value.Affinity(), p.value)
+		ret = p.value
 	}
 	return
 }
@@ -44,10 +44,10 @@ func (ps *Terms) SetField(target, field string, val rt.Value) (err error) {
 		err = rt.UnknownTarget{target}
 	} else if p, ok := ps.values[field]; !ok {
 		err = rt.UnknownField{target, field}
-	} else if v, e := generic.CopyValue(p.value.Affinity(), val); e != nil {
-		err = e
+	} else if a := p.value.Affinity(); a != val.Affinity() {
+		err = errutil.New("value is not", a)
 	} else {
-		p.value = v
+		p.value = val
 	}
 	return
 }

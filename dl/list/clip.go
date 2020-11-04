@@ -1,17 +1,6 @@
 package list
 
 // b/c copy() doesnt allocate
-func copystrings(src []string) []string {
-	out := make([]string, len(src))
-	copy(out, src)
-	return out
-}
-func copyfloats(src []float64) []float64 {
-	out := make([]float64, len(src))
-	copy(out, src)
-	return out
-}
-
 func clipStart(i, cnt int) (ret int) {
 	if i == 0 {
 		ret = 0 // unspecified: start at the front of the list

@@ -1,3 +1,3 @@
-// Package generic provides implementations of rt.Value for common golang primitive types.
-// It also provides iterators which generate those generic values from common slice types.
+// Package generic provides implementations of rt.Value for common types.
+// It also provides iterators which generate generic values from common slice types.
 package generic

@@ -109,27 +109,12 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
 
 // find an object with the passed partial name
 func getObjectExactly(run rt.Runtime, name string) (ret rt.Value, err error) {
-	switch v, e := run.GetField(object.Value, name); e.(type) {
-	case rt.UnknownField:
-		err = rt.UnknownObject(name)
-	default:
-		ret, err = v, e
-	}
-	return
+	return rt.Variable(name).GetObjectByName(run)
 }
 
 // first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
 func getObjectInexactly(run rt.Runtime, name string) (ret rt.Value, err error) {
-	switch local, e := run.GetField(object.Variables, name); e.(type) {
-	default:
-		err = e
-	// if there's no such variable, check if there's an object of that name.
-	case rt.UnknownTarget, rt.UnknownField:
-		ret, err = getObjectExactly(run, name)
-	case nil:
-		ret = local
-	}
-	return
+	return rt.Variable(name).GetObjectByVariable(run)
 }
 
 func (*NameOf) Compose() composer.Spec {

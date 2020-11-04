@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/writer"
@@ -36,6 +37,7 @@ type Runner struct {
 	fields  *Fields
 	plurals *Plurals
 	pairs   valueMap
+	kinds   qnaKinds
 }
 
 func (run *Runner) ActivateDomain(domain string, active bool) {
@@ -45,12 +47,19 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 	}
 }
 
-func (run *Runner) MakeRecord(kind string) (ret rt.Value, err error) {
-	err = errutil.Fmt("couldn't create record of kind %q", kind)
-	// fields := make(map[string]rt.Value)
-	// ret = generic.NewRecord(op.kind, fields)
-
+// notary interface
+func (run *Runner) Make(kind string) (ret rt.Value, err error) {
+	if k, e := run.KindByName(kind); e != nil {
+		err = errutil.New("can't make unknown kind", kind, e)
+	} else {
+		ret = k.NewRecord()
+	}
 	return
+}
+
+// notary interface
+func (run *Runner) Copy(val rt.Value) (ret rt.Value, err error) {
+	return generic.CopyValue(run, val)
 }
 
 func (run *Runner) SingularOf(str string) (ret string) {

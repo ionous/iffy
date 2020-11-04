@@ -1,16 +1,25 @@
 package rt
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/rt/writer"
 )
 
 // Panic implements Runtime throwing a panic for every method
 type Panic struct{}
 
+var _ Runtime = (*Panic)(nil)
+
 func (Panic) ActivateDomain(name string, enable bool) {
 	panic("Runtime panic")
 }
 func (Panic) GetEvalByName(string, interface{}) error {
+	panic("Runtime panic")
+}
+func (Panic) Make(string) (Value, error) {
+	panic("Runtime panic")
+}
+func (Panic) Copy(Value) (Value, error) {
 	panic("Runtime panic")
 }
 func (Panic) GetField(target, field string) (Value, error) {
@@ -46,19 +55,30 @@ func (Panic) SingularOf(plural string) string {
 
 type PanicValue struct{}
 
-func (PanicValue) GetBool(Runtime) (bool, error) {
+var _ Value = (*PanicValue)(nil)
+
+func (PanicValue) Affinity() affine.Affinity {
 	panic("Runtime panic")
 }
-func (PanicValue) GetNumber(Runtime) (float64, error) {
+func (PanicValue) Type() string {
 	panic("Runtime panic")
 }
-func (PanicValue) GetText(Runtime) (string, error) {
+func (PanicValue) GetBool() (bool, error) {
 	panic("Runtime panic")
 }
-func (PanicValue) GetNumList(Runtime) (Iterator, error) {
+func (PanicValue) GetNumber() (float64, error) {
 	panic("Runtime panic")
 }
-func (PanicValue) GetTextList(Runtime) (Iterator, error) {
+func (PanicValue) GetText() (string, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetNumList() ([]float64, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetTextList() ([]string, error) {
+	panic("Runtime panic")
+}
+func (PanicValue) GetRecordList() ([]Value, error) {
 	panic("Runtime panic")
 }
 func (PanicValue) GetLen() (int, error) {

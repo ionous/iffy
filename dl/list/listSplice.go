@@ -84,7 +84,7 @@ func (op *Splice) spliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err
 			// as long as the range was valid we take the result and set it back...
 			// even if no elements are cut or inserted.
 			// ( that bakes any evaluation that might have been in the target )
-			ret = copyfloats(els[i:j]) // before we start altering the memory of else, copy out
+			ret = generic.CopyFloats(els[i:j]) // before we start altering the memory of els, copy out
 			newVals := append(els[:i], append(add, els[j:]...)...)
 			if e := run.SetField(object.Variables, op.List,
 				&generic.FloatSlice{Values: newVals}); e != nil {
@@ -106,7 +106,7 @@ func (op *Splice) spliceText(run rt.Runtime, vs rt.Value) (ret []string, err err
 	} else {
 		// ... mirrors GetNumList()
 		if i >= 0 && j >= i {
-			ret = copystrings(els[i:j])
+			ret = generic.CopyStrings(els[i:j])
 			newVals := append(els[:i], append(add, els[j:]...)...)
 			if e := run.SetField(object.Variables, op.List,
 				&generic.StringSlice{Values: newVals}); e != nil {

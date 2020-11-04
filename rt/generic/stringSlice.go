@@ -11,7 +11,7 @@ type StringSlice struct {
 }
 
 func (l *StringSlice) Affinity() affine.Affinity { return affine.TextList }
-func (l *StringSlice) Type() string              { return "[]string" }
+func (l *StringSlice) Type() string              { return "string" }
 func (l *StringSlice) GetTextList() (ret []string, _ error) {
 	ret = l.Values
 	return
@@ -28,8 +28,9 @@ func (l *StringSlice) GetLen() (ret int, _ error) {
 // GetIndex returns the nth element of the underlying slice, where 0 is the first value;
 // otherwise this returns an error.
 func (l *StringSlice) GetIndex(i int) (ret rt.Value, err error) {
-	if vs := l.Values; i < 0 || i >= len(vs) {
-		err = OutOfRange(i)
+	vs := l.Values
+	if cnt := len(vs); i < 0 || i >= cnt {
+		err = rt.OutOfRange{i, cnt}
 	} else {
 		ret = &String{Value: vs[i]}
 	}

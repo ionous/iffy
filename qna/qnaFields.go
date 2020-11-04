@@ -21,6 +21,7 @@ type Fields struct {
 	countOf,
 	ancestorsOf,
 	kindOf,
+	fieldsOf,
 	aspectOf,
 	nameOf,
 	objOf,
@@ -52,10 +53,17 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 					using (kind)
 				where noun=?`),
 		kindOf: ps.Prep(db,
-			`select kind, 'text' from mdl_noun where noun=?`),
+			`select kind, 'text' 
+				from mdl_noun 
+				where noun=?`),
+		fieldsOf: ps.Prep(db,
+			`select field, type
+				from mdl_field 
+				where kind=?`),
 		// return the name of the aspect of the specified trait, or the empty string.
 		aspectOf: ps.Prep(db,
-			`select aspect, 'text' from mdl_noun_traits 
+			`select aspect, 'text' 
+				from mdl_noun_traits 
 				where (noun||'.'||trait)=?`),
 		// given an id, find the name
 		nameOf: ps.Prep(db,
@@ -100,12 +108,22 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 		target == object.Counter; !writable {
 		err = errutil.Fmt("can't change reserved field '%s.%s'", target, field)
 	} else {
-		switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
-		default:
-			err = e
-		case rt.UnknownTarget, rt.UnknownField:
-			key := makeKey(target, field)
-			err = n.setField(key, val)
+		// fix? implement a proper move
+		if val == nil {
+			if x, e := n.GetField(target, field); e != nil {
+				err = e
+			} else {
+				val, err = generic.MakeDefault(n, x.Affinity(), x.Type())
+			}
+		}
+		if err == nil {
+			switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
+			default:
+				err = e
+			case rt.UnknownTarget, rt.UnknownField:
+				key := makeKey(target, field)
+				err = n.setField(key, val)
+			}
 		}
 	}
 	return
@@ -123,10 +141,10 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 		} else {
 			// we want to change the aspect not the trait...
 			if b, e := val.GetBool(); e != nil {
-				err = errutil.Fmt("error setting trait; have %v %v %s", key, val, e)
+				err = errutil.New("error setting trait:", e)
 			} else if !b {
 				// future: might maintain a table of opposite names ( similar to plurals )
-				err = errutil.Fmt("error setting trait; %q can only be set to true, have %v", key, val)
+				err = errutil.Fmt("error setting trait: couldn't determine the opposite of %q", key)
 			} else {
 				// recurse...
 				targetAspect := keyType{key.target, aspect}
@@ -137,12 +155,10 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 		// didnt refer to a trait, so just set the field normally.
 		if q, e := n.cacheField(key); e != nil {
 			err = e
-		} else if nv, e := generic.CopyValue(q.affinity, val); e != nil {
-			err = e // unpack validates the incoming data type.
+		} else if a := q.affinity; a != val.Affinity() {
+			err = errutil.New("value is not", a)
 		} else {
-			// note: replaces the value in the cache
-			// we dont poke into the value and set its internal value.
-			q.value = nv
+			q.value = val
 		}
 	}
 	return
@@ -186,7 +202,7 @@ func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
 		if q, e := n.getField(makeKey(target, field)); e != nil {
 			err = e
 		} else {
-			ret, err = generic.CopyValue(q.affinity, q.value)
+			ret = q.value
 		}
 	}
 	return
@@ -202,7 +218,6 @@ func (n *Runner) getField(key keyType) (ret *qnaValue, err error) {
 		ret = q
 	}
 	return
-
 }
 
 // when we know that the field is not a reserved field, and we just want to check the value.
@@ -234,7 +249,7 @@ func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 		//
 
 	case object.Aspect:
-		// return the name of an aspect for a trait
+		// used internally: return the name of an aspect for a trait
 		ret, err = n.cacheQuery(key, n.fields.aspectOf, field)
 
 	case object.Kind:

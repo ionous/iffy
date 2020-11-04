@@ -48,7 +48,7 @@ func (on *dottedName) getValueNamed() *core.GetVar {
 // we dont know the type of "target" ahead of time
 // so we just pass it around behind the scenes as an interface.
 func (on *dottedName) getFromVar() (ret core.Assignment) {
-	return &core.FromVar{
+	return &core.CopyFrom{
 		Name:  T(on.name),
 		Flags: on.flags(),
 	}

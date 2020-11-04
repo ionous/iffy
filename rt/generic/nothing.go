@@ -34,6 +34,10 @@ func (n Nothing) GetTextList() (_ []string, err error) {
 	err = errutil.New("value is not a text list")
 	return
 }
+func (n Nothing) GetRecordList() (_ []rt.Value, err error) {
+	err = errutil.New("value is not a record list")
+	return
+}
 func (n Nothing) GetLen() (_ int, err error) {
 	err = errutil.New("value is not measurable")
 	return

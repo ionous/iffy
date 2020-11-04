@@ -12,6 +12,7 @@ var Slats = []composer.Slat{
 	(*Len)(nil),
 	(*Pop)(nil),
 	(*Push)(nil),
+	(*Set)(nil),
 	(*Slice)(nil),
 	(*Sort)(nil),
 	(*Splice)(nil),

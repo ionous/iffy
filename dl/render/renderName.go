@@ -59,7 +59,7 @@ func (op *Name) getPrintedNamedOf(run rt.Runtime, objectName string) (ret string
 	if printedName, e := rt.GetText(run, &core.Buffer{core.NewActivity(
 		&pattern.DetermineAct{
 			"printName",
-			core.NewArgs(&core.FromVar{
+			core.NewArgs(&core.CopyFrom{
 				Name:  &core.Text{objectName},
 				Flags: 0}),
 		})}); e != nil {
