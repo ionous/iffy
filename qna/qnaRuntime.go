@@ -23,6 +23,7 @@ func NewRuntime(db *sql.DB) *Runner {
 			fields:  fields,
 			plurals: plurals,
 			pairs:   make(valueMap),
+			kinds:   qnaKinds{fieldsFor: fields.fieldsFor},
 		}
 		run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
 	}
@@ -49,7 +50,7 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 
 // notary interface
 func (run *Runner) Make(kind string) (ret rt.Value, err error) {
-	if k, e := run.KindByName(kind); e != nil {
+	if k, e := run.kinds.KindByName(kind); e != nil {
 		err = errutil.New("can't make unknown kind", kind, e)
 	} else {
 		ret = k.NewRecord()
@@ -60,6 +61,10 @@ func (run *Runner) Make(kind string) (ret rt.Value, err error) {
 // notary interface
 func (run *Runner) Copy(val rt.Value) (ret rt.Value, err error) {
 	return generic.CopyValue(run, val)
+}
+
+func (run *Runner) KindByName(n string) (*generic.Kind, error) {
+	return run.kinds.KindByName(n)
 }
 
 func (run *Runner) SingularOf(str string) (ret string) {

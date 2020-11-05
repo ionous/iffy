@@ -3,6 +3,7 @@ package generic
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -23,19 +24,44 @@ func (r *Record) Type() string {
 }
 
 func (r *Record) GetField(field string) (ret rt.Value, err error) {
-	k := r.kind
-	if i := k.FieldIndex(field); i < 0 {
-		err = rt.UnknownField{k.name, field}
-	} else if ft, fv := k.fields[i], r.values[i]; fv == nil {
-		ret, err = MakeDefault(k.kinds, ft.Affinity, ft.Type)
-	} else if isTrait := ft.Type == "aspect" && ft.Name != field; !isTrait {
-		// if the field is an aspect, and the caller was asking for a trait...
-		// return the state of the trait
-		ret = fv // otherwise just return the value
+	switch k := r.kind; field {
+	case object.Name:
+		err = errutil.New("records don't have names")
+	case object.Kind, object.Kinds:
+		ret = &String{Value: r.kind.name}
+	default:
+		if i := k.FieldIndex(field); i < 0 {
+			err = rt.UnknownField{k.name, field}
+		} else {
+			fv, ft := r.values[i], k.fields[i]
+			if isTrait := ft.Type == "aspect" && ft.Name != field; isTrait {
+				ret, err = r.getTraitValue(fv, field)
+			} else {
+				ret, err = r.getFieldValue(fv, ft)
+			}
+		}
+	}
+	return
+}
+
+func (r *Record) getTraitValue(fv rt.Value, field string) (ret rt.Value, err error) {
+	if fv == nil {
+		ret = False
 	} else if trait, e := fv.GetText(); e != nil {
 		err = e
 	} else {
+		// if the field is an aspect, and the caller was asking for a trait...
+		// return the state of the trait
 		ret = &Bool{Value: trait == field}
+	}
+	return
+}
+
+func (r *Record) getFieldValue(fv rt.Value, ft Field) (ret rt.Value, err error) {
+	if fv == nil {
+		ret, err = MakeDefault(r.kind.kinds, ft.Affinity, ft.Type)
+	} else {
+		ret = fv
 	}
 	return
 }

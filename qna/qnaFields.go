@@ -21,7 +21,8 @@ type Fields struct {
 	countOf,
 	ancestorsOf,
 	kindOf,
-	fieldsOf,
+	fieldsFor,
+	traitsFor,
 	aspectOf,
 	nameOf,
 	objOf,
@@ -56,10 +57,19 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 			`select kind, 'text' 
 				from mdl_noun 
 				where noun=?`),
-		fieldsOf: ps.Prep(db,
-			`select field, type
-				from mdl_field 
-				where kind=?`),
+		fieldsFor: ps.Prep(db,
+			`select * from mdl_field
+				union all
+			select * from (
+				select aspect as kind, trait as field, 'trait' from mdl_aspect
+				order by rank 
+			)
+			where kind=?`),
+		traitsFor: ps.Prep(db,
+			`select trait
+				from mdl_aspect 
+				where aspect=?
+				order by rank`),
 		// return the name of the aspect of the specified trait, or the empty string.
 		aspectOf: ps.Prep(db,
 			`select aspect, 'text' 
@@ -113,7 +123,7 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 			if x, e := n.GetField(target, field); e != nil {
 				err = e
 			} else {
-				val, err = generic.MakeDefault(n, x.Affinity(), x.Type())
+				val, err = generic.MakeDefault(&n.kinds, x.Affinity(), x.Type())
 			}
 		}
 		if err == nil {
