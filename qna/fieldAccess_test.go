@@ -144,7 +144,7 @@ func TestFieldAccess(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
 		if apple, e := q.GetField(object.Value, "apple"); e != nil {
 			t.Fatal(e)
-		} else if e := apple.SetField("a", &generic.String{Value: "y"}); e != nil {
+		} else if e := apple.SetField("a", generic.NewString("y")); e != nil {
 			t.Fatal(e)
 		} else if v, e := apple.GetField("a"); e != nil {
 			t.Fatal(e)
@@ -159,7 +159,7 @@ func TestFieldAccess(t *testing.T) {
 		// boat.B has a default value of zz
 		if boat, e := q.GetField(object.Value, "boat"); e != nil {
 			t.Fatal(e)
-		} else if e := boat.SetField("z", &generic.Bool{Value: true}); e != nil {
+		} else if e := boat.SetField("z", generic.NewBool(true)); e != nil {
 			t.Fatal(e)
 		} else if v, e := boat.GetField("b"); e != nil {
 			t.Fatal(e)
@@ -173,7 +173,7 @@ func TestFieldAccess(t *testing.T) {
 		// toy boat.A has an initial value of y
 		if toyBoat, e := q.GetField(object.Value, "toyBoat"); e != nil {
 			t.Fatal(e)
-		} else if e := toyBoat.SetField("w", &generic.Bool{Value: true}); e != nil {
+		} else if e := toyBoat.SetField("w", generic.NewBool(true)); e != nil {
 			t.Fatal(e)
 		} else if v, e := toyBoat.GetField("a"); e != nil {
 			t.Fatal(e)

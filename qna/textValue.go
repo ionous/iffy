@@ -16,9 +16,9 @@ func (q *textEval) GetText() (string, error) {
 func newTextValue(run rt.Runtime, v interface{}) (ret rt.Value, err error) {
 	switch a := v.(type) {
 	case nil: // zero value for unhandled defaults in sqlite
-		ret = &generic.String{}
+		ret = generic.NewString("")
 	case string:
-		ret = &generic.String{Value: a}
+		ret = generic.NewString(a)
 	case []byte:
 		var eval rt.TextEval
 		if e := bytesToEval(a, &eval); e != nil {

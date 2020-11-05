@@ -68,7 +68,7 @@ func (op *Each) execute(run rt.Runtime) (err error) {
 				} else {
 					el.SetValue(at)
 					next := i + 1
-					index.SetValue(&generic.Int{Value: next})
+					index.SetValue(generic.NewInt(next))
 					if hasNext := next < cnt; !hasNext {
 						last.SetValue(generic.True)
 					}

@@ -158,7 +158,7 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 			} else {
 				// recurse...
 				targetAspect := keyType{key.target, aspect}
-				err = n.setField(targetAspect, &generic.String{Value: key.field})
+				err = n.setField(targetAspect, generic.NewString(key.field))
 			}
 		}
 	case rt.UnknownField:
@@ -289,7 +289,7 @@ func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 				} else {
 					// return whether the object's aspect equals the specified trait.
 					// ( we dont cache this value because multiple things can change it )
-					ret = &qnaValue{affine.Bool, &generic.Bool{Value: trait == field}}
+					ret = &qnaValue{affine.Bool, generic.NewBool(trait == field)}
 				}
 			}
 		}

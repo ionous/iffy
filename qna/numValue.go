@@ -16,13 +16,13 @@ func (q *numEval) GetNumber() (float64, error) {
 func newNumValue(run rt.Runtime, v interface{}) (ret rt.Value, err error) {
 	switch a := v.(type) {
 	case nil: // zero value for unhandled defaults in sqlite
-		ret = &generic.Float{}
+		ret = generic.Zero
 	case int:
-		ret = &generic.Int{Value: a}
+		ret = generic.NewInt(a)
 	case int64:
-		ret = &generic.Float{Value: float64(a)}
+		ret = generic.NewFloat(float64(a))
 	case float64:
-		ret = &generic.Float{Value: a}
+		ret = generic.NewFloat(a)
 	case []byte:
 		var eval rt.NumberEval
 		if e := bytesToEval(a, &eval); e != nil {

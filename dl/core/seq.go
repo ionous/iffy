@@ -40,7 +40,7 @@ func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret i
 			err = e
 		} else {
 			curr := int(num)
-			next := &generic.Int{Value: inc(curr, max)}
+			next := generic.NewInt(inc(curr, max))
 			if e := run.SetField(object.Counter, op.Seq, next); e != nil {
 				err = e
 			} else {

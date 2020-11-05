@@ -8,13 +8,13 @@ func SliceIt(size int, next func(int) rt.Value) *sliceIt {
 
 func SliceFloats(vs []float64) *sliceIt {
 	return SliceIt(len(vs), func(i int) rt.Value {
-		return &Float{Value: vs[i]}
+		return NewFloat(vs[i])
 	})
 }
 
 func SliceStrings(vs []string) *sliceIt {
 	return SliceIt(len(vs), func(i int) rt.Value {
-		return &String{Value: vs[i]}
+		return NewString(vs[i])
 	})
 }
 

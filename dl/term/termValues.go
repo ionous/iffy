@@ -43,7 +43,7 @@ func (n *Number) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalNumber(run, n.Init, 0); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, &generic.Float{Value: v})
+		p.AddTerm(n.Name, generic.NewFloat(v))
 	}
 	return
 }
@@ -56,7 +56,7 @@ func (n *Bool) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalBool(run, n.Init, false); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, &generic.Bool{Value: v})
+		p.AddTerm(n.Name, generic.NewBool(v))
 	}
 	return
 }
@@ -69,7 +69,7 @@ func (n *Text) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, &generic.String{Value: v})
+		p.AddTerm(n.Name, generic.NewString(v))
 	}
 	return
 }
@@ -82,7 +82,7 @@ func (n *Object) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, &generic.String{Value: v})
+		p.AddTerm(n.Name, generic.NewString(v))
 	}
 	return
 }
@@ -95,7 +95,7 @@ func (n *NumList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalNumbers(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, &generic.FloatSlice{Values: vs})
+		p.AddTerm(n.Name, generic.NewFloatSlice(vs))
 	}
 	return
 }
@@ -108,7 +108,7 @@ func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalTexts(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, &generic.StringSlice{Values: vs})
+		p.AddTerm(n.Name, generic.NewStringSlice(vs))
 	}
 	return
 }
@@ -118,6 +118,6 @@ func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
 // }
 
 // func (n *RecordList) Prepare(run rt.Runtime, p *Terms) (err error) {
-// 	p.AddTerm(n.Name, &generic.NewRecordSlice(n.Kind))
+// 	p.AddTerm(n.Name, generic.NewNewRecordSlice(n.Kind))
 // 	return
 // }

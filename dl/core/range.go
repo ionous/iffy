@@ -57,7 +57,7 @@ func (it *rangeIt) GetNext() (ret rt.Value, err error) {
 	if !it.HasNext() {
 		err = rt.StreamExceeded
 	} else {
-		ret = &generic.Int{Value: it.next}
+		ret = generic.NewInt(it.next)
 		it.next = it.next + it.step
 	}
 	return

@@ -95,7 +95,7 @@ func (m *seqTest) GetField(target, field string) (ret rt.Value, err error) {
 		err = rt.UnknownField{target, field}
 	} else {
 		v := m.counters[field]
-		ret = &generic.Int{Value: v}
+		ret = generic.NewInt(v)
 	}
 	return
 }

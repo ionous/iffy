@@ -45,7 +45,7 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 			} else if e := op.sortNumbers(run, els); e != nil {
 				err = e
 			} else {
-				newVals = &generic.FloatSlice{Values: els}
+				newVals = generic.NewFloatSlice(els)
 			}
 		case affine.TextList:
 			if els, e := vs.GetTextList(); e != nil {
@@ -53,7 +53,7 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 			} else if e := op.sortText(run, els); e != nil {
 				err = e
 			} else {
-				newVals = &generic.StringSlice{Values: els}
+				newVals = generic.NewStringSlice(els)
 			}
 		default:
 			err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)

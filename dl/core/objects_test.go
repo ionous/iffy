@@ -84,7 +84,7 @@ func (j *objTest) GetField(field string) (ret rt.Value, err error) {
 		if cls, ok := m.clsMap[j.name]; !ok {
 			err = rt.UnknownField{j.name, field}
 		} else {
-			ret = &generic.String{Value: cls}
+			ret = generic.NewString(cls)
 		}
 
 	case object.Kinds:
@@ -93,7 +93,7 @@ func (j *objTest) GetField(field string) (ret rt.Value, err error) {
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
-			ret = &generic.String{Value: path}
+			ret = generic.NewString(path)
 		}
 
 	default:

@@ -51,7 +51,7 @@ func TestScopeStack(t *testing.T) {
 			if want := count[i]; want != have {
 				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
 			} else {
-				next := &generic.Int{Value: have + 1}
+				next := generic.NewInt(have + 1)
 				switch e := stack.SetField(object.Variables, name, next); e.(type) {
 				default:
 					t.Fatal("fatal", reason, "step", step, name, "set failed", e)
@@ -107,7 +107,7 @@ func (k *mockScope) GetField(target, field string) (ret rt.Value, err error) {
 		err = rt.UnknownField{target, field}
 	} else {
 		k.gets++
-		ret = &generic.Int{Value: k.val}
+		ret = generic.NewInt(k.val)
 	}
 	return
 }

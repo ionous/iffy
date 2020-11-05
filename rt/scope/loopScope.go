@@ -66,11 +66,11 @@ func (l *loopScope) GetField(target, field string) (ret rt.Value, err error) {
 		case l.varName:
 			ret = l.varValue
 		case "index":
-			ret = &generic.Int{Value: l.currIndex}
+			ret = generic.NewInt(l.currIndex)
 		case "first":
-			ret = &generic.Bool{Value: l.currIndex == 1}
+			ret = generic.NewBool(l.currIndex == 1)
 		case "last":
-			ret = &generic.Bool{Value: !l.hasNext}
+			ret = generic.NewBool(!l.hasNext)
 		default:
 			err = rt.UnknownField{target, field}
 		}

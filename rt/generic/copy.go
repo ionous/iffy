@@ -33,31 +33,31 @@ func CopyValue(kinds Kinds, val rt.Value) (ret rt.Value, err error) {
 			if v, e := val.GetBool(); e != nil {
 				err = e
 			} else {
-				ret = &Bool{Value: v}
+				ret = NewBool(v)
 			}
 		case affine.Number:
 			if v, e := val.GetNumber(); e != nil {
 				err = e
 			} else {
-				ret = &Float{Value: v}
+				ret = NewFloat(v)
 			}
 		case affine.NumList:
 			if vs, e := val.GetNumList(); e != nil {
 				err = e
 			} else {
-				ret = &FloatSlice{Values: CopyFloats(vs)}
+				ret = NewFloatSlice(CopyFloats(vs))
 			}
 		case affine.Text:
 			if v, e := val.GetNumber(); e != nil {
 				err = e
 			} else {
-				ret = &Float{Value: v}
+				ret = NewFloat(v)
 			}
 		case affine.TextList:
 			if vs, e := val.GetTextList(); e != nil {
 				err = e
 			} else {
-				ret = &StringSlice{Values: CopyStrings(vs)}
+				ret = NewStringSlice(CopyStrings(vs))
 			}
 		case affine.Record:
 			// could also peek under the hood by casting to .(*Record)

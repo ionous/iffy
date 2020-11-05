@@ -71,7 +71,7 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = &generic.Bool{Value: val}
+		ret = generic.NewBool(val)
 	}
 	return
 }
@@ -93,7 +93,7 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = &generic.Float{Value: val}
+		ret = generic.NewFloat(val)
 	}
 	return
 }
@@ -114,7 +114,7 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = &generic.String{Value: val}
+		ret = generic.NewString(val)
 	}
 	return
 }
@@ -135,7 +135,7 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = &generic.FloatSlice{Values: vals}
+		ret = generic.NewFloatSlice(vals)
 	}
 	return
 }
@@ -156,7 +156,7 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err erro
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = &generic.StringSlice{Values: vals}
+		ret = generic.NewStringSlice(vals)
 	}
 	return
 }
