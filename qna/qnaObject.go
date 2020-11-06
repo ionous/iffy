@@ -44,12 +44,7 @@ func (q *qnaObject) GetField(field string) (ret rt.Value, err error) {
 	default:
 		key = makeKey(q.id, field)
 	}
-	if v, e := q.n.getField(key); e != nil {
-		err = e
-	} else {
-		ret = v.value
-	}
-	return
+	return q.n.getField(key)
 }
 
 func (q *qnaObject) SetField(field string, val rt.Value) (err error) {

@@ -9,6 +9,8 @@ type keyType struct {
 	target, field string
 }
 
+type valueMap map[keyType]rt.Value
+
 func (k *keyType) unknown() error {
 	return rt.UnknownField{k.target, k.field}
 }
@@ -17,8 +19,6 @@ func (k *keyType) unknown() error {
 func (k *keyType) dot(subField string) keyType {
 	return keyType{subField, k.target + "." + k.field}
 }
-
-type valueMap map[keyType]*qnaValue
 
 func makeKey(target, field string) keyType {
 	// FIX?

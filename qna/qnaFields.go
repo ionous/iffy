@@ -146,7 +146,7 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 		err = e // there was an unknown error
 	case nil:
 		// get the name of the aspect
-		if aspect, e := q.value.GetText(); e != nil {
+		if aspect, e := q.GetText(); e != nil {
 			err = e
 		} else {
 			// we want to change the aspect not the trait...
@@ -165,10 +165,10 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 		// didnt refer to a trait, so just set the field normally.
 		if q, e := n.cacheField(key); e != nil {
 			err = e
-		} else if a := q.affinity; a != val.Affinity() {
+		} else if a := q.Affinity(); a != val.Affinity() {
 			err = errutil.New("value is not", a)
 		} else {
-			q.value = val
+			n.pairs[key] = val
 		}
 	}
 	return
@@ -182,7 +182,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	// this automatically keeps them from conflicting.
 	key := makeKeyForEval(name, rtype.Name())
 	if q, ok := n.pairs[key]; ok {
-		eval := q.value.(*evalValue).eval
+		eval := q.(*evalValue).eval
 		store := r.ValueOf(eval)
 		outVal.Set(store)
 	} else {
@@ -196,8 +196,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 			err = e
 		}
 		// see notes: in theory GetEvalByName with
-		var rtval rt.Value = &evalValue{run: n, eval: store}
-		n.pairs[key] = &qnaValue{value: rtval}
+		n.pairs[key] = &evalValue{run: n, eval: store}
 	}
 	return
 }
@@ -212,14 +211,14 @@ func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
 		if q, e := n.getField(makeKey(target, field)); e != nil {
 			err = e
 		} else {
-			ret = q.value
+			ret = q
 		}
 	}
 	return
 }
 
 // check the cache before asking the database for info
-func (n *Runner) getField(key keyType) (ret *qnaValue, err error) {
+func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
 	if q, ok := n.pairs[key]; !ok {
 		ret, err = n.cacheField(key)
 	} else if q == nil {
@@ -232,7 +231,7 @@ func (n *Runner) getField(key keyType) (ret *qnaValue, err error) {
 
 // when we know that the field is not a reserved field, and we just want to check the value.
 // ie. for aspects
-func (n *Runner) getValue(key keyType) (ret *qnaValue, err error) {
+func (n *Runner) getValue(key keyType) (ret rt.Value, err error) {
 	if q, ok := n.pairs[key]; !ok {
 		ret, err = n.cacheQuery(key, n.fields.valueOf, key.target, key.field)
 	} else if q == nil {
@@ -243,7 +242,7 @@ func (n *Runner) getValue(key keyType) (ret *qnaValue, err error) {
 	return
 }
 
-func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
+func (n *Runner) cacheField(key keyType) (ret rt.Value, err error) {
 	switch target, field := key.target, key.field; target {
 	case object.Name:
 		// search for the object name using the object's id
@@ -278,18 +277,18 @@ func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 		case nil:
 			// we found the aspect name from the trait
 			// now we need to ask for the current value of the aspect
-			if aspectName, e := aspectOfTrait.value.GetText(); e != nil {
+			if aspectName, e := aspectOfTrait.GetText(); e != nil {
 				err = e
 			} else {
 				aspectOfTarget := keyType{target, aspectName}
 				if q, e := n.getValue(aspectOfTarget); e != nil {
 					err = e
-				} else if trait, e := q.value.GetText(); e != nil {
+				} else if trait, e := q.GetText(); e != nil {
 					err = errutil.Fmt("unexpected value in aspect '%v.%v' %v", target, aspectName, e)
 				} else {
 					// return whether the object's aspect equals the specified trait.
 					// ( we dont cache this value because multiple things can change it )
-					ret = &qnaValue{affine.Bool, generic.NewBool(trait == field)}
+					ret = generic.NewBool(trait == field)
 				}
 			}
 		}
@@ -299,7 +298,7 @@ func (n *Runner) cacheField(key keyType) (ret *qnaValue, err error) {
 
 // query the db and store the returned value in the cache.
 // note: all of the queries are expected to return two parts: the value and the typeName.
-func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret *qnaValue, err error) {
+func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret rt.Value, err error) {
 	var raw interface{}
 	var a affine.Affinity
 	switch e := q.QueryRow(args...).Scan(&raw, &a); e {
@@ -307,9 +306,8 @@ func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret 
 		if v, e := newValue(n, a, raw); e != nil {
 			err = e
 		} else {
-			q := &qnaValue{a, v}
-			n.pairs[key] = q
-			ret = q
+			n.pairs[key] = v
+			ret = v
 		}
 	case sql.ErrNoRows:
 		n.pairs[key] = nil

@@ -17,12 +17,6 @@ type evalValue struct {
 	eval            interface{}
 }
 
-//  cached value
-type qnaValue struct {
-	affinity affine.Affinity
-	value    rt.Value
-}
-
 func newValue(run *Runner, a affine.Affinity, v interface{}) (ret rt.Value, err error) {
 	switch a {
 	case affine.Bool:
