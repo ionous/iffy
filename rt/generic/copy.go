@@ -47,11 +47,12 @@ func CopyValue(kinds Kinds, val rt.Value) (ret rt.Value, err error) {
 			} else {
 				ret = NewFloatSlice(CopyFloats(vs))
 			}
+
 		case affine.Text:
-			if v, e := val.GetNumber(); e != nil {
+			if v, e := val.GetText(); e != nil {
 				err = e
 			} else {
-				ret = NewFloat(v)
+				ret = NewString(v)
 			}
 		case affine.TextList:
 			if vs, e := val.GetTextList(); e != nil {
@@ -59,6 +60,7 @@ func CopyValue(kinds Kinds, val rt.Value) (ret rt.Value, err error) {
 			} else {
 				ret = NewStringSlice(CopyStrings(vs))
 			}
+
 		case affine.Record:
 			// could also peek under the hood by casting to .(*Record)
 			if kind, e := kinds.KindByName(val.Type()); e != nil {
