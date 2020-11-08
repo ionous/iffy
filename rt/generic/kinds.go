@@ -11,28 +11,33 @@ type Kinds interface {
 	KindByName(name string) (*Kind, error)
 }
 
-func MakeDefault(ks Kinds, affinity affine.Affinity, typeName string) (ret rt.Value, err error) {
+// DefaultFor generates a zero value for the specified affinity;
+// uses the passed Kinds to generate empty records when necessary.
+func DefaultFor(ks Kinds, a affine.Affinity, subtype string) (ret rt.Value, err error) {
 	// return the default value for the
-	switch a := affinity; a {
+	switch a {
 	case affine.Bool:
-		ret = &Bool{}
+		ret = False
+
 	case affine.Number:
-		ret = &Float{}
+		ret = Zero
 	case affine.NumList:
-		ret = &FloatSlice{}
+		ret = ZeroList
+
 	case affine.Text:
-		ret = &String{}
+		ret = Empty
 	case affine.TextList:
-		ret = &StringSlice{}
+		ret = EmptyList
+
 	case affine.Record:
-		if n, e := ks.KindByName(typeName); e != nil {
-			err = errutil.New("unknown kind", typeName, e)
+		if n, e := ks.KindByName(subtype); e != nil {
+			err = errutil.New("unknown kind", subtype, e)
 		} else {
 			ret = n.NewRecord()
 		}
 	case affine.RecordList:
-		if n, e := ks.KindByName(typeName); e != nil {
-			err = errutil.New("unknown kind", typeName, e)
+		if n, e := ks.KindByName(subtype); e != nil {
+			err = errutil.New("unknown kind", subtype, e)
 		} else {
 			ret = n.NewRecordSlice()
 		}

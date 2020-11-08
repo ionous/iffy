@@ -21,7 +21,7 @@ func TestRecordAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if v != 0 {
 			t.Fatal("not default", v)
-		} else if e := beep.SetField("d", NewInt(5)); e != nil {
+		} else if e := beep.SetField("d", FloatOf(5)); e != nil {
 			t.Fatal(e)
 		} else if el, e := beep.GetField("d"); e != nil {
 			t.Fatal(e)
@@ -40,7 +40,7 @@ func TestRecordAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if len(v) > 0 {
 			t.Fatal("not default", v)
-		} else if e := boop.SetField("t", NewString("xyzzy")); e != nil {
+		} else if e := boop.SetField("t", StringOf("xyzzy")); e != nil {
 			t.Fatal(e)
 		} else if el, e := boop.GetField("t"); e != nil {
 			t.Fatal(e)
@@ -59,7 +59,7 @@ func TestRecordAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if v != false {
 			t.Fatal("not default", v)
-		} else if e := beep.SetField("x", NewBool(true)); e != nil {
+		} else if e := beep.SetField("x", BoolOf(true)); e != nil {
 			t.Fatal(e)
 		} else if el, e := beep.GetField("x"); e != nil {
 			t.Fatal(e)
@@ -73,7 +73,7 @@ func TestRecordAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if v != "x" {
 			t.Fatal(e)
-		} else if e := beep.SetField("a", NewString("w")); e != nil {
+		} else if e := beep.SetField("a", StringOf("w")); e != nil {
 			t.Fatal(e)
 		} else if el, e := beep.GetField("w"); e != nil {
 			t.Fatal(e)

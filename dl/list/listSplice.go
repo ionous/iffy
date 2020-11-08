@@ -87,7 +87,7 @@ func (op *Splice) spliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err
 			ret = generic.CopyFloats(els[i:j]) // before we start altering the memory of els, copy out
 			newVals := append(els[:i], append(add, els[j:]...)...)
 			if e := run.SetField(object.Variables, op.List,
-				generic.NewFloatSlice(newVals)); e != nil {
+				generic.FloatsOf(newVals)); e != nil {
 				err = e
 			}
 		}
@@ -109,7 +109,7 @@ func (op *Splice) spliceText(run rt.Runtime, vs rt.Value) (ret []string, err err
 			ret = generic.CopyStrings(els[i:j])
 			newVals := append(els[:i], append(add, els[j:]...)...)
 			if e := run.SetField(object.Variables, op.List,
-				generic.NewStringSlice(newVals)); e != nil {
+				generic.StringsOf(newVals)); e != nil {
 				err = cmdError(op, e)
 			}
 		}

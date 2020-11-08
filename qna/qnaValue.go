@@ -42,9 +42,9 @@ func (f errorValue) Snapshot(run rt.Runtime) (_ rt.Value, err error) {
 }
 
 // temp, ideally.
-type evalValue struct{ store interface{} }
+type patternValue struct{ store interface{} }
 
-func (f evalValue) Snapshot(run rt.Runtime) (_ rt.Value, err error) {
+func (f patternValue) Snapshot(run rt.Runtime) (_ rt.Value, err error) {
 	err = errutil.New("pattern expected use of GetEvalByName")
 	return
 }

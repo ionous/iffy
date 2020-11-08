@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -40,8 +41,9 @@ func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret i
 			err = e
 		} else {
 			curr := int(num)
-			next := generic.NewInt(inc(curr, max))
-			if e := run.SetField(object.Counter, op.Seq, next); e != nil {
+			if next, e := generic.ValueOf(affine.Number, inc(curr, max)); e != nil {
+				err = e
+			} else if e := run.SetField(object.Counter, op.Seq, next); e != nil {
 				err = e
 			} else {
 				ret = curr

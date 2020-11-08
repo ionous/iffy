@@ -49,7 +49,7 @@ package list
 // 			} else if e := op.sortNumbers(run, els); e != nil {
 // 				err = e
 // 			} else {
-// 				newVals = generic.NewFloatSlice(els)
+// 				newVals = generic.FloatsOf(els)
 // 			}
 // 		case affine.TextList:
 // 			if els, e := vs.GetTextList(); e != nil {
@@ -57,7 +57,7 @@ package list
 // 			} else if e := op.sortText(run, els); e != nil {
 // 				err = e
 // 			} else {
-// 				newVals = generic.NewStringSlice(els)
+// 				newVals = generic.StringsOf(els)
 // 			}
 // 		default:
 // 			err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)

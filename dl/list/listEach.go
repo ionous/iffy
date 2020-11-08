@@ -68,15 +68,20 @@ func (op *Each) execute(run rt.Runtime) (err error) {
 				} else {
 					el.SetValue(at)
 					next := i + 1
-					index.SetValue(generic.NewInt(next))
-					if hasNext := next < cnt; !hasNext {
-						last.SetValue(generic.True)
-					}
-					if e := op.Go.Execute(run); e != nil {
+					if v, e := generic.ValueOf(affine.Number, next); e != nil {
 						err = e
 						break
+					} else {
+						index.SetValue(v)
+						if hasNext := next < cnt; !hasNext {
+							last.SetValue(generic.True)
+						}
+						if e := op.Go.Execute(run); e != nil {
+							err = e
+							break
+						}
+						first.SetValue(generic.False)
 					}
-					first.SetValue(generic.False)
 				}
 			}
 			run.PopScope()

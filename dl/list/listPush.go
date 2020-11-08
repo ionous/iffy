@@ -66,7 +66,7 @@ func (op *Push) pushList(run rt.Runtime, orig rt.Value) (ret rt.Value, err error
 		} else if res, e := pushNumbers(orig, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret = generic.NewFloatSlice(res)
+			ret  = generic.FloatsOf(res)
 		}
 	case affine.TextList:
 		if add, e := getNewStrings(run, op.Insert); e != nil {
@@ -74,7 +74,7 @@ func (op *Push) pushList(run rt.Runtime, orig rt.Value) (ret rt.Value, err error
 		} else if res, e := pushText(orig, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret = generic.NewStringSlice(res)
+			ret = generic.StringsOf(res)
 		}
 	default:
 		err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)

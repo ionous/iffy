@@ -82,7 +82,7 @@ func (g *listTime) GetField(target, field string) (ret rt.Value, err error) {
 	if target != object.Variables || field != "strings" {
 		ret, err = g.ScopeStack.GetField(target, field)
 	} else {
-		ret = generic.NewStringSlice(g.strings)
+		ret  = generic.StringsOf(g.strings)
 	}
 	return
 }

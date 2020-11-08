@@ -90,7 +90,7 @@ func TestListOperations(t *testing.T) {
 // 		err = rt.UnknownField{target, field}
 // 	} else {
 // 		v := m.counters[field]
-// 		ret = generic.NewInt(v)
+// 		ret = generic.FloatOf(v)
 // 	}
 // 	return
 // }

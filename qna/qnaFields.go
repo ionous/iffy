@@ -124,7 +124,7 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 			if x, e := n.GetField(target, field); e != nil {
 				err = e
 			} else {
-				val, err = generic.MakeDefault(&n.kinds, x.Affinity(), x.Type())
+				val, err = generic.DefaultFor(&n.kinds, x.Affinity(), x.Type())
 			}
 		}
 		if err == nil {
@@ -159,7 +159,7 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 			} else {
 				// recurse...
 				targetAspect := keyType{key.target, aspect}
-				err = n.setField(targetAspect, generic.NewString(key.field))
+				err = n.setField(targetAspect, generic.StringOf(key.field))
 			}
 		}
 	case rt.UnknownField:
@@ -184,7 +184,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	// this automatically keeps them from conflicting.
 	key := makeKeyForEval(name, rtype.Name())
 	if q, ok := n.pairs[key]; ok {
-		eval := q.snapper.(evalValue).store
+		eval := q.snapper.(patternValue).store
 		rval := r.ValueOf(eval)
 		outVal.Set(rval)
 	} else {
@@ -198,7 +198,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 			err = e
 		}
 		// see notes: in theory GetEvalByName with
-		n.pairs[key] = qnaValue{snapper: evalValue{store}}
+		n.pairs[key] = qnaValue{snapper: patternValue{store}}
 	}
 	return
 }
@@ -284,7 +284,8 @@ func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 				} else {
 					// return whether the object's aspect equals the specified trait.
 					// ( we dont cache this value because multiple things can change it )
-					ret = qnaValue{affine.Bool, staticValue{generic.NewBool(trait == field)}}
+					v := generic.BoolOf(trait == field)
+					ret = qnaValue{affine.Bool, staticValue{v}}
 				}
 			}
 		}
@@ -299,23 +300,31 @@ func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret 
 	var a affine.Affinity
 	switch e := q.QueryRow(args...).Scan(&raw, &a); e {
 	case nil:
-		var p snapper
-		switch a {
-		case affine.Bool:
-			p, err = newBoolValue(raw)
-		case affine.Number:
-			p, err = newNumValue(raw)
-		case affine.Text:
-			p, err = newTextValue(raw)
-		case affine.Object:
-			p, err = newObjectValue(n, raw)
+		switch v := raw.(type) {
+		case []byte:
+			if p, e := newEval(a, v); e != nil {
+				err = e
+			} else {
+				ret = n.store(key, a, p)
+			}
+
 		default:
-			err = errutil.Fmt("unknown affinity %q", a)
-		}
-		if err == nil {
-			ret = n.store(key, a, p)
+			if a == affine.Object {
+				if p, e := newObjectValue(n, raw); e != nil {
+					err = e
+				} else {
+					ret = n.store(key, a, p)
+				}
+			} else {
+				if v, e := generic.ValueOf(a, v); e != nil {
+					err = e
+				} else {
+					ret = n.store(key, a, staticValue{v})
+				}
+			}
 		}
 	case sql.ErrNoRows:
+		// empty storage is okay.
 		ret = n.store(key, a, errorValue{key.unknown()})
 	default:
 		err = errutil.New("runtime error:", e)

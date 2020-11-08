@@ -6,13 +6,15 @@ import (
 )
 
 func SliceFloats(vs []float64) rt.Iterator {
-	return chain.SliceIt(len(vs), func(i int) (rt.Value, error) {
-		return NewFloat(vs[i]), nil
+	return chain.SliceIt(len(vs), func(i int) (ret rt.Value, err error) {
+		ret = FloatOf(vs[i])
+		return
 	})
 }
 
 func SliceStrings(vs []string) rt.Iterator {
-	return chain.SliceIt(len(vs), func(i int) (rt.Value, error) {
-		return NewString(vs[i]), nil
+	return chain.SliceIt(len(vs), func(i int) (ret rt.Value, err error) {
+		ret = StringOf(vs[i])
+		return
 	})
 }

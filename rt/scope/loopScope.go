@@ -2,6 +2,7 @@ package scope
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/generic"
@@ -66,11 +67,11 @@ func (l *loopScope) GetField(target, field string) (ret rt.Value, err error) {
 		case l.varName:
 			ret = l.varValue
 		case "index":
-			ret = generic.NewInt(l.currIndex)
+			ret, err = generic.ValueOf(affine.Number, l.currIndex)
 		case "first":
-			ret = generic.NewBool(l.currIndex == 1)
+			ret = generic.BoolOf(l.currIndex == 1)
 		case "last":
-			ret = generic.NewBool(!l.hasNext)
+			ret = generic.BoolOf(!l.hasNext)
 		default:
 			err = rt.UnknownField{target, field}
 		}

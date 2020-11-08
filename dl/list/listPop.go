@@ -73,10 +73,10 @@ func (op *Pop) popNumbers(run rt.Runtime, terms *term.Terms, vs rt.Value) (err e
 			remove, remain = els[last], els[:last]
 		}
 		if e := run.SetField(object.Variables, op.List,
-			generic.NewFloatSlice(remain)); e != nil {
+			generic.FloatsOf(remain)); e != nil {
 			err = e
 		} else {
-			terms.AddTerm("num", generic.NewFloat(remove))
+			terms.AddTerm("num", generic.FloatOf(remove))
 		}
 	}
 	return
@@ -95,10 +95,10 @@ func (op *Pop) popText(run rt.Runtime, terms *term.Terms, vs rt.Value) (err erro
 			remove, remain = els[last], els[:last]
 		}
 		if e := run.SetField(object.Variables, op.List,
-			generic.NewStringSlice(remain)); e != nil {
+			generic.StringsOf(remain)); e != nil {
 			err = e
 		} else {
-			terms.AddTerm("text", generic.NewString(remove))
+			terms.AddTerm("text", generic.StringOf(remove))
 		}
 	}
 	return
