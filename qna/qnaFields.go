@@ -118,7 +118,8 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 		target == object.Counter; !writable {
 		err = errutil.Fmt("can't change reserved field '%s.%s'", target, field)
 	} else {
-		// fix? implement a proper move
+		// use nil to indicate an erasure to a default value.
+		// fix? implement a proper move.
 		if val == nil {
 			if x, e := n.GetField(target, field); e != nil {
 				err = e
@@ -163,12 +164,13 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 		}
 	case rt.UnknownField:
 		// didnt refer to a trait, so just set the field normally.
+		// ( to set the field, we get the field to verify it exists, and to check affinity )
 		if q, e := n.cacheField(key); e != nil {
 			err = e
 		} else if a := q.Affinity(); a != val.Affinity() {
 			err = errutil.New("value is not", a)
 		} else {
-			n.pairs[key] = val
+			n.pairs[key] = qnaValue{a, staticValue{val}}
 		}
 	}
 	return
@@ -182,9 +184,9 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	// this automatically keeps them from conflicting.
 	key := makeKeyForEval(name, rtype.Name())
 	if q, ok := n.pairs[key]; ok {
-		eval := q.(*evalValue).eval
-		store := r.ValueOf(eval)
-		outVal.Set(store)
+		eval := q.snapper.(evalValue).store
+		rval := r.ValueOf(eval)
+		outVal.Set(rval)
 	} else {
 		var store interface{}
 		switch e := n.fields.progBytes.QueryRow(key.target, key.field).Scan(&tables.GobScanner{outVal}); e {
@@ -196,7 +198,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 			err = e
 		}
 		// see notes: in theory GetEvalByName with
-		n.pairs[key] = &evalValue{run: n, eval: store}
+		n.pairs[key] = qnaValue{snapper: evalValue{store}}
 	}
 	return
 }
@@ -219,12 +221,12 @@ func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
 
 // check the cache before asking the database for info
 func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
-	if q, ok := n.pairs[key]; !ok {
-		ret, err = n.cacheField(key)
-	} else if q == nil {
-		err = key.unknown()
+	if q, ok := n.pairs[key]; ok {
+		ret, err = q.Snapshot(n)
+	} else if q, e := n.cacheField(key); e == nil {
+		ret, err = q.Snapshot(n)
 	} else {
-		ret = q
+		err = e
 	}
 	return
 }
@@ -232,30 +234,24 @@ func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
 // when we know that the field is not a reserved field, and we just want to check the value.
 // ie. for aspects
 func (n *Runner) getValue(key keyType) (ret rt.Value, err error) {
-	if q, ok := n.pairs[key]; !ok {
-		ret, err = n.cacheQuery(key, n.fields.valueOf, key.target, key.field)
-	} else if q == nil {
-		err = key.unknown()
+	if q, ok := n.pairs[key]; ok {
+		ret, err = q.Snapshot(n)
+	} else if q, e := n.cacheQuery(key, n.fields.valueOf, key.target, key.field); e == nil {
+		ret, err = q.Snapshot(n)
 	} else {
-		ret = q
+		err = e
 	}
 	return
 }
 
-func (n *Runner) cacheField(key keyType) (ret rt.Value, err error) {
+func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 	switch target, field := key.target, key.field; target {
 	case object.Name:
 		// search for the object name using the object's id
 		ret, err = n.cacheQuery(key, n.fields.nameOf, field)
 
 	case object.Value:
-		switch v, e := n.cacheQuery(key, n.fields.objOf, field); e.(type) {
-		default:
-			ret, err = v, e
-		case rt.UnknownField:
-			err = rt.UnknownObject(field)
-		}
-		//
+		ret, err = n.cacheQuery(key, n.fields.objOf, field)
 
 	case object.Aspect:
 		// used internally: return the name of an aspect for a trait
@@ -288,7 +284,7 @@ func (n *Runner) cacheField(key keyType) (ret rt.Value, err error) {
 				} else {
 					// return whether the object's aspect equals the specified trait.
 					// ( we dont cache this value because multiple things can change it )
-					ret = generic.NewBool(trait == field)
+					ret = qnaValue{affine.Bool, staticValue{generic.NewBool(trait == field)}}
 				}
 			}
 		}
@@ -298,22 +294,37 @@ func (n *Runner) cacheField(key keyType) (ret rt.Value, err error) {
 
 // query the db and store the returned value in the cache.
 // note: all of the queries are expected to return two parts: the value and the typeName.
-func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret rt.Value, err error) {
+func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret qnaValue, err error) {
 	var raw interface{}
 	var a affine.Affinity
 	switch e := q.QueryRow(args...).Scan(&raw, &a); e {
 	case nil:
-		if v, e := newValue(n, a, raw); e != nil {
-			err = e
-		} else {
-			n.pairs[key] = v
-			ret = v
+		var p snapper
+		switch a {
+		case affine.Bool:
+			p, err = newBoolValue(raw)
+		case affine.Number:
+			p, err = newNumValue(raw)
+		case affine.Text:
+			p, err = newTextValue(raw)
+		case affine.Object:
+			p, err = newObjectValue(n, raw)
+		default:
+			err = errutil.Fmt("unknown affinity %q", a)
+		}
+		if err == nil {
+			ret = n.store(key, a, p)
 		}
 	case sql.ErrNoRows:
-		n.pairs[key] = nil
-		err = key.unknown()
+		ret = n.store(key, a, errorValue{key.unknown()})
 	default:
 		err = errutil.New("runtime error:", e)
 	}
 	return
+}
+
+func (n *Runner) store(key keyType, a affine.Affinity, p snapper) qnaValue {
+	val := qnaValue{a, p}
+	n.pairs[key] = val
+	return val
 }

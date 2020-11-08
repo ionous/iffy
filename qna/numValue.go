@@ -6,29 +6,34 @@ import (
 	"github.com/ionous/iffy/rt/generic"
 )
 
-type numEval struct{ evalValue }
+type numEval struct{ eval rt.NumberEval }
 
-// GetText, or error if the underlying value isn't represented by a string.
-func (q *numEval) GetNumber() (float64, error) {
-	return rt.GetNumber(q.run, q.eval.(rt.NumberEval))
+// GetNumber, or error if the underlying value isn't a number
+func (q numEval) Snapshot(run rt.Runtime) (ret rt.Value, err error) {
+	if v, e := rt.GetNumber(run, q.eval); e != nil {
+		err = e
+	} else {
+		ret = generic.NewFloat(v)
+	}
+	return
 }
 
-func newNumValue(run rt.Runtime, v interface{}) (ret rt.Value, err error) {
+func newNumValue(v interface{}) (ret snapper, err error) {
 	switch a := v.(type) {
 	case nil: // zero value for unhandled defaults in sqlite
-		ret = generic.Zero
+		ret = staticValue{generic.Zero}
 	case int:
-		ret = generic.NewInt(a)
+		ret = staticValue{generic.NewInt(a)}
 	case int64:
-		ret = generic.NewFloat(float64(a))
+		ret = staticValue{generic.NewFloat(float64(a))}
 	case float64:
-		ret = generic.NewFloat(a)
+		ret = staticValue{generic.NewFloat(a)}
 	case []byte:
 		var eval rt.NumberEval
 		if e := bytesToEval(a, &eval); e != nil {
 			err = e
 		} else {
-			ret = &numEval{evalValue{run: run, eval: eval}}
+			ret = numEval{eval}
 		}
 	default:
 		err = errutil.New("expected num value, got %v(%T)", v, v)

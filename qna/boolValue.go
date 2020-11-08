@@ -6,30 +6,34 @@ import (
 	"github.com/ionous/iffy/rt/generic"
 )
 
-type boolEval struct{ evalValue }
+type boolEval struct{ eval rt.BoolEval }
 
-// GetBool, or error if the underlying value isn't a bool
-func (q *boolEval) GetBool() (bool, error) {
-	return rt.GetBool(q.run, q.eval.(rt.BoolEval))
+func (q boolEval) Snapshot(run rt.Runtime) (ret rt.Value, err error) {
+	if v, e := rt.GetBool(run, q.eval); e != nil {
+		err = e
+	} else {
+		ret = generic.NewBool(v)
+	}
+	return
 }
 
-func newBoolValue(run rt.Runtime, v interface{}) (ret rt.Value, err error) {
+func newBoolValue(v interface{}) (ret snapper, err error) {
 	switch a := v.(type) {
 	case nil: // zero value for unhandled defaults in sqlite
-		ret = generic.False // fix? could also return some predefined "constants" for true,false,and... for the other types, nil
+		ret = staticValue{generic.False}
 	case bool:
-		ret = generic.NewBool(a)
+		ret = staticValue{generic.NewBool(a)}
 	case int64: // sqlite, boolean values can be represented as 1/0
-		ret = generic.NewBool(a != 0)
+		ret = staticValue{generic.NewBool(a != 0)}
 	case []byte:
 		var eval rt.BoolEval
 		if e := bytesToEval(a, &eval); e != nil {
 			err = e
 		} else {
-			ret = &boolEval{evalValue{run: run, eval: eval}}
+			ret = &boolEval{eval}
 		}
 	default:
-		err = errutil.New("expected boolean value, got %v(%T)", v, v)
+		err = errutil.Fmt("expected boolean value, got %v(%T)", v, v)
 	}
 	return
 }

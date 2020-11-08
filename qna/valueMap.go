@@ -2,6 +2,7 @@ package qna
 
 import (
 	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -9,10 +10,15 @@ type keyType struct {
 	target, field string
 }
 
-type valueMap map[keyType]rt.Value
+type valueMap map[keyType]qnaValue
 
-func (k *keyType) unknown() error {
-	return rt.UnknownField{k.target, k.field}
+func (k *keyType) unknown() (err error) {
+	if k.target == object.Value {
+		err = rt.UnknownObject(k.field)
+	} else {
+		err = rt.UnknownField{k.target, k.field}
+	}
+	return
 }
 
 // subField should be one of the package object prefixes

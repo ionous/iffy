@@ -26,7 +26,7 @@ func (e UnknownObject) Error() string {
 }
 
 func (e UnknownTarget) Error() string {
-	return errutil.Sprintf("field not found %q", e.Target)
+	return errutil.Sprintf("target not found %q", e.Target)
 }
 
 func (e UnknownField) Error() string {

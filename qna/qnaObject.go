@@ -10,16 +10,21 @@ import (
 
 type qnaObject struct {
 	generic.Nothing
-	n  *Runner // for fields cache
+	n  *Runner // for pointing back to the field cache
 	id string
 }
 
-func newObjectValue(run *Runner, v interface{}) (ret rt.Value, err error) {
+func newObjectValue(run *Runner, v interface{}) (ret snapper, err error) {
 	if id, ok := v.(string); !ok {
 		err = errutil.New("expected id value, got %v(%T)", v, v)
 	} else {
 		ret = &qnaObject{n: run, id: id}
 	}
+	return
+}
+
+func (q *qnaObject) Snapshot(rt.Runtime) (ret rt.Value, err error) {
+	ret = q
 	return
 }
 
