@@ -174,11 +174,11 @@ func innerParse(log Log, ctx Context, match Scanner, in []string, goals []Goal) 
 		} else if g, ok := goal.(*ActionGoal); !ok {
 			err = errutil.Fmt("unexpected goal %s %T for result %v", in, goal, pretty.Sprint(res))
 		} else if list, ok := res.(*ResultList); !ok {
-			err = errutil.New("expected result list %T", res)
+			err = errutil.Fmt("expected result list %T", res)
 		} else if last, ok := list.Last(); !ok {
 			err = errutil.New("result list was empty")
 		} else if act, ok := last.(ResolvedAction); !ok {
-			err = errutil.New("expected resolved action %T", last)
+			err = errutil.Fmt("expected resolved action %T", last)
 		} else if !strings.EqualFold(act.Name, g.Action) {
 			err = errutil.New("expected action", act, "got", g.Action)
 		} else {

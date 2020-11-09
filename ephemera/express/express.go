@@ -231,7 +231,7 @@ func (c *Converter) buildSpan(arity int) (err error) {
 			case rt.TextEval:
 				txts = append(txts, el)
 			default:
-				e := errutil.New("argument %T is not a text eval", el)
+				e := errutil.Fmt("argument %T is not a text eval", el)
 				err = errutil.Append(err, e)
 			}
 		}

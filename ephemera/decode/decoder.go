@@ -43,7 +43,7 @@ func (dec *Decoder) AddCallback(cmd composer.Slat, cb ReadRet) {
 	spec := cmd.Compose()
 	elem := r.TypeOf(cmd).Elem()
 	if n := spec.Name; len(n) == 0 {
-		panic(errutil.New("missing name for spec %q", elem))
+		panic(errutil.Fmt("missing name for spec %q", elem))
 	} else if was, exists := dec.cmds[n]; exists && was.customReader != nil {
 		panic(errutil.Fmt("conflicting name for spec %q %q!=%q", n, was.elem, elem))
 	} else {

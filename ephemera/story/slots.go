@@ -25,7 +25,7 @@ func slotName(i interface{}) (ret string, err error) {
 			}
 		}
 		if !found {
-			err = errutil.New("couldnt determine matching slot %T", i)
+			err = errutil.Fmt("couldnt determine matching slot %T", i)
 		}
 	}
 	return

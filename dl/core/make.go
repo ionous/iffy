@@ -31,7 +31,7 @@ package core
 // 	if rec, e := run.MakeRecord(op.kind); e != nil {
 // 		err = e
 // 	} else if fixme, ok := rec.(*generic.Record); !ok {
-// 		err = errutil.New("unexpected record type %T", rec)
+// 		err = errutil.Fmt("unexpected record type %T", rec)
 // 	} else {
 // 		for _, a := range op.Arguments.Args {
 // 			if val, e := a.GetAssignedValue(run); e != nil {

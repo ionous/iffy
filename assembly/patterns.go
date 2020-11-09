@@ -114,7 +114,7 @@ func (now *patternInfo) compare(was *patternInfo, pret *string) (err error) {
 			err = errutil.Fmt("Pattern %q's %q missing declaration", now.pat, now.arg)
 		} else if !change && (now.typ != was.typ) {
 			// regardless -- types should be consistent.
-			err = errutil.New("Pattern %q's %q type conflict, was %q now %q", now.pat, now.arg, was.typ, now.typ)
+			err = errutil.Fmt("Pattern %q's %q type conflict, was %q now %q", now.pat, now.arg, was.typ, now.typ)
 		} else if now.decl && now.pat == now.arg {
 			// assuming everything's ok, a decl where pat and arg match means the type of the pattern itself.
 			*pret = now.typ
