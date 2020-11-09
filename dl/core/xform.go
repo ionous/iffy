@@ -73,6 +73,10 @@ type MakeSentenceCase struct {
 	Text rt.TextEval
 }
 
+type MakeReversed struct {
+	Text rt.TextEval
+}
+
 // Compose defines a spec for the composer editor.
 func (*MakeUppercase) Compose() composer.Spec {
 	return composer.Spec{
@@ -117,6 +121,17 @@ func (*MakeSentenceCase) Compose() composer.Spec {
 	}
 }
 
+// Compose defines a spec for the composer editor.
+func (*MakeReversed) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "make_reversed",
+		Group: "format",
+		Desc: `Reverse text: returns new text flipped back to front. 
+		For example, "elppA" from "Apple", or "noon" from "noon".`,
+		Spec: "{text:text_eval} in reverse",
+	}
+}
+
 func (op *MakeLowercase) GetText(run rt.Runtime) (ret string, err error) {
 	if t, e := rt.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
@@ -149,6 +164,20 @@ func (op *MakeSentenceCase) GetText(run rt.Runtime) (ret string, err error) {
 		err = cmdError(op, e)
 	} else if len(t) > 0 {
 		ret = lang.SentenceCase(t)
+	}
+	return
+}
+
+func (op *MakeReversed) GetText(run rt.Runtime) (ret string, err error) {
+	if t, e := rt.GetText(run, op.Text); e != nil {
+		err = cmdError(op, e)
+	} else {
+		a := []rune(t)
+		for i := len(a)/2 - 1; i >= 0; i-- {
+			opp := len(a) - 1 - i
+			a[i], a[opp] = a[opp], a[i]
+		}
+		ret = string(a)
 	}
 	return
 }

@@ -76,8 +76,6 @@ var Slats = []composer.Slat{
 	(*PrintNum)(nil),
 	(*PrintNumWord)(nil),
 
-	// (*LenOfNumbers)(nil),
-	// (*LenOfTexts)(nil),
 	(*Range)(nil),
 
 	// FIX: should take a speaker, and we should have a default speaker
@@ -94,6 +92,7 @@ var Slats = []composer.Slat{
 	(*MakeLowercase)(nil),
 	(*MakeTitleCase)(nil),
 	(*MakeSentenceCase)(nil),
+	(*MakeReversed)(nil),
 	//
 	(*Matches)(nil),
 	(*MatchLike)(nil),
