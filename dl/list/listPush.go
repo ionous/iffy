@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Push struct {
@@ -58,7 +58,7 @@ func (op *Push) push(run rt.Runtime) (ret int, err error) {
 	return
 }
 
-func (op *Push) pushList(run rt.Runtime, vs rt.Value) (ret rt.Value, err error) {
+func (op *Push) pushList(run rt.Runtime, vs g.Value) (ret g.Value, err error) {
 	switch a := vs.Affinity(); a {
 	case affine.NumList:
 		if add, e := getNewFloats(run, op.Insert); e != nil {
@@ -66,7 +66,7 @@ func (op *Push) pushList(run rt.Runtime, vs rt.Value) (ret rt.Value, err error) 
 		} else if res, e := pushNumbers(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret = generic.FloatsOf(res)
+			ret = g.FloatsOf(res)
 		}
 	case affine.TextList:
 		if add, e := getNewStrings(run, op.Insert); e != nil {
@@ -74,7 +74,7 @@ func (op *Push) pushList(run rt.Runtime, vs rt.Value) (ret rt.Value, err error) 
 		} else if res, e := pushText(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret = generic.StringsOf(res)
+			ret = g.StringsOf(res)
 		}
 	case affine.RecordList:
 		t := vs.Type()
@@ -83,7 +83,7 @@ func (op *Push) pushList(run rt.Runtime, vs rt.Value) (ret rt.Value, err error) 
 		} else if res, e := pushRecords(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret, err = generic.ValueFor(res, a, t)
+			ret, err = g.ValueFor(res, a, t)
 		}
 	default:
 		err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)
@@ -91,7 +91,7 @@ func (op *Push) pushList(run rt.Runtime, vs rt.Value) (ret rt.Value, err error) 
 	return
 }
 
-func pushNumbers(vs rt.Value, add []float64, front bool) (ret []float64, err error) {
+func pushNumbers(vs g.Value, add []float64, front bool) (ret []float64, err error) {
 	if vs, e := vs.GetNumList(); e != nil {
 		err = e
 	} else if front {
@@ -102,7 +102,7 @@ func pushNumbers(vs rt.Value, add []float64, front bool) (ret []float64, err err
 	return
 }
 
-func pushText(vs rt.Value, add []string, front bool) (ret []string, err error) {
+func pushText(vs g.Value, add []string, front bool) (ret []string, err error) {
 	if vs, e := vs.GetTextList(); e != nil {
 		err = e
 	} else if front {
@@ -113,7 +113,7 @@ func pushText(vs rt.Value, add []string, front bool) (ret []string, err error) {
 	return
 }
 
-func pushRecords(vs rt.Value, add []rt.Value, front bool) (ret []rt.Value, err error) {
+func pushRecords(vs g.Value, add []*g.Record, front bool) (ret []*g.Record, err error) {
 	if vs, e := vs.GetRecordList(); e != nil {
 		err = e
 	} else if front {

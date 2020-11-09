@@ -6,7 +6,7 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 func TestScopeStack(t *testing.T) {
@@ -51,7 +51,7 @@ func TestScopeStack(t *testing.T) {
 			//
 			if want := count[i]; want != have {
 				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
-			} else if n, e := generic.ValueOf(affine.Number, have+1); e != nil {
+			} else if n, e := g.ValueOf(affine.Number, have+1); e != nil {
 				t.Fatal(e)
 			} else {
 				switch e := stack.SetField(object.Variables, name, n); e.(type) {
@@ -102,19 +102,19 @@ type mockScope struct {
 	val        int
 }
 
-func (k *mockScope) GetField(target, field string) (ret rt.Value, err error) {
+func (k *mockScope) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
 	} else if field != k.name {
 		err = rt.UnknownField{target, field}
 	} else {
 		k.gets++
-		ret, err = generic.ValueOf(affine.Number, k.val)
+		ret, err = g.ValueOf(affine.Number, k.val)
 	}
 	return
 }
 
-func (k *mockScope) SetField(target, field string, v rt.Value) (err error) {
+func (k *mockScope) SetField(target, field string, v g.Value) (err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
 	} else if field != k.name {

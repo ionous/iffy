@@ -1,6 +1,7 @@
 package rt
 
 import (
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/writer"
 )
 
@@ -9,23 +10,23 @@ import (
 // The objects and their fields depend on implementation and context.
 // See package object for a variety of common objects.
 type Scope interface {
-	GetField(object, field string) (Value, error)
+	GetField(object, field string) (g.Value, error)
 	// Store, or at least attempt to store, the passed value at the named field in the named object.
 	// It may return an error if the value is not of a compatible type,
 	// if its considered to be read-only, or if there is no predeclared value of that name.
-	SetField(object, field string, value Value) error
+	SetField(object, field string, value g.Value) error
 }
 
 type Notary interface {
 	// create a new field set from the named kind.
 	// an implementation might only support the creation of some kinds.
-	Make(kind string) (Value, error)
+	Make(kind string) (g.Value, error)
 	// copy the contents of the passed value into a new value.
-	Copy(Value) (Value, error)
+	Copy(g.Value) (g.Value, error)
 	// move the contents of the passed value into a new value.
 	// the fields of the old value are left at defaults
 	// currently implemented as SetField with a null value
-	// Move(Value) (Value, error)
+	// Move(g.Value) (g.Value, error)
 }
 
 // Runtime environment for an in-progress game.

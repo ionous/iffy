@@ -18,7 +18,7 @@ package core
 // 	return nil // unknown
 // }
 
-// func (op *MakeRecord) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+// func (op *MakeRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 // 	if v, e := op.getAssignedValue(run); e != nil {
 // 		err = cmdError(err, e)
 // 	} else {
@@ -27,10 +27,10 @@ package core
 // 	return
 // }
 
-// func (op *MakeRecord) getAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+// func (op *MakeRecord) getAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 // 	if rec, e := run.MakeRecord(op.kind); e != nil {
 // 		err = e
-// 	} else if fixme, ok := rec.(*generic.Record); !ok {
+// 	} else if fixme, ok := rec.(*g.Record); !ok {
 // 		err = errutil.Fmt("unexpected record type %T", rec)
 // 	} else {
 // 		for _, a := range op.Arguments.Args {

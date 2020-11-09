@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Slice struct {
@@ -69,7 +70,7 @@ func (op *Slice) GetTextList(run rt.Runtime) (ret []string, err error) {
 	return
 }
 
-func (op *Slice) sliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err error) {
+func (op *Slice) sliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err error) {
 	if els, e := vs.GetNumList(); e != nil {
 		err = e
 	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
@@ -80,7 +81,7 @@ func (op *Slice) sliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err e
 	return
 }
 
-func (op *Slice) sliceText(run rt.Runtime, vs rt.Value) (ret []string, err error) {
+func (op *Slice) sliceText(run rt.Runtime, vs g.Value) (ret []string, err error) {
 	if els, e := vs.GetTextList(); e != nil {
 		err = e
 	} else if i, j, e := op.getIndices(run, len(els)); e != nil {

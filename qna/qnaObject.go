@@ -5,11 +5,11 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type qnaObject struct {
-	generic.Nothing
+	g.Nothing
 	n  *Runner // for pointing back to the field cache
 	id string
 }
@@ -23,7 +23,7 @@ func newObjectValue(run *Runner, v interface{}) (ret snapper, err error) {
 	return
 }
 
-func (q *qnaObject) Snapshot(rt.Runtime) (ret rt.Value, err error) {
+func (q *qnaObject) Snapshot(rt.Runtime) (ret g.Value, err error) {
 	ret = q
 	return
 }
@@ -39,7 +39,7 @@ func (q *qnaObject) Type() string {
 	return "object{}"
 }
 
-func (q *qnaObject) GetNamedField(field string) (ret rt.Value, err error) {
+func (q *qnaObject) GetNamedField(field string) (ret g.Value, err error) {
 	// fix temp:
 	var key keyType
 	switch field {
@@ -52,7 +52,7 @@ func (q *qnaObject) GetNamedField(field string) (ret rt.Value, err error) {
 	return q.n.getField(key)
 }
 
-func (q *qnaObject) SetNamedField(field string, val rt.Value) (err error) {
+func (q *qnaObject) SetNamedField(field string, val g.Value) (err error) {
 	if len(field) == 0 {
 		err = errutil.Fmt("no field specified")
 	} else if writable := field[0] != object.Prefix; !writable {

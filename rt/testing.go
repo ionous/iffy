@@ -1,6 +1,7 @@
 package rt
 
 import (
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/writer"
 )
 
@@ -15,16 +16,16 @@ func (Panic) ActivateDomain(name string, enable bool) {
 func (Panic) GetEvalByName(string, interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) Make(string) (Value, error) {
+func (Panic) Make(string) (g.Value, error) {
 	panic("Runtime panic")
 }
-func (Panic) Copy(Value) (Value, error) {
+func (Panic) Copy(g.Value) (g.Value, error) {
 	panic("Runtime panic")
 }
-func (Panic) GetField(target, field string) (Value, error) {
+func (Panic) GetField(target, field string) (g.Value, error) {
 	panic("Runtime panic")
 }
-func (Panic) SetField(target, field string, v Value) error {
+func (Panic) SetField(target, field string, v g.Value) error {
 	panic("Runtime panic")
 }
 func (Panic) Writer() writer.Output {
@@ -39,7 +40,7 @@ func (Panic) PushScope(Scope) {
 func (Panic) PopScope() {
 	panic("Runtime panic")
 }
-func (Panic) MakeRecord(kind string) (Value, error) {
+func (Panic) MakeRecord(kind string) (g.Value, error) {
 	panic("Runtime panic")
 }
 func (Panic) Random(inclusiveMin, exclusiveMax int) int {

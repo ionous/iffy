@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // these definitions mirror modeling statements in iffy.js
@@ -33,6 +34,6 @@ func (*SimpleNoun) Compose() composer.Spec {
 // 	return op.GetObjectValue(run)
 // }
 
-func (op *SimpleNoun) GetObjectValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *SimpleNoun) GetObjectValue(run rt.Runtime) (ret g.Value, err error) {
 	return getObjectInexactly(run, string(op.Name))
 }

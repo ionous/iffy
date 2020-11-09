@@ -8,7 +8,7 @@ import (
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Each struct {
@@ -42,24 +42,24 @@ func (op *Each) execute(run rt.Runtime) (err error) {
 	} else if act := op.Go; act != nil && cnt > 0 {
 		//
 		var field string
-		var zero rt.Value
+		var zero g.Value
 		//
 		switch a := vs.Affinity(); a {
 		case affine.NumList:
 			field = "num"
-			zero = generic.Zero
+			zero = g.Zero
 		case affine.TextList:
 			field = "text"
-			zero = generic.Empty
+			zero = g.Empty
 		default:
 			err = errutil.Fmt("variable '%s(%s)' is an unknown list", op.List, a)
 		}
 		if err == nil {
 			var terms term.Terms
 			el := terms.AddTerm(field, zero)
-			index := terms.AddTerm("index", generic.Zero)
-			first := terms.AddTerm("first", generic.True)
-			last := terms.AddTerm("last", generic.False)
+			index := terms.AddTerm("index", g.Zero)
+			first := terms.AddTerm("first", g.True)
+			last := terms.AddTerm("last", g.False)
 			run.PushScope(&terms)
 			for i := 0; i < cnt; i++ {
 				if at, e := vs.GetIndex(i); e != nil {
@@ -68,19 +68,19 @@ func (op *Each) execute(run rt.Runtime) (err error) {
 				} else {
 					el.SetValue(at)
 					next := i + 1
-					if v, e := generic.ValueOf(affine.Number, next); e != nil {
+					if v, e := g.ValueOf(affine.Number, next); e != nil {
 						err = e
 						break
 					} else {
 						index.SetValue(v)
 						if hasNext := next < cnt; !hasNext {
-							last.SetValue(generic.True)
+							last.SetValue(g.True)
 						}
 						if e := op.Go.Execute(run); e != nil {
 							err = e
 							break
 						}
-						first.SetValue(generic.False)
+						first.SetValue(g.False)
 					}
 				}
 			}

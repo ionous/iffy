@@ -9,7 +9,7 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -110,7 +110,7 @@ func (n *Runner) IsLike(a, b string) (ret bool, err error) {
 	return
 }
 
-func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
+func (n *Runner) SetField(target, field string, val g.Value) (err error) {
 	if len(target) == 0 {
 		err = errutil.Fmt("no target specified for field %q", field)
 	} else if writable := target[0] != object.Prefix ||
@@ -124,7 +124,7 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 			if x, e := n.GetField(target, field); e != nil {
 				err = e
 			} else {
-				val, err = generic.DefaultFor(&n.kinds, x.Affinity(), x.Type())
+				val, err = g.DefaultFor(&n.kinds, x.Affinity(), x.Type())
 			}
 		}
 		if err == nil {
@@ -140,7 +140,7 @@ func (n *Runner) SetField(target, field string, val rt.Value) (err error) {
 	return
 }
 
-func (n *Runner) setField(key keyType, val rt.Value) (err error) {
+func (n *Runner) setField(key keyType, val g.Value) (err error) {
 	// first, check if the specified field refers to a trait
 	switch q, e := n.getField(key.dot(object.Aspect)); e.(type) {
 	default:
@@ -159,7 +159,7 @@ func (n *Runner) setField(key keyType, val rt.Value) (err error) {
 			} else {
 				// recurse...
 				targetAspect := keyType{key.target, aspect}
-				err = n.setField(targetAspect, generic.StringOf(key.field))
+				err = n.setField(targetAspect, g.StringOf(key.field))
 			}
 		}
 	case rt.UnknownField:
@@ -203,7 +203,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	return
 }
 
-func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
+func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 	switch v, e := n.ScopeStack.GetField(target, field); e.(type) {
 	default:
 		err = e
@@ -220,7 +220,7 @@ func (n *Runner) GetField(target, field string) (ret rt.Value, err error) {
 }
 
 // check the cache before asking the database for info
-func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
+func (n *Runner) getField(key keyType) (ret g.Value, err error) {
 	if q, ok := n.pairs[key]; ok {
 		ret, err = q.Snapshot(n)
 	} else if q, e := n.cacheField(key); e == nil {
@@ -233,7 +233,7 @@ func (n *Runner) getField(key keyType) (ret rt.Value, err error) {
 
 // when we know that the field is not a reserved field, and we just want to check the value.
 // ie. for aspects
-func (n *Runner) getValue(key keyType) (ret rt.Value, err error) {
+func (n *Runner) getValue(key keyType) (ret g.Value, err error) {
 	if q, ok := n.pairs[key]; ok {
 		ret, err = q.Snapshot(n)
 	} else if q, e := n.cacheQuery(key, n.fields.valueOf, key.target, key.field); e == nil {
@@ -284,7 +284,7 @@ func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 				} else {
 					// return whether the object's aspect equals the specified trait.
 					// ( we dont cache this value because multiple things can change it )
-					v := generic.BoolOf(trait == field)
+					v := g.BoolOf(trait == field)
 					ret = qnaValue{affine.Bool, staticValue{v}}
 				}
 			}
@@ -316,7 +316,7 @@ func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret 
 					ret = n.store(key, a, p)
 				}
 			} else {
-				if v, e := generic.ValueOf(a, v); e != nil {
+				if v, e := g.ValueOf(a, v); e != nil {
 					err = e
 				} else {
 					ret = n.store(key, a, staticValue{v})

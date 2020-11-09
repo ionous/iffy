@@ -8,7 +8,7 @@ import (
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
 )
 
@@ -78,30 +78,30 @@ func joinStrings(vs []string) (ret string) {
 	return
 }
 
-func (g *listTime) GetField(target, field string) (ret rt.Value, err error) {
+func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Variables || field != "strings" {
-		ret, err = g.ScopeStack.GetField(target, field)
+		ret, err = lt.ScopeStack.GetField(target, field)
 	} else {
-		ret  = generic.StringsOf(g.strings)
+		ret = g.StringsOf(lt.strings)
 	}
 	return
 }
 
-func (g *listTime) SetField(target, field string, value rt.Value) (err error) {
+func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
 	if target != object.Variables || field != "strings" {
-		err = g.ScopeStack.SetField(target, field, value)
+		err = lt.ScopeStack.SetField(target, field, value)
 	} else if vs, e := value.GetTextList(); e != nil {
 		err = e
 	} else {
-		g.strings = vs
+		lt.strings = vs
 	}
 	return
 }
 
-func (g *listTime) GetEvalByName(name string, pv interface{}) (err error) {
+func (lt *listTime) GetEvalByName(name string, pv interface{}) (err error) {
 	if name == "sort" {
 		ptr := pv.(*pattern.BoolPattern)
-		(*ptr) = *g.sort
+		(*ptr) = *lt.sort
 	}
 	return
 }

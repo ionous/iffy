@@ -1,6 +1,9 @@
 package rt
 
-import "github.com/ionous/errutil"
+import (
+	"github.com/ionous/errutil"
+	g "github.com/ionous/iffy/rt/generic"
+)
 
 // MissingEval error type for unknown variables while processing loops.
 type MissingEval string
@@ -144,7 +147,7 @@ func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 	return
 }
 
-func CompactNumbers(it Iterator, vals []float64) (ret []float64, err error) {
+func CompactNumbers(it g.Iterator, vals []float64) (ret []float64, err error) {
 	for it.HasNext() {
 		if n, e := it.GetNext(); e != nil {
 			err = e
@@ -162,7 +165,7 @@ func CompactNumbers(it Iterator, vals []float64) (ret []float64, err error) {
 	return
 }
 
-func CompactTexts(it Iterator, vals []string) (ret []string, err error) {
+func CompactTexts(it g.Iterator, vals []string) (ret []string, err error) {
 	for it.HasNext() {
 		if n, e := it.GetNext(); e != nil {
 			err = e

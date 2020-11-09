@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/ionous/iffy/affine"
-	"github.com/ionous/iffy/rt"
 )
 
 // we bake it down for faster, easier indexed access.
@@ -28,7 +27,7 @@ func NewKind(kinds Kinds, name string, fields []Field) *Kind {
 }
 
 func (k *Kind) NewRecord() *Record {
-	return &Record{kind: k, values: make([]rt.Value, len(k.fields))}
+	return &Record{kind: k, values: make([]Value, len(k.fields))}
 }
 
 func (k *Kind) NewRecordSlice() *RecordSlice {

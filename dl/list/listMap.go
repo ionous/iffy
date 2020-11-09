@@ -6,7 +6,7 @@ import (
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/chain"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Map struct {
@@ -39,7 +39,7 @@ func (op *Map) execute(run rt.Runtime) (err error) {
 	} else {
 		// walk from generically
 		outType := toList.Type()
-		for it := chain.ListIt(fromList); it.HasNext(); {
+		for it := g.ListIt(fromList); it.HasNext(); {
 			if inVal, e := it.GetNext(); e != nil {
 				err = e
 				break
@@ -64,7 +64,7 @@ func (op *Map) execute(run rt.Runtime) (err error) {
 }
 
 // see also pattern.Stitch
-func (op *Map) mapOne(run rt.Runtime, pat pattern.ActivityPattern, inVal, outVal rt.Value) (err error) {
+func (op *Map) mapOne(run rt.Runtime, pat pattern.ActivityPattern, inVal, outVal g.Value) (err error) {
 	var parms term.Terms
 	if e := pat.Prepare(run, &parms); e != nil {
 		err = e

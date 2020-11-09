@@ -3,60 +3,60 @@ package qna
 import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type boolEval struct{ eval rt.BoolEval }
 
-func (q boolEval) Snapshot(run rt.Runtime) (ret rt.Value, err error) {
+func (q boolEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetBool(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret = generic.BoolOf(v)
+		ret = g.BoolOf(v)
 	}
 	return
 }
 
 type numEval struct{ eval rt.NumberEval }
 
-func (q numEval) Snapshot(run rt.Runtime) (ret rt.Value, err error) {
+func (q numEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetNumber(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret = generic.FloatOf(v)
+		ret = g.FloatOf(v)
 	}
 	return
 }
 
 type textEval struct{ eval rt.TextEval }
 
-func (q textEval) Snapshot(run rt.Runtime) (ret rt.Value, err error) {
+func (q textEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetText(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret = generic.StringOf(v)
+		ret = g.StringOf(v)
 	}
 	return
 }
 
 type numListEval struct{ eval rt.NumListEval }
 
-func (q numListEval) Snapshot(run rt.Runtime) (ret rt.Value, err error) {
+func (q numListEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetNumList(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret = generic.FloatsOf(v)
+		ret = g.FloatsOf(v)
 	}
 	return
 }
 
 type textListEval struct{ eval rt.TextListEval }
 
-func (q textListEval) Snapshot(run rt.Runtime) (ret rt.Value, err error) {
+func (q textListEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetTextList(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret = generic.StringsOf(v)
+		ret = g.StringsOf(v)
 	}
 	return
 }

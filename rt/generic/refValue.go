@@ -5,7 +5,6 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
-	"github.com/ionous/iffy/rt"
 )
 
 type refValue struct {
@@ -14,7 +13,7 @@ type refValue struct {
 	t string
 }
 
-var _ rt.Value = (*refValue)(nil)
+var _ Value = (*refValue)(nil)
 
 func (n refValue) Affinity() (ret affine.Affinity) {
 	return n.a
@@ -54,6 +53,15 @@ func (n refValue) GetText() (ret string, err error) {
 	return
 }
 
+func (n refValue) GetRecord() (ret *Record, err error) {
+	if v, ok := n.v.Interface().(*Record); !ok {
+		err = errutil.New("value is not a record")
+	} else {
+		ret = v
+	}
+	return
+}
+
 func (n refValue) GetNumList() (ret []float64, err error) {
 	if vs, ok := n.v.Interface().([]float64); !ok {
 		err = errutil.New("value is not a number list")
@@ -70,8 +78,8 @@ func (n refValue) GetTextList() (ret []string, err error) {
 	}
 	return
 }
-func (n refValue) GetRecordList() (ret []rt.Value, err error) {
-	if vs, ok := n.v.Interface().([]rt.Value); !ok {
+func (n refValue) GetRecordList() (ret []*Record, err error) {
+	if vs, ok := n.v.Interface().([]*Record); !ok {
 		err = errutil.New("value is not a record list")
 	} else {
 		ret = vs
@@ -86,7 +94,7 @@ func (n refValue) GetLen() (ret int, err error) {
 	}
 	return
 }
-func (n refValue) GetIndex(i int) (ret rt.Value, err error) {
+func (n refValue) GetIndex(i int) (ret Value, err error) {
 	if e := n.validateIndex(i); e != nil {
 		err = e
 	} else if elAffinity := affine.Element(n.a); len(elAffinity) == 0 {
@@ -101,24 +109,24 @@ func (n refValue) validateIndex(i int) (err error) {
 	if n.v.Kind() != r.Slice {
 		err = errutil.New("value is not indexable")
 	} else if i < 0 {
-		err = rt.OutOfRange{i, 0}
+		err = Underflow{i, 0}
 	} else if cnt := n.v.Len(); i >= cnt {
-		err = rt.OutOfRange{i, cnt}
+		err = Overflow{i, cnt}
 	}
 	return
 }
 
-func (n refValue) GetNamedField(string) (ret rt.Value, err error) {
+func (n refValue) GetNamedField(string) (ret Value, err error) {
 	err = errutil.New("value doesnt have fields")
 	return
 }
 
-func (n refValue) SetNamedField(string, rt.Value) (err error) {
+func (n refValue) SetNamedField(string, Value) (err error) {
 	err = errutil.New("value is not field writable")
 	return
 }
 
-func (n refValue) SetIndexedValue(i int, v rt.Value) (err error) {
+func (n refValue) SetIndexedValue(i int, v Value) (err error) {
 	if e := n.validateIndex(i); e != nil {
 		err = e
 	} else if va, elAffinity := v.Affinity(), affine.Element(n.a); va != elAffinity {
@@ -132,11 +140,11 @@ func (n refValue) SetIndexedValue(i int, v rt.Value) (err error) {
 }
 
 // note: this can grow record slices with nil values.
-func (n refValue) Resize(newLen int) (ret rt.Value, err error) {
+func (n refValue) Resize(newLen int) (ret Value, err error) {
 	if vs := n.v; vs.Kind() != r.Slice {
 		err = errutil.New("value is not indexable")
 	} else if newLen < 0 {
-		err = rt.OutOfRange{newLen, 0}
+		err = Underflow{newLen, 0}
 	} else if cap := vs.Cap(); newLen <= cap {
 		vs.SetLen(newLen) // shrinking
 		ret = n           // the slice memory stays the same.
@@ -149,13 +157,13 @@ func (n refValue) Resize(newLen int) (ret rt.Value, err error) {
 	return
 }
 
-func (n refValue) Slice(i, j int) (ret rt.Value, err error) {
+func (n refValue) Slice(i, j int) (ret Value, err error) {
 	if vs := n.v; vs.Kind() != r.Slice {
 		err = errutil.New("value is not indexable")
 	} else if i < 0 {
-		err = rt.OutOfRange{i, 0}
+		err = Underflow{i, 0}
 	} else if cnt := vs.Len(); j > cnt {
-		err = rt.OutOfRange{j, cnt}
+		err = Overflow{j, cnt}
 	} else if i > j {
 		err = errutil.New("bad range", i, j)
 	} else {
@@ -164,7 +172,7 @@ func (n refValue) Slice(i, j int) (ret rt.Value, err error) {
 	return
 }
 
-func (n refValue) Append(v rt.Value) (ret rt.Value, err error) {
+func (n refValue) Append(v Value) (ret Value, err error) {
 	if vs := n.v; vs.Kind() != r.Slice {
 		err = errutil.New("value is not indexable")
 	} else if elAffinity := affine.Element(v.Affinity()); len(elAffinity) == 0 {
@@ -175,7 +183,7 @@ func (n refValue) Append(v rt.Value) (ret rt.Value, err error) {
 	return
 }
 
-func (n refValue) appendOne(v rt.Value) (ret rt.Value, err error) {
+func (n refValue) appendOne(v Value) (ret Value, err error) {
 	elAffinity := affine.Element(v.Affinity())
 	compatible := n.a == elAffinity && (elAffinity != affine.Record || v.Type() == n.t)
 	if !compatible {
@@ -188,7 +196,7 @@ func (n refValue) appendOne(v rt.Value) (ret rt.Value, err error) {
 	return
 }
 
-func (n refValue) appendMany(v rt.Value) (ret rt.Value, err error) {
+func (n refValue) appendMany(v Value) (ret Value, err error) {
 	va := v.Affinity()
 	compatible := n.a == va && (va != affine.RecordList || v.Type() == n.t)
 	if !compatible {
@@ -201,7 +209,7 @@ func (n refValue) appendMany(v rt.Value) (ret rt.Value, err error) {
 	return
 }
 
-// func (n refValue) SetValue(from rt.Value) (err error) {
+// func (n refValue) SetValue(from Value) (err error) {
 // 	if val := n.v; !val.CanSet() {
 // 		err = errutil.New("value is not writable")
 // 	} else {

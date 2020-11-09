@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Set struct {
@@ -49,7 +49,7 @@ func (op *Set) setAt(run rt.Runtime) (err error) {
 	return
 }
 
-func (op *Set) replace(run rt.Runtime, els rt.Value, i int) (ret rt.Value, err error) {
+func (op *Set) replace(run rt.Runtime, els g.Value, i int) (ret g.Value, err error) {
 	switch a := els.Affinity(); a {
 	case affine.NumList:
 		if els, e := els.GetNumList(); e != nil {
@@ -60,7 +60,7 @@ func (op *Set) replace(run rt.Runtime, els rt.Value, i int) (ret rt.Value, err e
 			err = e
 		} else {
 			els[i] = el
-			ret  = generic.FloatsOf(els)
+			ret = g.FloatsOf(els)
 		}
 	case affine.TextList:
 		if els, e := els.GetTextList(); e != nil {
@@ -71,7 +71,7 @@ func (op *Set) replace(run rt.Runtime, els rt.Value, i int) (ret rt.Value, err e
 			err = e
 		} else {
 			els[i] = el
-			ret  = generic.StringsOf(els)
+			ret = g.StringsOf(els)
 		}
 	default:
 		err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)

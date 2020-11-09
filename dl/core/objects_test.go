@@ -6,7 +6,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // test some simple functionality of the object commands using a mock runtime
@@ -58,7 +58,7 @@ type modelTest struct {
 	clsMap map[string]string
 }
 
-func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
+func (m *modelTest) GetField(target, field string) (ret g.Value, err error) {
 	switch target {
 	case object.Value:
 		if _, ok := m.clsMap[field]; !ok {
@@ -73,18 +73,18 @@ func (m *modelTest) GetField(target, field string) (ret rt.Value, err error) {
 }
 
 type objTest struct {
-	generic.Nothing
+	g.Nothing
 	model *modelTest
 	name  string
 }
 
-func (j *objTest) GetNamedField(field string) (ret rt.Value, err error) {
+func (j *objTest) GetNamedField(field string) (ret g.Value, err error) {
 	switch m := j.model; field {
 	case object.Kind:
 		if cls, ok := m.clsMap[j.name]; !ok {
 			err = rt.UnknownField{j.name, field}
 		} else {
-			ret = generic.StringOf(cls)
+			ret = g.StringOf(cls)
 		}
 
 	case object.Kinds:
@@ -93,7 +93,7 @@ func (j *objTest) GetNamedField(field string) (ret rt.Value, err error) {
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
-			ret = generic.StringOf(path)
+			ret = g.StringOf(path)
 		}
 
 	default:

@@ -9,7 +9,7 @@ import (
 	"github.com/ionous/iffy/assembly"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -144,7 +144,7 @@ func TestFieldAccess(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
 		if apple, e := q.GetField(object.Value, "apple"); e != nil {
 			t.Fatal(e)
-		} else if e := apple.SetNamedField("a", generic.StringOf("y")); e != nil {
+		} else if e := apple.SetNamedField("a", g.StringOf("y")); e != nil {
 			t.Fatal(e)
 		} else if v, e := apple.GetNamedField("a"); e != nil {
 			t.Fatal(e)
@@ -159,7 +159,7 @@ func TestFieldAccess(t *testing.T) {
 		// boat.B has a default value of zz
 		if boat, e := q.GetField(object.Value, "boat"); e != nil {
 			t.Fatal(e)
-		} else if e := boat.SetNamedField("z", generic.BoolOf(true)); e != nil {
+		} else if e := boat.SetNamedField("z", g.BoolOf(true)); e != nil {
 			t.Fatal(e)
 		} else if v, e := boat.GetNamedField("b"); e != nil {
 			t.Fatal(e)
@@ -173,7 +173,7 @@ func TestFieldAccess(t *testing.T) {
 		// toy boat.A has an initial value of y
 		if toyBoat, e := q.GetField(object.Value, "toyBoat"); e != nil {
 			t.Fatal(e)
-		} else if e := toyBoat.SetNamedField("w", generic.BoolOf(true)); e != nil {
+		} else if e := toyBoat.SetNamedField("w", g.BoolOf(true)); e != nil {
 			t.Fatal(e)
 		} else if v, e := toyBoat.GetNamedField("a"); e != nil {
 			t.Fatal(e)
@@ -218,7 +218,7 @@ func newFieldAccessTest(t *testing.T, dbloc string) (ret *sql.DB) {
 	return
 }
 
-func testTraits(obj rt.Value, csv string) (err error) {
+func testTraits(obj g.Value, csv string) (err error) {
 	traits := strings.Split(csv, ",")
 	// the first value in the list of traits is supposed to be true
 	for want := true; len(traits) > 0 && err == nil; want = false {

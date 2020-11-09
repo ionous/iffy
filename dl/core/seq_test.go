@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 func TestSequences(t *testing.T) {
@@ -91,17 +91,17 @@ func (m *seqTest) Random(inclusiveMin, exclusiveMax int) int {
 	return (exclusiveMax-inclusiveMin)/2 + inclusiveMin
 }
 
-func (m *seqTest) GetField(target, field string) (ret rt.Value, err error) {
+func (m *seqTest) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Counter {
 		err = rt.UnknownField{target, field}
 	} else {
 		v := m.counters[field]
-		ret, err = generic.ValueOf(affine.Number, v)
+		ret, err = g.ValueOf(affine.Number, v)
 	}
 	return
 }
 
-func (m *seqTest) SetField(target, field string, value rt.Value) (err error) {
+func (m *seqTest) SetField(target, field string, value g.Value) (err error) {
 	if target != object.Counter {
 		err = rt.UnknownField{target, field}
 	} else if v, e := value.GetNumber(); e != nil {

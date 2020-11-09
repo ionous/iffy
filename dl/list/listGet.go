@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 func getNewFloats(run rt.Runtime, assign core.Assignment) (ret []float64, err error) {
@@ -60,7 +61,7 @@ func getNewStrings(run rt.Runtime, assign core.Assignment) (ret []string, err er
 }
 
 func getNewRecords(run rt.Runtime, oldType string,
-	assign core.Assignment) (ret []rt.Value, err error) {
+	assign core.Assignment) (ret []*g.Record, err error) {
 	if assign != nil {
 		if v, e := assign.GetAssignedValue(run); e != nil {
 			err = e
@@ -69,7 +70,11 @@ func getNewRecords(run rt.Runtime, oldType string,
 		} else {
 			switch a := v.Affinity(); a {
 			case affine.Record:
-				ret = []rt.Value{v}
+				if one, e := v.GetRecord(); e != nil {
+					err = e
+				} else {
+					ret = []*g.Record{one}
+				}
 
 			case affine.RecordList:
 				if many, e := v.GetRecordList(); e != nil {

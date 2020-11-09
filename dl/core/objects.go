@@ -6,12 +6,13 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // ObjectEval provides a way to access an object.
 type ObjectEval interface {
 	// returns UnknownObject error when successfully determining there is no such object
-	GetObjectValue(run rt.Runtime) (rt.Value, error)
+	GetObjectValue(run rt.Runtime) (g.Value, error)
 }
 
 // ObjectName implements ObjectEval, searching for an object named as specified.
@@ -52,7 +53,7 @@ type IsExactKindOf struct {
 	Kind rt.TextEval
 }
 
-func GetObjectValue(run rt.Runtime, eval ObjectEval) (ret rt.Value, err error) {
+func GetObjectValue(run rt.Runtime, eval ObjectEval) (ret g.Value, err error) {
 	if eval == nil {
 		err = rt.MissingEval("empty object ref")
 	} else {
@@ -75,7 +76,7 @@ func (*ObjectName) Compose() composer.Spec {
 // 	return op.GetObjectValue(run)
 // }
 
-func (op *ObjectName) GetObjectValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *ObjectName) GetObjectValue(run rt.Runtime) (ret g.Value, err error) {
 	if name, e := rt.GetText(run, op.Name); e != nil {
 		err = e
 	} else {
@@ -108,12 +109,12 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
 }
 
 // find an object with the passed partial name
-func getObjectExactly(run rt.Runtime, name string) (ret rt.Value, err error) {
+func getObjectExactly(run rt.Runtime, name string) (ret g.Value, err error) {
 	return rt.Variable(name).GetObjectByName(run)
 }
 
 // first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
-func getObjectInexactly(run rt.Runtime, name string) (ret rt.Value, err error) {
+func getObjectInexactly(run rt.Runtime, name string) (ret g.Value, err error) {
 	return rt.Variable(name).GetObjectByVariable(run)
 }
 

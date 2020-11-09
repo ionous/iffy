@@ -5,17 +5,16 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
-	"github.com/ionous/iffy/rt"
 )
 
 // ValueOf returns a new generic value wrapper based on analyzing the passed value.
-func ValueOf(a affine.Affinity, i interface{}) (rt.Value, error) {
+func ValueOf(a affine.Affinity, i interface{}) (Value, error) {
 	return ValueFor(i, a, defaultType)
 }
 
 // ValueFor adds an optional subtype to values, for example:
 // marking text as specifically intended for aspects, traits, etc.
-func ValueFor(i interface{}, a affine.Affinity, subtype string) (ret rt.Value, err error) {
+func ValueFor(i interface{}, a affine.Affinity, subtype string) (ret Value, err error) {
 	switch a {
 	case affine.Bool:
 		ret, err = newBoolValue(i, subtype)
@@ -41,23 +40,23 @@ func ValueFor(i interface{}, a affine.Affinity, subtype string) (ret rt.Value, e
 	return
 }
 
-func BoolOf(v bool) rt.Value {
+func BoolOf(v bool) Value {
 	return makeValue(affine.Bool, defaultType, r.ValueOf(v))
 }
 
-func StringOf(v string) rt.Value {
+func StringOf(v string) Value {
 	return makeValue(affine.Text, defaultType, r.ValueOf(v))
 }
 
-func FloatOf(v float64) rt.Value {
+func FloatOf(v float64) Value {
 	return makeValue(affine.Number, defaultType, r.ValueOf(v))
 }
 
-func StringsOf(vs []string) rt.Value {
+func StringsOf(vs []string) Value {
 	return makeValue(affine.TextList, defaultType, r.ValueOf(vs))
 }
 
-func FloatsOf(vs []float64) rt.Value {
+func FloatsOf(vs []float64) Value {
 	return makeValue(affine.NumList, defaultType, r.ValueOf(vs))
 }
 
@@ -72,7 +71,7 @@ func makeValue(a affine.Affinity, subtype string, v r.Value) (ret refValue) {
 	return refValue{a: a, v: v, t: subtype}
 }
 
-func newBoolValue(i interface{}, subtype string) (ret rt.Value, err error) {
+func newBoolValue(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.Bool
 	switch v := i.(type) {
 	case nil:
@@ -92,7 +91,7 @@ func newBoolValue(i interface{}, subtype string) (ret rt.Value, err error) {
 	return
 }
 
-func newNumValue(i interface{}, subtype string) (ret rt.Value, err error) {
+func newNumValue(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.Number
 	switch v := i.(type) {
 	case nil:
@@ -109,7 +108,7 @@ func newNumValue(i interface{}, subtype string) (ret rt.Value, err error) {
 	return
 }
 
-func newTextValue(i interface{}, subtype string) (ret rt.Value, err error) {
+func newTextValue(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.Text
 	switch v := i.(type) {
 	case nil:
@@ -126,7 +125,7 @@ func newTextValue(i interface{}, subtype string) (ret rt.Value, err error) {
 	return
 }
 
-func newNumList(i interface{}, subtype string) (ret rt.Value, err error) {
+func newNumList(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.NumList
 	switch v := i.(type) {
 	case []float64:
@@ -137,7 +136,7 @@ func newNumList(i interface{}, subtype string) (ret rt.Value, err error) {
 	return
 }
 
-func newTextList(i interface{}, subtype string) (ret rt.Value, err error) {
+func newTextList(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.TextList
 	switch v := i.(type) {
 	case []string:
@@ -148,7 +147,7 @@ func newTextList(i interface{}, subtype string) (ret rt.Value, err error) {
 	return
 }
 
-func newRecord(i interface{}, subtype string) (ret rt.Value, err error) {
+func newRecord(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.Record
 	if r, ok := i.(*Record); !ok {
 		err = errutil.Fmt("unknown %s %T", a, i)
@@ -160,10 +159,10 @@ func newRecord(i interface{}, subtype string) (ret rt.Value, err error) {
 	return
 }
 
-func newRecordList(i interface{}, subtype string) (ret rt.Value, err error) {
+func newRecordList(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.RecordList
 	switch v := i.(type) {
-	case []rt.Value:
+	case []Value:
 		ret = makeValue(a, subtype, r.ValueOf(v))
 	default:
 		err = errutil.Fmt("unknown %s %T", a, v)

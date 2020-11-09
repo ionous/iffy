@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // LoopFactory or iterator variables while looping ( ex. through a series of objects. )
@@ -17,7 +17,7 @@ type LoopFactory struct {
 	i       int
 }
 
-func LoopOver(run rt.Runtime, varName string, it rt.Iterator, do, other rt.Execute) (err error) {
+func LoopOver(run rt.Runtime, varName string, it g.Iterator, do, other rt.Execute) (err error) {
 	if hasNext := it.HasNext(); !hasNext {
 		if e := rt.RunOne(run, other); e != nil {
 			err = e
@@ -45,7 +45,7 @@ func LoopOver(run rt.Runtime, varName string, it rt.Iterator, do, other rt.Execu
 
 // NewScope creates a scope for this round of the loop;
 // updates the internal counter for the next round of the loop.
-func (l *LoopFactory) NextScope(varValue rt.Value, hasNext bool) rt.Scope {
+func (l *LoopFactory) NextScope(varValue g.Value, hasNext bool) rt.Scope {
 	l.i++ // pre-inc, because while i starts at zero, the loop counter starts at one.
 	return &loopScope{varName: l.varName, varValue: varValue, currIndex: l.i, hasNext: hasNext}
 }
@@ -53,13 +53,13 @@ func (l *LoopFactory) NextScope(varValue rt.Value, hasNext bool) rt.Scope {
 // internal, implements Variable
 type loopScope struct {
 	varName   string
-	varValue  rt.Value
+	varValue  g.Value
 	currIndex int
 	hasNext   bool
 }
 
 // GetField returns values for the iterator variables (index,first,last) and anything up-
-func (l *loopScope) GetField(target, field string) (ret rt.Value, err error) {
+func (l *loopScope) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
 	} else {
@@ -67,11 +67,11 @@ func (l *loopScope) GetField(target, field string) (ret rt.Value, err error) {
 		case l.varName:
 			ret = l.varValue
 		case "index":
-			ret, err = generic.ValueOf(affine.Number, l.currIndex)
+			ret, err = g.ValueOf(affine.Number, l.currIndex)
 		case "first":
-			ret = generic.BoolOf(l.currIndex == 1)
+			ret = g.BoolOf(l.currIndex == 1)
 		case "last":
-			ret = generic.BoolOf(!l.hasNext)
+			ret = g.BoolOf(!l.hasNext)
 		default:
 			err = rt.UnknownField{target, field}
 		}
@@ -80,7 +80,7 @@ func (l *loopScope) GetField(target, field string) (ret rt.Value, err error) {
 }
 
 // note: iterator variables are not (currently) writable.
-func (l *loopScope) SetField(target, field string, v rt.Value) (err error) {
+func (l *loopScope) SetField(target, field string, v g.Value) (err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
 	} else {

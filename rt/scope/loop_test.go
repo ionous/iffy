@@ -5,7 +5,7 @@ import (
 
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 func TestLoop(t *testing.T) {
@@ -20,7 +20,7 @@ func TestLoop(t *testing.T) {
 			cap := cap[i]
 			count := i + 1
 			atEnd := count == cnt
-			s := lf.NextScope(generic.Nothing{}, !atEnd)
+			s := lf.NextScope(g.Nothing{}, !atEnd)
 
 			if p, e := s.GetField(object.Variables, "index"); e != nil {
 				t.Fatal("loop", i, e)

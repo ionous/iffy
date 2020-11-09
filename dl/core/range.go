@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // Range generates a series of integers r[i] = (start + step*i) where i>=0
@@ -54,10 +54,10 @@ func (it *rangeIt) HasNext() (okay bool) {
 }
 
 // GetNumber advances the iterator.
-func (it *rangeIt) GetNext() (ret rt.Value, err error) {
+func (it *rangeIt) GetNext() (ret g.Value, err error) {
 	if !it.HasNext() {
-		err = rt.StreamExceeded
-	} else if v, e := generic.ValueOf(affine.Number, it.next); e != nil {
+		err = g.StreamExceeded
+	} else if v, e := g.ValueOf(affine.Number, it.next); e != nil {
 		err = e
 	} else {
 		it.next = it.next + it.step

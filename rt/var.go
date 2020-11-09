@@ -1,15 +1,18 @@
 package rt
 
-import "github.com/ionous/iffy/object"
+import (
+	"github.com/ionous/iffy/object"
+	g "github.com/ionous/iffy/rt/generic"
+)
 
 // eliminates some boilerplate code when working with runtime variables
 type Variable string
 
-func (v Variable) GetValue(run Runtime) (Value, error) {
+func (v Variable) GetValue(run Runtime) (g.Value, error) {
 	return run.GetField(object.Variables, string(v))
 }
 
-func (v Variable) SetValue(run Runtime, val Value) error {
+func (v Variable) SetValue(run Runtime, val g.Value) error {
 	return run.SetField(object.Variables, string(v), val)
 }
 
@@ -58,7 +61,7 @@ func (v Variable) GetNumList(run Runtime) (ret []float64, err error) {
 	return
 }
 
-func (v Variable) GetRecordList(run Runtime) (ret []Value, err error) {
+func (v Variable) GetRecordList(run Runtime) (ret []*g.Record, err error) {
 	if val, e := v.GetValue(run); e != nil {
 		err = e
 	} else {
@@ -68,7 +71,7 @@ func (v Variable) GetRecordList(run Runtime) (ret []Value, err error) {
 }
 
 // returns the named object instead of the named variable
-func (v Variable) GetObjectByName(run Runtime) (ret Value, err error) {
+func (v Variable) GetObjectByName(run Runtime) (ret g.Value, err error) {
 	switch val, e := run.GetField(object.Value, string(v)); e.(type) {
 	case UnknownField:
 		err = UnknownObject(string(v))
@@ -79,7 +82,7 @@ func (v Variable) GetObjectByName(run Runtime) (ret Value, err error) {
 }
 
 // first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
-func (v Variable) GetObjectByVariable(run Runtime) (ret Value, err error) {
+func (v Variable) GetObjectByVariable(run Runtime) (ret g.Value, err error) {
 	switch val, e := v.GetValue(run); e.(type) {
 	default:
 		err = e

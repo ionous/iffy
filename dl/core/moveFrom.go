@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type MoveFrom struct {
@@ -19,7 +20,7 @@ func (*MoveFrom) Compose() composer.Spec {
 }
 
 func (op *MoveFrom) GetEval() interface{} { return nil }
-func (op *MoveFrom) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *MoveFrom) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := op.moveFrom(run); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -28,7 +29,7 @@ func (op *MoveFrom) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	return
 }
 
-func (op *MoveFrom) moveFrom(run rt.Runtime) (ret rt.Value, err error) {
+func (op *MoveFrom) moveFrom(run rt.Runtime) (ret g.Value, err error) {
 	if box, val, e := getVariableValue(run, op.Name, op.Flags); e != nil {
 		err = e
 	} else {

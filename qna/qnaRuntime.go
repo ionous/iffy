@@ -4,8 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/writer"
@@ -49,7 +48,7 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 }
 
 // notary interface
-func (run *Runner) Make(kind string) (ret rt.Value, err error) {
+func (run *Runner) Make(kind string) (ret g.Value, err error) {
 	if k, e := run.kinds.KindByName(kind); e != nil {
 		err = errutil.New("can't make unknown kind", kind, e)
 	} else {
@@ -59,11 +58,11 @@ func (run *Runner) Make(kind string) (ret rt.Value, err error) {
 }
 
 // notary interface
-func (run *Runner) Copy(val rt.Value) (ret rt.Value, err error) {
-	return generic.CopyValue(run, val)
+func (run *Runner) Copy(val g.Value) (ret g.Value, err error) {
+	return g.CopyValue(run, val)
 }
 
-func (run *Runner) KindByName(n string) (*generic.Kind, error) {
+func (run *Runner) KindByName(n string) (*g.Kind, error) {
 	return run.kinds.KindByName(n)
 }
 

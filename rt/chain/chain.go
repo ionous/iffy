@@ -1,33 +1,33 @@
 package chain
 
 import (
-	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // iterate across multiple streams
 type StreamIterator interface {
 	HasNextStream() bool
-	GetNextStream() (rt.Iterator, error) // return the first iterator of the next stream
+	GetNextStream() (g.Iterator, error) // return the first iterator of the next stream
 }
 
 type chain struct {
 	streams StreamIterator // iterate across streams
-	items   rt.Iterator    // iterate across numbers
+	items   g.Iterator     // iterate across numbers
 	err     error
 }
 
 // NewStreamOfStreams turns multiple streams into a single iterator
-func NewStreamOfStreams(streams StreamIterator) rt.Iterator {
-	k := &chain{streams: streams, items: rt.EmptyStream(true)}
+func NewStreamOfStreams(streams StreamIterator) g.Iterator {
+	k := &chain{streams: streams, items: g.EmptyStream(true)}
 	k.items, k.err = k.advance()
 	return k
 }
 
 func (k *chain) HasNext() bool {
-	return k.err != rt.StreamExceeded
+	return k.err != g.StreamExceeded
 }
 
-func (k *chain) GetNext() (ret rt.Value, err error) {
+func (k *chain) GetNext() (ret g.Value, err error) {
 	if k.err != nil {
 		err = k.err
 	} else if next, e := k.items.GetNext(); e != nil {
@@ -43,7 +43,7 @@ func (k *chain) GetNext() (ret rt.Value, err error) {
 // at the end of its stream, move to the next stream
 // return the new iterator
 // can advance k.streams,
-func (k *chain) advance() (it rt.Iterator, err error) {
+func (k *chain) advance() (it g.Iterator, err error) {
 	for it = k.items; !it.HasNext(); {
 		if next, e := k.streams.GetNextStream(); e != nil {
 			err = e

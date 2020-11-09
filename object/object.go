@@ -5,7 +5,7 @@ const Prefix = '$' // leading character used for all internal targets
 // internal targets for GetField
 const Aspect = "$aspect"   // name of aspect for noun.trait
 const Counter = "$counter" // sequence counter
-const Value = "$value"     // returns the object rt.Value
+const Value = "$value"     // returns the object g.Value
 const Variables = "$var"   // named values, controlled by scope, not associated with any particular object
 
 // internal fields for object

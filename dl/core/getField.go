@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // GetField a property value from an object by name.
@@ -67,7 +68,7 @@ func (op *GetField) GetTextList(run rt.Runtime) (ret []string, err error) {
 	return
 }
 
-func (op *GetField) getValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *GetField) getValue(run rt.Runtime) (ret g.Value, err error) {
 	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {

@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type At struct {
@@ -65,7 +66,7 @@ func (op *At) GetTextList(run rt.Runtime) (ret []string, err error) {
 	return
 }
 
-func (op *At) getValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *At) getValue(run rt.Runtime) (ret g.Value, err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = e
 	} else if el, e := vs.GetIndex(op.Index); e != nil {

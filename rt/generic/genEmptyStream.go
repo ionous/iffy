@@ -1,4 +1,4 @@
-package rt
+package generic
 
 type EmptyStream bool
 

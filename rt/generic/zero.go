@@ -1,9 +1,5 @@
 package generic
 
-import (
-	"github.com/ionous/iffy/rt"
-)
-
 var (
 	True      = BoolOf(true)
 	False     = BoolOf(false)
@@ -14,10 +10,3 @@ var (
 )
 
 const defaultType = "" // empty string
-
-func must(v rt.Value, e error) rt.Value {
-	if e != nil {
-		panic(e)
-	}
-	return v
-}

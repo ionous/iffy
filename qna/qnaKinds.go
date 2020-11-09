@@ -5,31 +5,31 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
 
 type qnaKinds struct {
-	kinds     map[string]*generic.Kind
+	kinds     map[string]*g.Kind
 	fieldsFor *sql.Stmt // selects field, type for a named kind
 }
 
 // aspects are a specific kind of record where every field is a boolean trait
-func (km *qnaKinds) addKind(n string, k *generic.Kind) *generic.Kind {
+func (km *qnaKinds) addKind(n string, k *g.Kind) *g.Kind {
 	if km.kinds == nil {
-		km.kinds = make(map[string]*generic.Kind)
+		km.kinds = make(map[string]*g.Kind)
 	}
 	km.kinds[n] = k
 	return k
 }
 
-func (km *qnaKinds) KindByName(name string) (ret *generic.Kind, err error) {
+func (km *qnaKinds) KindByName(name string) (ret *g.Kind, err error) {
 	if k, ok := km.kinds[name]; ok {
 		ret = k
 	} else {
 		// creates the kind if it needs to.
-		var aspects []*generic.Kind
-		var fields []generic.Field
+		var aspects []*g.Kind
+		var fields []g.Field
 		var field, fieldType string
 		// ex. number, text, aspect
 		if q, e := km.fieldsFor.Query(name); e != nil {
@@ -54,7 +54,7 @@ func (km *qnaKinds) KindByName(name string) (ret *generic.Kind, err error) {
 				}
 			}
 			if err == nil {
-				fields = append(fields, generic.Field{
+				fields = append(fields, g.Field{
 					Name:     field,
 					Affinity: affinity,
 					Type:     fieldType,
@@ -64,7 +64,7 @@ func (km *qnaKinds) KindByName(name string) (ret *generic.Kind, err error) {
 		}, &field, &fieldType); e != nil {
 			err = e
 		} else {
-			ret = km.addKind(name, generic.NewKind(km, name, fields))
+			ret = km.addKind(name, g.NewKind(km, name, fields))
 		}
 	}
 	return

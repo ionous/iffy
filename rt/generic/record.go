@@ -4,16 +4,15 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 )
 
 type Record struct {
 	Nothing
 	kind   *Kind
-	values []rt.Value
+	values []Value
 }
 
-var _ rt.Value = (*Record)(nil) // ensure compatibility
+var _ Value = (*Record)(nil) // ensure compatibility
 
 func (r *Record) Affinity() affine.Affinity {
 	return affine.Record
@@ -23,7 +22,12 @@ func (r *Record) Type() string {
 	return r.kind.name
 }
 
-func (r *Record) GetNamedField(field string) (ret rt.Value, err error) {
+func (r *Record) GetRecord() (ret *Record, err error) {
+	ret = r
+	return
+}
+
+func (r *Record) GetNamedField(field string) (ret Value, err error) {
 	switch k := r.kind; field {
 	case object.Name:
 		err = errutil.New("records don't have names")
@@ -33,7 +37,7 @@ func (r *Record) GetNamedField(field string) (ret rt.Value, err error) {
 
 	default:
 		if i := k.FieldIndex(field); i < 0 {
-			err = rt.UnknownField{k.name, field}
+			err = UnknownField{k.name, field}
 		} else {
 			fv, ft := r.values[i], k.fields[i]
 			if isTrait := ft.Type == "aspect" && ft.Name != field; isTrait {
@@ -46,7 +50,7 @@ func (r *Record) GetNamedField(field string) (ret rt.Value, err error) {
 	return
 }
 
-func (r *Record) getTraitValue(fv rt.Value, field string) (ret rt.Value, err error) {
+func (r *Record) getTraitValue(fv Value, field string) (ret Value, err error) {
 	if fv == nil {
 		ret = False
 	} else if trait, e := fv.GetText(); e != nil {
@@ -59,7 +63,7 @@ func (r *Record) getTraitValue(fv rt.Value, field string) (ret rt.Value, err err
 	return
 }
 
-func (r *Record) getFieldValue(fv rt.Value, ft Field) (ret rt.Value, err error) {
+func (r *Record) getFieldValue(fv Value, ft Field) (ret Value, err error) {
 	if fv == nil {
 		ret, err = DefaultFor(r.kind.kinds, ft.Affinity, ft.Type)
 	} else {
@@ -68,10 +72,10 @@ func (r *Record) getFieldValue(fv rt.Value, ft Field) (ret rt.Value, err error) 
 	return
 }
 
-func (r *Record) SetNamedField(field string, val rt.Value) (err error) {
+func (r *Record) SetNamedField(field string, val Value) (err error) {
 	k := r.kind
 	if i := k.FieldIndex(field); i < 0 {
-		err = rt.UnknownField{k.name, field}
+		err = UnknownField{k.name, field}
 	} else {
 		ft := k.fields[i]
 		if isTrait := ft.Type == "aspect" && ft.Name != field; isTrait {

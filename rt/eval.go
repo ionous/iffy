@@ -29,18 +29,3 @@ type NumListEval interface {
 type TextListEval interface {
 	GetTextList(Runtime) ([]string, error)
 }
-
-// Iterator provides a way to iterate over a stream of values.
-// The underlying implementation and values returned depends on the stream.
-type Iterator interface {
-	// HasNext returns true if the iterator can be safely advanced.
-	HasNext() bool
-	// GetNext returns the next value in the stream and advances the iterator.
-	GetNext() (Value, error)
-}
-
-// StreamCount optionally implemented for iterators to determine the length of remaining stream.
-type StreamCount interface {
-	Remaining() int
-	GetTextList(Runtime) ([]string, error)
-}

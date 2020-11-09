@@ -2,12 +2,12 @@ package term
 
 import (
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Number struct {
-	Name string
-	Init rt.NumberEval
+	Name string        // parameter name
+	Init rt.NumberEval // default value
 }
 type Bool struct {
 	Name string
@@ -43,7 +43,7 @@ func (n *Number) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalNumber(run, n.Init, 0); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, generic.FloatOf(v))
+		p.AddTerm(n.Name, g.FloatOf(v))
 	}
 	return
 }
@@ -56,7 +56,7 @@ func (n *Bool) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalBool(run, n.Init, false); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, generic.BoolOf(v))
+		p.AddTerm(n.Name, g.BoolOf(v))
 	}
 	return
 }
@@ -69,7 +69,7 @@ func (n *Text) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, generic.StringOf(v))
+		p.AddTerm(n.Name, g.StringOf(v))
 	}
 	return
 }
@@ -82,7 +82,7 @@ func (n *Object) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, generic.StringOf(v))
+		p.AddTerm(n.Name, g.StringOf(v))
 	}
 	return
 }
@@ -95,7 +95,7 @@ func (n *NumList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalNumbers(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, generic.FloatsOf(vs))
+		p.AddTerm(n.Name, g.FloatsOf(vs))
 	}
 	return
 }
@@ -108,7 +108,7 @@ func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if vs, e := rt.GetOptionalTexts(run, n.Init, nil); e != nil {
 		err = e
 	} else {
-		p.AddTerm(n.Name, generic.StringsOf(vs))
+		p.AddTerm(n.Name, g.StringsOf(vs))
 	}
 	return
 }
@@ -118,6 +118,6 @@ func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
 // }
 
 // func (n *RecordList) Prepare(run rt.Runtime, p *Terms) (err error) {
-// 	p.AddTerm(n.Name, generic.NewNewRecordSlice(n.Kind))
+// 	p.AddTerm(n.Name, g.NewNewRecordSlice(n.Kind))
 // 	return
 // }

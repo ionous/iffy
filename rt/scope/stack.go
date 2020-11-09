@@ -3,6 +3,7 @@ package scope
 import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type ScopeStack struct {
@@ -25,7 +26,7 @@ func (k *ScopeStack) PopScope() {
 }
 
 // GetField returns the value at 'name'
-func (k *ScopeStack) GetField(target, field string) (ret rt.Value, err error) {
+func (k *ScopeStack) GetField(target, field string) (ret g.Value, err error) {
 	norm := lang.Camelize(field)
 	err = k.visit(target, field, func(scope rt.Scope) (err error) {
 		if v, e := scope.GetField(target, norm); e != nil {
@@ -39,7 +40,7 @@ func (k *ScopeStack) GetField(target, field string) (ret rt.Value, err error) {
 }
 
 // SetField writes the value of 'v' into the value at 'name'.
-func (k *ScopeStack) SetField(target, field string, v rt.Value) (err error) {
+func (k *ScopeStack) SetField(target, field string, v g.Value) (err error) {
 	norm := lang.Camelize(field)
 	return k.visit(target, field, func(scope rt.Scope) error {
 		return scope.SetField(target, norm, v)

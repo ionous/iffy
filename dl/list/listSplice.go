@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Splice struct {
@@ -71,7 +71,7 @@ func (op *Splice) GetTextList(run rt.Runtime) (ret []string, err error) {
 	return
 }
 
-func (op *Splice) spliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err error) {
+func (op *Splice) spliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err error) {
 	if els, e := vs.GetNumList(); e != nil {
 		err = e
 	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
@@ -84,10 +84,10 @@ func (op *Splice) spliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err
 			// as long as the range was valid we take the result and set it back...
 			// even if no elements are cut or inserted.
 			// ( that bakes any evaluation that might have been in the target )
-			ret = generic.CopyFloats(els[i:j]) // before we start altering the memory of els, copy out
+			ret = g.CopyFloats(els[i:j]) // before we start altering the memory of els, copy out
 			newVals := append(els[:i], append(add, els[j:]...)...)
 			if e := run.SetField(object.Variables, op.List,
-				generic.FloatsOf(newVals)); e != nil {
+				g.FloatsOf(newVals)); e != nil {
 				err = e
 			}
 		}
@@ -96,7 +96,7 @@ func (op *Splice) spliceNumbers(run rt.Runtime, vs rt.Value) (ret []float64, err
 }
 
 // returns the removed elements
-func (op *Splice) spliceText(run rt.Runtime, vs rt.Value) (ret []string, err error) {
+func (op *Splice) spliceText(run rt.Runtime, vs g.Value) (ret []string, err error) {
 	if els, e := vs.GetTextList(); e != nil {
 		err = cmdError(op, e)
 	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
@@ -106,10 +106,10 @@ func (op *Splice) spliceText(run rt.Runtime, vs rt.Value) (ret []string, err err
 	} else {
 		// ... mirrors GetNumList()
 		if i >= 0 && j >= i {
-			ret = generic.CopyStrings(els[i:j])
+			ret = g.CopyStrings(els[i:j])
 			newVals := append(els[:i], append(add, els[j:]...)...)
 			if e := run.SetField(object.Variables, op.List,
-				generic.StringsOf(newVals)); e != nil {
+				g.StringsOf(newVals)); e != nil {
 				err = cmdError(op, e)
 			}
 		}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/chain"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/sliceOf"
 )
 
@@ -42,7 +43,7 @@ func TestTextIteration(t *testing.T) {
 
 			for i := 0; it.HasNext(); i++ {
 				if i >= cnt {
-					t.Fatal(rt.StreamExceeded)
+					t.Fatal(g.StreamExceeded)
 				} else {
 					if txt, e := it.GetNext(); e != nil {
 						t.Fatal(e)
@@ -78,7 +79,7 @@ func TestNumIteration(t *testing.T) {
 		it := chain.NewStreamOfStreams(&numIterator{pat: pat, order: inds})
 		for i := 0; it.HasNext(); i++ {
 			if i >= cnt {
-				t.Fatal(rt.StreamExceeded)
+				t.Fatal(g.StreamExceeded)
 			} else if num, e := it.GetNext(); e != nil {
 				t.Fatal(e)
 			} else if num, e := num.GetNumber(); e != nil {

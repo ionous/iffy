@@ -1,4 +1,4 @@
-package rt
+package generic
 
 import "github.com/ionous/iffy/affine"
 
@@ -15,13 +15,15 @@ type Value interface {
 	GetNumber() (float64, error)
 	// GetText, or error if the underlying value isn't represented by a string.
 	GetText() (string, error)
+	// GetRecord, returns the underlying record structure for record values
+	GetRecord() (*Record, error)
 	// GetNumList, or error if the underlying value isn't represented by a slice of floats.
 	GetNumList() ([]float64, error)
 	// GetTextList, or error if the underlying value isn't represented by a slice of strings.
 	GetTextList() ([]string, error)
 	// GetRecordList, or error if the underlying value isn't represented by a slice of values.
 	// ( every value in the returned list should be a record of this value's Type() )
-	GetRecordList() ([]Value, error)
+	GetRecordList() ([]*Record, error)
 	// GetIndex returns the nth element of the underlying slice, where 0 is the first value;
 	// otherwise this returns an error.
 	GetIndex(int) (Value, error)

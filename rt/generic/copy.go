@@ -3,7 +3,6 @@ package generic
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
-	"github.com/ionous/iffy/rt"
 )
 
 // CopyFloats: duplicate the passed slice.
@@ -24,7 +23,7 @@ func CopyStrings(src []string) []string {
 
 // CopyValue: create a new generic value capable of supporting the passed affinity.
 // from a snapshot of the passed value; errors if the two types are not compatible.
-func CopyValue(kinds Kinds, val rt.Value) (ret rt.Value, err error) {
+func CopyValue(kinds Kinds, val Value) (ret Value, err error) {
 	if val == nil {
 		err = errutil.New("failed to copy nil value")
 	} else {
@@ -76,7 +75,7 @@ func CopyValue(kinds Kinds, val rt.Value) (ret rt.Value, err error) {
 			} else if cnt, e := val.GetLen(); e != nil {
 				err = e
 			} else {
-				values := make([]rt.Value, cnt)
+				values := make([]*Record, cnt)
 				for i := 0; i < cnt; i++ {
 					if el, e := val.GetIndex(i); e != nil {
 						err = e
@@ -104,9 +103,9 @@ func CopyValue(kinds Kinds, val rt.Value) (ret rt.Value, err error) {
 }
 
 // assumes in value is a record.
-func copyRecord(kind *Kind, val rt.Value) (ret rt.Value, err error) {
+func copyRecord(kind *Kind, val Value) (ret *Record, err error) {
 	cnt := kind.NumField()
-	values := make([]rt.Value, cnt)
+	values := make([]Value, cnt)
 	for i := 0; i < cnt; i++ {
 		ft := kind.Field(i) // fix: get field by index?
 		if el, e := val.GetNamedField(ft.Name); e != nil {

@@ -3,7 +3,6 @@ package generic
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
-	"github.com/ionous/iffy/rt"
 )
 
 // Kinds database ( primarily for generating default values )
@@ -13,7 +12,7 @@ type Kinds interface {
 
 // DefaultFor generates a zero value for the specified affinity;
 // uses the passed Kinds to generate empty records when necessary.
-func DefaultFor(ks Kinds, a affine.Affinity, subtype string) (ret rt.Value, err error) {
+func DefaultFor(ks Kinds, a affine.Affinity, subtype string) (ret Value, err error) {
 	// return the default value for the
 	switch a {
 	case affine.Bool:

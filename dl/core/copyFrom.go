@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type CopyFrom struct {
@@ -19,7 +20,7 @@ func (*CopyFrom) Compose() composer.Spec {
 }
 
 func (op *CopyFrom) GetEval() interface{} { return nil }
-func (op *CopyFrom) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *CopyFrom) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := op.copyFrom(run); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -28,7 +29,7 @@ func (op *CopyFrom) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
 	return
 }
 
-func (op *CopyFrom) copyFrom(run rt.Runtime) (ret rt.Value, err error) {
+func (op *CopyFrom) copyFrom(run rt.Runtime) (ret g.Value, err error) {
 	if box, val, e := getVariableValue(run, op.Name, op.Flags); e != nil {
 		err = e
 	} else if val != nil {

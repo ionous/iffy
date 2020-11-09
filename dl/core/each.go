@@ -3,7 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
 )
 
@@ -49,7 +49,7 @@ func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
 	if vs, e := rt.GetNumList(run, f.In); e != nil {
 		err = e
 	} else {
-		it := generic.SliceFloats(vs)
+		it := g.SliceFloats(vs)
 		err = scope.LoopOver(run, "num", it, f.Go, f.Else)
 	}
 	return
@@ -68,7 +68,7 @@ func (f *ForEachText) Execute(run rt.Runtime) (err error) {
 	if vs, e := rt.GetTextList(run, f.In); e != nil {
 		err = e
 	} else {
-		it := generic.SliceStrings(vs)
+		it := g.SliceStrings(vs)
 		err = scope.LoopOver(run, "text", it, f.Go, f.Else)
 	}
 	return

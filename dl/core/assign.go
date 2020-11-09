@@ -3,19 +3,19 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // Assignment helps limit variable and parameter assignment to particular contexts.
 type Assignment interface {
 	// write the results of evaluating this into that.
-	GetAssignedValue(rt.Runtime) (rt.Value, error)
+	GetAssignedValue(rt.Runtime) (g.Value, error)
 	// fix? for import so we can determine the eval type.
 	// maybe at least change to affinity
 	GetEval() interface{}
 }
 
-func GetAssignedValue(run rt.Runtime, a Assignment) (ret rt.Value, err error) {
+func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 	if a == nil {
 		err = rt.MissingEval("empty assignment")
 	} else {
@@ -67,11 +67,11 @@ func (*FromBool) Compose() composer.Spec {
 	}
 }
 
-func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = generic.BoolOf(val)
+		ret = g.BoolOf(val)
 	}
 	return
 }
@@ -89,11 +89,11 @@ func (*FromNum) Compose() composer.Spec {
 	}
 }
 
-func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = generic.FloatOf(val)
+		ret = g.FloatOf(val)
 	}
 	return
 }
@@ -110,11 +110,11 @@ func (*FromText) Compose() composer.Spec {
 	}
 }
 
-func (op *FromText) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret  = generic.StringOf(val)
+		ret = g.StringOf(val)
 	}
 	return
 }
@@ -131,11 +131,11 @@ func (*FromNumList) Compose() composer.Spec {
 	}
 }
 
-func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret  = generic.FloatsOf(vals)
+		ret = g.FloatsOf(vals)
 	}
 	return
 }
@@ -152,11 +152,11 @@ func (*FromTextList) Compose() composer.Spec {
 	}
 }
 
-func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret rt.Value, err error) {
+func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret  = generic.StringsOf(vals)
+		ret = g.StringsOf(vals)
 	}
 	return
 }

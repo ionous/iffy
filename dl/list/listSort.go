@@ -10,7 +10,7 @@ import (
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Sort struct {
@@ -37,7 +37,7 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = e
 	} else {
-		var newVals rt.Value // write back in case vs was temporary storage.
+		var newVals g.Value // write back in case vs was temporary storage.
 		switch a := vs.Affinity(); a {
 		case affine.NumList:
 			if els, e := vs.GetNumList(); e != nil {
@@ -45,7 +45,7 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 			} else if e := op.sortNumbers(run, els); e != nil {
 				err = e
 			} else {
-				newVals = generic.FloatsOf(els)
+				newVals = g.FloatsOf(els)
 			}
 		case affine.TextList:
 			if els, e := vs.GetTextList(); e != nil {
@@ -53,7 +53,7 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 			} else if e := op.sortText(run, els); e != nil {
 				err = e
 			} else {
-				newVals = generic.StringsOf(els)
+				newVals = g.StringsOf(els)
 			}
 		default:
 			err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)

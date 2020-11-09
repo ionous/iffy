@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // Terms implements a Scope mapping names to specified parameters.
@@ -17,7 +18,7 @@ type Terms struct {
 
 type termValues map[string]*Value
 
-func (ps *Terms) AddTerm(field string, value rt.Value) *Value {
+func (ps *Terms) AddTerm(field string, value g.Value) *Value {
 	if ps.values == nil {
 		ps.values = make(termValues)
 	}
@@ -27,7 +28,7 @@ func (ps *Terms) AddTerm(field string, value rt.Value) *Value {
 }
 
 // GetField returns the value at 'name', the caller is responsible for determining the type.
-func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
+func (ps *Terms) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
 	} else if p, ok := ps.values[field]; !ok {
@@ -39,7 +40,7 @@ func (ps *Terms) GetField(target, field string) (ret rt.Value, err error) {
 }
 
 // SetField writes (a copy of) the passed value into the term at 'name'.
-func (ps *Terms) SetField(target, field string, val rt.Value) (err error) {
+func (ps *Terms) SetField(target, field string, val g.Value) (err error) {
 	if target != object.Variables {
 		err = rt.UnknownTarget{target}
 	} else if p, ok := ps.values[field]; !ok {
