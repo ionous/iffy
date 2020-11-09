@@ -23,7 +23,7 @@ func (r *Record) Type() string {
 	return r.kind.name
 }
 
-func (r *Record) GetField(field string) (ret rt.Value, err error) {
+func (r *Record) GetNamedField(field string) (ret rt.Value, err error) {
 	switch k := r.kind; field {
 	case object.Name:
 		err = errutil.New("records don't have names")
@@ -68,7 +68,7 @@ func (r *Record) getFieldValue(fv rt.Value, ft Field) (ret rt.Value, err error) 
 	return
 }
 
-func (r *Record) SetField(field string, val rt.Value) (err error) {
+func (r *Record) SetNamedField(field string, val rt.Value) (err error) {
 	k := r.kind
 	if i := k.FieldIndex(field); i < 0 {
 		err = rt.UnknownField{k.name, field}

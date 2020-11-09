@@ -29,7 +29,7 @@ func (op *SetField) Execute(run rt.Runtime) (err error) {
 	} else {
 		// if its going to a record, it should have been a move or copy assignment.
 		// in either case, we're overwriting the value.
-		err = obj.SetField(field, val)
+		err = obj.SetNamedField(field, val)
 	}
 	return
 }

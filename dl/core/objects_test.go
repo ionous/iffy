@@ -78,13 +78,13 @@ type objTest struct {
 	name  string
 }
 
-func (j *objTest) GetField(field string) (ret rt.Value, err error) {
+func (j *objTest) GetNamedField(field string) (ret rt.Value, err error) {
 	switch m := j.model; field {
 	case object.Kind:
 		if cls, ok := m.clsMap[j.name]; !ok {
 			err = rt.UnknownField{j.name, field}
 		} else {
-			ret= generic.StringOf(cls)
+			ret = generic.StringOf(cls)
 		}
 
 	case object.Kinds:

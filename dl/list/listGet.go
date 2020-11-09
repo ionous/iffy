@@ -26,7 +26,7 @@ func getNewFloats(run rt.Runtime, assign core.Assignment) (ret []float64, err er
 					ret = many
 				}
 			default:
-				err = errutil.New("cant add %s to a num list", a)
+				err = errutil.Fmt("cant add %q to a num list", a)
 			}
 		}
 	}
@@ -52,7 +52,33 @@ func getNewStrings(run rt.Runtime, assign core.Assignment) (ret []string, err er
 					ret = many
 				}
 			default:
-				err = errutil.New("cant add %s to a text list", a)
+				err = errutil.Fmt("cant add %q to a text list", a)
+			}
+		}
+	}
+	return
+}
+
+func getNewRecords(run rt.Runtime, oldType string,
+	assign core.Assignment) (ret []rt.Value, err error) {
+	if assign != nil {
+		if v, e := assign.GetAssignedValue(run); e != nil {
+			err = e
+		} else if v.Type() != oldType {
+			err = errutil.New("mismatched record types", oldType)
+		} else {
+			switch a := v.Affinity(); a {
+			case affine.Record:
+				ret = []rt.Value{v}
+
+			case affine.RecordList:
+				if many, e := v.GetRecordList(); e != nil {
+					err = e
+				} else {
+					ret = many
+				}
+			default:
+				err = errutil.Fmt("cant add %q to a record list", a)
 			}
 		}
 	}

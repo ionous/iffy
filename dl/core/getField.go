@@ -73,7 +73,7 @@ func (op *GetField) getValue(run rt.Runtime) (ret rt.Value, err error) {
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
 	} else {
-		ret, err = obj.GetField(field)
+		ret, err = obj.GetNamedField(field)
 	}
 	return
 }

@@ -129,7 +129,7 @@ func (*NameOf) Compose() composer.Spec {
 func (op *NameOf) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := obj.GetField(object.Name); e != nil {
+	} else if p, e := obj.GetNamedField(object.Name); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret, err = p.GetText()
@@ -149,7 +149,7 @@ func (*KindOf) Compose() composer.Spec {
 func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
 	if obj, e := GetObjectValue(run, op.Obj); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := obj.GetField(object.Kind); e != nil {
+	} else if p, e := obj.GetNamedField(object.Kind); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret, err = p.GetText()
@@ -171,7 +171,7 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := obj.GetField(object.Kinds); e != nil {
+	} else if p, e := obj.GetNamedField(object.Kinds); e != nil {
 		err = cmdError(op, e)
 	} else if fullPath, e := p.GetText(); e != nil {
 		err = cmdError(op, e)
@@ -194,7 +194,7 @@ func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := obj.GetField(object.Kind); e != nil {
+	} else if p, e := obj.GetNamedField(object.Kind); e != nil {
 		err = cmdError(op, e)
 	} else if objKind, e := p.GetText(); e != nil {
 		err = cmdError(op, e)

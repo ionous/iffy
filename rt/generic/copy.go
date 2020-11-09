@@ -109,7 +109,7 @@ func copyRecord(kind *Kind, val rt.Value) (ret rt.Value, err error) {
 	values := make([]rt.Value, cnt)
 	for i := 0; i < cnt; i++ {
 		ft := kind.Field(i) // fix: get field by index?
-		if el, e := val.GetField(ft.Name); e != nil {
+		if el, e := val.GetNamedField(ft.Name); e != nil {
 			err = e
 			break
 			if cpy, e := CopyValue(kind.kinds, el); e != nil {

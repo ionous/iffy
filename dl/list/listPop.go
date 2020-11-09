@@ -8,7 +8,6 @@ import (
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/generic"
 )
 
 type Pop struct {
@@ -37,68 +36,38 @@ func (op *Pop) Execute(run rt.Runtime) (err error) {
 func (op *Pop) execute(run rt.Runtime) (err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = e
+	} else if elAffinity := affine.Element(vs.Affinity()); len(elAffinity) == 0 {
+		err = errutil.Fmt("Variable %q is %q, pop expected a list", op.List, vs.Affinity())
 	} else if cnt, e := vs.GetLen(); e != nil {
 		err = e
 	} else if cnt == 0 && op.Else != nil {
 		err = op.Else.Execute(run)
-	} else if cnt > 0 {
-		var terms term.Terms
-		switch a := vs.Affinity(); a {
-		case affine.NumList:
-			err = op.popNumbers(run, &terms, vs)
-		case affine.TextList:
-			err = op.popText(run, &terms, vs)
-		default:
-			err = errutil.Fmt("variable '%s(%s)' is an unknown list", op.List, a)
+	} else {
+		var at, start, end int
+		if op.Front {
+			at, start, end = 0, 1, cnt
+		} else {
+			at, start, end = cnt-1, 0, cnt-1
 		}
-		if err == nil && op.Go != nil {
+		if popped, e := vs.GetIndex(at); e != nil {
+			err = e
+		} else if newEls, e := vs.Slice(start, end); e != nil {
+			err = e
+		} else if e := run.SetField(object.Variables, op.List, newEls); e != nil {
+			err = e
+		} else if op.Go != nil {
+			var terms term.Terms
+			var term string
+			if elAffinity != affine.Record {
+				term = string(elAffinity)
+			} else {
+				term = vs.Type()
+			}
+			terms.AddTerm(term, popped)
+			//
 			run.PushScope(&terms)
 			err = op.Go.Execute(run)
 			run.PopScope()
-		}
-	}
-	return
-}
-
-func (op *Pop) popNumbers(run rt.Runtime, terms *term.Terms, vs rt.Value) (err error) {
-	if els, e := vs.GetNumList(); e != nil {
-		err = e
-	} else {
-		var remove float64
-		var remain []float64
-		if op.Front {
-			remove, remain = els[0], els[1:]
-		} else {
-			last := len(els) - 1
-			remove, remain = els[last], els[:last]
-		}
-		if e := run.SetField(object.Variables, op.List,
-			generic.FloatsOf(remain)); e != nil {
-			err = e
-		} else {
-			terms.AddTerm("num", generic.FloatOf(remove))
-		}
-	}
-	return
-}
-
-func (op *Pop) popText(run rt.Runtime, terms *term.Terms, vs rt.Value) (err error) {
-	if els, e := vs.GetTextList(); e != nil {
-		err = e
-	} else {
-		var remove string
-		var remain []string
-		if op.Front {
-			remove, remain = els[0], els[1:]
-		} else {
-			last := len(els) - 1
-			remove, remain = els[last], els[:last]
-		}
-		if e := run.SetField(object.Variables, op.List,
-			generic.StringsOf(remain)); e != nil {
-			err = e
-		} else {
-			terms.AddTerm("text", generic.StringOf(remove))
 		}
 	}
 	return

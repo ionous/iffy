@@ -57,7 +57,7 @@ func TestFieldAccess(t *testing.T) {
 			name, field := els[i], els[i+1]
 			if obj, e := q.GetField(object.Value, name); e != nil {
 				t.Fatal(e)
-			} else if p, e := obj.GetField(object.Kind); e != nil {
+			} else if p, e := obj.GetNamedField(object.Kind); e != nil {
 				t.Fatal(e)
 			} else if kind, e := p.GetText(); e != nil {
 				t.Fatal("assign", e)
@@ -74,7 +74,7 @@ func TestFieldAccess(t *testing.T) {
 			// asking for "Kinds" should get us the hierarchy
 			if obj, e := q.GetField(object.Value, name); e != nil {
 				t.Fatal(e)
-			} else if p, e := obj.GetField(object.Kinds); e != nil {
+			} else if p, e := obj.GetNamedField(object.Kinds); e != nil {
 				t.Fatal(e)
 			} else if path, e := p.GetText(); e != nil {
 				t.Fatal("assign", e)
@@ -91,7 +91,7 @@ func TestFieldAccess(t *testing.T) {
 				if obj, e := q.GetField(object.Value, name); e != nil {
 					t.Fatal(e)
 				} else {
-					p, e := obj.GetField(field)
+					p, e := obj.GetNamedField(field)
 					switch e.(type) {
 					default:
 						t.Fatal(e)
@@ -119,7 +119,7 @@ func TestFieldAccess(t *testing.T) {
 			for i := 0; i < 2; i++ {
 				if obj, e := q.GetField(object.Value, name); e != nil {
 					t.Fatal(e)
-				} else if p, e := obj.GetField(field); e != nil {
+				} else if p, e := obj.GetNamedField(field); e != nil {
 					t.Fatal(e)
 				} else if num, e := p.GetNumber(); e != nil {
 					t.Fatal("assign", e)
@@ -144,9 +144,9 @@ func TestFieldAccess(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
 		if apple, e := q.GetField(object.Value, "apple"); e != nil {
 			t.Fatal(e)
-		} else if e := apple.SetField("a", generic.StringOf("y")); e != nil {
+		} else if e := apple.SetNamedField("a", generic.StringOf("y")); e != nil {
 			t.Fatal(e)
-		} else if v, e := apple.GetField("a"); e != nil {
+		} else if v, e := apple.GetNamedField("a"); e != nil {
 			t.Fatal(e)
 		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
@@ -159,9 +159,9 @@ func TestFieldAccess(t *testing.T) {
 		// boat.B has a default value of zz
 		if boat, e := q.GetField(object.Value, "boat"); e != nil {
 			t.Fatal(e)
-		} else if e := boat.SetField("z", generic.BoolOf(true)); e != nil {
+		} else if e := boat.SetNamedField("z", generic.BoolOf(true)); e != nil {
 			t.Fatal(e)
-		} else if v, e := boat.GetField("b"); e != nil {
+		} else if v, e := boat.GetNamedField("b"); e != nil {
 			t.Fatal(e)
 		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
@@ -173,9 +173,9 @@ func TestFieldAccess(t *testing.T) {
 		// toy boat.A has an initial value of y
 		if toyBoat, e := q.GetField(object.Value, "toyBoat"); e != nil {
 			t.Fatal(e)
-		} else if e := toyBoat.SetField("w", generic.BoolOf(true)); e != nil {
+		} else if e := toyBoat.SetNamedField("w", generic.BoolOf(true)); e != nil {
 			t.Fatal(e)
-		} else if v, e := toyBoat.GetField("a"); e != nil {
+		} else if v, e := toyBoat.GetNamedField("a"); e != nil {
 			t.Fatal(e)
 		} else if str, e := v.GetText(); e != nil {
 			t.Fatal(e)
@@ -224,7 +224,7 @@ func testTraits(obj rt.Value, csv string) (err error) {
 	for want := true; len(traits) > 0 && err == nil; want = false {
 		trait := traits[0]
 		traits = traits[1:]
-		if p, e := obj.GetField(trait); e != nil {
+		if p, e := obj.GetNamedField(trait); e != nil {
 			err = errutil.New(e)
 		} else if got, e := p.GetBool(); e != nil {
 			err = errutil.New("assign", e)

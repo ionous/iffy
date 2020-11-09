@@ -26,3 +26,16 @@ const (
 	// Trait       Affinity = "trait"
 	// Verb        Affinity = "verb"
 )
+
+// return the affinity of an affine list, or blank if not a list.
+func Element(list Affinity) (ret Affinity) {
+	switch a := list; a {
+	case TextList:
+		ret = Text
+	case NumList:
+		ret = Number
+	case RecordList:
+		ret = Record
+	}
+	return
+}

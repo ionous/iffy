@@ -16,7 +16,7 @@ type qnaObject struct {
 
 func newObjectValue(run *Runner, v interface{}) (ret snapper, err error) {
 	if id, ok := v.(string); !ok {
-		err = errutil.New("expected id value, got %v(%T)", v, v)
+		err = errutil.Fmt("expected id value, got %v(%T)", v, v)
 	} else {
 		ret = &qnaObject{n: run, id: id}
 	}
@@ -39,7 +39,7 @@ func (q *qnaObject) Type() string {
 	return "object{}"
 }
 
-func (q *qnaObject) GetField(field string) (ret rt.Value, err error) {
+func (q *qnaObject) GetNamedField(field string) (ret rt.Value, err error) {
 	// fix temp:
 	var key keyType
 	switch field {
@@ -52,7 +52,7 @@ func (q *qnaObject) GetField(field string) (ret rt.Value, err error) {
 	return q.n.getField(key)
 }
 
-func (q *qnaObject) SetField(field string, val rt.Value) (err error) {
+func (q *qnaObject) SetNamedField(field string, val rt.Value) (err error) {
 	if len(field) == 0 {
 		err = errutil.Fmt("no field specified")
 	} else if writable := field[0] != object.Prefix; !writable {

@@ -1,7 +1,6 @@
 package rt
 
 import (
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/rt/writer"
 )
 
@@ -50,46 +49,5 @@ func (Panic) PluralOf(single string) string {
 	panic("Runtime panic")
 }
 func (Panic) SingularOf(plural string) string {
-	panic("Runtime panic")
-}
-
-type PanicValue struct{}
-
-var _ Value = (*PanicValue)(nil)
-
-func (PanicValue) Affinity() affine.Affinity {
-	panic("Runtime panic")
-}
-func (PanicValue) Type() string {
-	panic("Runtime panic")
-}
-func (PanicValue) GetBool() (bool, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetNumber() (float64, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetText() (string, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetNumList() ([]float64, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetTextList() ([]string, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetRecordList() ([]Value, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetLen() (int, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetIndex(int) (Value, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) GetField(string) (Value, error) {
-	panic("Runtime panic")
-}
-func (PanicValue) SetField(string, Value) error {
 	panic("Runtime panic")
 }
