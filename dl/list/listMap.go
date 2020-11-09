@@ -1,116 +1,88 @@
 package list
 
-// import (
-// 	"sort"
+import (
+	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/pattern"
+	"github.com/ionous/iffy/dl/term"
+	"github.com/ionous/iffy/object"
+	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/chain"
+)
 
-// 	"github.com/ionous/errutil"
-// 	"github.com/ionous/iffy/affine"
-// 	"github.com/ionous/iffy/dl/composer"
-// 	"github.com/ionous/iffy/dl/core"
-// 	"github.com/ionous/iffy/dl/pattern"
-// 	"github.com/ionous/iffy/object"
-// 	"github.com/ionous/iffy/rt"
-// 	"github.com/ionous/iffy/rt/generic"
-// )
+type Map struct {
+	FromList, ToList, Pattern string // variable names
+}
 
-// type Map struct {
-// 	FromList, ToList, WithPattern string // variable names
-// }
+func (*Map) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "list_map",
+		Group: "list",
+		Desc: `Map List: Transform the values from one list and place the results in another list.
+		The named pattern is called with two parameters: 'in' and 'out'`,
+	}
+}
+func (op *Map) Execute(run rt.Runtime) (err error) {
+	if e := op.execute(run); e != nil {
+		err = cmdError(op, e)
+	}
+	return
+}
 
-// // future: lists of lists? probably through lists of records containing lists.
-// func (*Map) Compose() composer.Spec {
-// 	return composer.Spec{
-// 		Name:  "list_map",
-// 		Group: "list",
-// 		// Spec:  "{list:text} entry {index:number}",
-// 		Desc: `Map List: Transform the values from one list and place the results in another list.
-// 		The named pattern is called with two parameters: 'in' and 'out'`,
-// 	}
-// }
-// func (op *Map) Execute(run rt.Runtime) (err error) {
-// 	if e := op.execute(run); e != nil {
-// 		err = cmdError(op, e)
-// 	}
-// 	return
-// }
+func (op *Map) execute(run rt.Runtime) (err error) {
+	var pat pattern.ActivityPattern
+	if fromList, e := run.GetField(object.Variables, op.FromList); e != nil {
+		err = e
+	} else if toList, e := run.GetField(object.Variables, op.ToList); e != nil {
+		err = e
+	} else if e := run.GetEvalByName(op.Pattern, &pat); e != nil {
+		err = e
+	} else {
+		// walk from generically
+		outType := toList.Type()
+		for it := chain.ListIt(fromList); it.HasNext(); {
+			if inVal, e := it.GetNext(); e != nil {
+				err = e
+				break
+			} else if outVal, e := run.Make(outType); e != nil {
+				err = e
+				break
+			} else if e := op.mapOne(run, pat, inVal, outVal); e != nil {
+				err = e
+				break
+			} else if vs, e := toList.Append(outVal); e != nil {
+				err = e
+				break
+			} else {
+				toList = vs
+			}
+		}
+		if err == nil {
+			err = run.SetField(object.Variables, op.ToList, toList)
+		}
+	}
+	return
+}
 
-// func (op *Map) execute(run rt.Runtime) (err error) {
-// 	if fromList, e := run.GetField(object.Variables, op.FromList); e != nil {
-// 		err = e
-// 	} else if toList, e := run.GetField(object.Variables, op.ToList); e != nil {
-// 		err = e
-// 	} else {
-
-// 		var newVals rt.Value // write back in case vs was temporary storage.
-// 		switch a := vs.Affinity(); a {
-// 		case affine.NumList:
-// 			if els, e := vs.GetNumList(); e != nil {
-// 				err = e
-// 			} else if e := op.sortNumbers(run, els); e != nil {
-// 				err = e
-// 			} else {
-// 				newVals = generic.FloatsOf(els)
-// 			}
-// 		case affine.TextList:
-// 			if els, e := vs.GetTextList(); e != nil {
-// 				err = e
-// 			} else if e := op.sortText(run, els); e != nil {
-// 				err = e
-// 			} else {
-// 				newVals = generic.StringsOf(els)
-// 			}
-// 		default:
-// 			err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)
-// 		}
-// 		if err == nil {
-// 			err = run.SetField(object.Variables, op.List, newVals)
-// 		}
-// 	}
-// 	return
-// }
-
-// func (op *Map) sortNumbers(run rt.Runtime, src []float64) (err error) {
-// 	var one, two core.Number
-// 	det := makeDet("sort", &core.FromNum{&one}, &core.FromNum{&two})
-// 	sort.Slice(src, func(i, j int) (ret bool) {
-// 		one.Num, two.Num = src[i], src[j]
-// 		if x, e := det.GetBool(run); e != nil {
-// 			err = errutil.Append(err, e)
-// 		} else {
-// 			ret = x
-// 		}
-// 		return
-// 	})
-// 	return
-// }
-
-// func (op *Map) sortText(run rt.Runtime, src []string) (err error) {
-// 	var one, two core.Text
-// 	det := makeDet("sort", &core.FromText{&one}, &core.FromText{&two})
-// 	sort.Slice(src, func(i, j int) (ret bool) {
-// 		one.Text, two.Text = src[i], src[j]
-// 		if x, e := det.GetBool(run); e != nil {
-// 			err = errutil.Append(err, e)
-// 		} else {
-// 			ret = x
-// 		}
-// 		return
-// 	})
-// 	return
-// }
-
-// // similar to express buildPattern
-// func makeDet(name string, first, second core.Assignment) rt.BoolEval {
-// 	return &pattern.DetermineBool{
-// 		Pattern: name,
-// 		Arguments: &core.Arguments{
-// 			Args: []*core.Argument{{
-// 				Name: "$1",
-// 				From: first,
-// 			}, {
-// 				Name: "$2",
-// 				From: second,
-// 			}},
-// 		},
-// 	}
-// }
+// see also pattern.Stitch
+func (op *Map) mapOne(run rt.Runtime, pat pattern.ActivityPattern, inVal, outVal rt.Value) (err error) {
+	var parms term.Terms
+	if e := pat.Prepare(run, &parms); e != nil {
+		err = e
+	} else if e := parms.SetField(object.Variables, "in", inVal); e != nil {
+		err = e
+	} else if e := parms.SetField(object.Variables, "out", outVal); e != nil {
+		err = e
+	} else {
+		run.PushScope(&parms)
+		var locals term.Terms
+		if e := pat.ComputeLocals(run, &locals); e != nil {
+			err = e
+		} else {
+			run.PushScope(&locals)
+			err = pat.Execute(run)
+			run.PopScope()
+		}
+		run.PopScope()
+	}
+	return
+}
