@@ -6,9 +6,9 @@ import (
 )
 
 type SetField struct {
-	Obj        ObjectEval
-	Field      rt.TextEval
-	Assignment Assignment
+	Obj   ObjectEval
+	Field rt.TextEval
+	From  Assignment
 }
 
 func (*SetField) Compose() composer.Spec {
@@ -24,7 +24,7 @@ func (op *SetField) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else if field, e := rt.GetText(run, op.Field); e != nil {
 		err = e
-	} else if val, e := GetAssignedValue(run, op.Assignment); e != nil {
+	} else if val, e := GetAssignedValue(run, op.From); e != nil {
 		err = e
 	} else {
 		// if its going to a record, it should have been a move or copy assignment.

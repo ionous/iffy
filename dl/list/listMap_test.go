@@ -3,6 +3,7 @@ package list_test
 import (
 	"testing"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
@@ -35,7 +36,8 @@ func TestMapStrings(t *testing.T) {
 	}
 }
 
-func xTestMapRecords(t *testing.T) {
+func TestMapRecords(t *testing.T) {
+	errutil.Panic = true
 	kind := g.NewKind(nil, "Record", []g.Field{
 		{Name: "Fruit", Affinity: affine.Text, Type: "string"},
 	})
@@ -52,7 +54,7 @@ func xTestMapRecords(t *testing.T) {
 		rec:   kind,
 		src:   g.RecordsOf(kind, fruits),
 		res:   g.RecordsOf(kind, nil),
-		remap: &reverseStrings,
+		remap: &reverseRecords,
 	}
 	if e := remap.Execute(&lt); e != nil {
 		t.Fatal(e)
@@ -76,29 +78,31 @@ func xTestMapRecords(t *testing.T) {
 
 var remap = list.Map{FromList: "src", ToList: "res", Pattern: "remap"}
 
-// var reverseRecords = pattern.ActivityPattern{
-// 	CommonPattern: pattern.CommonPattern{
-// 		Name: "remap",
-// 		Prologue: []term.Preparer{
-// 			&term.Text{Name: "in"},
-// 			&term.Text{Name: "out"},
-// 		},
-// 	},
-// 	Rules: []*pattern.ExecuteRule{
-// 		&pattern.ExecuteRule{
-// 			Execute: &core.Assign{
-// 				Name: "out",
-// 				From: &core.FromText{
-// 					&core.MakeReversed{
-// 						&core.GetVar{
-// 							Name: T("in"),
-// 						},
-// 					},
-// 				},
-// 			},
-// 		},
-// 	},
-// }
+var reverseRecords = pattern.ActivityPattern{
+	CommonPattern: pattern.CommonPattern{
+		Name: "remap",
+		Prologue: []term.Preparer{
+			&term.Record{Name: "in", Kind: "Record"},
+			&term.Record{Name: "out", Kind: "Record"},
+		},
+	},
+	Rules: []*pattern.ExecuteRule{
+		&pattern.ExecuteRule{
+			Execute: &core.SetField{
+				Obj:   V("out"),
+				Field: T("Fruit"),
+				From: &core.FromText{
+					&core.MakeReversed{
+						&core.GetField{
+							Obj:   V("in"),
+							Field: T("Fruit"),
+						},
+					},
+				},
+			},
+		},
+	},
+}
 
 var reverseStrings = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{

@@ -17,6 +17,9 @@ type Text struct {
 	Name string
 	Init rt.TextEval
 }
+type Record struct {
+	Name, Kind string
+}
 type Object struct {
 	Name, Kind string
 	Init       rt.TextEval
@@ -70,6 +73,19 @@ func (n *Text) Prepare(run rt.Runtime, p *Terms) (err error) {
 		err = e
 	} else {
 		p.AddTerm(n.Name, g.StringOf(v))
+	}
+	return
+}
+
+func (n *Record) String() string {
+	return n.Name
+}
+
+func (n *Record) Prepare(run rt.Runtime, p *Terms) (err error) {
+	if k, e := run.GetKindByName(n.Kind); e != nil {
+		err = e
+	} else {
+		p.AddTerm(n.Name, g.RecordOf(k.NewRecord()))
 	}
 	return
 }

@@ -22,7 +22,7 @@ type CommonPattern struct {
 	Locals   []term.Preparer
 }
 
-// setup the runtime parameter info with our stored parameter inf
+// setup the runtime parameter info with our stored parameter info
 func (ps *CommonPattern) Prepare(run rt.Runtime, parms *term.Terms) (err error) {
 	return prepareList(run, ps.Prologue, parms)
 }

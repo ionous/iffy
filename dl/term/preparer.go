@@ -4,9 +4,9 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-// parameters in the future might have defaults...
-// something similar might be used for local variables.
-// we could also -- in some far future land -- code generate things.
+// preparable terms are stored as part of a pattern.
+// they can add their names and default values to the list of expected parameters or predetermined locals
+// stored lists of preparers may be replaced by kinds at some point
 type Preparer interface {
 	Prepare(rt.Runtime, *Terms) error
 	String() string
