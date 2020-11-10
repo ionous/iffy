@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/kr/pretty"
 )
 
@@ -23,12 +24,12 @@ func TestPop(t *testing.T) {
 
 func popTest(front bool, amt int, strs ...string) []string {
 	var out []string
-	pop := &list.Pop{List: "strings",
+	pop := &list.Pop{List: "src",
 		Front: list.FrontOrBack(front),
 		Go:    core.NewActivity(&Write{&out, &core.GetVar{Name: T("text")}}),
 		Else:  core.NewActivity(&Write{&out, T("x")}),
 	}
-	run := listTime{strings: strs}
+	run := listTime{src: g.StringsOf(strs)}
 	for i := 0; i < amt; i++ {
 		if e := pop.Execute(&run); e != nil {
 			panic(e)

@@ -35,7 +35,7 @@ func (n *recordTest) GetField(target, field string) (ret g.Value, err error) {
 		if v, ok := n.vars[field]; !ok {
 			err = g.UnknownField{target, field}
 		} else {
-			ret = v
+			ret = g.RecordOf(v)
 		}
 	default:
 		err = errutil.New("unknown field", target, field)

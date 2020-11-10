@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/kr/pretty"
 )
 
@@ -49,11 +50,11 @@ func TestEach(t *testing.T) {
 func eachTest(t *testing.T, src []string, res []accum, otherwise int) {
 	var out []string
 	var visits []accum
-	each := &list.Each{List: "strings",
+	each := &list.Each{List: "src",
 		Go:   core.NewActivity(&visitEach{&visits}),
 		Else: core.NewActivity(&Write{&out, T("x")}),
 	}
-	if e := each.Execute(&listTime{strings: src}); e != nil {
+	if e := each.Execute(&listTime{src: g.StringsOf(src)}); e != nil {
 		t.Fatal(e)
 	} else if d := pretty.Diff(visits, res); len(d) > 0 || len(out) != otherwise {
 		t.Fatal(out, d)

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/dl/list"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 func TestSlices(t *testing.T) {
@@ -55,6 +56,6 @@ func TestSlices(t *testing.T) {
 }
 
 func slice(start, end int, src []string) string {
-	run := listTime{strings: src}
-	return joinText(&run, &list.Slice{"strings", I(start), I(end)})
+	run := listTime{src: g.StringsOf(src)}
+	return joinText(&run, &list.Slice{"src", I(start), I(end)})
 }

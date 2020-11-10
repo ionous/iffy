@@ -54,6 +54,9 @@ func FloatOf(v float64) Value {
 func RecordOf(v *Record) Value {
 	return makeValue(affine.Record, v.Type(), r.ValueOf(v))
 }
+func RecordsOf(k *Kind, vs []*Record) Value {
+	return makeValue(affine.RecordList, k.Name(), r.ValueOf(vs))
+}
 
 func StringsOf(vs []string) Value {
 	return makeValue(affine.TextList, defaultType, r.ValueOf(vs))

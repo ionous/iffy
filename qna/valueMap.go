@@ -3,6 +3,7 @@ package qna
 import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 type keyType struct {

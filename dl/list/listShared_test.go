@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
@@ -17,11 +18,11 @@ type panicTime struct {
 }
 type listTime struct {
 	panicTime
-	strings []string
-	res     []string
+	src, res g.Value
 	scope.ScopeStack
 	sort  *pattern.BoolPattern
 	remap *pattern.ActivityPattern
+	rec   *g.Kind
 }
 
 func B(i bool) rt.BoolEval   { return &core.Bool{i} }
@@ -85,10 +86,10 @@ func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
 		ret, err = lt.ScopeStack.GetField(target, field)
 	} else {
 		switch field {
-		case "strings":
-			ret = g.StringsOf(lt.strings)
+		case "src":
+			ret = lt.src
 		case "res":
-			ret = g.StringsOf(lt.res)
+			ret = lt.res
 		default:
 			ret, err = lt.ScopeStack.GetField(target, field)
 		}
@@ -101,18 +102,10 @@ func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
 		err = lt.ScopeStack.SetField(target, field, value)
 	} else {
 		switch field {
-		case "strings":
-			if vs, e := value.GetTextList(); e != nil {
-				err = e
-			} else {
-				lt.strings = vs
-			}
+		case "src":
+			lt.src = value
 		case "res":
-			if vs, e := value.GetTextList(); e != nil {
-				err = e
-			} else {
-				lt.res = vs
-			}
+			lt.res = value
 		default:
 			err = lt.ScopeStack.SetField(target, field, value)
 		}
@@ -127,6 +120,15 @@ func (lt *listTime) GetEvalByName(name string, pv interface{}) (err error) {
 	} else if name == "remap" {
 		ptr := pv.(*pattern.ActivityPattern)
 		(*ptr) = *lt.remap
+	}
+	return
+}
+
+func (lt *listTime) GetKindByName(name string) (ret *g.Kind, err error) {
+	if name == "Record" && lt.rec != nil {
+		ret = lt.rec
+	} else {
+		err = errutil.New("unknown kind", name)
 	}
 	return
 }
