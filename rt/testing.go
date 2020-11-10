@@ -16,10 +16,7 @@ func (Panic) ActivateDomain(name string, enable bool) {
 func (Panic) GetEvalByName(string, interface{}) error {
 	panic("Runtime panic")
 }
-func (Panic) Make(string) (g.Value, error) {
-	panic("Runtime panic")
-}
-func (Panic) Copy(g.Value) (g.Value, error) {
+func (Panic) GetKindByName(string) (*g.Kind, error) {
 	panic("Runtime panic")
 }
 func (Panic) GetField(target, field string) (g.Value, error) {

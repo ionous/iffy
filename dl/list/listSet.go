@@ -39,8 +39,10 @@ func (op *Set) setAt(run rt.Runtime) (err error) {
 		err = e
 	} else if cnt, e := els.GetLen(); e != nil {
 		err = e
-	} else if i := int(i - 1); i < 0 || i >= cnt {
-		err = rt.OutOfRange{i, cnt}
+	} else if i := int(i - 1); i < 0 {
+		err = g.Underflow{i, 0}
+	} else if i >= cnt {
+		err = g.Overflow{i, cnt}
 	} else if els, e := op.replace(run, els, i); e != nil {
 		err = e
 	} else {

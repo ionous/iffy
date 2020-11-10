@@ -100,7 +100,7 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
 	switch _, e := GetObjectValue(run, op.Obj); e.(type) {
 	case nil:
 		okay = true
-	case rt.UnknownObject:
+	case g.UnknownObject:
 		okay = false
 	default:
 		err = cmdError(op, e)

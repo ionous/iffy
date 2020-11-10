@@ -18,8 +18,10 @@ type panicTime struct {
 type listTime struct {
 	panicTime
 	strings []string
+	res     []string
 	scope.ScopeStack
-	sort *pattern.BoolPattern
+	sort  *pattern.BoolPattern
+	remap *pattern.ActivityPattern
 }
 
 func B(i bool) rt.BoolEval   { return &core.Bool{i} }
@@ -79,21 +81,41 @@ func joinStrings(vs []string) (ret string) {
 }
 
 func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
-	if target != object.Variables || field != "strings" {
+	if target != object.Variables {
 		ret, err = lt.ScopeStack.GetField(target, field)
 	} else {
-		ret = g.StringsOf(lt.strings)
+		switch field {
+		case "strings":
+			ret = g.StringsOf(lt.strings)
+		case "res":
+			ret = g.StringsOf(lt.res)
+		default:
+			ret, err = lt.ScopeStack.GetField(target, field)
+		}
 	}
 	return
 }
 
 func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
-	if target != object.Variables || field != "strings" {
+	if target != object.Variables {
 		err = lt.ScopeStack.SetField(target, field, value)
-	} else if vs, e := value.GetTextList(); e != nil {
-		err = e
 	} else {
-		lt.strings = vs
+		switch field {
+		case "strings":
+			if vs, e := value.GetTextList(); e != nil {
+				err = e
+			} else {
+				lt.strings = vs
+			}
+		case "res":
+			if vs, e := value.GetTextList(); e != nil {
+				err = e
+			} else {
+				lt.res = vs
+			}
+		default:
+			err = lt.ScopeStack.SetField(target, field, value)
+		}
 	}
 	return
 }
@@ -102,6 +124,9 @@ func (lt *listTime) GetEvalByName(name string, pv interface{}) (err error) {
 	if name == "sort" {
 		ptr := pv.(*pattern.BoolPattern)
 		(*ptr) = *lt.sort
+	} else if name == "remap" {
+		ptr := pv.(*pattern.ActivityPattern)
+		(*ptr) = *lt.remap
 	}
 	return
 }

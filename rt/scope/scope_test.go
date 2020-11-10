@@ -5,7 +5,6 @@ import (
 
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
 
@@ -36,7 +35,7 @@ func TestScopeStack(t *testing.T) {
 			switch p, e := stack.GetField(object.Variables, name); e.(type) {
 			default:
 				t.Fatal("fatal", e)
-			case rt.UnknownTarget, rt.UnknownField:
+			case g.UnknownTarget, g.UnknownField:
 				// t.Log(reason, "loop", i, "asking for", name, "... unknown")
 				have = -1
 			case nil:
@@ -57,7 +56,7 @@ func TestScopeStack(t *testing.T) {
 				switch e := stack.SetField(object.Variables, name, n); e.(type) {
 				default:
 					t.Fatal("fatal", reason, "step", step, name, "set failed", e)
-				case rt.UnknownField:
+				case g.UnknownField:
 					if have != -1 {
 						t.Fatal("fatal", "step", step, name, "set failed", e)
 					}
@@ -104,9 +103,9 @@ type mockScope struct {
 
 func (k *mockScope) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Variables {
-		err = rt.UnknownTarget{target}
+		err = g.UnknownTarget{target}
 	} else if field != k.name {
-		err = rt.UnknownField{target, field}
+		err = g.UnknownField{target, field}
 	} else {
 		k.gets++
 		ret, err = g.ValueOf(affine.Number, k.val)
@@ -116,9 +115,9 @@ func (k *mockScope) GetField(target, field string) (ret g.Value, err error) {
 
 func (k *mockScope) SetField(target, field string, v g.Value) (err error) {
 	if target != object.Variables {
-		err = rt.UnknownTarget{target}
+		err = g.UnknownTarget{target}
 	} else if field != k.name {
-		err = rt.UnknownField{target, field}
+		err = g.UnknownField{target, field}
 	} else if n, e := v.GetNumber(); e != nil {
 		err = e
 	} else {

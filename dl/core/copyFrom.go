@@ -37,7 +37,7 @@ func (op *CopyFrom) copyFrom(run rt.Runtime) (ret g.Value, err error) {
 	} else if op.Flags.tryObject() {
 		ret, err = box.GetObjectByName(run)
 	} else {
-		err = rt.UnknownObject(string(box))
+		err = g.UnknownObject(string(box))
 	}
 	return
 }

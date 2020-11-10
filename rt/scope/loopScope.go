@@ -61,7 +61,7 @@ type loopScope struct {
 // GetField returns values for the iterator variables (index,first,last) and anything up-
 func (l *loopScope) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Variables {
-		err = rt.UnknownTarget{target}
+		err = g.UnknownTarget{target}
 	} else {
 		switch field {
 		case l.varName:
@@ -73,7 +73,7 @@ func (l *loopScope) GetField(target, field string) (ret g.Value, err error) {
 		case "last":
 			ret = g.BoolOf(!l.hasNext)
 		default:
-			err = rt.UnknownField{target, field}
+			err = g.UnknownField{target, field}
 		}
 	}
 	return
@@ -82,13 +82,13 @@ func (l *loopScope) GetField(target, field string) (ret g.Value, err error) {
 // note: iterator variables are not (currently) writable.
 func (l *loopScope) SetField(target, field string, v g.Value) (err error) {
 	if target != object.Variables {
-		err = rt.UnknownTarget{target}
+		err = g.UnknownTarget{target}
 	} else {
 		switch field {
 		case l.varName, "index", "first", "last":
 			err = errutil.New("loop counters cant be changed")
 		default:
-			err = rt.UnknownField{target, field}
+			err = g.UnknownField{target, field}
 		}
 	}
 	return

@@ -1,6 +1,7 @@
 package list
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
@@ -37,16 +38,15 @@ func (op *Map) execute(run rt.Runtime) (err error) {
 	} else if e := run.GetEvalByName(op.Pattern, &pat); e != nil {
 		err = e
 	} else {
-		// walk from generically
-		outType := toList.Type()
+		a, t := affine.Element(toList.Affinity()), toList.Type()
 		for it := g.ListIt(fromList); it.HasNext(); {
 			if inVal, e := it.GetNext(); e != nil {
 				err = e
 				break
-			} else if outVal, e := run.Make(outType); e != nil {
+			} else if defVal, e := g.DefaultFor(run, a, t); e != nil {
 				err = e
 				break
-			} else if e := op.mapOne(run, pat, inVal, outVal); e != nil {
+			} else if outVal, e := op.mapOne(run, pat, inVal, defVal); e != nil {
 				err = e
 				break
 			} else if vs, e := toList.Append(outVal); e != nil {
@@ -64,7 +64,7 @@ func (op *Map) execute(run rt.Runtime) (err error) {
 }
 
 // see also pattern.Stitch
-func (op *Map) mapOne(run rt.Runtime, pat pattern.ActivityPattern, inVal, outVal g.Value) (err error) {
+func (op *Map) mapOne(run rt.Runtime, pat pattern.ActivityPattern, inVal, outVal g.Value) (ret g.Value, err error) {
 	var parms term.Terms
 	if e := pat.Prepare(run, &parms); e != nil {
 		err = e
@@ -79,10 +79,17 @@ func (op *Map) mapOne(run rt.Runtime, pat pattern.ActivityPattern, inVal, outVal
 			err = e
 		} else {
 			run.PushScope(&locals)
-			err = pat.Execute(run)
+			if e := pat.Execute(run); e != nil {
+				err = e
+			} else if v, e := parms.GetField(object.Variables, "out"); e != nil {
+				err = e
+			} else {
+				ret = v
+			}
 			run.PopScope()
 		}
 		run.PopScope()
+
 	}
 	return
 }

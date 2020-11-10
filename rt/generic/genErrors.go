@@ -13,6 +13,13 @@ type Underflow struct {
 	Index, Bounds int
 }
 
+type UnknownObject string
+
+// error for GetField, SetField
+type UnknownTarget struct {
+	Target string
+}
+
 // error for GetField, SetField
 type UnknownField struct {
 	Target, Field string
@@ -28,4 +35,12 @@ func (e Overflow) Error() string {
 
 func (e UnknownField) Error() string {
 	return errutil.Sprintf(`field not found "%s.%s"`, e.Target, e.Field)
+}
+
+func (e UnknownObject) Error() string {
+	return errutil.Sprintf("unknown object %q", string(e))
+}
+
+func (e UnknownTarget) Error() string {
+	return errutil.Sprintf("target not found %q", e.Target)
 }

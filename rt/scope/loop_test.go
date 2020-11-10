@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
 
@@ -38,7 +37,7 @@ func TestLoop(t *testing.T) {
 				t.Fatal("last error", last, "at", c, i, e)
 			} else {
 				_, e := s.GetField(object.Variables, "nothing")
-				if _, ok := e.(rt.UnknownField); !ok {
+				if _, ok := e.(g.UnknownField); !ok {
 					t.Fatal("expected loop error")
 				} else {
 					t.Log("loop", i, "of", cnt, fidx, first, last)

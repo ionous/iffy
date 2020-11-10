@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
@@ -57,6 +58,15 @@ func (*Assign) Compose() composer.Spec {
 		Group: "variables",
 		Desc:  "Assignment: Sets a variable to a value.",
 	}
+}
+
+func (op *Assign) Execute(run rt.Runtime) (err error) {
+	if v, e := GetAssignedValue(run, op.From); e != nil {
+		err = cmdError(op, e)
+	} else if e := run.SetField(object.Variables, op.Name, v); e != nil {
+		err = cmdError(op, e)
+	}
+	return
 }
 
 func (*FromBool) Compose() composer.Spec {

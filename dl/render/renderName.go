@@ -10,6 +10,7 @@ import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // Name handles changing a template like {.boombip} into text.
@@ -36,7 +37,7 @@ func (op *Name) GetText(run rt.Runtime) (ret string, err error) {
 		switch v, e := run.GetField(object.Variables, op.Name); e.(type) {
 		default:
 			err = cmdError(op, e)
-		case rt.UnknownTarget, rt.UnknownField:
+		case g.UnknownTarget, g.UnknownField:
 			// if there was no such variable, then it's probably an object name
 			ret, err = op.getPrintedNamedOf(run, name)
 		case nil:

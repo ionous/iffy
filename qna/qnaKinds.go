@@ -23,7 +23,7 @@ func (km *qnaKinds) addKind(n string, k *g.Kind) *g.Kind {
 	return k
 }
 
-func (km *qnaKinds) KindByName(name string) (ret *g.Kind, err error) {
+func (km *qnaKinds) GetKindByName(name string) (ret *g.Kind, err error) {
 	if k, ok := km.kinds[name]; ok {
 		ret = k
 	} else {
@@ -47,7 +47,7 @@ func (km *qnaKinds) KindByName(name string) (ret *g.Kind, err error) {
 				// aspects are stored as text in the runtime
 				affinity = affine.Text
 				// we need the aspect record to lookup related traits
-				if aspect, e := km.KindByName(name); e != nil {
+				if aspect, e := km.GetKindByName(name); e != nil {
 					err = errutil.New("aspect not found", fieldType, e)
 				} else {
 					aspects = append(aspects, aspect)

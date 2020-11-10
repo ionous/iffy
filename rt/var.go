@@ -73,8 +73,8 @@ func (v Variable) GetRecordList(run Runtime) (ret []*g.Record, err error) {
 // returns the named object instead of the named variable
 func (v Variable) GetObjectByName(run Runtime) (ret g.Value, err error) {
 	switch val, e := run.GetField(object.Value, string(v)); e.(type) {
-	case UnknownField:
-		err = UnknownObject(string(v))
+	case g.UnknownField:
+		err = g.UnknownObject(string(v))
 	default:
 		ret, err = val, e
 	}
@@ -87,7 +87,7 @@ func (v Variable) GetObjectByVariable(run Runtime) (ret g.Value, err error) {
 	default:
 		err = e
 	// if there's no such variable, check if there's an object of that name.
-	case UnknownTarget, UnknownField:
+	case g.UnknownTarget, g.UnknownField:
 		ret, err = v.GetObjectByName(run)
 	case nil:
 		ret = val

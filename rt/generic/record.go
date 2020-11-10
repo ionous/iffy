@@ -2,29 +2,16 @@ package generic
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 )
 
 type Record struct {
-	Nothing
 	kind   *Kind
 	values []Value
 }
 
-var _ Value = (*Record)(nil) // ensure compatibility
-
-func (r *Record) Affinity() affine.Affinity {
-	return affine.Record
-}
-
 func (r *Record) Type() string {
 	return r.kind.name
-}
-
-func (r *Record) GetRecord() (ret *Record, err error) {
-	ret = r
-	return
 }
 
 func (r *Record) GetNamedField(field string) (ret Value, err error) {

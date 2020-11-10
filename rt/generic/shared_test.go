@@ -15,7 +15,7 @@ func (n *recordTest) NewKind(name string, fields []g.Field) (ret *g.Kind) {
 	return k
 }
 
-func (n *recordTest) KindByName(name string) (ret *g.Kind, err error) {
+func (n *recordTest) GetKindByName(name string) (ret *g.Kind, err error) {
 	var ok bool
 	for _, k := range n.ks {
 		if k.Name() == name {
@@ -33,7 +33,7 @@ func (n *recordTest) GetField(target, field string) (ret g.Value, err error) {
 	switch target {
 	case object.Variables:
 		if v, ok := n.vars[field]; !ok {
-			err = rt.UnknownField{target, field}
+			err = g.UnknownField{target, field}
 		} else {
 			ret = v
 		}

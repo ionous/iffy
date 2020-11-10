@@ -62,12 +62,12 @@ func (m *modelTest) GetField(target, field string) (ret g.Value, err error) {
 	switch target {
 	case object.Value:
 		if _, ok := m.clsMap[field]; !ok {
-			err = rt.UnknownObject(field)
+			err = g.UnknownObject(field)
 		} else {
 			ret = &objTest{model: m, name: field}
 		}
 	default:
-		err = rt.UnknownField{target, field}
+		err = g.UnknownField{target, field}
 	}
 	return
 }
@@ -82,14 +82,14 @@ func (j *objTest) GetNamedField(field string) (ret g.Value, err error) {
 	switch m := j.model; field {
 	case object.Kind:
 		if cls, ok := m.clsMap[j.name]; !ok {
-			err = rt.UnknownField{j.name, field}
+			err = g.UnknownField{j.name, field}
 		} else {
 			ret = g.StringOf(cls)
 		}
 
 	case object.Kinds:
 		if cls, ok := m.clsMap[j.name]; !ok {
-			err = rt.UnknownField{j.name, field}
+			err = g.UnknownField{j.name, field}
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
@@ -97,7 +97,7 @@ func (j *objTest) GetNamedField(field string) (ret g.Value, err error) {
 		}
 
 	default:
-		err = rt.UnknownField{j.name, field}
+		err = g.UnknownField{j.name, field}
 	}
 	return
 }

@@ -75,7 +75,7 @@ func (op *GetVar) getObjectValue(run rt.Runtime) (ret g.Value, err error) {
 	} else if op.Flags.tryObject() {
 		ret, err = name.GetObjectByName(run)
 	} else {
-		err = rt.UnknownObject(string(name))
+		err = g.UnknownObject(string(name))
 	}
 	return
 }
@@ -138,7 +138,7 @@ func getVariableValue(run rt.Runtime, text rt.TextEval, flags TryAsNoun) (retBox
 				retVal = val
 			default:
 				err = e
-			case rt.UnknownTarget, rt.UnknownField:
+			case g.UnknownTarget, g.UnknownField:
 				retVal = nil // no such variable....
 			}
 		}

@@ -8,7 +8,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
@@ -131,7 +130,7 @@ func (n *Runner) SetField(target, field string, val g.Value) (err error) {
 			switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
 			default:
 				err = e
-			case rt.UnknownTarget, rt.UnknownField:
+			case g.UnknownTarget, g.UnknownField:
 				key := makeKey(target, field)
 				err = n.setField(key, val)
 			}
@@ -162,7 +161,7 @@ func (n *Runner) setField(key keyType, val g.Value) (err error) {
 				err = n.setField(targetAspect, g.StringOf(key.field))
 			}
 		}
-	case rt.UnknownField:
+	case g.UnknownField:
 		// didnt refer to a trait, so just set the field normally.
 		// ( to set the field, we get the field to verify it exists, and to check affinity )
 		if q, e := n.cacheField(key); e != nil {
@@ -209,7 +208,7 @@ func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 		err = e
 	case nil:
 		ret = v
-	case rt.UnknownTarget, rt.UnknownField:
+	case g.UnknownTarget, g.UnknownField:
 		if q, e := n.getField(makeKey(target, field)); e != nil {
 			err = e
 		} else {
@@ -268,7 +267,7 @@ func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 		switch aspectOfTrait, e := n.getField(key.dot(object.Aspect)); e.(type) {
 		default:
 			err = e
-		case rt.UnknownField:
+		case g.UnknownField:
 			ret, err = n.cacheQuery(key, n.fields.valueOf, target, field)
 		case nil:
 			// we found the aspect name from the trait

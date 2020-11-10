@@ -8,7 +8,6 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/assembly"
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
@@ -39,7 +38,7 @@ func TestFieldAccess(t *testing.T) {
 			default:
 				t.Fatal("assign", e)
 
-			case rt.UnknownObject:
+			case g.UnknownObject:
 				if v.exists {
 					t.Fatal("wanted to exist and it doesnt", name)
 				}
@@ -95,7 +94,7 @@ func TestFieldAccess(t *testing.T) {
 					switch e.(type) {
 					default:
 						t.Fatal(e)
-					case rt.UnknownField:
+					case g.UnknownField:
 						if value != nil {
 							t.Fatal("got unknown field, but expecting a value")
 						}

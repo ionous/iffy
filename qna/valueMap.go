@@ -3,7 +3,6 @@ package qna
 import (
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 )
 
 type keyType struct {
@@ -14,9 +13,9 @@ type valueMap map[keyType]qnaValue
 
 func (k *keyType) unknown() (err error) {
 	if k.target == object.Value {
-		err = rt.UnknownObject(k.field)
+		err = g.UnknownObject(k.field)
 	} else {
-		err = rt.UnknownField{k.target, k.field}
+		err = g.UnknownField{k.target, k.field}
 	}
 	return
 }

@@ -116,13 +116,21 @@ func (n refValue) validateIndex(i int) (err error) {
 	return
 }
 
-func (n refValue) GetNamedField(string) (ret Value, err error) {
-	err = errutil.New("value doesnt have fields")
+func (n refValue) GetNamedField(f string) (ret Value, err error) {
+	if d, e := n.GetRecord(); e != nil {
+		err = e
+	} else {
+		ret, err = d.GetNamedField(f)
+	}
 	return
 }
 
-func (n refValue) SetNamedField(string, Value) (err error) {
-	err = errutil.New("value is not field writable")
+func (n refValue) SetNamedField(f string, v Value) (err error) {
+	if d, e := n.GetRecord(); e != nil {
+		err = e
+	} else {
+		err = d.SetNamedField(f, v)
+	}
 	return
 }
 
@@ -184,8 +192,8 @@ func (n refValue) Append(v Value) (ret Value, err error) {
 }
 
 func (n refValue) appendOne(v Value) (ret Value, err error) {
-	elAffinity := affine.Element(v.Affinity())
-	compatible := n.a == elAffinity && (elAffinity != affine.Record || v.Type() == n.t)
+	va, elAffinity := v.Affinity(), affine.Element(n.a)
+	compatible := va == elAffinity && (va != affine.Record || v.Type() == n.t)
 	if !compatible {
 		err = errutil.New("value is not compatible with list")
 	} else if refv, ok := v.(refValue); !ok {

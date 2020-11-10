@@ -52,7 +52,7 @@ func (k *ScopeStack) visit(target, field string, visitor func(rt.Scope) error) (
 		case nil:
 			// no error? we're done.
 			goto Done
-		case rt.UnknownTarget, rt.UnknownField:
+		case g.UnknownTarget, g.UnknownField:
 			// didn't find? keep looking...
 		default:
 			// other error? done.
@@ -60,7 +60,7 @@ func (k *ScopeStack) visit(target, field string, visitor func(rt.Scope) error) (
 			goto Done
 		}
 	}
-	err = rt.UnknownField{target, field}
+	err = g.UnknownField{target, field}
 Done:
 	return
 }

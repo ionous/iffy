@@ -7,7 +7,7 @@ import (
 
 // Kinds database ( primarily for generating default values )
 type Kinds interface {
-	KindByName(name string) (*Kind, error)
+	GetKindByName(n string) (*Kind, error)
 }
 
 // DefaultFor generates a zero value for the specified affinity;
@@ -29,16 +29,16 @@ func DefaultFor(ks Kinds, a affine.Affinity, subtype string) (ret Value, err err
 		ret = EmptyList
 
 	case affine.Record:
-		if n, e := ks.KindByName(subtype); e != nil {
+		if k, e := ks.GetKindByName(subtype); e != nil {
 			err = errutil.New("unknown kind", subtype, e)
 		} else {
-			ret = n.NewRecord()
+			ret, err = ValueFor(k.NewRecord(), a, subtype)
 		}
 	case affine.RecordList:
-		if n, e := ks.KindByName(subtype); e != nil {
+		if _, e := ks.GetKindByName(subtype); e != nil {
 			err = errutil.New("unknown kind", subtype, e)
 		} else {
-			ret = n.NewRecordSlice()
+			ret, err = ValueFor(nil, a, subtype)
 		}
 	default:
 		err = errutil.New("unhandled affinity", a)

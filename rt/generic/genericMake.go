@@ -51,6 +51,9 @@ func StringOf(v string) Value {
 func FloatOf(v float64) Value {
 	return makeValue(affine.Number, defaultType, r.ValueOf(v))
 }
+func RecordOf(v *Record) Value {
+	return makeValue(affine.Record, v.Type(), r.ValueOf(v))
+}
 
 func StringsOf(vs []string) Value {
 	return makeValue(affine.TextList, defaultType, r.ValueOf(vs))
@@ -149,20 +152,21 @@ func newTextList(i interface{}, subtype string) (ret Value, err error) {
 
 func newRecord(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.Record
-	if r, ok := i.(*Record); !ok {
+	if v, ok := i.(*Record); !ok {
 		err = errutil.Fmt("unknown %s %T", a, i)
-	} else if t := r.Type(); len(subtype) > 0 && t != subtype {
+	} else if t := v.Type(); len(subtype) > 0 && t != subtype {
 		err = errutil.Fmt("mismatched record types", a, t, subtype)
 	} else {
-		ret = r // record implements value
+		ret = makeValue(a, t, r.ValueOf(v))
 	}
 	return
 }
 
+// note: doesnt check individual record types.
 func newRecordList(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.RecordList
 	switch v := i.(type) {
-	case []Value:
+	case []*Record:
 		ret = makeValue(a, subtype, r.ValueOf(v))
 	default:
 		err = errutil.Fmt("unknown %s %T", a, v)

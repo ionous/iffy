@@ -41,7 +41,7 @@ func (op *MoveFrom) moveFrom(run rt.Runtime) (ret g.Value, err error) {
 			// its an object reference, move is the same as copy.
 			ret, err = box.GetObjectByName(run)
 		} else {
-			err = rt.UnknownObject(string(box))
+			err = g.UnknownObject(string(box))
 		}
 	}
 	return

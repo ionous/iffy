@@ -30,10 +30,6 @@ func (k *Kind) NewRecord() *Record {
 	return &Record{kind: k, values: make([]Value, len(k.fields))}
 }
 
-func (k *Kind) NewRecordSlice() *RecordSlice {
-	return &RecordSlice{kind: k}
-}
-
 func (k *Kind) Name() string {
 	return k.name
 }
@@ -81,7 +77,7 @@ func (k *Kind) ensureTraits() {
 		var ts []trait
 		for _, ft := range k.fields {
 			if ft.Type == "aspect" {
-				if aspect, e := k.kinds.KindByName(ft.Name); e != nil {
+				if aspect, e := k.kinds.GetKindByName(ft.Name); e != nil {
 					log.Println("unknown aspect", ft.Name)
 				} else {
 					ts = makeTraits(aspect, ts)

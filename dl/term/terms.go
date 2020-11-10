@@ -3,7 +3,6 @@ package term
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
 
@@ -30,9 +29,9 @@ func (ps *Terms) AddTerm(field string, value g.Value) *Value {
 // GetField returns the value at 'name', the caller is responsible for determining the type.
 func (ps *Terms) GetField(target, field string) (ret g.Value, err error) {
 	if target != object.Variables {
-		err = rt.UnknownTarget{target}
+		err = g.UnknownTarget{target}
 	} else if p, ok := ps.values[field]; !ok {
-		err = rt.UnknownField{target, field}
+		err = g.UnknownField{target, field}
 	} else {
 		ret = p.value
 	}
@@ -42,9 +41,9 @@ func (ps *Terms) GetField(target, field string) (ret g.Value, err error) {
 // SetField writes (a copy of) the passed value into the term at 'name'.
 func (ps *Terms) SetField(target, field string, val g.Value) (err error) {
 	if target != object.Variables {
-		err = rt.UnknownTarget{target}
+		err = g.UnknownTarget{target}
 	} else if p, ok := ps.values[field]; !ok {
-		err = rt.UnknownField{target, field}
+		err = g.UnknownField{target, field}
 	} else if a := p.value.Affinity(); a != val.Affinity() {
 		err = errutil.New("value is not", a)
 	} else {

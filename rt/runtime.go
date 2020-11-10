@@ -17,18 +17,6 @@ type Scope interface {
 	SetField(object, field string, value g.Value) error
 }
 
-type Notary interface {
-	// create a new field set from the named kind.
-	// an implementation might only support the creation of some kinds.
-	Make(kind string) (g.Value, error)
-	// copy the contents of the passed value into a new value.
-	Copy(g.Value) (g.Value, error)
-	// move the contents of the passed value into a new value.
-	// the fields of the old value are left at defaults
-	// currently implemented as SetField with a null value
-	// Move(g.Value) (g.Value, error)
-}
-
 // Runtime environment for an in-progress game.
 type Runtime interface {
 	// objects are grouped into potentially hierarchical "domains"
@@ -39,7 +27,7 @@ type Runtime interface {
 	// pv should be a pointer to a concrete type.
 	GetEvalByName(name string, pv interface{}) error
 	// record manipulation
-	Notary
+	GetKindByName(name string) (*g.Kind, error)
 	// the runtime behaves as stack of scopes.
 	// if a variable isnt found in the most recently pushed scope
 	// the next most recently pushed scope will be checked and so on.
