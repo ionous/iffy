@@ -4,13 +4,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
+	"github.com/ionous/iffy/rt/test"
 )
 
 type panicTime struct {
@@ -19,10 +19,11 @@ type panicTime struct {
 type listTime struct {
 	panicTime
 	src, res g.Value
+	objs     map[string]*g.Record
 	scope.ScopeStack
 	sort  *pattern.BoolPattern
 	remap *pattern.ActivityPattern
-	rec   *g.Kind
+	kinds *test.Kinds
 }
 
 func B(i bool) rt.BoolEval       { return &core.Bool{i} }
@@ -83,17 +84,14 @@ func joinStrings(vs []string) (ret string) {
 }
 
 func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
-	if target != object.Variables {
-		ret, err = lt.ScopeStack.GetField(target, field)
+	if target == object.Variables && field == "src" {
+		ret = lt.src
+	} else if target == object.Variables && field == "res" {
+		ret = lt.res
+	} else if obj, ok := lt.objs[field]; target == object.Value && ok {
+		ret, err = g.ValueOf(obj)
 	} else {
-		switch field {
-		case "src":
-			ret = lt.src
-		case "res":
-			ret = lt.res
-		default:
-			ret, err = lt.ScopeStack.GetField(target, field)
-		}
+		ret, err = lt.ScopeStack.GetField(target, field)
 	}
 	return
 }
@@ -125,11 +123,6 @@ func (lt *listTime) GetEvalByName(name string, pv interface{}) (err error) {
 	return
 }
 
-func (lt *listTime) GetKindByName(name string) (ret *g.Kind, err error) {
-	if name == "Record" && lt.rec != nil {
-		ret = lt.rec
-	} else {
-		err = errutil.New("unknown kind", name)
-	}
-	return
+func (lt *listTime) GetKindByName(name string) (*g.Kind, error) {
+	return lt.kinds.GetKindByName(name)
 }

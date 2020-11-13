@@ -84,7 +84,7 @@ func (j *objTest) GetNamedField(field string) (ret g.Value, err error) {
 		if cls, ok := m.clsMap[j.name]; !ok {
 			err = g.UnknownField{j.name, field}
 		} else {
-			ret = g.StringOf(cls)
+			ret, err = g.ValueOf(cls)
 		}
 
 	case object.Kinds:
@@ -93,7 +93,7 @@ func (j *objTest) GetNamedField(field string) (ret g.Value, err error) {
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
-			ret = g.StringOf(path)
+			ret, err = g.ValueOf(path)
 		}
 
 	default:

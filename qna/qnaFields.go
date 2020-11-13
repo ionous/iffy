@@ -123,7 +123,7 @@ func (n *Runner) SetField(target, field string, val g.Value) (err error) {
 			if x, e := n.GetField(target, field); e != nil {
 				err = e
 			} else {
-				val, err = g.DefaultFor(&n.kinds, x.Affinity(), x.Type())
+				val, err = g.DefaultFrom(&n.kinds, x.Affinity(), x.Type())
 			}
 		}
 		if err == nil {
@@ -315,7 +315,7 @@ func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret 
 					ret = n.store(key, a, p)
 				}
 			} else {
-				if v, e := g.ValueOf(a, v); e != nil {
+				if v, e := g.ValueFrom(v, a, ""); e != nil {
 					err = e
 				} else {
 					ret = n.store(key, a, staticValue{v})

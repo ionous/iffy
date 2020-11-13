@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
@@ -57,7 +56,7 @@ func (it *rangeIt) HasNext() (okay bool) {
 func (it *rangeIt) GetNext() (ret g.Value, err error) {
 	if !it.HasNext() {
 		err = g.StreamExceeded
-	} else if v, e := g.ValueOf(affine.Number, it.next); e != nil {
+	} else if v, e := g.ValueOf(it.next); e != nil {
 		err = e
 	} else {
 		it.next = it.next + it.step

@@ -3,25 +3,24 @@ package list_test
 import (
 	"testing"
 
-	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/test"
 	"github.com/kr/pretty"
 )
 
 func TestMapStrings(t *testing.T) {
+	var kinds test.Kinds
+	kinds.Add((*Record)(nil))
 	fruit := []string{"Orange", "Lemon", "Mango", "Banana", "Lime"}
-	g.NewKind(nil, "Record", []g.Field{
-		{Name: "Fruit", Affinity: affine.Text, Type: "string"},
-	})
 	lt := listTime{
 		src:   g.StringsOf(fruit),
 		res:   g.StringsOf(nil),
 		remap: &reverseStrings,
+		kinds: &kinds,
 	}
 	if e := remap.Execute(&lt); e != nil {
 		t.Fatal(e)
@@ -36,26 +35,30 @@ func TestMapStrings(t *testing.T) {
 	}
 }
 
+type Record struct{ Fruit string }
+
 func TestMapRecords(t *testing.T) {
-	errutil.Panic = true
-	kind := g.NewKind(nil, "Record", []g.Field{
-		{Name: "Fruit", Affinity: affine.Text, Type: "string"},
-	})
-	var fruits []*g.Record
-	for _, f := range []string{"Orange", "Lemon", "Mango", "Banana", "Lime"} {
-		one := kind.NewRecord()
-		if e := one.SetNamedField("Fruit", g.StringOf(f)); e != nil {
-			t.Fatal(e)
-		}
-		fruits = append(fruits, one)
-	}
-	//
+	var kinds test.Kinds
+	kinds.Add((*Record)(nil))
 	lt := listTime{
-		rec:   kind,
-		src:   g.RecordsOf(kind, fruits),
-		res:   g.RecordsOf(kind, nil),
+		kinds: &kinds,
 		remap: &reverseRecords,
 	}
+	if k, e := lt.GetKindByName("Record"); e != nil {
+		t.Fatal(e)
+	} else {
+		var fruits []*g.Record
+		for _, f := range []string{"Orange", "Lemon", "Mango", "Banana", "Lime"} {
+			one := k.NewRecord()
+			if e := one.SetNamedField("Fruit", g.StringOf(f)); e != nil {
+				t.Fatal(e)
+			}
+			fruits = append(fruits, one)
+		}
+		lt.src = g.RecordsOf(k, fruits)
+		lt.res = g.RecordsOf(k, nil)
+	}
+
 	if e := remap.Execute(&lt); e != nil {
 		t.Fatal(e)
 	} else if res, e := lt.res.GetRecordList(); e != nil {

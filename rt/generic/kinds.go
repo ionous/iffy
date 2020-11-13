@@ -10,9 +10,9 @@ type Kinds interface {
 	GetKindByName(n string) (*Kind, error)
 }
 
-// DefaultFor generates a zero value for the specified affinity;
+// DefaultFrom generates a zero value for the specified affinity;
 // uses the passed Kinds to generate empty records when necessary.
-func DefaultFor(ks Kinds, a affine.Affinity, subtype string) (ret Value, err error) {
+func DefaultFrom(ks Kinds, a affine.Affinity, subtype string) (ret Value, err error) {
 	// return the default value for the
 	switch a {
 	case affine.Bool:
@@ -32,13 +32,13 @@ func DefaultFor(ks Kinds, a affine.Affinity, subtype string) (ret Value, err err
 		if k, e := ks.GetKindByName(subtype); e != nil {
 			err = errutil.New("unknown kind", subtype, e)
 		} else {
-			ret, err = ValueFor(k.NewRecord(), a, subtype)
+			ret, err = ValueFrom(k.NewRecord(), a, subtype)
 		}
 	case affine.RecordList:
 		if _, e := ks.GetKindByName(subtype); e != nil {
 			err = errutil.New("unknown kind", subtype, e)
 		} else {
-			ret, err = ValueFor(nil, a, subtype)
+			ret, err = ValueFrom(nil, a, subtype)
 		}
 	default:
 		err = errutil.New("unhandled affinity", a)

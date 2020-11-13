@@ -68,7 +68,7 @@ func (op *Each) execute(run rt.Runtime) (err error) {
 				} else {
 					el.SetValue(at)
 					next := i + 1
-					if v, e := g.ValueOf(affine.Number, next); e != nil {
+					if v, e := g.ValueOf(next); e != nil {
 						err = e
 						break
 					} else {

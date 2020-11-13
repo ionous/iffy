@@ -62,7 +62,7 @@ func (op *Set) replace(run rt.Runtime, els g.Value, i int) (ret g.Value, err err
 			err = e
 		} else {
 			els[i] = el
-			ret = g.FloatsOf(els)
+			ret, err = g.ValueOf(els)
 		}
 	case affine.TextList:
 		if els, e := els.GetTextList(); e != nil {
@@ -73,7 +73,7 @@ func (op *Set) replace(run rt.Runtime, els g.Value, i int) (ret g.Value, err err
 			err = e
 		} else {
 			els[i] = el
-			ret = g.StringsOf(els)
+			ret, err = g.ValueOf(els)
 		}
 	default:
 		err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)

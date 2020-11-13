@@ -52,7 +52,7 @@ func (r *Record) getTraitValue(fv Value, field string) (ret Value, err error) {
 
 func (r *Record) getFieldValue(fv Value, ft Field) (ret Value, err error) {
 	if fv == nil {
-		ret, err = DefaultFor(r.kind.kinds, ft.Affinity, ft.Type)
+		ret, err = DefaultFrom(r.kind.kinds, ft.Affinity, ft.Type)
 	} else {
 		ret = fv
 	}

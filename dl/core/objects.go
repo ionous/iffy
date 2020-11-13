@@ -29,8 +29,8 @@ type ObjectExists struct {
 	Obj ObjectEval
 }
 
-// NameOf returns the full name of an object as written by the author when declared.
-// The name cannot be changed at runtime, instead use the "printed name" property.
+// NameOf returns the full name of an object as declared by the author.
+// It doesnt change over the course of play. To change the name use the "printed name" property.
 type NameOf struct {
 	Obj ObjectEval
 }

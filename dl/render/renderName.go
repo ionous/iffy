@@ -14,7 +14,7 @@ import (
 )
 
 // Name handles changing a template like {.boombip} into text.
-// if the name is a variable containing an object name: return the printed object name.
+// if the name is a variable containing an object name: return the printed object name ( via "print name" )
 // if the name is a variable with some other text: return that text.
 // if the name isn't a variable but refers to some object: return that object's printed object name.
 // otherwise, its an error.

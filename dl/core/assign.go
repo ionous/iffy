@@ -81,7 +81,7 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := rt.GetBool(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.BoolOf(val)
+		ret, err = g.ValueOf(val)
 	}
 	return
 }
@@ -103,7 +103,7 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := rt.GetNumber(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.FloatOf(val)
+		ret, err = g.ValueOf(val)
 	}
 	return
 }
@@ -124,7 +124,7 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := rt.GetText(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.StringOf(val)
+		ret, err = g.ValueOf(val)
 	}
 	return
 }
@@ -145,7 +145,7 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error)
 	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.FloatsOf(vals)
+		ret, err = g.ValueOf(vals)
 	}
 	return
 }
@@ -166,7 +166,7 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error
 	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.StringsOf(vals)
+		ret, err = g.ValueOf(vals)
 	}
 	return
 }

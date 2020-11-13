@@ -105,12 +105,13 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				default:
 					// the type might be some sort of kind...
 					if kind := kind.String; len(kind) > 0 {
-						p := term.Object{Name: paramName, Kind: kind}
-						if e := decode(prog, &p.Init); e != nil {
-							err = errutil.New("couldnt decode", patternName, paramName, e)
-						} else {
-							err = last.AddParam(category, &p)
-						}
+						p := term.Record{Name: paramName, Kind: kind}
+						// fix.
+						// if e := decode(prog, &p.Init); e != nil {
+						// 	err = errutil.New("couldnt decode", patternName, paramName, e)
+						// } else {
+						err = last.AddParam(category, &p)
+						// }
 					} else {
 						err = errutil.Fmt("pattern %q parameter %q has unknown type %q ( expected an eval .)",
 							patternName, paramName, typeName)

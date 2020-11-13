@@ -21,7 +21,7 @@ var Support = []interface{}{
 	(*term.Number)(nil),
 	(*term.Bool)(nil),
 	(*term.Text)(nil),
-	(*term.Object)(nil),
+	(*term.Record)(nil),
 	(*term.NumList)(nil),
 	(*term.TextList)(nil),
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
@@ -96,7 +95,7 @@ func (m *seqTest) GetField(target, field string) (ret g.Value, err error) {
 		err = g.UnknownField{target, field}
 	} else {
 		v := m.counters[field]
-		ret, err = g.ValueOf(affine.Number, v)
+		ret, err = g.ValueOf(v)
 	}
 	return
 }

@@ -66,7 +66,7 @@ func (op *Push) pushList(run rt.Runtime, vs g.Value) (ret g.Value, err error) {
 		} else if res, e := pushNumbers(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret = g.FloatsOf(res)
+			ret, err = g.ValueOf(res)
 		}
 	case affine.TextList:
 		if add, e := getNewStrings(run, op.Insert); e != nil {
@@ -74,7 +74,7 @@ func (op *Push) pushList(run rt.Runtime, vs g.Value) (ret g.Value, err error) {
 		} else if res, e := pushText(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret = g.StringsOf(res)
+			ret, err = g.ValueOf(res)
 		}
 	case affine.RecordList:
 		t := vs.Type()
@@ -83,7 +83,7 @@ func (op *Push) pushList(run rt.Runtime, vs g.Value) (ret g.Value, err error) {
 		} else if res, e := pushRecords(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret, err = g.ValueFor(res, a, t)
+			ret, err = g.ValueFrom(res, a, t)
 		}
 	default:
 		err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)

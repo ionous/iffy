@@ -8,32 +8,46 @@ import (
 )
 
 // ValueOf returns a new generic value wrapper based on analyzing the passed value.
-func ValueOf(a affine.Affinity, i interface{}) (Value, error) {
-	return ValueFor(i, a, defaultType)
+func ValueOf(i interface{}) (ret Value, err error) {
+	switch i.(type) {
+	case bool, *bool:
+		ret, err = newBoolValue(i, defaultType)
+	case int, int64, float32, float64, *int, *int64, *float32, *float64:
+		ret, err = newNumValue(i, defaultType)
+	case string, *string:
+		ret, err = newTextValue(i, defaultType)
+	case []float64:
+		ret, err = newNumList(i, defaultType)
+	case []string:
+		ret, err = newTextList(i, defaultType)
+	case *Record:
+		ret, err = newRecord(i, defaultType)
+	// case []*Record:
+	// 	ret, err = newRecordList(i, defaultType)
+	default:
+		err = errutil.New("unhandled value %v(%T)", i, i)
+	}
+	return
 }
 
-// ValueFor adds an optional subtype to values, for example:
+// ValueFrom adds an optional subtype to values, for example:
 // marking text as specifically intended for aspects, traits, etc.
-func ValueFor(i interface{}, a affine.Affinity, subtype string) (ret Value, err error) {
+func ValueFrom(i interface{}, a affine.Affinity, subtype string) (ret Value, err error) {
 	switch a {
 	case affine.Bool:
 		ret, err = newBoolValue(i, subtype)
-
 	case affine.Number:
 		ret, err = newNumValue(i, subtype)
 	case affine.NumList:
 		ret, err = newNumList(i, subtype)
-
 	case affine.Text:
 		ret, err = newTextValue(i, subtype)
 	case affine.TextList:
 		ret, err = newTextList(i, subtype)
-
 	case affine.Record:
 		ret, err = newRecord(i, subtype)
 	case affine.RecordList:
 		ret, err = newRecordList(i, subtype)
-
 	default:
 		err = errutil.New("unhandled affinity", a)
 	}
@@ -43,11 +57,9 @@ func ValueFor(i interface{}, a affine.Affinity, subtype string) (ret Value, err 
 func BoolOf(v bool) Value {
 	return makeValue(affine.Bool, defaultType, r.ValueOf(v))
 }
-
 func StringOf(v string) Value {
 	return makeValue(affine.Text, defaultType, r.ValueOf(v))
 }
-
 func FloatOf(v float64) Value {
 	return makeValue(affine.Number, defaultType, r.ValueOf(v))
 }

@@ -3,7 +3,6 @@ package scope
 import (
 	"testing"
 
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
 )
@@ -50,7 +49,7 @@ func TestScopeStack(t *testing.T) {
 			//
 			if want := count[i]; want != have {
 				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
-			} else if n, e := g.ValueOf(affine.Number, have+1); e != nil {
+			} else if n, e := g.ValueOf(have + 1); e != nil {
 				t.Fatal(e)
 			} else {
 				switch e := stack.SetField(object.Variables, name, n); e.(type) {
@@ -108,7 +107,7 @@ func (k *mockScope) GetField(target, field string) (ret g.Value, err error) {
 		err = g.UnknownField{target, field}
 	} else {
 		k.gets++
-		ret, err = g.ValueOf(affine.Number, k.val)
+		ret, err = g.ValueOf(k.val)
 	}
 	return
 }
