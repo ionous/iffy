@@ -54,7 +54,7 @@ func eachTest(t *testing.T, src []string, res []accum, otherwise int) {
 		Go:   core.NewActivity(&visitEach{&visits}),
 		Else: core.NewActivity(&Write{&out, T("x")}),
 	}
-	if e := each.Execute(&listTime{src: g.StringsOf(src)}); e != nil {
+	if e := each.Execute(&listTime{vals: values{"src": g.StringsOf(src)}}); e != nil {
 		t.Fatal(e)
 	} else if d := pretty.Diff(visits, res); len(d) > 0 || len(out) != otherwise {
 		t.Fatal(out, d)

@@ -1,6 +1,6 @@
 package test
 
-type GroupPartition struct {
+type GroupSettings struct {
 	// the name of the object this record describes
 	// ex. tile X, or tile W ( from a scrabble set )
 	Name string
@@ -30,3 +30,13 @@ const (
 	// ex. the X and the W tiles from a Scrabble set.
 	WithArticles
 )
+
+type Groupings struct {
+	Ungrouped []GroupSettings // all of the objects which werent part of any particular group
+	Groups    []GroupedObjects
+}
+
+type GroupedObjects struct {
+	Settings GroupSettings // the settings of the first object in the group
+	Objects  []string      // of the objects in the group
+}

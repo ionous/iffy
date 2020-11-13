@@ -56,6 +56,6 @@ func TestSlices(t *testing.T) {
 }
 
 func slice(start, end int, src []string) string {
-	run := listTime{src: g.StringsOf(src)}
+	run := listTime{vals: values{"src": g.StringsOf(src)}}
 	return joinText(&run, &list.Slice{"src", I(start), I(end)})
 }

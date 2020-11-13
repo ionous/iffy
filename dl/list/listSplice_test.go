@@ -65,9 +65,9 @@ func TestSplices(t *testing.T) {
 }
 
 func splice(src []string, start, cnt int, add ...string) (ret string, err error) {
-	run := listTime{src: g.StringsOf(append([]string{}, src...))}
-	rub := joinText(&run, &list.Splice{"src", I(start), I(cnt), FromTs(add)})
-	if strs, e := run.src.GetTextList(); e != nil {
+	lt := listTime{vals: values{"src": g.StringsOf(append([]string{}, src...))}}
+	rub := joinText(&lt, &list.Splice{"src", I(start), I(cnt), FromTs(add)})
+	if strs, e := lt.vals["src"].GetTextList(); e != nil {
 		err = e
 	} else {
 		next := joinStrings(strs) // get the variable set by splice

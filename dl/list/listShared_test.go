@@ -18,13 +18,15 @@ type panicTime struct {
 }
 type listTime struct {
 	panicTime
-	src, res g.Value
-	objs     map[string]*g.Record
+	objs map[string]*g.Record
+	vals values
 	scope.ScopeStack
 	sort  *pattern.BoolPattern
 	remap *pattern.ActivityPattern
 	kinds *test.Kinds
 }
+
+type values map[string]g.Value
 
 func B(i bool) rt.BoolEval       { return &core.Bool{i} }
 func I(i int) rt.NumberEval      { return &core.Number{float64(i)} }
@@ -85,9 +87,9 @@ func joinStrings(vs []string) (ret string) {
 
 func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
 	if target == object.Variables && field == "src" {
-		ret = lt.src
+		ret = lt.vals["src"]
 	} else if target == object.Variables && field == "res" {
-		ret = lt.res
+		ret = lt.vals["res"]
 	} else if obj, ok := lt.objs[field]; target == object.Value && ok {
 		ret, err = g.ValueOf(obj)
 	} else {
@@ -102,9 +104,9 @@ func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
 	} else {
 		switch field {
 		case "src":
-			lt.src = value
+			lt.vals["src"] = value
 		case "res":
-			lt.res = value
+			lt.vals["res"] = value
 		default:
 			err = lt.ScopeStack.SetField(target, field, value)
 		}

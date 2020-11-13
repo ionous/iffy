@@ -29,7 +29,7 @@ func popTest(front bool, amt int, strs ...string) []string {
 		Go:    core.NewActivity(&Write{&out, &core.GetVar{Name: T("text")}}),
 		Else:  core.NewActivity(&Write{&out, T("x")}),
 	}
-	run := listTime{src: g.StringsOf(strs)}
+	run := listTime{vals: values{"src": g.StringsOf(strs)}}
 	for i := 0; i < amt; i++ {
 		if e := pop.Execute(&run); e != nil {
 			panic(e)

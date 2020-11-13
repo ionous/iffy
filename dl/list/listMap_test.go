@@ -17,14 +17,16 @@ func TestMapStrings(t *testing.T) {
 	kinds.Add((*Record)(nil))
 	fruit := []string{"Orange", "Lemon", "Mango", "Banana", "Lime"}
 	lt := listTime{
-		src:   g.StringsOf(fruit),
-		res:   g.StringsOf(nil),
+		vals: values{
+			"src": g.StringsOf(fruit),
+			"res": g.StringsOf(nil),
+		},
 		remap: &reverseStrings,
 		kinds: &kinds,
 	}
 	if e := remap.Execute(&lt); e != nil {
 		t.Fatal(e)
-	} else if res, e := lt.res.GetTextList(); e != nil {
+	} else if res, e := lt.vals["res"].GetTextList(); e != nil {
 		t.Fatal(e)
 	} else if diff := pretty.Diff(res, []string{
 		"egnarO", "nomeL", "ognaM", "ananaB", "emiL",
@@ -43,6 +45,7 @@ func TestMapRecords(t *testing.T) {
 	lt := listTime{
 		kinds: &kinds,
 		remap: &reverseRecords,
+		vals:  values{},
 	}
 	if k, e := lt.GetKindByName("Record"); e != nil {
 		t.Fatal(e)
@@ -55,13 +58,13 @@ func TestMapRecords(t *testing.T) {
 			}
 			fruits = append(fruits, one)
 		}
-		lt.src = g.RecordsOf(k, fruits)
-		lt.res = g.RecordsOf(k, nil)
+		lt.vals["src"] = g.RecordsOf(k, fruits)
+		lt.vals["res"] = g.RecordsOf(k, nil)
 	}
 
 	if e := remap.Execute(&lt); e != nil {
 		t.Fatal(e)
-	} else if res, e := lt.res.GetRecordList(); e != nil {
+	} else if res, e := lt.vals["res"].GetRecordList(); e != nil {
 		t.Fatal(e)
 	} else {
 		expect := []string{

@@ -20,7 +20,7 @@ type fieldMap map[string][]g.Field
 // register kinds from a struct using reflection
 func (ks *Kinds) Add(is ...interface{}) {
 	for _, el := range is {
-		ks.fields = kindsForType(ks.fields, el)
+		ks.fields = kindsForType(ks.fields, r.TypeOf(el).Elem())
 	}
 }
 
@@ -52,9 +52,8 @@ func (ks *Kinds) GetKindByName(name string) (ret *g.Kind, err error) {
 }
 
 // generate kinds from a struct using reflection
-func kindsForType(kinds fieldMap, i interface{}) fieldMap {
+func kindsForType(kinds fieldMap, t r.Type) fieldMap {
 	type stringer interface{ String() string }
-	t := r.TypeOf(i).Elem()
 	rstringer := r.TypeOf((*stringer)(nil)).Elem()
 	if kinds == nil {
 		kinds = make(fieldMap)
@@ -63,24 +62,33 @@ func kindsForType(kinds fieldMap, i interface{}) fieldMap {
 	var fields []g.Field
 	for i, cnt := 0, t.NumField(); i < cnt; i++ {
 		f := t.Field(i)
-		ft := f.Type
+		fieldType := f.Type
 		var a affine.Affinity
 		var t string
-		switch k := ft.Kind(); k {
+		switch k := fieldType.Kind(); k {
 		default:
-			panic("unknown kind")
+			panic(errutil.Sprint("unknown kind", k))
 		case r.Bool:
 			a, t = affine.Bool, k.String()
 		case r.String:
 			a, t = affine.Text, k.String()
+		case r.Struct:
+			a, t = affine.Record, fieldType.Name()
+			kinds = kindsForType(kinds, fieldType)
+
 		case r.Slice:
-			switch k := ft.Kind(); k {
+			elType := fieldType.Elem()
+			switch k := elType.Kind(); k {
 			case r.String:
 				a, t = affine.TextList, k.String()
 			case r.Float64:
 				a, t = affine.NumList, k.String()
+			case r.Struct:
+				a, t = affine.RecordList, elType.Name()
+				kinds = kindsForType(kinds, elType)
+
 			default:
-				panic("unknown slice")
+				panic(errutil.Sprint("unknown slice", elType.String()))
 			}
 
 		case r.Float64:
@@ -88,23 +96,23 @@ func kindsForType(kinds fieldMap, i interface{}) fieldMap {
 
 		case r.Int:
 			a, t = affine.Text, "aspect"
-			if !ft.Implements(rstringer) {
+			if !fieldType.Implements(rstringer) {
 				panic("unknown enum")
 			}
 
-			x := r.New(ft).Elem()
+			x := r.New(fieldType).Elem()
 			var traits []g.Field
 			for j := int64(0); j < 25; j++ {
 				x.SetInt(j)
 				trait := x.Interface().(stringer).String()
-				end := fmt.Sprintf("%s(%d)", ft.Name(), j)
+				end := fmt.Sprintf("%s(%d)", fieldType.Name(), j)
 				if trait == end {
 					break
 				}
 				traits = append(traits, g.Field{Name: trait, Affinity: affine.Bool, Type: "trait"})
 
 			}
-			kinds[ft.Name()] = traits
+			kinds[fieldType.Name()] = traits
 		}
 		fields = append(fields, g.Field{Name: f.Name, Affinity: a, Type: t})
 

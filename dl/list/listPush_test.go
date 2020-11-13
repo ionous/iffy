@@ -42,9 +42,9 @@ func TestPush(t *testing.T) {
 }
 
 func push(src []string, front bool, add ...string) (ret string, err error) {
-	run := listTime{src: g.StringsOf(append([]string{}, src...))}
-	num := getNum(&run, &list.Push{"src", list.FrontOrBack(front), FromTs(add)})
-	if strs, e := run.src.GetTextList(); e != nil {
+	lt := listTime{vals: values{"src": g.StringsOf(append([]string{}, src...))}}
+	num := getNum(&lt, &list.Push{"src", list.FrontOrBack(front), FromTs(add)})
+	if strs, e := lt.vals["src"].GetTextList(); e != nil {
 		err = e
 	} else {
 		next := joinStrings(strs) // get the variable set by splice
