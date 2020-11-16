@@ -25,7 +25,11 @@ func TestSort(t *testing.T) {
 
 func sortTest(strs []string) (err error) {
 	sort := list.Sort{"src", "sort"}
-	return sort.Execute(&listTime{vals: values{"src": g.StringsOf(strs)}, sort: &sortPattern})
+	return sort.Execute(&listTime{
+		vals: values{"src": g.StringsOf(strs)},
+		PatternMap: pattern.PatternMap{
+			"sort": &sortPattern,
+		}})
 }
 
 var sortPattern = pattern.BoolPattern{

@@ -12,7 +12,7 @@ import (
 // TestFactorial of the number 3 to verify pattern recursion works.
 func TestFactorial(t *testing.T) {
 	// rules are run in reverse order.
-	run := patternRuntime{patternMap: patternMap{
+	run := patternRuntime{PatternMap: pattern.PatternMap{
 		"factorial": &pattern.NumberPattern{
 			pattern.CommonPattern{
 				Name: "factorial",
@@ -23,7 +23,7 @@ func TestFactorial(t *testing.T) {
 				NumberEval: &core.ProductOf{
 					&core.GetVar{Name: &core.Text{"num"}},
 					&pattern.DetermineNum{
-						"factorial", pattern.NewNamedParams(
+						Pattern: "factorial", Arguments: pattern.NewNamedParams(
 							"num", &core.FromNum{
 								&core.DiffOf{
 									&core.GetVar{Name: &core.Text{"num"}},
@@ -42,7 +42,7 @@ func TestFactorial(t *testing.T) {
 	}}
 	// determine the factorial of the number 3
 	det := pattern.DetermineNum{
-		"factorial", pattern.NewNamedParams(
+		Pattern: "factorial", Arguments: pattern.NewNamedParams(
 			"num", &core.FromNum{
 				&core.Number{3},
 			}),

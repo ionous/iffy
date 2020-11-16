@@ -17,7 +17,6 @@ var Support = []interface{}{
 	(*ExecuteRule)(nil),
 	//
 	//(*term.Preparer)(nil),
-	(*term.Terms)(nil),
 	(*term.Number)(nil),
 	(*term.Bool)(nil),
 	(*term.Text)(nil),

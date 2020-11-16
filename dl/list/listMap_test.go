@@ -21,7 +21,9 @@ func TestMapStrings(t *testing.T) {
 			"src": g.StringsOf(fruit),
 			"res": g.StringsOf(nil),
 		},
-		remap: &reverseStrings,
+		PatternMap: pattern.PatternMap{
+			"remap": &reverseStrings,
+		},
 		kinds: &kinds,
 	}
 	if e := remap.Execute(&lt); e != nil {
@@ -44,8 +46,10 @@ func TestMapRecords(t *testing.T) {
 	kinds.Add((*Record)(nil))
 	lt := listTime{
 		kinds: &kinds,
-		remap: &reverseRecords,
-		vals:  values{},
+		PatternMap: pattern.PatternMap{
+			"remap": &reverseRecords,
+		},
+		vals: values{},
 	}
 	if k, e := lt.GetKindByName("Record"); e != nil {
 		t.Fatal(e)
@@ -66,6 +70,8 @@ func TestMapRecords(t *testing.T) {
 		t.Fatal(e)
 	} else if res, e := lt.vals["res"].GetRecordList(); e != nil {
 		t.Fatal(e)
+	} else if len(res) != 5 {
+		t.Fatal("missing results")
 	} else {
 		expect := []string{
 			"egnarO", "nomeL", "ognaM", "ananaB", "emiL",
@@ -76,7 +82,7 @@ func TestMapRecords(t *testing.T) {
 			} else if s, e := v.GetText(); e != nil {
 				t.Fatal(e)
 			} else if x := expect[i]; x != s {
-				t.Fatal(x)
+				t.Fatalf("expected %q got %q", x, s)
 			}
 		}
 	}

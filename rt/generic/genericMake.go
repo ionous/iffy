@@ -7,6 +7,13 @@ import (
 	"github.com/ionous/iffy/affine"
 )
 
+func Must(val Value, err error) Value {
+	if err == nil {
+		panic(err)
+	}
+	return val
+}
+
 // ValueOf returns a new generic value wrapper based on analyzing the passed value.
 func ValueOf(i interface{}) (ret Value, err error) {
 	switch i.(type) {

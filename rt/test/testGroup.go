@@ -1,5 +1,6 @@
 package test
 
+// the pattern group together builds a list of group settings from a list of objects
 type GroupSettings struct {
 	// the name of the object this record describes
 	// ex. tile X, or tile W ( from a scrabble set )
@@ -12,17 +13,17 @@ type GroupSettings struct {
 	// ex. five scrabble tiles.
 	Innumerable bool
 	// whether and how to print objects.
-	ObjectGrouping ObjectGrouping
+	Options GroupOptions
 }
 
-// ObjectGrouping defines how objects in groups should display.
-type ObjectGrouping int
+// GroupOptions defines how objects in groups should display.
+type GroupOptions int
 
-//go:generate stringer -type=ObjectGrouping
+//go:generate stringer -type=GroupOptions
 const (
 	// indicates we dont want the individual objects in the group
 	// ex. the scrabble tiles, the usual utensils, several things.
-	WithoutObjects ObjectGrouping = iota
+	WithoutObjects GroupOptions = iota
 	// indicates the individual objects shouldnt use articles
 	// ex. tiles X and W from a Scrabble set.
 	WithoutArticles
@@ -31,12 +32,12 @@ const (
 	WithArticles
 )
 
-type Groupings struct {
-	Ungrouped []GroupSettings // all of the objects which werent part of any particular group
-	Groups    []GroupedObjects
+// the pattern collate groups builds a group collation from a list of group settings
+type GroupCollation struct {
+	Groups []GroupObjects
 }
 
-type GroupedObjects struct {
+type GroupObjects struct {
 	Settings GroupSettings // the settings of the first object in the group
-	Objects  []string      // of the objects in the group
+	Objects  []string      // the list of objects with the same settings
 }

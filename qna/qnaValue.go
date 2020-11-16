@@ -28,11 +28,13 @@ func (q qnaValue) Affinity() affine.Affinity {
 	return q.affinity
 }
 
-type staticValue struct{ val g.Value }
+type staticValue struct {
+	affinity affine.Affinity
+	val      interface{}
+}
 
-func (f staticValue) Snapshot(run rt.Runtime) (ret g.Value, _ error) {
-	ret = f.val
-	return
+func (f staticValue) Snapshot(run rt.Runtime) (ret g.Value, err error) {
+	return g.ValueFrom(f.val, f.affinity, "")
 }
 
 type errorValue struct{ err error }

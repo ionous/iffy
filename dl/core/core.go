@@ -52,6 +52,7 @@ var Slats = []composer.Slat{
 
 	(*IsTrue)(nil),    // transparent pass-through of a bool eval
 	(*IsNotTrue)(nil), // inverts a bool eval
+
 	// literals
 	(*Bool)(nil),
 	(*Number)(nil),
@@ -114,8 +115,6 @@ var Slats = []composer.Slat{
 	(*LessThan)(nil),
 	(*GreaterOrEqual)(nil),
 	(*LessOrEqual)(nil),
-
-	//
 
 	// (*MakeRecord)(nil),
 

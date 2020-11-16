@@ -69,7 +69,13 @@ func kindsForType(kinds fieldMap, t r.Type) fieldMap {
 		default:
 			panic(errutil.Sprint("unknown kind", k))
 		case r.Bool:
-			a, t = affine.Bool, k.String()
+			a, t = affine.Text, "aspect"
+			// the name of the aspect is the name of the field
+			kinds[f.Name] = []g.Field{
+				{Name: "Is " + f.Name, Affinity: affine.Bool, Type: "trait"},
+				{Name: "Not " + f.Name, Affinity: affine.Bool, Type: "trait"},
+			}
+
 		case r.String:
 			a, t = affine.Text, k.String()
 		case r.Struct:

@@ -12,7 +12,7 @@ func (q boolEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetBool(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret, err = g.ValueOf(v)
+		ret = g.BoolOf(v)
 	}
 	return
 }
@@ -23,7 +23,7 @@ func (q numEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetNumber(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret, err = g.ValueOf(v)
+		ret = g.FloatOf(v)
 	}
 	return
 }
@@ -34,7 +34,7 @@ func (q textEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetText(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret, err = g.ValueOf(v)
+		ret = g.StringOf(v)
 	}
 	return
 }
@@ -45,7 +45,7 @@ func (q numListEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetNumList(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret, err = g.ValueOf(v)
+		ret = g.FloatsOf(v)
 	}
 	return
 }
@@ -56,7 +56,7 @@ func (q textListEval) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := rt.GetTextList(run, q.eval); e != nil {
 		err = e
 	} else {
-		ret, err = g.ValueOf(v)
+		ret = g.StringsOf(v)
 	}
 	return
 }

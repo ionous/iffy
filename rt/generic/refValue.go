@@ -139,10 +139,10 @@ func (n refValue) SetIndexedValue(i int, v Value) (err error) {
 		err = e
 	} else if va, elAffinity := v.Affinity(), affine.Element(n.a); va != elAffinity {
 		err = errutil.Fmt("mismatched affinity %q for element %q", va, elAffinity)
-	} else if refv, ok := v.(refValue); !ok {
-		err = errutil.Fmt("unknown source value %v(%T)", v, v)
+	} else if el, e := CopyValue(v); e != nil {
+		err = e
 	} else {
-		n.v.Index(i).Set(refv.v)
+		n.v.Index(i).Set(r.ValueOf(el))
 	}
 	return
 }
@@ -160,7 +160,8 @@ func (n refValue) Resize(newLen int) (ret Value, err error) {
 		// grow using make, append ( versus make, copy )
 		// to trigger go's grow padding
 		blanks := r.MakeSlice(vs.Type().Elem(), grow, grow)
-		ret = makeValue(n.a, n.t, r.AppendSlice(vs, blanks))
+		els := r.AppendSlice(vs, blanks)
+		ret = makeValue(n.a, n.t, els)
 	}
 	return
 }
@@ -175,7 +176,8 @@ func (n refValue) Slice(i, j int) (ret Value, err error) {
 	} else if i > j {
 		err = errutil.New("bad range", i, j)
 	} else {
-		ret = makeValue(n.a, n.t, vs.Slice(i, j))
+		els := vs.Slice(i, j)
+		ret = makeValue(n.a, n.t, els)
 	}
 	return
 }
@@ -196,10 +198,11 @@ func (n refValue) appendOne(v Value) (ret Value, err error) {
 	compatible := va == elAffinity && (va != affine.Record || v.Type() == n.t)
 	if !compatible {
 		err = errutil.New("value is not compatible with list")
-	} else if refv, ok := v.(refValue); !ok {
-		err = errutil.Fmt("unknown source value %v(%T)", v, v)
+	} else if el, e := CopyValue(v); e != nil {
+		err = e
 	} else {
-		ret = makeValue(n.a, n.t, r.Append(n.v, refv.v))
+		els := r.Append(n.v, r.ValueOf(el))
+		ret = makeValue(n.a, n.t, els)
 	}
 	return
 }
@@ -209,10 +212,11 @@ func (n refValue) appendMany(v Value) (ret Value, err error) {
 	compatible := n.a == va && (va != affine.RecordList || v.Type() == n.t)
 	if !compatible {
 		err = errutil.New("value is not compatible with list")
-	} else if refv, ok := v.(refValue); !ok {
-		err = errutil.Fmt("unknown source value %v(%T)", v, v)
+	} else if el, e := CopyValue(v); e != nil {
+		err = e
 	} else {
-		ret = makeValue(n.a, n.t, r.AppendSlice(n.v, refv.v))
+		els := r.AppendSlice(n.v, r.ValueOf(el))
+		ret = makeValue(n.a, n.t, els)
 	}
 	return
 }

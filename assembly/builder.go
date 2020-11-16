@@ -83,35 +83,18 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				switch typeName {
 				case "text_eval":
 					p := term.Text{Name: paramName}
-					if e := decode(prog, &p.Init); e != nil {
-						err = errutil.New("couldnt decode", patternName, paramName, e)
-					} else {
-						err = last.AddParam(category, &p)
-					}
+					err = last.AddParam(category, &p)
 				case "number_eval":
 					p := term.Number{Name: paramName}
-					if e := decode(prog, &p.Init); e != nil {
-						err = errutil.New("couldnt decode", patternName, paramName, e)
-					} else {
-						err = last.AddParam(category, &p)
-					}
+					err = last.AddParam(category, &p)
 				case "bool_eval":
 					p := term.Bool{Name: paramName}
-					if e := decode(prog, &p.Init); e != nil {
-						err = errutil.New("couldnt decode", patternName, paramName, e)
-					} else {
-						err = last.AddParam(category, &p)
-					}
+					err = last.AddParam(category, &p)
 				default:
 					// the type might be some sort of kind...
 					if kind := kind.String; len(kind) > 0 {
 						p := term.Record{Name: paramName, Kind: kind}
-						// fix.
-						// if e := decode(prog, &p.Init); e != nil {
-						// 	err = errutil.New("couldnt decode", patternName, paramName, e)
-						// } else {
 						err = last.AddParam(category, &p)
-						// }
 					} else {
 						err = errutil.Fmt("pattern %q parameter %q has unknown type %q ( expected an eval .)",
 							patternName, paramName, typeName)

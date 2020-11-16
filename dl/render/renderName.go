@@ -59,8 +59,8 @@ func (op *Name) GetText(run rt.Runtime) (ret string, err error) {
 func (op *Name) getPrintedNamedOf(run rt.Runtime, objectName string) (ret string, err error) {
 	if printedName, e := rt.GetText(run, &core.Buffer{core.NewActivity(
 		&pattern.DetermineAct{
-			"printName",
-			core.NewArgs(&core.CopyFrom{
+			Pattern: "printName",
+			Arguments: core.NewArgs(&core.CopyFrom{
 				Name:  &core.Text{objectName},
 				Flags: 0}),
 		})}); e != nil {

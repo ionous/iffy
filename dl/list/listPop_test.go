@@ -25,6 +25,7 @@ func TestPop(t *testing.T) {
 func popTest(front bool, amt int, strs ...string) []string {
 	var out []string
 	pop := &list.Pop{List: "src",
+		With:  "text",
 		Front: list.FrontOrBack(front),
 		Go:    core.NewActivity(&Write{&out, &core.GetVar{Name: T("text")}}),
 		Else:  core.NewActivity(&Write{&out, T("x")}),

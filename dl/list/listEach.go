@@ -5,15 +5,17 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/scope"
 )
 
 type Each struct {
 	List     string // variable name
+	With     string // counter name
 	Go, Else *core.Activity
+	k        *g.Kind
 }
 
 func (op *Each) Compose() composer.Spec {
@@ -21,7 +23,7 @@ func (op *Each) Compose() composer.Spec {
 		Name:   "list_each",
 		Group:  "list",
 		Desc:   `For each in list: Loops over the elements in the passed list, or runs the 'else' activity if empty.`,
-		Locals: []string{"index", "first", "last", "text", "num"},
+		Locals: []string{"index", "first", "last"},
 	}
 }
 
@@ -35,57 +37,49 @@ func (op *Each) Execute(run rt.Runtime) (err error) {
 func (op *Each) execute(run rt.Runtime) (err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = e
+	} else if elAffinity := affine.Element(vs.Affinity()); len(elAffinity) == 0 {
+		err = errutil.Fmt("Variable %q is %q, each expected a list", op.List, vs.Affinity())
 	} else if cnt, e := vs.GetLen(); e != nil {
 		err = e
 	} else if otherwise := op.Else; otherwise != nil && cnt == 0 {
 		err = op.Else.Execute(run)
 	} else if act := op.Go; act != nil && cnt > 0 {
-		//
-		var field string
-		var zero g.Value
-		//
-		switch a := vs.Affinity(); a {
-		case affine.NumList:
-			field = "num"
-			zero = g.Zero
-		case affine.TextList:
-			field = "text"
-			zero = g.Empty
-		default:
-			err = errutil.Fmt("variable '%s(%s)' is an unknown list", op.List, a)
+		const el, index, first, last = 0, 1, 2, 3
+		if op.k == nil || op.k.IsStaleKind(run) {
+			op.k = g.NewKind(run, "", []g.Field{
+				{Name: op.With, Affinity: elAffinity, Type: vs.Type()},
+				{Name: "index", Affinity: affine.Number},
+				{Name: "first", Affinity: affine.Bool},
+				{Name: "last", Affinity: affine.Bool},
+			})
 		}
-		if err == nil {
-			var terms term.Terms
-			el := terms.AddTerm(field, zero)
-			index := terms.AddTerm("index", g.Zero)
-			first := terms.AddTerm("first", g.True)
-			last := terms.AddTerm("last", g.False)
-			run.PushScope(&terms)
-			for i := 0; i < cnt; i++ {
-				if at, e := vs.GetIndex(i); e != nil {
-					err = e
-					break
-				} else {
-					el.SetValue(at)
-					next := i + 1
-					if v, e := g.ValueOf(next); e != nil {
-						err = e
-						break
-					} else {
-						index.SetValue(v)
-						if hasNext := next < cnt; !hasNext {
-							last.SetValue(g.True)
-						}
-						if e := op.Go.Execute(run); e != nil {
-							err = e
-							break
-						}
-						first.SetValue(g.False)
-					}
-				}
+		ls := op.k.NewRecord()
+		run.PushScope(&scope.TargetRecord{object.Variables, ls})
+		for i := 0; i < cnt; i++ {
+			if at, e := vs.GetIndex(i); e != nil {
+				err = e
+				break
+			} else if e := ls.SetFieldByIndex(el, at); e != nil {
+				err = e
+				break
+			} else if ind, e := g.ValueOf(i + 1); e != nil {
+				err = e
+				break
+			} else if e := ls.SetFieldByIndex(index, ind); e != nil {
+				err = e
+				break
+			} else if e := ls.SetFieldByIndex(first, g.BoolOf(i == 0)); e != nil {
+				err = e
+				break
+			} else if e := ls.SetFieldByIndex(last, g.BoolOf((i+1) == cnt)); e != nil {
+				err = e
+				break
+			} else if e := op.Go.Execute(run); e != nil {
+				err = e
+				break
 			}
-			run.PopScope()
 		}
+		run.PopScope()
 	}
 	return
 }

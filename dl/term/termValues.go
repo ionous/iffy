@@ -3,31 +3,25 @@ package term
 import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/rt"
-	g "github.com/ionous/iffy/rt/generic"
 )
 
 type Number struct {
-	Name string        // parameter name
-	Init rt.NumberEval // default value
+	Name string // parameter name
 }
 type Bool struct {
 	Name string
-	Init rt.BoolEval
 }
 type Text struct {
 	Name string
-	Init rt.TextEval
 }
 type Record struct {
 	Name, Kind string
 }
 type NumList struct {
 	Name string
-	Init rt.NumListEval
 }
 type TextList struct {
 	Name string
-	Init rt.TextListEval
 }
 type RecordList struct {
 	Name, Kind string
@@ -38,13 +32,7 @@ func (n *Number) String() string {
 }
 
 func (n *Number) Prepare(run rt.Runtime, p *Terms) (err error) {
-	if v, e := rt.GetOptionalNumber(run, n.Init, 0); e != nil {
-		err = e
-	} else if t, e := g.ValueOf(v); e != nil {
-		err = e
-	} else {
-		p.AddTerm(n.Name, t)
-	}
+	p.AddTerm(n.Name, affine.Number, "")
 	return
 }
 
@@ -53,13 +41,7 @@ func (n *Bool) String() string {
 }
 
 func (n *Bool) Prepare(run rt.Runtime, p *Terms) (err error) {
-	if v, e := rt.GetOptionalBool(run, n.Init, false); e != nil {
-		err = e
-	} else if t, e := g.ValueOf(v); e != nil {
-		err = e
-	} else {
-		p.AddTerm(n.Name, t)
-	}
+	p.AddTerm(n.Name, affine.Bool, "")
 	return
 }
 
@@ -68,13 +50,7 @@ func (n *Text) String() string {
 }
 
 func (n *Text) Prepare(run rt.Runtime, p *Terms) (err error) {
-	if v, e := rt.GetOptionalText(run, n.Init, ""); e != nil {
-		err = e
-	} else if t, e := g.ValueOf(v); e != nil {
-		err = e
-	} else {
-		p.AddTerm(n.Name, t)
-	}
+	p.AddTerm(n.Name, affine.Text, "")
 	return
 }
 
@@ -85,10 +61,8 @@ func (n *Record) String() string {
 func (n *Record) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if k, e := run.GetKindByName(n.Kind); e != nil {
 		err = e
-	} else if t, e := g.ValueOf(k.NewRecord()); e != nil {
-		err = e
 	} else {
-		p.AddTerm(n.Name, t)
+		p.AddTerm(n.Name, affine.Record, k.Name())
 	}
 	return
 }
@@ -98,13 +72,7 @@ func (n *NumList) String() string {
 }
 
 func (n *NumList) Prepare(run rt.Runtime, p *Terms) (err error) {
-	if vs, e := rt.GetOptionalNumbers(run, n.Init, nil); e != nil {
-		err = e
-	} else if t, e := g.ValueOf(vs); e != nil {
-		err = e
-	} else {
-		p.AddTerm(n.Name, t)
-	}
+	p.AddTerm(n.Name, affine.NumList, "")
 	return
 }
 
@@ -113,13 +81,7 @@ func (n *TextList) String() string {
 }
 
 func (n *TextList) Prepare(run rt.Runtime, p *Terms) (err error) {
-	if vs, e := rt.GetOptionalTexts(run, n.Init, nil); e != nil {
-		err = e
-	} else if t, e := g.ValueOf(vs); e != nil {
-		err = e
-	} else {
-		p.AddTerm(n.Name, t)
-	}
+	p.AddTerm(n.Name, affine.TextList, "")
 	return
 }
 
@@ -130,10 +92,8 @@ func (n *RecordList) String() string {
 func (n *RecordList) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if k, e := run.GetKindByName(n.Kind); e != nil {
 		err = e
-	} else if t, e := g.ValueFrom([]*g.Record{}, affine.RecordList, k.Name()); e != nil {
-		err = e
 	} else {
-		p.AddTerm(n.Name, t)
+		p.AddTerm(n.Name, affine.RecordList, k.Name())
 	}
 	return
 }

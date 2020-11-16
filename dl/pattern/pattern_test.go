@@ -3,9 +3,7 @@ package pattern_test
 import (
 	"fmt"
 
-	r "reflect"
-
-	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
@@ -15,7 +13,7 @@ import (
 // http://learnyouahaskell.com/syntax-in-functions
 func ExampleSayMe() {
 	// rules are run in reverse order.
-	run := patternRuntime{patternMap: patternMap{
+	run := patternRuntime{PatternMap: pattern.PatternMap{
 		"sayMe": &debug.SayPattern,
 	}}
 	// say 4 numbers
@@ -41,21 +39,6 @@ type baseRuntime struct {
 
 type patternRuntime struct {
 	baseRuntime
-	scope.ScopeStack // parameters are pushed onto the stack.
-	patternMap       // holds pointers to patterns
-}
-type patternMap map[string]interface{}
-
-// skip assembling the pattern from the db
-// we just want to test we can invoke a pattern successfully.
-// pv is a pointer to a pattern instance, and we copy its contents in.
-func (m *patternRuntime) GetEvalByName(name string, pv interface{}) (err error) {
-	if patternPtr, ok := m.patternMap[name]; ok {
-		stored := r.ValueOf(patternPtr).Elem()
-		outVal := r.ValueOf(pv).Elem()
-		outVal.Set(stored)
-	} else {
-		err = errutil.New("patternRuntime: unknown pattern", name)
-	}
-	return
+	scope.ScopeStack   // parameters are pushed onto the stack.
+	pattern.PatternMap // holds pointers to patterns
 }

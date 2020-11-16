@@ -9,6 +9,9 @@ import (
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/scope"
 )
 
 // FromPattern helps runs a pattern
@@ -16,6 +19,7 @@ type FromPattern struct {
 	Pattern   string          // pattern name, i guess a text eval here would be like a function pointer.
 	Arguments *core.Arguments // arguments passed to the pattern. kept as a pointer for composer formatting...
 	// each is a name targeting some parameter, and an "assignment"
+	ps, ls *g.Kind
 }
 
 type DetermineAct FromPattern
@@ -31,37 +35,63 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 	// find the pattern (p), qna's implementation assembles the rules by querying the db.
 	if e := run.GetEvalByName(op.Pattern, pat); e != nil {
 		err = e
+	} else if pk, e := op.newParams(run, pat); e != nil {
+		err = e
+	} else if lk, e := op.newLocals(run, pat); e != nil {
+		err = e
 	} else {
-		// create variables for all the known parameters
+		ps, ls := pk.NewRecord(), lk.NewRecord()
+		// read from each argument and store into the parameters
+		if op.Arguments != nil {
+			for _, arg := range op.Arguments.Args {
+				if name, e := getParamName(pat, arg.Name); e != nil {
+					err = errutil.Append(err, e)
+				} else if val, e := arg.From.GetAssignedValue(run); e != nil {
+					err = errutil.Append(err, e)
+				} else if e := ps.SetNamedField(name, val); e != nil {
+					err = errutil.Append(err, e)
+				}
+			}
+		}
+
+		if err == nil {
+			// fix: dont love the double map creation, double scope....
+			run.PushScope(&scope.TargetRecord{object.Variables, ps})
+			run.PushScope(&scope.TargetRecord{object.Variables, ls})
+			err = fn()
+			run.PopScope()
+			run.PopScope()
+		}
+	}
+	return
+}
+
+func (op *FromPattern) newParams(run rt.Runtime, pat Pattern) (ret *g.Kind, err error) {
+	// create variables for all the known parameters
+	if op.ps != nil {
+		ret = op.ps
+	} else {
 		var parms term.Terms
 		if e := pat.Prepare(run, &parms); e != nil {
 			err = e
 		} else {
-			// read from each argument and store into the parameters
-			if op.Arguments != nil {
-				for _, arg := range op.Arguments.Args {
-					if name, e := getParamName(pat, arg.Name); e != nil {
-						err = errutil.Append(err, e)
-					} else if val, e := arg.From.GetAssignedValue(run); e != nil {
-						err = errutil.Append(err, e)
-					} else if e := parms.SetField(object.Variables, name, val); e != nil {
-						err = errutil.Append(err, e)
-					}
-				}
-			}
+			ps := parms.NewKind(run)
+			ret, op.ps = ps, ps
 		}
-		if err == nil {
-			run.PushScope(&parms)
-			// fix: not sure that i love the double map creation, double scope....
-			var locals term.Terms
-			if e := pat.ComputeLocals(run, &locals); e != nil {
-				err = e
-			} else {
-				run.PushScope(&locals)
-				err = fn()
-				run.PopScope()
-			}
-			run.PopScope()
+	}
+	return
+}
+func (op *FromPattern) newLocals(run rt.Runtime, pat Pattern) (ret *g.Kind, err error) {
+	// create variables for all the known parameters
+	if op.ls != nil {
+		ret = op.ls
+	} else {
+		var locals term.Terms
+		if e := pat.ComputeLocals(run, &locals); e != nil {
+			err = e
+		} else {
+			ls := locals.NewKind(run)
+			ret, op.ls = ls, ls
 		}
 	}
 	return

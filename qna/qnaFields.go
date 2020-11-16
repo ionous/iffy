@@ -168,8 +168,10 @@ func (n *Runner) setField(key keyType, val g.Value) (err error) {
 			err = e
 		} else if a := q.Affinity(); a != val.Affinity() {
 			err = errutil.New("value is not", a)
+		} else if v, e := g.CopyValue(val); e != nil {
+			err = e
 		} else {
-			n.pairs[key] = qnaValue{a, staticValue{val}}
+			n.pairs[key] = qnaValue{a, staticValue{a, v}}
 		}
 	}
 	return
@@ -283,8 +285,7 @@ func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 				} else {
 					// return whether the object's aspect equals the specified trait.
 					// ( we dont cache this value because multiple things can change it )
-					v := g.BoolOf(trait == field)
-					ret = qnaValue{affine.Bool, staticValue{v}}
+					ret = qnaValue{affine.Bool, staticValue{affine.Bool, trait == field}}
 				}
 			}
 		}
@@ -315,11 +316,7 @@ func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret 
 					ret = n.store(key, a, p)
 				}
 			} else {
-				if v, e := g.ValueFrom(v, a, ""); e != nil {
-					err = e
-				} else {
-					ret = n.store(key, a, staticValue{v})
-				}
+				ret = n.store(key, a, staticValue{a, v})
 			}
 		}
 	case sql.ErrNoRows:

@@ -15,7 +15,6 @@ type visitEach struct {
 }
 
 func TestEach(t *testing.T) {
-
 	// primary looping test:
 	eachTest(t, []string{
 		"Orange", "Lemon", "Mango",
@@ -50,16 +49,17 @@ func TestEach(t *testing.T) {
 func eachTest(t *testing.T, src []string, res []accum, otherwise int) {
 	var out []string
 	var visits []accum
-	each := &list.Each{List: "src",
+	each := &list.Each{
+		List: "src",
+		With: "text",
 		Go:   core.NewActivity(&visitEach{&visits}),
 		Else: core.NewActivity(&Write{&out, T("x")}),
 	}
 	if e := each.Execute(&listTime{vals: values{"src": g.StringsOf(src)}}); e != nil {
-		t.Fatal(e)
+		t.Fatal(src, e)
 	} else if d := pretty.Diff(visits, res); len(d) > 0 || len(out) != otherwise {
-		t.Fatal(out, d)
+		t.Fatal(src, out, d)
 	}
-
 }
 
 func (v *visitEach) Execute(run rt.Runtime) (err error) {

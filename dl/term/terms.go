@@ -1,8 +1,7 @@
 package term
 
 import (
-	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/object"
+	"github.com/ionous/iffy/affine"
 	g "github.com/ionous/iffy/rt/generic"
 )
 
@@ -12,42 +11,15 @@ import (
 // Its pushed into scope so the names can be used as a source of values for rt.Runtime::GetField().
 // ( ex. For use with the commands GetVar{},  SimpleNoun{}, ProperNoun{}, ObjectName{}, ... )
 type Terms struct {
-	values termValues
+	fields []g.Field
 }
 
-type termValues map[string]*Value
-
-func (ps *Terms) AddTerm(field string, value g.Value) *Value {
-	if ps.values == nil {
-		ps.values = make(termValues)
-	}
-	v := &Value{value}
-	ps.values[field] = v
-	return v
+// rather than copying etc here, can we use records --
+// what is it anyway?
+func (ps *Terms) NewKind(kinds g.Kinds) *g.Kind {
+	return g.NewKind(kinds, "", ps.fields)
 }
 
-// GetField returns the value at 'name', the caller is responsible for determining the type.
-func (ps *Terms) GetField(target, field string) (ret g.Value, err error) {
-	if target != object.Variables {
-		err = g.UnknownTarget{target}
-	} else if p, ok := ps.values[field]; !ok {
-		err = g.UnknownField{target, field}
-	} else {
-		ret = p.value
-	}
-	return
-}
-
-// SetField writes (a copy of) the passed value into the term at 'name'.
-func (ps *Terms) SetField(target, field string, val g.Value) (err error) {
-	if target != object.Variables {
-		err = g.UnknownTarget{target}
-	} else if p, ok := ps.values[field]; !ok {
-		err = g.UnknownField{target, field}
-	} else if a := p.value.Affinity(); a != val.Affinity() {
-		err = errutil.New("value is not", a)
-	} else {
-		p.value = val
-	}
-	return
+func (ps *Terms) AddTerm(name string, affinity affine.Affinity, typeName string) {
+	ps.fields = append(ps.fields, g.Field{Name: name, Affinity: affinity, Type: typeName})
 }

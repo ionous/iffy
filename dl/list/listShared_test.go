@@ -21,8 +21,7 @@ type listTime struct {
 	objs map[string]*g.Record
 	vals values
 	scope.ScopeStack
-	sort  *pattern.BoolPattern
-	remap *pattern.ActivityPattern
+	pattern.PatternMap
 	kinds *test.Kinds
 }
 
@@ -99,28 +98,10 @@ func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
 }
 
 func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
-	if target != object.Variables {
-		err = lt.ScopeStack.SetField(target, field, value)
+	if _, ok := lt.vals[field]; (target == object.Variables) && ok {
+		lt.vals[field] = value
 	} else {
-		switch field {
-		case "src":
-			lt.vals["src"] = value
-		case "res":
-			lt.vals["res"] = value
-		default:
-			err = lt.ScopeStack.SetField(target, field, value)
-		}
-	}
-	return
-}
-
-func (lt *listTime) GetEvalByName(name string, pv interface{}) (err error) {
-	if name == "sort" {
-		ptr := pv.(*pattern.BoolPattern)
-		(*ptr) = *lt.sort
-	} else if name == "remap" {
-		ptr := pv.(*pattern.ActivityPattern)
-		(*ptr) = *lt.remap
+		err = lt.ScopeStack.SetField(target, field, value)
 	}
 	return
 }

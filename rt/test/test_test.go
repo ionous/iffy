@@ -8,17 +8,13 @@ import (
 
 func TestKindsForType(t *testing.T) {
 	var ks Kinds
-	ks.Add((*Groupings)(nil))
+	ks.Add((*GroupCollation)(nil))
 	if diff := pretty.Diff(ks.fields, fieldMap{
-		"GroupedObjects": {
-			{"Settings", "record", "GroupSettings"},
-			{"Objects", "text_list", "string"},
+		"Innumerable": {
+			{"Is Innumerable", "bool", "trait"},
+			{"Not Innumerable", "bool", "trait"},
 		},
-		"Groupings": {
-			{"Ungrouped", "record_list", "GroupSettings"},
-			{"Groups", "record_list", "GroupedObjects"},
-		},
-		"ObjectGrouping": {
+		"GroupOptions": {
 			{"WithoutObjects", "bool", "trait"},
 			{"WithoutArticles", "bool", "trait"},
 			{"WithArticles", "bool", "trait"},
@@ -26,10 +22,17 @@ func TestKindsForType(t *testing.T) {
 		"GroupSettings": {
 			{"Name", "text", "string"},
 			{"Label", "text", "string"},
-			{"Innumerable", "bool", "bool"},
-			{"ObjectGrouping", "text", "aspect"},
+			{"Innumerable", "text", "aspect"},
+			{"Options", "text", "aspect"},
+		},
+		"GroupObjects": {
+			{"Settings", "record", "GroupSettings"},
+			{"Objects", "text_list", "string"},
+		},
+		"GroupCollation": {
+			{"Groups", "record_list", "GroupObjects"},
 		},
 	}); len(diff) > 0 {
-		t.Fatal(diff)
+		t.Fatal(pretty.Println(ks.fields))
 	}
 }

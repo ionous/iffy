@@ -31,7 +31,7 @@ func (m MatchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
 
 func DetermineSay(i int) *pattern.DetermineText {
 	return &pattern.DetermineText{
-		"sayMe", pattern.NewNamedParams(
+		Pattern: "sayMe", Arguments: pattern.NewNamedParams(
 			"num", &core.FromNum{
 				&core.Number{float64(i)},
 			}),

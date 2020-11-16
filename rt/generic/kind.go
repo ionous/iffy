@@ -8,11 +8,11 @@ import (
 
 // we bake it down for faster, easier indexed access.
 type Kind struct {
-	kinds     Kinds
-	name      string
-	fields    []Field
-	traits    []trait
-	lastField int
+	kinds   Kinds
+	name    string
+	fields  []Field
+	traits  []trait
+	lastOne int // one-based index of last field
 }
 
 type Field struct {
@@ -26,8 +26,13 @@ func NewKind(kinds Kinds, name string, fields []Field) *Kind {
 	return &Kind{kinds: kinds, name: name, fields: fields}
 }
 
+// fix: temp till all kinds are moved to assembly
+func (k *Kind) IsStaleKind(kinds Kinds) bool {
+	return kinds != k.kinds
+}
+
 func (k *Kind) NewRecord() *Record {
-	return &Record{kind: k, values: make([]Value, len(k.fields))}
+	return &Record{kind: k, values: make([]interface{}, len(k.fields))}
 }
 
 func (k *Kind) Name() string {
@@ -39,15 +44,15 @@ func (k *Kind) NumField() int {
 }
 
 func (k *Kind) Field(i int) Field {
-	k.lastField = i
+	k.lastOne = i + 1
 	return k.fields[i]
 }
 
-// searches for the field which handles the passed field
-// for traits, it returns the aspect.
+// searches for the field which handles the passed field;
+// for traits, it returns the index of its associated aspect.
 // returns -1 if no matching field was found
 func (k *Kind) FieldIndex(n string) (ret int) {
-	if prev := k.lastField; prev >= 0 && k.fields[prev].Name == n {
+	if prev := k.lastOne - 1; prev >= 0 && k.fields[prev].Name == n {
 		ret = prev
 	} else {
 		k.ensureTraits()
@@ -56,7 +61,7 @@ func (k *Kind) FieldIndex(n string) (ret int) {
 		} else {
 			ret = k.fieldIndex(n)
 		}
-		k.lastField = ret
+		k.lastOne = ret + 1
 	}
 	return
 }
