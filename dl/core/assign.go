@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -43,12 +44,20 @@ type FromText struct {
 	Val rt.TextEval
 }
 
+type FromRecord struct {
+	Val rt.RecordEval
+}
+
 type FromNumList struct {
 	Vals rt.NumListEval
 }
 
 type FromTextList struct {
 	Vals rt.TextListEval
+}
+
+type FromRecordList struct {
+	Vals rt.RecordListEval
 }
 
 func (*Assign) Compose() composer.Spec {
@@ -133,6 +142,27 @@ func (op *FromText) GetEval() interface{} {
 	return op.Val
 }
 
+func (*FromRecord) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "assign_record",
+		Group: "variables",
+		Desc:  "Assign Record: Assigns the passed record.",
+	}
+}
+
+func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if val, e := rt.GetRecord(run, op.Val); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = g.RecordOf(val)
+	}
+	return
+}
+
+func (op *FromRecord) GetEval() interface{} {
+	return op.Val
+}
+
 func (*FromNumList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_num_list",
@@ -172,5 +202,26 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error
 }
 
 func (op *FromTextList) GetEval() interface{} {
+	return op.Vals
+}
+
+func (*FromRecordList) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "assign_record_list",
+		Group: "variables",
+		Desc:  "Assign Record List: Assigns the passed record list.",
+	}
+}
+
+func (op *FromRecordList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if typeName, vals, e := rt.GetRecordList(run, op.Vals); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret, err = g.ValueFrom(vals, affine.RecordList, typeName)
+	}
+	return
+}
+
+func (op *FromRecordList) GetEval() interface{} {
 	return op.Vals
 }

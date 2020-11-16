@@ -1,7 +1,9 @@
 package pattern
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/term"
 )
 
@@ -32,4 +34,8 @@ var Slats = []composer.Slat{
 	(*DetermineBool)(nil),
 	(*DetermineNumList)(nil),
 	(*DetermineTextList)(nil),
+}
+
+func cmdError(op composer.Slat, e error) error {
+	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }

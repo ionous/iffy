@@ -61,11 +61,13 @@ func (v Variable) GetNumList(run Runtime) (ret []float64, err error) {
 	return
 }
 
-func (v Variable) GetRecordList(run Runtime) (ret []*g.Record, err error) {
+func (v Variable) GetRecordList(run Runtime) (retType string, retList []*g.Record, err error) {
 	if val, e := v.GetValue(run); e != nil {
 		err = e
+	} else if vs, e := val.GetRecordList(); e != nil {
+		err = e
 	} else {
-		ret, err = val.GetRecordList()
+		retType, retList = val.Type(), vs
 	}
 	return
 }

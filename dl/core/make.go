@@ -1,48 +1,43 @@
 package core
 
-// // some sort of assignment like a parameter call.
-// type MakeRecord struct {
-// 	Kind      string     // name of the record
-// 	Arguments *Arguments // arguments to initialize record fields
-// }
+import (
+	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+)
 
-// func (op *MakeRecord) Compose() composer.Spec {
-// 	return composer.Spec{
-// 		Name:  "make_record",
-// 		Group: "variables",
-// 		Desc:  "Make Record: specify a set of fields.",
-// 	}
-// }
+type Make struct {
+	Name      string
+	Arguments *Arguments // kept as a pointer for composer formatting...
+}
 
-// func (op *MakeRecord) GetEval() interface{} {
-// 	return nil // unknown
-// }
+func (*Make) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "core_make",
+	}
+}
 
-// func (op *MakeRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-// 	if v, e := op.getAssignedValue(run); e != nil {
-// 		err = cmdError(err, e)
-// 	} else {
-// 		ret = v
-// 	}
-// 	return
-// }
+func (op *Make) GetRecord(run rt.Runtime) (ret *g.Record, err error) {
+	if b, e := op.makeRecord(run); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = b
+	}
+	return
+}
 
-// func (op *MakeRecord) getAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-// 	if rec, e := run.MakeRecord(op.kind); e != nil {
-// 		err = e
-// 	} else if fixme, ok := rec.(*g.Record); !ok {
-// 		err = errutil.Fmt("unexpected record type %T", rec)
-// 	} else {
-// 		for _, a := range op.Arguments.Args {
-// 			if val, e := a.GetAssignedValue(run); e != nil {
-// 				err = errutil.Append(err, e)
-// 			} else if e := fixme.SetField(field, val); e != nil {
-// 				err = errutil.Append(err, e)
-// 			}
-// 		}
-// 		if err == nil {
-// 			ret = rec
-// 		}
-// 	}
-// 	return
-// }
+func (op *Make) makeRecord(run rt.Runtime) (ret *g.Record, err error) {
+	if k, e := run.GetKindByName(op.Name); e != nil {
+		err = e
+	} else {
+		b := k.NewRecord()
+		if op.Arguments != nil {
+			if e := op.Arguments.Distill(run, b); e != nil {
+				err = e
+			} else {
+				ret = b
+			}
+		}
+	}
+	return
+}

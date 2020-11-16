@@ -102,13 +102,13 @@ func (op *GetVar) GetTextList(run rt.Runtime) (ret []string, err error) {
 	return
 }
 
-func (op *GetVar) GetRecordList(run rt.Runtime) (ret []*g.Record, err error) {
+func (op *GetVar) GetRecordList(run rt.Runtime) (retType string, retList []*g.Record, err error) {
 	if box, e := getVariableNamed(run, op.Name); e != nil {
 		err = cmdError(op, e)
-	} else if res, e := box.GetRecordList(run); e != nil {
+	} else if typeName, vs, e := box.GetRecordList(run); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = res
+		retType, retList = typeName, vs
 	}
 	return
 }

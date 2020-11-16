@@ -83,7 +83,7 @@ func (k *Kind) ensureTraits() {
 		for _, ft := range k.fields {
 			if ft.Type == "aspect" {
 				if aspect, e := k.kinds.GetKindByName(ft.Name); e != nil {
-					log.Println("unknown aspect", ft.Name)
+					log.Println("unknown aspect", ft.Name, e)
 				} else {
 					ts = makeTraits(aspect, ts)
 				}

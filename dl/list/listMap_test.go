@@ -14,7 +14,7 @@ import (
 
 func TestMapStrings(t *testing.T) {
 	var kinds test.Kinds
-	kinds.Add((*Record)(nil))
+	kinds.AddKinds((*Record)(nil))
 	fruit := []string{"Orange", "Lemon", "Mango", "Banana", "Lime"}
 	lt := listTime{
 		vals: values{
@@ -43,7 +43,7 @@ type Record struct{ Fruit string }
 
 func TestMapRecords(t *testing.T) {
 	var kinds test.Kinds
-	kinds.Add((*Record)(nil))
+	kinds.AddKinds((*Record)(nil))
 	lt := listTime{
 		kinds: &kinds,
 		PatternMap: pattern.PatternMap{

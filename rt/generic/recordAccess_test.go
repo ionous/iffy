@@ -61,7 +61,7 @@ func TestRecordAccess(t *testing.T) {
 			t.Fatal(e)
 		} else if v, e := el.GetBool(); e != nil {
 			t.Fatal(e)
-		} else if v != false {
+		} else if !v {
 			t.Fatal("not default", v)
 		} else if e := beep.SetNamedField("x", g.BoolOf(true)); e != nil {
 			t.Fatal(e)

@@ -1,6 +1,8 @@
 package rt
 
-import g "github.com/ionous/iffy/rt/generic"
+import (
+	g "github.com/ionous/iffy/rt/generic"
+)
 
 // Execute runs a bit of code that has no return value.
 type Execute interface {
@@ -36,5 +38,5 @@ type TextListEval interface {
 }
 
 type RecordListEval interface {
-	GetRecordList(Runtime) ([]*g.Record, error)
+	GetRecordList(Runtime) (string, []*g.Record, error)
 }

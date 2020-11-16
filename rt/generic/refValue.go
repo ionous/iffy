@@ -139,10 +139,10 @@ func (n refValue) SetIndexedValue(i int, v Value) (err error) {
 		err = e
 	} else if va, elAffinity := v.Affinity(), affine.Element(n.a); va != elAffinity {
 		err = errutil.Fmt("mismatched affinity %q for element %q", va, elAffinity)
-	} else if el, e := CopyValue(v); e != nil {
-		err = e
+	} else if rv, ok := v.(refValue); !ok {
+		err = errutil.New("unable to determine value from %T", rv)
 	} else {
-		n.v.Index(i).Set(r.ValueOf(el))
+		n.v.Index(i).Set(rv.v)
 	}
 	return
 }
@@ -198,10 +198,10 @@ func (n refValue) appendOne(v Value) (ret Value, err error) {
 	compatible := va == elAffinity && (va != affine.Record || v.Type() == n.t)
 	if !compatible {
 		err = errutil.New("value is not compatible with list")
-	} else if el, e := CopyValue(v); e != nil {
-		err = e
+	} else if rv, ok := v.(refValue); !ok {
+		err = errutil.New("unable to determine value from %T", rv)
 	} else {
-		els := r.Append(n.v, r.ValueOf(el))
+		els := r.Append(n.v, rv.v)
 		ret = makeValue(n.a, n.t, els)
 	}
 	return
@@ -212,10 +212,10 @@ func (n refValue) appendMany(v Value) (ret Value, err error) {
 	compatible := n.a == va && (va != affine.RecordList || v.Type() == n.t)
 	if !compatible {
 		err = errutil.New("value is not compatible with list")
-	} else if el, e := CopyValue(v); e != nil {
-		err = e
+	} else if rv, ok := v.(refValue); !ok {
+		err = errutil.New("unable to determine value from %T", rv)
 	} else {
-		els := r.AppendSlice(n.v, r.ValueOf(el))
+		els := r.AppendSlice(n.v, rv.v)
 		ret = makeValue(n.a, n.t, els)
 	}
 	return

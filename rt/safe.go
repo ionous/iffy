@@ -79,6 +79,16 @@ func GetText(run Runtime, eval TextEval) (ret string, err error) {
 	return
 }
 
+// GetRecord runs the specified eval, returning an error if the eval is nil.
+func GetRecord(run Runtime, eval RecordEval) (ret *g.Record, err error) {
+	if eval == nil {
+		err = MissingEval("empty record eval")
+	} else {
+		ret, err = eval.GetRecord(run)
+	}
+	return
+}
+
 // GetOptionalBool runs the optionally specified eval.
 func GetOptionalBool(run Runtime, eval BoolEval, fallback bool) (ret bool, err error) {
 	if eval == nil {
@@ -143,6 +153,15 @@ func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
 func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 	if eval != nil {
 		ret, err = eval.GetTextList(run)
+	}
+	return
+}
+
+// GetRecordList returns an new iterator to walk the passed list,
+// or an empty iterator if the value is null.
+func GetRecordList(run Runtime, eval RecordListEval) (retType string, retList []*g.Record, err error) {
+	if eval != nil {
+		retType, retList, err = eval.GetRecordList(run)
 	}
 	return
 }

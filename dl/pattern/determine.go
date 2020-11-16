@@ -1,9 +1,6 @@
 package pattern
 
 import (
-	"strconv"
-
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/term"
@@ -41,19 +38,10 @@ func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err
 		err = e
 	} else {
 		ps, ls := pk.NewRecord(), lk.NewRecord()
-		// read from each argument and store into the parameters
 		if op.Arguments != nil {
-			for _, arg := range op.Arguments.Args {
-				if name, e := getParamName(pat, arg.Name); e != nil {
-					err = errutil.Append(err, e)
-				} else if val, e := arg.From.GetAssignedValue(run); e != nil {
-					err = errutil.Append(err, e)
-				} else if e := ps.SetNamedField(name, val); e != nil {
-					err = errutil.Append(err, e)
-				}
-			}
+			// read from each argument and store into the parameters
+			err = op.Arguments.Distill(run, ps)
 		}
-
 		if err == nil {
 			// fix: dont love the double map creation, double scope....
 			run.PushScope(&scope.TargetRecord{object.Variables, ps})
@@ -72,7 +60,7 @@ func (op *FromPattern) newParams(run rt.Runtime, pat Pattern) (ret *g.Kind, err 
 		ret = op.ps
 	} else {
 		var parms term.Terms
-		if e := pat.Prepare(run, &parms); e != nil {
+		if e := pat.ComputeParams(run, &parms); e != nil {
 			err = e
 		} else {
 			ps := parms.NewKind(run)
@@ -97,19 +85,6 @@ func (op *FromPattern) newLocals(run rt.Runtime, pat Pattern) (ret *g.Kind, err 
 	return
 }
 
-// change a argument name ( which could be an index ) into a valid param name
-func getParamName(pat Pattern, arg string) (ret string, err error) {
-	if usesIndex := len(arg) > 1 && arg[:1] == "$"; !usesIndex {
-		ret = arg
-	} else if idx, e := strconv.Atoi(arg[1:]); e != nil {
-		err = e
-	} else {
-		// parameters are 1 indexed right now
-		ret, err = pat.GetParameterName(idx - 1)
-	}
-	return
-}
-
 func (*DetermineAct) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_act",
@@ -120,10 +95,12 @@ func (*DetermineAct) Compose() composer.Spec {
 
 func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
 	var pat ActivityPattern
-	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		err = pat.Execute(run)
 		return
-	})
+	}); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }
 
@@ -139,10 +116,12 @@ func (*DetermineNum) Compose() composer.Spec {
 // GetNumber returns the first matching num evaluation.
 func (op *DetermineNum) GetNumber(run rt.Runtime) (ret float64, err error) {
 	var pat NumberPattern
-	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetNumber(run)
 		return
-	})
+	}); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }
 
@@ -158,10 +137,12 @@ func (*DetermineText) Compose() composer.Spec {
 // GetText returns the first matching text evaluation.
 func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
 	var pat TextPattern
-	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetText(run)
 		return
-	})
+	}); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }
 
@@ -177,10 +158,12 @@ func (*DetermineBool) Compose() composer.Spec {
 // GetBool returns the first matching bool evaluation.
 func (op *DetermineBool) GetBool(run rt.Runtime) (ret bool, err error) {
 	var pat BoolPattern
-	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetBool(run)
 		return
-	})
+	}); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }
 
@@ -195,10 +178,12 @@ func (*DetermineNumList) Compose() composer.Spec {
 
 func (op *DetermineNumList) GetNumList(run rt.Runtime) (ret []float64, err error) {
 	var pat NumListPattern
-	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetNumList(run)
 		return
-	})
+	}); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }
 
@@ -213,9 +198,11 @@ func (*DetermineTextList) Compose() composer.Spec {
 
 func (op *DetermineTextList) GetTextList(run rt.Runtime) (ret []string, err error) {
 	var pat TextListPattern
-	err = (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
+	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetTextList(run)
 		return
-	})
+	}); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }

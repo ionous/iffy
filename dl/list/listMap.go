@@ -81,7 +81,7 @@ func (op *Map) newParams(run rt.Runtime, pat *pattern.ActivityPattern) (ret *g.K
 		ret = op.pk
 	} else {
 		var parms term.Terms
-		if e := pat.Prepare(run, &parms); e != nil {
+		if e := pat.ComputeParams(run, &parms); e != nil {
 			err = e
 		} else {
 			pk := parms.NewKind(run)

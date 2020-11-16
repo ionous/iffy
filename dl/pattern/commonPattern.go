@@ -8,9 +8,8 @@ import (
 
 type Pattern interface {
 	// setup the runtime parameter info with our stored parameter info
-	Prepare(rt.Runtime, *term.Terms) error
+	ComputeParams(rt.Runtime, *term.Terms) error
 	ComputeLocals(rt.Runtime, *term.Terms) error
-	GetParameterName(int) (string, error)
 }
 
 // fix: the duplication of this and the name, prologue parameters indicates that
@@ -23,7 +22,7 @@ type CommonPattern struct {
 }
 
 // setup the runtime parameter info with our stored parameter info
-func (ps *CommonPattern) Prepare(run rt.Runtime, parms *term.Terms) (err error) {
+func (ps *CommonPattern) ComputeParams(run rt.Runtime, parms *term.Terms) (err error) {
 	return prepareList(run, ps.Prologue, parms)
 }
 
@@ -36,18 +35,6 @@ func prepareList(run rt.Runtime, list []term.Preparer, parms *term.Terms) (err e
 		if e := n.Prepare(run, parms); e != nil {
 			err = errutil.Append(err, e)
 		}
-	}
-	return
-}
-
-func (ps *CommonPattern) GetParameterName(idx int) (ret string, err error) {
-	if idx < 0 || idx >= len(ps.Prologue) {
-		err = errutil.New("indexed parameter out of range", idx)
-	} else {
-		// alt: we could use the database to search GetFieldByIndex
-		p := ps.Prologue[idx]
-		// preliminarily, the parameters are just their names.
-		ret = p.String()
 	}
 	return
 }

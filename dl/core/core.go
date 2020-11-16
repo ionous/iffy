@@ -29,10 +29,13 @@ var Slats = []composer.Slat{
 	(*FromBool)(nil),
 	(*FromNum)(nil),
 	(*FromText)(nil),
+	(*FromRecord)(nil),
 	(*FromNumList)(nil),
 	(*FromTextList)(nil),
+	(*FromRecordList)(nil),
 	(*CopyFrom)(nil),
 	(*MoveFrom)(nil),
+	(*Make)(nil),
 
 	// FIX: Choose scalar/any?
 	(*Choose)(nil),

@@ -13,7 +13,7 @@ type GroupSettings struct {
 	// ex. five scrabble tiles.
 	Innumerable bool
 	// whether and how to print objects.
-	Options GroupOptions
+	GroupOptions
 }
 
 // GroupOptions defines how objects in groups should display.

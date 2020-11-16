@@ -8,11 +8,11 @@ import (
 
 func TestKindsForType(t *testing.T) {
 	var ks Kinds
-	ks.Add((*GroupCollation)(nil))
+	ks.AddKinds((*GroupCollation)(nil))
 	if diff := pretty.Diff(ks.fields, fieldMap{
 		"Innumerable": {
-			{"Is Innumerable", "bool", "trait"},
 			{"Not Innumerable", "bool", "trait"},
+			{"Is Innumerable", "bool", "trait"},
 		},
 		"GroupOptions": {
 			{"WithoutObjects", "bool", "trait"},
@@ -23,7 +23,7 @@ func TestKindsForType(t *testing.T) {
 			{"Name", "text", "string"},
 			{"Label", "text", "string"},
 			{"Innumerable", "text", "aspect"},
-			{"Options", "text", "aspect"},
+			{"GroupOptions", "text", "aspect"},
 		},
 		"GroupObjects": {
 			{"Settings", "record", "GroupSettings"},

@@ -18,7 +18,7 @@ type kindMap map[string]*g.Kind
 type fieldMap map[string][]g.Field
 
 // register kinds from a struct using reflection
-func (ks *Kinds) Add(is ...interface{}) {
+func (ks *Kinds) AddKinds(is ...interface{}) {
 	for _, el := range is {
 		ks.fields = kindsForType(ks.fields, r.TypeOf(el).Elem())
 	}
@@ -72,8 +72,9 @@ func kindsForType(kinds fieldMap, t r.Type) fieldMap {
 			a, t = affine.Text, "aspect"
 			// the name of the aspect is the name of the field
 			kinds[f.Name] = []g.Field{
-				{Name: "Is " + f.Name, Affinity: affine.Bool, Type: "trait"},
+				// false first.
 				{Name: "Not " + f.Name, Affinity: affine.Bool, Type: "trait"},
+				{Name: "Is " + f.Name, Affinity: affine.Bool, Type: "trait"},
 			}
 
 		case r.String:
@@ -105,7 +106,6 @@ func kindsForType(kinds fieldMap, t r.Type) fieldMap {
 			if !fieldType.Implements(rstringer) {
 				panic("unknown enum")
 			}
-
 			x := r.New(fieldType).Elem()
 			var traits []g.Field
 			for j := int64(0); j < 25; j++ {
@@ -116,9 +116,9 @@ func kindsForType(kinds fieldMap, t r.Type) fieldMap {
 					break
 				}
 				traits = append(traits, g.Field{Name: trait, Affinity: affine.Bool, Type: "trait"})
-
 			}
-			kinds[fieldType.Name()] = traits
+			aspect := fieldType.Name()
+			kinds[aspect] = traits
 		}
 		fields = append(fields, g.Field{Name: f.Name, Affinity: a, Type: t})
 
