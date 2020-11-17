@@ -24,6 +24,20 @@ func (*GetVar) Compose() composer.Spec {
 	}
 }
 
+func (op *GetVar) GetEval() interface{} {
+	return op
+}
+
+// GetAssignedValue implements Assignment so we can SetXXX values from variables without a FromXXX statement in between.
+func (op *GetVar) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if box, e := getVariableNamed(run, op.Name); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret, err = box.GetValue(run)
+	}
+	return
+}
+
 func (op *GetVar) GetBool(run rt.Runtime) (ret bool, err error) {
 	if box, e := getVariableNamed(run, op.Name); e != nil {
 		err = cmdError(op, e)

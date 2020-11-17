@@ -60,8 +60,12 @@ package list_test
 // 	return
 // }
 
-// var runGroupTogther = list.Map{FromList: "objects", ToList: "groups", Pattern: "groupTogether"}
-// var runCollateGroups = list.Reduce{FromList: "groups", Into: "collection", Pattern: "collateGroups"}
+// var runGroupTogther = list.Map{FromList: "objects", ToList: "groups", UsingPattern: "groupTogether"}
+// var runCollateGroups = list.Reduce{FromList: "groups", IntoValue: "collection", UsingPattern: "collateGroups"}
+
+// func T(t string) rt.TextEval {
+// 	return &core.Text{t}
+// }
 
 // var collateGroups = pattern.ActivityPattern{
 // 	CommonPattern: pattern.CommonPattern{
@@ -72,34 +76,69 @@ package list_test
 // 		},
 // 		Locals: []term.Preparer{
 // 			&term.Number{Name: "idx"},
-// 			&term.RecordList{Name: "groups", Kind:"GroupCollation"},
+// 			&term.RecordList{Name: "groups", Kind: "GroupObjects"},
+// 			&term.Record{Name: "group", Kind: "GroupObjects"},
+// 			&term.TextList{Name: "names"},
 // 		},
 // 	},
 // 	Rules: []*pattern.ExecuteRule{
-// 		&pattern.ExecuteRule{Execute: &core.Activity{[]rt.Execute{
-// 			// walk out.Groups for matching settings
-// 			&core.Assign{"groups", &core.FC
-// 			&list.Each{List:in
-// 			// ie. compare Label, Innumerable, and GroupOptions.
-// 			// if one is found add it to that index, otherwise...
-// 			// this would be great as a pattern.
-// 			&core.SetField{
-// 				Obj:   V("out"),
-// 				Field: T("Name"),
-// 				From: &core.FromText{
-// 					Val: T("in"),
+// 		&pattern.ExecuteRule{Execute: core.NewActivity(
+// 			// // walk out.Groups for matching settings
+// 			&core.Assign{"groups", &core.GetField{V("out"), "groups"}},
+// 			&list.Each{
+// 				List: "groups",
+// 				With: "el",
+// 				Go: core.NewActivity(
+// 					&core.Choose{
+// 						If: &pattern.DetermineBool{
+// 							Pattern:   "isMatchingGroup",
+// 							Arguments: core.NewArgs(V("in"), V("el"))},
+// 						True: core.NewActivity(
+// 							&core.Assign{
+// 								Name: "idx",
+// 								From: V("index"),
+// 							},
+// 							// implement a "break" for the each that returns a constant error?
+// 						),
+// 					},
+// 				)}, // end go-each
+// 			&core.Choose{
+// 				If: &core.CompareNum{
+// 					A:  V("idx"),
+// 					Is: &core.EqualTo{},
+// 					B:  &core.Num{0},
 // 				},
+// 				// havent found a matching group?
+// 				// make sure the scratch group is empty,
+// 				// pack the object and its settings into it,
+// 				// push the group into the groups.
+// 				True: core.NewActivity(
+// 					&core.Assign{"group", &core.Make{"GroupObjects"}},
+// 					&core.Assign{"names", &core.GetField{V("group"), "objects"}},
+// 					&list.Push{"names", &core.GetField{V("in"), "Name"}, true},
+// 					&core.SetField{V("group"), "objects", V("names")},
+// 					&list.Push{"groups", V("group"), true},
+// 				), // end true
+// 				// found a matching group?
+// 				// unpack it, add the object to it, then pack it up again.
+// 				False: core.NewActivity(
+// 					&core.Assign{"group", &list.At{"groups", V("idx")}},
+// 					&core.Assign{"names", &core.GetField{V("group"), "objects"}},
+// 					&list.Push{"names", &core.GetField{V("in"), "Name"}, true},
+// 					&core.SetField{V("group"), "objects", V("names")},
+// 					&list.Set{V("groups"), V("idx"), V("group")},
+// 				), // end false
 // 			},
-// 		}}},
+// 		)},
 // 	},
 // }
 
 // // a pattern for matching groups --
 // // we add rules that if things arent equal we return false
 // // we could have just one rule if we wanted
-// var areMatchingGroups = pattern.BoolPattern{
+// var isMatchingGroup = pattern.BoolPattern{
 // 	CommonPattern: pattern.CommonPattern{
-// 		Name: "areMatchingGroups",
+// 		Name: "isMatchingGroup",
 // 		Prologue: []term.Preparer{
 // 			&term.Record{Name: "a", Kind: "GroupSettings"},
 // 			&term.Record{Name: "b", Kind: "GroupSettings"},
@@ -109,34 +148,34 @@ package list_test
 // 		&core.CompareText{
 // 			&core.GetField{
 // 				Obj:   V("a"),
-// 				Field: T("Label"),
+// 				Field: "Label",
 // 			},
 // 			&core.NotEqualTo{},
 // 			&core.GetField{
 // 				Obj:   V("b"),
-// 				Field: T("Label"),
+// 				Field: "Label",
 // 			},
 // 		}, &core.Bool{Bool: false}}, {
 // 		&core.CompareText{
 // 			&core.GetField{
 // 				Obj:   V("a"),
-// 				Field: T("Innumerable"),
+// 				Field: "Innumerable",
 // 			},
 // 			&core.NotEqualTo{},
 // 			&core.GetField{
 // 				Obj:   V("b"),
-// 				Field: T("Innumerable"),
+// 				Field: "Innumerable",
 // 			},
 // 		}, &core.Bool{Bool: false}}, {
 // 		&core.Bool{
 // 			&core.GetField{
 // 				Obj:   V("a"),
-// 				Field: T("Options"),
+// 				Field: "Options",
 // 			},
 // 			&core.NotEqualTo{},
 // 			&core.GetField{
 // 				Obj:   V("b"),
-// 				Field: T("Options"),
+// 				Field: "Options",
 // 			},
 // 		}, &core.Bool{Bool: false}},
 // 	},

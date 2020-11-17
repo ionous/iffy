@@ -43,7 +43,7 @@ func TestPush(t *testing.T) {
 
 func push(src []string, front bool, add ...string) (ret string, err error) {
 	lt := listTime{vals: values{"src": g.StringsOf(append([]string{}, src...))}}
-	num := getNum(&lt, &list.Push{"src", list.FrontOrBack(front), FromTs(add)})
+	num := getNum(&lt, &list.Push{"src", FromTs(add), list.FrontOrBack(front)})
 	if strs, e := lt.vals["src"].GetTextList(); e != nil {
 		err = e
 	} else {

@@ -14,7 +14,7 @@ import (
 
 func TestMapStrings(t *testing.T) {
 	var kinds test.Kinds
-	kinds.AddKinds((*Record)(nil))
+	kinds.AddKinds((*Fruit)(nil))
 	fruit := []string{"Orange", "Lemon", "Mango", "Banana", "Lime"}
 	lt := listTime{
 		vals: values{
@@ -39,11 +39,11 @@ func TestMapStrings(t *testing.T) {
 	}
 }
 
-type Record struct{ Fruit string }
+type Fruit struct{ Name string }
 
 func TestMapRecords(t *testing.T) {
 	var kinds test.Kinds
-	kinds.AddKinds((*Record)(nil))
+	kinds.AddKinds((*Fruit)(nil))
 	lt := listTime{
 		kinds: &kinds,
 		PatternMap: pattern.PatternMap{
@@ -51,13 +51,13 @@ func TestMapRecords(t *testing.T) {
 		},
 		vals: values{},
 	}
-	if k, e := lt.GetKindByName("Record"); e != nil {
+	if k, e := lt.GetKindByName("Fruit"); e != nil {
 		t.Fatal(e)
 	} else {
 		var fruits []*g.Record
 		for _, f := range []string{"Orange", "Lemon", "Mango", "Banana", "Lime"} {
 			one := k.NewRecord()
-			if e := one.SetNamedField("Fruit", g.StringOf(f)); e != nil {
+			if e := one.SetNamedField("Name", g.StringOf(f)); e != nil {
 				t.Fatal(e)
 			}
 			fruits = append(fruits, one)
@@ -76,38 +76,42 @@ func TestMapRecords(t *testing.T) {
 		expect := []string{
 			"egnarO", "nomeL", "ognaM", "ananaB", "emiL",
 		}
-		for i, el := range res {
-			if v, e := el.GetNamedField("Fruit"); e != nil {
+		var got []string
+		for _, el := range res {
+			if v, e := el.GetNamedField("Name"); e != nil {
 				t.Fatal(e)
 			} else if s, e := v.GetText(); e != nil {
 				t.Fatal(e)
-			} else if x := expect[i]; x != s {
-				t.Fatalf("expected %q got %q", x, s)
+			} else {
+				got = append(got, s)
 			}
+		}
+		if diff := pretty.Diff(expect, got); len(diff) > 0 {
+			t.Fatal("error", got)
 		}
 	}
 }
 
-var remap = list.Map{FromList: "src", ToList: "res", Pattern: "remap"}
+var remap = list.Map{FromList: "src", ToList: "res", UsingPattern: "remap"}
 
 var reverseRecords = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{
 		Name: "remap",
 		Prologue: []term.Preparer{
-			&term.Record{Name: "in", Kind: "Record"},
-			&term.Record{Name: "out", Kind: "Record"},
+			&term.Record{Name: "in", Kind: "Fruit"},
+			&term.Record{Name: "out", Kind: "Fruit"},
 		},
 	},
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{
 			Execute: &core.SetField{
 				Obj:   V("out"),
-				Field: "Fruit",
+				Field: "Name",
 				From: &core.FromText{
 					&core.MakeReversed{
 						&core.GetField{
 							Obj:   V("in"),
-							Field: "Fruit",
+							Field: "Name",
 						},
 					},
 				},

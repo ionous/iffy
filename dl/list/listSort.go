@@ -67,7 +67,7 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 
 func (op *Sort) sortNumbers(run rt.Runtime, src []float64) (err error) {
 	var one, two core.Number
-	det := makeDet("sort", &core.FromNum{&one}, &core.FromNum{&two})
+	det := makeDet(op.Pattern, &core.FromNum{&one}, &core.FromNum{&two})
 	sort.Slice(src, func(i, j int) (ret bool) {
 		one.Num, two.Num = src[i], src[j]
 		if x, e := det.GetBool(run); e != nil {
@@ -82,7 +82,7 @@ func (op *Sort) sortNumbers(run rt.Runtime, src []float64) (err error) {
 
 func (op *Sort) sortText(run rt.Runtime, src []string) (err error) {
 	var one, two core.Text
-	det := makeDet("sort", &core.FromText{&one}, &core.FromText{&two})
+	det := makeDet(op.Pattern, &core.FromText{&one}, &core.FromText{&two})
 	sort.Slice(src, func(i, j int) (ret bool) {
 		one.Text, two.Text = src[i], src[j]
 		if x, e := det.GetBool(run); e != nil {

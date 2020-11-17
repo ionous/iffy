@@ -23,6 +23,10 @@ func (n refValue) Type() string {
 	return n.t
 }
 
+func (n refValue) String() string {
+	return n.v.String()
+}
+
 func (n refValue) GetBool() (ret bool, err error) {
 	if n.v.Kind() != r.Bool {
 		err = errutil.New("value is not a bool")
@@ -139,10 +143,10 @@ func (n refValue) SetIndexedValue(i int, v Value) (err error) {
 		err = e
 	} else if va, elAffinity := v.Affinity(), affine.Element(n.a); va != elAffinity {
 		err = errutil.Fmt("mismatched affinity %q for element %q", va, elAffinity)
-	} else if rv, ok := v.(refValue); !ok {
-		err = errutil.New("unable to determine value from %T", rv)
+	} else if el, e := CopyValue(v); e != nil {
+		err = e
 	} else {
-		n.v.Index(i).Set(rv.v)
+		n.v.Index(i).Set(r.ValueOf(el))
 	}
 	return
 }
@@ -198,10 +202,10 @@ func (n refValue) appendOne(v Value) (ret Value, err error) {
 	compatible := va == elAffinity && (va != affine.Record || v.Type() == n.t)
 	if !compatible {
 		err = errutil.New("value is not compatible with list")
-	} else if rv, ok := v.(refValue); !ok {
-		err = errutil.New("unable to determine value from %T", rv)
+	} else if el, e := CopyValue(v); e != nil {
+		err = e
 	} else {
-		els := r.Append(n.v, rv.v)
+		els := r.Append(n.v, r.ValueOf(el))
 		ret = makeValue(n.a, n.t, els)
 	}
 	return
@@ -212,72 +216,11 @@ func (n refValue) appendMany(v Value) (ret Value, err error) {
 	compatible := n.a == va && (va != affine.RecordList || v.Type() == n.t)
 	if !compatible {
 		err = errutil.New("value is not compatible with list")
-	} else if rv, ok := v.(refValue); !ok {
-		err = errutil.New("unable to determine value from %T", rv)
+	} else if el, e := CopyValue(v); e != nil {
+		err = e
 	} else {
-		els := r.AppendSlice(n.v, rv.v)
+		els := r.AppendSlice(n.v, r.ValueOf(el))
 		ret = makeValue(n.a, n.t, els)
 	}
 	return
 }
-
-// func (n refValue) SetValue(from Value) (err error) {
-// 	if val := n.v; !val.CanSet() {
-// 		err = errutil.New("value is not writable")
-// 	} else {
-// 		switch k := val.Kind(); k {
-// 		case r.Bool:
-// 			if v, e := from.GetBool(); e != nil {
-// 				err = e
-// 			} else {
-// 				val.SetBool(v)
-// 			}
-// 		case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-// 			if v, e := from.GetNumber(); e != nil {
-// 				err = e
-// 			} else {
-// 				val.SetInt(int64(v))
-// 			}
-// 		case r.Float64, r.Float32:
-// 			if v, e := from.GetNumber(); e != nil {
-// 				err = e
-// 			} else {
-// 				val.SetFloat(v)
-// 			}
-// 		case r.String:
-// 			if v, e := from.GetText(); e != nil {
-// 				err = e
-// 			} else {
-// 				val.SetString(v)
-// 			}
-// 		case r.Interface:
-// 			// test each
-// 			// val.Implements
-
-// 		case r.Slice:
-// 			switch k := n.v.Type().Elem().Kind(); k {
-// 			case r.Float32, r.Float64, r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-// 				if vs, e := from.GetNumList(); e != nil {
-// 					err = e
-// 				} else {
-// 					val.Set(r.ValueOf(vs))
-// 				}
-// 			case r.String:
-// 				if vs, e := from.GetNumList(); e != nil {
-// 					err = e
-// 				} else {
-// 					val.Set(r.ValueOf(vs))
-// 				}
-// 			case r.Ptr:
-// 				//ret = affine.RecordList
-// 			default:
-// 				panic("unknown list " + k.String())
-// 			}
-
-// 		default:
-// 			panic("unknown kind " + k.String())
-// 		}
-
-// 	}
-// 	return
-// }
