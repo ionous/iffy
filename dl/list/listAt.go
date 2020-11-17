@@ -9,7 +9,7 @@ import (
 
 type At struct {
 	List  string // variable name
-	Index int
+	Index rt.NumberEval
 }
 
 // future: lists of lists? probably through lists of records containing lists.
@@ -23,9 +23,9 @@ func (*At) Compose() composer.Spec {
 }
 
 func (op *At) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if vs, e := op.getValue(run); e != nil {
+	if el, e := op.getEl(run); e != nil {
 		err = cmdError(op, e)
-	} else if n, e := vs.GetNumber(); e != nil {
+	} else if n, e := el.GetNumber(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = float64(n)
@@ -34,9 +34,9 @@ func (op *At) GetNumber(run rt.Runtime) (ret float64, err error) {
 }
 
 func (op *At) GetText(run rt.Runtime) (ret string, err error) {
-	if vs, e := op.getValue(run); e != nil {
+	if el, e := op.getEl(run); e != nil {
 		err = cmdError(op, e)
-	} else if n, e := vs.GetText(); e != nil {
+	} else if n, e := el.GetText(); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = n
@@ -44,32 +44,22 @@ func (op *At) GetText(run rt.Runtime) (ret string, err error) {
 	return
 }
 
-func (op *At) GetNumList(run rt.Runtime) (ret []float64, err error) {
-	if vs, e := op.getValue(run); e != nil {
-		err = cmdError(op, e)
-	} else if vs, e := vs.GetNumList(); e != nil {
+func (op *At) GetObject(run rt.Runtime) (ret g.Value, err error) {
+	if el, e := op.getEl(run); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = vs
+		ret = el
 	}
 	return
 }
 
-func (op *At) GetTextList(run rt.Runtime) (ret []string, err error) {
-	if vs, e := op.getValue(run); e != nil {
-		err = cmdError(op, e)
-	} else if vs, e := vs.GetTextList(); e != nil {
-		err = cmdError(op, e)
-	} else {
-		ret = vs
-	}
-	return
-}
-
-func (op *At) getValue(run rt.Runtime) (ret g.Value, err error) {
+//
+func (op *At) getEl(run rt.Runtime) (ret g.Value, err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = e
-	} else if el, e := vs.GetIndex(op.Index); e != nil {
+	} else if idx, e := rt.GetNumber(run, op.Index); e != nil {
+		err = e
+	} else if el, e := vs.GetIndex(int(idx) - 1); e != nil {
 		err = e
 	} else {
 		ret = el

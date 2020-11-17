@@ -27,7 +27,7 @@ func popTest(front bool, amt int, strs ...string) []string {
 	pop := &list.Pop{List: "src",
 		With:  "text",
 		Front: list.FrontOrBack(front),
-		Go:    core.NewActivity(&Write{&out, &core.GetVar{Name: T("text")}}),
+		Go:    core.NewActivity(&Write{&out, V("text")}),
 		Else:  core.NewActivity(&Write{&out, T("x")}),
 	}
 	run := listTime{vals: values{"src": g.StringsOf(strs)}}

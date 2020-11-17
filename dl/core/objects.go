@@ -9,12 +9,6 @@ import (
 	g "github.com/ionous/iffy/rt/generic"
 )
 
-// ObjectEval provides a way to access an object.
-type ObjectEval interface {
-	// returns UnknownObject error when successfully determining there is no such object
-	GetObjectValue(run rt.Runtime) (g.Value, error)
-}
-
 // ObjectName implements ObjectEval, searching for an object named as specified.
 // ex. ObjectName{ "target" } looks for the object named "target".
 // this is an internal command, used by express.... fix: maybe it should live there.
@@ -26,40 +20,31 @@ type ObjectName struct {
 // tbd: this isnt currently exposed....
 // this also could be done by IsKindOf("kind")
 type ObjectExists struct {
-	Obj ObjectEval
+	Obj rt.ObjectEval
 }
 
 // NameOf returns the full name of an object as declared by the author.
 // It doesnt change over the course of play. To change the name use the "printed name" property.
 type NameOf struct {
-	Obj ObjectEval
+	Obj rt.ObjectEval
 }
 
 // KindOf returns the class of an object.
 type KindOf struct {
-	Obj ObjectEval
+	Obj rt.ObjectEval
 }
 
 // IsKindOf is less about caring, and more about sharing;
 // it returns true when the object is compatible with the named kind.
 type IsKindOf struct {
-	Obj  ObjectEval
+	Obj  rt.ObjectEval
 	Kind rt.TextEval
 }
 
 // IsExactKindOf returns true when the object is of exactly the named kind.
 type IsExactKindOf struct {
-	Obj  ObjectEval
+	Obj  rt.ObjectEval
 	Kind rt.TextEval
-}
-
-func GetObjectValue(run rt.Runtime, eval ObjectEval) (ret g.Value, err error) {
-	if eval == nil {
-		err = rt.MissingEval("empty object ref")
-	} else {
-		ret, err = eval.GetObjectValue(run)
-	}
-	return
 }
 
 func (*ObjectName) Compose() composer.Spec {
@@ -73,10 +58,10 @@ func (*ObjectName) Compose() composer.Spec {
 
 // can be used as text, returns the object id.
 // func (op *ObjectName) GetText(run rt.Runtime) (ret string, err error) {
-// 	return op.GetObjectValue(run)
+// 	return op.GetObject(run)
 // }
 
-func (op *ObjectName) GetObjectValue(run rt.Runtime) (ret g.Value, err error) {
+func (op *ObjectName) GetObject(run rt.Runtime) (ret g.Value, err error) {
 	if name, e := rt.GetText(run, op.Name); e != nil {
 		err = e
 	} else {
@@ -97,7 +82,7 @@ func (*ObjectExists) Compose() composer.Spec {
 func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
 	// checking for object.Exists only searches by object id
 	// we want to check for the object by friendly name, and possibly by looking in scope
-	switch _, e := GetObjectValue(run, op.Obj); e.(type) {
+	switch _, e := rt.GetObject(run, op.Obj); e.(type) {
 	case nil:
 		okay = true
 	case g.UnknownObject:
@@ -128,7 +113,7 @@ func (*NameOf) Compose() composer.Spec {
 }
 
 func (op *NameOf) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, e := GetObjectValue(run, op.Obj); e != nil {
+	if obj, e := rt.GetObject(run, op.Obj); e != nil {
 		err = cmdError(op, e)
 	} else if p, e := obj.GetNamedField(object.Name); e != nil {
 		err = cmdError(op, e)
@@ -148,7 +133,7 @@ func (*KindOf) Compose() composer.Spec {
 }
 
 func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, e := GetObjectValue(run, op.Obj); e != nil {
+	if obj, e := rt.GetObject(run, op.Obj); e != nil {
 		err = cmdError(op, e)
 	} else if p, e := obj.GetNamedField(object.Kind); e != nil {
 		err = cmdError(op, e)
@@ -168,7 +153,7 @@ func (*IsKindOf) Compose() composer.Spec {
 }
 
 func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
-	if obj, e := GetObjectValue(run, op.Obj); e != nil {
+	if obj, e := rt.GetObject(run, op.Obj); e != nil {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
@@ -191,7 +176,7 @@ func (*IsExactKindOf) Compose() composer.Spec {
 }
 
 func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
-	if obj, e := GetObjectValue(run, op.Obj); e != nil {
+	if obj, e := rt.GetObject(run, op.Obj); e != nil {
 		err = cmdError(op, e)
 	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)

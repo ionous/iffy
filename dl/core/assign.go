@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -44,8 +43,8 @@ type FromText struct {
 	Val rt.TextEval
 }
 
-type FromRecord struct {
-	Val rt.RecordEval
+type FromObject struct {
+	Val rt.ObjectEval
 }
 
 type FromNumList struct {
@@ -56,8 +55,8 @@ type FromTextList struct {
 	Vals rt.TextListEval
 }
 
-type FromRecordList struct {
-	Vals rt.RecordListEval
+type FromObjectList struct {
+	Vals rt.ObjectListEval
 }
 
 func (*Assign) Compose() composer.Spec {
@@ -142,7 +141,7 @@ func (op *FromText) GetEval() interface{} {
 	return op.Val
 }
 
-func (*FromRecord) Compose() composer.Spec {
+func (*FromObject) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_record",
 		Group: "variables",
@@ -150,16 +149,16 @@ func (*FromRecord) Compose() composer.Spec {
 	}
 }
 
-func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if val, e := rt.GetRecord(run, op.Val); e != nil {
+func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if obj, e := rt.GetObject(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.RecordOf(val)
+		ret = obj
 	}
 	return
 }
 
-func (op *FromRecord) GetEval() interface{} {
+func (op *FromObject) GetEval() interface{} {
 	return op.Val
 }
 
@@ -205,7 +204,7 @@ func (op *FromTextList) GetEval() interface{} {
 	return op.Vals
 }
 
-func (*FromRecordList) Compose() composer.Spec {
+func (*FromObjectList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_record_list",
 		Group: "variables",
@@ -213,15 +212,15 @@ func (*FromRecordList) Compose() composer.Spec {
 	}
 }
 
-func (op *FromRecordList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if typeName, vals, e := rt.GetRecordList(run, op.Vals); e != nil {
+func (op *FromObjectList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if objs, e := rt.GetObjectList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret, err = g.ValueFrom(vals, affine.RecordList, typeName)
+		ret = objs
 	}
 	return
 }
 
-func (op *FromRecordList) GetEval() interface{} {
+func (op *FromObjectList) GetEval() interface{} {
 	return op.Vals
 }

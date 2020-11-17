@@ -86,7 +86,7 @@ func TestExpressions(t *testing.T) {
 	})
 	t.Run("big dot", func(t *testing.T) {
 		if e := testExpression(".A.num",
-			&core.GetField{O("A", true), T("num")}); e != nil {
+			&core.GetField{O("A", true), "num"}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -96,17 +96,17 @@ func TestExpressions(t *testing.T) {
 				&core.ObjectName{
 					Name: &core.GetField{
 						O("a", false),
-						T("b")},
+						"b"},
 				},
-				T("c")}); e != nil {
+				"c"}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("binary", func(t *testing.T) {
 		if e := testExpression(".A.num * .b.num",
 			&core.ProductOf{
-				&core.GetField{O("A", true), T("num")},
-				&core.GetField{O("b", false), T("num")},
+				&core.GetField{O("A", true), "num"},
+				&core.GetField{O("b", false), "num"},
 			}); e != nil {
 			t.Fatal(e)
 		}
@@ -130,7 +130,7 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("{printNumWord: .groupSize}",
 			&core.PrintNumWord{
 				Num: &core.GetVar{
-					Name:  &core.Text{Text: "groupSize"},
+					Name:  "groupSize",
 					Flags: core.TryAsBoth,
 				},
 			}); e != nil {
@@ -248,7 +248,7 @@ func TestTemplates(t *testing.T) {
 	// dotted names started with capital letters are requests for objects exactly matching that name
 	t.Run("global prop", func(t *testing.T) {
 		if e := testTemplate("{.Object.prop}",
-			&core.GetField{O("Object", true), T("prop")},
+			&core.GetField{O("Object", true), "prop"},
 		); e != nil {
 			t.Fatal(e)
 		}

@@ -17,7 +17,7 @@ func ExampleIndex() {
 		&ForEachText{
 			In: &Texts{oneTwoThree},
 			Go: NewActivity(
-				&Say{&PrintNum{&GetVar{Name: T("index")}}},
+				&Say{&PrintNum{&GetVar{Name: "index"}}},
 			),
 		},
 	); e != nil {
@@ -36,12 +36,12 @@ func ExampleChooseText() {
 				In: &Texts{oneTwoThree},
 				Go: NewActivity(
 					&Say{&ChooseText{
-						If:   &GetVar{Name: T("last")},
+						If:   &GetVar{Name: "last"},
 						True: T("last"),
 						False: &ChooseText{
-							If:    &GetVar{Name: T("first")},
+							If:    &GetVar{Name: "first"},
 							True:  T("first"),
-							False: &GetVar{Name: T("text")},
+							False: &GetVar{Name: "text"},
 						},
 					}}),
 			}),

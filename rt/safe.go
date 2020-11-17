@@ -79,12 +79,12 @@ func GetText(run Runtime, eval TextEval) (ret string, err error) {
 	return
 }
 
-// GetRecord runs the specified eval, returning an error if the eval is nil.
-func GetRecord(run Runtime, eval RecordEval) (ret *g.Record, err error) {
+// GetObject runs the specified eval, returning an error if the eval is nil.
+func GetObject(run Runtime, eval ObjectEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty record eval")
+		err = MissingEval("empty object eval")
 	} else {
-		ret, err = eval.GetRecord(run)
+		ret, err = eval.GetObject(run)
 	}
 	return
 }
@@ -157,11 +157,11 @@ func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 	return
 }
 
-// GetRecordList returns an new iterator to walk the passed list,
+// GetObjectList returns an new iterator to walk the passed list,
 // or an empty iterator if the value is null.
-func GetRecordList(run Runtime, eval RecordListEval) (retType string, retList []*g.Record, err error) {
+func GetObjectList(run Runtime, eval ObjectListEval) (ret g.Value, err error) {
 	if eval != nil {
-		retType, retList, err = eval.GetRecordList(run)
+		ret, err = eval.GetObjectList(run)
 	}
 	return
 }

@@ -38,7 +38,7 @@ func (on *dottedName) flags() (ret core.TryAsNoun) {
 // but we can use the existing command GetVar which implements every eval type.
 func (on *dottedName) getValueNamed() *core.GetVar {
 	return &core.GetVar{
-		Name:  T(on.name),
+		Name:  on.name,
 		Flags: on.flags(),
 	}
 }
@@ -49,7 +49,7 @@ func (on *dottedName) getValueNamed() *core.GetVar {
 // so we just pass it around behind the scenes as an interface.
 func (on *dottedName) getFromVar() (ret core.Assignment) {
 	return &core.CopyFrom{
-		Name:  T(on.name),
+		Name:  on.name,
 		Flags: on.flags(),
 	}
 }

@@ -44,9 +44,9 @@ var sortPattern = pattern.BoolPattern{
 		&pattern.BoolRule{
 			Filter: B(true),
 			BoolEval: &core.CompareText{
-				A:  &core.GetVar{Name: T("a")},
+				A:  V("a"),
 				Is: &core.LessThan{},
-				B:  &core.GetVar{Name: T("b")},
+				B:  V("b"),
 			},
 		},
 	},

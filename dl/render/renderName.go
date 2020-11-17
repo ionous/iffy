@@ -61,7 +61,7 @@ func (op *Name) getPrintedNamedOf(run rt.Runtime, objectName string) (ret string
 		&pattern.DetermineAct{
 			Pattern: "printName",
 			Arguments: core.NewArgs(&core.CopyFrom{
-				Name:  &core.Text{objectName},
+				Name:  objectName,
 				Flags: 0}),
 		})}); e != nil {
 		err = cmdError(op, e)

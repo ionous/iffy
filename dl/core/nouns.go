@@ -31,9 +31,9 @@ func (*SimpleNoun) Compose() composer.Spec {
 
 // can be used as text, returns the object.id
 // func (op *SimpleNoun) GetText(run rt.Runtime) (ret string, err error) {
-// 	return op.GetObjectValue(run)
+// 	return op.GetObject(run)
 // }
 
-func (op *SimpleNoun) GetObjectValue(run rt.Runtime) (ret g.Value, err error) {
+func (op *SimpleNoun) GetObject(run rt.Runtime) (ret g.Value, err error) {
 	return getObjectInexactly(run, string(op.Name))
 }

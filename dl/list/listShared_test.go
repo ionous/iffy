@@ -27,10 +27,10 @@ type listTime struct {
 
 type values map[string]g.Value
 
-func B(i bool) rt.BoolEval       { return &core.Bool{i} }
-func I(i int) rt.NumberEval      { return &core.Number{float64(i)} }
-func T(i string) rt.TextEval     { return &core.Text{i} }
-func V(i string) core.ObjectEval { return &core.GetVar{Name: T(i)} }
+func B(i bool) rt.BoolEval    { return &core.Bool{i} }
+func I(i int) rt.NumberEval   { return &core.Number{float64(i)} }
+func T(i string) rt.TextEval  { return &core.Text{i} }
+func V(i string) *core.GetVar { return &core.GetVar{Name: i} }
 
 func FromTs(vs []string) (ret core.Assignment) {
 	if len(vs) == 1 {

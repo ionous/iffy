@@ -8,8 +8,8 @@ import (
 
 // GetField a property value from an object by name.
 type GetField struct {
-	Obj   ObjectEval
-	Field rt.TextEval
+	Obj   rt.ObjectEval
+	Field string
 }
 
 func (*GetField) Compose() composer.Spec {
@@ -17,14 +17,14 @@ func (*GetField) Compose() composer.Spec {
 		Name: "get_field",
 		// fix: should use determiner; that should be a hint... yeah?
 		// but if so... then doesnt GetField need that determiner?
-		Spec:  "the {field:text_eval} of {object%obj:object_ref}",
+		Spec:  "the {field:text_eval} of {object:object_ref}",
 		Group: "objects",
 		Desc:  "Get Field: Return the value of the named object property.",
 	}
 }
 
 func (op *GetField) GetBool(run rt.Runtime) (ret bool, err error) {
-	if p, e := op.getValue(run); e != nil {
+	if p, e := op.getField(run); e != nil {
 		err = e
 	} else {
 		ret, err = p.GetBool()
@@ -33,7 +33,7 @@ func (op *GetField) GetBool(run rt.Runtime) (ret bool, err error) {
 }
 
 func (op *GetField) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if p, e := op.getValue(run); e != nil {
+	if p, e := op.getField(run); e != nil {
 		err = e
 	} else {
 		ret, err = p.GetNumber()
@@ -42,7 +42,7 @@ func (op *GetField) GetNumber(run rt.Runtime) (ret float64, err error) {
 }
 
 func (op *GetField) GetText(run rt.Runtime) (ret string, err error) {
-	if p, e := op.getValue(run); e != nil {
+	if p, e := op.getField(run); e != nil {
 		err = e
 	} else {
 		ret, err = p.GetText()
@@ -51,7 +51,7 @@ func (op *GetField) GetText(run rt.Runtime) (ret string, err error) {
 }
 
 func (op *GetField) GetNumList(run rt.Runtime) (ret []float64, err error) {
-	if p, e := op.getValue(run); e != nil {
+	if p, e := op.getField(run); e != nil {
 		err = e
 	} else {
 		ret, err = p.GetNumList()
@@ -60,7 +60,7 @@ func (op *GetField) GetNumList(run rt.Runtime) (ret []float64, err error) {
 }
 
 func (op *GetField) GetTextList(run rt.Runtime) (ret []string, err error) {
-	if p, e := op.getValue(run); e != nil {
+	if p, e := op.getField(run); e != nil {
 		err = e
 	} else {
 		ret, err = p.GetTextList()
@@ -68,13 +68,11 @@ func (op *GetField) GetTextList(run rt.Runtime) (ret []string, err error) {
 	return
 }
 
-func (op *GetField) getValue(run rt.Runtime) (ret g.Value, err error) {
-	if obj, e := GetObjectValue(run, op.Obj); e != nil {
-		err = e
-	} else if field, e := rt.GetText(run, op.Field); e != nil {
+func (op *GetField) getField(run rt.Runtime) (ret g.Value, err error) {
+	if obj, e := rt.GetObject(run, op.Obj); e != nil {
 		err = e
 	} else {
-		ret, err = obj.GetNamedField(field)
+		ret, err = obj.GetNamedField(op.Field)
 	}
 	return
 }

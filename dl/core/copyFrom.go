@@ -7,8 +7,8 @@ import (
 )
 
 type CopyFrom struct {
-	Name  rt.TextEval // name of the variable or object.
-	Flags TryAsNoun   `if:"internal"`
+	Name  string    // name of the variable or object.
+	Flags TryAsNoun `if:"internal"`
 }
 
 func (*CopyFrom) Compose() composer.Spec {

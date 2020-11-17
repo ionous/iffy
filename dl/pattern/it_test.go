@@ -4,6 +4,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/chain"
 	g "github.com/ionous/iffy/rt/generic"
@@ -116,3 +117,5 @@ func (b Bool) GetBool(rt.Runtime) (bool, error) {
 }
 
 var Skip = Bool(false)
+
+func V(n string) *core.GetVar { return &core.GetVar{Name: n} }

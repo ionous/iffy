@@ -6,8 +6,8 @@ import (
 )
 
 type SetField struct {
-	Obj   ObjectEval
-	Field rt.TextEval
+	Obj   rt.ObjectEval
+	Field string
 	From  Assignment
 }
 
@@ -20,16 +20,14 @@ func (*SetField) Compose() composer.Spec {
 }
 
 func (op *SetField) Execute(run rt.Runtime) (err error) {
-	if obj, e := GetObjectValue(run, op.Obj); e != nil {
-		err = e
-	} else if field, e := rt.GetText(run, op.Field); e != nil {
+	if obj, e := rt.GetObject(run, op.Obj); e != nil {
 		err = e
 	} else if val, e := GetAssignedValue(run, op.From); e != nil {
 		err = e
 	} else {
 		// if its going to a record, it should have been a move or copy assignment.
 		// in either case, we're overwriting the value.
-		err = obj.SetNamedField(field, val)
+		err = obj.SetNamedField(op.Field, val)
 	}
 	return
 }

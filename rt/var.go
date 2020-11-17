@@ -43,6 +43,15 @@ func (v Variable) GetText(run Runtime) (ret string, err error) {
 	return
 }
 
+func (v Variable) GetRecord(run Runtime) (ret *g.Record, err error) {
+	if val, e := v.GetValue(run); e != nil {
+		err = e
+	} else {
+		ret, err = val.GetRecord()
+	}
+	return
+}
+
 func (v Variable) GetTextList(run Runtime) (ret []string, err error) {
 	if val, e := v.GetValue(run); e != nil {
 		err = e

@@ -214,16 +214,8 @@ var FactorialZero = map[string]interface{}{
 }
 
 var FactorialNum = map[string]interface{}{
-	"type": "text_eval",
-	"value": map[string]interface{}{
-		"type": "text_value",
-		"value": map[string]interface{}{
-			"$TEXT": map[string]interface{}{
-				"type":  "text",
-				"value": "num",
-			},
-		},
-	},
+	"type":  "text",
+	"value": "num",
 }
 
 var FactorialSubtract = map[string]interface{}{

@@ -1,8 +1,6 @@
 package rt
 
-import (
-	g "github.com/ionous/iffy/rt/generic"
-)
+import g "github.com/ionous/iffy/rt/generic"
 
 // Execute runs a bit of code that has no return value.
 type Execute interface {
@@ -23,8 +21,9 @@ type TextEval interface {
 	GetText(Runtime) (string, error)
 }
 
-type RecordEval interface {
-	GetRecord(Runtime) (*g.Record, error)
+// ObjectEval represents something made of fields.
+type ObjectEval interface {
+	GetObject(Runtime) (g.Value, error)
 }
 
 // NumListEval returns or generates a series of numbers.
@@ -37,6 +36,7 @@ type TextListEval interface {
 	GetTextList(Runtime) ([]string, error)
 }
 
-type RecordListEval interface {
-	GetRecordList(Runtime) (string, []*g.Record, error)
+// ObjectEval returns or generates a series of object instances.
+type ObjectListEval interface {
+	GetObjectList(Runtime) (g.Value, error)
 }

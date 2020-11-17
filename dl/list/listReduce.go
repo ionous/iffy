@@ -33,7 +33,7 @@ package list
 
 // func (op *Reduce) execute(run rt.Runtime) (err error) {
 // 	var one, two core.R
-// 	det := makeDet("sort", &core.FromRecord{&one}, &core.FromRecord{&two})
+// 	det := makeDet("sort", &core.FromObject{&one}, &core.FromObject{&two})
 
 // 	var pat pattern.ActivityPattern
 // 	if fromList, e := run.GetField(object.Variables, op.FromList); e != nil {

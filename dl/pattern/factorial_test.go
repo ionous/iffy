@@ -21,19 +21,19 @@ func TestFactorial(t *testing.T) {
 				},
 			}, []*pattern.NumberRule{{
 				NumberEval: &core.ProductOf{
-					&core.GetVar{Name: &core.Text{"num"}},
+					&core.GetVar{Name: "num"},
 					&pattern.DetermineNum{
 						Pattern: "factorial", Arguments: pattern.NewNamedParams(
 							"num", &core.FromNum{
 								&core.DiffOf{
-									&core.GetVar{Name: &core.Text{"num"}},
+									&core.GetVar{Name: "num"},
 									&core.Number{1},
 								},
 							},
 						)}},
 			}, {
 				Filter: &core.CompareNum{
-					&core.GetVar{Name: &core.Text{"num"}},
+					&core.GetVar{Name: "num"},
 					&core.EqualTo{},
 					&core.Number{0},
 				},
