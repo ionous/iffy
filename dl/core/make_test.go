@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/test"
 	"github.com/kr/pretty"
 )
@@ -25,7 +26,7 @@ func TestMake(t *testing.T) {
 		t.Fatal(e)
 	} else if d, e := obj.GetRecord(); e != nil {
 		t.Fatal(e)
-	} else if diff := pretty.Diff(d.Values(), map[string]interface{}{
+	} else if diff := pretty.Diff(g.RecordToValue(d), map[string]interface{}{
 		"Name":         "",
 		"Label":        "",
 		"Innumerable":  "NotInnumerable",

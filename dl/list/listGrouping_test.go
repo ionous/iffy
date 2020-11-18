@@ -13,6 +13,7 @@ import (
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/test"
 	"github.com/ionous/sliceOf"
+	"github.com/kr/pretty"
 )
 
 func TestMatching(t *testing.T) {
@@ -25,7 +26,8 @@ func TestMatching(t *testing.T) {
 	lt := listTime{kinds: &kinds,
 		PatternMap: pattern.PatternMap{
 			"isMatchingGroup": &isMatchingGroup,
-		}}
+		},
+	}
 
 	a, b := k.NewRecord(), k.NewRecord()
 	runMatching := &pattern.DetermineBool{
@@ -88,6 +90,7 @@ func TestMatching(t *testing.T) {
 		}
 	}
 }
+
 func TestGrouping(t *testing.T) {
 	var kinds test.Kinds
 	type Things struct{}
@@ -121,46 +124,42 @@ func TestGrouping(t *testing.T) {
 			t.Fatal(e)
 		} else if e := runGroupTogther.Execute(&lt); e != nil {
 			t.Fatal("groupTogther", e)
+		} else if e := runCollateGroups.Execute(&lt); e != nil {
+			t.Fatal("collateGroups", e)
+		} else if collation, e := values.GetNamedField("Collation"); e != nil {
+			t.Fatal(e)
+		} else if groups, e := g.Must(collation.GetNamedField("Groups")).GetRecordList(); e != nil {
+			t.Fatal(e)
 		} else {
-			if groups, e := g.Must(values.GetNamedField("Settings")).GetRecordList(); e != nil {
-				t.Fatal(e)
-			} else {
-				logSettings(t, groups)
-				if e := runCollateGroups.Execute(&lt); e != nil {
-					t.Fatal("collateGroups", e)
-				} else if collation, e := values.GetNamedField("Collation"); e != nil {
-					t.Fatal(e)
-				} else if groups, e := g.Must(collation.GetNamedField("Groups")).GetRecordList(); e != nil {
-					t.Fatal(e)
-				} else {
-					logGroups(t, groups)
-				}
+			expect := []interface{}{
+				map[string]interface{}{
+					"Settings": map[string]interface{}{
+						"Name":         "mildred",
+						"Label":        "",
+						"Innumerable":  "NotInnumerable",
+						"GroupOptions": "WithoutObjects",
+					},
+					"Objects": []string{"mildred", "apple", "pen"},
+				},
+				map[string]interface{}{
+					"Settings": map[string]interface{}{
+						"Name":         "thing#1",
+						"Label":        "thingies",
+						"Innumerable":  "NotInnumerable",
+						"GroupOptions": "WithoutObjects",
+					},
+					"Objects": []string{"thing#1", "thing#2"},
+				},
+			}
+			if diff := pretty.Diff(expect, g.RecordsToValue(groups)); len(diff) > 0 {
+				t.Fatal(diff)
 			}
 		}
 	}
 }
 
-func logSettings(t *testing.T, settings []*g.Record) {
-	t.Log("settings len", len(settings))
-	for _, el := range settings {
-		t.Log(el.Values())
-	}
-}
-
 func logGroups(t *testing.T, groups []*g.Record) {
-	t.Log("group len", len(groups))
-	for _, el := range groups {
-		if settings, e := g.Must(el.GetNamedField("Settings")).GetRecord(); e != nil {
-			t.Fatal(e)
-		} else {
-			t.Log(settings.Values())
-		}
-		if objects, e := g.Must(el.GetNamedField("Objects")).GetTextList(); e != nil {
-			t.Fatal(e)
-		} else {
-			t.Log(objects)
-		}
-	}
+	t.Log("groups", len(groups), pretty.Sprint(g.RecordsToValue(groups)))
 }
 
 func objects(kind *g.Kind, names ...string) (ret map[string]*g.Record, err error) {
@@ -256,18 +255,17 @@ var collateGroups = pattern.ActivityPattern{
 				// pack the object and its settings into it,
 				// push the group into the groups.
 				True: core.NewActivity(
-					&core.Assign{"group", &core.FromObject{&core.Make{Name: "GroupObjects"}}},
-					&core.Assign{"names", &core.GetField{V("group"), "Objects"}},
-					&list.Push{"names", &core.GetField{V("in"), "Name"}, true},
+					&list.Push{"names", &core.GetField{V("in"), "Name"}, false},
 					&core.SetField{V("group"), "Objects", V("names")},
-					&list.Push{"groups", V("group"), true},
+					&core.SetField{V("group"), "Settings", V("in")},
+					&list.Push{"groups", V("group"), false},
 				), // end true
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
 					&core.Assign{"group", &core.FromObject{&list.At{"groups", V("idx")}}},
 					&core.Assign{"names", &core.GetField{V("group"), "Objects"}},
-					&list.Push{"names", &core.GetField{V("in"), "Name"}, true},
+					&list.Push{"names", &core.GetField{V("in"), "Name"}, false},
 					&core.SetField{V("group"), "Objects", V("names")},
 					&list.Set{"groups", V("idx"), V("group")},
 				), // end false

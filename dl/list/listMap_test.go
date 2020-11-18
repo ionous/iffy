@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/object"
+	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/test"
@@ -28,9 +29,13 @@ func TestMapStrings(t *testing.T) {
 		PatternMap: pattern.PatternMap{
 			"remap": &reverseStrings,
 		},
+		ScopeStack: scope.ScopeStack{
+			Scopes: []rt.Scope{
+				&scope.TargetRecord{object.Variables, values},
+			},
+		},
 		kinds: &kinds,
 	}
-	lt.PushScope(&scope.TargetRecord{object.Variables, values})
 	if e := values.SetNamedField("Fruits", g.StringsOf([]string{"Orange", "Lemon", "Mango", "Banana", "Lime"})); e != nil {
 		t.Fatal(e)
 	} else if e := remap.Execute(&lt); e != nil {
@@ -59,13 +64,7 @@ func TestMapRecords(t *testing.T) {
 	}
 	kinds.AddKinds((*Fruit)(nil), (*Values)(nil))
 	values := kinds.New("Values")
-	lt := listTime{
-		kinds: &kinds,
-		PatternMap: pattern.PatternMap{
-			"remap": &reverseRecords,
-		},
-	}
-	if k, e := lt.GetKindByName("Fruit"); e != nil {
+	if k, e := kinds.GetKindByName("Fruit"); e != nil {
 		t.Fatal(e)
 	} else {
 		var fruits []*g.Record
@@ -80,8 +79,17 @@ func TestMapRecords(t *testing.T) {
 			t.Fatal(e)
 		}
 	}
-
-	lt.PushScope(&scope.TargetRecord{object.Variables, values})
+	lt := listTime{
+		kinds: &kinds,
+		PatternMap: pattern.PatternMap{
+			"remap": &reverseRecords,
+		},
+		ScopeStack: scope.ScopeStack{
+			Scopes: []rt.Scope{
+				&scope.TargetRecord{object.Variables, values},
+			},
+		},
+	}
 	if e := remap.Execute(&lt); e != nil {
 		t.Fatal(e)
 	} else if val, e := values.GetNamedField("Results"); e != nil {

@@ -11,6 +11,7 @@ import (
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/rt/writer"
 )
 
 type panicTime struct {
@@ -24,16 +25,23 @@ type listTime struct {
 	kinds *test.Kinds
 }
 
+func (lt *listTime) Writer() writer.Output {
+	return writer.NewStdout()
+}
 func newListTime(src []string, p pattern.PatternMap) (ret rt.Runtime, vals *g.Record, err error) {
 	var kinds test.Kinds
 	type Values struct{ Source []string }
 	kinds.AddKinds((*Values)(nil))
+	values := kinds.New("Values")
 	lt := listTime{
 		kinds:      &kinds,
 		PatternMap: p,
+		ScopeStack: scope.ScopeStack{
+			Scopes: []rt.Scope{
+				&scope.TargetRecord{object.Variables, values},
+			},
+		},
 	}
-	values := kinds.New("Values")
-	lt.PushScope(&scope.TargetRecord{object.Variables, values})
 	if e := values.SetNamedField("Source", g.StringsOf(src)); e != nil {
 		err = e
 	} else {
