@@ -38,7 +38,7 @@ func DefaultFrom(ks Kinds, a affine.Affinity, subtype string) (ret Value, err er
 		if _, e := ks.GetKindByName(subtype); e != nil {
 			err = errutil.New("unknown kind", subtype, e)
 		} else {
-			ret, err = ValueFrom(nil, a, subtype)
+			ret, err = ValueFrom([]*Record{}, a, subtype)
 		}
 	default:
 		err = errutil.New("unhandled affinity", a)
