@@ -65,20 +65,11 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 	return
 }
 
-type fromValue struct{ value g.Value }
-
-func (op *fromValue) GetEval() interface{} { return nil }
-
-func (op *fromValue) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	ret = op.value
-	return
-}
-
 func (op *Sort) sortNumbers(run rt.Runtime, src []float64) (err error) {
-	var one, two fromValue
+	var one, two core.FromValue
 	det := makeDet(op.Pattern, &one, &two)
 	sort.Slice(src, func(i, j int) (ret bool) {
-		one.value, two.value = g.FloatOf(src[i]), g.FloatOf(src[j])
+		one.Value, two.Value = g.FloatOf(src[i]), g.FloatOf(src[j])
 		if x, e := det.GetBool(run); e != nil {
 			err = errutil.Append(err, e)
 		} else {
@@ -90,10 +81,10 @@ func (op *Sort) sortNumbers(run rt.Runtime, src []float64) (err error) {
 }
 
 func (op *Sort) sortText(run rt.Runtime, src []string) (err error) {
-	var one, two fromValue
+	var one, two core.FromValue
 	det := makeDet(op.Pattern, &one, &two)
 	sort.Slice(src, func(i, j int) (ret bool) {
-		one.value, two.value = g.StringOf(src[i]), g.StringOf(src[j])
+		one.Value, two.Value = g.StringOf(src[i]), g.StringOf(src[j])
 		if x, e := det.GetBool(run); e != nil {
 			err = errutil.Append(err, e)
 		} else {

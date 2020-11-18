@@ -15,6 +15,79 @@ import (
 	"github.com/ionous/sliceOf"
 )
 
+func TestMatching(t *testing.T) {
+	var kinds test.Kinds
+	type Things struct{}
+	kinds.AddKinds((*Things)(nil), (*test.GroupSettings)(nil))
+	k := kinds.Kind("GroupSettings")
+
+	//
+	lt := listTime{kinds: &kinds,
+		PatternMap: pattern.PatternMap{
+			"isMatchingGroup": &isMatchingGroup,
+		}}
+
+	a, b := k.NewRecord(), k.NewRecord()
+	runMatching := &pattern.DetermineBool{
+		Pattern: "isMatchingGroup", Arguments: core.NewArgs(
+			&core.FromValue{g.RecordOf(a)},
+			&core.FromValue{g.RecordOf(b)},
+		)}
+	// default should match
+	{
+		if ok, e := runMatching.GetBool(&lt); e != nil {
+			t.Fatal(e)
+		} else if ok != true {
+			t.Fatal(e)
+		}
+	}
+	// different labels shouldnt match
+	{
+		if e := test.SetRecord(a, "Label", "beep"); e != nil {
+			t.Fatal(e)
+		} else if ok, e := runMatching.GetBool(&lt); e != nil {
+			t.Fatal(e)
+		} else if ok != false {
+			t.Fatal(e)
+		}
+	}
+	// same labels should match
+	{
+		if e := test.SetRecord(b, "Label", "beep"); e != nil {
+			t.Fatal(e)
+		} else if ok, e := runMatching.GetBool(&lt); e != nil {
+			t.Fatal(e)
+		} else if ok != true {
+			t.Fatal(e)
+		}
+	}
+	// many fields should match
+	{
+		if e := test.SetRecord(a, "Innumerable", "IsInnumerable"); e != nil {
+			t.Fatal(e)
+		} else if e := test.SetRecord(b, "IsInnumerable", true); e != nil {
+			t.Fatal(e)
+		} else if e := test.SetRecord(a, "GroupOptions", "WithArticles"); e != nil {
+			t.Fatal(e)
+		} else if e := test.SetRecord(b, "GroupOptions", "WithArticles"); e != nil {
+			t.Fatal(e)
+		} else if ok, e := runMatching.GetBool(&lt); e != nil {
+			t.Fatal(e)
+		} else if ok != true {
+			t.Fatal(e)
+		}
+	}
+	// names shouldnt be involved
+	{
+		if e := test.SetRecord(a, "Name", "hola"); e != nil {
+			t.Fatal(e)
+		} else if ok, e := runMatching.GetBool(&lt); e != nil {
+			t.Fatal(e)
+		} else if ok != true {
+			t.Fatal(e)
+		}
+	}
+}
 func TestGrouping(t *testing.T) {
 	var kinds test.Kinds
 	type Things struct{}
