@@ -8,7 +8,7 @@ import (
 )
 
 func Must(val Value, err error) Value {
-	if err == nil {
+	if err != nil {
 		panic(err)
 	}
 	return val
