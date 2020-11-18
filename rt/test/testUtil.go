@@ -24,6 +24,10 @@ func (ks *Kinds) AddKinds(is ...interface{}) {
 	}
 }
 
+func (ks *Kinds) New(name string) *g.Record {
+	return ks.Kind(name).NewRecord()
+}
+
 func (ks *Kinds) Kind(name string) (ret *g.Kind) {
 	if k, e := ks.GetKindByName(name); e != nil {
 		panic(e)

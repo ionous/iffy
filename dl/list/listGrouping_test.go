@@ -7,8 +7,10 @@ package list_test
 // 	"github.com/ionous/iffy/dl/list"
 // 	"github.com/ionous/iffy/dl/pattern"
 // 	"github.com/ionous/iffy/dl/term"
+// 	"github.com/ionous/iffy/object"
 // 	"github.com/ionous/iffy/rt"
 // 	g "github.com/ionous/iffy/rt/generic"
+// 	"github.com/ionous/iffy/rt/scope"
 // 	"github.com/ionous/iffy/rt/test"
 // 	"github.com/ionous/sliceOf"
 // 	"github.com/kr/pretty"
@@ -20,30 +22,38 @@ package list_test
 
 // func TestGrouping(t *testing.T) {
 // 	var kinds test.Kinds
-
 // 	type Things struct{}
-// 	kinds.Add((*Things)(nil), (*test.GroupCollation)(nil))
+// 	type Values struct {
+// 		Objects   []string
+// 		Groups    []test.GroupSettings
+// 		Collation test.GroupCollation
+// 	}
+// 	kinds.AddKinds((*Things)(nil), (*Values)(nil))
+// 	objectNames := sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2")
 // 	//
-// 	if objs, e := objects(kinds.Kind("Things"), "mildred", "apple", "pen", "thing#1", "thing#2"); e != nil {
+// 	if objs, e := objects(kinds.Kind("Things"), objectNames...); e != nil {
 // 		t.Fatal(e)
 // 	} else {
+// 		values := kinds.New("Values")
 // 		lt := listTime{
 // 			kinds: &kinds,
 // 			objs:  objs,
-// 			// fix: change test to a record
-// 			vals: values{
-// 				"objects":   g.StringsOf(sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2")),
-// 				"groups":    g.RecordsOf(kinds.Kind("GroupSettings"), nil),
-// 				"collation": g.RecordOf(kinds.Kind("GroupCollation").NewRecord()),
+// 			ScopeStack: scope.ScopeStack{
+// 				Scopes: []rt.Scope{
+// 					&scope.TargetRecord{object.Variables, values},
+// 				},
 // 			},
 // 		}
-
-// 		if e := runGroupTogther.Execute(&lt); e != nil {
+// 		if e := values.SetNamedField("Objects", g.StringsOf(objectNames)); e != nil {
+// 			t.Fatal(e)
+// 		} else if e := runGroupTogther.Execute(&lt); e != nil {
 // 			t.Fatal(e)
 // 		} else if e := runCollateGroups.Execute(&lt); e != nil {
 // 			t.Fatal(e)
+// 		} else if v, e := values.GetNamedField("collation"); e != nil {
+// 			t.Fatal(e)
 // 		} else {
-// 			pretty.Println(lt.vals["collation"])
+// 			pretty.Println(v)
 // 		}
 // 	}
 // }
@@ -60,12 +70,8 @@ package list_test
 // 	return
 // }
 
-// var runGroupTogther = list.Map{FromList: "objects", ToList: "groups", UsingPattern: "groupTogether"}
-// var runCollateGroups = list.Reduce{FromList: "groups", IntoValue: "collection", UsingPattern: "collateGroups"}
-
-// func T(t string) rt.TextEval {
-// 	return &core.Text{t}
-// }
+// var runGroupTogther = list.Map{FromList: "Objects", ToList: "Groups", UsingPattern: "groupTogether"}
+// var runCollateGroups = list.Reduce{FromList: "Groups", IntoValue: "Collection", UsingPattern: "collateGroups"}
 
 // var collateGroups = pattern.ActivityPattern{
 // 	CommonPattern: pattern.CommonPattern{
@@ -106,14 +112,14 @@ package list_test
 // 				If: &core.CompareNum{
 // 					A:  V("idx"),
 // 					Is: &core.EqualTo{},
-// 					B:  &core.Num{0},
+// 					B:  &core.Number{0},
 // 				},
 // 				// havent found a matching group?
 // 				// make sure the scratch group is empty,
 // 				// pack the object and its settings into it,
 // 				// push the group into the groups.
 // 				True: core.NewActivity(
-// 					&core.Assign{"group", &core.Make{"GroupObjects"}},
+// 					&core.Assign{"group", &core.FromObject{&core.Make{Name: "GroupObjects"}}},
 // 					&core.Assign{"names", &core.GetField{V("group"), "objects"}},
 // 					&list.Push{"names", &core.GetField{V("in"), "Name"}, true},
 // 					&core.SetField{V("group"), "objects", V("names")},
@@ -122,11 +128,11 @@ package list_test
 // 				// found a matching group?
 // 				// unpack it, add the object to it, then pack it up again.
 // 				False: core.NewActivity(
-// 					&core.Assign{"group", &list.At{"groups", V("idx")}},
+// 					&core.Assign{"group", &core.FromObject{&list.At{"groups", V("idx")}}},
 // 					&core.Assign{"names", &core.GetField{V("group"), "objects"}},
 // 					&list.Push{"names", &core.GetField{V("in"), "Name"}, true},
 // 					&core.SetField{V("group"), "objects", V("names")},
-// 					&list.Set{V("groups"), V("idx"), V("group")},
+// 					&list.Set{"groups", V("idx"), V("group")},
 // 				), // end false
 // 			},
 // 		)},
@@ -167,15 +173,15 @@ package list_test
 // 				Field: "Innumerable",
 // 			},
 // 		}, &core.Bool{Bool: false}}, {
-// 		&core.Bool{
+// 		&core.CompareText{
 // 			&core.GetField{
 // 				Obj:   V("a"),
-// 				Field: "Options",
+// 				Field: "GroupOptions",
 // 			},
 // 			&core.NotEqualTo{},
 // 			&core.GetField{
 // 				Obj:   V("b"),
-// 				Field: "Options",
+// 				Field: "GroupOptions",
 // 			},
 // 		}, &core.Bool{Bool: false}},
 // 	},
@@ -194,7 +200,7 @@ package list_test
 // 		{Execute: &core.Activity{[]rt.Execute{
 // 			&core.SetField{
 // 				Obj:   V("out"),
-// 				Field: T("Name"),
+// 				Field: "Name",
 // 				From: &core.FromText{
 // 					Val: T("in"),
 // 				},

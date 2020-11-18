@@ -19,13 +19,29 @@ type panicTime struct {
 type listTime struct {
 	panicTime
 	objs map[string]*g.Record
-	vals values
 	scope.ScopeStack
 	pattern.PatternMap
 	kinds *test.Kinds
 }
 
-type values map[string]g.Value
+func newListTime(src []string, p pattern.PatternMap) (ret rt.Runtime, vals *g.Record, err error) {
+	var kinds test.Kinds
+	type Values struct{ Source []string }
+	kinds.AddKinds((*Values)(nil))
+	lt := listTime{
+		kinds:      &kinds,
+		PatternMap: p,
+	}
+	values := kinds.New("Values")
+	lt.PushScope(&scope.TargetRecord{object.Variables, values})
+	if e := values.SetNamedField("Source", g.StringsOf(src)); e != nil {
+		err = e
+	} else {
+		ret = &lt
+		vals = values
+	}
+	return
+}
 
 func B(i bool) rt.BoolEval    { return &core.Bool{i} }
 func I(i int) rt.NumberEval   { return &core.Number{float64(i)} }
@@ -85,11 +101,7 @@ func joinStrings(vs []string) (ret string) {
 }
 
 func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
-	if target == object.Variables && field == "src" {
-		ret = lt.vals["src"]
-	} else if target == object.Variables && field == "res" {
-		ret = lt.vals["res"]
-	} else if obj, ok := lt.objs[field]; target == object.Value && ok {
+	if obj, ok := lt.objs[field]; target == object.Value && ok {
 		ret, err = g.ValueOf(obj)
 	} else {
 		ret, err = lt.ScopeStack.GetField(target, field)
@@ -98,12 +110,7 @@ func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
 }
 
 func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
-	if _, ok := lt.vals[field]; (target == object.Variables) && ok {
-		lt.vals[field] = value
-	} else {
-		err = lt.ScopeStack.SetField(target, field, value)
-	}
-	return
+	return lt.ScopeStack.SetField(target, field, value)
 }
 
 func (lt *listTime) GetKindByName(name string) (*g.Kind, error) {

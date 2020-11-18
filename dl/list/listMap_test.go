@@ -7,28 +7,37 @@ import (
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
+	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/test"
 	"github.com/kr/pretty"
 )
 
 func TestMapStrings(t *testing.T) {
 	var kinds test.Kinds
-	kinds.AddKinds((*Fruit)(nil))
-	fruit := []string{"Orange", "Lemon", "Mango", "Banana", "Lime"}
+	type Fruit struct {
+		Name string
+	}
+	type Values struct {
+		Fruits, Results []string
+	}
+	kinds.AddKinds((*Fruit)(nil), (*Values)(nil))
+	values := kinds.New("Values")
 	lt := listTime{
-		vals: values{
-			"src": g.StringsOf(fruit),
-			"res": g.StringsOf(nil),
-		},
 		PatternMap: pattern.PatternMap{
 			"remap": &reverseStrings,
 		},
 		kinds: &kinds,
 	}
-	if e := remap.Execute(&lt); e != nil {
+	lt.PushScope(&scope.TargetRecord{object.Variables, values})
+	if e := values.SetNamedField("Fruits", g.StringsOf([]string{"Orange", "Lemon", "Mango", "Banana", "Lime"})); e != nil {
 		t.Fatal(e)
-	} else if res, e := lt.vals["res"].GetTextList(); e != nil {
+	} else if e := remap.Execute(&lt); e != nil {
+		t.Fatal(e)
+	} else if results, e := values.GetNamedField("Results"); e != nil {
+		t.Fatal(e)
+	} else if res, e := results.GetTextList(); e != nil {
 		t.Fatal(e)
 	} else if diff := pretty.Diff(res, []string{
 		"egnarO", "nomeL", "ognaM", "ananaB", "emiL",
@@ -39,17 +48,22 @@ func TestMapStrings(t *testing.T) {
 	}
 }
 
-type Fruit struct{ Name string }
-
 func TestMapRecords(t *testing.T) {
 	var kinds test.Kinds
-	kinds.AddKinds((*Fruit)(nil))
+	type Fruit struct {
+		Name string
+	}
+	type Values struct {
+		Fruits  []Fruit
+		Results []Fruit
+	}
+	kinds.AddKinds((*Fruit)(nil), (*Values)(nil))
+	values := kinds.New("Values")
 	lt := listTime{
 		kinds: &kinds,
 		PatternMap: pattern.PatternMap{
 			"remap": &reverseRecords,
 		},
-		vals: values{},
 	}
 	if k, e := lt.GetKindByName("Fruit"); e != nil {
 		t.Fatal(e)
@@ -62,14 +76,18 @@ func TestMapRecords(t *testing.T) {
 			}
 			fruits = append(fruits, one)
 		}
-		lt.vals["src"] = g.RecordsOf(k, fruits)
-		lt.vals["res"] = g.RecordsOf(k, nil)
+		if e := values.SetNamedField("Fruits", g.RecordsOf(k, fruits)); e != nil {
+			t.Fatal(e)
+		}
 	}
 
+	lt.PushScope(&scope.TargetRecord{object.Variables, values})
 	if e := remap.Execute(&lt); e != nil {
 		t.Fatal(e)
-	} else if res, e := lt.vals["res"].GetRecordList(); e != nil {
+	} else if val, e := values.GetNamedField("Results"); e != nil {
 		t.Fatal(e)
+	} else if res, e := val.GetRecordList(); e != nil {
+		t.Fatal(e, val.Affinity())
 	} else if len(res) != 5 {
 		t.Fatal("missing results")
 	} else {
@@ -92,7 +110,7 @@ func TestMapRecords(t *testing.T) {
 	}
 }
 
-var remap = list.Map{FromList: "src", ToList: "res", UsingPattern: "remap"}
+var remap = list.Map{FromList: "Fruits", ToList: "Results", UsingPattern: "remap"}
 
 var reverseRecords = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{

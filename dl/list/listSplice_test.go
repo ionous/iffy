@@ -65,13 +65,17 @@ func TestSplices(t *testing.T) {
 }
 
 func splice(src []string, start, cnt int, add ...string) (ret string, err error) {
-	lt := listTime{vals: values{"src": g.StringsOf(append([]string{}, src...))}}
-	rub := joinText(&lt, &list.Splice{"src", I(start), I(cnt), FromTs(add)})
-	if strs, e := lt.vals["src"].GetTextList(); e != nil {
+	// copy the src string so we can muck with it
+	if run, vals, e := newListTime(append([]string{}, src...), nil); e != nil {
 		err = e
 	} else {
-		next := joinStrings(strs) // get the variable set by splice
-		ret = next + "; " + rub
+		rub := joinText(run, &list.Splice{"Source", I(start), I(cnt), FromTs(add)})
+		if strs, e := g.Must(vals.GetNamedField("Source")).GetTextList(); e != nil {
+			err = e
+		} else {
+			next := joinStrings(strs) // get the variable set by splice
+			ret = next + "; " + rub
+		}
 	}
 	return
 }

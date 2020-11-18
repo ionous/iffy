@@ -42,13 +42,16 @@ func TestPush(t *testing.T) {
 }
 
 func push(src []string, front bool, add ...string) (ret string, err error) {
-	lt := listTime{vals: values{"src": g.StringsOf(append([]string{}, src...))}}
-	num := getNum(&lt, &list.Push{"src", FromTs(add), list.FrontOrBack(front)})
-	if strs, e := lt.vals["src"].GetTextList(); e != nil {
+	if run, vals, e := newListTime(src, nil); e != nil {
 		err = e
 	} else {
-		next := joinStrings(strs) // get the variable set by splice
-		ret = num + "; " + next
+		num := getNum(run, &list.Push{"Source", FromTs(add), list.FrontOrBack(front)})
+		if strs, e := g.Must(vals.GetNamedField("Source")).GetTextList(); e != nil {
+			err = e
+		} else {
+			next := joinStrings(strs) // get the variable set by splice
+			ret = num + "; " + next
+		}
 	}
 	return
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
-	g "github.com/ionous/iffy/rt/generic"
 	"github.com/kr/pretty"
 )
 
@@ -22,18 +21,21 @@ func TestPop(t *testing.T) {
 	}
 }
 
-func popTest(front bool, amt int, strs ...string) []string {
+func popTest(front bool, amt int, src ...string) []string {
 	var out []string
-	pop := &list.Pop{List: "src",
+	pop := &list.Pop{List: "Source",
 		With:  "text",
 		Front: list.FrontOrBack(front),
 		Go:    core.NewActivity(&Write{&out, V("text")}),
 		Else:  core.NewActivity(&Write{&out, T("x")}),
 	}
-	run := listTime{vals: values{"src": g.StringsOf(strs)}}
-	for i := 0; i < amt; i++ {
-		if e := pop.Execute(&run); e != nil {
-			panic(e)
+	if run, _, e := newListTime(src, nil); e != nil {
+		panic(e)
+	} else {
+		for i := 0; i < amt; i++ {
+			if e := pop.Execute(run); e != nil {
+				panic(e)
+			}
 		}
 	}
 	return out

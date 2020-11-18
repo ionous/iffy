@@ -7,7 +7,6 @@ import (
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
-	g "github.com/ionous/iffy/rt/generic"
 	"github.com/kr/pretty"
 )
 
@@ -23,13 +22,16 @@ func TestSort(t *testing.T) {
 	t.Log("ok", fruit)
 }
 
-func sortTest(strs []string) (err error) {
-	sort := list.Sort{"src", "sort"}
-	return sort.Execute(&listTime{
-		vals: values{"src": g.StringsOf(strs)},
-		PatternMap: pattern.PatternMap{
-			"sort": &sortPattern,
-		}})
+func sortTest(src []string) (err error) {
+	if run, _, e := newListTime(src, pattern.PatternMap{
+		"sort": &sortPattern,
+	}); e != nil {
+		err = e
+	} else {
+		sort := list.Sort{"Source", "sort"}
+		err = sort.Execute(run)
+	}
+	return
 }
 
 var sortPattern = pattern.BoolPattern{
