@@ -6,8 +6,7 @@ import (
 )
 
 func isList(v g.Value) bool {
-	elAffinity := affine.Element(v.Affinity())
-	return len(elAffinity) > 0
+	return affine.IsList(v.Affinity())
 }
 
 // increase the size of vs by amt, return the previous len of vs

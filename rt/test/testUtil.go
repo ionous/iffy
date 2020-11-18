@@ -77,8 +77,8 @@ func kindsForType(kinds fieldMap, t r.Type) fieldMap {
 			// the name of the aspect is the name of the field
 			kinds[f.Name] = []g.Field{
 				// false first.
-				{Name: "Not " + f.Name, Affinity: affine.Bool, Type: "trait"},
-				{Name: "Is " + f.Name, Affinity: affine.Bool, Type: "trait"},
+				{Name: "Not" + f.Name, Affinity: affine.Bool, Type: "trait"},
+				{Name: "Is" + f.Name, Affinity: affine.Bool, Type: "trait"},
 			}
 
 		case r.String:

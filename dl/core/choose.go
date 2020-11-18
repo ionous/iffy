@@ -41,7 +41,9 @@ func (op *Choose) Execute(run rt.Runtime) (err error) {
 		} else {
 			next = op.False
 		}
-		err = rt.RunOne(run, next)
+		if next != nil {
+			err = rt.RunOne(run, next)
+		}
 	}
 	return
 }

@@ -37,7 +37,7 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 	if vs, e := run.GetField(object.Variables, op.List); e != nil {
 		err = e
 	} else {
-		var newVals g.Value // write back in case vs was temporary storage.
+		var newVals g.Value
 		switch a := vs.Affinity(); a {
 		case affine.NumList:
 			if els, e := vs.GetNumList(); e != nil {
@@ -65,11 +65,20 @@ func (op *Sort) execute(run rt.Runtime) (err error) {
 	return
 }
 
+type fromValue struct{ value g.Value }
+
+func (op *fromValue) GetEval() interface{} { return nil }
+
+func (op *fromValue) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	ret = op.value
+	return
+}
+
 func (op *Sort) sortNumbers(run rt.Runtime, src []float64) (err error) {
-	var one, two core.Number
-	det := makeDet(op.Pattern, &core.FromNum{&one}, &core.FromNum{&two})
+	var one, two fromValue
+	det := makeDet(op.Pattern, &one, &two)
 	sort.Slice(src, func(i, j int) (ret bool) {
-		one.Num, two.Num = src[i], src[j]
+		one.value, two.value = g.FloatOf(src[i]), g.FloatOf(src[j])
 		if x, e := det.GetBool(run); e != nil {
 			err = errutil.Append(err, e)
 		} else {
@@ -81,10 +90,10 @@ func (op *Sort) sortNumbers(run rt.Runtime, src []float64) (err error) {
 }
 
 func (op *Sort) sortText(run rt.Runtime, src []string) (err error) {
-	var one, two core.Text
-	det := makeDet(op.Pattern, &core.FromText{&one}, &core.FromText{&two})
+	var one, two fromValue
+	det := makeDet(op.Pattern, &one, &two)
 	sort.Slice(src, func(i, j int) (ret bool) {
-		one.Text, two.Text = src[i], src[j]
+		one.value, two.value = g.StringOf(src[i]), g.StringOf(src[j])
 		if x, e := det.GetBool(run); e != nil {
 			err = errutil.Append(err, e)
 		} else {

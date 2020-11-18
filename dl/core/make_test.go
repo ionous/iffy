@@ -28,7 +28,7 @@ func TestMake(t *testing.T) {
 	} else if diff := pretty.Diff(d.Values(), map[string]interface{}{
 		"Name":         "",
 		"Label":        "",
-		"Innumerable":  "Not Innumerable",
+		"Innumerable":  "NotInnumerable",
 		"GroupOptions": "WithArticles",
 	}); len(diff) != 0 {
 		t.Fatal(diff)

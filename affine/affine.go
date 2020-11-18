@@ -39,3 +39,12 @@ func Element(list Affinity) (ret Affinity) {
 	}
 	return
 }
+
+func MatchTypes(a Affinity, at string, b Affinity, bt string) bool {
+	return a == b && ((a != Record && a != RecordList) || (at == bt))
+}
+
+func IsList(a Affinity) bool {
+	elAffinity := Element(a)
+	return len(elAffinity) > 0
+}

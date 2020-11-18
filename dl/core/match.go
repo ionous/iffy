@@ -11,7 +11,7 @@ import (
 type Matches struct {
 	Text    rt.TextEval
 	Pattern string
-	// should transform into a different command probably during compile
+	// fix: should transform into a different command probably during compile
 	exp *regexp.Regexp `if:"internal"`
 	err error
 }

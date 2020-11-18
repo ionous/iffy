@@ -98,8 +98,7 @@ func copyRecord(v *Record) (ret *Record, err error) {
 	cnt := v.kind.NumField()
 	values := make([]interface{}, cnt, cnt)
 	for i := 0; i < cnt; i++ {
-		ft := v.kind.Field(i) // fix: get field by index?
-		if el, e := v.GetNamedField(ft.Name); e != nil {
+		if el, e := v.GetFieldByIndex(i); e != nil {
 			err = e
 			break
 		} else if cpy, e := CopyValue(el); e != nil {

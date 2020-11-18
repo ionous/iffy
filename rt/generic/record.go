@@ -2,6 +2,7 @@ package generic
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 )
 
@@ -88,14 +89,15 @@ func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 	return
 }
 
-// generates records on demand ( ex. so that we dont have to expand recursive records )
-// fix: assembly should probably throw those types out.
-
+// this is a little ugly.
+// fix? if DefaultFrom returned a raw value maybe this could be cleaned up.
+// -or- if record.values stored refValues ( though that is random extra storage )
 func (d *Record) cache(i int, nv Value) (ret Value, err error) {
-	if e := d.SetFieldByIndex(i, nv); e != nil {
-		err = e
+	if el, ok := nv.(refValue); !ok {
+		err = errutil.New("unexpected error creating default values")
 	} else {
-		ret = nv
+		d.values[i] = el.v.Interface()
+		ret = el
 	}
 	return
 }
@@ -122,12 +124,12 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 
 func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	ft := d.kind.fields[i]
-	if val.Affinity() != ft.Affinity {
-		err = errutil.New("value is not", ft.Affinity)
-	} else if rv, ok := val.(refValue); !ok {
-		err = errutil.New("unable to determine value from %T", rv)
+	if !affine.MatchTypes(ft.Affinity, ft.Type, val.Affinity(), val.Type()) {
+		err = errutil.New("value is not", ft.Affinity, ft.Type)
+	} else if el, e := CopyValue(val); e != nil {
+		err = e
 	} else {
-		d.values[i] = rv.v.Interface()
+		d.values[i] = el
 	}
 	return
 }

@@ -31,12 +31,12 @@ func (op *Make) makeRecord(run rt.Runtime) (ret *g.Record, err error) {
 		err = e
 	} else {
 		b := k.NewRecord()
-		if op.Arguments != nil {
-			if e := op.Arguments.Distill(run, b); e != nil {
-				err = e
-			} else {
-				ret = b
-			}
+		if op.Arguments == nil {
+			ret = b // return the empty record
+		} else if e := op.Arguments.Distill(run, b); e != nil {
+			err = e
+		} else {
+			ret = b
 		}
 	}
 	return

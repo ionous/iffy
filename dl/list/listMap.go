@@ -35,13 +35,14 @@ func (op *Map) execute(run rt.Runtime) (err error) {
 	} else if e := op.cacheKinds(run, op.UsingPattern); e != nil {
 		err = e
 	} else {
-		ps := op.pk.NewRecord()
 		for it := g.ListIt(fromList); it.HasNext(); {
+			ps := op.pk.NewRecord() // create a new set of parameters each loop
 			if inVal, e := it.GetNext(); e != nil {
 				err = e
 				break
 			} else if e := ps.SetFieldByIndex(op.in, inVal); e != nil {
 				err = e
+				break
 			} else if e := op.call(run, ps); e != nil {
 				err = e
 				break

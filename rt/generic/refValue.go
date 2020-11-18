@@ -141,8 +141,8 @@ func (n refValue) SetNamedField(f string, v Value) (err error) {
 func (n refValue) SetIndexedValue(i int, v Value) (err error) {
 	if e := n.validateIndex(i); e != nil {
 		err = e
-	} else if va, elAffinity := v.Affinity(), affine.Element(n.a); va != elAffinity {
-		err = errutil.Fmt("mismatched affinity %q for element %q", va, elAffinity)
+	} else if !affine.MatchTypes(affine.Element(n.a), n.t, v.Affinity(), v.Type()) {
+		err = errutil.Fmt("mismatched affinity %q for element %q", v.Affinity(), v.Type())
 	} else if el, e := CopyValue(v); e != nil {
 		err = e
 	} else {
@@ -189,7 +189,7 @@ func (n refValue) Slice(i, j int) (ret Value, err error) {
 func (n refValue) Append(v Value) (ret Value, err error) {
 	if vs := n.v; vs.Kind() != r.Slice {
 		err = errutil.New("value is not indexable")
-	} else if elAffinity := affine.Element(v.Affinity()); len(elAffinity) == 0 {
+	} else if !affine.IsList(v.Affinity()) {
 		ret, err = n.appendOne(v)
 	} else {
 		ret, err = n.appendMany(v)

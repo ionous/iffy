@@ -11,8 +11,8 @@ func TestKindsForType(t *testing.T) {
 	ks.AddKinds((*GroupCollation)(nil))
 	if diff := pretty.Diff(ks.fields, fieldMap{
 		"Innumerable": {
-			{"Not Innumerable", "bool", "trait"},
-			{"Is Innumerable", "bool", "trait"},
+			{"NotInnumerable", "bool", "trait"},
+			{"IsInnumerable", "bool", "trait"},
 		},
 		"GroupOptions": {
 			{"WithoutObjects", "bool", "trait"},

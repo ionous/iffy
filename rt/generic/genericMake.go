@@ -177,7 +177,7 @@ func newRecord(i interface{}, subtype string) (ret Value, err error) {
 	if v, ok := i.(*Record); !ok {
 		err = errutil.Fmt("unknown %s %T", a, i)
 	} else if t := v.Type(); len(subtype) > 0 && t != subtype {
-		err = errutil.Fmt("mismatched record types", a, t, subtype)
+		err = errutil.New("mismatched record types", a, t, subtype)
 	} else {
 		ret = makeValue(a, t, r.ValueOf(v))
 	}
