@@ -6,6 +6,8 @@ import (
 
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
+	"github.com/ionous/iffy/rt/safe"
+	"github.com/ionous/iffy/rt/test"
 	"github.com/ionous/iffy/rt/writer"
 	"github.com/ionous/iffy/tables"
 	"github.com/kr/pretty"
@@ -17,9 +19,9 @@ func TestObjectFunc(t *testing.T) {
 	defer db.Close()
 	if rule, e := imp_object_func(k, _object_func); e != nil {
 		t.Fatal(e)
-	} else if text, e := rt.GetText(nil, *rule.CmdPtr().(*rt.TextEval)); e != nil {
+	} else if text, e := safe.GetText(nil, *rule.CmdPtr().(*rt.TextEval)); e != nil {
 		t.Fatal(e)
-	} else if text != "hello" {
+	} else if text := text.String(); text != "hello" {
 		t.Fatal(text)
 	}
 }
@@ -35,7 +37,7 @@ func TestPatternActivity(t *testing.T) {
 		out := print.NewLines()
 		run.SetWriter(out)
 		// should this call/test buildRule
-		if e := rt.RunOne(&run, exe); e != nil {
+		if e := safe.Run(&run, exe); e != nil {
 			t.Fatal(e)
 		} else if diff := pretty.Diff(out.Lines(), []string{"hello", "hello"}); len(diff) > 0 {
 			t.Fatal(diff)
@@ -137,7 +139,7 @@ var _text_eval = map[string]interface{}{
 }
 
 type baseRuntime struct {
-	rt.Panic
+	test.PanicRuntime
 }
 type testRuntime struct {
 	baseRuntime

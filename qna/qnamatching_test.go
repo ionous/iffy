@@ -43,7 +43,7 @@ func TestLike(t *testing.T) {
 		}
 		if ok, e := c.GetBool(run); e != nil {
 			t.Fatal(e)
-		} else if ok != test.ok {
+		} else if ok := ok.Bool(); ok != test.ok {
 			t.Fatalf("test %v (%q like %q) != %v", i, test.text, test.pattern, test.ok)
 		} else {
 			t.Log(test.text, "like", test.pattern, ok)

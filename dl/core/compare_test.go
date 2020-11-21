@@ -3,16 +3,17 @@ package core
 import (
 	"testing"
 
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
+	"github.com/ionous/iffy/rt/test"
 )
 
 func TestCompareNumbers(t *testing.T) {
 	test := func(a float64, op Comparator, b float64, res bool) {
-		var run rt.Panic
+		var run test.PanicRuntime
 		cmp := &CompareNum{&Number{a}, op, &Number{b}}
-		if ok, e := rt.GetBool(run, cmp); e != nil {
+		if ok, e := safe.GetBool(run, cmp); e != nil {
 			t.Fatal(e)
-		} else if res != ok {
+		} else if res != ok.Bool() {
 			t.Fatal("mismatch")
 		}
 	}
@@ -31,11 +32,11 @@ func TestCompareNumbers(t *testing.T) {
 
 func TestCompareText(t *testing.T) {
 	test := func(a string, op Comparator, b string, res bool) {
-		var run rt.Panic
+		var run test.PanicRuntime
 		cmp := &CompareText{&Text{a}, op, &Text{b}}
-		if ok, e := rt.GetBool(run, cmp); e != nil {
+		if ok, e := safe.GetBool(run, cmp); e != nil {
 			t.Fatal(e)
-		} else if res != ok {
+		} else if res != ok.Bool() {
 			t.Fatal("mismatch")
 		}
 	}

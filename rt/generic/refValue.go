@@ -1,21 +1,23 @@
 package generic
 
 import (
-	r "reflect"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 )
 
+// every primitive value is its own unique instance.
+// records are as pointers, and lists as pointers to slices;
+// their data is therefore shared across refValues.
+// pointers to slices allows for in-place grow, append, etc.
 type refValue struct {
 	a affine.Affinity
-	v r.Value
 	t string
+	i interface{}
 }
 
 var _ Value = (*refValue)(nil)
 
-func (n refValue) Affinity() (ret affine.Affinity) {
+func (n refValue) Affinity() affine.Affinity {
 	return n.a
 }
 
@@ -23,204 +25,202 @@ func (n refValue) Type() string {
 	return n.t
 }
 
-func (n refValue) String() string {
-	return n.v.String()
+func (n refValue) Bool() bool {
+	return n.i.(bool)
 }
 
-func (n refValue) GetBool() (ret bool, err error) {
-	if n.v.Kind() != r.Bool {
-		err = errutil.New("value is not a bool")
-	} else {
-		ret = n.v.Bool()
-	}
-	return
-}
-
-func (n refValue) GetNumber() (ret float64, err error) {
-	switch k := n.v.Kind(); k {
-	case r.Float32, r.Float64:
-		ret = n.v.Float()
-	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-		ret = float64(n.v.Int())
+func (n refValue) Float() (ret float64) {
+	switch v := n.i.(type) {
+	case float64:
+		ret = v
+	case float32:
+		ret = float64(v)
+	case int:
+		ret = float64(v)
+	case int64:
+		ret = float64(v)
 	default:
-		err = errutil.New("value is not a number")
+		panic(errutil.Sprintf("value %v(%T) is not a number", v, v))
 	}
 	return
 }
 
-func (n refValue) GetText() (ret string, err error) {
-	if n.v.Kind() != r.String {
-		err = errutil.New("value is not a text")
-	} else {
-		ret = n.v.String()
+func (n refValue) Int() (ret int) {
+	switch v := n.i.(type) {
+	case int:
+		ret = v
+	case int64:
+		ret = int(v)
+	case float32:
+		ret = int(v)
+	case float64:
+		ret = int(v)
+	default:
+		panic("value is not a number")
 	}
 	return
 }
 
-func (n refValue) GetRecord() (ret *Record, err error) {
-	if v, ok := n.v.Interface().(*Record); !ok {
-		err = errutil.New("value is not a record")
+func (n refValue) String() string {
+	return n.i.(string)
+}
+
+func (n refValue) Record() *Record {
+	return n.i.(*Record)
+}
+
+func (n refValue) Floats() (ret []float64) {
+	vp := n.i.(*[]float64)
+	return *vp
+}
+
+func (n refValue) Strings() (ret []string) {
+	vp := n.i.(*[]string)
+	return *vp
+}
+
+func (n refValue) Records() (ret []*Record) {
+	vp := n.i.(*[]*Record)
+	return *vp
+}
+
+func (n refValue) Len() (ret int) {
+	switch vp := n.i.(type) {
+	case *[]float64:
+		ret = len(*vp)
+	case *[]string:
+		ret = len(*vp)
+	case *[]*Record:
+		ret = len(*vp)
+	default:
+		panic("value is not measurable")
+	}
+	return
+}
+
+func (n refValue) Index(i int) (ret Value) {
+	switch vp := n.i.(type) {
+	case *[]float64:
+		ret = FloatOf((*vp)[i])
+	case *[]string:
+		ret = StringOf((*vp)[i])
+	case *[]*Record:
+		ret = RecordOf((*vp)[i])
+	default:
+		panic("value is not measurable")
+	}
+	return
+}
+
+func (n refValue) FieldByName(f string) (ret Value, err error) {
+	if v, e := n.Record().GetNamedField(f); e != nil {
+		err = e
 	} else {
 		ret = v
 	}
 	return
 }
 
-func (n refValue) GetNumList() (ret []float64, err error) {
-	if vs, ok := n.v.Interface().([]float64); !ok {
-		err = errutil.New("value is not a number list")
-	} else {
-		ret = vs
-	}
-	return
-}
-func (n refValue) GetTextList() (ret []string, err error) {
-	if vs, ok := n.v.Interface().([]string); !ok {
-		err = errutil.New("value is not a text list")
-	} else {
-		ret = vs
-	}
-	return
-}
-func (n refValue) GetRecordList() (ret []*Record, err error) {
-	if vs, ok := n.v.Interface().([]*Record); !ok {
-		err = errutil.New("value is not a record list")
-	} else {
-		ret = vs
-	}
-	return
-}
-func (n refValue) GetLen() (ret int, err error) {
-	if n.v.Kind() != r.Slice {
-		err = errutil.New("value is not measurable")
-	} else {
-		ret = n.v.Len()
-	}
-	return
-}
-func (n refValue) GetIndex(i int) (ret Value, err error) {
-	if e := n.validateIndex(i); e != nil {
-		err = e
-	} else if elAffinity := affine.Element(n.a); len(elAffinity) == 0 {
-		err = errutil.New("unknown list affinity", n.a)
-	} else {
-		ret = makeValue(elAffinity, n.t, n.v.Index(i))
-	}
-	return
+func (n refValue) SetFieldByName(f string, v Value) (err error) {
+	return n.Record().SetNamedField(f, v)
 }
 
-func (n refValue) validateIndex(i int) (err error) {
-	if n.v.Kind() != r.Slice {
-		err = errutil.New("value is not indexable")
-	} else if i < 0 {
-		err = Underflow{i, 0}
-	} else if cnt := n.v.Len(); i >= cnt {
-		err = Overflow{i, cnt}
+func (n refValue) SetIndex(i int, v Value) {
+	switch vp := n.i.(type) {
+	case *[]float64:
+		(*vp)[i] = v.Float()
+	case *[]string:
+		(*vp)[i] = v.String()
+	case *[]*Record:
+		if n.Type() != v.Type() {
+			panic("record types dont match")
+		}
+		(*vp)[i] = v.Record()
+	default:
+		panic("value is not measurable")
 	}
-	return
-}
-
-func (n refValue) GetNamedField(f string) (ret Value, err error) {
-	if d, e := n.GetRecord(); e != nil {
-		err = e
-	} else {
-		ret, err = d.GetNamedField(f)
-	}
-	return
-}
-
-func (n refValue) SetNamedField(f string, v Value) (err error) {
-	if d, e := n.GetRecord(); e != nil {
-		err = e
-	} else {
-		err = d.SetNamedField(f, v)
-	}
-	return
-}
-
-func (n refValue) SetIndexedValue(i int, v Value) (err error) {
-	if e := n.validateIndex(i); e != nil {
-		err = e
-	} else if !affine.MatchTypes(affine.Element(n.a), n.t, v.Affinity(), v.Type()) {
-		err = errutil.Fmt("mismatched affinity %q for element %q", v.Affinity(), v.Type())
-	} else if el, e := CopyValue(v); e != nil {
-		err = e
-	} else {
-		n.v.Index(i).Set(r.ValueOf(el))
-	}
-	return
 }
 
 // note: this can grow record slices with nil values.
-func (n refValue) Resize(newLen int) (ret Value, err error) {
-	if vs := n.v; vs.Kind() != r.Slice {
-		err = errutil.New("value is not indexable")
-	} else if newLen < 0 {
-		err = Underflow{newLen, 0}
-	} else if cap := vs.Cap(); newLen <= cap {
-		vs.SetLen(newLen) // shrinking
-		ret = n           // the slice memory stays the same.
-	} else if grow := newLen - n.v.Len(); grow > 0 {
-		// grow using make, append ( versus make, copy )
-		// to trigger go's grow padding
-		blanks := r.MakeSlice(vs.Type().Elem(), grow, grow)
-		els := r.AppendSlice(vs, blanks)
-		ret = makeValue(n.a, n.t, els)
-	}
-	return
-}
+// func (n refValue) Resize(newLen int) {
+// 	if vs := n.v; vs.Kind() != r.Slice {
+// 		panic("value is not indexable")
+// 	} else if newLen < 0 {
+// 		err = Underflow{newLen, 0}
+// 	} else if cap := vs.Cap(); newLen <= cap {
+// 		vs.SetLen(newLen) // shrinking; the slice memory stays the same.
+// 	} else if grow := newLen - n.v.Len(); grow > 0 {
+// 		// grow using make, append ( versus make, copy )
+// 		// to trigger go's grow padding
+// 		blanks := r.MakeSlice(vs.Type().Elem(), grow, grow)
+// 		n.v = r.AppendSlice(vs, blanks)
+// 	}
+// 	return
+// }
 
 func (n refValue) Slice(i, j int) (ret Value, err error) {
-	if vs := n.v; vs.Kind() != r.Slice {
-		err = errutil.New("value is not indexable")
-	} else if i < 0 {
+	if i < 0 {
 		err = Underflow{i, 0}
-	} else if cnt := vs.Len(); j > cnt {
+	} else if cnt := n.Len(); j > cnt {
 		err = Overflow{j, cnt}
 	} else if i > j {
 		err = errutil.New("bad range", i, j)
 	} else {
-		els := vs.Slice(i, j)
-		ret = makeValue(n.a, n.t, els)
+		switch vp := n.i.(type) {
+		case *[]float64:
+			vs := CopyFloats((*vp)[i:j])
+			ret = FloatsOf(vs)
+		case *[]string:
+			vs := CopyStrings((*vp)[i:j])
+			ret = StringsOf(vs)
+		case *[]*Record:
+			vs := CopyRecords((*vp)[i:j])
+			ret = RecordsOf(n.Type(), vs)
+		default:
+			panic("value is not sliceable")
+		}
 	}
 	return
 }
 
-func (n refValue) Append(v Value) (ret Value, err error) {
-	if vs := n.v; vs.Kind() != r.Slice {
-		err = errutil.New("value is not indexable")
-	} else if !affine.IsList(v.Affinity()) {
-		ret, err = n.appendOne(v)
+func (n refValue) Append(v Value) {
+	if !affine.IsList(v.Affinity()) {
+		n.appendOne(v)
 	} else {
-		ret, err = n.appendMany(v)
+		n.appendMany(v)
 	}
 	return
 }
 
-func (n refValue) appendOne(v Value) (ret Value, err error) {
-	va, elAffinity := v.Affinity(), affine.Element(n.a)
-	compatible := va == elAffinity && (va != affine.Record || v.Type() == n.t)
-	if !compatible {
-		err = errutil.New("value is not compatible with list")
-	} else if el, e := CopyValue(v); e != nil {
-		err = e
-	} else {
-		els := r.Append(n.v, r.ValueOf(el))
-		ret = makeValue(n.a, n.t, els)
+func (n refValue) appendOne(v Value) {
+	switch vp := n.i.(type) {
+	case *[]float64:
+		(*vp) = append((*vp), v.Float())
+	case *[]string:
+		(*vp) = append((*vp), v.String())
+	case *[]*Record:
+		if n.Type() != v.Type() {
+			panic("record types dont match")
+		}
+		(*vp) = append((*vp), v.Record())
+	default:
+		panic("value is not extensible")
 	}
-	return
 }
 
-func (n refValue) appendMany(v Value) (ret Value, err error) {
-	va := v.Affinity()
-	compatible := n.a == va && (va != affine.RecordList || v.Type() == n.t)
-	if !compatible {
-		err = errutil.New("value is not compatible with list")
-	} else if el, e := CopyValue(v); e != nil {
-		err = e
-	} else {
-		els := r.AppendSlice(n.v, r.ValueOf(el))
-		ret = makeValue(n.a, n.t, els)
+func (n refValue) appendMany(v Value) {
+	switch vp := n.i.(type) {
+	case *[]float64:
+		(*vp) = append((*vp), v.Floats()...)
+	case *[]string:
+		(*vp) = append((*vp), v.Strings()...)
+	case *[]*Record:
+		if n.Type() != v.Type() {
+			panic("record types dont match")
+		}
+		(*vp) = append((*vp), v.Records()...)
+	default:
+		panic("value is not extensible")
 	}
 	return
 }

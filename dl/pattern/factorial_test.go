@@ -6,7 +6,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // TestFactorial of the number 3 to verify pattern recursion works.
@@ -47,9 +47,9 @@ func TestFactorial(t *testing.T) {
 				&core.Number{3},
 			}),
 	}
-	if v, e := rt.GetNumber(&run, &det); e != nil {
+	if v, e := safe.GetNumber(&run, &det); e != nil {
 		t.Fatal(e)
-	} else if want := 3.0 * (2 * (1 * 1)); v != want {
+	} else if want := 3 * (2 * (1 * 1)); v.Int() != want {
 		t.Fatal("mismatch: expected:", want, "have:", v)
 	} else {
 		t.Log("factorial okay", v)

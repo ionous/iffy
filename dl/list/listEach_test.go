@@ -3,9 +3,11 @@ package list_test
 import (
 	"testing"
 
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 	"github.com/kr/pretty"
 )
 
@@ -64,28 +66,21 @@ func eachTest(t *testing.T, src []string, res []accum, otherwise int) {
 }
 
 func (v *visitEach) Execute(run rt.Runtime) (err error) {
-	if i, e := index.GetNumber(run); e != nil {
+	if i, e := safe.Variable(run, "index", affine.Number); e != nil {
 		err = e
-	} else if f, e := first.GetBool(run); e != nil {
+	} else if f, e := safe.Variable(run, "first", affine.Bool); e != nil {
 		err = e
-	} else if l, e := last.GetBool(run); e != nil {
+	} else if l, e := safe.Variable(run, "last", affine.Bool); e != nil {
 		err = e
-	} else if t, e := text.GetText(run); e != nil {
+	} else if t, e := safe.Variable(run, "text", affine.Text); e != nil {
 		err = e
 	} else {
 		(*v.visits) = append((*v.visits), accum{
-			int(i), f, l, t,
+			i.Int(), f.Bool(), l.Bool(), t.String(),
 		})
 	}
 	return
 }
-
-var (
-	index rt.Variable = "index"
-	first rt.Variable = "first"
-	last  rt.Variable = "last"
-	text  rt.Variable = "text"
-)
 
 type accum struct {
 	index int

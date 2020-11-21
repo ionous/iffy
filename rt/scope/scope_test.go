@@ -38,20 +38,15 @@ func TestScopeStack(t *testing.T) {
 				// t.Log(reason, "loop", i, "asking for", name, "... unknown")
 				have = -1
 			case nil:
-				if v, e := p.GetNumber(); e != nil {
-					t.Fatal("fatal", e)
-				} else {
-					have = int(v)
-					// t.Log(reason, "loop", i, name, "got", have)
-				}
+				have = p.Int()
+				// t.Log(reason, "loop", i, name, "got", have)
 			}
 
 			//
 			if want := count[i]; want != have {
 				t.Fatal("fatal", reason, "step", step, name, "have:", have, "want:", want)
-			} else if n, e := g.ValueOf(have + 1); e != nil {
-				t.Fatal(e)
 			} else {
+				n := g.IntOf(have + 1)
 				switch e := stack.SetField(object.Variables, name, n); e.(type) {
 				default:
 					t.Fatal("fatal", reason, "step", step, name, "set failed", e)
@@ -107,7 +102,7 @@ func (k *mockScope) GetField(target, field string) (ret g.Value, err error) {
 		err = g.UnknownField{target, field}
 	} else {
 		k.gets++
-		ret, err = g.ValueOf(k.val)
+		ret = g.IntOf(k.val)
 	}
 	return
 }
@@ -117,10 +112,8 @@ func (k *mockScope) SetField(target, field string, v g.Value) (err error) {
 		err = g.UnknownTarget{target}
 	} else if field != k.name {
 		err = g.UnknownField{target, field}
-	} else if n, e := v.GetNumber(); e != nil {
-		err = e
 	} else {
-		k.val = int(n)
+		k.val = v.Int()
 		k.sets++
 	}
 	return

@@ -3,7 +3,6 @@ package core
 import (
 	"testing"
 
-	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/test"
 	"github.com/kr/pretty"
@@ -11,7 +10,7 @@ import (
 
 func TestMake(t *testing.T) {
 	type panicTime struct {
-		rt.Panic
+		test.PanicRuntime
 	}
 	var testTime struct {
 		panicTime
@@ -24,9 +23,7 @@ func TestMake(t *testing.T) {
 		}}}
 	if obj, e := op.GetObject(&testTime); e != nil {
 		t.Fatal(e)
-	} else if d, e := obj.GetRecord(); e != nil {
-		t.Fatal(e)
-	} else if diff := pretty.Diff(g.RecordToValue(d), map[string]interface{}{
+	} else if diff := pretty.Diff(g.RecordToValue(obj.Record()), map[string]interface{}{
 		"Name":         "",
 		"Label":        "",
 		"Innumerable":  "NotInnumerable",

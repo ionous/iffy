@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // Returns allows a local variable to be used as an output.
@@ -23,27 +24,27 @@ func (*Returns) Compose() composer.Spec {
 
 const returnNotImplemented = errutil.Error("return not implemented")
 
-func (op *Returns) GetBool(run rt.Runtime) (ret bool, err error) {
+func (op *Returns) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	err = returnNotImplemented
 	return
 }
 
-func (op *Returns) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (op *Returns) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 	err = returnNotImplemented
 	return
 }
 
-func (op *Returns) GetText(run rt.Runtime) (ret string, err error) {
+func (op *Returns) GetText(run rt.Runtime) (ret g.Value, err error) {
 	err = returnNotImplemented
 	return
 }
 
-func (op *Returns) GetNumList(run rt.Runtime) (ret []float64, err error) {
+func (op *Returns) GetNumList(run rt.Runtime) (ret g.Value, err error) {
 	err = returnNotImplemented
 	return
 }
 
-func (op *Returns) GetTextList(run rt.Runtime) (ret []string, err error) {
+func (op *Returns) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	err = returnNotImplemented
 	return
 }

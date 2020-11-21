@@ -1,6 +1,8 @@
 package generic
 
-import "github.com/ionous/errutil"
+import (
+	"github.com/ionous/errutil"
+)
 
 // error constant for iterators
 const StreamExceeded errutil.Error = "stream exceeded"

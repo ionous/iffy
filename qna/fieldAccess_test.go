@@ -56,11 +56,9 @@ func TestFieldAccess(t *testing.T) {
 			name, field := els[i], els[i+1]
 			if obj, e := q.GetField(object.Value, name); e != nil {
 				t.Fatal(e)
-			} else if p, e := obj.GetNamedField(object.Kind); e != nil {
+			} else if p, e := obj.FieldByName(object.Kind); e != nil {
 				t.Fatal(e)
-			} else if kind, e := p.GetText(); e != nil {
-				t.Fatal("assign", e)
-			} else if kind != field {
+			} else if kind := p.String(); kind != field {
 				t.Fatal("mismatch", name, field, "got:", kind, "expected:", field)
 			}
 		}
@@ -73,11 +71,9 @@ func TestFieldAccess(t *testing.T) {
 			// asking for "Kinds" should get us the hierarchy
 			if obj, e := q.GetField(object.Value, name); e != nil {
 				t.Fatal(e)
-			} else if p, e := obj.GetNamedField(object.Kinds); e != nil {
+			} else if p, e := obj.FieldByName(object.Kinds); e != nil {
 				t.Fatal(e)
-			} else if path, e := p.GetText(); e != nil {
-				t.Fatal("assign", e)
-			} else if path != field {
+			} else if path := p.String(); path != field {
 				t.Fatal("mismatch", name, field, "got:", name, "expected:", field)
 			}
 		}
@@ -90,7 +86,7 @@ func TestFieldAccess(t *testing.T) {
 				if obj, e := q.GetField(object.Value, name); e != nil {
 					t.Fatal(e)
 				} else {
-					p, e := obj.GetNamedField(field)
+					p, e := obj.FieldByName(field)
 					switch e.(type) {
 					default:
 						t.Fatal(e)
@@ -101,9 +97,7 @@ func TestFieldAccess(t *testing.T) {
 					case nil:
 						if p == nil {
 							t.Fatal("value and error are both nil for", name, field)
-						} else if txt, e := p.GetText(); e != nil {
-							t.Fatal("assign", e)
-						} else if txt != value {
+						} else if txt := p.String(); txt != value {
 							t.Fatalf("mismatch %s.%s got:%q expected:%q", name, field, txt, value)
 						}
 					}
@@ -118,11 +112,9 @@ func TestFieldAccess(t *testing.T) {
 			for i := 0; i < 2; i++ {
 				if obj, e := q.GetField(object.Value, name); e != nil {
 					t.Fatal(e)
-				} else if p, e := obj.GetNamedField(field); e != nil {
+				} else if p, e := obj.FieldByName(field); e != nil {
 					t.Fatal(e)
-				} else if num, e := p.GetNumber(); e != nil {
-					t.Fatal("assign", e)
-				} else if num != value {
+				} else if num := p.Float(); num != value {
 					t.Fatal("mismatch", name, "have:", num, "want:", value)
 				}
 			}
@@ -143,13 +135,11 @@ func TestFieldAccess(t *testing.T) {
 		// apple.A had an implicit value of w; change it to "y"
 		if apple, e := q.GetField(object.Value, "apple"); e != nil {
 			t.Fatal(e)
-		} else if e := apple.SetNamedField("a", g.StringOf("y")); e != nil {
+		} else if e := apple.SetFieldByName("a", g.StringOf("y")); e != nil {
 			t.Fatal(e)
-		} else if v, e := apple.GetNamedField("a"); e != nil {
+		} else if v, e := apple.FieldByName("a"); e != nil {
 			t.Fatal(e)
-		} else if str, e := v.GetText(); e != nil {
-			t.Fatal(e)
-		} else if str != "y" {
+		} else if str := v.String(); str != "y" {
 			t.Fatal("mismatch", str)
 		} else if e := testTraits(apple, "y,w,x"); e != nil {
 			t.Fatal(e)
@@ -158,13 +148,11 @@ func TestFieldAccess(t *testing.T) {
 		// boat.B has a default value of zz
 		if boat, e := q.GetField(object.Value, "boat"); e != nil {
 			t.Fatal(e)
-		} else if e := boat.SetNamedField("z", g.BoolOf(true)); e != nil {
+		} else if e := boat.SetFieldByName("z", g.BoolOf(true)); e != nil {
 			t.Fatal(e)
-		} else if v, e := boat.GetNamedField("b"); e != nil {
+		} else if v, e := boat.FieldByName("b"); e != nil {
 			t.Fatal(e)
-		} else if str, e := v.GetText(); e != nil {
-			t.Fatal(e)
-		} else if str != "z" {
+		} else if str := v.String(); str != "z" {
 			t.Fatal("mismatch", str)
 		} else if e := testTraits(boat, "z, zz"); e != nil {
 			t.Fatal(e)
@@ -172,13 +160,11 @@ func TestFieldAccess(t *testing.T) {
 		// toy boat.A has an initial value of y
 		if toyBoat, e := q.GetField(object.Value, "toyBoat"); e != nil {
 			t.Fatal(e)
-		} else if e := toyBoat.SetNamedField("w", g.BoolOf(true)); e != nil {
+		} else if e := toyBoat.SetFieldByName("w", g.BoolOf(true)); e != nil {
 			t.Fatal(e)
-		} else if v, e := toyBoat.GetNamedField("a"); e != nil {
+		} else if v, e := toyBoat.FieldByName("a"); e != nil {
 			t.Fatal(e)
-		} else if str, e := v.GetText(); e != nil {
-			t.Fatal(e)
-		} else if str != "w" {
+		} else if str := v.String(); str != "w" {
 			t.Fatal("mismatch", str)
 		} else if e := testTraits(toyBoat, "w,x,y"); e != nil {
 			t.Fatal(e)
@@ -223,11 +209,9 @@ func testTraits(obj g.Value, csv string) (err error) {
 	for want := true; len(traits) > 0 && err == nil; want = false {
 		trait := traits[0]
 		traits = traits[1:]
-		if p, e := obj.GetNamedField(trait); e != nil {
+		if p, e := obj.FieldByName(trait); e != nil {
 			err = errutil.New(e)
-		} else if got, e := p.GetBool(); e != nil {
-			err = errutil.New("assign", e)
-		} else if got != want {
+		} else if got := p.Bool(); got != want {
 			err = errutil.New("mismatch", trait, "got:", got, "expected:", want)
 		}
 	}

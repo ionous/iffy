@@ -11,6 +11,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Sort struct {
@@ -34,23 +35,21 @@ func (op *Sort) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Sort) execute(run rt.Runtime) (err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = e
 	} else {
 		var newVals g.Value
 		switch a := vs.Affinity(); a {
 		case affine.NumList:
-			if els, e := vs.GetNumList(); e != nil {
-				err = e
-			} else if e := op.sortNumbers(run, els); e != nil {
+			els := vs.Floats()
+			if e := op.sortNumbers(run, els); e != nil {
 				err = e
 			} else {
 				newVals = g.FloatsOf(els)
 			}
 		case affine.TextList:
-			if els, e := vs.GetTextList(); e != nil {
-				err = e
-			} else if e := op.sortText(run, els); e != nil {
+			els := vs.Strings()
+			if e := op.sortText(run, els); e != nil {
 				err = e
 			} else {
 				newVals = g.StringsOf(els)
@@ -73,7 +72,7 @@ func (op *Sort) sortNumbers(run rt.Runtime, src []float64) (err error) {
 		if x, e := det.GetBool(run); e != nil {
 			err = errutil.Append(err, e)
 		} else {
-			ret = x
+			ret = x.Bool()
 		}
 		return
 	})
@@ -88,7 +87,7 @@ func (op *Sort) sortText(run rt.Runtime, src []string) (err error) {
 		if x, e := det.GetBool(run); e != nil {
 			err = errutil.Append(err, e)
 		} else {
-			ret = x
+			ret = x.Bool()
 		}
 		return
 	})

@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // LoopFactory or iterator variables while looping ( ex. through a series of objects. )
@@ -18,7 +19,7 @@ type LoopFactory struct {
 
 func LoopOver(run rt.Runtime, varName string, it g.Iterator, do, other rt.Execute) (err error) {
 	if hasNext := it.HasNext(); !hasNext {
-		if e := rt.RunOne(run, other); e != nil {
+		if e := safe.Run(run, other); e != nil {
 			err = e
 		}
 	} else {
@@ -30,7 +31,7 @@ func LoopOver(run rt.Runtime, varName string, it g.Iterator, do, other rt.Execut
 				hasNext = it.HasNext()
 				// brings the names of an object's properties into scope for the duration of fn.
 				run.PushScope(lf.NextScope(val, hasNext))
-				e := rt.RunOne(run, do)
+				e := safe.Run(run, do)
 				run.PopScope()
 				if e != nil {
 					err = e
@@ -66,11 +67,11 @@ func (l *loopScope) GetField(target, field string) (ret g.Value, err error) {
 		case l.varName:
 			ret = l.varValue
 		case "index":
-			ret, err = g.ValueOf(l.currIndex)
+			ret = g.IntOf(l.currIndex)
 		case "first":
-			ret, err = g.ValueOf(l.currIndex == 1)
+			ret = g.BoolOf(l.currIndex == 1)
 		case "last":
-			ret, err = g.ValueOf(!l.hasNext)
+			ret = g.BoolOf(!l.hasNext)
 		default:
 			err = g.UnknownField{target, field}
 		}

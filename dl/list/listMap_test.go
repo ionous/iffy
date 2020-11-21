@@ -42,14 +42,15 @@ func TestMapStrings(t *testing.T) {
 		t.Fatal(e)
 	} else if results, e := values.GetNamedField("Results"); e != nil {
 		t.Fatal(e)
-	} else if res, e := results.GetTextList(); e != nil {
-		t.Fatal(e)
-	} else if diff := pretty.Diff(res, []string{
-		"egnarO", "nomeL", "ognaM", "ananaB", "emiL",
-	}); len(diff) > 0 {
-		t.Fatal(res)
 	} else {
-		t.Log("ok", res)
+		res := results.Strings()
+		if diff := pretty.Diff(res, []string{
+			"egnarO", "nomeL", "ognaM", "ananaB", "emiL",
+		}); len(diff) > 0 {
+			t.Fatal(res)
+		} else {
+			t.Log("ok", res)
+		}
 	}
 }
 
@@ -75,7 +76,7 @@ func TestMapRecords(t *testing.T) {
 			}
 			fruits = append(fruits, one)
 		}
-		if e := values.SetNamedField("Fruits", g.RecordsOf(k, fruits)); e != nil {
+		if e := values.SetNamedField("Fruits", g.RecordsOf(k.Name(), fruits)); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -94,9 +95,7 @@ func TestMapRecords(t *testing.T) {
 		t.Fatal(e)
 	} else if val, e := values.GetNamedField("Results"); e != nil {
 		t.Fatal(e)
-	} else if res, e := val.GetRecordList(); e != nil {
-		t.Fatal(e, val.Affinity())
-	} else if len(res) != 5 {
+	} else if res := val.Records(); len(res) != 5 {
 		t.Fatal("missing results")
 	} else {
 		expect := []string{
@@ -106,10 +105,8 @@ func TestMapRecords(t *testing.T) {
 		for _, el := range res {
 			if v, e := el.GetNamedField("Name"); e != nil {
 				t.Fatal(e)
-			} else if s, e := v.GetText(); e != nil {
-				t.Fatal(e)
 			} else {
-				got = append(got, s)
+				got = append(got, v.String())
 			}
 		}
 		if diff := pretty.Diff(expect, got); len(diff) > 0 {

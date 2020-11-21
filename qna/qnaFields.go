@@ -146,21 +146,16 @@ func (n *Runner) setField(key keyType, val g.Value) (err error) {
 		err = e // there was an unknown error
 	case nil:
 		// get the name of the aspect
-		if aspect, e := q.GetText(); e != nil {
-			err = e
+
+		if aspect, b := q.String(), val.Bool(); !b {
+			// future: might maintain a table of opposite names ( similar to plurals )
+			err = errutil.Fmt("error setting trait: couldn't determine the opposite of %q", key)
 		} else {
-			// we want to change the aspect not the trait...
-			if b, e := val.GetBool(); e != nil {
-				err = errutil.New("error setting trait:", e)
-			} else if !b {
-				// future: might maintain a table of opposite names ( similar to plurals )
-				err = errutil.Fmt("error setting trait: couldn't determine the opposite of %q", key)
-			} else {
-				// recurse...
-				targetAspect := keyType{key.target, aspect}
-				err = n.setField(targetAspect, g.StringOf(key.field))
-			}
+			// recurse...
+			targetAspect := keyType{key.target, aspect}
+			err = n.setField(targetAspect, g.StringOf(key.field))
 		}
+
 	case g.UnknownField:
 		// didnt refer to a trait, so just set the field normally.
 		// ( to set the field, we get the field to verify it exists, and to check affinity )
@@ -274,19 +269,16 @@ func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 		case nil:
 			// we found the aspect name from the trait
 			// now we need to ask for the current value of the aspect
-			if aspectName, e := aspectOfTrait.GetText(); e != nil {
+
+			aspectName := aspectOfTrait.String()
+			aspectOfTarget := keyType{target, aspectName}
+			if q, e := n.getValue(aspectOfTarget); e != nil {
 				err = e
 			} else {
-				aspectOfTarget := keyType{target, aspectName}
-				if q, e := n.getValue(aspectOfTarget); e != nil {
-					err = e
-				} else if trait, e := q.GetText(); e != nil {
-					err = errutil.Fmt("unexpected value in aspect '%v.%v' %v", target, aspectName, e)
-				} else {
-					// return whether the object's aspect equals the specified trait.
-					// ( we dont cache this value because multiple things can change it )
-					ret = qnaValue{affine.Bool, staticValue{affine.Bool, trait == field}}
-				}
+				trait := q.String()
+				// return whether the object's aspect equals the specified trait.
+				// ( we dont cache this value because multiple things can change it )
+				ret = qnaValue{affine.Bool, staticValue{affine.Bool, trait == field}}
 			}
 		}
 	}

@@ -7,8 +7,7 @@ import (
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
-	"github.com/ionous/iffy/rt"
-	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 	"github.com/kr/pretty"
 )
 
@@ -30,12 +29,12 @@ func sortTest(src []string) (ret []string, err error) {
 		"sort": &sortPattern,
 	}); e != nil {
 		err = e
-	} else if e := rt.RunOne(run, &list.Sort{"Source", "sort"}); e != nil {
+	} else if e := safe.Run(run, &list.Sort{"Source", "sort"}); e != nil {
 		err = e
-	} else if res, e := g.Must(values.GetNamedField("Source")).GetTextList(); e != nil {
+	} else if res, e := values.GetNamedField("Source"); e != nil {
 		err = e
 	} else {
-		ret = res
+		ret = res.Strings()
 	}
 	return
 }

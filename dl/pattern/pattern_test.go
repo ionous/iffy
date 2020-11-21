@@ -5,8 +5,8 @@ import (
 
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/debug"
-	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/scope"
+	"github.com/ionous/iffy/rt/test"
 )
 
 // ExampleSayMe converts numbers to text
@@ -34,7 +34,7 @@ func ExampleSayMe() {
 }
 
 type baseRuntime struct {
-	rt.Panic
+	test.PanicRuntime
 }
 
 type patternRuntime struct {

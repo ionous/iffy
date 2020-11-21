@@ -4,9 +4,9 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Slice struct {
@@ -33,7 +33,7 @@ func (*Slice) Compose() composer.Spec {
 }
 
 func (op *Slice) Execute(run rt.Runtime) (err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = cmdError(op, e)
 	} else {
 		switch a := vs.Affinity(); a {
@@ -48,32 +48,31 @@ func (op *Slice) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-func (op *Slice) GetNumList(run rt.Runtime) (ret []float64, err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+func (op *Slice) GetNumList(run rt.Runtime) (ret g.Value, err error) {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = cmdError(op, e)
 	} else if vals, e := op.sliceNumbers(run, vs); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = vals
+		ret = g.FloatsOf(vals)
 	}
 	return
 }
 
-func (op *Slice) GetTextList(run rt.Runtime) (ret []string, err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+func (op *Slice) GetTextList(run rt.Runtime) (ret g.Value, err error) {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = cmdError(op, e)
 	} else if vals, e := op.sliceText(run, vs); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = vals
+		ret = g.StringsOf(vals)
 	}
 	return
 }
 
 func (op *Slice) sliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err error) {
-	if els, e := vs.GetNumList(); e != nil {
-		err = e
-	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
+	els := vs.Floats()
+	if i, j, e := op.getIndices(run, len(els)); e != nil {
 		err = e
 	} else if i >= 0 && j >= i {
 		ret = els[i:j]
@@ -82,9 +81,8 @@ func (op *Slice) sliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err er
 }
 
 func (op *Slice) sliceText(run rt.Runtime, vs g.Value) (ret []string, err error) {
-	if els, e := vs.GetTextList(); e != nil {
-		err = e
-	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
+	els := vs.Strings()
+	if i, j, e := op.getIndices(run, len(els)); e != nil {
 		err = e
 	} else if i >= 0 && j >= i {
 		ret = els[i:j]
@@ -94,13 +92,13 @@ func (op *Slice) sliceText(run rt.Runtime, vs g.Value) (ret []string, err error)
 
 // reti is < 0 to indicate an empty list
 func (op *Slice) getIndices(run rt.Runtime, cnt int) (reti, retj int, err error) {
-	if i, e := rt.GetOptionalNumber(run, op.Start, 0); e != nil {
+	if i, e := safe.GetOptionalNumber(run, op.Start, 0); e != nil {
 		err = e
-	} else if j, e := rt.GetOptionalNumber(run, op.End, 0); e != nil {
+	} else if j, e := safe.GetOptionalNumber(run, op.End, 0); e != nil {
 		err = e
 	} else {
-		reti = clipStart(int(i), cnt)
-		retj = clipEnd(int(j), cnt)
+		reti = clipStart(i.Int(), cnt)
+		retj = clipEnd(j.Int(), cnt)
 	}
 	return
 }

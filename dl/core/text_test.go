@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 	"github.com/kr/pretty"
 )
 
@@ -50,9 +51,9 @@ func TestText(t *testing.T) {
 }
 
 func testTrue(t *testing.T, run rt.Runtime, eval rt.BoolEval) {
-	if ok, e := rt.GetBool(run, eval); e != nil {
+	if ok, e := safe.GetBool(run, eval); e != nil {
 		t.Fatal(e)
-	} else if !ok {
+	} else if !ok.Bool() {
 		t.Fatal("expected true", pretty.Sprint(eval))
 	}
 }

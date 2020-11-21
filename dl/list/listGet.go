@@ -15,17 +15,10 @@ func getNewFloats(run rt.Runtime, assign core.Assignment) (ret []float64, err er
 		} else {
 			switch a := v.Affinity(); a {
 			case affine.Number:
-				if one, e := v.GetNumber(); e != nil {
-					err = e
-				} else {
-					ret = []float64{one}
-				}
+				one := v.Float()
+				ret = []float64{one}
 			case affine.NumList:
-				if many, e := v.GetNumList(); e != nil {
-					err = e
-				} else {
-					ret = many
-				}
+				ret = v.Floats()
 			default:
 				err = errutil.Fmt("cant add %q to a num list", a)
 			}
@@ -41,17 +34,10 @@ func getNewStrings(run rt.Runtime, assign core.Assignment) (ret []string, err er
 		} else {
 			switch a := v.Affinity(); a {
 			case affine.Text:
-				if one, e := v.GetText(); e != nil {
-					err = e
-				} else {
-					ret = []string{one}
-				}
+				one := v.String()
+				ret = []string{one}
 			case affine.TextList:
-				if many, e := v.GetTextList(); e != nil {
-					err = e
-				} else {
-					ret = many
-				}
+				ret = v.Strings()
 			default:
 				err = errutil.Fmt("cant add %q to a text list", a)
 			}
@@ -70,18 +56,10 @@ func getNewRecords(run rt.Runtime, oldType string,
 		} else {
 			switch a := v.Affinity(); a {
 			case affine.Record:
-				if one, e := v.GetRecord(); e != nil {
-					err = e
-				} else {
-					ret = []*g.Record{one}
-				}
-
+				one := v.Record()
+				ret = []*g.Record{one}
 			case affine.RecordList:
-				if many, e := v.GetRecordList(); e != nil {
-					err = e
-				} else {
-					ret = many
-				}
+				ret = v.Records()
 			default:
 				err = errutil.Fmt("cant add %q to a record list", a)
 			}

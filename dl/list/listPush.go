@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Push struct {
@@ -34,26 +35,24 @@ func (op *Push) Execute(run rt.Runtime) (err error) {
 }
 
 // returns the new size
-func (op *Push) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (op *Push) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 	if cnt, e := op.push(run); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = float64(cnt)
+		ret = g.IntOf(cnt)
 	}
 	return
 }
 
 func (op *Push) push(run rt.Runtime) (ret int, err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = e
 	} else if res, e := op.pushList(run, vs); e != nil {
-		err = e
-	} else if cnt, e := res.GetLen(); e != nil {
 		err = e
 	} else if e := run.SetField(object.Variables, op.List, res); e != nil {
 		err = e
 	} else {
-		ret = cnt
+		ret = res.Len()
 	}
 	return
 }
@@ -66,7 +65,7 @@ func (op *Push) pushList(run rt.Runtime, vs g.Value) (ret g.Value, err error) {
 		} else if res, e := pushNumbers(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret, err = g.ValueOf(res)
+			ret = g.FloatsOf(res)
 		}
 	case affine.TextList:
 		if add, e := getNewStrings(run, op.Insert); e != nil {
@@ -74,7 +73,7 @@ func (op *Push) pushList(run rt.Runtime, vs g.Value) (ret g.Value, err error) {
 		} else if res, e := pushText(vs, add, bool(op.Front)); e != nil {
 			err = e
 		} else {
-			ret, err = g.ValueOf(res)
+			ret = g.StringsOf(res)
 		}
 	case affine.RecordList:
 		t := vs.Type()
@@ -91,10 +90,9 @@ func (op *Push) pushList(run rt.Runtime, vs g.Value) (ret g.Value, err error) {
 	return
 }
 
-func pushNumbers(vs g.Value, add []float64, front bool) (ret []float64, err error) {
-	if vs, e := vs.GetNumList(); e != nil {
-		err = e
-	} else if front {
+func pushNumbers(v g.Value, add []float64, front bool) (ret []float64, err error) {
+	vs := v.Floats()
+	if front {
 		ret = append(add, vs...)
 	} else {
 		ret = append(vs, add...)
@@ -102,10 +100,9 @@ func pushNumbers(vs g.Value, add []float64, front bool) (ret []float64, err erro
 	return
 }
 
-func pushText(vs g.Value, add []string, front bool) (ret []string, err error) {
-	if vs, e := vs.GetTextList(); e != nil {
-		err = e
-	} else if front {
+func pushText(v g.Value, add []string, front bool) (ret []string, err error) {
+	vs := v.Strings()
+	if front {
 		ret = append(add, vs...)
 	} else {
 		ret = append(vs, add...)
@@ -113,10 +110,9 @@ func pushText(vs g.Value, add []string, front bool) (ret []string, err error) {
 	return
 }
 
-func pushRecords(vs g.Value, add []*g.Record, front bool) (ret []*g.Record, err error) {
-	if vs, e := vs.GetRecordList(); e != nil {
-		err = e
-	} else if front {
+func pushRecords(v g.Value, add []*g.Record, front bool) (ret []*g.Record, err error) {
+	vs := v.Records()
+	if front {
 		ret = append(add, vs...)
 	} else {
 		ret = append(vs, add...)

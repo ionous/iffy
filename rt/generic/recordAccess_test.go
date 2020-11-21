@@ -15,19 +15,15 @@ func TestRecordAccess(t *testing.T) {
 		// beep, number
 		if beep, e := q.GetField(object.Variables, "beep"); e != nil {
 			t.Fatal(e)
-		} else if el, e := beep.GetNamedField("d"); e != nil {
+		} else if el, e := beep.FieldByName("d"); e != nil {
 			t.Fatal(e)
-		} else if v, e := el.GetNumber(); e != nil {
-			t.Fatal(e)
-		} else if v != 0 {
+		} else if v := el.Float(); v != 0 {
 			t.Fatal("not default", v)
-		} else if e := beep.SetNamedField("d", g.FloatOf(5)); e != nil {
+		} else if e := beep.SetFieldByName("d", g.FloatOf(5)); e != nil {
 			t.Fatal(e)
-		} else if el, e := beep.GetNamedField("d"); e != nil {
+		} else if el, e := beep.FieldByName("d"); e != nil {
 			t.Fatal(e)
-		} else if v, e := el.GetNumber(); e != nil {
-			t.Fatal(e)
-		} else if v != 5 {
+		} else if v := el.Float(); v != 5 {
 			t.Fatal("not changed", v)
 		}
 	})
@@ -36,19 +32,15 @@ func TestRecordAccess(t *testing.T) {
 		//
 		if boop, e := q.GetField(object.Variables, "boop"); e != nil {
 			t.Fatal(e)
-		} else if el, e := boop.GetNamedField("t"); e != nil {
+		} else if el, e := boop.FieldByName("t"); e != nil {
 			t.Fatal(e)
-		} else if v, e := el.GetText(); e != nil {
-			t.Fatal(e)
-		} else if len(v) > 0 {
+		} else if v := el.String(); len(v) > 0 {
 			t.Fatal("not default", v)
-		} else if e := boop.SetNamedField("t", g.StringOf("xyzzy")); e != nil {
+		} else if e := boop.SetFieldByName("t", g.StringOf("xyzzy")); e != nil {
 			t.Fatal(e)
-		} else if el, e := boop.GetNamedField("t"); e != nil {
+		} else if el, e := boop.FieldByName("t"); e != nil {
 			t.Fatal(e)
-		} else if v, e := el.GetText(); e != nil {
-			t.Fatal(e)
-		} else if v != "xyzzy" {
+		} else if v := el.String(); v != "xyzzy" {
 			t.Fatal("not changed", v)
 		}
 	})
@@ -57,33 +49,25 @@ func TestRecordAccess(t *testing.T) {
 		//
 		if beep, e := q.GetField(object.Variables, "beep"); e != nil {
 			t.Fatal(e)
-		} else if el, e := beep.GetNamedField("x"); e != nil {
+		} else if el, e := beep.FieldByName("x"); e != nil {
 			t.Fatal(e)
-		} else if v, e := el.GetBool(); e != nil {
-			t.Fatal(e)
-		} else if !v {
+		} else if v := el.Bool(); !v {
 			t.Fatal("not default", v)
-		} else if e := beep.SetNamedField("x", g.BoolOf(true)); e != nil {
+		} else if e := beep.SetFieldByName("x", g.BoolOf(true)); e != nil {
 			t.Fatal(e)
-		} else if el, e := beep.GetNamedField("x"); e != nil {
+		} else if el, e := beep.FieldByName("x"); e != nil {
 			t.Fatal(e)
-		} else if v, e := el.GetBool(); e != nil {
-			t.Fatal(e)
-		} else if v != true {
+		} else if v := el.Bool(); v != true {
 			t.Fatal("not changed", v)
-		} else if el, e := beep.GetNamedField("a"); e != nil {
+		} else if el, e := beep.FieldByName("a"); e != nil {
 			t.Fatal(e)
-		} else if v, e := el.GetText(); e != nil {
+		} else if v := el.String(); v != "x" {
 			t.Fatal(e)
-		} else if v != "x" {
+		} else if e := beep.SetFieldByName("a", g.StringOf("w")); e != nil {
 			t.Fatal(e)
-		} else if e := beep.SetNamedField("a", g.StringOf("w")); e != nil {
+		} else if el, e := beep.FieldByName("w"); e != nil {
 			t.Fatal(e)
-		} else if el, e := beep.GetNamedField("w"); e != nil {
-			t.Fatal(e)
-		} else if v, e := el.GetBool(); e != nil {
-			t.Fatal(e)
-		} else if v != true {
+		} else if v := el.Bool(); v != true {
 			t.Fatal("aspect not changed")
 		}
 	})
@@ -92,13 +76,13 @@ func TestRecordAccess(t *testing.T) {
 		//
 		if beep, e := q.GetField(object.Variables, "beep"); e != nil {
 			t.Fatal(e)
-		} else if _, e := beep.GetNamedField("nope"); e == nil {
+		} else if _, e := beep.FieldByName("nope"); e == nil {
 			t.Fatal("expected no such field")
-		} else if e := beep.SetNamedField("a", g.True); e == nil {
+		} else if e := beep.SetFieldByName("a", g.True); e == nil {
 			t.Fatal("aspects should be set with strings")
-		} else if e := beep.SetNamedField("x", g.Empty); e == nil {
+		} else if e := beep.SetFieldByName("x", g.Empty); e == nil {
 			t.Fatal("traits should be set with bools")
-		} else if e := beep.SetNamedField("x", g.False); e == nil {
+		} else if e := beep.SetFieldByName("x", g.False); e == nil {
 			// we dont have support for opposite values right now.
 			t.Fatal("traits should be set with true values only")
 		} else if _, e := q.GetField(object.Variables, "blip"); e == nil {

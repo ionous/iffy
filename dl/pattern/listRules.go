@@ -2,6 +2,7 @@ package pattern
 
 import (
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // ListRule for any rule which can respond with multiple results.
@@ -29,9 +30,9 @@ type ExecuteRule struct {
 }
 
 func (r *ListRule) GetFlags(run rt.Runtime) (ret Flags, err error) {
-	if ok, e := rt.GetOptionalBool(run, r.Filter, true); e != nil {
+	if ok, e := safe.GetOptionalBool(run, r.Filter, true); e != nil {
 		err = e
-	} else if !ok {
+	} else if !ok.Bool() {
 		ret = -1
 	} else {
 		ret = r.Flags

@@ -3,6 +3,8 @@ package render
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Template struct {
@@ -19,6 +21,11 @@ func (*Template) Compose() composer.Spec {
 }
 
 // RunTest returns an error on failure.
-func (op *Template) GetText(run rt.Runtime) (ret string, err error) {
-	return rt.GetText(run, op.Expression)
+func (op *Template) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if v, e := safe.GetOptionalText(run, op.Expression, ""); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = v
+	}
+	return
 }

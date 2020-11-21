@@ -5,8 +5,8 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/object"
-	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // test some simple functionality of the object commands using a mock runtime
@@ -28,9 +28,9 @@ func TestObjects(t *testing.T) {
 		testTrue(t, &run, &IsNotTrue{&ObjectExists{nothing}})
 	})
 	t.Run("kind_of", func(t *testing.T) {
-		if cls, e := rt.GetText(&run, &KindOf{this}); e != nil {
+		if cls, e := safe.GetText(&run, &KindOf{this}); e != nil {
 			t.Fatal(e)
-		} else if cls != base.Text {
+		} else if cls.String() != base.Text {
 			t.Fatal("unexpected", cls)
 		}
 	})
@@ -78,13 +78,13 @@ type objTest struct {
 	name  string
 }
 
-func (j *objTest) GetNamedField(field string) (ret g.Value, err error) {
+func (j *objTest) FieldByName(field string) (ret g.Value, err error) {
 	switch m := j.model; field {
 	case object.Kind:
 		if cls, ok := m.clsMap[j.name]; !ok {
 			err = g.UnknownField{j.name, field}
 		} else {
-			ret, err = g.ValueOf(cls)
+			ret = g.StringOf(cls)
 		}
 
 	case object.Kinds:
@@ -93,7 +93,7 @@ func (j *objTest) GetNamedField(field string) (ret g.Value, err error) {
 		} else if path, ok := m.clsMap[cls]; !ok {
 			err = errutil.New("modelTest: unknown class", cls)
 		} else {
-			ret, err = g.ValueOf(path)
+			ret = g.StringOf(path)
 		}
 
 	default:

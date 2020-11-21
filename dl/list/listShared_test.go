@@ -15,7 +15,7 @@ import (
 )
 
 type panicTime struct {
-	rt.Panic
+	test.PanicRuntime
 }
 type listTime struct {
 	panicTime
@@ -76,7 +76,7 @@ func (op *Write) Execute(run rt.Runtime) (err error) {
 	if t, e := op.Text.GetText(run); e != nil {
 		err = e
 	} else {
-		(*op.out) = append((*op.out), t)
+		(*op.out) = append((*op.out), t.String())
 	}
 	return
 }
@@ -85,7 +85,7 @@ func getNum(run rt.Runtime, op rt.NumberEval) (ret string) {
 	if v, e := op.GetNumber(run); e != nil {
 		ret = e.Error()
 	} else {
-		ret = strconv.FormatFloat(v, 'g', -1, 64)
+		ret = strconv.FormatFloat(v.Float(), 'g', -1, 64)
 	}
 	return
 }
@@ -94,7 +94,7 @@ func joinText(run rt.Runtime, op rt.TextListEval) (ret string) {
 	if vs, e := op.GetTextList(run); e != nil {
 		ret = e.Error()
 	} else {
-		ret = joinStrings(vs)
+		ret = joinStrings(vs.Strings())
 	}
 	return
 }
@@ -110,7 +110,7 @@ func joinStrings(vs []string) (ret string) {
 
 func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
 	if obj, ok := lt.objs[field]; target == object.Value && ok {
-		ret, err = g.ValueOf(obj)
+		ret = g.RecordOf(obj)
 	} else {
 		ret, err = lt.ScopeStack.GetField(target, field)
 	}

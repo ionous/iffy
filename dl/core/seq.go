@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Sequence struct {
@@ -36,18 +37,24 @@ func (op *Sequence) updateCounter(run rt.Runtime, inc func(int, int) int) (ret i
 	if max := len(op.Parts); max > 0 {
 		if p, e := run.GetField(object.Counter, op.Seq); e != nil {
 			err = e
-		} else if num, e := p.GetNumber(); e != nil {
-			err = e
 		} else {
-			curr := int(num)
-			if next, e := g.ValueOf(inc(curr, max)); e != nil {
-				err = e
-			} else if e := run.SetField(object.Counter, op.Seq, next); e != nil {
+			curr := p.Int()
+			next := g.IntOf(inc(curr, max))
+			if e := run.SetField(object.Counter, op.Seq, next); e != nil {
 				err = e
 			} else {
-				ret = curr
+				ret = curr + 1
 			}
 		}
+	}
+	return
+}
+
+func (op *Sequence) getText(run rt.Runtime, onedex int) (ret g.Value, err error) {
+	if i, max := onedex-1, len(op.Parts); i >= 0 && i < max {
+		ret, err = safe.GetText(run, op.Parts[i])
+	} else {
+		ret = g.Empty
 	}
 	return
 }
@@ -60,11 +67,11 @@ func (*CycleText) Compose() composer.Spec {
 	}
 }
 
-func (op *CycleText) GetText(run rt.Runtime) (ret string, err error) {
-	if curr, e := op.updateCounter(run, wrap); e != nil {
-		err = e
-	} else if max := len(op.Parts); curr < max {
-		ret, err = rt.GetText(run, op.Parts[curr])
+func (op *CycleText) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if onedex, e := op.updateCounter(run, wrap); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret, err = op.getText(run, onedex)
 	}
 	return
 }
@@ -77,10 +84,19 @@ func (*ShuffleText) Compose() composer.Spec {
 	}
 }
 
-func (op *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
+func (op *ShuffleText) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if onedex, e := op.shuffle(run); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret, err = op.getText(run, onedex)
+	}
+	return
+}
+
+func (op *ShuffleText) shuffle(run rt.Runtime) (ret int, err error) {
 	if curr, e := op.updateCounter(run, wrap); e != nil {
 		err = e
-	} else if max := len(op.Parts); curr < max {
+	} else if curr, max := curr-1, len(op.Parts); curr < max {
 		// uses the Fisher–Yates algorithm to sort indices
 		if len(op.indices) == 0 {
 			op.indices = makeIndices(max)
@@ -91,8 +107,7 @@ func (op *ShuffleText) GetText(run rt.Runtime) (ret string, err error) {
 			op.indices[curr], op.indices[j] = op.indices[j], op.indices[curr]
 		}
 		// and that's the real index we use.
-		sel := op.indices[curr]
-		ret, err = rt.GetText(run, op.Parts[sel])
+		ret = 1 + op.indices[curr]
 	}
 	return
 }
@@ -105,23 +120,24 @@ func (*StoppingText) Compose() composer.Spec {
 	}
 }
 
-func (op *StoppingText) GetText(run rt.Runtime) (ret string, err error) {
+func (op *StoppingText) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if onedex, e := op.stopping(run); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret, err = op.getText(run, onedex)
+	}
+	return
+}
+
+func (op *StoppingText) stopping(run rt.Runtime) (ret int, err error) {
 	switch max := len(op.Parts); max {
 	case 0:
-		// do nothing.
+		// no elements, nothing to do.
 	case 1:
 		// when one element, return it once then the empty string after.
-		if curr, e := op.updateCounter(run, saturate); e != nil {
-			err = e
-		} else if curr == 0 {
-			ret, err = rt.GetText(run, op.Parts[curr])
-		}
+		ret, err = op.updateCounter(run, saturate)
 	default:
-		if curr, e := op.updateCounter(run, cap); e != nil {
-			err = e
-		} else if curr < max {
-			ret, err = rt.GetText(run, op.Parts[curr])
-		}
+		ret, err = op.updateCounter(run, cap)
 	}
 	return
 }

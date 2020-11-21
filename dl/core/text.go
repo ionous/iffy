@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // IsEmpty determines whether the text contains any characters at all.
@@ -34,11 +35,12 @@ func (*IsEmpty) Compose() composer.Spec {
 	}
 }
 
-func (op *IsEmpty) GetBool(run rt.Runtime) (ret bool, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
-		err = errutil.New("IsEmpty.Text", e)
-	} else if len(t) == 0 {
-		ret = true
+func (op *IsEmpty) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
+		err = cmdError(op, e)
+	} else {
+		b := len(t.String()) == 0
+		ret = g.BoolOf(b)
 	}
 	return
 }
@@ -51,13 +53,14 @@ func (*Includes) Compose() composer.Spec {
 	}
 }
 
-func (op *Includes) GetBool(run rt.Runtime) (ret bool, err error) {
-	if text, e := rt.GetText(run, op.Text); e != nil {
-		err = errutil.New("Includes.Text", e)
-	} else if part, e := rt.GetText(run, op.Part); e != nil {
-		err = errutil.New("Includes.Part", e)
+func (op *Includes) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if text, e := safe.GetText(run, op.Text); e != nil {
+		err = cmdErrorCtx(op, "Text", e)
+	} else if part, e := safe.GetText(run, op.Part); e != nil {
+		err = cmdErrorCtx(op, "Part", e)
 	} else {
-		ret = strings.Contains(text, part)
+		contains := strings.Contains(text.String(), part.String())
+		ret = g.BoolOf(contains)
 	}
 	return
 }
@@ -70,32 +73,34 @@ func (*Join) Compose() composer.Spec {
 	}
 }
 
-func (op *Join) GetText(run rt.Runtime) (ret string, err error) {
-	if sep, e := rt.GetOptionalText(run, op.Sep, ""); e != nil {
-		err = e
+func (op *Join) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if sep, e := safe.GetOptionalText(run, op.Sep, ""); e != nil {
+		err = cmdErrorCtx(op, "Sep", e)
 	} else {
 		var buf bytes.Buffer
+		sep := sep.String()
 		for _, txt := range op.Parts {
-			if str, e := rt.GetText(run, txt); e != nil {
-				err = e
+			if str, e := safe.GetText(run, txt); e != nil {
+				err = cmdErrorCtx(op, "Part", e)
 				break
 			} else {
 				if buf.Len() > 0 {
 					buf.WriteString(sep)
 				}
-				buf.WriteString(str)
+				buf.WriteString(str.String())
 			}
 		}
 		if err == nil {
-			ret = buf.String()
+			str := buf.String()
+			ret = g.StringOf(str)
 		}
 	}
 	return
 }
 
-// if sep, e := rt.GetOptionalText(run, op.Sep, ""); e != nil {
+// if sep, e := safe.GetOptionalText(run, op.Sep, ""); e != nil {
 // 	err = e
-// } else if it, e := rt.GetTextList(run, op.Parts); e != nil {
+// } else if it, e := safe.GetTextList(run, op.Parts); e != nil {
 // 	err = e
 // } else {
 // 	var buf bytes.Buffer

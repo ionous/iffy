@@ -2,6 +2,8 @@ package pattern
 
 import (
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // BoolPattern finds the first matched rule and returns the result of that evaluation.
@@ -25,14 +27,15 @@ type TextPattern struct {
 }
 
 // GetBool returns the first matching bool evaluation.
-func (ps *BoolPattern) GetBool(run rt.Runtime) (ret bool, err error) {
+func (ps *BoolPattern) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	ret = g.False // provisionally
 	for i, cnt := 0, len(ps.Rules); i < cnt; i++ {
 		p := ps.Rules[cnt-i-1]
-		if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
+		if matched, e := safe.GetOptionalBool(run, p.Filter, true); e != nil {
 			err = e
 			break
-		} else if matched {
-			ret, err = rt.GetBool(run, p.BoolEval)
+		} else if matched.Bool() {
+			ret, err = safe.GetBool(run, p.BoolEval)
 			break
 		}
 	}
@@ -40,14 +43,15 @@ func (ps *BoolPattern) GetBool(run rt.Runtime) (ret bool, err error) {
 }
 
 // GetNumber returns the first matching num evaluation.
-func (ps *NumberPattern) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (ps *NumberPattern) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+	ret = g.Zero // provisionally
 	for i, cnt := 0, len(ps.Rules); i < cnt; i++ {
 		p := ps.Rules[cnt-i-1]
-		if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
+		if matched, e := safe.GetOptionalBool(run, p.Filter, true); e != nil {
 			err = e
 			break
-		} else if matched {
-			ret, err = rt.GetNumber(run, p.NumberEval)
+		} else if matched.Bool() {
+			ret, err = safe.GetNumber(run, p.NumberEval)
 			break
 		}
 	}
@@ -55,14 +59,15 @@ func (ps *NumberPattern) GetNumber(run rt.Runtime) (ret float64, err error) {
 }
 
 // GetText returns the first matching text evaluation.
-func (ps *TextPattern) GetText(run rt.Runtime) (ret string, err error) {
+func (ps *TextPattern) GetText(run rt.Runtime) (ret g.Value, err error) {
+	ret = g.Empty // provisionally
 	for i, cnt := 0, len(ps.Rules); i < cnt; i++ {
 		p := ps.Rules[cnt-i-1]
-		if matched, e := rt.GetOptionalBool(run, p.Filter, true); e != nil {
+		if matched, e := safe.GetOptionalBool(run, p.Filter, true); e != nil {
 			err = e
 			break
-		} else if matched {
-			ret, err = rt.GetText(run, p.TextEval)
+		} else if matched.Bool() {
+			ret, err = safe.GetText(run, p.TextEval)
 			break
 		}
 	}

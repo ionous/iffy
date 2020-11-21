@@ -3,6 +3,8 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // HasTrait a property value from an object by name.
@@ -21,17 +23,15 @@ func (*HasTrait) Compose() composer.Spec {
 	}
 }
 
-func (op *HasTrait) GetBool(run rt.Runtime) (ret bool, err error) {
-	if obj, e := rt.GetObject(run, op.Obj); e != nil {
+func (op *HasTrait) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if obj, e := safe.GetObject(run, op.Obj); e != nil {
 		err = cmdError(op, e)
-	} else if trait, e := rt.GetText(run, op.Trait); e != nil {
+	} else if trait, e := safe.GetText(run, op.Trait); e != nil {
 		err = cmdError(op, e)
-	} else if p, e := obj.GetNamedField(trait); e != nil {
-		err = cmdError(op, e)
-	} else if ok, e := p.GetBool(); e != nil {
+	} else if p, e := obj.FieldByName(trait.String()); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = ok
+		ret = p
 	}
 	return
 }

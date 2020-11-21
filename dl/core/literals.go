@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 )
 
 // Bool specifies a simple true/false value.
@@ -48,13 +49,14 @@ func (*Bool) Compose() composer.Spec {
 }
 
 // GetBool implements BoolEval; providing the dl with a boolean literal.
-func (b *Bool) GetBool(rt.Runtime) (bool, error) {
-	return b.Bool, nil
+func (op *Bool) GetBool(rt.Runtime) (ret g.Value, _ error) {
+	ret = g.BoolOf(op.Bool)
+	return
 }
 
 // String uses strconv.FormatBool.
-func (b *Bool) String() string {
-	return strconv.FormatBool(b.Bool)
+func (op *Bool) String() string {
+	return strconv.FormatBool(op.Bool)
 }
 
 func (*Number) Compose() composer.Spec {
@@ -67,23 +69,24 @@ func (*Number) Compose() composer.Spec {
 }
 
 // GetNumber implements NumberEval providing the dl with a number literal.
-func (n *Number) GetNumber(rt.Runtime) (float64, error) {
-	return n.Num, nil
+func (op *Number) GetNumber(rt.Runtime) (ret g.Value, _ error) {
+	ret = g.FloatOf(op.Num)
+	return
 }
 
 // Int converts to native int.
-func (n *Number) Int() int {
-	return int(n.Num)
+func (op *Number) Int() int {
+	return int(op.Num)
 }
 
 // Float converts to native float.
-func (n *Number) Float() float64 {
-	return n.Num
+func (op *Number) Float() float64 {
+	return op.Num
 }
 
 // String returns a nicely formatted float, with no decimal point when possible.
-func (n *Number) String() string {
-	return strconv.FormatFloat(n.Num, 'g', -1, 64)
+func (op *Number) String() string {
+	return strconv.FormatFloat(op.Num, 'g', -1, 64)
 }
 
 func (*Text) Compose() composer.Spec {
@@ -96,14 +99,14 @@ func (*Text) Compose() composer.Spec {
 }
 
 // GetText implements interface TextEval providing the dl with a text literal.
-func (t *Text) GetText(run rt.Runtime) (ret string, err error) {
-	ret = t.Text
+func (op *Text) GetText(run rt.Runtime) (ret g.Value, _ error) {
+	ret = g.StringOf(op.Text)
 	return
 }
 
 // String returns the text.
-func (t *Text) String() string {
-	return t.Text
+func (op *Text) String() string {
+	return op.Text
 }
 
 func (*Lines) Compose() composer.Spec {
@@ -116,14 +119,14 @@ func (*Lines) Compose() composer.Spec {
 }
 
 // GetLines implements interface LinesEval providing the dl with a lines literal.
-func (t *Lines) GetLines(run rt.Runtime) (ret string, err error) {
-	ret = t.Lines
+func (op *Lines) GetLines(run rt.Runtime) (ret g.Value, _ error) {
+	ret = g.StringOf(op.Lines)
 	return
 }
 
 // String returns the lines.
-func (t *Lines) String() string {
-	return t.Lines
+func (op *Lines) String() string {
+	return op.Lines
 }
 
 func (*Numbers) Compose() composer.Spec {
@@ -134,8 +137,8 @@ func (*Numbers) Compose() composer.Spec {
 	}
 }
 
-func (l *Numbers) GetNumList(rt.Runtime) (ret []float64, _ error) {
-	ret = l.Values
+func (op *Numbers) GetNumList(rt.Runtime) (ret g.Value, _ error) {
+	ret = g.FloatsOf(op.Values)
 	return
 }
 
@@ -147,7 +150,7 @@ func (*Texts) Compose() composer.Spec {
 	}
 }
 
-func (l *Texts) GetTextList(rt.Runtime) (ret []string, _ error) {
-	ret = l.Values
+func (op *Texts) GetTextList(rt.Runtime) (ret g.Value, _ error) {
+	ret = g.StringsOf(op.Values)
 	return
 }

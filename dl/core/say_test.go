@@ -3,7 +3,8 @@ package core
 import (
 	"fmt"
 
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
+	"github.com/ionous/iffy/rt/test"
 	"github.com/ionous/iffy/rt/writer"
 )
 
@@ -16,7 +17,7 @@ var helloThereWorld = NewActivity(
 func ExampleSpan() {
 	var run sayTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.WriteText(&run, &Span{helloThereWorld}); e != nil {
+	if e := safe.WriteText(&run, &Span{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -26,7 +27,7 @@ func ExampleSpan() {
 func ExampleBracket() {
 	var run sayTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.WriteText(&run, &Bracket{helloThereWorld}); e != nil {
+	if e := safe.WriteText(&run, &Bracket{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -36,7 +37,7 @@ func ExampleBracket() {
 func ExampleSlash() {
 	var run sayTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.WriteText(&run, &Slash{helloThereWorld}); e != nil {
+	if e := safe.WriteText(&run, &Slash{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -46,7 +47,7 @@ func ExampleSlash() {
 func ExampleCommas() {
 	var run sayTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.WriteText(&run, &Commas{helloThereWorld}); e != nil {
+	if e := safe.WriteText(&run, &Commas{helloThereWorld}); e != nil {
 		fmt.Println("Error:", e)
 	}
 	// Output:
@@ -54,7 +55,7 @@ func ExampleCommas() {
 }
 
 type baseRuntime struct {
-	rt.Panic
+	test.PanicRuntime
 }
 type sayTester struct {
 	baseRuntime

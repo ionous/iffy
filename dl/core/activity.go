@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // Activity wraps a block of multiple execute statements
@@ -21,5 +22,5 @@ func (*Activity) Compose() composer.Spec {
 
 // Execute statements
 func (op *Activity) Execute(run rt.Runtime) error {
-	return rt.RunAll(run, op.Exe)
+	return safe.RunAll(run, op.Exe)
 }

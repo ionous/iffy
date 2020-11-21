@@ -114,7 +114,7 @@ func (*DetermineNum) Compose() composer.Spec {
 }
 
 // GetNumber returns the first matching num evaluation.
-func (op *DetermineNum) GetNumber(run rt.Runtime) (ret float64, err error) {
+func (op *DetermineNum) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 	var pat NumberPattern
 	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetNumber(run)
@@ -135,7 +135,7 @@ func (*DetermineText) Compose() composer.Spec {
 }
 
 // GetText returns the first matching text evaluation.
-func (op *DetermineText) GetText(run rt.Runtime) (ret string, err error) {
+func (op *DetermineText) GetText(run rt.Runtime) (ret g.Value, err error) {
 	var pat TextPattern
 	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetText(run)
@@ -156,7 +156,7 @@ func (*DetermineBool) Compose() composer.Spec {
 }
 
 // GetBool returns the first matching bool evaluation.
-func (op *DetermineBool) GetBool(run rt.Runtime) (ret bool, err error) {
+func (op *DetermineBool) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	var pat BoolPattern
 	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetBool(run)
@@ -176,7 +176,7 @@ func (*DetermineNumList) Compose() composer.Spec {
 	}
 }
 
-func (op *DetermineNumList) GetNumList(run rt.Runtime) (ret []float64, err error) {
+func (op *DetermineNumList) GetNumList(run rt.Runtime) (ret g.Value, err error) {
 	var pat NumListPattern
 	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetNumList(run)
@@ -196,7 +196,7 @@ func (*DetermineTextList) Compose() composer.Spec {
 	}
 }
 
-func (op *DetermineTextList) GetTextList(run rt.Runtime) (ret []string, err error) {
+func (op *DetermineTextList) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	var pat TextListPattern
 	if e := (*FromPattern)(op).Stitch(run, &pat, func() (err error) {
 		ret, err = pat.GetTextList(run)

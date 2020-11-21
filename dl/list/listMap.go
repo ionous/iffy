@@ -1,10 +1,13 @@
 package list
 
 import (
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Map struct {
@@ -28,9 +31,9 @@ func (op *Map) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Map) execute(run rt.Runtime) (err error) {
-	if fromList, e := run.GetField(object.Variables, op.FromList); e != nil {
+	if fromList, e := safe.GetList(run, op.FromList); e != nil {
 		err = e
-	} else if toList, e := run.GetField(object.Variables, op.ToList); e != nil {
+	} else if toList, e := safe.GetList(run, op.ToList); e != nil {
 		err = e
 	} else if e := op.cacheKinds(run, op.UsingPattern); e != nil {
 		err = e
@@ -49,11 +52,12 @@ func (op *Map) execute(run rt.Runtime) (err error) {
 			} else if newVal, e := ps.GetFieldByIndex(op.out); e != nil {
 				err = e
 				break
-			} else if vs, e := toList.Append(newVal); e != nil {
-				err = e
+			} else if src, dst := newVal.Affinity(), toList.Affinity(); src != affine.Element(dst) ||
+				((src == affine.Record) && newVal.Type() != toList.Type()) {
+				err = errutil.New("elements dont match")
 				break
 			} else {
-				toList = vs
+				toList.Append(newVal)
 			}
 		}
 		if err == nil {

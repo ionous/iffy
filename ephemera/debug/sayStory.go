@@ -1,12 +1,14 @@
 package debug
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/ephemera/reader"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 func SayIt(s string) rt.TextEval {
@@ -17,14 +19,12 @@ type MatchNumber struct {
 	Val int
 }
 
-func (m MatchNumber) GetBool(run rt.Runtime) (okay bool, err error) {
-	if a, e := run.GetField(object.Variables, "num"); e != nil {
-		err = e
-	} else if v, e := a.GetNumber(); e != nil {
+func (m MatchNumber) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if a, e := safe.Variable(run, "num", affine.Number); e != nil {
 		err = e
 	} else {
-		n := int(v)
-		okay = n == int(m.Val)
+		n := a.Int()
+		ret = g.BoolOf(n == m.Val)
 	}
 	return
 }

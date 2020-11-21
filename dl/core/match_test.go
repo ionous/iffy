@@ -3,18 +3,18 @@ package core
 import (
 	"testing"
 
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/test"
 )
 
 func TestMatches(t *testing.T) {
-	var run rt.Panic
+	var run test.PanicRuntime
 	// test a valid regexp
 	// loop to verify(ish) the cache
 	m := &Matches{Text: &Text{"gophergopher"}, Pattern: "(gopher){2}"}
 	for i := 0; i < 2; i++ {
 		if ok, e := m.GetBool(&run); e != nil {
 			t.Fatal(e)
-		} else if !ok {
+		} else if !ok.Bool() {
 			t.Fatal("mismatch")
 		}
 	}

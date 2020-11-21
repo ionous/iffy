@@ -21,6 +21,14 @@ func CopyStrings(src []string) []string {
 	return out
 }
 
+// CopyRecords: duplicate the passed slice.
+// ( b/c golang's built in copy doesnt allocate )
+func CopyRecords(src []*Record) []*Record {
+	out := make([]*Record, len(src))
+	copy(out, src)
+	return out
+}
+
 // CopyValue: create a new value from a snapshot of the passed value
 func CopyValue(val Value) (ret interface{}, err error) {
 	if val == nil {
@@ -28,60 +36,38 @@ func CopyValue(val Value) (ret interface{}, err error) {
 	} else {
 		switch a := val.Affinity(); a {
 		case affine.Bool:
-			if v, e := val.GetBool(); e != nil {
-				err = e
-			} else {
-				ret = v
-			}
+			ret = val.Bool()
 		case affine.Number:
-			if v, e := val.GetNumber(); e != nil {
-				err = e
-			} else {
-				ret = v
-			}
+			ret = val.Float()
 		case affine.Text:
-			if v, e := val.GetText(); e != nil {
-				err = e
-			} else {
-				ret = v
-			}
+			ret = val.String()
 		case affine.Record:
-			if v, e := val.GetRecord(); e != nil {
-				err = e
-			} else if next, e := copyRecord(v); e != nil {
+			if next, e := copyRecord(val.Record()); e != nil {
 				err = e
 			} else {
 				ret = next
 			}
 		case affine.NumList:
-			if vs, e := val.GetNumList(); e != nil {
-				err = e
-			} else {
-				ret = CopyFloats(vs)
-			}
+			ret = CopyFloats(val.Floats())
+
 		case affine.TextList:
-			if vs, e := val.GetTextList(); e != nil {
-				err = e
-			} else {
-				ret = CopyStrings(vs)
-			}
+			ret = CopyStrings(val.Strings())
+
 		case affine.RecordList:
-			if vs, e := val.GetRecordList(); e != nil {
-				err = e
-			} else {
-				values := make([]*Record, len(vs))
-				for i, el := range vs {
-					if cpy, e := copyRecord(el); e != nil {
-						err = e
-						break
-					} else {
-						values[i] = cpy
-					}
-				}
-				if err == nil {
-					ret = values
+			vs := val.Records()
+			values := make([]*Record, len(vs))
+			for i, el := range vs {
+				if cpy, e := copyRecord(el); e != nil {
+					err = e
+					break
+				} else {
+					values[i] = cpy
 				}
 			}
+			if err == nil {
+				ret = values
+			}
+
 		case affine.Object:
 			// new nouns cant be dynamically added to the runtime.
 			err = errutil.New("can't duplicate object values")

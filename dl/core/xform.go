@@ -6,6 +6,8 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // MakeSingular
@@ -23,11 +25,14 @@ func (*MakeSingular) Compose() composer.Spec {
 	}
 }
 
-func (op *MakeSingular) GetText(run rt.Runtime) (ret string, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
+func (op *MakeSingular) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
-	} else if len(t) > 0 {
-		ret = run.SingularOf(t)
+	} else if t := t.String(); len(t) == 0 {
+		ret = g.Empty
+	} else {
+		singular := run.SingularOf(t)
+		ret = g.StringOf(singular)
 	}
 	return
 }
@@ -47,11 +52,14 @@ func (*MakePlural) Compose() composer.Spec {
 	}
 }
 
-func (op *MakePlural) GetText(run rt.Runtime) (ret string, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
+func (op *MakePlural) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
-	} else if len(t) > 0 {
-		ret = run.PluralOf(t)
+	} else if t := t.String(); len(t) == 0 {
+		ret = g.Empty
+	} else {
+		plural := run.PluralOf(t)
+		ret = g.StringOf(plural)
 	}
 	return
 }
@@ -132,52 +140,60 @@ func (*MakeReversed) Compose() composer.Spec {
 	}
 }
 
-func (op *MakeLowercase) GetText(run rt.Runtime) (ret string, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
+func (op *MakeLowercase) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = strings.ToLower(t)
+		lwr := strings.ToLower(t.String())
+		ret = g.StringOf(lwr)
 	}
 	return
 }
 
-func (op *MakeUppercase) GetText(run rt.Runtime) (ret string, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
+func (op *MakeUppercase) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = strings.ToUpper(t)
+		upper := strings.ToUpper(t.String())
+		ret = g.StringOf(upper)
 	}
 	return
 }
 
-func (op *MakeTitleCase) GetText(run rt.Runtime) (ret string, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
+func (op *MakeTitleCase) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
-	} else if len(t) > 0 {
-		ret = lang.Titlecase(t)
+	} else if t := t.String(); len(t) == 0 {
+		ret = g.Empty
+	} else {
+		title := lang.Titlecase(t)
+		ret = g.StringOf(title)
 	}
 	return
 }
 
-func (op *MakeSentenceCase) GetText(run rt.Runtime) (ret string, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
+func (op *MakeSentenceCase) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
-	} else if len(t) > 0 {
-		ret = lang.SentenceCase(t)
+	} else if t := t.String(); len(t) == 0 {
+		ret = g.Empty
+	} else {
+		sentence := lang.SentenceCase(t)
+		ret = g.StringOf(sentence)
 	}
 	return
 }
 
-func (op *MakeReversed) GetText(run rt.Runtime) (ret string, err error) {
-	if t, e := rt.GetText(run, op.Text); e != nil {
+func (op *MakeReversed) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if t, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
-		a := []rune(t)
+		a := []rune(t.String())
 		for i := len(a)/2 - 1; i >= 0; i-- {
 			opp := len(a) - 1 - i
 			a[i], a[opp] = a[opp], a[i]
 		}
-		ret = string(a)
+		ret = g.StringOf(string(a))
 	}
 	return
 }

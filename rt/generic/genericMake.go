@@ -7,36 +7,6 @@ import (
 	"github.com/ionous/iffy/affine"
 )
 
-func Must(val Value, err error) Value {
-	if err != nil {
-		panic(err)
-	}
-	return val
-}
-
-// ValueOf returns a new generic value wrapper based on analyzing the passed value.
-func ValueOf(i interface{}) (ret Value, err error) {
-	switch i.(type) {
-	case bool, *bool:
-		ret, err = newBoolValue(i, defaultType)
-	case int, int64, float32, float64, *int, *int64, *float32, *float64:
-		ret, err = newNumValue(i, defaultType)
-	case string, *string:
-		ret, err = newTextValue(i, defaultType)
-	case []float64:
-		ret, err = newNumList(i, defaultType)
-	case []string:
-		ret, err = newTextList(i, defaultType)
-	case *Record:
-		ret, err = newRecord(i, defaultType)
-	// case []*Record:
-	// 	ret, err = newRecordList(i, defaultType)
-	default:
-		err = errutil.New("unhandled value %v(%T)", i, i)
-	}
-	return
-}
-
 // ValueFrom adds an optional subtype to values, for example:
 // marking text as specifically intended for aspects, traits, etc.
 func ValueFrom(i interface{}, a affine.Affinity, subtype string) (ret Value, err error) {
@@ -62,38 +32,42 @@ func ValueFrom(i interface{}, a affine.Affinity, subtype string) (ret Value, err
 }
 
 func BoolOf(v bool) Value {
-	return makeValue(affine.Bool, defaultType, r.ValueOf(v))
+	return makeValue(affine.Bool, defaultType, v)
 }
 func StringOf(v string) Value {
-	return makeValue(affine.Text, defaultType, r.ValueOf(v))
+	return makeValue(affine.Text, defaultType, v)
 }
 func FloatOf(v float64) Value {
-	return makeValue(affine.Number, defaultType, r.ValueOf(v))
+	return makeValue(affine.Number, defaultType, v)
+}
+func IntOf(v int) Value {
+	return makeValue(affine.Number, defaultType, v)
 }
 func RecordOf(v *Record) Value {
-	return makeValue(affine.Record, v.Type(), r.ValueOf(v))
+	return makeValue(affine.Record, v.Type(), v)
 }
-func RecordsOf(k *Kind, vs []*Record) Value {
-	return makeValue(affine.RecordList, k.Name(), r.ValueOf(vs))
+func RecordsOf(typeName string, vs []*Record) Value {
+	return makeValue(affine.RecordList, typeName, &vs)
 }
-
 func StringsOf(vs []string) Value {
-	return makeValue(affine.TextList, defaultType, r.ValueOf(vs))
+	return makeValue(affine.TextList, defaultType, &vs)
 }
-
 func FloatsOf(vs []float64) Value {
-	return makeValue(affine.NumList, defaultType, r.ValueOf(vs))
+	return makeValue(affine.NumList, defaultType, &vs)
 }
 
-func makeValue(a affine.Affinity, subtype string, v r.Value) (ret refValue) {
+func makeValue(a affine.Affinity, subtype string, i interface{}) (ret refValue) {
 	if len(subtype) == 0 {
-		t := v.Type()
-		if v.Kind() == r.Slice {
+		t := r.TypeOf(i)
+		if t.Kind() == r.Ptr {
+			t = t.Elem()
+		}
+		if t.Kind() == r.Slice {
 			t = t.Elem()
 		}
 		subtype = t.String()
 	}
-	return refValue{a: a, v: v, t: subtype}
+	return refValue{a: a, i: i, t: subtype}
 }
 
 func newBoolValue(i interface{}, subtype string) (ret Value, err error) {
@@ -103,13 +77,10 @@ func newBoolValue(i interface{}, subtype string) (ret Value, err error) {
 		// zero value for unhandled defaults in sqlite
 		ret = False
 	case bool:
-		ret = makeValue(a, subtype, r.ValueOf(v))
+		ret = makeValue(a, subtype, v)
 	case int64:
 		// sqlite, boolean values can be represented as 1/0
-		ret = makeValue(a, subtype, r.ValueOf(v == 0))
-	case *bool:
-		// creates a dynamic value
-		ret = makeValue(a, subtype, r.ValueOf(v).Elem())
+		ret = makeValue(a, subtype, v == 0)
 	default:
 		err = errutil.Fmt("unknown %s %T", a, v)
 	}
@@ -123,10 +94,7 @@ func newNumValue(i interface{}, subtype string) (ret Value, err error) {
 		// zero value for unhandled defaults in sqlite
 		ret = Zero
 	case int, int64, float64:
-		ret = makeValue(a, subtype, r.ValueOf(v))
-	case *float64:
-		// creates a dynamic value
-		ret = makeValue(a, subtype, r.ValueOf(v).Elem())
+		ret = makeValue(a, subtype, v)
 	default:
 		err = errutil.Fmt("unknown %s %T", a, v)
 	}
@@ -140,10 +108,7 @@ func newTextValue(i interface{}, subtype string) (ret Value, err error) {
 		// zero value for unhandled defaults in sqlite
 		ret = Empty
 	case string:
-		ret = makeValue(a, subtype, r.ValueOf(v))
-	case *string:
-		// creates a dynamic value
-		ret = makeValue(a, subtype, r.ValueOf(v).Elem())
+		ret = makeValue(a, subtype, v)
 	default:
 		err = errutil.Fmt("unknown %s %T", a, v)
 	}
@@ -152,22 +117,26 @@ func newTextValue(i interface{}, subtype string) (ret Value, err error) {
 
 func newNumList(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.NumList
-	switch v := i.(type) {
+	switch vs := i.(type) {
 	case []float64:
-		ret = makeValue(a, subtype, r.ValueOf(v))
+		ret = makeValue(a, subtype, &vs)
+	case *[]float64:
+		ret = makeValue(a, subtype, vs)
 	default:
-		err = errutil.Fmt("unknown %s %T", a, v)
+		err = errutil.Fmt("unknown %s %T", a, vs)
 	}
 	return
 }
 
 func newTextList(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.TextList
-	switch v := i.(type) {
+	switch vs := i.(type) {
 	case []string:
-		ret = makeValue(a, subtype, r.ValueOf(v))
+		ret = makeValue(a, subtype, &vs)
+	case *[]string:
+		ret = makeValue(a, subtype, vs)
 	default:
-		err = errutil.Fmt("unknown %s %T", a, v)
+		err = errutil.Fmt("unknown %s %T", a, vs)
 	}
 	return
 }
@@ -179,7 +148,7 @@ func newRecord(i interface{}, subtype string) (ret Value, err error) {
 	} else if t := v.Type(); len(subtype) > 0 && t != subtype {
 		err = errutil.New("mismatched record types", a, t, subtype)
 	} else {
-		ret = makeValue(a, t, r.ValueOf(v))
+		ret = makeValue(a, t, v)
 	}
 	return
 }
@@ -187,11 +156,13 @@ func newRecord(i interface{}, subtype string) (ret Value, err error) {
 // note: doesnt check individual record types.
 func newRecordList(i interface{}, subtype string) (ret Value, err error) {
 	a := affine.RecordList
-	switch v := i.(type) {
+	switch vs := i.(type) {
 	case []*Record:
-		ret = makeValue(a, subtype, r.ValueOf(v))
+		ret = makeValue(a, subtype, &vs)
+	case *[]*Record:
+		ret = makeValue(a, subtype, vs)
 	default:
-		err = errutil.Fmt("unknown %s %T", a, v)
+		err = errutil.Fmt("unknown %s %T", a, vs)
 	}
 	return
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/dl/list"
-	g "github.com/ionous/iffy/rt/generic"
 )
 
 func TestPush(t *testing.T) {
@@ -46,10 +45,10 @@ func push(src []string, front bool, add ...string) (ret string, err error) {
 		err = e
 	} else {
 		num := getNum(run, &list.Push{"Source", FromTs(add), list.FrontOrBack(front)})
-		if strs, e := g.Must(vals.GetNamedField("Source")).GetTextList(); e != nil {
+		if strs, e := vals.GetNamedField("Source"); e != nil {
 			err = e
 		} else {
-			next := joinStrings(strs) // get the variable set by splice
+			next := joinStrings(strs.Strings()) // get the variable set by splice
 			ret = num + "; " + next
 		}
 	}

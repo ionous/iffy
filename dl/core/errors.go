@@ -23,6 +23,6 @@ func cmdError(op composer.Slat, e error) error {
 	return errutil.Append(&CommandError{Cmd: op}, e)
 }
 
-func cmdErrorCtx(op composer.Slat, Ctx string, e error) error {
-	return errutil.Append(&CommandError{Cmd: op, Ctx: Ctx}, e)
+func cmdErrorCtx(op composer.Slat, ctx string, e error) error {
+	return errutil.Append(&CommandError{Cmd: op, Ctx: ctx}, e)
 }

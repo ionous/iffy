@@ -9,16 +9,16 @@ type Execute interface {
 
 // BoolEval represents some boolean logic expression.
 type BoolEval interface {
-	GetBool(Runtime) (bool, error)
+	GetBool(Runtime) (g.Value, error)
 }
 
 // NumberEval represents some numeric expression.
 type NumberEval interface {
-	GetNumber(Runtime) (float64, error)
+	GetNumber(Runtime) (g.Value, error)
 }
 
 type TextEval interface {
-	GetText(Runtime) (string, error)
+	GetText(Runtime) (g.Value, error)
 }
 
 // ObjectEval represents something made of fields.
@@ -28,12 +28,12 @@ type ObjectEval interface {
 
 // NumListEval returns or generates a series of numbers.
 type NumListEval interface {
-	GetNumList(Runtime) ([]float64, error)
+	GetNumList(Runtime) (g.Value, error)
 }
 
 // TextListEval returns or generates a series of strings.
 type TextListEval interface {
-	GetTextList(Runtime) ([]string, error)
+	GetTextList(Runtime) (g.Value, error)
 }
 
 // ObjectEval returns or generates a series of object instances.

@@ -3,6 +3,8 @@ package pattern
 import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/chain"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type NumListPattern struct {
@@ -23,14 +25,14 @@ func (ps *NumListPattern) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err er
 	return ps.Rules[i].GetFlags(run)
 }
 
-func (ps *NumListPattern) GetNumList(run rt.Runtime) (ret []float64, err error) {
+func (ps *NumListPattern) GetNumList(run rt.Runtime) (ret g.Value, err error) {
 	if inds, e := splitNumbers(run, ps.Rules); e != nil {
 		err = e
 	} else {
 		// fix: simplify this, doesnt need the iterators
 		it := numIterator{run, ps, inds, 0}
 		x := chain.NewStreamOfStreams(&it)
-		ret, err = rt.CompactNumbers(x, nil)
+		ret, err = g.CompactNumbers(x, nil)
 	}
 	return
 }
@@ -40,14 +42,14 @@ func (ps *TextListPattern) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err e
 	return ps.Rules[i].GetFlags(run)
 }
 
-func (ps *TextListPattern) GetTextList(run rt.Runtime) (ret []string, err error) {
+func (ps *TextListPattern) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	if inds, e := splitText(run, ps.Rules); e != nil {
 		err = e
 	} else {
 		it := textIterator{run, ps, inds, 0}
 		// fix: simplify this, doesnt need the iterators
 		x := chain.NewStreamOfStreams(&it)
-		ret, err = rt.CompactTexts(x, nil)
+		ret, err = g.CompactTexts(x, nil)
 	}
 	return
 }
@@ -62,7 +64,7 @@ func (ps *ActivityPattern) Execute(run rt.Runtime) (err error) {
 		err = e
 	} else {
 		for _, i := range inds {
-			if e := rt.RunOne(run, ps.Rules[i].Execute); e != nil {
+			if e := safe.Run(run, ps.Rules[i].Execute); e != nil {
 				err = e
 				break
 			}

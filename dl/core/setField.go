@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type SetField struct {
@@ -20,14 +21,14 @@ func (*SetField) Compose() composer.Spec {
 }
 
 func (op *SetField) Execute(run rt.Runtime) (err error) {
-	if obj, e := rt.GetObject(run, op.Obj); e != nil {
+	if obj, e := safe.GetObject(run, op.Obj); e != nil {
 		err = e
 	} else if val, e := GetAssignedValue(run, op.From); e != nil {
 		err = e
 	} else {
 		// if its going to a record, it should have been a move or copy assignment.
 		// in either case, we're overwriting the value.
-		err = obj.SetNamedField(op.Field, val)
+		err = obj.SetFieldByName(op.Field, val)
 	}
 	return
 }

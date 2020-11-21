@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Splice struct {
@@ -32,7 +33,7 @@ and true/false values can't be added to a list.`,
 }
 
 func (op *Splice) Execute(run rt.Runtime) (err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = cmdError(op, e)
 	} else {
 		switch a := vs.Affinity(); a {
@@ -48,33 +49,32 @@ func (op *Splice) Execute(run rt.Runtime) (err error) {
 }
 
 // returns the removed elements
-func (op *Splice) GetNumList(run rt.Runtime) (ret []float64, err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+func (op *Splice) GetNumList(run rt.Runtime) (ret g.Value, err error) {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = cmdError(op, e)
 	} else if vals, e := op.spliceNumbers(run, vs); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = vals
+		ret = g.FloatsOf(vals)
 	}
 	return
 }
 
 // returns the removed elements
-func (op *Splice) GetTextList(run rt.Runtime) (ret []string, err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+func (op *Splice) GetTextList(run rt.Runtime) (ret g.Value, err error) {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = cmdError(op, e)
 	} else if vals, e := op.spliceText(run, vs); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = vals
+		ret = g.StringsOf(vals)
 	}
 	return
 }
 
 func (op *Splice) spliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err error) {
-	if els, e := vs.GetNumList(); e != nil {
-		err = e
-	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
+	els := vs.Floats()
+	if i, j, e := op.getIndices(run, len(els)); e != nil {
 		err = e
 	} else if add, e := getNewFloats(run, op.Insert); e != nil {
 		err = e
@@ -84,12 +84,12 @@ func (op *Splice) spliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err 
 			// as long as the range was valid we take the result and set it back...
 			// even if no elements are cut or inserted.
 			// ( that bakes any evaluation that might have been in the target )
-			ret = g.CopyFloats(els[i:j]) // before we start altering the memory of els, copy out
+			out := g.CopyFloats(els[i:j]) // before we start altering the memory of els, copy out
 			newVals := append(els[:i], append(add, els[j:]...)...)
-			if vs, e := g.ValueOf(newVals); e != nil {
+			if e := run.SetField(object.Variables, op.List, g.FloatsOf(newVals)); e != nil {
 				err = e
-			} else if e := run.SetField(object.Variables, op.List, vs); e != nil {
-				err = e
+			} else {
+				ret = out
 			}
 		}
 	}
@@ -98,21 +98,20 @@ func (op *Splice) spliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err 
 
 // returns the removed elements
 func (op *Splice) spliceText(run rt.Runtime, vs g.Value) (ret []string, err error) {
-	if els, e := vs.GetTextList(); e != nil {
-		err = cmdError(op, e)
-	} else if i, j, e := op.getIndices(run, len(els)); e != nil {
-		err = cmdError(op, e)
+	els := vs.Strings()
+	if i, j, e := op.getIndices(run, len(els)); e != nil {
+		err = e
 	} else if add, e := getNewStrings(run, op.Insert); e != nil {
-		err = cmdError(op, e)
+		err = e
 	} else {
 		// ... mirrors GetNumList()
 		if i >= 0 && j >= i {
-			ret = g.CopyStrings(els[i:j])
+			out := g.CopyStrings(els[i:j])
 			newVals := append(els[:i], append(add, els[j:]...)...)
-			if vs, e := g.ValueOf(newVals); e != nil {
+			if e := run.SetField(object.Variables, op.List, g.StringsOf(newVals)); e != nil {
 				err = e
-			} else if e := run.SetField(object.Variables, op.List, vs); e != nil {
-				err = cmdError(op, e)
+			} else {
+				ret = out
 			}
 		}
 	}
@@ -121,13 +120,13 @@ func (op *Splice) spliceText(run rt.Runtime, vs g.Value) (ret []string, err erro
 
 // reti is < 0 to indicate an empty list
 func (op *Splice) getIndices(run rt.Runtime, cnt int) (reti, retj int, err error) {
-	if i, e := rt.GetOptionalNumber(run, op.Start, 0); e != nil {
+	if i, e := safe.GetOptionalNumber(run, op.Start, 0); e != nil {
 		err = e
-	} else if rng, e := rt.GetOptionalNumber(run, op.Remove, 0); e != nil {
+	} else if rng, e := safe.GetOptionalNumber(run, op.Remove, 0); e != nil {
 		err = e
 	} else {
-		reti = clipStart(int(i), cnt)
-		retj = clipRange(reti, int(rng), cnt)
+		reti = clipStart(i.Int(), cnt)
+		retj = clipRange(reti, rng.Int(), cnt)
 	}
 	return
 }

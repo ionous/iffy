@@ -6,6 +6,8 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type Matches struct {
@@ -44,13 +46,14 @@ func (*MatchLike) Compose() composer.Spec {
 	}
 }
 
-func (op *Matches) GetBool(run rt.Runtime) (ret bool, err error) {
-	if text, e := rt.GetText(run, op.Text); e != nil {
+func (op *Matches) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if text, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
 	} else if exp, e := op.getRegexp(); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = exp.MatchString(text)
+		b := exp.MatchString(text.String())
+		ret = g.BoolOf(b)
 	}
 	return
 }
@@ -70,19 +73,21 @@ func (op *Matches) getRegexp() (ret *regexp.Regexp, err error) {
 	return
 }
 
-func (op *MatchLike) GetBool(run rt.Runtime) (ret bool, err error) {
+func (op *MatchLike) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	type isLike interface {
 		IsLike(text, pattern string) (bool, error)
 	}
 	if isLike, ok := run.(isLike); !ok {
 		e := errutil.New("the runtime doesnt implement the like matcher interface")
 		err = cmdError(op, e)
-	} else if text, e := rt.GetText(run, op.Text); e != nil {
+	} else if text, e := safe.GetText(run, op.Text); e != nil {
 		err = cmdError(op, e)
-	} else if pattern, e := rt.GetText(run, op.Pattern); e != nil {
+	} else if pattern, e := safe.GetText(run, op.Pattern); e != nil {
 		err = cmdError(op, e)
+	} else if b, e := isLike.IsLike(text.String(), pattern.String()); e != nil {
+		cmdError(op, e)
 	} else {
-		ret, err = isLike.IsLike(text, pattern)
+		ret = g.BoolOf(b)
 	}
 	return
 }

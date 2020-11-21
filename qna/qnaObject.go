@@ -39,7 +39,7 @@ func (q *qnaObject) Type() string {
 	return "object{}"
 }
 
-func (q *qnaObject) GetNamedField(field string) (ret g.Value, err error) {
+func (q *qnaObject) FieldByName(field string) (ret g.Value, err error) {
 	// fix temp:
 	var key keyType
 	switch field {
@@ -52,7 +52,7 @@ func (q *qnaObject) GetNamedField(field string) (ret g.Value, err error) {
 	return q.n.getField(key)
 }
 
-func (q *qnaObject) SetNamedField(field string, val g.Value) (err error) {
+func (q *qnaObject) SetFieldByName(field string, val g.Value) (err error) {
 	if len(field) == 0 {
 		err = errutil.Fmt("no field specified")
 	} else if writable := field[0] != object.Prefix; !writable {

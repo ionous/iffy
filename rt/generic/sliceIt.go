@@ -1,9 +1,5 @@
 package generic
 
-import (
-	"math"
-)
-
 func SliceFloats(vs []float64) Iterator {
 	return SliceIt(len(vs), func(i int) (ret Value, err error) {
 		ret = FloatOf(vs[i])
@@ -22,17 +18,12 @@ func SliceIt(size int, next func(int) (Value, error)) *sliceIt {
 	return &sliceIt{size: size, next: next}
 }
 
+// panics if the value isnt a list
 func ListIt(v Value) (ret *sliceIt) {
-	if cnt, e := v.GetLen(); e != nil {
-		ret = SliceIt(math.MaxInt64, func(i int) (Value, error) {
-			return nil, e
-		})
-	} else {
-		ret = SliceIt(cnt, func(i int) (Value, error) {
-			return v.GetIndex(i)
-		})
-	}
-	return
+	return SliceIt(v.Len(), func(i int) (ret Value, _ error) {
+		ret = v.Index(i)
+		return
+	})
 }
 
 type sliceIt struct {

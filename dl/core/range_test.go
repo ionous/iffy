@@ -4,13 +4,19 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 	"github.com/kr/pretty"
 )
 
 func TestRange(t *testing.T) {
 	list := func(eval rt.NumListEval) (ret []float64, err error) {
 		var run baseRuntime
-		return rt.GetNumList(&run, eval)
+		if vs, e := safe.GetNumList(&run, eval); e != nil {
+			err = e
+		} else {
+			ret = vs.Floats()
+		}
+		return
 	}
 	t.Run("range(10)", func(t *testing.T) {
 		want := []float64{

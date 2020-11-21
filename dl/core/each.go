@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 	"github.com/ionous/iffy/rt/scope"
 )
 
@@ -46,11 +47,10 @@ func (*ForEachNum) Compose() composer.Spec {
 }
 
 func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
-	if vs, e := rt.GetNumList(run, f.In); e != nil {
+	if vs, e := safe.GetNumList(run, f.In); e != nil {
 		err = e
 	} else {
-		it := g.SliceFloats(vs)
-		err = scope.LoopOver(run, "num", it, f.Go, f.Else)
+		err = scope.LoopOver(run, "num", g.ListIt(vs), f.Go, f.Else)
 	}
 	return
 }
@@ -65,11 +65,10 @@ func (*ForEachText) Compose() composer.Spec {
 }
 
 func (f *ForEachText) Execute(run rt.Runtime) (err error) {
-	if vs, e := rt.GetTextList(run, f.In); e != nil {
+	if vs, e := safe.GetTextList(run, f.In); e != nil {
 		err = e
 	} else {
-		it := g.SliceStrings(vs)
-		err = scope.LoopOver(run, "text", it, f.Go, f.Else)
+		err = scope.LoopOver(run, "text", g.ListIt(vs), f.Go, f.Else)
 	}
 	return
 }

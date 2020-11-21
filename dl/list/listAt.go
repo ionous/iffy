@@ -1,10 +1,11 @@
 package list
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 type At struct {
@@ -22,47 +23,27 @@ func (*At) Compose() composer.Spec {
 	}
 }
 
-func (op *At) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if el, e := op.getEl(run); e != nil {
-		err = cmdError(op, e)
-	} else if n, e := el.GetNumber(); e != nil {
-		err = cmdError(op, e)
-	} else {
-		ret = float64(n)
-	}
-	return
+func (op *At) GetNumber(run rt.Runtime) (g.Value, error) {
+	return op.getAt(run, affine.NumList)
 }
 
-func (op *At) GetText(run rt.Runtime) (ret string, err error) {
-	if el, e := op.getEl(run); e != nil {
-		err = cmdError(op, e)
-	} else if n, e := el.GetText(); e != nil {
-		err = cmdError(op, e)
-	} else {
-		ret = n
-	}
-	return
+func (op *At) GetText(run rt.Runtime) (g.Value, error) {
+	return op.getAt(run, affine.TextList)
 }
 
-func (op *At) GetObject(run rt.Runtime) (ret g.Value, err error) {
-	if el, e := op.getEl(run); e != nil {
-		err = cmdError(op, e)
-	} else {
-		ret = el
-	}
-	return
+func (op *At) GetObject(run rt.Runtime) (g.Value, error) {
+	return op.getAt(run, affine.RecordList)
 }
 
-//
-func (op *At) getEl(run rt.Runtime) (ret g.Value, err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
-		err = e
-	} else if idx, e := rt.GetNumber(run, op.Index); e != nil {
-		err = e
-	} else if el, e := vs.GetIndex(int(idx) - 1); e != nil {
-		err = e
+func (op *At) getAt(run rt.Runtime, aff affine.Affinity) (ret g.Value, err error) {
+	if vs, e := safe.Variable(run, op.List, aff); e != nil {
+		err = cmdError(op, e)
+	} else if idx, e := safe.GetNumber(run, op.Index); e != nil {
+		err = cmdError(op, e)
+	} else if i, e := safe.Range(idx.Int()-1, 0, vs.Len()); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret = el
+		ret = vs.Index(i)
 	}
 	return
 }

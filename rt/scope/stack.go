@@ -53,6 +53,7 @@ func (k *ScopeStack) SetField(target, field string, v g.Value) (err error) {
 		return scope.SetField(target, norm, v)
 	})
 }
+
 func (k *ScopeStack) visit(target, field string, visitor func(rt.Scope) error) (err error) {
 	for i := len(k.Scopes) - 1; i >= 0; i-- {
 		switch e := visitor(k.Scopes[i]); e.(type) {

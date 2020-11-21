@@ -19,20 +19,16 @@ func RecordToValue(d *Record) map[string]interface{} {
 		} else {
 			var el interface{}
 			switch a := rv.Affinity(); a {
+			case affine.TextList:
+				el = rv.Strings()
+			case affine.NumList:
+				el = rv.Floats()
 			case affine.Record:
-				if d, e := rv.GetRecord(); e != nil {
-					panic(e)
-				} else {
-					el = RecordToValue(d)
-				}
+				el = RecordToValue(rv.Record())
 			case affine.RecordList:
-				if ds, e := rv.GetRecordList(); e != nil {
-					panic(e)
-				} else {
-					el = RecordsToValue(ds)
-				}
+				el = RecordsToValue(rv.Records())
 			default:
-				el = rv.(refValue).v.Interface()
+				el = rv.(refValue).i
 			}
 			m[f.Name] = el
 		}

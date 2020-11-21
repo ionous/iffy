@@ -39,7 +39,7 @@ func TestMatching(t *testing.T) {
 	{
 		if ok, e := runMatching.GetBool(&lt); e != nil {
 			t.Fatal(e)
-		} else if ok != true {
+		} else if ok.Bool() != true {
 			t.Fatal(e)
 		}
 	}
@@ -49,7 +49,7 @@ func TestMatching(t *testing.T) {
 			t.Fatal(e)
 		} else if ok, e := runMatching.GetBool(&lt); e != nil {
 			t.Fatal(e)
-		} else if ok != false {
+		} else if ok.Bool() != false {
 			t.Fatal(e)
 		}
 	}
@@ -59,7 +59,7 @@ func TestMatching(t *testing.T) {
 			t.Fatal(e)
 		} else if ok, e := runMatching.GetBool(&lt); e != nil {
 			t.Fatal(e)
-		} else if ok != true {
+		} else if ok.Bool() != true {
 			t.Fatal(e)
 		}
 	}
@@ -75,7 +75,7 @@ func TestMatching(t *testing.T) {
 			t.Fatal(e)
 		} else if ok, e := runMatching.GetBool(&lt); e != nil {
 			t.Fatal(e)
-		} else if ok != true {
+		} else if ok.Bool() != true {
 			t.Fatal(e)
 		}
 	}
@@ -85,7 +85,7 @@ func TestMatching(t *testing.T) {
 			t.Fatal(e)
 		} else if ok, e := runMatching.GetBool(&lt); e != nil {
 			t.Fatal(e)
-		} else if ok != true {
+		} else if ok.Bool() != true {
 			t.Fatal(e)
 		}
 	}
@@ -128,7 +128,7 @@ func TestGrouping(t *testing.T) {
 			t.Fatal("collateGroups", e)
 		} else if collation, e := values.GetNamedField("Collation"); e != nil {
 			t.Fatal(e)
-		} else if groups, e := g.Must(collation.GetNamedField("Groups")).GetRecordList(); e != nil {
+		} else if groups, e := collation.FieldByName("Groups"); e != nil {
 			t.Fatal(e)
 		} else {
 			expect := []interface{}{
@@ -151,7 +151,9 @@ func TestGrouping(t *testing.T) {
 					"Objects": []string{"thing#1", "thing#2"},
 				},
 			}
-			if diff := pretty.Diff(expect, g.RecordsToValue(groups)); len(diff) > 0 {
+			got := g.RecordsToValue(groups.Records())
+			if diff := pretty.Diff(expect, got); len(diff) > 0 {
+				t.Log(pretty.Sprint(got))
 				t.Fatal(diff)
 			}
 		}

@@ -1,9 +1,10 @@
 package core
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // IsTrue transparently returns a boolean eval.
@@ -27,9 +28,9 @@ func (*IsTrue) Compose() composer.Spec {
 	}
 }
 
-func (op *IsTrue) GetBool(run rt.Runtime) (ret bool, err error) {
-	if val, e := rt.GetBool(run, op.Test); e != nil {
-		err = errutil.New("IsNot.Negate", e)
+func (op *IsTrue) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if val, e := safe.GetBool(run, op.Test); e != nil {
+		err = cmdError(op, e)
 	} else {
 		ret = val
 	}
@@ -44,11 +45,11 @@ func (*IsNotTrue) Compose() composer.Spec {
 	}
 }
 
-func (op *IsNotTrue) GetBool(run rt.Runtime) (ret bool, err error) {
-	if val, e := rt.GetBool(run, op.Test); e != nil {
-		err = errutil.New("IsNot.Negate", e)
+func (op *IsNotTrue) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if val, e := safe.GetBool(run, op.Test); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret = !val
+		ret = g.BoolOf(!val.Bool())
 	}
 	return
 }

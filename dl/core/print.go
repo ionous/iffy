@@ -6,6 +6,8 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // PrintNum writes a number using numerals, eg. "1".
@@ -28,13 +30,13 @@ func (*PrintNum) Compose() composer.Spec {
 	}
 }
 
-func (p *PrintNum) GetText(run rt.Runtime) (ret string, err error) {
-	if n, e := rt.GetNumber(run, p.Num); e != nil {
-		err = e
-	} else if s := strconv.FormatFloat(n, 'g', -1, 64); len(s) > 0 {
-		ret = s
+func (op *PrintNum) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if n, e := safe.GetNumber(run, op.Num); e != nil {
+		err = cmdError(op, e)
+	} else if s := strconv.FormatFloat(n.Float(), 'g', -1, 64); len(s) > 0 {
+		ret = g.StringOf(s)
 	} else {
-		ret = "<num>"
+		ret = g.StringOf("<num>")
 	}
 	return
 }
@@ -48,13 +50,13 @@ func (*PrintNumWord) Compose() composer.Spec {
 	}
 }
 
-func (p *PrintNumWord) GetText(run rt.Runtime) (ret string, err error) {
-	if n, e := rt.GetNumber(run, p.Num); e != nil {
-		err = e
-	} else if s, ok := lang.NumToWords(int(n)); ok {
-		ret = s
+func (op *PrintNumWord) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if n, e := safe.GetNumber(run, op.Num); e != nil {
+		err = cmdError(op, e)
+	} else if s, ok := lang.NumToWords(n.Int()); ok {
+		ret = g.StringOf(s)
 	} else {
-		ret = "<num>"
+		ret = g.StringOf("<num>")
 	}
 	return
 }

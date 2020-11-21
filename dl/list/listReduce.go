@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // A normal reduce would return a value, instead we accumulate into a variable
@@ -30,9 +31,9 @@ func (op *Reduce) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Reduce) execute(run rt.Runtime) (err error) {
-	if fromList, e := run.GetField(object.Variables, op.FromList); e != nil {
+	if fromList, e := safe.GetList(run, op.FromList); e != nil {
 		err = e
-	} else if outVal, e := run.GetField(object.Variables, op.IntoValue); e != nil {
+	} else if outVal, e := safe.Variable(run, op.IntoValue, ""); e != nil {
 		err = e
 	} else if e := op.cacheKinds(run, op.UsingPattern); e != nil {
 		err = e

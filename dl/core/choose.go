@@ -3,6 +3,8 @@ package core
 import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // Choose to execute one of two blocks based on a boolean test.
@@ -32,17 +34,19 @@ func (*Choose) Compose() composer.Spec {
 
 // Execute evals, eats the returns
 func (op *Choose) Execute(run rt.Runtime) (err error) {
-	if b, e := rt.GetBool(run, op.If); e != nil {
-		err = e
+	if b, e := safe.GetBool(run, op.If); e != nil {
+		err = cmdError(op, e)
 	} else {
 		var next *Activity
-		if b {
+		if b.Bool() {
 			next = op.True
 		} else {
 			next = op.False
 		}
 		if next != nil {
-			err = rt.RunOne(run, next)
+			if e := safe.Run(run, next); e != nil {
+				err = cmdError(op, e)
+			}
 		}
 	}
 	return
@@ -56,18 +60,20 @@ func (*ChooseNum) Compose() composer.Spec {
 	}
 }
 
-func (op *ChooseNum) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if b, e := rt.GetBool(run, op.If); e != nil {
-		err = e
+func (op *ChooseNum) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+	if b, e := safe.GetBool(run, op.If); e != nil {
+		err = cmdError(op, e)
 	} else {
 		var next rt.NumberEval
-		if b {
+		if b.Bool() {
 			next = op.True
 		} else {
 			next = op.False
 		}
-		if next != nil {
-			ret, err = rt.GetNumber(run, next)
+		if v, e := safe.GetOptionalNumber(run, next, 0); e != nil {
+			err = cmdError(op, e)
+		} else {
+			ret = v
 		}
 	}
 	return
@@ -81,18 +87,20 @@ func (*ChooseText) Compose() composer.Spec {
 	}
 }
 
-func (op *ChooseText) GetText(run rt.Runtime) (ret string, err error) {
-	if b, e := rt.GetBool(run, op.If); e != nil {
-		err = e
+func (op *ChooseText) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if b, e := safe.GetBool(run, op.If); e != nil {
+		err = cmdError(op, e)
 	} else {
 		var next rt.TextEval
-		if b {
+		if b.Bool() {
 			next = op.True
 		} else {
 			next = op.False
 		}
-		if next != nil {
-			ret, err = rt.GetText(run, next)
+		if v, e := safe.GetOptionalText(run, next, ""); e != nil {
+			err = cmdError(op, e)
+		} else {
+			ret = v
 		}
 	}
 	return

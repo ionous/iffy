@@ -27,6 +27,11 @@ const (
 	// Verb        Affinity = "verb"
 )
 
+func IsList(a Affinity) bool {
+	elAffinity := Element(a)
+	return len(elAffinity) > 0
+}
+
 // return the affinity of an affine list, or blank if not a list.
 func Element(list Affinity) (ret Affinity) {
 	switch a := list; a {
@@ -38,13 +43,4 @@ func Element(list Affinity) (ret Affinity) {
 		ret = Record
 	}
 	return
-}
-
-func MatchTypes(a Affinity, at string, b Affinity, bt string) bool {
-	return a == b && ((a != Record && a != RecordList) || (at == bt))
-}
-
-func IsList(a Affinity) bool {
-	elAffinity := Element(a)
-	return len(elAffinity) > 0
 }

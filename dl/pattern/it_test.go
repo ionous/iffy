@@ -48,10 +48,8 @@ func TestTextIteration(t *testing.T) {
 				} else {
 					if txt, e := it.GetNext(); e != nil {
 						t.Fatal(e)
-					} else if txt, e := txt.GetText(); e != nil {
-						t.Fatal(e)
 					} else {
-						str += txt
+						str += txt.String()
 					}
 				}
 			}
@@ -83,10 +81,8 @@ func TestNumIteration(t *testing.T) {
 				t.Fatal(g.StreamExceeded)
 			} else if num, e := it.GetNext(); e != nil {
 				t.Fatal(e)
-			} else if num, e := num.GetNumber(); e != nil {
-				t.Fatal(e)
 			} else {
-				fin += num * math.Pow10(cnt-i-1)
+				fin += num.Float() * math.Pow10(cnt-i-1)
 			}
 
 		}
@@ -98,22 +94,22 @@ func TestNumIteration(t *testing.T) {
 
 type Text string
 
-func (t Text) GetTextList(rt.Runtime) ([]string, error) {
+func (t Text) GetTextList(rt.Runtime) (g.Value, error) {
 	v := string(t) // for testing we return a slice of one string
-	return sliceOf.String(v), nil
+	return g.StringsOf(sliceOf.String(v)), nil
 }
 
 type Number float64
 
-func (n Number) GetNumList(rt.Runtime) ([]float64, error) {
+func (n Number) GetNumList(rt.Runtime) (g.Value, error) {
 	v := float64(n) // for testing we return a slice of one number
-	return sliceOf.Float64(v), nil
+	return g.FloatsOf(sliceOf.Float64(v)), nil
 }
 
 type Bool bool
 
-func (b Bool) GetBool(rt.Runtime) (bool, error) {
-	return bool(b), nil
+func (b Bool) GetBool(rt.Runtime) (g.Value, error) {
+	return g.BoolOf(bool(b)), nil
 }
 
 var Skip = Bool(false)

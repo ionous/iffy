@@ -6,15 +6,17 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 func getPair(run rt.Runtime, a, b rt.NumberEval) (reta, retb float64, err error) {
-	if a, e := rt.GetNumber(run, a); e != nil {
+	if a, e := safe.GetNumber(run, a); e != nil {
 		err = errutil.New("couldnt get first operand, because", e)
-	} else if b, e := rt.GetNumber(run, b); e != nil {
+	} else if b, e := safe.GetNumber(run, b); e != nil {
 		err = errutil.New("couldnt get second operand, because", e)
 	} else {
-		reta, retb = a, b
+		reta, retb = a.Float(), b.Float()
 	}
 	return
 }
@@ -34,11 +36,11 @@ func (*SumOf) Compose() composer.Spec {
 	}
 }
 
-func (cmd *SumOf) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("SumOf", e)
+func (op *SumOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+	if a, b, e := getPair(run, op.A, op.B); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret = a + b
+		ret = g.FloatOf(a + b)
 	}
 	return
 }
@@ -52,11 +54,11 @@ func (*DiffOf) Compose() composer.Spec {
 	}
 }
 
-func (cmd *DiffOf) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("DiffOf", e)
+func (op *DiffOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+	if a, b, e := getPair(run, op.A, op.B); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret = a - b
+		ret = g.FloatOf(a - b)
 	}
 	return
 }
@@ -70,11 +72,11 @@ func (*ProductOf) Compose() composer.Spec {
 	}
 }
 
-func (cmd *ProductOf) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("ProductOf", e)
+func (op *ProductOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+	if a, b, e := getPair(run, op.A, op.B); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret = a * b
+		ret = g.FloatOf(a * b)
 	}
 	return
 }
@@ -88,13 +90,14 @@ func (*QuotientOf) Compose() composer.Spec {
 	}
 }
 
-func (cmd *QuotientOf) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("QuotientOf", e)
+func (op *QuotientOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+	if a, b, e := getPair(run, op.A, op.B); e != nil {
+		err = cmdError(op, e)
 	} else if math.Abs(b) <= 1e-5 {
-		err = errutil.New("QuotientOf second operand is too small")
+		e := errutil.New("QuotientOf second operand is too small")
+		err = cmdError(op, e)
 	} else {
-		ret = a / b
+		ret = g.FloatOf(a / b)
 	}
 	return
 }
@@ -108,11 +111,12 @@ func (*RemainderOf) Compose() composer.Spec {
 	}
 }
 
-func (cmd *RemainderOf) GetNumber(run rt.Runtime) (ret float64, err error) {
-	if a, b, e := getPair(run, cmd.A, cmd.B); e != nil {
-		err = errutil.New("RemainderOf", e)
+func (op *RemainderOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+	if a, b, e := getPair(run, op.A, op.B); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret = math.Mod(a, b)
+		mod := math.Mod(a, b)
+		ret = g.FloatOf(mod)
 	}
 	return
 }

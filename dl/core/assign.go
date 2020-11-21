@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // Assignment helps limit variable and parameter assignment to particular contexts.
@@ -18,7 +19,7 @@ type Assignment interface {
 
 func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 	if a == nil {
-		err = rt.MissingEval("empty assignment")
+		err = safe.MissingEval("empty assignment")
 	} else {
 		ret, err = a.GetAssignedValue(run)
 	}
@@ -86,10 +87,10 @@ func (*FromBool) Compose() composer.Spec {
 }
 
 func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if val, e := rt.GetBool(run, op.Val); e != nil {
+	if val, e := safe.GetBool(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.BoolOf(val)
+		ret = val
 	}
 	return
 }
@@ -108,10 +109,10 @@ func (*FromNum) Compose() composer.Spec {
 }
 
 func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if val, e := rt.GetNumber(run, op.Val); e != nil {
+	if val, e := safe.GetNumber(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.FloatOf(val)
+		ret = val
 	}
 	return
 }
@@ -129,10 +130,10 @@ func (*FromText) Compose() composer.Spec {
 }
 
 func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if val, e := rt.GetText(run, op.Val); e != nil {
+	if val, e := safe.GetText(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.StringOf(val)
+		ret = val
 	}
 	return
 }
@@ -150,7 +151,7 @@ func (*FromObject) Compose() composer.Spec {
 }
 
 func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if obj, e := rt.GetObject(run, op.Val); e != nil {
+	if obj, e := safe.GetObject(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = obj
@@ -171,10 +172,10 @@ func (*FromNumList) Compose() composer.Spec {
 }
 
 func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if vals, e := rt.GetNumList(run, op.Vals); e != nil {
+	if vals, e := safe.GetNumList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.FloatsOf(vals)
+		ret = vals
 	}
 	return
 }
@@ -192,10 +193,10 @@ func (*FromTextList) Compose() composer.Spec {
 }
 
 func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if vals, e := rt.GetTextList(run, op.Vals); e != nil {
+	if vals, e := safe.GetTextList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = g.StringsOf(vals)
+		ret = vals
 	}
 	return
 }
@@ -213,7 +214,7 @@ func (*FromObjectList) Compose() composer.Spec {
 }
 
 func (op *FromObjectList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if objs, e := rt.GetObjectList(run, op.Vals); e != nil {
+	if objs, e := safe.GetObjectList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = objs

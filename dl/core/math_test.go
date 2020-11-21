@@ -5,14 +5,15 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/test"
 )
 
 func TestMath(t *testing.T) {
 	match := func(v float64, eval rt.NumberEval) (err error) {
-		var run rt.Panic
+		var run test.PanicRuntime
 		if n, e := eval.GetNumber(&run); e != nil {
 			err = e
-		} else if n != v {
+		} else if n.Float() != v {
 			err = errutil.Fmt("%v != %v (have != want)", n, v)
 		}
 		return

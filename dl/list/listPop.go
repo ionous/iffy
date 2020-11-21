@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 	"github.com/ionous/iffy/rt/scope"
 )
 
@@ -37,41 +38,40 @@ func (op *Pop) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Pop) execute(run rt.Runtime) (err error) {
-	if vs, e := run.GetField(object.Variables, op.List); e != nil {
+	if vs, e := safe.GetList(run, op.List); e != nil {
 		err = e
 	} else if elAffinity := affine.Element(vs.Affinity()); len(elAffinity) == 0 {
 		err = errutil.Fmt("Variable %q is %q, pop expected a list", op.List, vs.Affinity())
-	} else if cnt, e := vs.GetLen(); e != nil {
-		err = e
-	} else if cnt == 0 && op.Else != nil {
-		err = op.Else.Execute(run)
 	} else {
-		const el = 0
-		if op.k == nil || op.k.IsStaleKind(run) {
-			op.k = g.NewKind(run, "", []g.Field{
-				{Name: op.With, Affinity: elAffinity, Type: vs.Type()},
-			})
-		}
-		ls := op.k.NewRecord()
-		//
-		var at, start, end int
-		if op.Front {
-			at, start, end = 0, 1, cnt
+		if cnt := vs.Len(); cnt == 0 && op.Else != nil {
+			err = op.Else.Execute(run)
 		} else {
-			at, start, end = cnt-1, 0, cnt-1
-		}
-		if popped, e := vs.GetIndex(at); e != nil {
-			err = e
-		} else if newEls, e := vs.Slice(start, end); e != nil {
-			err = e
-		} else if e := run.SetField(object.Variables, op.List, newEls); e != nil {
-			err = e
-		} else if e := ls.SetFieldByIndex(el, popped); e != nil {
-			err = e
-		} else if op.Go != nil {
-			run.PushScope(&scope.TargetRecord{object.Variables, ls})
-			err = op.Go.Execute(run)
-			run.PopScope()
+			const el = 0
+			if op.k == nil || op.k.IsStaleKind(run) {
+				op.k = g.NewKind(run, "", []g.Field{
+					{Name: op.With, Affinity: elAffinity, Type: vs.Type()},
+				})
+			}
+			ls := op.k.NewRecord()
+			//
+			var at, start, end int
+			if op.Front {
+				at, start, end = 0, 1, cnt
+			} else {
+				at, start, end = cnt-1, 0, cnt-1
+			}
+			popped := vs.Index(at)
+			if newEls, e := vs.Slice(start, end); e != nil {
+				err = e
+			} else if e := run.SetField(object.Variables, op.List, newEls); e != nil {
+				err = e
+			} else if e := ls.SetFieldByIndex(el, popped); e != nil {
+				err = e
+			} else if op.Go != nil {
+				run.PushScope(&scope.TargetRecord{object.Variables, ls})
+				err = op.Go.Execute(run)
+				run.PopScope()
+			}
 		}
 	}
 	return

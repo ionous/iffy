@@ -5,7 +5,10 @@ import (
 
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
+	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/print"
+	"github.com/ionous/iffy/rt/safe"
+	"github.com/ionous/iffy/rt/writer"
 )
 
 // Say some bit of text.
@@ -50,7 +53,7 @@ func (*Say) Compose() composer.Spec {
 
 // Execute writes text to the runtime's current writer.
 func (op *Say) Execute(run rt.Runtime) (err error) {
-	return rt.WriteText(run, op.Text)
+	return safe.WriteText(run, op.Text)
 }
 
 // Compose defines a spec for the composer editor.
@@ -61,16 +64,9 @@ func (*Buffer) Compose() composer.Spec {
 	}
 }
 
-func (op *Buffer) GetText(run rt.Runtime) (ret string, err error) {
+func (op *Buffer) GetText(run rt.Runtime) (g.Value, error) {
 	var buf bytes.Buffer
-	if e := rt.WritersBlock(run, &buf, func() error {
-		return rt.RunOne(run, op.Go)
-	}); e != nil {
-		err = e
-	} else {
-		ret = buf.String()
-	}
-	return
+	return writeSpan(run, &buf, op, op.Go, &buf)
 }
 
 // Compose defines a spec for the composer editor.
@@ -82,16 +78,9 @@ func (*Span) Compose() composer.Spec {
 	}
 }
 
-func (op *Span) GetText(run rt.Runtime) (ret string, err error) {
+func (op *Span) GetText(run rt.Runtime) (g.Value, error) {
 	span := print.NewSpanner() // separate punctuation with spaces
-	if e := rt.WritersBlock(run, span, func() error {
-		return rt.RunOne(run, op.Go)
-	}); e != nil {
-		err = e
-	} else {
-		ret = span.String()
-	}
-	return
+	return writeSpan(run, span, op, op.Go, span)
 }
 
 // Compose defines a spec for the composer editor.
@@ -103,17 +92,9 @@ func (*Bracket) Compose() composer.Spec {
 	}
 }
 
-func (op *Bracket) GetText(run rt.Runtime) (ret string, err error) {
+func (op *Bracket) GetText(run rt.Runtime) (g.Value, error) {
 	span := print.NewSpanner() // separate punctuation with spaces
-	w := print.Parens(span)
-	if e := rt.WritersBlock(run, w, func() error {
-		return rt.RunOne(run, op.Go)
-	}); e != nil {
-		err = e
-	} else {
-		ret = span.String()
-	}
-	return
+	return writeSpan(run, span, op, op.Go, print.Parens(span))
 }
 
 // Compose defines a spec for the composer editor.
@@ -125,17 +106,9 @@ func (*Slash) Compose() composer.Spec {
 	}
 }
 
-func (op *Slash) GetText(run rt.Runtime) (ret string, err error) {
+func (op *Slash) GetText(run rt.Runtime) (g.Value, error) {
 	span := print.NewSpanner() // separate punctuation with spaces
-	w := print.Slash(span)
-	if e := rt.WritersBlock(run, w, func() error {
-		return rt.RunOne(run, op.Go)
-	}); e != nil {
-		err = e
-	} else {
-		ret = span.String()
-	}
-	return
+	return writeSpan(run, span, op, op.Go, print.Slash(span))
 }
 
 // Compose defines a spec for the composer editor.
@@ -147,15 +120,20 @@ func (*Commas) Compose() composer.Spec {
 	}
 }
 
-func (op *Commas) GetText(run rt.Runtime) (ret string, err error) {
+func (op *Commas) GetText(run rt.Runtime) (g.Value, error) {
 	span := print.NewSpanner() // separate punctuation with spaces
-	w := print.AndSeparator(span)
+	return writeSpan(run, span, op, op.Go, print.AndSeparator(span))
+}
+
+type stringer interface{ String() string }
+
+func writeSpan(run rt.Runtime, span stringer, op composer.Slat, act *Activity, w writer.Output) (ret g.Value, err error) {
 	if e := rt.WritersBlock(run, w, func() error {
-		return rt.RunOne(run, op.Go)
+		return safe.Run(run, act)
 	}); e != nil {
-		err = e
+		err = cmdError(op, e)
 	} else {
-		ret = span.String()
+		ret = g.StringOf(span.String())
 	}
 	return
 }

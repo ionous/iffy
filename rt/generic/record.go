@@ -36,11 +36,10 @@ func (d *Record) GetNamedField(field string) (ret Value, err error) {
 			ft := k.fields[i]
 			if isTrait := ft.Type == "aspect" && ft.Name != field; !isTrait {
 				ret = v
-			} else if trait, e := v.GetText(); e != nil {
-				err = e
 			} else {
 				// if the field is an aspect, and the caller was asking for a trait...
 				// return the state of the trait
+				trait := v.String()
 				ret, err = newBoolValue(trait == field, "trait")
 			}
 		}
@@ -80,10 +79,9 @@ func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 // -or- if record.values stored refValues ( though that is random extra storage )
 func (d *Record) cache(i int, nv Value) (ret Value, err error) {
 	if el, ok := nv.(refValue); !ok {
-		err = errutil.New("unexpected error creating default values")
+		err = errutil.New("unexpected error storing %v(%T)", nv, nv)
 	} else {
-		d.values[i] = el.v.Interface()
-		ret = el
+		ret, d.values[i] = el, el.i
 	}
 	return
 }
@@ -96,10 +94,8 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 		ft := k.fields[i]
 		if isTrait := ft.Type == "aspect" && ft.Name != field; !isTrait {
 			err = d.SetFieldByIndex(i, val)
-		} else if yes, e := val.GetBool(); e != nil {
-			err = errutil.New("error setting trait:", e)
-		} else if !yes {
-			err = errutil.Fmt("error setting trait: couldn't determine the opposite of %q", field)
+		} else if yes := val.Affinity() == affine.Bool && val.Bool(); !yes {
+			err = errutil.Fmt("error setting trait: couldn't determine the meaning of %q %s %v", field, val.Affinity(), val)
 		} else {
 			// set the aspect to the value of the requested trait
 			d.values[i] = field
@@ -110,12 +106,14 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 
 func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	ft := d.kind.fields[i]
-	if !affine.MatchTypes(ft.Affinity, ft.Type, val.Affinity(), val.Type()) {
+	if !matchTypes(ft.Affinity, ft.Type, val.Affinity(), val.Type()) {
 		err = errutil.New("value is not", ft.Affinity, ft.Type)
-	} else if el, e := CopyValue(val); e != nil {
-		err = e
 	} else {
-		d.values[i] = el
+		_, err = d.cache(i, val)
 	}
 	return
+}
+
+func matchTypes(a affine.Affinity, at string, b affine.Affinity, bt string) bool {
+	return a == b && ((a != affine.Record && a != affine.RecordList) || (at == bt))
 }

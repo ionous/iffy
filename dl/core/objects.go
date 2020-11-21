@@ -3,10 +3,12 @@ package core
 import (
 	"strings"
 
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // ObjectName implements ObjectEval, searching for an object named as specified.
@@ -56,16 +58,13 @@ func (*ObjectName) Compose() composer.Spec {
 	}
 }
 
-// can be used as text, returns the object id.
-// func (op *ObjectName) GetText(run rt.Runtime) (ret string, err error) {
-// 	return op.GetObject(run)
-// }
-
 func (op *ObjectName) GetObject(run rt.Runtime) (ret g.Value, err error) {
-	if name, e := rt.GetText(run, op.Name); e != nil {
-		err = e
+	if name, e := safe.GetText(run, op.Name); e != nil {
+		err = cmdError(op, e)
+	} else if v, e := getObjectExactly(run, name.String()); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret, err = getObjectExactly(run, name)
+		ret = v
 	}
 	return
 }
@@ -79,28 +78,48 @@ func (*ObjectExists) Compose() composer.Spec {
 	}
 }
 
-func (op *ObjectExists) GetBool(run rt.Runtime) (okay bool, err error) {
-	// checking for object.Exists only searches by object id
-	// we want to check for the object by friendly name, and possibly by looking in scope
-	switch _, e := rt.GetObject(run, op.Obj); e.(type) {
-	case nil:
-		okay = true
-	case g.UnknownObject:
-		okay = false
-	default:
-		err = cmdError(op, e)
+func (op *ObjectExists) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if _, e := safe.GetObject(run, op.Obj); e != nil {
+		ret = g.False
+	} else {
+		ret = g.True
 	}
 	return
+
+	// fix? b/c of cmdError ( errutil.multierror) we can't test the error type like this.
+	// switch _, e := safe.GetObject(run, op.Obj); e.(type) {
+	// case nil:
+	// 	ret = g.True
+	// case g.UnknownObject:
+	// 	ret = g.False
+	// default:
+	// 	err = cmdError(op, e)
+	// }
 }
 
 // find an object with the passed partial name
 func getObjectExactly(run rt.Runtime, name string) (ret g.Value, err error) {
-	return rt.Variable(name).GetObjectByName(run)
+	switch val, e := run.GetField(object.Value, name); e.(type) {
+	case g.UnknownField:
+		err = g.UnknownObject(name)
+	default:
+		ret, err = val, e
+	}
+	return
 }
 
 // first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
 func getObjectInexactly(run rt.Runtime, name string) (ret g.Value, err error) {
-	return rt.Variable(name).GetObjectByVariable(run)
+	switch val, e := safe.Variable(run, name, ""); e.(type) {
+	default:
+		err = e
+	// if there's no such variable, check if there's an object of that name.
+	case g.UnknownTarget, g.UnknownField:
+		ret, err = getObjectByName(run, name)
+	case nil:
+		ret = val
+	}
+	return
 }
 
 func (*NameOf) Compose() composer.Spec {
@@ -112,13 +131,11 @@ func (*NameOf) Compose() composer.Spec {
 	}
 }
 
-func (op *NameOf) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, e := rt.GetObject(run, op.Obj); e != nil {
-		err = cmdError(op, e)
-	} else if p, e := obj.GetNamedField(object.Name); e != nil {
+func (op *NameOf) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if v, e := safe.Field(run, op.Obj, object.Name, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret, err = p.GetText()
+		ret = v
 	}
 	return
 }
@@ -132,13 +149,11 @@ func (*KindOf) Compose() composer.Spec {
 	}
 }
 
-func (op *KindOf) GetText(run rt.Runtime) (ret string, err error) {
-	if obj, e := rt.GetObject(run, op.Obj); e != nil {
-		err = cmdError(op, e)
-	} else if p, e := obj.GetNamedField(object.Kind); e != nil {
+func (op *KindOf) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if v, e := safe.Field(run, op.Obj, object.Kind, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret, err = p.GetText()
+		ret = v
 	}
 	return
 }
@@ -152,17 +167,15 @@ func (*IsKindOf) Compose() composer.Spec {
 	}
 }
 
-func (op *IsKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
-	if obj, e := rt.GetObject(run, op.Obj); e != nil {
+func (op *IsKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if tgtKind, e := safe.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
-		err = cmdError(op, e)
-	} else if p, e := obj.GetNamedField(object.Kinds); e != nil {
-		err = cmdError(op, e)
-	} else if fullPath, e := p.GetText(); e != nil {
+	} else if fullPath, e := safe.Field(run, op.Obj, object.Kinds, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = strings.Contains(fullPath+",", tgtKind+",")
+		// Contains reports whether second is within first.
+		b := strings.Contains(fullPath.String()+",", tgtKind.String()+",")
+		ret = g.BoolOf(b)
 	}
 	return
 }
@@ -175,17 +188,14 @@ func (*IsExactKindOf) Compose() composer.Spec {
 	}
 }
 
-func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret bool, err error) {
-	if obj, e := rt.GetObject(run, op.Obj); e != nil {
+func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if tgtKind, e := safe.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if tgtKind, e := rt.GetText(run, op.Kind); e != nil {
-		err = cmdError(op, e)
-	} else if p, e := obj.GetNamedField(object.Kind); e != nil {
-		err = cmdError(op, e)
-	} else if objKind, e := p.GetText(); e != nil {
+	} else if kind, e := safe.Field(run, op.Obj, object.Kind, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
-		ret = objKind == tgtKind
+		b := tgtKind.String() == kind.String()
+		ret = g.BoolOf(b)
 	}
 	return
 }

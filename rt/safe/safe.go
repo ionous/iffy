@@ -1,9 +1,36 @@
-package rt
+package safe
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
+	"github.com/ionous/iffy/object"
+	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
+
+// resolve a requested variable name into any list type.
+func GetList(run rt.Runtime, n string) (ret g.Value, err error) {
+	if vs, e := run.GetField(object.Variables, n); e != nil {
+		err = e
+	} else if !affine.IsList(vs.Affinity()) {
+		err = errutil.Fmt("%q is not a list", n)
+	} else {
+		ret = vs
+	}
+	return
+}
+
+// resolve a requested variable name into any non-list type
+func GetScalar(run rt.Runtime, n string) (ret g.Value, err error) {
+	if vs, e := run.GetField(object.Variables, n); e != nil {
+		err = e
+	} else if affine.IsList(vs.Affinity()) {
+		err = errutil.Fmt("%q is not a scalar", n)
+	} else {
+		ret = vs
+	}
+	return
+}
 
 // MissingEval error type for unknown variables while processing loops.
 type MissingEval string
@@ -13,7 +40,7 @@ func (e MissingEval) Error() string { return string(e) }
 
 // Run executes the passed statement using the passed runtime;
 // does *not* error if the passed exec is nil.
-func RunAll(run Runtime, exes []Execute) (err error) {
+func RunAll(run rt.Runtime, exes []rt.Execute) (err error) {
 	for _, exe := range exes {
 		if exe != nil {
 			if e := exe.Execute(run); e != nil {
@@ -27,7 +54,7 @@ func RunAll(run Runtime, exes []Execute) (err error) {
 
 // Run executes the passed statement using the passed runtime;
 // does *not* error if the passed exec is nil.
-func RunOne(run Runtime, exe Execute) (err error) {
+func Run(run rt.Runtime, exe rt.Execute) (err error) {
 	if exe == nil {
 		err = MissingEval("empty execute")
 	} else {
@@ -37,30 +64,30 @@ func RunOne(run Runtime, exe Execute) (err error) {
 }
 
 // WriteText evaluates t and outputs the results to w.
-func WriteText(run Runtime, eval TextEval) (err error) {
+func WriteText(run rt.Runtime, eval rt.TextEval) (err error) {
 	if t, e := GetText(run, eval); e != nil {
 		err = e
 	} else if w := run.Writer(); w == nil {
 		err = errutil.New("missing writer")
 	} else {
-		_, e := w.WriteString(t)
+		_, e := w.WriteString(t.String())
 		err = e
 	}
 	return
 }
 
 // GetBool runs the specified eval, returning an error if the eval is nil.
-func GetBool(run Runtime, eval BoolEval) (okay bool, err error) {
+func GetBool(run rt.Runtime, eval rt.BoolEval) (ret g.Value, err error) {
 	if eval == nil {
 		err = MissingEval("empty boolean eval")
 	} else {
-		okay, err = eval.GetBool(run)
+		ret, err = eval.GetBool(run)
 	}
 	return
 }
 
 // GetNumber runs the specified eval, returning an error if the eval is nil.
-func GetNumber(run Runtime, eval NumberEval) (ret float64, err error) {
+func GetNumber(run rt.Runtime, eval rt.NumberEval) (ret g.Value, err error) {
 	if eval == nil {
 		err = MissingEval("empty number eval")
 	} else {
@@ -70,7 +97,7 @@ func GetNumber(run Runtime, eval NumberEval) (ret float64, err error) {
 }
 
 // GetText runs the specified eval, returning an error if the eval is nil.
-func GetText(run Runtime, eval TextEval) (ret string, err error) {
+func GetText(run rt.Runtime, eval rt.TextEval) (ret g.Value, err error) {
 	if eval == nil {
 		err = MissingEval("empty text eval")
 	} else {
@@ -80,7 +107,7 @@ func GetText(run Runtime, eval TextEval) (ret string, err error) {
 }
 
 // GetObject runs the specified eval, returning an error if the eval is nil.
-func GetObject(run Runtime, eval ObjectEval) (ret g.Value, err error) {
+func GetObject(run rt.Runtime, eval rt.ObjectEval) (ret g.Value, err error) {
 	if eval == nil {
 		err = MissingEval("empty object eval")
 	} else {
@@ -90,9 +117,9 @@ func GetObject(run Runtime, eval ObjectEval) (ret g.Value, err error) {
 }
 
 // GetOptionalBool runs the optionally specified eval.
-func GetOptionalBool(run Runtime, eval BoolEval, fallback bool) (ret bool, err error) {
+func GetOptionalBool(run rt.Runtime, eval rt.BoolEval, fallback bool) (ret g.Value, err error) {
 	if eval == nil {
-		ret = fallback
+		ret = g.BoolOf(fallback)
 	} else {
 		ret, err = eval.GetBool(run)
 	}
@@ -100,9 +127,9 @@ func GetOptionalBool(run Runtime, eval BoolEval, fallback bool) (ret bool, err e
 }
 
 // GetOptionalNumber runs the optionally specified eval.
-func GetOptionalNumber(run Runtime, eval NumberEval, fallback float64) (ret float64, err error) {
+func GetOptionalNumber(run rt.Runtime, eval rt.NumberEval, fallback float64) (ret g.Value, err error) {
 	if eval == nil {
-		ret = fallback
+		ret = g.FloatOf(fallback)
 	} else {
 		ret, err = eval.GetNumber(run)
 	}
@@ -110,9 +137,9 @@ func GetOptionalNumber(run Runtime, eval NumberEval, fallback float64) (ret floa
 }
 
 // GetOptionalText runs the optionally specified eval.
-func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, err error) {
+func GetOptionalText(run rt.Runtime, eval rt.TextEval, fallback string) (ret g.Value, err error) {
 	if eval == nil {
-		ret = fallback
+		ret = g.StringOf(fallback)
 	} else {
 		ret, err = eval.GetText(run)
 	}
@@ -120,9 +147,9 @@ func GetOptionalText(run Runtime, eval TextEval, fallback string) (ret string, e
 }
 
 // GetOptionalNumber runs the optionally specified eval.
-func GetOptionalNumbers(run Runtime, eval NumListEval, fallback []float64) (ret []float64, err error) {
+func GetOptionalNumbers(run rt.Runtime, eval rt.NumListEval, fallback []float64) (ret g.Value, err error) {
 	if eval == nil {
-		ret = fallback
+		ret = g.FloatsOf(fallback)
 	} else {
 		ret, err = GetNumList(run, eval)
 	}
@@ -130,9 +157,9 @@ func GetOptionalNumbers(run Runtime, eval NumListEval, fallback []float64) (ret 
 }
 
 // GetOptionalText runs the optionally specified eval.
-func GetOptionalTexts(run Runtime, eval TextListEval, fallback []string) (ret []string, err error) {
+func GetOptionalTexts(run rt.Runtime, eval rt.TextListEval, fallback []string) (ret g.Value, err error) {
 	if eval == nil {
-		ret = fallback
+		ret = g.StringsOf(fallback)
 	} else {
 		ret, err = GetTextList(run, eval)
 	}
@@ -141,8 +168,10 @@ func GetOptionalTexts(run Runtime, eval TextListEval, fallback []string) (ret []
 
 // GetNumList returns an new iterator to walk the passed list,
 // or an empty iterator if the value is null.
-func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
-	if eval != nil {
+func GetNumList(run rt.Runtime, eval rt.NumListEval) (ret g.Value, err error) {
+	if eval == nil {
+		err = MissingEval("empty object eval")
+	} else {
 		ret, err = eval.GetNumList(run)
 	}
 	return
@@ -150,8 +179,10 @@ func GetNumList(run Runtime, eval NumListEval) (ret []float64, err error) {
 
 // GetTextList returns an new iterator to walk the passed list,
 // or an empty iterator if the value is null.
-func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
-	if eval != nil {
+func GetTextList(run rt.Runtime, eval rt.TextListEval) (ret g.Value, err error) {
+	if eval == nil {
+		err = MissingEval("empty object eval")
+	} else {
 		ret, err = eval.GetTextList(run)
 	}
 	return
@@ -159,45 +190,11 @@ func GetTextList(run Runtime, eval TextListEval) (ret []string, err error) {
 
 // GetObjectList returns an new iterator to walk the passed list,
 // or an empty iterator if the value is null.
-func GetObjectList(run Runtime, eval ObjectListEval) (ret g.Value, err error) {
-	if eval != nil {
+func GetObjectList(run rt.Runtime, eval rt.ObjectListEval) (ret g.Value, err error) {
+	if eval == nil {
+		err = MissingEval("empty object eval")
+	} else {
 		ret, err = eval.GetObjectList(run)
-	}
-	return
-}
-
-func CompactNumbers(it g.Iterator, vals []float64) (ret []float64, err error) {
-	for it.HasNext() {
-		if n, e := it.GetNext(); e != nil {
-			err = e
-			break
-		} else if v, e := n.GetNumber(); e != nil {
-			err = e
-			break
-		} else {
-			vals = append(vals, v)
-		}
-	}
-	if err == nil {
-		ret = vals
-	}
-	return
-}
-
-func CompactTexts(it g.Iterator, vals []string) (ret []string, err error) {
-	for it.HasNext() {
-		if n, e := it.GetNext(); e != nil {
-			err = e
-			break
-		} else if v, e := n.GetText(); e != nil {
-			err = e
-			break
-		} else {
-			vals = append(vals, v)
-		}
-	}
-	if err == nil {
-		ret = vals
 	}
 	return
 }

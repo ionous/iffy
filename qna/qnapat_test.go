@@ -34,7 +34,7 @@ func TestSayMe(t *testing.T) {
 	for i, expect := range []string{"One!", "Two!", "Three!", "Not between 1 and 3."} {
 		if text, e := debug.DetermineSay(i + 1).GetText(run); e != nil {
 			t.Fatal(e)
-		} else if expect != text {
+		} else if text := text.String(); expect != text {
 			t.Fatal(i, text)
 		} else {
 			t.Log(text)

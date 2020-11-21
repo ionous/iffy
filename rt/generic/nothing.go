@@ -1,11 +1,12 @@
 package generic
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 )
 
 type Nothing struct{}
+
+var _ Value = (*Nothing)(nil)
 
 func (n Nothing) Affinity() affine.Affinity {
 	return ""
@@ -13,63 +14,48 @@ func (n Nothing) Affinity() affine.Affinity {
 func (n Nothing) Type() string {
 	return ""
 }
-func (n Nothing) GetBool() (_ bool, err error) {
-	err = errutil.New("value is not a bool")
-	return
+func (n Nothing) Bool() bool {
+	panic("value is not a bool")
 }
-func (n Nothing) GetNumber() (_ float64, err error) {
-	err = errutil.New("value is not a number")
-	return
+func (n Nothing) Float() float64 {
+	panic("value is not a number")
 }
-func (n Nothing) GetText() (_ string, err error) {
-	err = errutil.New("value is not a text")
-	return
+func (n Nothing) Int() int {
+	panic("value is not a number")
 }
-func (n Nothing) GetRecord() (_ *Record, err error) {
-	err = errutil.New("value is not a record")
-	return
+func (n Nothing) String() string {
+	panic("value is not a text")
 }
-func (n Nothing) GetNumList() (_ []float64, err error) {
-	err = errutil.New("value is not a number list")
-	return
+func (n Nothing) Record() *Record {
+	panic("value is not a record")
 }
-func (n Nothing) GetTextList() (_ []string, err error) {
-	err = errutil.New("value is not a text list")
-	return
+func (n Nothing) Floats() []float64 {
+	panic("value is not a number list")
 }
-func (n Nothing) GetRecordList() (_ []*Record, err error) {
-	err = errutil.New("value is not a record list")
-	return
+func (n Nothing) Strings() []string {
+	panic("value is not a text list")
 }
-func (n Nothing) GetLen() (_ int, err error) {
-	err = errutil.New("value is not measurable")
-	return
+func (n Nothing) Records() []*Record {
+	panic("value is not a record list")
 }
-func (n Nothing) GetIndex(int) (_ Value, err error) {
-	err = errutil.New("value is not indexable")
-	return
+func (n Nothing) Index(int) Value {
+	panic("value is not indexable")
 }
-func (n Nothing) GetNamedField(string) (_ Value, err error) {
-	err = errutil.New("value is not an object")
-	return
+func (n Nothing) Len() int {
+	panic("value is not measurable")
 }
-func (n Nothing) SetNamedField(string, Value) (err error) {
-	err = errutil.New("value is not field writable")
-	return
+func (n Nothing) FieldByName(string) (Value, error) {
+	panic("value is not an object")
 }
-func (n Nothing) SetIndexedValue(int, Value) (err error) {
-	err = errutil.New("value is not index writable")
-	return
+func (n Nothing) SetFieldByName(string, Value) error {
+	panic("value is not field writable")
 }
-func (n Nothing) Append(Value) (_ Value, err error) {
-	err = errutil.New("value is not extendable")
-	return
+func (n Nothing) SetIndex(int, Value) {
+	panic("value is not index writable")
 }
-func (n Nothing) Resize(int) (_ Value, err error) {
-	err = errutil.New("value is not resizable")
-	return
+func (n Nothing) Append(Value) {
+	panic("value is not extendable")
 }
-func (n Nothing) Slice(i, j int) (_ Value, err error) {
-	err = errutil.New("value is not sliceable")
-	return
+func (n Nothing) Slice(i, j int) (Value, error) {
+	panic("value is not sliceable")
 }

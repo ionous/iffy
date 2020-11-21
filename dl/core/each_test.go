@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/rt/safe"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/writer"
 )
@@ -13,7 +13,7 @@ import (
 func ExampleIndex() {
 	var run forTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.RunOne(&run,
+	if e := safe.Run(&run,
 		&ForEachText{
 			In: &Texts{oneTwoThree},
 			Go: NewActivity(
@@ -30,7 +30,7 @@ func ExampleIndex() {
 func ExampleChooseText() {
 	var run forTester
 	run.SetWriter(writer.NewStdout())
-	if e := rt.RunOne(&run,
+	if e := safe.Run(&run,
 		&Say{&Commas{NewActivity(
 			&ForEachText{
 				In: &Texts{oneTwoThree},

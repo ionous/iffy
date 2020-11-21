@@ -2,6 +2,7 @@ package core
 
 import (
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
@@ -30,19 +31,16 @@ func (op *MoveFrom) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 }
 
 func (op *MoveFrom) moveFrom(run rt.Runtime) (ret g.Value, err error) {
-	if box, val, e := getVariableValue(run, op.Name, op.Flags); e != nil {
+	if val, e := getVariableValue(run, op.Name, op.Flags); e != nil {
 		err = e
+	} else if val != nil {
+		// clear out the old contents
+		ret, err = val, run.SetField(object.Variables, op.Name, nil)
+	} else if op.Flags.tryObject() {
+		// its an object reference, move is the same as copy.
+		ret, err = getObjectByName(run, op.Name)
 	} else {
-		if val != nil {
-			// we found the named variable;
-			// clear out the old contents
-			ret, err = val, box.SetValue(run, nil)
-		} else if op.Flags.tryObject() {
-			// its an object reference, move is the same as copy.
-			ret, err = box.GetObjectByName(run)
-		} else {
-			err = g.UnknownObject(string(box))
-		}
+		err = g.UnknownObject(op.Name)
 	}
 	return
 }
