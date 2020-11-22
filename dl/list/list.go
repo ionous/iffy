@@ -25,18 +25,30 @@ func cmdError(op composer.Slat, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }
 
-// can a be inserted into b
+// can el be inserted into els?
 func IsInsertable(el, els g.Value) (okay bool) {
+	return isInsertable(els, el.Affinity(), el.Type())
+}
+
+// can el be appended to els?
+// this is similar to IsInsertable, except that the el can itself be a list.
+func IsAppendable(el, els g.Value) (okay bool) {
+	elAff := el.Affinity()
+	if unlist := affine.Element(elAff); len(unlist) > 0 {
+		elAff = unlist
+	}
+	return isInsertable(els, elAff, el.Type())
+}
+
+func isInsertable(els g.Value, haveAff affine.Affinity, haveType string) (okay bool) {
 	okay = true // provisionally
 	listAff := els.Affinity()
 	if needAff := affine.Element(listAff); len(needAff) == 0 {
-		okay = false
-	} else if haveAff := el.Affinity(); haveAff != needAff {
-		okay = false
-	} else if haveAff == affine.Record {
-		if elt, elst := el.Type(), els.Type(); elt != elst {
-			okay = false
-		}
+		okay = false // els was not actually a list
+	} else if haveAff != needAff {
+		okay = false // the element affinities dont match
+	} else if haveAff == affine.Record && haveType != els.Type() {
+		okay = false // the record types dont match
 	}
 	return
 }

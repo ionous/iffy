@@ -64,7 +64,7 @@ func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 				}
 			}
 		} else {
-			if nv, e := DefaultFrom(d.kind.kinds, ft.Affinity, ft.Type); e != nil {
+			if nv, e := NewDefaultValue(d.kind.kinds, ft.Affinity, ft.Type); e != nil {
 				err = e
 			} else {
 				ret, err = d.cache(i, nv)
@@ -75,7 +75,7 @@ func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 }
 
 // this is a little ugly.
-// fix? if DefaultFrom returned a raw value maybe this could be cleaned up.
+// fix? if NewDefaultValue returned a raw value maybe this could be cleaned up.
 // -or- if record.values stored refValues ( though that is random extra storage )
 func (d *Record) cache(i int, nv Value) (ret Value, err error) {
 	if el, ok := nv.(refValue); !ok {

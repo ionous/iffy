@@ -36,7 +36,7 @@ package list_test
 // 			fruits = append(fruits, one)
 // 		}
 // 		lt.vals["Source"] = g.RecordsOf(k, fruits)
-// 		lt.vals["res"] = g.StringOf("")
+// 		lt.vals["res"] = g.Empty
 // 	}
 
 // 	if e := reduce.Execute(&lt); e != nil {

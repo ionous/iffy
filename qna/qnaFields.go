@@ -123,7 +123,7 @@ func (n *Runner) SetField(target, field string, val g.Value) (err error) {
 			if x, e := n.GetField(target, field); e != nil {
 				err = e
 			} else {
-				val, err = g.DefaultFrom(&n.kinds, x.Affinity(), x.Type())
+				val, err = g.NewDefaultValue(&n.kinds, x.Affinity(), x.Type())
 			}
 		}
 		if err == nil {

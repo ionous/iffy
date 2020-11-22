@@ -253,21 +253,20 @@ var collateGroups = pattern.ActivityPattern{
 					B:  &core.Number{0},
 				},
 				// havent found a matching group?
-				// make sure the scratch group is empty,
 				// pack the object and its settings into it,
 				// push the group into the groups.
 				True: core.NewActivity(
-					&list.Push{"names", &core.GetField{V("in"), "Name"}, false},
+					&list.Push{"names", &core.GetField{V("in"), "Name"}},
 					&core.SetField{V("group"), "Objects", V("names")},
 					&core.SetField{V("group"), "Settings", V("in")},
-					&list.Push{"groups", V("group"), false},
+					&list.Push{"groups", V("group")},
 				), // end true
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
 					&core.Assign{"group", &core.FromObject{&list.At{"groups", V("idx")}}},
 					&core.Assign{"names", &core.GetField{V("group"), "Objects"}},
-					&list.Push{"names", &core.GetField{V("in"), "Name"}, false},
+					&list.Push{"names", &core.GetField{V("in"), "Name"}},
 					&core.SetField{V("group"), "Objects", V("names")},
 					&list.Set{"groups", V("idx"), V("group")},
 				), // end false
