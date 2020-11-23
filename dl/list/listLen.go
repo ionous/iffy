@@ -21,7 +21,7 @@ func (*Len) Compose() composer.Spec {
 }
 
 func (op *Len) GetNumber(run rt.Runtime) (ret g.Value, err error) {
-	if v, e := safe.GetList(run, op.List); e != nil {
+	if v, e := safe.List(run, op.List); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = g.IntOf(v.Len())

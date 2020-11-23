@@ -11,6 +11,7 @@ import (
 type Push struct {
 	List   string // variable name
 	Insert core.Assignment
+	Front  Front
 }
 
 func (op *Push) Compose() composer.Spec {
@@ -41,15 +42,21 @@ func (op *Push) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 }
 
 func (op *Push) push(run rt.Runtime) (ret int, err error) {
-	if els, e := safe.GetList(run, op.List); e != nil {
+	if els, e := safe.List(run, op.List); e != nil {
 		err = e
-	} else if el, e := core.GetAssignedValue(run, op.Insert); e != nil {
+	} else if ins, e := core.GetAssignedValue(run, op.Insert); e != nil {
 		err = e
-	} else if !IsAppendable(el, els) {
-		err = insertError{el, els}
+	} else if !IsAppendable(ins, els) {
+		err = insertError{ins, els}
 	} else {
-		els.Append(el)
-		ret = els.Len()
+		if !op.Front {
+			els.Append(ins)
+		} else {
+			_, err = els.Splice(0, 0, ins)
+		}
+		if err == nil {
+			ret = els.Len()
+		}
 	}
 	return
 }

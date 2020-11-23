@@ -2,9 +2,9 @@ package list
 
 import "github.com/ionous/iffy/dl/composer"
 
-type FrontOrBack bool
+type Front bool
 
-func (op FrontOrBack) Compose() composer.Spec {
+func (op Front) Compose() composer.Spec {
 	//make.str("bool", "{true} or {false}");
 	return composer.Spec{
 		Name:  "list_edge",

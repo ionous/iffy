@@ -63,12 +63,12 @@ func TestSplices(t *testing.T) {
 	}
 }
 
-func splice(src []string, start, cnt int, add ...string) (ret string, err error) {
+func splice(src []string, start, cnt int, ins ...string) (ret string, err error) {
 	// copy the src string so we can muck with it
 	if run, vals, e := newListTime(append([]string{}, src...), nil); e != nil {
 		err = e
 	} else {
-		rub := joinText(run, &list.Splice{"Source", I(start), I(cnt), FromTs(add)})
+		rub := joinText(run, &list.Splice{"Source", I(start), I(cnt), FromTs(ins)})
 		if strs, e := vals.GetNamedField("Source"); e != nil {
 			err = e
 		} else {

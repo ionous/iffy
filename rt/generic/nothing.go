@@ -54,8 +54,11 @@ func (n Nothing) SetIndex(int, Value) {
 	panic("value is not index writable")
 }
 func (n Nothing) Append(Value) {
-	panic("value is not extendable")
+	panic("value is not appendable")
 }
 func (n Nothing) Slice(i, j int) (Value, error) {
 	panic("value is not sliceable")
+}
+func (n Nothing) Splice(start, end int, add Value) (Value, error) {
+	panic("value is not spliceable")
 }

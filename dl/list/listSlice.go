@@ -1,7 +1,6 @@
 package list
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
@@ -33,59 +32,57 @@ func (*Slice) Compose() composer.Spec {
 }
 
 func (op *Slice) Execute(run rt.Runtime) (err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
-		err = cmdError(op, e)
-	} else {
-		switch a := vs.Affinity(); a {
-		case affine.NumList:
-			_, err = op.sliceNumbers(run, vs)
-		case affine.TextList:
-			_, err = op.sliceText(run, vs)
-		default:
-			err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)
-		}
-	}
+	_, _, err = op.sliceList(run, "")
 	return
 }
 
 func (op *Slice) GetNumList(run rt.Runtime) (ret g.Value, err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
+	if v, _, e := op.sliceList(run, affine.NumList); e != nil {
 		err = cmdError(op, e)
-	} else if vals, e := op.sliceNumbers(run, vs); e != nil {
-		err = cmdError(op, e)
+	} else if v == nil {
+		ret = g.FloatsOf(nil)
 	} else {
-		ret = g.FloatsOf(vals)
+		ret = v
 	}
 	return
 }
 
 func (op *Slice) GetTextList(run rt.Runtime) (ret g.Value, err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
+	if v, _, e := op.sliceList(run, affine.TextList); e != nil {
 		err = cmdError(op, e)
-	} else if vals, e := op.sliceText(run, vs); e != nil {
-		err = cmdError(op, e)
+	} else if v == nil {
+		ret = g.StringsOf(nil)
 	} else {
-		ret = g.StringsOf(vals)
+		ret = v
 	}
 	return
 }
 
-func (op *Slice) sliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err error) {
-	els := vs.Floats()
-	if i, j, e := op.getIndices(run, len(els)); e != nil {
-		err = e
-	} else if i >= 0 && j >= i {
-		ret = els[i:j]
+func (op *Slice) GetRecordList(run rt.Runtime) (ret g.Value, err error) {
+	if v, t, e := op.sliceList(run, affine.RecordList); e != nil {
+		err = cmdError(op, e)
+	} else if v == nil {
+		ret = g.RecordsOf(t, nil)
+	} else {
+		ret = v
 	}
 	return
 }
 
-func (op *Slice) sliceText(run rt.Runtime, vs g.Value) (ret []string, err error) {
-	els := vs.Strings()
-	if i, j, e := op.getIndices(run, len(els)); e != nil {
+func (op *Slice) sliceList(run rt.Runtime, aff affine.Affinity) (retVal g.Value, retType string, err error) {
+	if els, e := safe.List(run, op.List); e != nil {
 		err = e
-	} else if i >= 0 && j >= i {
-		ret = els[i:j]
+	} else if e := safe.Check(els, aff); e != nil {
+		err = e
+	} else if i, j, e := op.getIndices(run, els.Len()); e != nil {
+		err = e
+	} else {
+		if i >= 0 && j >= i {
+			retVal, err = els.Slice(i, j)
+		}
+		if err == nil {
+			retType = els.Type()
+		}
 	}
 	return
 }

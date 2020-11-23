@@ -2,6 +2,15 @@ package affine
 
 type Affinity string
 
+func (a Affinity) String() (ret string) {
+	if a := string(a); len(a) > 0 {
+		ret = a
+	} else {
+		ret = "unknown affinity"
+	}
+	return
+}
+
 const (
 	Bool       Affinity = "bool"
 	Number     Affinity = "number"

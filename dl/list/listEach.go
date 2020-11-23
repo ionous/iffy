@@ -1,7 +1,6 @@
 package list
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
@@ -36,11 +35,8 @@ func (op *Each) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Each) execute(run rt.Runtime) (err error) {
-
-	if vs, e := safe.GetList(run, op.List); e != nil {
+	if vs, e := safe.List(run, op.List); e != nil {
 		err = e
-	} else if elAffinity := affine.Element(vs.Affinity()); len(elAffinity) == 0 {
-		err = errutil.Fmt("Variable %q is %q, each expected a list", op.List, vs.Affinity())
 	} else {
 		cnt := vs.Len()
 		if otherwise := op.Else; otherwise != nil && cnt == 0 {
@@ -48,8 +44,9 @@ func (op *Each) execute(run rt.Runtime) (err error) {
 		} else if act := op.Go; act != nil && cnt > 0 {
 			const el, index, first, last = 0, 1, 2, 3
 			if op.k == nil || op.k.IsStaleKind(run) {
+				elAff, elType := affine.Element(vs.Affinity()), vs.Type()
 				op.k = g.NewKind(run, "", []g.Field{
-					{Name: op.With, Affinity: elAffinity, Type: vs.Type()},
+					{Name: op.With, Affinity: elAff, Type: elType},
 					{Name: "index", Affinity: affine.Number},
 					{Name: "first", Affinity: affine.Bool},
 					{Name: "last", Affinity: affine.Bool},

@@ -40,7 +40,7 @@ func (n refValue) Float() (ret float64) {
 	case int64:
 		ret = float64(v)
 	default:
-		panic(errutil.Sprintf("value %v(%T) is not a number", v, v))
+		panic(n.a.String() + " is not a number")
 	}
 	return
 }
@@ -56,7 +56,7 @@ func (n refValue) Int() (ret int) {
 	case float64:
 		ret = int(v)
 	default:
-		panic("value is not a number")
+		panic(n.a.String() + " is not a number")
 	}
 	return
 }
@@ -93,7 +93,7 @@ func (n refValue) Len() (ret int) {
 	case *[]*Record:
 		ret = len(*vp)
 	default:
-		panic("value is not measurable")
+		panic(n.a.String() + " is not measurable")
 	}
 	return
 }
@@ -107,7 +107,7 @@ func (n refValue) Index(i int) (ret Value) {
 	case *[]*Record:
 		ret = RecordOf((*vp)[i])
 	default:
-		panic("value is not measurable")
+		panic(n.a.String() + " is not indexable")
 	}
 	return
 }
@@ -132,31 +132,14 @@ func (n refValue) SetIndex(i int, v Value) {
 	case *[]string:
 		(*vp)[i] = v.String()
 	case *[]*Record:
-		if n.Type() != v.Type() {
+		if n.t != v.Type() {
 			panic("record types dont match")
 		}
 		(*vp)[i] = v.Record()
 	default:
-		panic("value is not measurable")
+		panic(n.a.String() + " is not index writable")
 	}
 }
-
-// note: this can grow record slices with nil values.
-// func (n refValue) Resize(newLen int) {
-// 	if vs := n.v; vs.Kind() != r.Slice {
-// 		panic("value is not indexable")
-// 	} else if newLen < 0 {
-// 		err = Underflow{newLen, 0}
-// 	} else if cap := vs.Cap(); newLen <= cap {
-// 		vs.SetLen(newLen) // shrinking; the slice memory stays the same.
-// 	} else if grow := newLen - n.v.Len(); grow > 0 {
-// 		// grow using make, append ( versus make, copy )
-// 		// to trigger go's grow padding
-// 		blanks := r.MakeSlice(vs.Type().Elem(), grow, grow)
-// 		n.v = r.AppendSlice(vs, blanks)
-// 	}
-// 	return
-// }
 
 func (n refValue) Slice(i, j int) (ret Value, err error) {
 	if i < 0 {
@@ -166,61 +149,90 @@ func (n refValue) Slice(i, j int) (ret Value, err error) {
 	} else if i > j {
 		err = errutil.New("bad range", i, j)
 	} else {
-		switch vp := n.i.(type) {
-		case *[]float64:
-			vs := CopyFloats((*vp)[i:j])
-			ret = FloatsOf(vs)
-		case *[]string:
-			vs := CopyStrings((*vp)[i:j])
-			ret = StringsOf(vs)
-		case *[]*Record:
-			vs := CopyRecords((*vp)[i:j])
-			ret = RecordsOf(n.Type(), vs)
+		switch n.a {
+		case affine.NumList:
+			vp := n.i.(*[]float64)
+			ret = FloatsOf(copyFloats((*vp)[i:j]))
+
+		case affine.TextList:
+			vp := n.i.(*[]string)
+			ret = StringsOf(copyStrings((*vp)[i:j]))
+
+		case affine.RecordList:
+			vp := n.i.(*[]*Record)
+			ret = RecordsOf(n.Type(), copyRecords((*vp)[i:j]))
+
 		default:
-			panic("value is not sliceable")
+			panic(n.a.String() + " is not sliceable")
 		}
 	}
 	return
 }
 
-func (n refValue) Append(v Value) {
-	if !affine.IsList(v.Affinity()) {
-		n.appendOne(v)
+func (n refValue) Splice(i, j int, add Value) (ret Value, err error) {
+	if i < 0 {
+		err = Underflow{i, 0}
+	} else if cnt := n.Len(); j > cnt {
+		err = Overflow{j, cnt}
+	} else if i > j {
+		err = errutil.New("bad range", i, j)
 	} else {
-		n.appendMany(v)
+		switch n.a {
+		case affine.NumList:
+			vp := n.i.(*[]float64)
+			els := (*vp)
+			cut := copyFloats(els[i:j])
+			ins := normalizeFloats(add)
+			(*vp) = append(els[:i], append(ins, els[j:]...)...)
+			ret = FloatsOf(cut)
+
+		case affine.TextList:
+			vp := n.i.(*[]string)
+			els := (*vp)
+			cut := copyStrings(els[i:j])
+			ins := normalizeStrings(add)
+			(*vp) = append(els[:i], append(ins, els[j:]...)...)
+			ret = StringsOf(cut)
+
+		case affine.RecordList:
+			vp := n.i.(*[]*Record)
+			if n.t != add.Type() {
+				panic("record types dont match")
+			}
+			els := (*vp)
+			cut := copyRecords(els[i:j])
+			ins := normalizeRecords(add)
+			(*vp) = append(els[:i], append(ins, els[j:]...)...)
+			ret = RecordsOf(n.t, cut)
+
+		default:
+			panic(n.a.String() + " is not spliceable")
+		}
 	}
 	return
 }
 
-func (n refValue) appendOne(v Value) {
-	switch vp := n.i.(type) {
-	case *[]float64:
-		(*vp) = append((*vp), v.Float())
-	case *[]string:
-		(*vp) = append((*vp), v.String())
-	case *[]*Record:
-		if n.Type() != v.Type() {
-			panic("record types dont match")
-		}
-		(*vp) = append((*vp), v.Record())
-	default:
-		panic("value is not extensible")
-	}
-}
+func (n refValue) Append(add Value) {
+	switch n.a {
+	case affine.NumList:
+		vp := n.i.(*[]float64)
+		ins := normalizeFloats(add)
+		(*vp) = append((*vp), ins...)
 
-func (n refValue) appendMany(v Value) {
-	switch vp := n.i.(type) {
-	case *[]float64:
-		(*vp) = append((*vp), v.Floats()...)
-	case *[]string:
-		(*vp) = append((*vp), v.Strings()...)
-	case *[]*Record:
-		if n.Type() != v.Type() {
+	case affine.TextList:
+		vp := n.i.(*[]string)
+		ins := normalizeStrings(add)
+		(*vp) = append((*vp), ins...)
+
+	case affine.RecordList:
+		vp := n.i.(*[]*Record)
+		if n.t != add.Type() {
 			panic("record types dont match")
 		}
-		(*vp) = append((*vp), v.Records()...)
+		ins := normalizeRecords(add)
+		(*vp) = append((*vp), ins...)
+
 	default:
-		panic("value is not extensible")
+		panic(n.a.String() + " is not appendable")
 	}
-	return
 }

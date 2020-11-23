@@ -1,7 +1,6 @@
 package list
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
@@ -15,7 +14,7 @@ import (
 type Pop struct {
 	List     string // variable name
 	With     string // counter name
-	Front    FrontOrBack
+	Front    Front
 	Go, Else *core.Activity
 	k        *g.Kind
 }
@@ -38,34 +37,28 @@ func (op *Pop) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Pop) execute(run rt.Runtime) (err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
+	if vs, e := safe.List(run, op.List); e != nil {
 		err = e
-	} else if elAffinity := affine.Element(vs.Affinity()); len(elAffinity) == 0 {
-		err = errutil.Fmt("Variable %q is %q, pop expected a list", op.List, vs.Affinity())
 	} else {
 		if cnt := vs.Len(); cnt == 0 && op.Else != nil {
 			err = op.Else.Execute(run)
 		} else {
 			const el = 0
 			if op.k == nil || op.k.IsStaleKind(run) {
+				elAff, elType := affine.Element(vs.Affinity()), vs.Type()
 				op.k = g.NewKind(run, "", []g.Field{
-					{Name: op.With, Affinity: elAffinity, Type: vs.Type()},
+					{Name: op.With, Affinity: elAff, Type: elType},
 				})
 			}
 			ls := op.k.NewRecord()
 			//
-			var at, start, end int
-			if op.Front {
-				at, start, end = 0, 1, cnt
-			} else {
-				at, start, end = cnt-1, 0, cnt-1
+			var at int
+			if !op.Front {
+				at = cnt - 1
 			}
-			popped := vs.Index(at)
-			if newEls, e := vs.Slice(start, end); e != nil {
+			if popped, e := vs.Splice(at, at+1, nil); e != nil {
 				err = e
-			} else if e := run.SetField(object.Variables, op.List, newEls); e != nil {
-				err = e
-			} else if e := ls.SetFieldByIndex(el, popped); e != nil {
+			} else if e := ls.SetFieldByIndex(el, popped.Index(0)); e != nil {
 				err = e
 			} else if op.Go != nil {
 				run.PushScope(&scope.TargetRecord{object.Variables, ls})

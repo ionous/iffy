@@ -35,7 +35,7 @@ func (op *Sort) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Sort) execute(run rt.Runtime) (err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
+	if vs, e := safe.List(run, op.List); e != nil {
 		err = e
 	} else {
 		var newVals g.Value

@@ -40,7 +40,7 @@ func (d *Record) GetNamedField(field string) (ret Value, err error) {
 				// if the field is an aspect, and the caller was asking for a trait...
 				// return the state of the trait
 				trait := v.String()
-				ret, err = newBoolValue(trait == field, "trait")
+				ret = BoolFrom(trait == field, "trait")
 			}
 		}
 	}
@@ -50,18 +50,15 @@ func (d *Record) GetNamedField(field string) (ret Value, err error) {
 // GetFieldByIndex cant ask for traits, only their aspects.
 func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 	if fv, ft := d.values[i], d.kind.fields[i]; fv != nil {
-		ret, err = ValueFrom(fv, ft.Affinity, ft.Type)
+		ret = makeValue(ft.Affinity, ft.Type, fv)
 	} else {
 		if ft.Type == "aspect" {
 			if k, e := d.kind.kinds.GetKindByName(ft.Name); e != nil {
 				err = e
 			} else {
 				firstTrait := k.Field(0) // first trait is the default
-				if nv, e := ValueFrom(firstTrait.Name, ft.Affinity, ft.Type); e != nil {
-					err = e
-				} else {
-					ret, err = d.cache(i, nv)
-				}
+				nv := StringFrom(firstTrait.Name, ft.Type)
+				ret, err = d.cache(i, nv)
 			}
 		} else {
 			if nv, e := NewDefaultValue(d.kind.kinds, ft.Affinity, ft.Type); e != nil {
@@ -106,8 +103,8 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 
 func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	ft := d.kind.fields[i]
-	if !matchTypes(ft.Affinity, ft.Type, val.Affinity(), val.Type()) {
-		err = errutil.New("value is not", ft.Affinity, ft.Type)
+	if a, t := val.Affinity(), val.Type(); !matchTypes(ft.Affinity, ft.Type, a, t) {
+		err = errutil.Fmt("%s of %s is not %s of %s", a, t, ft.Affinity, ft.Type)
 	} else {
 		_, err = d.cache(i, val)
 	}

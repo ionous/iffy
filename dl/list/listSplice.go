@@ -1,11 +1,9 @@
 package list
 
 import (
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
@@ -33,92 +31,65 @@ and true/false values can't be added to a list.`,
 }
 
 func (op *Splice) Execute(run rt.Runtime) (err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
-		err = cmdError(op, e)
-	} else {
-		switch a := vs.Affinity(); a {
-		case affine.NumList:
-			_, err = op.spliceNumbers(run, vs)
-		case affine.TextList:
-			_, err = op.spliceText(run, vs)
-		default:
-			err = errutil.Fmt("variable '%s(%s)' isn't a list", op.List, a)
-		}
-	}
+	_, _, err = op.spliceList(run, "")
 	return
 }
 
-// returns the removed elements
 func (op *Splice) GetNumList(run rt.Runtime) (ret g.Value, err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
+	if v, _, e := op.spliceList(run, affine.NumList); e != nil {
 		err = cmdError(op, e)
-	} else if vals, e := op.spliceNumbers(run, vs); e != nil {
-		err = cmdError(op, e)
+	} else if v == nil {
+		ret = g.FloatsOf(nil)
 	} else {
-		ret = g.FloatsOf(vals)
+		ret = v
 	}
 	return
 }
 
-// returns the removed elements
 func (op *Splice) GetTextList(run rt.Runtime) (ret g.Value, err error) {
-	if vs, e := safe.GetList(run, op.List); e != nil {
+	if v, _, e := op.spliceList(run, affine.TextList); e != nil {
 		err = cmdError(op, e)
-	} else if vals, e := op.spliceText(run, vs); e != nil {
-		err = cmdError(op, e)
+	} else if v == nil {
+		ret = g.StringsOf(nil)
 	} else {
-		ret = g.StringsOf(vals)
+		ret = v
 	}
 	return
 }
 
-func (op *Splice) spliceNumbers(run rt.Runtime, vs g.Value) (ret []float64, err error) {
-	els := vs.Floats()
-	if i, j, e := op.getIndices(run, len(els)); e != nil {
+func (op *Splice) GetRecordList(run rt.Runtime) (ret g.Value, err error) {
+	if v, t, e := op.spliceList(run, affine.RecordList); e != nil {
+		err = cmdError(op, e)
+	} else if v == nil {
+		ret = g.RecordsOf(t, nil)
+	} else {
+		ret = v
+	}
+	return
+}
+
+func (op *Splice) spliceList(run rt.Runtime, aff affine.Affinity) (retVal g.Value, retType string, err error) {
+	if els, e := safe.List(run, op.List); e != nil {
 		err = e
-	} else if add, e := getNewFloats(run, op.Insert); e != nil {
+	} else if e := safe.Check(els, aff); e != nil {
+		err = e
+	} else if ins, e := core.GetAssignedValue(run, op.Insert); e != nil {
+		err = e
+	} else if !IsAppendable(ins, els) {
+		err = insertError{ins, els}
+	} else if i, j, e := op.getIndices(run, els.Len()); e != nil {
 		err = e
 	} else {
 		if i >= 0 && j >= i {
-			// cut out i to j, then i becomes the insertion point.
-			// as long as the range was valid we take the result and set it back...
-			// even if no elements are cut or inserted.
-			// ( that bakes any evaluation that might have been in the target )
-			out := g.CopyFloats(els[i:j]) // before we start altering the memory of els, copy out
-			newVals := append(els[:i], append(add, els[j:]...)...)
-			if e := run.SetField(object.Variables, op.List, g.FloatsOf(newVals)); e != nil {
-				err = e
-			} else {
-				ret = out
-			}
+			retVal, err = els.Splice(i, j, ins)
+		}
+		if err == nil {
+			retType = els.Type()
 		}
 	}
 	return
 }
 
-// returns the removed elements
-func (op *Splice) spliceText(run rt.Runtime, vs g.Value) (ret []string, err error) {
-	els := vs.Strings()
-	if i, j, e := op.getIndices(run, len(els)); e != nil {
-		err = e
-	} else if add, e := getNewStrings(run, op.Insert); e != nil {
-		err = e
-	} else {
-		// ... mirrors GetNumList()
-		if i >= 0 && j >= i {
-			out := g.CopyStrings(els[i:j])
-			newVals := append(els[:i], append(add, els[j:]...)...)
-			if e := run.SetField(object.Variables, op.List, g.StringsOf(newVals)); e != nil {
-				err = e
-			} else {
-				ret = out
-			}
-		}
-	}
-	return
-}
-
-// reti is < 0 to indicate an empty list
 func (op *Splice) getIndices(run rt.Runtime, cnt int) (reti, retj int, err error) {
 	if i, e := safe.GetOptionalNumber(run, op.Start, 0); e != nil {
 		err = e

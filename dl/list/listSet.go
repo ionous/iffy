@@ -29,7 +29,7 @@ func (op *Set) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Set) setAt(run rt.Runtime) (err error) {
-	if els, e := safe.GetList(run, op.List); e != nil {
+	if els, e := safe.List(run, op.List); e != nil {
 		err = e
 	} else if onedex, e := safe.GetNumber(run, op.Index); e != nil {
 		err = e

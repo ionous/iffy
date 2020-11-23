@@ -16,30 +16,34 @@ func NewDefaultValue(ks Kinds, a affine.Affinity, subtype string) (ret Value, er
 	// return the default value for the
 	switch a {
 	case affine.Bool:
-		ret = False
+		ret = BoolFrom(false, subtype)
 
 	case affine.Number:
-		ret = Zero
+		ret = FloatFrom(0, subtype)
+
 	case affine.NumList:
-		ret, err = newNumList(new([]float64), subtype)
+		ret = FloatsFrom(nil, subtype)
 
 	case affine.Text:
-		ret = Empty
+		ret = StringFrom("", subtype)
+
 	case affine.TextList:
-		ret, err = newTextList(new([]string), subtype)
+		ret = StringsFrom(nil, subtype)
 
 	case affine.Record:
 		if k, e := ks.GetKindByName(subtype); e != nil {
 			err = errutil.New("unknown kind", subtype, e)
 		} else {
-			ret, err = newRecord(k.NewRecord(), subtype)
+			ret = RecordFrom(k.NewRecord(), subtype)
 		}
+
 	case affine.RecordList:
 		if _, e := ks.GetKindByName(subtype); e != nil {
 			err = errutil.New("unknown kind", subtype, e)
 		} else {
-			ret, err = newRecordList(new([]*Record), subtype)
+			ret = RecordsFrom(nil, subtype)
 		}
+
 	default:
 		err = errutil.New("unhandled affinity", a)
 	}

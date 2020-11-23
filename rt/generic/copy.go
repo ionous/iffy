@@ -5,30 +5,6 @@ import (
 	"github.com/ionous/iffy/affine"
 )
 
-// CopyFloats: duplicate the passed slice.
-// ( b/c golang's built in copy doesnt allocate )
-func CopyFloats(src []float64) []float64 {
-	out := make([]float64, len(src))
-	copy(out, src)
-	return out
-}
-
-// CopyStrings: duplicate the passed slice.
-// ( b/c golang's built in copy doesnt allocate )
-func CopyStrings(src []string) []string {
-	out := make([]string, len(src))
-	copy(out, src)
-	return out
-}
-
-// CopyRecords: duplicate the passed slice.
-// ( b/c golang's built in copy doesnt allocate )
-func CopyRecords(src []*Record) []*Record {
-	out := make([]*Record, len(src))
-	copy(out, src)
-	return out
-}
-
 // CopyValue: create a new value from a snapshot of the passed value
 func CopyValue(val Value) (ret interface{}, err error) {
 	if val == nil {
@@ -48,10 +24,10 @@ func CopyValue(val Value) (ret interface{}, err error) {
 				ret = next
 			}
 		case affine.NumList:
-			ret = CopyFloats(val.Floats())
+			ret = copyFloats(val.Floats())
 
 		case affine.TextList:
-			ret = CopyStrings(val.Strings())
+			ret = copyStrings(val.Strings())
 
 		case affine.RecordList:
 			vs := val.Records()

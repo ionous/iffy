@@ -25,19 +25,19 @@ func cmdError(op composer.Slat, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }
 
-// can el be inserted into els?
-func IsInsertable(el, els g.Value) (okay bool) {
-	return isInsertable(els, el.Affinity(), el.Type())
+// can add be inserted into els?
+func IsInsertable(ins, els g.Value) (okay bool) {
+	return isInsertable(els, ins.Affinity(), ins.Type())
 }
 
-// can el be appended to els?
-// this is similar to IsInsertable, except that the el can itself be a list.
-func IsAppendable(el, els g.Value) (okay bool) {
-	elAff := el.Affinity()
-	if unlist := affine.Element(elAff); len(unlist) > 0 {
-		elAff = unlist
+// can add be appended to els?
+// this is similar to IsInsertable, except that the add can itself be a list.
+func IsAppendable(ins, els g.Value) (okay bool) {
+	inAff := ins.Affinity()
+	if unlist := affine.Element(inAff); len(unlist) > 0 {
+		inAff = unlist
 	}
-	return isInsertable(els, elAff, el.Type())
+	return isInsertable(els, inAff, ins.Type())
 }
 
 func isInsertable(els g.Value, haveAff affine.Affinity, haveType string) (okay bool) {
@@ -54,11 +54,11 @@ func isInsertable(els g.Value, haveAff affine.Affinity, haveType string) (okay b
 }
 
 type insertError struct {
-	el, els g.Value
+	ins, els g.Value
 }
 
 func (e insertError) Error() string {
 	return errutil.Sprintf("%s of %q isn't insertable into %s of %q",
-		e.el.Affinity(), e.el.Type(),
+		e.ins.Affinity(), e.ins.Type(),
 		e.els.Affinity(), e.els.Type())
 }

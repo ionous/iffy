@@ -31,9 +31,9 @@ func (op *Map) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Map) execute(run rt.Runtime) (err error) {
-	if fromList, e := safe.GetList(run, op.FromList); e != nil {
+	if fromList, e := safe.List(run, op.FromList); e != nil {
 		err = e
-	} else if toList, e := safe.GetList(run, op.ToList); e != nil {
+	} else if toList, e := safe.List(run, op.ToList); e != nil {
 		err = e
 	} else if e := op.cacheKinds(run, op.UsingPattern); e != nil {
 		err = e

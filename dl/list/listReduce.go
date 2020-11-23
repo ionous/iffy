@@ -31,7 +31,7 @@ func (op *Reduce) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Reduce) execute(run rt.Runtime) (err error) {
-	if fromList, e := safe.GetList(run, op.FromList); e != nil {
+	if fromList, e := safe.List(run, op.FromList); e != nil {
 		err = e
 	} else if outVal, e := safe.Variable(run, op.IntoValue, ""); e != nil {
 		err = e

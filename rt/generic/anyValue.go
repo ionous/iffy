@@ -31,7 +31,7 @@ type Value interface {
 	// Index returns the nth element of the underlying slice, where 0 is the first value;
 	// otherwise this returns an panic.
 	Index(int) Value
-	// Len returns the number of elements in the underlying value if it's a slice,
+	// Len returns the number of elements in the underylying value if it's a slice,
 	// otherwise this returns an panic.
 	Len() int
 	// FieldByName for values representing objects, errors otherwise ( or if the field doesnt exit ).
@@ -47,4 +47,8 @@ type Value interface {
 	// Slice returns a new list containing the first index up to (not including) the second index
 	// Unlike go, the slices are distinct.
 	Slice(i, j int) (Value, error)
+	// Splice cuts elements from start to end, adding new elements at the start of the cut point
+	// As a special case, passing a nil value only cuts elements.
+	// Returns an error if the start and end indices are bad; panics if the element/s to add are of an incompatible type.
+	Splice(start, end int, add Value) (Value, error)
 }
