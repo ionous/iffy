@@ -11,13 +11,13 @@ import (
 
 // GetVariable reads a value of the specified name from the current scope.
 // ( ex. loop locals, or -- in a noun scope -- might translate "apple" to "$macintosh" )
-type GetVar struct {
+type Var struct {
 	Name  string
 	Flags TryAsNoun `if:"internal"`
 }
 
 // Compose implements composer.Slat
-func (*GetVar) Compose() composer.Spec {
+func (*Var) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "get_var",
 		Spec:  "the {name:text_eval}",
@@ -26,29 +26,29 @@ func (*GetVar) Compose() composer.Spec {
 	}
 }
 
-func (op *GetVar) GetEval() interface{} {
+func (op *Var) GetEval() interface{} {
 	return op
 }
 
 // GetAssignedValue implements Assignment so we can SetXXX values from variables without a FromXXX statement in between.
-func (op *GetVar) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, "")
 }
 
-func (op *GetVar) GetBool(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.Bool)
 }
 
-func (op *GetVar) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.Number)
 }
 
-func (op *GetVar) GetText(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetText(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.Text)
 }
 
-// allows us to use GetVar directly in commands which take a named object.
-func (op *GetVar) GetObject(run rt.Runtime) (ret g.Value, err error) {
+// allows us to use Var directly in commands which take a named object.
+func (op *Var) GetObject(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := op.getObject(run); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -57,7 +57,7 @@ func (op *GetVar) GetObject(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *GetVar) getObject(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) getObject(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := getVariableValue(run, op.Name, op.Flags); e != nil {
 		err = e
 	} else if val != nil {
@@ -70,21 +70,21 @@ func (op *GetVar) getObject(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *GetVar) GetNumList(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetNumList(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.NumList)
 }
 
-func (op *GetVar) GetTextList(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.TextList)
 }
 
 // fix: should we bother to try to confirm that it's a RecordList or let the caller figure it out?
 // see also: GetObject
-func (op *GetVar) GetObjectList(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetObjectList(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.RecordList)
 }
 
-func (op *GetVar) getVar(run rt.Runtime, aff affine.Affinity) (ret g.Value, err error) {
+func (op *Var) getVar(run rt.Runtime, aff affine.Affinity) (ret g.Value, err error) {
 	if v, e := safe.Variable(run, op.Name, aff); e != nil {
 		err = cmdError(op, e)
 	} else {

@@ -19,7 +19,7 @@ package list_test
 // 	kinds.AddKinds((*Fruit)(nil))
 // 	lt := listTime{
 // 		kinds: &kinds,
-// 		PatternMap: pattern.PatternMap{
+// 		PatternMap: testutil.PatternMap{
 // 			"reduce": &reduceRecords,
 // 		},
 // 		vals: values{},

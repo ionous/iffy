@@ -1,25 +1,26 @@
-package core
+package test
 
 import (
 	"testing"
 
+	"github.com/ionous/iffy/dl/core"
 	g "github.com/ionous/iffy/rt/generic"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 	"github.com/kr/pretty"
 )
 
 func TestMake(t *testing.T) {
 	type panicTime struct {
-		test.PanicRuntime
+		testutil.PanicRuntime
 	}
 	var testTime struct {
 		panicTime
-		test.Kinds
+		testutil.Kinds
 	}
-	testTime.Kinds.AddKinds((*test.GroupSettings)(nil))
-	op := Make{Name: "GroupSettings",
-		Arguments: &Arguments{[]*Argument{
-			{"WithArticles", &FromBool{&Bool{true}}},
+	testTime.Kinds.AddKinds((*GroupSettings)(nil))
+	op := &core.Make{Name: "GroupSettings",
+		Arguments: &core.Arguments{[]*core.Argument{
+			{"WithArticles", &core.FromBool{&core.Bool{true}}},
 		}}}
 	if obj, e := op.GetObject(&testTime); e != nil {
 		t.Fatal(e)

@@ -1,4 +1,4 @@
-package test
+package testutil
 
 import (
 	"fmt"
@@ -10,22 +10,28 @@ import (
 )
 
 type Kinds struct {
-	kinds  kindMap
-	fields fieldMap
+	Kinds  KindMap
+	Fields FieldMap
 }
 
-type kindMap map[string]*g.Kind
-type fieldMap map[string][]g.Field
+type KindMap map[string]*g.Kind
+type FieldMap map[string][]g.Field
 
 // register kinds from a struct using reflection
 func (ks *Kinds) AddKinds(is ...interface{}) {
 	for _, el := range is {
-		ks.fields = kindsForType(ks.fields, r.TypeOf(el).Elem())
+		ks.Fields = kindsForType(ks.Fields, r.TypeOf(el).Elem())
 	}
 }
 
-func (ks *Kinds) New(name string) *g.Record {
-	return ks.Kind(name).NewRecord()
+func (ks *Kinds) New(name string, valuePairs ...interface{}) *g.Record {
+	v := ks.Kind(name).NewRecord()
+	if len(valuePairs) > 0 {
+		if e := SetRecord(v, valuePairs...); e != nil {
+			panic(e)
+		}
+	}
+	return v
 }
 
 func (ks *Kinds) Kind(name string) (ret *g.Kind) {
@@ -39,28 +45,28 @@ func (ks *Kinds) Kind(name string) (ret *g.Kind) {
 
 //
 func (ks *Kinds) GetKindByName(name string) (ret *g.Kind, err error) {
-	if k, ok := ks.kinds[name]; ok {
+	if k, ok := ks.Kinds[name]; ok {
 		ret = k // we created the kind already
-	} else if fs, ok := ks.fields[name]; !ok {
+	} else if fs, ok := ks.Fields[name]; !ok {
 		err = errutil.New("unknown kind", name)
 	} else {
-		if ks.kinds == nil {
-			ks.kinds = make(kindMap)
+		if ks.Kinds == nil {
+			ks.Kinds = make(KindMap)
 		}
 		// create the kind from the stored fields
 		k := g.NewKind(ks, name, fs)
-		ks.kinds[name] = k
+		ks.Kinds[name] = k
 		ret = k
 	}
 	return
 }
 
 // generate kinds from a struct using reflection
-func kindsForType(kinds fieldMap, t r.Type) fieldMap {
+func kindsForType(kinds FieldMap, t r.Type) FieldMap {
 	type stringer interface{ String() string }
 	rstringer := r.TypeOf((*stringer)(nil)).Elem()
 	if kinds == nil {
-		kinds = make(fieldMap)
+		kinds = make(FieldMap)
 	}
 
 	var fields []g.Field

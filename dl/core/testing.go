@@ -10,7 +10,7 @@ func NewActivity(exe ...rt.Execute) *Activity {
 	return &Activity{Exe: exe}
 }
 
-func NewArgs(from ...Assignment) *Arguments {
+func Args(from ...Assignment) *Arguments {
 	var p Arguments
 	for i, from := range from {
 		p.Args = append(p.Args, &Argument{
@@ -19,4 +19,10 @@ func NewArgs(from ...Assignment) *Arguments {
 		})
 	}
 	return &p
+}
+
+func NamedArgs(name string, from Assignment) *Arguments {
+	return &Arguments{[]*Argument{{
+		name, from,
+	}}}
 }

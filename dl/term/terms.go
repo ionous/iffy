@@ -9,7 +9,7 @@ import (
 // The only current user is pattern.FromPattern::Stitch()
 // It stores values from indexed and key name arguments ( originally specified as evals. )
 // Its pushed into scope so the names can be used as a source of values for rt.Runtime::GetField().
-// ( ex. For use with the commands GetVar{},  SimpleNoun{}, ProperNoun{}, ObjectName{}, ... )
+// ( ex. For use with the commands Var{},  SimpleNoun{}, ProperNoun{}, ObjectName{}, ... )
 type Terms struct {
 	fields []g.Field
 }

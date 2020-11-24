@@ -11,12 +11,12 @@ import (
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 	"github.com/kr/pretty"
 )
 
 func TestMapStrings(t *testing.T) {
-	var kinds test.Kinds
+	var kinds testutil.Kinds
 	type Fruit struct {
 		Name string
 	}
@@ -26,7 +26,7 @@ func TestMapStrings(t *testing.T) {
 	kinds.AddKinds((*Fruit)(nil), (*Values)(nil))
 	values := kinds.New("Values")
 	lt := listTime{
-		PatternMap: pattern.PatternMap{
+		PatternMap: testutil.PatternMap{
 			"remap": &reverseStrings,
 		},
 		ScopeStack: scope.ScopeStack{
@@ -34,7 +34,7 @@ func TestMapStrings(t *testing.T) {
 				&scope.TargetRecord{object.Variables, values},
 			},
 		},
-		kinds: &kinds,
+		Kinds: &kinds,
 	}
 	if e := values.SetNamedField("Fruits", g.StringsOf([]string{"Orange", "Lemon", "Mango", "Banana", "Lime"})); e != nil {
 		t.Fatal(e)
@@ -55,7 +55,7 @@ func TestMapStrings(t *testing.T) {
 }
 
 func TestMapRecords(t *testing.T) {
-	var kinds test.Kinds
+	var kinds testutil.Kinds
 	type Fruit struct {
 		Name string
 	}
@@ -81,8 +81,8 @@ func TestMapRecords(t *testing.T) {
 		}
 	}
 	lt := listTime{
-		kinds: &kinds,
-		PatternMap: pattern.PatternMap{
+		Kinds: &kinds,
+		PatternMap: testutil.PatternMap{
 			"remap": &reverseRecords,
 		},
 		ScopeStack: scope.ScopeStack{
@@ -157,7 +157,7 @@ var reverseStrings = pattern.ActivityPattern{
 				Name: "out",
 				From: &core.FromText{
 					&core.MakeReversed{
-						&core.GetVar{
+						&core.Var{
 							Name: "in",
 						},
 					},

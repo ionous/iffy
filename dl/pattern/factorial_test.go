@@ -7,12 +7,13 @@ import (
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/rt/safe"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 // TestFactorial of the number 3 to verify pattern recursion works.
 func TestFactorial(t *testing.T) {
 	// rules are run in reverse order.
-	run := patternRuntime{PatternMap: pattern.PatternMap{
+	run := patternRuntime{PatternMap: testutil.PatternMap{
 		"factorial": &pattern.NumberPattern{
 			pattern.CommonPattern{
 				Name: "factorial",
@@ -21,19 +22,19 @@ func TestFactorial(t *testing.T) {
 				},
 			}, []*pattern.NumberRule{{
 				NumberEval: &core.ProductOf{
-					&core.GetVar{Name: "num"},
+					&core.Var{Name: "num"},
 					&pattern.DetermineNum{
-						Pattern: "factorial", Arguments: pattern.NewNamedParams(
+						Pattern: "factorial", Arguments: core.NamedArgs(
 							"num", &core.FromNum{
 								&core.DiffOf{
-									&core.GetVar{Name: "num"},
+									&core.Var{Name: "num"},
 									&core.Number{1},
 								},
 							},
 						)}},
 			}, {
 				Filter: &core.CompareNum{
-					&core.GetVar{Name: "num"},
+					&core.Var{Name: "num"},
 					&core.EqualTo{},
 					&core.Number{0},
 				},
@@ -42,7 +43,7 @@ func TestFactorial(t *testing.T) {
 	}}
 	// determine the factorial of the number 3
 	det := pattern.DetermineNum{
-		Pattern: "factorial", Arguments: pattern.NewNamedParams(
+		Pattern: "factorial", Arguments: core.NamedArgs(
 			"num", &core.FromNum{
 				&core.Number{3},
 			}),

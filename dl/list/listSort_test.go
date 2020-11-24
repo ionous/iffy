@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/rt/safe"
+	"github.com/ionous/iffy/test/testutil"
 	"github.com/kr/pretty"
 )
 
@@ -25,7 +26,7 @@ func TestSort(t *testing.T) {
 }
 
 func sortTest(src []string) (ret []string, err error) {
-	if run, values, e := newListTime(src, pattern.PatternMap{
+	if run, values, e := newListTime(src, testutil.PatternMap{
 		"sort": &sortPattern,
 	}); e != nil {
 		err = e

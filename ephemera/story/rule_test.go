@@ -7,9 +7,9 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/safe"
-	"github.com/ionous/iffy/rt/test"
 	"github.com/ionous/iffy/rt/writer"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testutil"
 	"github.com/kr/pretty"
 )
 
@@ -139,7 +139,7 @@ var _text_eval = map[string]interface{}{
 }
 
 type baseRuntime struct {
-	test.PanicRuntime
+	testutil.PanicRuntime
 }
 type testRuntime struct {
 	baseRuntime

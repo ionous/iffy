@@ -5,12 +5,12 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 func TestMath(t *testing.T) {
 	match := func(v float64, eval rt.NumberEval) (err error) {
-		var run test.PanicRuntime
+		var run testutil.PanicRuntime
 		if n, e := eval.GetNumber(&run); e != nil {
 			err = e
 		} else if n.Float() != v {

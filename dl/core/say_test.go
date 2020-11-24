@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/ionous/iffy/rt/safe"
-	"github.com/ionous/iffy/rt/test"
 	"github.com/ionous/iffy/rt/writer"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 var helloThereWorld = NewActivity(
@@ -55,7 +55,7 @@ func ExampleCommas() {
 }
 
 type baseRuntime struct {
-	test.PanicRuntime
+	testutil.PanicRuntime
 }
 type sayTester struct {
 	baseRuntime

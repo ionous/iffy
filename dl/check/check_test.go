@@ -5,8 +5,8 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt/print"
-	"github.com/ionous/iffy/rt/test"
 	"github.com/ionous/iffy/rt/writer"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 func TestCheck(t *testing.T) {
@@ -36,7 +36,7 @@ func runTest(prog *CheckOutput) (err error) {
 }
 
 type baseRuntime struct {
-	test.PanicRuntime
+	testutil.PanicRuntime
 }
 type checkTester struct {
 	baseRuntime

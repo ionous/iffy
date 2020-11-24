@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 func (n *recordTest) NewKind(name string, fields []g.Field) (ret *g.Kind) {
@@ -43,7 +43,7 @@ func (n *recordTest) GetField(target, field string) (ret g.Value, err error) {
 }
 
 type recordTest struct {
-	test.PanicRuntime
+	testutil.PanicRuntime
 	ks   []*g.Kind
 	vars map[string]*g.Record
 }

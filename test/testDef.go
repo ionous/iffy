@@ -1,5 +1,16 @@
 package test
 
+// a simple noun
+type Things struct {
+}
+
+// global variables for grouping tests
+type Values struct {
+	Objects   []string
+	Settings  []GroupSettings
+	Collation GroupCollation
+}
+
 // the pattern group together builds a list of group settings from a list of objects
 type GroupSettings struct {
 	// the name of the object this record describes

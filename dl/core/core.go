@@ -46,7 +46,7 @@ var Slats = []composer.Slat{
 	(*ForEachText)(nil),
 
 	(*GetField)(nil),
-	(*GetVar)(nil),
+	(*Var)(nil),
 	(*HasTrait)(nil),
 
 	(*IsTrue)(nil),    // transparent pass-through of a bool eval

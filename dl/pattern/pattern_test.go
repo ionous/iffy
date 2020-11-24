@@ -3,17 +3,16 @@ package pattern_test
 import (
 	"fmt"
 
-	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/rt/scope"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 // ExampleSayMe converts numbers to text
 // http://learnyouahaskell.com/syntax-in-functions
 func ExampleSayMe() {
 	// rules are run in reverse order.
-	run := patternRuntime{PatternMap: pattern.PatternMap{
+	run := patternRuntime{PatternMap: testutil.PatternMap{
 		"sayMe": &debug.SayPattern,
 	}}
 	// say 4 numbers
@@ -34,11 +33,11 @@ func ExampleSayMe() {
 }
 
 type baseRuntime struct {
-	test.PanicRuntime
+	testutil.PanicRuntime
 }
 
 type patternRuntime struct {
 	baseRuntime
-	scope.ScopeStack   // parameters are pushed onto the stack.
-	pattern.PatternMap // holds pointers to patterns
+	scope.ScopeStack    // parameters are pushed onto the stack.
+	testutil.PatternMap // holds pointers to patterns
 }

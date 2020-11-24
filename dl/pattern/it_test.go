@@ -114,4 +114,4 @@ func (b Bool) GetBool(rt.Runtime) (g.Value, error) {
 
 var Skip = Bool(false)
 
-func V(n string) *core.GetVar { return &core.GetVar{Name: n} }
+func V(n string) *core.Var { return &core.Var{Name: n} }

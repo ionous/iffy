@@ -138,6 +138,8 @@ func (*Numbers) Compose() composer.Spec {
 }
 
 func (op *Numbers) GetNumList(rt.Runtime) (ret g.Value, _ error) {
+	// note: this generates a new slice pointing to the op.Values memory;
+	// fix: should this be a copy? or, maybe mark this as read-only
 	ret = g.FloatsOf(op.Values)
 	return
 }

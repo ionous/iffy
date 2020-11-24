@@ -3,11 +3,11 @@ package core
 import (
 	"testing"
 
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 func TestMatches(t *testing.T) {
-	var run test.PanicRuntime
+	var run testutil.PanicRuntime
 	// test a valid regexp
 	// loop to verify(ish) the cache
 	m := &Matches{Text: &Text{"gophergopher"}, Pattern: "(gopher){2}"}

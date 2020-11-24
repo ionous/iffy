@@ -16,7 +16,7 @@ func B(b bool) rt.BoolEval {
 }
 func O(n string, exact bool) (ret rt.ObjectEval) {
 	if !exact {
-		ret = &core.GetVar{Name: n, Flags: core.TryAsBoth}
+		ret = &core.Var{Name: n, Flags: core.TryAsBoth}
 	} else {
 		ret = &core.ObjectName{T(n)}
 	}

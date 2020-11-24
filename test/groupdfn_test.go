@@ -3,13 +3,14 @@ package test
 import (
 	"testing"
 
+	"github.com/ionous/iffy/test/testutil"
 	"github.com/kr/pretty"
 )
 
 func TestKindsForType(t *testing.T) {
-	var ks Kinds
+	var ks testutil.Kinds
 	ks.AddKinds((*GroupCollation)(nil))
-	if diff := pretty.Diff(ks.fields, fieldMap{
+	if diff := pretty.Diff(ks.Fields, testutil.FieldMap{
 		"Innumerable": {
 			{"NotInnumerable", "bool", "trait"},
 			{"IsInnumerable", "bool", "trait"},
@@ -33,6 +34,6 @@ func TestKindsForType(t *testing.T) {
 			{"Groups", "record_list", "GroupObjects"},
 		},
 	}); len(diff) > 0 {
-		t.Fatal(pretty.Println(ks.fields))
+		t.Fatal(pretty.Println(ks.Fields))
 	}
 }

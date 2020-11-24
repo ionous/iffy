@@ -5,36 +5,45 @@ import (
 	"strings"
 
 	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/scope"
-	"github.com/ionous/iffy/rt/test"
 	"github.com/ionous/iffy/rt/writer"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 type panicTime struct {
-	test.PanicRuntime
+	testutil.PanicRuntime
 }
 type listTime struct {
 	panicTime
 	objs map[string]*g.Record
 	scope.ScopeStack
-	pattern.PatternMap
-	kinds *test.Kinds
+	testutil.PatternMap
+	*testutil.Kinds
 }
 
 func (lt *listTime) Writer() writer.Output {
 	return writer.NewStdout()
 }
-func newListTime(src []string, p pattern.PatternMap) (ret rt.Runtime, vals *g.Record, err error) {
-	var kinds test.Kinds
+
+func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
+	if obj, ok := lt.objs[field]; target == object.Value && ok {
+		ret = g.RecordOf(obj)
+	} else {
+		ret, err = lt.ScopeStack.GetField(target, field)
+	}
+	return
+}
+
+func newListTime(src []string, p testutil.PatternMap) (ret rt.Runtime, vals *g.Record, err error) {
+	var kinds testutil.Kinds
 	type Values struct{ Source []string }
 	kinds.AddKinds((*Values)(nil))
 	values := kinds.New("Values")
 	lt := listTime{
-		kinds:      &kinds,
+		Kinds:      &kinds,
 		PatternMap: p,
 		ScopeStack: scope.ScopeStack{
 			Scopes: []rt.Scope{
@@ -51,10 +60,10 @@ func newListTime(src []string, p pattern.PatternMap) (ret rt.Runtime, vals *g.Re
 	return
 }
 
-func B(i bool) rt.BoolEval    { return &core.Bool{i} }
-func I(i int) rt.NumberEval   { return &core.Number{float64(i)} }
-func T(i string) rt.TextEval  { return &core.Text{i} }
-func V(i string) *core.GetVar { return &core.GetVar{Name: i} }
+func B(i bool) rt.BoolEval   { return &core.Bool{i} }
+func I(i int) rt.NumberEval  { return &core.Number{float64(i)} }
+func T(i string) rt.TextEval { return &core.Text{i} }
+func V(i string) *core.Var   { return &core.Var{Name: i} }
 
 func FromTs(vs []string) (ret core.Assignment) {
 	if len(vs) == 1 {
@@ -108,19 +117,10 @@ func joinStrings(vs []string) (ret string) {
 	return
 }
 
-func (lt *listTime) GetField(target, field string) (ret g.Value, err error) {
-	if obj, ok := lt.objs[field]; target == object.Value && ok {
-		ret = g.RecordOf(obj)
-	} else {
-		ret, err = lt.ScopeStack.GetField(target, field)
-	}
-	return
-}
+// func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
+// 	return lt.ScopeStack.SetField(target, field, value)
+// }
 
-func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
-	return lt.ScopeStack.SetField(target, field, value)
-}
-
-func (lt *listTime) GetKindByName(name string) (*g.Kind, error) {
-	return lt.kinds.GetKindByName(name)
-}
+// func (lt *listTime) GetKindByName(name string) (*g.Kind, error) {
+// 	return lt.kinds.GetKindByName(name)
+// }

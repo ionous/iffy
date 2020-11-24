@@ -129,7 +129,7 @@ func TestTemplates(t *testing.T) {
 	t.Run("print", func(t *testing.T) {
 		if e := testTemplate("{printNumWord: .groupSize}",
 			&core.PrintNumWord{
-				Num: &core.GetVar{
+				Num: &core.Var{
 					Name:  "groupSize",
 					Flags: core.TryAsBoth,
 				},
@@ -227,7 +227,7 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("{'world'|hello!}",
 			&core.Buffer{core.NewActivity(
 				&pattern.DetermineAct{
-					Pattern: "hello", Arguments: core.NewArgs(
+					Pattern: "hello", Arguments: core.Args(
 						&core.FromText{T("world")},
 					)})}); e != nil {
 			t.Fatal(e)

@@ -57,6 +57,8 @@ func StringsFrom(vs []string, subtype string) (ret Value) {
 }
 func FloatsFrom(vs []float64, subtype string) (ret Value) {
 	if a := affine.NumList; vs != nil {
+		// note: this address is of the unique slice "vs" which shares memory with the slice passed
+		// but has its own length. quite possibly this should be marked as "read-only"
 		ret = makeValue(a, subtype, &vs)
 	} else {
 		ret = makeValue(a, subtype, new([]float64))

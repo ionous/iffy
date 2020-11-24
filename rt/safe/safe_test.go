@@ -4,11 +4,11 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/rt/safe"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 func TestSafety(t *testing.T) {
-	var run test.PanicRuntime
+	var run testutil.PanicRuntime
 	switch e := safe.RunAll(&run, nil); e.(type) {
 	case nil:
 		t.Log("okay nothing run")

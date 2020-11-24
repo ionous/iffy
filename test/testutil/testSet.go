@@ -1,4 +1,4 @@
-package test
+package testutil
 
 import (
 	"github.com/ionous/errutil"

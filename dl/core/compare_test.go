@@ -4,12 +4,12 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/rt/safe"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 func TestCompareNumbers(t *testing.T) {
 	test := func(a float64, op Comparator, b float64, res bool) {
-		var run test.PanicRuntime
+		var run testutil.PanicRuntime
 		cmp := &CompareNum{&Number{a}, op, &Number{b}}
 		if ok, e := safe.GetBool(run, cmp); e != nil {
 			t.Fatal(e)
@@ -32,7 +32,7 @@ func TestCompareNumbers(t *testing.T) {
 
 func TestCompareText(t *testing.T) {
 	test := func(a string, op Comparator, b string, res bool) {
-		var run test.PanicRuntime
+		var run testutil.PanicRuntime
 		cmp := &CompareText{&Text{a}, op, &Text{b}}
 		if ok, e := safe.GetBool(run, cmp); e != nil {
 			t.Fatal(e)

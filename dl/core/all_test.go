@@ -7,11 +7,11 @@ import (
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
-	"github.com/ionous/iffy/rt/test"
+	"github.com/ionous/iffy/test/testutil"
 )
 
 func TestAllTrue(t *testing.T) {
-	run := &test.PanicRuntime{}
+	run := &testutil.PanicRuntime{}
 	var l boolList
 	evals := []rt.BoolEval{}
 	for i := 0; i < 3; i++ {
@@ -40,7 +40,7 @@ func TestAllTrue(t *testing.T) {
 }
 
 func TestAnyTrue(t *testing.T) {
-	run := &test.PanicRuntime{}
+	run := &testutil.PanicRuntime{}
 	var l boolList
 	evals := []rt.BoolEval{}
 	for i := 0; i < 3; i++ {

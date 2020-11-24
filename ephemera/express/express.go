@@ -278,7 +278,7 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 				// ex. could be .ringBearer, or could be .samWise
 				// lets assume for now, that if a variable holds text referring to an object....
 				// then it needs to hold the object id, ie. we dont have to resolve the name of the object again.
-				obj = &core.GetVar{Name: firstField, Flags: core.TryAsBoth}
+				obj = &core.Var{Name: firstField, Flags: core.TryAsBoth}
 			}
 			if len(fields) == 1 {
 				// we dont know yet how { .name.... } is being used:

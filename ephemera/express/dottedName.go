@@ -35,9 +35,9 @@ func (on *dottedName) flags() (ret core.TryAsNoun) {
 // when dotted names are used as arguments to concrete functions
 // 		ex. {numAsWords: .count}
 // we cant know the type of the variable .count without keeping a name stack during compilation
-// but we can use the existing command GetVar which implements every eval type.
-func (on *dottedName) getValueNamed() *core.GetVar {
-	return &core.GetVar{
+// but we can use the existing command Var which implements every eval type.
+func (on *dottedName) getValueNamed() *core.Var {
+	return &core.Var{
 		Name:  on.name,
 		Flags: on.flags(),
 	}

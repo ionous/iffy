@@ -15,7 +15,7 @@ import (
 // note: the pattern is undefined.
 func TestDetermineNum(t *testing.T) {
 	expect := pattern.DetermineNum{
-		Pattern: "factorial", Arguments: pattern.NewNamedParams(
+		Pattern: "factorial", Arguments: core.NamedArgs(
 			"num", &core.FromNum{
 				&core.Number{3},
 			})}
