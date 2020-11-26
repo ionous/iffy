@@ -44,6 +44,10 @@ type FromText struct {
 	Val rt.TextEval
 }
 
+type FromRecord struct {
+	Val rt.RecordEval
+}
+
 type FromObject struct {
 	Val rt.ObjectEval
 }
@@ -56,8 +60,8 @@ type FromTextList struct {
 	Vals rt.TextListEval
 }
 
-type FromObjectList struct {
-	Vals rt.ObjectListEval
+type FromRecordList struct {
+	Vals rt.RecordListEval
 }
 
 func (*Assign) Compose() composer.Spec {
@@ -142,11 +146,32 @@ func (op *FromText) GetEval() interface{} {
 	return op.Val
 }
 
-func (*FromObject) Compose() composer.Spec {
+func (*FromRecord) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_record",
 		Group: "variables",
 		Desc:  "Assign Record: Assigns the passed record.",
+	}
+}
+
+func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if obj, e := safe.GetRecord(run, op.Val); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = obj
+	}
+	return
+}
+
+func (op *FromRecord) GetEval() interface{} {
+	return op.Val
+}
+
+func (*FromObject) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "assign_object",
+		Group: "variables",
+		Desc:  "Assign Object: Assigns the passed object",
 	}
 }
 
@@ -205,7 +230,7 @@ func (op *FromTextList) GetEval() interface{} {
 	return op.Vals
 }
 
-func (*FromObjectList) Compose() composer.Spec {
+func (*FromRecordList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_record_list",
 		Group: "variables",
@@ -213,8 +238,8 @@ func (*FromObjectList) Compose() composer.Spec {
 	}
 }
 
-func (op *FromObjectList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if objs, e := safe.GetObjectList(run, op.Vals); e != nil {
+func (op *FromRecordList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if objs, e := safe.GetRecordList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = objs
@@ -222,6 +247,6 @@ func (op *FromObjectList) GetAssignedValue(run rt.Runtime) (ret g.Value, err err
 	return
 }
 
-func (op *FromObjectList) GetEval() interface{} {
+func (op *FromRecordList) GetEval() interface{} {
 	return op.Vals
 }

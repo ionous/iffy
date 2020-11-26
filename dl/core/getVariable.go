@@ -80,7 +80,7 @@ func (op *Var) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 
 // fix: should we bother to try to confirm that it's a RecordList or let the caller figure it out?
 // see also: GetObject
-func (op *Var) GetObjectList(run rt.Runtime) (ret g.Value, err error) {
+func (op *Var) GetRecordList(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.RecordList)
 }
 

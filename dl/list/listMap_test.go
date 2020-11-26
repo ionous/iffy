@@ -132,7 +132,7 @@ var reverseRecords = pattern.ActivityPattern{
 				Field: "Name",
 				From: &core.FromText{
 					&core.MakeReversed{
-						&core.GetField{
+						&core.Field{
 							Obj:   V("in"),
 							Field: "Name",
 						},

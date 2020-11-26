@@ -70,7 +70,7 @@ package list_test
 // 				Name: "out",
 // 				From: &core.FromText{&core.Join{Sep: T(", "), Parts: []rt.TextEval{
 // 					V("out"),
-// 					&core.GetField{V("in"), "Name"},
+// 					&core.Field{V("in"), "Name"},
 // 				}}},
 // 			},
 // 		},

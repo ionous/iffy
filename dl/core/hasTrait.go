@@ -17,7 +17,7 @@ type HasTrait struct {
 func (*HasTrait) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "has_trait",
-		Spec:  "{object%object:object_ref} is {trait:text_eval}",
+		Spec:  "{object%object:object_eval} is {trait:text_eval}",
 		Group: "objects",
 		Desc:  "Has Trait: Return true if noun is currently in the requested state.",
 	}

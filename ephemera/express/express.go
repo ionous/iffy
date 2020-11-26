@@ -295,7 +295,7 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 			} else {
 				// a chain of dots indicates we're getting one or more fields of objects
 				// ex. for { .object.fieldContainingAnObject.otherField }
-				var getField *core.GetField
+				var getField *core.Field
 				// .a.b: from the named object a, we want its field b
 				// .a.b.c: after getting the object name in field b, get that object's field c
 				for _, field := range fields[1:] {
@@ -308,7 +308,7 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 						obj = &core.ObjectName{getField}
 					}
 					//
-					getField = &core.GetField{
+					getField = &core.Field{
 						Obj:   obj,
 						Field: field,
 					}

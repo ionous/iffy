@@ -27,10 +27,23 @@ func Variable(run rt.Runtime, n string, aff affine.Affinity) (ret g.Value, err e
 	return
 }
 
-func Field(run rt.Runtime, obj rt.ObjectEval, field string, aff affine.Affinity) (ret g.Value, err error) {
-	if obj, e := GetObject(run, obj); e != nil {
+func Field(run rt.Runtime, eval rt.ObjectEval, field string, aff affine.Affinity) (ret g.Value, err error) {
+	if obj, e := GetObject(run, eval); e != nil {
 		err = e
 	} else if v, e := obj.FieldByName(field); e != nil {
+		err = e
+	} else if Check(v, aff); e != nil {
+		err = e
+	} else {
+		ret = v
+	}
+	return
+}
+
+func Unpack(run rt.Runtime, eval rt.RecordEval, field string, aff affine.Affinity) (ret g.Value, err error) {
+	if d, e := GetRecord(run, eval); e != nil {
+		err = e
+	} else if v, e := d.FieldByName(field); e != nil {
 		err = e
 	} else if Check(v, aff); e != nil {
 		err = e

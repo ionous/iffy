@@ -86,15 +86,15 @@ func TestExpressions(t *testing.T) {
 	})
 	t.Run("big dot", func(t *testing.T) {
 		if e := testExpression(".A.num",
-			&core.GetField{O("A", true), "num"}); e != nil {
+			&core.Field{O("A", true), "num"}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("little dot", func(t *testing.T) {
 		if e := testExpression(".a.b.c",
-			&core.GetField{
+			&core.Field{
 				&core.ObjectName{
-					Name: &core.GetField{
+					Name: &core.Field{
 						O("a", false),
 						"b"},
 				},
@@ -105,8 +105,8 @@ func TestExpressions(t *testing.T) {
 	t.Run("binary", func(t *testing.T) {
 		if e := testExpression(".A.num * .b.num",
 			&core.ProductOf{
-				&core.GetField{O("A", true), "num"},
-				&core.GetField{O("b", false), "num"},
+				&core.Field{O("A", true), "num"},
+				&core.Field{O("b", false), "num"},
 			}); e != nil {
 			t.Fatal(e)
 		}
@@ -248,7 +248,7 @@ func TestTemplates(t *testing.T) {
 	// dotted names started with capital letters are requests for objects exactly matching that name
 	t.Run("global prop", func(t *testing.T) {
 		if e := testTemplate("{.Object.prop}",
-			&core.GetField{O("Object", true), "prop"},
+			&core.Field{O("Object", true), "prop"},
 		); e != nil {
 			t.Fatal(e)
 		}

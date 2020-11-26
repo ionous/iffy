@@ -26,7 +26,7 @@ var collateGroups = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{Execute: core.NewActivity(
 			// walk out.Groups for matching settings
-			&core.Assign{"groups", &core.GetField{&core.Var{Name: "out"}, "Groups"}},
+			&core.Assign{"groups", &core.Field{&core.Var{Name: "out"}, "Groups"}},
 			&list.Each{
 				List: "groups",
 				With: "el",
@@ -34,7 +34,7 @@ var collateGroups = pattern.ActivityPattern{
 					&core.Choose{
 						If: &pattern.DetermineBool{
 							Pattern:   "isMatchingGroup",
-							Arguments: core.Args(&core.Var{Name: "in"}, &core.GetField{&core.Var{Name: "el"}, "Settings"})},
+							Arguments: core.Args(&core.Var{Name: "in"}, &core.Field{&core.Var{Name: "el"}, "Settings"})},
 						True: core.NewActivity(
 							&core.Assign{
 								Name: "idx",
@@ -54,7 +54,7 @@ var collateGroups = pattern.ActivityPattern{
 				// pack the object and its settings into it,
 				// push the group into the groups.
 				True: core.NewActivity(
-					&list.Push{List: "names", Insert: &core.GetField{&core.Var{Name: "in"}, "Name"}},
+					&list.Push{List: "names", Insert: &core.Field{&core.Var{Name: "in"}, "Name"}},
 					&core.SetField{&core.Var{Name: "group"}, "Objects", &core.Var{Name: "names"}},
 					&core.SetField{&core.Var{Name: "group"}, "Settings", &core.Var{Name: "in"}},
 					&list.Push{List: "groups", Insert: &core.Var{Name: "group"}},
@@ -63,8 +63,8 @@ var collateGroups = pattern.ActivityPattern{
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
 					&core.Assign{"group", &core.FromObject{&list.At{"groups", &core.Var{Name: "idx"}}}},
-					&core.Assign{"names", &core.GetField{&core.Var{Name: "group"}, "Objects"}},
-					&list.Push{List: "names", Insert: &core.GetField{&core.Var{Name: "in"}, "Name"}},
+					&core.Assign{"names", &core.Field{&core.Var{Name: "group"}, "Objects"}},
+					&list.Push{List: "names", Insert: &core.Field{&core.Var{Name: "in"}, "Name"}},
 					&core.SetField{&core.Var{Name: "group"}, "Objects", &core.Var{Name: "names"}},
 					&list.Set{"groups", &core.Var{Name: "idx"}, &core.Var{Name: "group"}},
 				), // end false

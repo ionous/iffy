@@ -108,26 +108,12 @@ func getObjectExactly(run rt.Runtime, name string) (ret g.Value, err error) {
 	return
 }
 
-// first look for a variable named "name" in scope, unbox it (if need be) to return the object's id.
-func getObjectInexactly(run rt.Runtime, name string) (ret g.Value, err error) {
-	switch val, e := safe.Variable(run, name, ""); e.(type) {
-	default:
-		err = e
-	// if there's no such variable, check if there's an object of that name.
-	case g.UnknownTarget, g.UnknownField:
-		ret, err = getObjectByName(run, name)
-	case nil:
-		ret = val
-	}
-	return
-}
-
 func (*NameOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "name_of",
 		Group: "objects",
 		Desc:  "Name Of: Full name of the object.",
-		Spec:  "name of {object%obj:object_ref}",
+		Spec:  "name of {object%obj:object_eval}",
 	}
 }
 
@@ -145,7 +131,7 @@ func (*KindOf) Compose() composer.Spec {
 		Name:  "kind_of",
 		Group: "objects",
 		Desc:  "Kind Of: Friendly name of the object's kind.",
-		Spec:  "kind of {object%obj:object_ref}",
+		Spec:  "kind of {object%obj:object_eval}",
 	}
 }
 
@@ -161,7 +147,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 func (*IsKindOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "is_kind_of",
-		Spec:  "Is {object%obj:object_ref} a kind of {kind:singular_kind}",
+		Spec:  "Is {object%obj:object_eval} a kind of {kind:singular_kind}",
 		Group: "objects",
 		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",
 	}

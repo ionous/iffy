@@ -32,11 +32,17 @@ func (q *qnaObject) Affinity() affine.Affinity {
 	return affine.Object //
 }
 
-func (q *qnaObject) Type() string {
-	// fix: should this be "kind"?
-	// for now we return "object" and records will return their individual record kind
-	// note: we'll have to exclude certain names from records: basically the affinities
-	return "object{}"
+func (q *qnaObject) String() (ret string) {
+	return q.id
+}
+
+func (q *qnaObject) Type() (ret string) {
+	if v, e := q.FieldByName(object.Kind); e != nil {
+		ret = "object{}"
+	} else {
+		ret = v.String()
+	}
+	return
 }
 
 func (q *qnaObject) FieldByName(field string) (ret g.Value, err error) {
