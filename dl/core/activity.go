@@ -21,6 +21,9 @@ func (*Activity) Compose() composer.Spec {
 }
 
 // Execute statements
-func (op *Activity) Execute(run rt.Runtime) error {
-	return safe.RunAll(run, op.Exe)
+func (op *Activity) Execute(run rt.Runtime) (err error) {
+	if e := safe.RunAll(run, op.Exe); e != nil {
+		err = cmdError(op, e)
+	}
+	return
 }

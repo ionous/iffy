@@ -28,13 +28,13 @@ func (op *Sort) Compose() composer.Spec {
 }
 
 func (op *Sort) Execute(run rt.Runtime) (err error) {
-	if e := op.execute(run); e != nil {
+	if e := op.sort(run); e != nil {
 		err = cmdError(op, e)
 	}
 	return
 }
 
-func (op *Sort) execute(run rt.Runtime) (err error) {
+func (op *Sort) sort(run rt.Runtime) (err error) {
 	if vs, e := safe.List(run, op.List); e != nil {
 		err = e
 	} else {

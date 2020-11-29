@@ -21,6 +21,13 @@ func (*SetField) Compose() composer.Spec {
 }
 
 func (op *SetField) Execute(run rt.Runtime) (err error) {
+	if e := op.setField(run); e != nil {
+		err = cmdError(op, e)
+	}
+	return
+}
+
+func (op *SetField) setField(run rt.Runtime) (err error) {
 	if obj, e := safe.GetObject(run, op.Obj); e != nil {
 		err = e
 	} else if val, e := GetAssignedValue(run, op.From); e != nil {

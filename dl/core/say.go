@@ -53,7 +53,10 @@ func (*Say) Compose() composer.Spec {
 
 // Execute writes text to the runtime's current writer.
 func (op *Say) Execute(run rt.Runtime) (err error) {
-	return safe.WriteText(run, op.Text)
+	if e := safe.WriteText(run, op.Text); e != nil {
+		err = cmdError(op, e)
+	}
+	return
 }
 
 // Compose defines a spec for the composer editor.

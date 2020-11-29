@@ -24,13 +24,13 @@ func (*Map) Compose() composer.Spec {
 	}
 }
 func (op *Map) Execute(run rt.Runtime) (err error) {
-	if e := op.execute(run); e != nil {
+	if e := op.remap(run); e != nil {
 		err = cmdError(op, e)
 	}
 	return
 }
 
-func (op *Map) execute(run rt.Runtime) (err error) {
+func (op *Map) remap(run rt.Runtime) (err error) {
 	if fromList, e := safe.List(run, op.FromList); e != nil {
 		err = e
 	} else if toList, e := safe.List(run, op.ToList); e != nil {

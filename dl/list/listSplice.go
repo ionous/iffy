@@ -31,7 +31,9 @@ and true/false values can't be added to a list.`,
 }
 
 func (op *Splice) Execute(run rt.Runtime) (err error) {
-	_, _, err = op.spliceList(run, "")
+	if _, _, e := op.spliceList(run, ""); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }
 

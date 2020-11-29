@@ -21,6 +21,13 @@ func (*Pack) Compose() composer.Spec {
 }
 
 func (op *Pack) Execute(run rt.Runtime) (err error) {
+	if e := op.pack(run); e != nil {
+		err = cmdError(op, e)
+	}
+	return
+}
+
+func (op *Pack) pack(run rt.Runtime) (err error) {
 	if obj, e := safe.GetRecord(run, op.Record); e != nil {
 		err = e
 	} else if val, e := GetAssignedValue(run, op.From); e != nil {

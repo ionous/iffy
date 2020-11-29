@@ -28,13 +28,13 @@ func (op *Each) Compose() composer.Spec {
 }
 
 func (op *Each) Execute(run rt.Runtime) (err error) {
-	if e := op.execute(run); e != nil {
+	if e := op.forEach(run); e != nil {
 		err = cmdError(op, e)
 	}
 	return
 }
 
-func (op *Each) execute(run rt.Runtime) (err error) {
+func (op *Each) forEach(run rt.Runtime) (err error) {
 	if vs, e := safe.List(run, op.List); e != nil {
 		err = e
 	} else {

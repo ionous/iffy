@@ -46,11 +46,18 @@ func (*ForEachNum) Compose() composer.Spec {
 	}
 }
 
-func (f *ForEachNum) Execute(run rt.Runtime) (err error) {
-	if vs, e := safe.GetNumList(run, f.In); e != nil {
+func (op *ForEachNum) Execute(run rt.Runtime) (err error) {
+	if e := op.forEach(run); e != nil {
+		err = cmdError(op, e)
+	}
+	return
+}
+
+func (op *ForEachNum) forEach(run rt.Runtime) (err error) {
+	if vs, e := safe.GetNumList(run, op.In); e != nil {
 		err = e
 	} else {
-		err = scope.LoopOver(run, "num", g.ListIt(vs), f.Go, f.Else)
+		err = scope.LoopOver(run, "num", g.ListIt(vs), op.Go, op.Else)
 	}
 	return
 }
@@ -64,11 +71,18 @@ func (*ForEachText) Compose() composer.Spec {
 	}
 }
 
-func (f *ForEachText) Execute(run rt.Runtime) (err error) {
-	if vs, e := safe.GetTextList(run, f.In); e != nil {
+func (op *ForEachText) Execute(run rt.Runtime) (err error) {
+	if e := op.forEach(run); e != nil {
+		err = cmdError(op, e)
+	}
+	return
+}
+
+func (op *ForEachText) forEach(run rt.Runtime) (err error) {
+	if vs, e := safe.GetTextList(run, op.In); e != nil {
 		err = e
 	} else {
-		err = scope.LoopOver(run, "text", g.ListIt(vs), f.Go, f.Else)
+		err = scope.LoopOver(run, "text", g.ListIt(vs), op.Go, op.Else)
 	}
 	return
 }

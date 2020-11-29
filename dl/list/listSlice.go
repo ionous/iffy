@@ -32,7 +32,9 @@ func (*Slice) Compose() composer.Spec {
 }
 
 func (op *Slice) Execute(run rt.Runtime) (err error) {
-	_, _, err = op.sliceList(run, "")
+	if _, _, e := op.sliceList(run, ""); e != nil {
+		err = cmdError(op, e)
+	}
 	return
 }
 
