@@ -17,11 +17,6 @@ type Scope interface {
 	SetField(object, field string, value g.Value) error
 }
 
-type Relations interface {
-	Relate(a, b, relation string) error
-	Relatives(a, relation string) (g.Value, error)
-}
-
 // Runtime environment for an in-progress game.
 type Runtime interface {
 	// objects are grouped into potentially hierarchical "domains"
@@ -34,7 +29,8 @@ type Runtime interface {
 	// record manipulation
 	GetKindByName(name string) (*g.Kind, error)
 	//
-	Relations
+	Relate(a, b, relation string) error
+	Relatives(a, relation string) ([]string, error)
 	// the runtime behaves as stack of scopes.
 	// if a variable isnt found in the most recently pushed scope
 	// the next most recently pushed scope will be checked and so on.

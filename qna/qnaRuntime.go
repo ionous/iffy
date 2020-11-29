@@ -85,6 +85,6 @@ func (run *Runner) Relate(a, b, relation string) (err error) {
 	return
 }
 
-func (run *Runner) Relatives(a, relation string) (ret g.Value, err error) {
+func (run *Runner) Relatives(a, relation string) (ret []string, err error) {
 	return
 }
