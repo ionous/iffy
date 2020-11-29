@@ -10,6 +10,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/web"
 	"github.com/ionous/iffy/web/support"
 	_ "github.com/mattn/go-sqlite3"
@@ -31,7 +32,7 @@ func main() {
 	if len(fileName) == 0 || fileName == "memory" {
 		fileName = "file:test.db?cache=shared&mode=memory"
 	}
-	if db, e := sql.Open("sqlite3", fileName); e != nil {
+	if db, e := sql.Open(tables.DefaultDriver, fileName); e != nil {
 		log.Fatalln("db open", e)
 	} else {
 		if !testData {

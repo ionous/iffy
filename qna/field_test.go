@@ -12,7 +12,7 @@ func xTestPatternFields(t *testing.T) {
 	// gob.Register((*core.Text)(nil))
 	// gob.Register((*debug.MatchNumber)(nil))
 
-	// db := newQnaDB(t, memory)
+	// db := newQnaDB(t, testdb.Memory)
 	// defer db.Close()
 	// if e := tables.CreateModel(db); e != nil {
 	// 	t.Fatal(e)

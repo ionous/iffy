@@ -10,11 +10,12 @@ import (
 	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 //
 func TestFieldAccess(t *testing.T) {
-	db := newFieldAccessTest(t, memory)
+	db := newFieldAccessTest(t, testdb.Memory)
 	defer db.Close()
 	q := NewRuntime(db)
 

@@ -7,10 +7,11 @@ import (
 
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 func TestPatternCheck(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -147,7 +148,7 @@ func TestPatternCheck(t *testing.T) {
 
 // check that the pattern type matches the rule
 func TestRuleCheck(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

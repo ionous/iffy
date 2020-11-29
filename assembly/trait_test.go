@@ -11,6 +11,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 func addTraits(rec *ephemera.Recorder, pairs []string) (err error) {
@@ -55,7 +56,7 @@ func matchTraits(db *sql.DB, want []expectedTrait) (err error) {
 
 // TestTraits to verify that aspects/traits in ephemera can become part of the model.
 func TestTraits(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -81,7 +82,7 @@ func TestTraits(t *testing.T) {
 
 // TestTraitConflicts
 func TestTraitConflicts(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -101,7 +102,7 @@ func TestTraitConflicts(t *testing.T) {
 }
 
 func TestTraitMissingAspect(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -124,7 +125,7 @@ func TestTraitMissingAspect(t *testing.T) {
 }
 
 func TestTraitMissingTraits(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

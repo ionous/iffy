@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 // does the custom sql function from pluralize.go function correctly.
 func TestPluralizeKinds(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

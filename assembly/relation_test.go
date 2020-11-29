@@ -8,13 +8,14 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 // TestVerbMismatches verifies that we can collapse multiple relation-verb pairs so long as the verb-stem pair match
 // while ensuring the same stem cannot be used in multiple relations.
 func TestVerbMismatches(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal("error creating test", e)
 	} else {
 		defer asm.db.Close()
@@ -72,7 +73,7 @@ func matchRelations(db *sql.DB, want ...string) (err error) {
 
 // TestRelationCreation to verify it's possible to build relations
 func TestRelationCreation(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -105,7 +106,7 @@ func TestRelationCreation(t *testing.T) {
 
 // TestRelationCardinality detects conflicting cardinalities
 func TestRelationCardinality(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -129,7 +130,7 @@ func TestRelationCardinality(t *testing.T) {
 
 // TestRelationLca
 func TestRelationLcaSuccess(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -159,7 +160,7 @@ func TestRelationLcaSuccess(t *testing.T) {
 
 // TestRelationLcaFailure to verify a mismatched relation hierarchy generates an error.
 func TestRelationLcaFailure(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

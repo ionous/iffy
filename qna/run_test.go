@@ -10,12 +10,13 @@ import (
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 // no idea where this test should live...
 // complete, manual, end to end test of factorial pattern.
 func TestFullFactorial(t *testing.T) {
-	db := newQnaDB(t, memory)
+	db := newQnaDB(t, testdb.Memory)
 	defer db.Close()
 
 	//import factorialStory, assemble and run.

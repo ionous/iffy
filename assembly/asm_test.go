@@ -2,39 +2,23 @@ package assembly
 
 import (
 	"database/sql"
-	"os/user"
-	"path"
-	"strings"
 	"testing"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
-
-func getPath(file string) (ret string, err error) {
-	if user, e := user.Current(); e != nil {
-		err = e
-	} else {
-		ret = path.Join(user.HomeDir, file)
-	}
-	return
-}
-
-const memory = "file:test.db?cache=shared&mode=memory"
 
 func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 	var source string
 	if len(path) > 0 {
 		source = path
+	} else if p, e := testdb.PathFromName(t.Name()); e != nil {
+		err = e
 	} else {
-		base := strings.Replace(t.Name(), "/", ".", -1) + ".db"
-		if p, e := getPath(base); e != nil {
-			err = errutil.New(e, "for", base)
-		} else {
-			source = p
-		}
+		source = p
 	}
 	if err == nil {
 		if db, e := sql.Open(SqlCustomDriver, source); e != nil {

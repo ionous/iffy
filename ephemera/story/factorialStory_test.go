@@ -6,11 +6,12 @@ import (
 
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 // read the factorial test story
 func TestFactorialStory(t *testing.T) {
-	db := newImportDB(t, memory)
+	db := newImportDB(t, testdb.Memory)
 	defer db.Close()
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create tables", e)

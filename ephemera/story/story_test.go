@@ -7,10 +7,11 @@ import (
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 func TestImportStory(t *testing.T) {
-	db := newImportDB(t, memory)
+	db := newImportDB(t, testdb.Memory)
 	defer db.Close()
 	//
 	var in reader.Map

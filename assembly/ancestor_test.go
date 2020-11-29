@@ -8,12 +8,13 @@ import (
 
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 // TestAncestors verifies valid parent-child ephemera can generate a valid ancestry cache.
 // these arent necessarily valid or logical ancestries
 func TestAncestors(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -110,7 +111,7 @@ func TestAncestors(t *testing.T) {
 // TestAncestorCycle verifies cycles in parent-child ephemera generate errors.
 // ex. P inherits from T; T inherits from P.
 func TestAncestorCycle(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -132,7 +133,7 @@ func TestAncestorCycle(t *testing.T) {
 // TestAncestorConflict verifies conflicting parent ephemera (multiple inheritance) generates an error.
 // ex. P,Q inherits from T; K inherits from P and Q.
 func TestAncestorConflict(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

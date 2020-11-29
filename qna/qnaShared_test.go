@@ -2,26 +2,23 @@ package qna
 
 import (
 	"database/sql"
-	"os/user"
-	"path"
 	"testing"
 
 	"github.com/ionous/iffy/assembly"
+	"github.com/ionous/iffy/test/testdb"
 )
 
-const memory = "file:test.db?cache=shared&mode=memory"
-
 // if path is nil, it will use a file db.
-func newQnaDB(t *testing.T, where string) (ret *sql.DB) {
+func newQnaDB(t *testing.T, path string) (ret *sql.DB) {
 	var source string
-	if len(where) > 0 {
-		source = where
-	} else if user, e := user.Current(); e != nil {
+	if len(path) > 0 {
+		source = path
+	} else if p, e := testdb.PathFromName(t.Name()); e != nil {
 		t.Fatal(e)
 	} else {
-		source = path.Join(user.HomeDir, t.Name()+".db")
+		source = p
 	}
-	//
+	// assembly needed for TestFullFactorial
 	if db, e := sql.Open(assembly.SqlCustomDriver, source); e != nil {
 		t.Fatal(e)
 	} else {

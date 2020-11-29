@@ -2,8 +2,6 @@ package story
 
 import (
 	"database/sql"
-	"os/user"
-	"path"
 	"strings"
 	"testing"
 
@@ -11,6 +9,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 func lines(s ...string) string {
@@ -40,20 +39,18 @@ func newTestImporterDecoder(t *testing.T, dec *decode.Decoder, where string) (re
 	return
 }
 
-const memory = "file:test.db?cache=shared&mode=memory"
-
 // if path is nil, it will use a file db.
 func newImportDB(t *testing.T, where string) (ret *sql.DB) {
 	var source string
 	if len(where) > 0 {
 		source = where
-	} else if user, e := user.Current(); e != nil {
+	} else if p, e := testdb.PathFromName(t.Name()); e != nil {
 		t.Fatal(e)
 	} else {
-		source = path.Join(user.HomeDir, t.Name()+".db")
+		source = p
 	}
 	//
-	if db, e := sql.Open("sqlite3", source); e != nil {
+	if db, e := sql.Open(tables.DefaultDriver, source); e != nil {
 		t.Fatal(e)
 	} else {
 		t.Log("opened db", source)

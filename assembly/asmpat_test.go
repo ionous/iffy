@@ -11,12 +11,13 @@ import (
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 //
 func TestPatternAsm(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -63,7 +64,7 @@ func TestRuleAsm(t *testing.T) {
 	gob.Register((*core.Text)(nil))
 	gob.Register((*debug.MatchNumber)(nil))
 	//
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

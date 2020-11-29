@@ -9,13 +9,14 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 // todo: check the wrong nouns using a verb, using the wrong verb, etc.
 // todo: ensure that the same stem can be used in multiple relations ( so long as the kinds differ, ex. in room, vs in box. )
 func TestRelativeFormation(t *testing.T) {
-	if asm, e := newRelativesTest(t, memory,
+	if asm, e := newRelativesTest(t, testdb.Memory,
 		"a", "v1", "a",
 		"b", "v1", "c",
 		"c", "v1", "b",
@@ -115,7 +116,7 @@ func matchRelatives(db *sql.DB, want ...string) (err error) {
 
 func TestOneToOneViolations(t *testing.T) {
 	test := func(add, want []string) (err error) {
-		if asm, e := newRelativesTest(t, memory, add...); e != nil {
+		if asm, e := newRelativesTest(t, testdb.Memory, add...); e != nil {
 			err = e
 		} else {
 			defer asm.db.Close()

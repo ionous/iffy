@@ -6,13 +6,14 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 // manually add an assembled pattern to the database, test that it works as expected.
 func TestLike(t *testing.T) {
 	gob.Register((*core.MatchLike)(nil))
 
-	db := newQnaDB(t, memory)
+	db := newQnaDB(t, testdb.Memory)
 	defer db.Close()
 	if e := tables.CreateAll(db); e != nil {
 		t.Fatal(e)

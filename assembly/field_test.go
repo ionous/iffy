@@ -10,6 +10,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 // write some primitives
@@ -50,7 +51,7 @@ func matchProperties(db *sql.DB, want ...string) (err error) {
 }
 
 func TestFields(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -80,7 +81,7 @@ func TestFields(t *testing.T) {
 }
 
 func TestFieldLca(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -109,7 +110,7 @@ func TestFieldLca(t *testing.T) {
 // TestFieldTypeMismatch verifies that ephemera with conflicting primitive types generates an error
 // ex. T.a:text, T.a:number
 func TestFieldTypeMismatch(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

@@ -8,12 +8,13 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 // TestInitialFieldAssignment to verify initial values for fields can be assigned to instances.
 func TestInitialFieldAssignment(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -57,7 +58,7 @@ func TestInitialFieldAssignment(t *testing.T) {
 
 // TestInitialTraitAssignments to verify default traits can be assigned to kinds.
 func TestInitialTraitAssignment(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

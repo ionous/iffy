@@ -8,13 +8,14 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 // TestNounFormation to verify we can successfully assemble nouns from ephemera
 func TestNounFormation(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
-		if asm, e := newAssemblyTest(t, memory); e != nil {
+		if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 			t.Fatal(e)
 		} else {
 			defer asm.db.Close()
@@ -43,7 +44,7 @@ func TestNounFormation(t *testing.T) {
 		}
 	})
 	t.Run("failure", func(t *testing.T) {
-		if asm, e := newAssemblyTest(t, memory); e != nil {
+		if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 			t.Fatal(e)
 		} else {
 			defer asm.db.Close()
@@ -101,7 +102,7 @@ func addNounEphemera(rec *ephemera.Recorder, els ...string) (err error) {
 
 // TestNounLcaSuccess to verify we can successfully determine the lowest common ancestor of nouns.
 func TestNounLcaSuccess(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -134,7 +135,7 @@ func TestNounLcaSuccess(t *testing.T) {
 
 // TestNounLcaFailure to verify a mismatched noun hierarchy generates an error.
 func TestNounLcaFailure(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -161,7 +162,7 @@ func TestNounLcaFailure(t *testing.T) {
 
 // TestNounParts to verify a single noun generates multi part names
 func TestNounParts(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()

@@ -55,7 +55,7 @@ func distill(outFile, inFile string) (err error) {
 		// 0777 -> ModePerm ... read/writable by all
 		os.MkdirAll(path.Dir(outFile), os.ModePerm)
 		//
-		if outDB, e := sql.Open("sqlite3", outFile); e != nil {
+		if outDB, e := sql.Open(tables.DefaultDriver, outFile); e != nil {
 			err = errutil.New("couldn't create output file", outFile, e)
 		} else {
 			defer outDB.Close()

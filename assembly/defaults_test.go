@@ -8,12 +8,13 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 // TestDefaultFieldAssigment to verify default values can be assigned to kinds.
 func TestDefaultFieldAssigment(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -62,7 +63,7 @@ func TestDefaultFieldAssigment(t *testing.T) {
 
 // TestDefaultTraitAssignment to verify default traits can be assigned to kinds.
 func TestDefaultTraitAssignment(t *testing.T) {
-	if asm, e := newDefaultsTest(t, memory,
+	if asm, e := newDefaultsTest(t, testdb.Memory,
 		"Ks", "x", true,
 		"Ls", "y", true,
 		"Ls", "z", true,
@@ -90,7 +91,7 @@ func TestDefaultTraitAssignment(t *testing.T) {
 
 // TestDefaultDuplicates to verify that duplicate default specifications are okay
 func TestDefaultDuplicates(t *testing.T) {
-	if asm, e := newDefaultsTest(t, memory,
+	if asm, e := newDefaultsTest(t, testdb.Memory,
 		"Ks", "t", "text",
 		"Ks", "t", "text",
 		"Ls", "t", "text",
@@ -116,7 +117,7 @@ func TestDefaultDuplicates(t *testing.T) {
 // TestDefaultConflict to verify that conflicting values for the same default are not okay
 func TestDefaultConflict(t *testing.T) {
 	testConflict := func(t *testing.T, vals ...interface{}) (err error) {
-		if asm, e := newDefaultsTest(t, memory, vals...); e != nil {
+		if asm, e := newDefaultsTest(t, testdb.Memory, vals...); e != nil {
 			t.Fatal(e)
 		} else {
 			defer asm.db.Close()
@@ -162,7 +163,7 @@ func TestDefaultBadValue(t *testing.T) {
 	//- for now, we only allow text and number [ text and number ]
 	// - later we could add ambiguity for conversion [ 4 -> "4" ]
 	testInvalid := func(t *testing.T, vals ...interface{}) (err error) {
-		if asm, e := newDefaultsTest(t, memory, vals...); e != nil {
+		if asm, e := newDefaultsTest(t, testdb.Memory, vals...); e != nil {
 			err = e
 		} else {
 			defer asm.db.Close()

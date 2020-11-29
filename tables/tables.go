@@ -7,6 +7,8 @@ import (
 	_ "github.com/mattn/go-sqlite3" // queries are specific to sqlite, so force the sqlite driver.
 )
 
+const DefaultDriver = "sqlite3"
+
 // CreateEphemera creates the tables listed in ephemera.sql
 //go:generate templify -p tables -o ephemera.gen.go ephemera.sql
 func CreateEphemera(db *sql.DB) (err error) {

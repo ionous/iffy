@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 )
 
 // TestMissingKinds to verify the kinds mentioned in parent-child ephemera exist.
 func TestMissingKinds(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -35,7 +36,7 @@ func TestMissingKinds(t *testing.T) {
 
 // TestMissingAspects detects fields labeled as aspects which are missing from the aspects ephemera.
 func TestMissingAspects(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -65,7 +66,7 @@ func TestMissingAspects(t *testing.T) {
 }
 
 func TestMissingField(t *testing.T) {
-	if asm, e := newAssemblyTest(t, memory); e != nil {
+	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
 		defer asm.db.Close()
@@ -90,7 +91,7 @@ func TestMissingField(t *testing.T) {
 
 // xTestMissingUnknownField missing properties ( kind, field pair doesn't exist in model )
 // func xTestMissingUnknownField(t *testing.T) {
-// 	if asm, e := newAssemblyTest(t, memory); e != nil {
+// 	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
 // 		t.Fatal(e)
 // 	} else {
 // 		defer asm.db.Close()

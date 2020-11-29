@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 func TestImportNamedNouns(t *testing.T) {
-	k, db := newTestDecoder(t, memory)
+	k, db := newTestDecoder(t, testdb.Memory)
 	defer db.Close()
 	//
 	nouns := []string{

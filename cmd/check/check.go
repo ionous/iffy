@@ -37,7 +37,7 @@ func main() {
 func checkFile(inFile, testName string) (ret int, err error) {
 	if inFile, e := filepath.Abs(inFile); e != nil {
 		err = e
-	} else if db, e := sql.Open("sqlite3", inFile); e != nil {
+	} else if db, e := sql.Open(tables.DefaultDriver, inFile); e != nil {
 		err = errutil.New("couldn't create output file", inFile, e)
 	} else {
 		defer db.Close()

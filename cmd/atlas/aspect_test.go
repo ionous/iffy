@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 	"os"
+
+	"github.com/ionous/iffy/tables"
 )
 
 func ExampleAspectData() {
@@ -59,7 +61,7 @@ func ExampleAspectData() {
 
 func ExampleAspectDB() {
 	const memory = "file:ExampleAspectDB.db?cache=shared&mode=memory"
-	if db, e := sql.Open("sqlite3", memory); e != nil {
+	if db, e := sql.Open(tables.DefaultDriver, memory); e != nil {
 		log.Fatalln("couldnt open db ", e)
 	} else if e := createTestData(db); e != nil {
 		log.Fatal("couldnt create test data ", e)

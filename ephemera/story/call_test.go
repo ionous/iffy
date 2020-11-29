@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/tables"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
@@ -19,7 +20,7 @@ func TestDetermineNum(t *testing.T) {
 			"num", &core.FromNum{
 				&core.Number{3},
 			})}
-	k, db := newTestDecoder(t, memory)
+	k, db := newTestDecoder(t, testdb.Memory)
 	defer db.Close()
 	if rule, e := imp_determine_num(k, debug.FactorialDetermineNum); e != nil {
 		t.Fatal(e)

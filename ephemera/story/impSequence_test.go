@@ -5,11 +5,12 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
+	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 func TestImportSequence(t *testing.T) {
-	k, db := newTestDecoder(t, memory)
+	k, db := newTestDecoder(t, testdb.Memory)
 	defer db.Close()
 	if cmd, e := imp_cycle_text(k, _cycle_text); e != nil {
 		t.Fatal(e)
