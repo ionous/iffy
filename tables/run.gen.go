@@ -14,6 +14,9 @@ func runTemplate() string {
 		" */\n" +
 		"create table if not exists \n" +
 		"\trun_domain( domain text, active int, primary key( domain )); \n" +
+		"\n" +
+		"create table if not exists \n" +
+		"\trun_pair( noun text, relation text, otherNoun text, unique( noun, relation, otherNoun ) ); \n" +
 		""
 	return tmpl
 }

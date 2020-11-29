@@ -10,9 +10,8 @@ create table mdl_aspect( aspect text, trait text, rank int, primary key( aspect,
 create table mdl_check( name text, type text, expect text );
 /* default values for the field of a kind ( and its descendant kinds ) */
 create table mdl_default( kind text, field text, value blob );
-/* todo: hierarchy of domains 
+/* hierarchy of domains */
 create table mdl_domain( domain text, path text, primary key( domain ));
-*/
 /* properties of a kind. type is a PRIM_ */
 create table mdl_field( kind text, field text, type text, primary key( kind, field ));
 /* a class of objects with shared characteristics */
@@ -23,7 +22,7 @@ create table mdl_name( noun text, name text, rank int );
 /* a person, place, or thing in the world. */
 create table mdl_noun( noun text, kind text, primary key( noun ));
 /* relation between two specific nouns. these change over the course of a game. */
-create table mdl_pair( noun text, relation text, otherNoun text );
+create table mdl_pair( noun text, relation text, otherNoun text, domain text );
 /* maps common and uncommon words to their plurals */
 create table mdl_plural( one text, many text );
 /* stored programs, a work in progress 

@@ -25,7 +25,9 @@ type Fields struct {
 	aspectOf,
 	nameOf,
 	objOf,
-	isLike *sql.Stmt
+	isLike,
+	removePairs,
+	insertPairs *sql.Stmt
 }
 
 func NewFields(db *sql.DB) (ret *Fields, err error) {
@@ -95,11 +97,41 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 		// use the sqlite like function to match
 		isLike: ps.Prep(db,
 			`select ? like ?`),
+		removePairs: ps.Prep(db,
+			`delete from 
+			run_pair as prev
+			where exists (
+				select * from mdl_pair_rel next
+				where next.relation=prev.relation and 
+				? = ifnull(next.domain, 'entireGame') and
+				((prev.noun = next.noun and next.cardinality glob '*_one') or
+				(prev.otherNoun = next.otherNoun and next.cardinality glob 'one_*'))
+			)`),
+		insertPairs: ps.Prep(db,
+			`insert or ignore into run_pair
+			select noun, relation, otherNoun 
+			from mdl_pair_rel next
+			where ? = ifnull(next.domain, 'entireGame')`),
 	}
 	if e := ps.Err(); e != nil {
 		err = e
 	} else {
 		ret = f
+	}
+	return
+}
+
+func (n *Fields) UpdatePairs(domain string) (ret int, err error) {
+	if removed, e := n.removePairs.Exec(domain); e != nil {
+		err = e
+	} else if inserted, e := n.insertPairs.Exec(domain); e != nil {
+		err = e
+	} else if rr, e := removed.RowsAffected(); e != nil {
+		// it's fine
+	} else if ii, e := inserted.RowsAffected(); e != nil {
+		// it's fine
+	} else {
+		ret = int(ii - rr)
 	}
 	return
 }

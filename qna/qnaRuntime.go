@@ -2,6 +2,7 @@ package qna
 
 import (
 	"database/sql"
+	"log"
 
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/print"
@@ -44,6 +45,18 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 	if e != nil {
 		panic(e)
 	}
+	// fix: we want activate to return a list of *newly* active domains;
+	// this is a lot like a state transition list.
+	// you might be able to do something clever? like "time activated" --
+	// and select for current time (even possibly override the sql timer with game round )
+	// or use the domain path.
+	if active {
+		if cnt, e := run.fields.UpdatePairs(domain); e != nil {
+			panic(e)
+		} else {
+			log.Println("activate domain affected", cnt, "rows")
+		}
+	}
 }
 
 func (run *Runner) GetKindByName(n string) (*g.Kind, error) {
@@ -65,5 +78,13 @@ func (run *Runner) PluralOf(str string) (ret string) {
 	} else {
 		ret = n
 	}
+	return
+}
+
+func (run *Runner) Relate(a, b, relation string) (err error) {
+	return
+}
+
+func (run *Runner) Relatives(a, relation string) (ret g.Value, err error) {
 	return
 }

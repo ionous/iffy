@@ -21,9 +21,8 @@ func modelTemplate() string {
 		"create table mdl_check( name text, type text, expect text );\n" +
 		"/* default values for the field of a kind ( and its descendant kinds ) */\n" +
 		"create table mdl_default( kind text, field text, value blob );\n" +
-		"/* todo: hierarchy of domains \n" +
+		"/* hierarchy of domains */\n" +
 		"create table mdl_domain( domain text, path text, primary key( domain ));\n" +
-		"*/\n" +
 		"/* properties of a kind. type is a PRIM_ */\n" +
 		"create table mdl_field( kind text, field text, type text, primary key( kind, field ));\n" +
 		"/* a class of objects with shared characteristics */\n" +
@@ -34,7 +33,7 @@ func modelTemplate() string {
 		"/* a person, place, or thing in the world. */\n" +
 		"create table mdl_noun( noun text, kind text, primary key( noun ));\n" +
 		"/* relation between two specific nouns. these change over the course of a game. */\n" +
-		"create table mdl_pair( noun text, relation text, otherNoun text );\n" +
+		"create table mdl_pair( noun text, relation text, otherNoun text, domain text );\n" +
 		"/* maps common and uncommon words to their plurals */\n" +
 		"create table mdl_plural( one text, many text );\n" +
 		"/* stored programs, a work in progress \n" +

@@ -16,6 +16,7 @@ func ActivateDomain(db *sql.DB, domain string, active bool) (err error) {
 	return
 }
 
+// inserts a newly active domain name, or sets an existing domain's status
 var run_domain = tables.InsertWith("run_domain",
 	"on conflict(domain) do update set active=excluded.active;",
 	"domain", "active")

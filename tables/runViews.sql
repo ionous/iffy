@@ -26,6 +26,16 @@ join mdl_aspect ma
 where ma.aspect = mf.field
 order by noun, aspect, rank;
 
+/**
+ * relational pairs, and the cardinality of their relations
+ */
+create temp view 
+mdl_pair_rel as 
+select noun, otherNoun, relation, cardinality, domain
+from mdl_pair mp 
+join mdl_rel mr 
+	using (relation);
+
 /* the initial values of noun fields: noun, field, type, value, tier
 tier is hierarchy depth, more derived is better.
 more derived classes are on the left, root is on the right, so a small tier is better.

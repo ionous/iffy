@@ -37,6 +37,16 @@ func runViewsTemplate() string {
 		"where ma.aspect = mf.field\n" +
 		"order by noun, aspect, rank;\n" +
 		"\n" +
+		"/**\n" +
+		" * relational pairs, and the cardinality of their relations\n" +
+		" */\n" +
+		"create temp view \n" +
+		"mdl_pair_rel as \n" +
+		"select noun, otherNoun, relation, cardinality, domain\n" +
+		"from mdl_pair mp \n" +
+		"join mdl_rel mr \n" +
+		"\tusing (relation);\n" +
+		"\n" +
 		"/* the initial values of noun fields: noun, field, type, value, tier\n" +
 		"tier is hierarchy depth, more derived is better.\n" +
 		"more derived classes are on the left, root is on the right, so a small tier is better.\n" +
