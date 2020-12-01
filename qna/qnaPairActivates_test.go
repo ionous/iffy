@@ -11,7 +11,7 @@ import (
 	"github.com/ionous/iffy/test/testdb"
 )
 
-func TestPairChanges(t *testing.T) {
+func TestPairActivation(t *testing.T) {
 	if db, e := newPairTest(t, testdb.Memory); e != nil {
 		t.Fatal(e)
 	} else {
@@ -24,6 +24,8 @@ func TestPairChanges(t *testing.T) {
 				"1N", tables.ONE_TO_MANY,
 				"N1", tables.MANY_TO_ONE,
 				"NN", tables.MANY_TO_MANY,
+				"XX", tables.ONE_TO_MANY,
+				"ZZ", tables.ONE_TO_ONE,
 			); e != nil {
 				t.Fatal(e)
 			}
@@ -42,7 +44,12 @@ func TestPairChanges(t *testing.T) {
 				"N1", "c", "b",
 				// various nouns reference various other nouns.
 				"NN", "a", "b",
+				"NN", "a", "c",
 				"NN", "b", "a",
+				"NN", "n", "m",
+				//
+				"XX", "x", "x",
+				"XX", "x", "y",
 			); e != nil {
 				t.Fatal(e)
 			}
@@ -50,8 +57,7 @@ func TestPairChanges(t *testing.T) {
 			if e := testdb.Ins(db, testdb.TableCols("mdl_pair", "relation", "noun", "otherNoun"),
 				// should replace both the a-b, and the c-d relations.
 				"11", "a", "d",
-				// should replace the a-c pair; a-b should be replace itself.
-				"1N", "a", "b",
+				// d-c should replace the a-c pair; a-b should be replace itself.
 				"1N", "d", "c",
 				// should add the d-b relation, should replace the a-b relation
 				"N1", "d", "b",
@@ -60,6 +66,8 @@ func TestPairChanges(t *testing.T) {
 				"NN", "a", "f",
 				"NN", "f", "a",
 				"NN", "a", "b",
+				// we dont touch XX, and we add something we previously didnt have
+				"ZZ", "z", "z",
 			); e != nil {
 				t.Fatal(e)
 			}
@@ -69,20 +77,30 @@ func TestPairChanges(t *testing.T) {
 			} else {
 				log.Println("activate domain affected", cnt, "rows")
 				var buf strings.Builder
-				if e := testdb.WriteCsv(db, &buf, run_pair); e != nil {
+				if e := testdb.WriteCsv(db, &buf, run_pair, "where active=1"); e != nil {
 					t.Fatal(e)
 				} else if have, want := buf.String(), lines(
 					"11,a,d",
 					"11,n,m",
+					//
 					"1N,a,b",
 					"1N,d,c",
+					//
 					"N1,a,g",
 					"N1,c,b",
 					"N1,d,b",
+					//
 					"NN,a,b",
+					"NN,a,c",
 					"NN,a,f",
 					"NN,b,a",
 					"NN,f,a",
+					"NN,n,m",
+					// untouched
+					"XX,x,x",
+					"XX,x,y",
+					// newly added
+					"ZZ,z,z",
 				); have != want {
 					t.Fatal(have)
 				}

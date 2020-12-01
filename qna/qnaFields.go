@@ -15,6 +15,7 @@ import (
 // Fields implements rt.Fields: key,field,value storage for nouns, kinds, and patterns.
 // It reads its data from the play database and caches the results in memory.
 type Fields struct {
+	activeNouns,
 	valueOf,
 	progBytes,
 	countOf,
@@ -26,13 +27,22 @@ type Fields struct {
 	nameOf,
 	objOf,
 	isLike,
-	removePairs,
-	insertPairs *sql.Stmt
+	relativesOf,
+	relateTo,
+	relativeKinds,
+	updatePairs *sql.Stmt
 }
 
 func NewFields(db *sql.DB) (ret *Fields, err error) {
 	var ps tables.Prep
 	f := &Fields{
+		activeNouns: ps.Prep(db,
+			// instr(X,Y) finds the first occurrence of string Y in string X
+			`select 1 from 
+			mdl_noun mn 
+			join run_domain rd 
+			where rd.active and instr(mn.noun, '#' || rd.domain || '::') = 1
+			and mn.noun=?`),
 		valueOf: ps.Prep(db,
 			`select value, type
 				from run_value 
@@ -80,7 +90,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 		nameOf: ps.Prep(db,
 			`select name, 'text' 
 				from mdl_name
-				join run_noun
+				join mdl_noun
 					using (noun)
 				where noun=?
 				order by rank
@@ -89,7 +99,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 		objOf: ps.Prep(db,
 			`select noun, 'object'
 				from mdl_name
-				join run_noun
+				join mdl_noun
 					using (noun)
 				where UPPER(name)=UPPER(?)
 				order by rank
@@ -97,21 +107,46 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 		// use the sqlite like function to match
 		isLike: ps.Prep(db,
 			`select ? like ?`),
-		removePairs: ps.Prep(db,
-			`delete from 
-			run_pair as prev
-			where exists (
-				select * from mdl_pair_rel next
-				where next.relation=prev.relation and 
-				? = ifnull(next.domain, 'entireGame') and
-				((prev.noun = next.noun and next.cardinality glob '*_one') or
-				(prev.otherNoun = next.otherNoun and next.cardinality glob 'one_*'))
-			)`),
-		insertPairs: ps.Prep(db,
-			`insert or ignore into run_pair
-			select noun, relation, otherNoun 
-			from mdl_pair_rel next
-			where ? = ifnull(next.domain, 'entireGame')`),
+		relativeKinds: ps.Prep(db,
+			`select mr.kind, mr.otherKind, mr.cardinality
+				from mdl_rel mr 
+				where relation=?`),
+		// instead of separately deleting old pairs and inserting new ones;
+		// we insert and replace active ones.
+		updatePairs: ps.Prep(db,
+			`with next as (
+			select noun, otherNoun, relation, cardinality 
+			from mdl_pair 
+			join mdl_rel mr 
+				using (relation)
+			where ?=ifnull(domain, 'entireGame')
+			)
+			insert or replace into run_pair
+			select prev.noun, relation, prev.otherNoun, 0
+				from next
+				join run_pair prev 
+					using (relation)
+				where  ((prev.noun = next.noun and next.cardinality glob '*_one') or
+						(prev.otherNoun = next.otherNoun and next.cardinality glob 'one_*')) 
+			union all
+			select next.noun, relation, next.otherNoun, 1 
+			from next`),
+		relativesOf: ps.Prep(db,
+			`select otherNoun from run_pair where active and noun=?1 and relation=?2`),
+		relateTo: ps.Prep(db,
+			`with next as (
+				select ?1 as noun, ?2 as otherNoun, ?3 as relation, ?4 as cardinality
+			)
+			insert or replace into run_pair
+			select prev.noun, relation, prev.otherNoun, 0
+			from next
+			join run_pair prev 
+				using (relation)
+			where  ((prev.noun = next.noun and next.cardinality glob '*_one') or
+					(prev.otherNoun = next.otherNoun and next.cardinality glob 'one_*')) 
+			union all 
+			select next.noun, relation, next.otherNoun, 1
+			from next`),
 	}
 	if e := ps.Err(); e != nil {
 		err = e
@@ -122,16 +157,10 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 }
 
 func (n *Fields) UpdatePairs(domain string) (ret int, err error) {
-	if removed, e := n.removePairs.Exec(domain); e != nil {
+	if res, e := n.updatePairs.Exec(domain); e != nil {
 		err = e
-	} else if inserted, e := n.insertPairs.Exec(domain); e != nil {
-		err = e
-	} else if rr, e := removed.RowsAffected(); e != nil {
-		// it's fine
-	} else if ii, e := inserted.RowsAffected(); e != nil {
-		// it's fine
 	} else {
-		ret = int(ii - rr)
+		ret = tables.RowsAffected(res)
 	}
 	return
 }
@@ -275,11 +304,25 @@ func (n *Runner) getValue(key keyType) (ret g.Value, err error) {
 func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 	switch target, field := key.target, key.field; target {
 	case object.Name:
-		// search for the object name using the object's id
-		ret, err = n.cacheQuery(key, n.fields.nameOf, field)
+		// given an id, make sure the object should be available,
+		// then return its author given name.
+		if !n.activeNouns.isActive(field) {
+			err = g.UnknownObject(field)
+		} else if b, e := n.cacheQuery(key, n.fields.nameOf, field); e != nil {
+			err = e
+		} else {
+			ret = b
+		}
 
 	case object.Value:
-		ret, err = n.cacheQuery(key, n.fields.objOf, field)
+		// given a name, find an object (id) and make sure it should be available
+		if b, e := n.cacheQuery(key, n.fields.objOf, field); e != nil {
+			err = e
+		} else if obj, _ := b.snapper.(*qnaObject); obj == nil || !n.activeNouns.isActive(obj.id) {
+			err = g.UnknownObject(field)
+		} else {
+			ret = b
+		}
 
 	case object.Aspect:
 		// used internally: return the name of an aspect for a trait

@@ -23,6 +23,15 @@ func Must(db *sql.DB, q string, args ...interface{}) (ret int64) {
 	return
 }
 
+func RowsAffected(res sql.Result) (ret int) {
+	if cnt, e := res.RowsAffected(); e != nil {
+		ret = -1
+	} else {
+		ret = int(cnt)
+	}
+	return
+}
+
 // QueryAll queries the db ( or statement cache ) for one or more rows.
 // For each row, it writes the row to the 'dest' args and calls 'cb' for processing.
 func QueryAll(db Query, q string, cb func() error, dest ...interface{}) (err error) {

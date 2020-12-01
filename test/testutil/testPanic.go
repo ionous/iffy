@@ -20,10 +20,10 @@ func (PanicRuntime) GetEvalByName(string, interface{}) error {
 func (PanicRuntime) GetKindByName(string) (*g.Kind, error) {
 	panic("Runtime panic")
 }
-func (PanicRuntime) Relate(a, b, relation string) error {
+func (PanicRuntime) RelateTo(a, b, relation string) error {
 	panic("Runtime panic")
 }
-func (PanicRuntime) Relatives(a, relation string) ([]string, error) {
+func (PanicRuntime) RelativesOf(a, relation string) ([]string, error) {
 	panic("Runtime panic")
 }
 func (PanicRuntime) GetField(target, field string) (g.Value, error) {

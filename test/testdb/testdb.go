@@ -51,8 +51,8 @@ func Ins(db Executer, tablecols []string, els ...interface{}) (err error) {
 	return
 }
 
-func WriteCsv(db Querier, w io.Writer, tablecols []string) (err error) {
+func WriteCsv(db Querier, w io.Writer, tablecols []string, where string) (err error) {
 	table, cols := tablecols[0], strings.Join(tablecols[1:], ", ")
-	q := strings.Join(sliceOf.String("select", cols, "from", table, "order by", cols), " ")
+	q := strings.Join(sliceOf.String("select", cols, "from", table, where, "order by", cols), " ")
 	return tables.WriteCsv(db, w, q, len(tablecols)-1)
 }

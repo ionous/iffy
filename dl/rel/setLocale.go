@@ -31,7 +31,7 @@ func (op *SetLocale) setLocale(run rt.Runtime) (err error) {
 		err = e
 	} else if b, e := safe.GetObject(run, op.Parent); e != nil {
 		err = e
-	} else if e := run.Relate(a.String(), b.String(), "locale"); e != nil {
+	} else if e := run.RelateTo(a.String(), b.String(), "locale"); e != nil {
 		err = e
 	} else {
 		err = a.SetFieldByName(object.Locale, b)

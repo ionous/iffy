@@ -62,12 +62,3 @@ select noun, aspect as field, 'text' as type, trait as value, length(fullpath) a
 union all  /* add all fields with zero values as null, and we'll order by nulls last */
 select noun, field,  type, null as value, null as tier
 	from mdl_noun_field;
-
-/* active nouns */
-create temp view
-run_noun as 
-select mn.noun, mn.kind 
-from mdl_noun mn 
-join run_domain rd 
-	on (mn.noun like ('#' || rd.domain || '::%'))
-where rd.active = true;

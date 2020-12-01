@@ -32,7 +32,7 @@ func (op *Relate) setRelation(run rt.Runtime) (err error) {
 	} else if b, e := safe.GetObject(run, op.B); e != nil {
 		err = e
 	} else {
-		err = run.Relate(a.String(), b.String(), op.Relation)
+		err = run.RelateTo(a.String(), b.String(), op.Relation)
 	}
 	return
 }

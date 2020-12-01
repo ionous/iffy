@@ -4,10 +4,13 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/rt/writer"
+	"github.com/ionous/iffy/tables"
 )
 
 func NewRuntime(db *sql.DB) *Runner {
@@ -18,11 +21,13 @@ func NewRuntime(db *sql.DB) *Runner {
 		panic(e)
 	} else {
 		run = &Runner{
-			db:      db,
-			fields:  fields,
-			plurals: plurals,
-			pairs:   make(valueMap),
-			kinds:   qnaKinds{fieldsFor: fields.fieldsFor},
+			db:            db,
+			fields:        fields,
+			plurals:       plurals,
+			pairs:         make(valueMap),
+			kinds:         qnaKinds{fieldsFor: fields.fieldsFor},
+			activeNouns:   activeNouns{q: fields.activeNouns},
+			relativeKinds: relativeKinds{q: fields.relativeKinds},
 		}
 		run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
 	}
@@ -38,6 +43,8 @@ type Runner struct {
 	plurals *Plurals
 	pairs   valueMap
 	kinds   qnaKinds
+	activeNouns
+	relativeKinds
 }
 
 func (run *Runner) ActivateDomain(domain string, active bool) {
@@ -57,6 +64,7 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 			log.Println("activate domain affected", cnt, "rows")
 		}
 	}
+	run.activeNouns.reset()
 }
 
 func (run *Runner) GetKindByName(n string) (*g.Kind, error) {
@@ -81,10 +89,45 @@ func (run *Runner) PluralOf(str string) (ret string) {
 	return
 }
 
-func (run *Runner) Relate(a, b, relation string) (err error) {
+// assumes a and b are valid nouns
+func (run *Runner) RelateTo(a, b, relation string) (err error) {
+	// we validate inputs in go rather than sql b/c
+	// a, the sql for validation gets big and ugly quick
+	// b. we get better reporting this way.
+	// -- perhaps there could be a standalone validation query that returns nice errors
+	// but this is okay for now.
+	if !run.isActive(a) {
+		err = g.UnknownObject(a)
+	} else if !run.isActive(b) {
+		err = g.UnknownObject(b)
+	} else if ak, e := run.getField(makeKey(object.Kinds, a)); e != nil {
+		err = e
+	} else if bk, e := run.getField(makeKey(object.Kinds, b)); e != nil {
+		err = e
+	} else if rel := run.relativeKind(relation); !compatibleKind(ak.String(), rel.kind) {
+		err = errutil.Fmt("relation %s expects %s doesnt support %s ( a kind of %s )", relation, rel.kind, ak.String())
+	} else if !compatibleKind(bk.String(), rel.otherKind) {
+		err = errutil.Fmt("relation %s expects %s doesnt support %s ( a kind of %s )", relation, rel.otherKind, bk.String())
+	} else if res, e := run.fields.relateTo.Exec(a, b, relation, rel.cardinality); e != nil {
+		err = e
+	} else {
+		log.Println(tables.RowsAffected(res), "rows affected relating", a, "to", b, "via", relation)
+	}
 	return
 }
 
-func (run *Runner) Relatives(a, relation string) (ret []string, err error) {
+// assumes a is a valid noun
+func (run *Runner) RelativesOf(a, relation string) (ret []string, err error) {
+	if !run.isActive(a) {
+		err = g.UnknownObject(a)
+	} else if rows, e := run.fields.relativesOf.Query(a, relation); e != nil {
+		err = e
+	} else {
+		var otherNoun string
+		err = tables.ScanAll(rows, func() (err error) {
+			ret = append(ret, otherNoun)
+			return
+		}, &otherNoun)
+	}
 	return
 }

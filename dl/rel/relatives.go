@@ -33,7 +33,7 @@ func (op *Relatives) relatives(run rt.Runtime) (ret []string, err error) {
 	if a, e := safe.GetObject(run, op.Object); e != nil {
 		err = e
 	} else {
-		ret, err = run.Relatives(a.String(), op.Relation)
+		ret, err = run.RelativesOf(a.String(), op.Relation)
 	}
 	return
 }
