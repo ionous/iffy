@@ -1,8 +1,6 @@
 package rel
 
 import (
-	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -34,12 +32,8 @@ func (op *Locale) GetObject(run rt.Runtime) (ret g.Value, err error) {
 func (op *Locale) getLocale(run rt.Runtime) (ret g.Value, err error) {
 	if a, e := safe.GetObject(run, op.Object); e != nil {
 		err = e
-	} else if v, e := a.FieldByName(object.Locale); e != nil {
-		err = e
-	} else if va := v.Affinity(); va != affine.Object {
-		err = errutil.New("expected object, got %s", va)
 	} else {
-		ret = v
+		ret, err = a.FieldByName(object.Locale)
 	}
 	return
 }

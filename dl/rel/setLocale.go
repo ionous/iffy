@@ -27,14 +27,12 @@ func (op *SetLocale) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *SetLocale) setLocale(run rt.Runtime) (err error) {
-	if a, e := safe.GetObject(run, op.Object); e != nil {
+	if child, e := safe.GetObject(run, op.Object); e != nil {
 		err = e
-	} else if b, e := safe.GetObject(run, op.Parent); e != nil {
-		err = e
-	} else if e := run.RelateTo(a.String(), b.String(), "locale"); e != nil {
+	} else if parent, e := safe.GetObject(run, op.Parent); e != nil {
 		err = e
 	} else {
-		err = a.SetFieldByName(object.Locale, b)
+		err = child.SetFieldByName(object.Locale, parent)
 	}
 	return
 }

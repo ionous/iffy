@@ -28,6 +28,7 @@ func NewRuntime(db *sql.DB) *Runner {
 			kinds:         qnaKinds{fieldsFor: fields.fieldsFor},
 			activeNouns:   activeNouns{q: fields.activeNouns},
 			relativeKinds: relativeKinds{q: fields.relativeKinds},
+			nounLocale:    nounLocale{q: fields.relativesOf},
 		}
 		run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
 	}
@@ -45,6 +46,7 @@ type Runner struct {
 	kinds   qnaKinds
 	activeNouns
 	relativeKinds
+	nounLocale
 }
 
 func (run *Runner) ActivateDomain(domain string, active bool) {
@@ -65,6 +67,7 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 		}
 	}
 	run.activeNouns.reset()
+	run.nounLocale.reset()
 }
 
 func (run *Runner) GetKindByName(n string) (*g.Kind, error) {
@@ -128,6 +131,22 @@ func (run *Runner) RelativesOf(a, relation string) (ret []string, err error) {
 			ret = append(ret, otherNoun)
 			return
 		}, &otherNoun)
+	}
+	return
+}
+
+// assumes b is a valid noun
+func (run *Runner) ReciprocalOf(b, relation string) (ret []string, err error) {
+	if !run.isActive(b) {
+		err = g.UnknownObject(b)
+	} else if rows, e := run.fields.reciprocalOf.Query(b, relation); e != nil {
+		err = e
+	} else {
+		var noun string
+		err = tables.ScanAll(rows, func() (err error) {
+			ret = append(ret, noun)
+			return
+		}, &noun)
 	}
 	return
 }

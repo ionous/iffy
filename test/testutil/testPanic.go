@@ -26,6 +26,9 @@ func (PanicRuntime) RelateTo(a, b, relation string) error {
 func (PanicRuntime) RelativesOf(a, relation string) ([]string, error) {
 	panic("Runtime panic")
 }
+func (PanicRuntime) ReciprocalOf(a, relation string) ([]string, error) {
+	panic("Runtime panic")
+}
 func (PanicRuntime) GetField(target, field string) (g.Value, error) {
 	panic("Runtime panic")
 }

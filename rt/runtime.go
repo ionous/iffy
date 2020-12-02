@@ -31,6 +31,7 @@ type Runtime interface {
 	//
 	RelateTo(a, b, relation string) error
 	RelativesOf(a, relation string) ([]string, error)
+	ReciprocalOf(b, relation string) ([]string, error)
 	// the runtime behaves as stack of scopes.
 	// if a variable isnt found in the most recently pushed scope
 	// the next most recently pushed scope will be checked and so on.

@@ -49,7 +49,7 @@ func (q *qnaObject) FieldByName(field string) (ret g.Value, err error) {
 	// fix temp:
 	var key keyType
 	switch field {
-	case object.Name, object.Kind, object.Kinds:
+	case object.Name, object.Kind, object.Kinds, object.Locale:
 		// sigh
 		key = makeKey(field, q.id)
 	default:
@@ -59,11 +59,23 @@ func (q *qnaObject) FieldByName(field string) (ret g.Value, err error) {
 }
 
 func (q *qnaObject) SetFieldByName(field string, val g.Value) (err error) {
-	if len(field) == 0 {
+	switch {
+	case len(field) == 0:
 		err = errutil.Fmt("no field specified")
-	} else if writable := field[0] != object.Prefix; !writable {
+	case field == object.Locale:
+		if va := val.Affinity(); va != affine.Object {
+			err = errutil.New("set expected object not", va)
+		} else {
+			id, parent := q.id, val.String()
+			if e := q.n.RelateTo(id, parent, "locale"); e != nil {
+				err = e
+			} else {
+				q.n.nounLocale.setLocaleOf(id, parent)
+			}
+		}
+	case field[0] == object.Prefix:
 		err = errutil.Fmt("can't change reserved field %q", field)
-	} else {
+	default:
 		key := makeKey(q.id, field)
 		err = q.n.setField(key, val)
 	}

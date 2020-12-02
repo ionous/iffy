@@ -28,6 +28,7 @@ type Fields struct {
 	objOf,
 	isLike,
 	relativesOf,
+	reciprocalOf,
 	relateTo,
 	relativeKinds,
 	updatePairs *sql.Stmt
@@ -133,6 +134,8 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 			from next`),
 		relativesOf: ps.Prep(db,
 			`select otherNoun from run_pair where active and noun=?1 and relation=?2`),
+		reciprocalOf: ps.Prep(db,
+			`select noun from run_pair where active and otherNoun=?1 and relation=?2`),
 		relateTo: ps.Prep(db,
 			`with next as (
 				select ?1 as noun, ?2 as otherNoun, ?3 as relation, ?4 as cardinality
@@ -207,7 +210,6 @@ func (n *Runner) setField(key keyType, val g.Value) (err error) {
 		err = e // there was an unknown error
 	case nil:
 		// get the name of the aspect
-
 		if aspect, b := q.String(), val.Bool(); !b {
 			// future: might maintain a table of opposite names ( similar to plurals )
 			err = errutil.Fmt("error setting trait: couldn't determine the opposite of %q", key)
@@ -333,6 +335,9 @@ func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 
 	case object.Kinds:
 		ret, err = n.cacheQuery(key, n.fields.ancestorsOf, field)
+
+	case object.Locale:
+		ret = qnaValue{affine.Object, &qnaObject{n: n, id: n.nounLocale.localeOf(field)}}
 
 	default:
 		// see if the user is asking for the status of a trait

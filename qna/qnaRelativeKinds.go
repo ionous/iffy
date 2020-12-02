@@ -21,7 +21,7 @@ type relativeKind struct {
 
 // doesThis, implementThat
 func compatibleKind(path, k string) bool {
-	return strings.Contains(path, k+",")
+	return path == k || strings.Contains(path, k+",")
 }
 
 func (a *relativeKinds) relativeKind(id string) (ret relativeKind) {
