@@ -1,5 +1,7 @@
 package reader
 
+import "github.com/ionous/errutil"
+
 // Map string keys to generic values with methods for extracting specific types.
 type Map map[string]interface{}
 
@@ -13,7 +15,13 @@ func Box(i interface{}) Map {
 // StrOf the value at the passed key as a string.
 func (m Map) StrOf(key string) (ret string) {
 	if v, ok := m[key]; ok {
-		ret = v.(string)
+		switch v := v.(type) {
+		case nil:
+		case string:
+			ret = v
+		default:
+			panic(errutil.Fmt("key %q expected a string, not %v(%T)", key, v, v))
+		}
 	}
 	return
 }
