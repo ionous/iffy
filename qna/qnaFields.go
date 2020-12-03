@@ -70,13 +70,15 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				from mdl_noun 
 				where noun=?`),
 		fieldsFor: ps.Prep(db,
-			`select * from mdl_field
+			`select field, type from mdl_field
+			where kind=?1
 				union all
 			select * from (
-				select aspect as kind, trait as field, 'trait' from mdl_aspect
+				select trait, 'trait' 
+				from mdl_aspect
+				where aspect = ?1
 				order by rank 
-			)
-			where kind=?`),
+			)`),
 		traitsFor: ps.Prep(db,
 			`select trait
 				from mdl_aspect 

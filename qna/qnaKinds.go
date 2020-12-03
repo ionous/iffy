@@ -3,7 +3,6 @@ package qna
 import (
 	"database/sql"
 
-	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
@@ -28,7 +27,6 @@ func (km *qnaKinds) GetKindByName(name string) (ret *g.Kind, err error) {
 		ret = k
 	} else {
 		// creates the kind if it needs to.
-		var aspects []*g.Kind
 		var fields []g.Field
 		var field, fieldType string
 		// ex. number, text, aspect
@@ -47,11 +45,14 @@ func (km *qnaKinds) GetKindByName(name string) (ret *g.Kind, err error) {
 				// aspects are stored as text in the runtime
 				affinity = affine.Text
 				// we need the aspect record to lookup related traits
-				if aspect, e := km.GetKindByName(name); e != nil {
-					err = errutil.New("aspect not found", fieldType, e)
-				} else {
-					aspects = append(aspects, aspect)
-				}
+				// fix: generic does this on demand; should there be a way to pre-populate?
+				// if _, e := km.GetKindByName(field); e != nil {
+				// 	err = errutil.New("aspect not found", field, e)
+				// } else {
+				// var aspects []*g.Kind
+				// aspects = append(aspects, aspect)
+				//
+				// }
 			}
 			if err == nil {
 				fields = append(fields, g.Field{
