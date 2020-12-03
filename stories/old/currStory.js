@@ -561,7 +561,7 @@ function getStory() {
                                                       "value": {
                                                         "$OBJ": {
                                                           "id": "id-1743bd78458-4",
-                                                          "type": "object_ref",
+                                                          "type": "object_eval",
                                                           "value": {
                                                             "id": "id-1743bd78458-5",
                                                             "type": "named_noun",
@@ -608,7 +608,7 @@ function getStory() {
                                 "value": {
                                   "$OBJ": {
                                     "id": "id-17494737044-4",
-                                    "type": "object_ref",
+                                    "type": "object_eval",
                                     "value": {
                                       "id": "id-17494737044-6",
                                       "type": "named_noun",
@@ -684,7 +684,7 @@ function getStory() {
                                                   },
                                                   "$OBJ": {
                                                     "id": "id-1743bd78458-32",
-                                                    "type": "object_ref",
+                                                    "type": "object_eval",
                                                     "value": {
                                                       "id": "id-1743bd78458-35",
                                                       "type": "named_noun",
@@ -750,7 +750,7 @@ function getStory() {
                                         },
                                         "$OBJ": {
                                           "id": "id-174941fde22-15",
-                                          "type": "object_ref",
+                                          "type": "object_eval",
                                           "value": {
                                             "id": "id-174941fde22-20",
                                             "type": "named_noun",
@@ -838,7 +838,7 @@ function getStory() {
                                                   },
                                                   "$OBJ": {
                                                     "id": "id-173f8fba4ff-30",
-                                                    "type": "object_ref",
+                                                    "type": "object_eval",
                                                     "value": {
                                                       "id": "id-173f8fba4ff-31",
                                                       "type": "named_noun",
@@ -1081,7 +1081,7 @@ function getStory() {
                                         },
                                         "$OBJ": {
                                           "id": "id-17494737044-25",
-                                          "type": "object_ref",
+                                          "type": "object_eval",
                                           "value": {
                                             "id": "id-17494737044-28",
                                             "type": "named_noun",
@@ -2163,11 +2163,11 @@ function getStory() {
                               "type": "execute",
                               "value": {
                                 "id": "id-174bd1dc16a-107",
-                                "type": "set_field_text",
+                                "type": "set_field",
                                 "value": {
                                   "$OBJ": {
                                     "id": "id-174bd1dc16a-108",
-                                    "type": "object_ref",
+                                    "type": "object_eval",
                                     "value": {
                                       "id": "id-174bd1dc16a-111",
                                       "type": "named_noun",
@@ -2200,17 +2200,22 @@ function getStory() {
                                       }
                                     }
                                   },
-                                  "$VAL": {
-                                    "id": "id-174bd1dc16a-110",
-                                    "type": "text_eval",
+                                  "$FROM": {
+                                    "type": "assignment",
                                     "value": {
-                                      "id": "id-174bd1dc16a-116",
-                                      "type": "text_value",
+                                      "type": "assign_text",
                                       "value": {
-                                        "$TEXT": {
-                                          "id": "id-174bd1dc16a-117",
-                                          "type": "text",
-                                          "value": "party favors"
+                                        "$VAL": {
+                                          "type": "text_eval",
+                                          "value": {
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "type": "text",
+                                                "value": "party favors"
+                                              }
+                                            }
+                                          }
                                         }
                                       }
                                     }

@@ -251,7 +251,7 @@
                                         },
                                         "$OBJ": {
                                           "id": "id-17494737044-25",
-                                          "type": "object_ref",
+                                          "type": "object_eval",
                                           "value": {
                                             "id": "id-17494737044-28",
                                             "type": "named_noun",

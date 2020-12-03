@@ -572,11 +572,11 @@
                               "type": "execute",
                               "value": {
                                 "id": "id-174bd1dc16a-107",
-                                "type": "set_field_text",
+                                "type": "set_field",
                                 "value": {
                                   "$OBJ": {
                                     "id": "id-174bd1dc16a-108",
-                                    "type": "object_ref",
+                                    "type": "object_eval",
                                     "value": {
                                       "id": "id-174bd1dc16a-111",
                                       "type": "named_noun",
@@ -596,30 +596,25 @@
                                   },
                                   "$FIELD": {
                                     "id": "id-174bd1dc16a-109",
-                                    "type": "text_eval",
-                                    "value": {
-                                      "id": "id-174bd1dc16a-114",
-                                      "type": "text_value",
-                                      "value": {
-                                        "$TEXT": {
-                                          "id": "id-174bd1dc16a-115",
-                                          "type": "text",
-                                          "value": "printed plural name"
-                                        }
-                                      }
-                                    }
+                                    "type": "text",
+                                    "value": "printed plural name"
                                   },
-                                  "$VAL": {
-                                    "id": "id-174bd1dc16a-110",
-                                    "type": "text_eval",
+                                  "$FROM": {
+                                    "type": "assignment",
                                     "value": {
-                                      "id": "id-174bd1dc16a-116",
-                                      "type": "text_value",
+                                      "type": "assign_text",
                                       "value": {
-                                        "$TEXT": {
-                                          "id": "id-174bd1dc16a-117",
-                                          "type": "text",
-                                          "value": "party favors"
+                                        "$VAL": {
+                                          "type": "text_eval",
+                                          "value": {
+                                            "type": "text_value",
+                                            "value": {
+                                              "$TEXT": {
+                                                "type": "text",
+                                                "value": "party favors"
+                                              }
+                                            }
+                                          }
                                         }
                                       }
                                     }

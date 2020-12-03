@@ -1279,7 +1279,7 @@
                                 "value": {
                                   "$OBJ": {
                                     "id": "id-174f0910998-55",
-                                    "type": "object_ref",
+                                    "type": "object_eval",
                                     "value": {
                                       "id": "id-174f0910998-57",
                                       "type": "get_var",
@@ -1396,7 +1396,7 @@
                                         },
                                         "$OBJ": {
                                           "id": "id-174f0910998-82",
-                                          "type": "object_ref",
+                                          "type": "object_eval",
                                           "value": {
                                             "id": "id-174f0910998-85",
                                             "type": "get_var",
@@ -1607,7 +1607,7 @@
                                 "value": {
                                   "$OBJ": {
                                     "id": "id-174f2020d9d-31",
-                                    "type": "object_ref",
+                                    "type": "object_eval",
                                     "value": {
                                       "id": "id-174f2020d9d-32",
                                       "type": "get_var",

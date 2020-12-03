@@ -486,7 +486,7 @@
                                                       "value": {
                                                         "$OBJ": {
                                                           "id": "id-1743bd78458-4",
-                                                          "type": "object_ref",
+                                                          "type": "object_eval",
                                                           "value": {
                                                             "id": "id-1743bd78458-5",
                                                             "type": "named_noun",
@@ -533,7 +533,7 @@
                                 "value": {
                                   "$OBJ": {
                                     "id": "id-17494737044-4",
-                                    "type": "object_ref",
+                                    "type": "object_eval",
                                     "value": {
                                       "id": "id-17494737044-6",
                                       "type": "named_noun",
@@ -592,7 +592,7 @@
                                                   "type": "name_of",
                                                   "value": {
                                                     "$OBJ": {
-                                                      "type": "object_ref",
+                                                      "type": "object_eval",
                                                       "value": {
                                                         "type": "named_noun",
                                                         "value": {
@@ -657,7 +657,7 @@
                                         },
                                         "$OBJ": {
                                           "id": "id-174941fde22-15",
-                                          "type": "object_ref",
+                                          "type": "object_eval",
                                           "value": {
                                             "id": "id-174941fde22-20",
                                             "type": "named_noun",
@@ -745,7 +745,7 @@
                                                   },
                                                   "$OBJ": {
                                                     "id": "id-173f8fba4ff-30",
-                                                    "type": "object_ref",
+                                                    "type": "object_eval",
                                                     "value": {
                                                       "id": "id-173f8fba4ff-31",
                                                       "type": "named_noun",

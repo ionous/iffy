@@ -50,7 +50,7 @@ function localLang(make) {
 
     make.run("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 
-    make.run("named_noun", "object_ref", "{determiner} {name:noun_name}");
+    make.run("named_noun", "object_eval", "{determiner} {name:noun_name}");
 
     make.str("determiner", "{a}, {an}, {the}, {our}, or {other determiner%determiner}",
       `Determiners: modify a word they are associated to designate specificity or, sometimes, a count.

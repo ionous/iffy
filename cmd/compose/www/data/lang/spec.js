@@ -31,8 +31,18 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "Object Reference: Helper used when referring to objects.",
-    "name": "object_ref",
+    "desc": "Object: Statements which return an object.",
+    "name": "object_eval",
+    "uses": "slot"
+  },
+  {
+    "desc": "Texts: Statements which return a record.",
+    "name": "record_eval",
+    "uses": "slot"
+  },
+  {
+    "desc": "Record Lists:  Statements which return a list of records.",
+    "name": "record_list_eval",
     "uses": "slot"
   },
   {
@@ -149,7 +159,11 @@ const spec = [
     "name": "assign",
     "spec": "let {name:variable_name} be {from:assignment}",
     "uses": "run",
-    "with": {}
+    "with": {
+      "slots": [
+        "execute"
+      ]
+    }
   },
   {
     "desc": "Assign Boolean: Assigns the passed boolean value.",
@@ -212,6 +226,75 @@ const spec = [
     }
   },
   {
+    "desc": "Assign Object: Assigns the passed object",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_object",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "object_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from object",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Record: Assigns the passed record.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_record",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "record_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from record",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Record List: Assigns the passed record list.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_record_list",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$VALS": {
+          "label": "vals",
+          "type": "record_list_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from record list",
+        "$VALS"
+      ]
+    }
+  },
+  {
     "desc": "Assign Text: Assigns the passed piece of text.",
     "group": [
       "variables"
@@ -254,29 +337,6 @@ const spec = [
       "tokens": [
         "from text list",
         "$VALS"
-      ]
-    }
-  },
-  {
-    "desc": "Assign Variable: Assigns one variable or object to another.\n\t\tUsed internally for pattern calls in templates. ex. { pattern: .something }.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_var",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text_eval"
-        }
-      },
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "from var",
-        "$NAME"
       ]
     }
   },
@@ -495,6 +555,29 @@ const spec = [
     }
   },
   {
+    "desc": "Copy Variable: Copy the contents of one variable to another.",
+    "group": [
+      "variables"
+    ],
+    "name": "copy_from",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "copy from",
+        "$NAME"
+      ]
+    }
+  },
+  {
     "desc": "Cycle Text: When called multiple times, returns each of its inputs in turn.",
     "group": [
       "cycle"
@@ -662,7 +745,7 @@ const spec = [
     }
   },
   {
-    "desc": "For Each Number: Loops over the passed list of numbers, or runs the 'else' statement if empty.",
+    "desc": "For Each Number: Loops over the passed list of numbers, or runs the 'else' activity if empty.",
     "group": [
       "exec"
     ],
@@ -695,7 +778,7 @@ const spec = [
     }
   },
   {
-    "desc": "For Each Text: Loops over the passed list of text, or runs the 'else' statement if empty.",
+    "desc": "For Each Text: Loops over the passed list of text, or runs the 'else' activity if empty.",
     "group": [
       "exec"
     ],
@@ -733,15 +816,19 @@ const spec = [
       "objects"
     ],
     "name": "get_field",
-    "spec": "the {field:text_eval} of {object%obj:object_ref}",
+    "spec": "the {field:text_eval} of {object:object_eval}",
     "uses": "run",
     "with": {
       "slots": [
         "bool_eval",
         "number_eval",
         "text_eval",
+        "record_eval",
+        "object_eval",
         "num_list_eval",
-        "text_list_eval"
+        "text_list_eval",
+        "record_list_eval",
+        "assignment"
       ]
     }
   },
@@ -758,9 +845,11 @@ const spec = [
         "bool_eval",
         "number_eval",
         "text_eval",
+        "object_eval",
         "num_list_eval",
         "text_list_eval",
-        "object_ref"
+        "record_list_eval",
+        "assignment"
       ]
     }
   },
@@ -784,7 +873,7 @@ const spec = [
       "objects"
     ],
     "name": "has_trait",
-    "spec": "{object%obj:object_ref} is {trait:text_eval}",
+    "spec": "{object%object:object_eval} is {trait:text_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -858,7 +947,7 @@ const spec = [
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_ref"
+          "type": "object_eval"
         }
       },
       "slots": [
@@ -877,7 +966,7 @@ const spec = [
       "objects"
     ],
     "name": "is_kind_of",
-    "spec": "Is {object%obj:object_ref} a kind of {kind:singular_kind}",
+    "spec": "Is {object%obj:object_eval} a kind of {kind:singular_kind}",
     "uses": "run",
     "with": {
       "slots": [
@@ -957,7 +1046,7 @@ const spec = [
       "objects"
     ],
     "name": "kind_of",
-    "spec": "kind of {object%obj:object_ref}",
+    "spec": "kind of {object%obj:object_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -990,12 +1079,304 @@ const spec = [
     "with": {}
   },
   {
+    "desc": "Value of List: Get a value from a list. The first element is is index 1.",
+    "group": [
+      "list"
+    ],
+    "name": "list_at",
+    "spec": "{list:text} entry {index:number}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "number_eval",
+        "text_eval",
+        "object_eval"
+      ]
+    }
+  },
+  {
+    "desc": "For each in list: Loops over the elements in the passed list, or runs the 'else' activity if empty.",
+    "group": [
+      "list"
+    ],
+    "name": "list_each",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$ELSE": {
+          "label": "else",
+          "type": "activity"
+        },
+        "$GO": {
+          "label": "go",
+          "type": "activity"
+        },
+        "$LIST": {
+          "label": "list",
+          "type": "text"
+        },
+        "$WITH": {
+          "label": "with",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "each",
+        "$LIST",
+        "$WITH",
+        "$GO",
+        "$ELSE"
+      ]
+    }
+  },
+  {
+    "desc": "Length of List: Determines the number of values in a list.",
+    "group": [
+      "list"
+    ],
+    "name": "list_len",
+    "spec": "length of {list:text}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Map List: Transform the values from one list and place the results in another list.\n\t\tThe named pattern is called with two records 'in' and 'out' from the source and output lists respectively.",
+    "group": [
+      "list"
+    ],
+    "name": "list_map",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$FROM_LIST": {
+          "label": "from list",
+          "type": "text"
+        },
+        "$TO_LIST": {
+          "label": "to list",
+          "type": "text"
+        },
+        "$USING_PATTERN": {
+          "label": "using pattern",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "map",
+        "$FROM_LIST",
+        "$TO_LIST",
+        "$USING_PATTERN"
+      ]
+    }
+  },
+  {
+    "desc": "Pop from list: Remove an element from the front or back of a list.\nRuns an activity with the popped value, or runs the 'else' activity if the list was empty.",
+    "group": [
+      "list"
+    ],
+    "name": "list_pop",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$ELSE": {
+          "label": "else",
+          "type": "activity"
+        },
+        "$FRONT": {
+          "label": "front",
+          "type": "bool"
+        },
+        "$GO": {
+          "label": "go",
+          "type": "activity"
+        },
+        "$LIST": {
+          "label": "list",
+          "type": "text"
+        },
+        "$WITH": {
+          "label": "with",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "pop",
+        "$LIST",
+        "$WITH",
+        "$FRONT",
+        "$GO",
+        "$ELSE"
+      ]
+    }
+  },
+  {
+    "desc": "Push into list: Add elements to the front or back of a list.\nReturns the new length of the list.",
+    "group": [
+      "list"
+    ],
+    "name": "list_push",
+    "spec": "push {list:text} {front} {inserting%insert?assignment}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "execute",
+        "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Set Value of List: Overwrite an existing value in a list.",
+    "group": [
+      "list"
+    ],
+    "name": "list_set",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$ELEMENT": {
+          "label": "element",
+          "type": "assignment"
+        },
+        "$INDEX": {
+          "label": "index",
+          "type": "number_eval"
+        },
+        "$LIST": {
+          "label": "list",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "set",
+        "$LIST",
+        "$INDEX",
+        "$ELEMENT"
+      ]
+    }
+  },
+  {
+    "desc": "Slice of List: Create a new list from a section of another list.",
+    "group": [
+      "list"
+    ],
+    "name": "list_slice",
+    "spec": "slice {list:text} {from entry%start?number} {ending before entry%eend?number}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "execute",
+        "num_list_eval",
+        "text_list_eval",
+        "record_list_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
+    "group": [
+      "list"
+    ],
+    "name": "list_sort",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$LIST": {
+          "label": "list",
+          "type": "text"
+        },
+        "$PATTERN": {
+          "label": "pattern",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "sort",
+        "$LIST",
+        "$PATTERN"
+      ]
+    }
+  },
+  {
+    "desc": "Splice into list: Modify a list by adding and removing elements.\nNote: the type of the elements being added must match the type of the list. \nText cant be added to a list of numbers, numbers cant be added to a list of text, \nand true/false values can't be added to a list.",
+    "group": [
+      "list"
+    ],
+    "name": "list_splice",
+    "spec": "splice into {list:text} {at entry%start?number} {removing%remove?number} {inserting%insert?assignment}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "execute",
+        "num_list_eval",
+        "text_list_eval",
+        "record_list_eval"
+      ]
+    }
+  },
+  {
+    "name": "make",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$ARGUMENTS": {
+          "label": "arguments",
+          "type": "arguments"
+        },
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "object_eval"
+      ],
+      "tokens": [
+        "make",
+        "$NAME",
+        "$ARGUMENTS"
+      ]
+    }
+  },
+  {
     "desc": "Lowercase: returns new text, with every letter turned into lowercase. \n\t\tFor example, \"shout\" from \"SHOUT\".",
     "group": [
       "format"
     ],
     "name": "make_lowercase",
     "spec": "{text:text_eval} in lowercase",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "text_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Reverse text: returns new text flipped back to front. \n\t\tFor example, \"elppA\" from \"Apple\", or \"noon\" from \"noon\".",
+    "group": [
+      "format"
+    ],
+    "name": "make_reversed",
+    "spec": "{text:text_eval} in reverse",
     "uses": "run",
     "with": {
       "slots": [
@@ -1074,12 +1455,35 @@ const spec = [
     }
   },
   {
+    "desc": "Move Variable: Move the contents of one variable to another, leaving the first variable blank.",
+    "group": [
+      "variables"
+    ],
+    "name": "move_from",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "move from",
+        "$NAME"
+      ]
+    }
+  },
+  {
     "desc": "Name Of: Full name of the object.",
     "group": [
       "objects"
     ],
     "name": "name_of",
-    "spec": "name of {object%obj:object_ref}",
+    "spec": "name of {object%obj:object_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -1098,29 +1502,6 @@ const spec = [
     "with": {
       "slots": [
         "number_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Length of Number List: Determines the number of elements in a list of numbers.",
-    "group": [
-      "format"
-    ],
-    "name": "number_list_count",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$ELEMS": {
-          "label": "elems",
-          "type": "num_list_eval"
-        }
-      },
-      "slots": [
-        "number_eval"
-      ],
-      "tokens": [
-        "len of numbers",
-        "$ELEMS"
       ]
     }
   },
@@ -1145,6 +1526,53 @@ const spec = [
       "tokens": [
         "numbers",
         "$VALUES"
+      ]
+    }
+  },
+  {
+    "desc": "Object Exists: Returns whether there is a noun of the specified name.",
+    "group": [
+      "objects"
+    ],
+    "name": "object_exists",
+    "spec": "object named {name:text_eval}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Pack: Puts a value into a record.",
+    "group": [
+      "variables"
+    ],
+    "name": "pack",
+    "uses": "run",
+    "with": {
+      "params": {
+        "$FIELD": {
+          "label": "field",
+          "type": "text"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$RECORD": {
+          "label": "record",
+          "type": "record_eval"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "pack",
+        "$RECORD",
+        "$FIELD",
+        "$FROM"
       ]
     }
   },
@@ -1312,167 +1740,35 @@ const spec = [
     }
   },
   {
-    "desc": "Set Boolean Field: Sets the named field to the passed boolean value.",
+    "desc": "Set Field: Sets the named field to the assigned value.",
     "group": [
       "objects"
     ],
-    "name": "set_field_bool",
+    "name": "set_field",
     "uses": "run",
     "with": {
       "params": {
         "$FIELD": {
           "label": "field",
-          "type": "text_eval"
+          "type": "text"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
         },
         "$OBJ": {
           "label": "obj",
-          "type": "object_ref"
-        },
-        "$VAL": {
-          "label": "val",
-          "type": "bool_eval"
+          "type": "object_eval"
         }
       },
       "slots": [
         "execute"
       ],
       "tokens": [
-        "set field bool",
+        "set field",
         "$OBJ",
         "$FIELD",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "Set Number Field: Sets the named field to the passed number.",
-    "group": [
-      "objects"
-    ],
-    "name": "set_field_num",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$FIELD": {
-          "label": "field",
-          "type": "text_eval"
-        },
-        "$OBJ": {
-          "label": "obj",
-          "type": "object_ref"
-        },
-        "$VAL": {
-          "label": "val",
-          "type": "number_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set field num",
-        "$OBJ",
-        "$FIELD",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "Set Number List Field: Sets the named field to the passed number list.",
-    "group": [
-      "objects"
-    ],
-    "name": "set_field_num_list",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$FIELD": {
-          "label": "field",
-          "type": "text_eval"
-        },
-        "$OBJ": {
-          "label": "obj",
-          "type": "object_ref"
-        },
-        "$VALS": {
-          "label": "vals",
-          "type": "num_list_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set field num list",
-        "$OBJ",
-        "$FIELD",
-        "$VALS"
-      ]
-    }
-  },
-  {
-    "desc": "Set Text Field: Sets the named field to the passed text value.",
-    "group": [
-      "objects"
-    ],
-    "name": "set_field_text",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$FIELD": {
-          "label": "field",
-          "type": "text_eval"
-        },
-        "$OBJ": {
-          "label": "obj",
-          "type": "object_ref"
-        },
-        "$VAL": {
-          "label": "val",
-          "type": "text_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set field text",
-        "$OBJ",
-        "$FIELD",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "Set Text List Field: Sets the named field to the passed text list.",
-    "group": [
-      "objects"
-    ],
-    "name": "set_field_text_list",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$FIELD": {
-          "label": "field",
-          "type": "text_eval"
-        },
-        "$OBJ": {
-          "label": "obj",
-          "type": "object_ref"
-        },
-        "$VALS": {
-          "label": "vals",
-          "type": "text_list_eval"
-        }
-      },
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "set field text list",
-        "$OBJ",
-        "$FIELD",
-        "$VALS"
+        "$FROM"
       ]
     }
   },
@@ -1599,29 +1895,6 @@ const spec = [
     }
   },
   {
-    "desc": "Length of Text List: Determines the number of text elements in a list.",
-    "group": [
-      "format"
-    ],
-    "name": "text_list_count",
-    "uses": "run",
-    "with": {
-      "params": {
-        "$ELEMS": {
-          "label": "elems",
-          "type": "text_list_eval"
-        }
-      },
-      "slots": [
-        "number_eval"
-      ],
-      "tokens": [
-        "len of texts",
-        "$ELEMS"
-      ]
-    }
-  },
-  {
     "desc": "Text Value: specify a small bit of text.",
     "group": [
       "literals"
@@ -1674,6 +1947,28 @@ const spec = [
     }
   },
   {
+    "desc": "Unpack: Get a value from a record.",
+    "group": [
+      "variables"
+    ],
+    "name": "unpack",
+    "spec": "unpack {field:text_eval} from {record:record_eval}",
+    "uses": "run",
+    "with": {
+      "slots": [
+        "bool_eval",
+        "number_eval",
+        "text_eval",
+        "record_eval",
+        "object_eval",
+        "num_list_eval",
+        "text_list_eval",
+        "record_list_eval",
+        "assignment"
+      ]
+    }
+  },
+  {
     "name": "comparison",
     "uses": "group"
   },
@@ -1695,6 +1990,10 @@ const spec = [
   },
   {
     "name": "hidden",
+    "uses": "group"
+  },
+  {
+    "name": "list",
     "uses": "group"
   },
   {
