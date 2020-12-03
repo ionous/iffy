@@ -11,6 +11,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/assembly"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -61,14 +62,14 @@ func assemble(outFile, inFile string) (err error) {
 		}(); e != nil {
 			err = errutil.New("error attaching", e, inFile)
 		} else {
-			var ds assembly.Dilemmas
+			var ds reader.Dilemmas
 			if e := assembly.AssembleStory(db, "kinds", ds.Add); e != nil {
 				err = errutil.New("error assembling", e, inFile)
 			}
 			if len(ds) > 0 {
 				e := errutil.New("issues assembling", ds.Err())
 				err = errutil.Append(err, e)
-				assembly.PrintDilemmas(log.Writer(), ds)
+				reader.PrintDilemmas(log.Writer(), ds)
 			}
 		}
 	}

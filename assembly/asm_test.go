@@ -30,18 +30,15 @@ func newAssemblyTest(t *testing.T, path string) (ret *assemblyTest, err error) {
 		} else if e := tables.CreateModel(db); e != nil {
 			err = errutil.New(e, "for", source)
 		} else {
-			ds := new(Dilemmas)
+			var ds reader.Dilemmas
 			rec := ephemera.NewRecorder(t.Name(), db)
-			mdl := NewAssemblerReporter(db, func(pos reader.Position, msg string) {
-				t.Log("report:", pos, msg)
-				ds.Add(pos, msg)
-			})
+			mdl := NewAssemblerReporter(db, ds.Add)
 			ret = &assemblyTest{
 				T:         t,
 				db:        db,
 				rec:       rec,
 				assembler: mdl,
-				dilemmas:  ds,
+				dilemmas:  &ds,
 			}
 		}
 	}
@@ -53,5 +50,5 @@ type assemblyTest struct {
 	db        *sql.DB
 	rec       *ephemera.Recorder
 	assembler *Assembler
-	dilemmas  *Dilemmas
+	dilemmas  *reader.Dilemmas
 }

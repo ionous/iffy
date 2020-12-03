@@ -26,6 +26,17 @@ func Fields(name string) []string {
 	return p.flush()
 }
 
+func Underscore(name string) string {
+	var b strings.Builder
+	for i, el := range Fields(name) {
+		if i > 0 {
+			b.WriteRune('_')
+		}
+		b.WriteString(strings.ToLower(el))
+	}
+	return b.String()
+}
+
 // fix. this horrible algorithm sure needs to change
 // itd be fine i think to split first and then combine with word rules even
 // possibly worth considering ditching camelCasing anyway:

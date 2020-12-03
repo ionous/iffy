@@ -10,6 +10,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 )
@@ -115,7 +116,7 @@ func TestTraitMissingAspect(t *testing.T) {
 		} else if e := AssembleAspects(asm.assembler); e == nil {
 			t.Fatal("expected error")
 		} else if asm.dilemmas.Len() != 1 ||
-			!strings.Contains((*asm.dilemmas)[0].Msg, `missing aspect: "z"`) {
+			!strings.Contains((*asm.dilemmas)[0].Err.Error(), `missing aspect: "z"`) {
 			t.Fatal(asm.dilemmas)
 		} else {
 			t.Log("ok:", e)
@@ -148,15 +149,15 @@ func TestTraitMissingTraits(t *testing.T) {
 	}
 }
 
-func containsOnly(ds *Dilemmas, msg ...string) bool {
+func containsOnly(ds *reader.Dilemmas, msg ...string) bool {
 	return ds.Len() == len(msg) && containsMessages(ds, msg...)
 }
 
-func containsMessages(ds *Dilemmas, msg ...string) (ret bool) {
+func containsMessages(ds *reader.Dilemmas, msg ...string) (ret bool) {
 	for _, d := range *ds {
 		foundAt := -1
 		for i, str := range msg {
-			if strings.Contains(d.Msg, str) {
+			if strings.Contains(d.Err.Error(), str) {
 				foundAt = i
 				break
 			}

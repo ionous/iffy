@@ -30,7 +30,7 @@ func TestFullFactorial(t *testing.T) {
 }
 
 func testAll(inFile string, db *sql.DB, m reader.Map) (ret int, err error) {
-	var ds assembly.Dilemmas
+	var ds reader.Dilemmas
 	if e := tables.CreateAll(db); e != nil {
 		err = errutil.New("couldn't create tables", e)
 	} else if e := story.ImportStory(inFile, db, m); e != nil {

@@ -1,27 +1,26 @@
-package assembly
+package reader
 
 import (
 	"io"
 	"sort"
 
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ephemera/reader"
 )
 
 // Dilemma presents an situation unresolvable without user intervention.
 // Branched ( is that a good euphemism? ) from go/scanner#Error, go/scanner#Dilemmas
 //
 type Dilemma struct {
-	Pos reader.Position
-	Msg string
+	Pos Position
+	Err error
 }
 
 // Error implements the error interface.
 func (e Dilemma) Error() (ret string) {
-	if e.Pos.Source != "" || e.Pos.IsValid() {
-		ret = e.Pos.String() + ": " + e.Msg
+	if msg := e.Err.Error(); e.Pos.Source != "" || e.Pos.IsValid() {
+		ret = e.Pos.String() + ": " + msg
 	} else {
-		ret = e.Msg
+		ret = msg
 	}
 	return
 }
@@ -31,9 +30,13 @@ func (e Dilemma) Error() (ret string) {
 //
 type Dilemmas []*Dilemma
 
-// Add adds an Error with given reader.Position and error message to an Dilemmas.
-func (p *Dilemmas) Add(pos reader.Position, msg string) {
-	*p = append(*p, &Dilemma{pos, msg})
+// Add adds an Error with given Position and error message to an Dilemmas.
+func (p *Dilemmas) Add(pos Position, msg string) {
+	*p = append(*p, &Dilemma{pos, errutil.New(msg)})
+}
+
+func (p *Dilemmas) Report(pos Position, err error) {
+	*p = append(*p, &Dilemma{pos, err})
 }
 
 // Reset resets an Dilemmas to no errors.
@@ -56,7 +59,7 @@ func (p Dilemmas) Less(i, j int) bool {
 	return e.LessThan(f)
 }
 
-// Sort sorts an Dilemmas. *Error entries are sorted by reader.Position,
+// Sort sorts an Dilemmas. *Error entries are sorted by Position,
 // other errors are sorted by error message, and before any *Error
 // entry.
 //
@@ -67,7 +70,7 @@ func (p Dilemmas) Sort() {
 // RemoveMultiples sorts an Dilemmas and removes all but the first error per line.
 func (p *Dilemmas) RemoveMultiples() {
 	sort.Sort(p)
-	var last reader.Position // initial last.Line is != any legal error line
+	var last Position // initial last.Line is != any legal error line
 	i := 0
 	for _, e := range *p {
 		if e.Pos != last {
