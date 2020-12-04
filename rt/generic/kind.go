@@ -1,15 +1,17 @@
 package generic
 
 import (
-	"log"
+	"strings"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 )
 
 // we bake it down for faster, easier indexed access.
 type Kind struct {
 	kinds   Kinds
-	name    string
+	name    string // keeping name *and* path makes debugging easier
+	path    []string
 	fields  []Field
 	traits  []trait
 	lastOne int // one-based index of last field
@@ -23,7 +25,11 @@ type Field struct {
 
 // aspects are a specific kind of record where every field is a boolean trait
 func NewKind(kinds Kinds, name string, fields []Field) *Kind {
-	return &Kind{kinds: kinds, name: name, fields: fields}
+	path := strings.Split(name, ",")
+	if end := len(path) - 1; end >= 0 {
+		name = path[end]
+	}
+	return &Kind{kinds: kinds, name: name, path: path, fields: fields}
 }
 
 // fix: temp till all kinds are moved to assembly
@@ -35,7 +41,22 @@ func (k *Kind) NewRecord() *Record {
 	return &Record{kind: k, values: make([]interface{}, len(k.fields))}
 }
 
-func (k *Kind) Name() string {
+func (k *Kind) Path() (ret []string) {
+	ret = append(ret, k.path...)
+	return
+}
+
+func (k *Kind) Implements(i string) (ret bool) {
+	for _, p := range k.path {
+		if i == p {
+			ret = true
+			break
+		}
+	}
+	return
+}
+
+func (k *Kind) Name() (ret string) {
 	return k.name
 }
 
@@ -83,7 +104,7 @@ func (k *Kind) ensureTraits() {
 		for _, ft := range k.fields {
 			if ft.Type == "aspect" {
 				if aspect, e := k.kinds.GetKindByName(ft.Name); e != nil {
-					log.Println("unknown aspect", ft.Name, e)
+					panic(errutil.Sprint("unknown aspect", ft.Name, e))
 				} else {
 					ts = makeTraits(aspect, ts)
 				}

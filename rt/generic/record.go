@@ -103,7 +103,7 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 
 func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	ft := d.kind.fields[i]
-	if a, t := val.Affinity(), val.Type(); !matchTypes(ft.Affinity, ft.Type, a, t) {
+	if a, t := val.Affinity(), val.Type(); !matchTypes(d.kind.kinds, ft.Affinity, ft.Type, a, t) {
 		err = errutil.Fmt("%s of %s is not %s of %s", a, t, ft.Affinity, ft.Type)
 	} else {
 		_, err = d.cache(i, val)
@@ -111,6 +111,17 @@ func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	return
 }
 
-func matchTypes(a affine.Affinity, at string, b affine.Affinity, bt string) bool {
-	return a == b && ((a != affine.Record && a != affine.RecordList) || (at == bt))
+func matchTypes(ks Kinds, fa affine.Affinity, ft string, va affine.Affinity, vt string) (okay bool) {
+	if fa == va {
+		recordLike := fa == affine.Object || fa == affine.Record || fa == affine.RecordList
+		if !recordLike {
+			okay = true
+		} else if vk, e := ks.GetKindByName(vt); e == nil {
+			// a field takes: cats
+			// my value is things, animals, cats, tigers.
+			// so we should ask: does the value's path contains the field's kind.
+			okay = vk.Implements(ft)
+		}
+	}
+	return
 }
