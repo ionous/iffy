@@ -73,14 +73,6 @@ func runViewsTemplate() string {
 		"union all  /* add all fields with zero values as null, and we'll order by nulls last */\n" +
 		"select noun, field,  type, null as value, null as tier\n" +
 		"\tfrom mdl_noun_field;\n" +
-		"\n" +
-		"/* active nouns */\n" +
-		"create temp view\n" +
-		"run_noun as \n" +
-		"select mn.noun, mn.kind \n" +
-		"from mdl_noun mn \n" +
-		"join run_domain rd \n" +
-		"\ton (mn.noun like ('#' || rd.domain || '::%'))\n" +
-		"where rd.active = true;"
+		""
 	return tmpl
 }
