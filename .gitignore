@@ -17,3 +17,5 @@ cmd/play/play
 cmd/spec/spec
 cmd/spec/spec.js
 cmd/stem/stem
+node_modules
+cmd/makeops/temp.go
