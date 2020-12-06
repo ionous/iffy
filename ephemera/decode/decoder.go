@@ -2,6 +2,7 @@ package decode
 
 import (
 	r "reflect"
+	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
@@ -117,7 +118,7 @@ func (dec *Decoder) readNew(cmd cmdRec, m reader.Map) (ret r.Value, err error) {
 			ret = r.ValueOf(res)
 		}
 	} else if cmd.elem.Kind() != r.Struct {
-		err = errutil.New("expected a struct")
+		err = errutil.New("expected a struct", cmd.name, "is a", cmd.elem.String())
 	} else {
 		ptr := r.New(cmd.elem)
 		dec.ReadFields(reader.At(m), ptr.Elem(), m.MapOf(reader.ItemValue))
@@ -135,7 +136,10 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 		if inVal, ok := in[token]; !ok {
 			// log only if the field is required. not optional.
 			if t := tag.ReadTag(f.Tag); !t.Exists("internal") && !t.Exists("optional") {
-				dec.report(at, errutil.Fmt("missing %q", token))
+				// and even then only if its a fixed field
+				if f.Type.Kind() != r.Ptr {
+					dec.report(at, errutil.Fmt("missing %q", token))
+				}
 			}
 		} else {
 			outAt := out.FieldByIndex(path)
@@ -223,16 +227,57 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		})
 
 	case r.Ptr:
-		if slat, ok := inVal.(map[string]interface{}); !ok {
-			err = errutil.New("value not a slot")
-		} else if newVal, e := dec.importSlot(slat, outAt.Type()); e != nil {
-			dec.report(reader.At(slat), e)
+		// see if its an optional value.
+		ptr := r.New(outAt.Type().Elem())
+		if e := dec.importValue(ptr.Elem(), inVal); e != nil {
+			err = e
 		} else {
-			outAt.Set(newVal)
+			outAt.Set(ptr)
+		}
+
+	case r.Struct:
+		if swap, ok := outAt.Addr().Interface().(swapType); ok {
+			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+				if data, ok := v.(map[string]interface{}); !ok {
+					err = errutil.New("value not a slat")
+				} else {
+					found := false
+					for k, elType := range swap.Swap() {
+						token := "$" + strings.ToUpper(k)
+						if contents, ok := data[token]; ok {
+							ptr := r.New(r.TypeOf(elType).Elem())
+							if e := dec.importValue(ptr.Elem(), contents); e != nil {
+								err = e
+							} else {
+								outAt.Field(0).Set(ptr.Elem())
+							}
+							found = true
+							break
+						}
+					}
+					if !found {
+						err = errutil.New("no valid swap data found")
+					}
+				}
+				return
+			}); e != nil {
+				err = errutil.Append(err, e)
+			}
+
+		} else {
+			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+				if slot, ok := v.(map[string]interface{}); !ok {
+					err = errutil.New("value not a slat")
+				} else {
+					dec.ReadFields(reader.At(slot), outAt, reader.Map(slot))
+				}
+				return
+			}); e != nil {
+				err = errutil.Append(err, e)
+			}
 		}
 
 	case r.Interface:
-		// note: this skips over the slot itself ( ex execute )
 		if e := dec.unpack(inVal, func(v interface{}) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
@@ -255,15 +300,13 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			elType := outType.Elem()
 			if slice := outAt; len(items) > 0 {
 				for _, item := range items {
-					if elType.Kind() == r.Ptr {
-						if itemData, ok := item.(map[string]interface{}); !ok {
-							err = errutil.Fmt("item data empty %T", itemData)
-						} else if v, e := dec.importSlot(itemData, elType); e != nil {
-							err = e // elType is ex. *story.Paragraph; itemData has a member $STORY_STATEMENT
+					if k := elType.Kind(); k != r.Interface {
+						el := r.New(elType).Elem()
+						if e := dec.importValue(el, item); e != nil {
+							err = errutil.Append(err, e)
 						} else {
-							slice = r.Append(slice, v)
+							slice = r.Append(slice, el)
 						}
-
 					} else {
 						// note: this skips over the slot itself ( ex execute )
 						if e := dec.unpack(item, func(v interface{}) (err error) {
@@ -288,9 +331,20 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 				outAt.Set(slice)
 			}
 		}
-
 	}
 	return
+}
+
+type swapType interface {
+	Swap() map[string]interface{}
+}
+
+type strType interface {
+	Str() (bool, []string)
+}
+
+type numType interface {
+	Num() (bool, []string)
 }
 
 func at(inVal interface{}) (ret string) {
