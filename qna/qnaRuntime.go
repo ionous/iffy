@@ -63,7 +63,7 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 		if cnt, e := run.fields.UpdatePairs(domain); e != nil {
 			panic(e)
 		} else {
-			log.Println("activate domain affected", cnt, "rows")
+			log.Println("activate domain", domain, "affected", cnt, "noun pairs")
 		}
 	}
 	run.activeNouns.reset()
@@ -73,7 +73,6 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 func (run *Runner) GetKindByName(n string) (*g.Kind, error) {
 	return run.kinds.GetKindByName(n)
 }
-
 func (run *Runner) SingularOf(str string) (ret string) {
 	if n, e := run.plurals.Singular(str); e != nil {
 		ret = str // fix: report e

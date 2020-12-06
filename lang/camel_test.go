@@ -1,7 +1,6 @@
 package lang
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -12,51 +11,54 @@ func TestEmptyCamelize(t *testing.T) {
 	}
 }
 
-func ExampleCamelize() {
-	print := func(s ...string) {
-		for _, s := range s {
-			fmt.Println(fmt.Sprintf("%#v => %#v", s, Camelize(s)))
+func TestCamelize(t *testing.T) {
+	test := func(pairs ...string) {
+		for i, cnt := 0, len(pairs); i < cnt; i += 2 {
+			a, want := pairs[i], pairs[i+1]
+			if got := Camelize(a); got != want {
+				t.Log(i/2, "got", got, "want", want)
+				t.Fail()
+			}
 		}
 	}
-	print(
+	test(
 		// single words
-		"apples",
-		"Apples",
-		"APPLES",
-		// multi-words
-		"appleTurnover",
-		"apple turnover",
-		"Apple Turnover",
-		"Apple turnover",
-		"APPLE TURNOVER",
-		"apple-turnover",
-		"apple---turn---over",
+		"apples", "apples",
+		"Apples", "apples",
+		"APPLES", "apples",
+		// multiple words
+		"appleTurnover", "appleTurnover",
+		"apple turnover", "appleTurnover",
+		"Apple Turnover", "appleTurnover",
+		"Apple turnover", "appleTurnover",
+		"APPLE TURNOVER", "appleTurnover",
+		"apple-turnover", "appleTurnover",
+		"apple---turn---over", "appleTurnOver",
 		// multi-word casing
-		"WasPascalCase",
-		"wasCamelCase",
-		"something-like-this",
-		"something_like_that",
-		"some___thing__like_that",
+		"WasPascalCase", "wasPascalCase",
+		"wasCamelCase", "wasCamelCase",
+		"something-like-this", "somethingLikeThis",
+		"something_like_that", "somethingLikeThat",
+		"some___thing__like_that", "someThingLikeThat",
 		// rando
-		"whaTAboutThis",
-		//fatih
-		"",
-		"lowercase",
-		"Class",
-		"MyClass",
-		"MyC",
-		"HTML",
-		"PDFLoader",
-		"AString",
-		"SimpleXMLParser",
-		"vimRPCPlugin",
-		"GL11Version",
-		"99Bottles",
-		"May5",
-		"BFG9000",
-		"BöseÜberraschung",
-		"Two  spaces",
-		"BadUTF8\xe2\xe2\xa1",
+		"whaTAboutThis", "whaTaboutThis",
+		"", "",
+		"lowercase", "lowercase",
+		"Class", "class",
+		"MyClass", "myClass",
+		"MyC", "myC",
+		"HTML", "html",
+		"PDFLoader", "pdfloader",
+		"AString", "astring",
+		"SimpleXMLParser", "simpleXmlparser",
+		"vimRPCPlugin", "vimRpcplugin",
+		"GL11Version", "gl11Version",
+		"99Bottles", "99Bottles",
+		"May5", "may5",
+		"BFG9000", "bfg9000",
+		"BöseÜberraschung", "böseÜberraschung",
+		"Two  spaces", "twoSpaces",
+		"BadUTF8\xe2\xe2\xa1", "badUtf8",
 	)
 
 	// FIX: the rule should be, start with capitals then lowercase them,
@@ -66,38 +68,4 @@ func ExampleCamelize() {
 	// "SimpleXMLParser" => "simpleXMLparser"
 	// "THEcrazyCASE" => "theCRAZYcase" ?
 
-	// Output:
-	// "apples" => "apples"
-	// "Apples" => "apples"
-	// "APPLES" => "apples"
-	// "appleTurnover" => "appleTurnover"
-	// "apple turnover" => "appleTurnover"
-	// "Apple Turnover" => "appleTurnover"
-	// "Apple turnover" => "appleTurnover"
-	// "APPLE TURNOVER" => "appleTurnover"
-	// "apple-turnover" => "appleTurnover"
-	// "apple---turn---over" => "appleTurnOver"
-	// "WasPascalCase" => "wasPascalCase"
-	// "wasCamelCase" => "wasCamelCase"
-	// "something-like-this" => "somethingLikeThis"
-	// "something_like_that" => "somethingLikeThat"
-	// "some___thing__like_that" => "someThingLikeThat"
-	// "whaTAboutThis" => "whaTaboutThis"
-	// "" => ""
-	// "lowercase" => "lowercase"
-	// "Class" => "class"
-	// "MyClass" => "myClass"
-	// "MyC" => "myC"
-	// "HTML" => "html"
-	// "PDFLoader" => "pdfloader"
-	// "AString" => "astring"
-	// "SimpleXMLParser" => "simpleXmlparser"
-	// "vimRPCPlugin" => "vimRpcplugin"
-	// "GL11Version" => "gl11Version"
-	// "99Bottles" => "99Bottles"
-	// "May5" => "may5"
-	// "BFG9000" => "bfg9000"
-	// "BöseÜberraschung" => "böseÜberraschung"
-	// "Two  spaces" => "twoSpaces"
-	// "BadUTF8\xe2\xe2\xa1" => "badUtf8"
 }
