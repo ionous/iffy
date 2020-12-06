@@ -1,7 +1,8 @@
-// txtTemplate.js
+// spec.js
 'use strict';
 module.exports =
-`type {{Pascal name}} string
+`// {{Pascal name}} requires one or more lines of user specified text.
+type {{Pascal name}} string
 {{#if desc}}
 
 {{>spec spec=this}}

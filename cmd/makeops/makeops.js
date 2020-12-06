@@ -1,17 +1,10 @@
-// node makeops.js > temp.go
+// node makeops.js > ../../ephemera/story/iffy_model.go
 'use strict';
 
 const Handlebars = require('handlebars'); // for templates
-const fs = require('fs'); // filesystem for loading iffy language file
-const vm = require('vm'); // virtual machine for parsing iffy language file
-const Make = require('./directives.js'); // composer directives
-
-// load the language file; brings 'localLang()' into global scope.
-const filename= `../compose/www/data/lang/iffy.js`
-vm.runInThisContext(fs.readFileSync(filename));
-const m= new Make();
-localLang(m);
-var processing= "";
+const allTypes= require('./model.js'); // iffy language file
+//console.log(JSON.stringify(allTypes, 0,2 ));
+//return
 
 // change lower case to pascal-cased ( golang public )
 const pascal= function(name) {
@@ -29,19 +22,16 @@ const lower= function(name) {
 // given a strType with the specified pascal'd name, return its list of choice
 const strChoices= function(name, strType) {
   const out=[];
-  if (!strType) {
-    throw new Error(`${name} has no strType processing ${processing}`);
-  }
-  for (const k in strType.with.params) {
-    const p=lower(k);
-    if (p === name) {
-      out.unshift(p); // move the dynamic key to the front
-    } else {
-      out.push(p);
+  const { with : {params= {}}= {} } = strType;
+  if (params) {
+    for (const k in params) {
+      const p=lower(k);
+      if (p === name) {
+        out.unshift(p); // move the dynamic key to the front
+      } else {
+        out.push(p);
+      }
     }
-  }
-  if (!out.length) {
-    throw new Error("xxx");
   }
   return out;
 };
@@ -49,27 +39,53 @@ const strChoices= function(name, strType) {
 Handlebars.registerHelper('Pascal', pascal);
 Handlebars.registerHelper('Lower', lower);
 
-// try to determine if the field name and field type have the same name
-// ( and therefore the golang spec can be anonymous )
-Handlebars.registerHelper('IsAnonymous', function(a,b) {
-  return pascal(a) == pascal(b);
-});
-
 // does the passed string start with a $
 Handlebars.registerHelper('IsToken', function(str) {
   return (str && str[0]=== '$');
 });
 
-// is the passed name a slot/interface
+// characters preceding a type declaration
+  // "label": "trait",
+  // "type": "trait",
+  // "optional": true,
+  // "repeats": true,
+  // "filters": [
+  //   "comma-and"
+  // ]
+Handlebars.registerHelper('Lede', function(param) {
+  let out = "";
+  const name = param.type;
+  const type = allTypes[name];
+  if (param.optional) {
+    out+= "*";
+  }
+  if (param.repeats) {
+    out+= "[]";
+  }
+  out+= (name.indexOf("_eval") >= 0) ? "rt." :"";
+  return out;
+});
+
+Handlebars.registerHelper('Tail', function(param) {
+  return "";//param.optional? ' `if:"optional"`': "";
+});
+
+// is the passed name a slot
 Handlebars.registerHelper('IsSlot', function(name) {
-  return (name.indexOf("_eval") >= 0) || (m.types.all[name].uses=== 'slot');
+  const { uses }= allTypes[name];
+  return uses === 'slot';
+});
+
+Handlebars.registerHelper('IsSlat', function(name) {
+  const { uses }= allTypes[name];
+  return uses !== 'slot' && uses !== 'group';
 });
 
 // for uses='str'
-Handlebars.registerHelper('IsDynamic', function(strType) {
+Handlebars.registerHelper('IsClosed', function(strType) {
   const name= lower(strType.name);
   const cs= strChoices(name, strType);
-  return cs[0] === name;
+  return cs.length && cs[0] !== name;
 });
 
 // for uses='str'
@@ -79,12 +95,6 @@ Handlebars.registerHelper('Choices', function(strType) {
   return cs[0]===name? cs.slice(1): cs; // remove the dynamic key
 });
 
-// for uses='str'
-Handlebars.registerHelper('IsEnumerated', function(strType) {
-  const name= lower(strType.name);
-  const cs= strChoices(name, strType);
-  return cs.length >1 || (cs[0] !== name);
-});
 
 // flatten desc
 Handlebars.registerHelper('DescOf', function (x) {
@@ -109,42 +119,22 @@ Handlebars.registerHelper('GroupOf', function (desc) {
   return desc.group.join(', ');
 })
 
-// console.log(m.currGroups);
-console.log("package lang\n")
-
 // load each js file as a handlebars template
 const partials= ['spec'];
-const sources= ['slots', 'num', 'txt', 'opt', 'run', 'str'];
+const sources= ['header', 'num', 'txt', 'opt', 'run', 'str', 'slot', 'footer'];
 partials.forEach(k=> Handlebars.registerPartial(k, require(`./templates/${k}Partial.js`)));
 const templates= Object.fromEntries(sources.map(k=> [k,
 Handlebars.compile(require(`./templates/${k}Template.js`))]));
 
-const sorted= Object.keys(m.types.all).sort();
-// console.log(sorted);
-// console.log(m.types.all);
-// return;
+console.log(templates.header({package:'story'}));
 
-const slots= [];
-const groups= [];
-for (const typeName of sorted) {
-  processing= typeName;
-  const type= m.types.all[typeName];
+// switch to partials?
+for (const typeName in allTypes) {
+  const type= allTypes[typeName];
   const mytemp= templates[type.uses];
   if (mytemp) {
-    const out= mytemp(type);
-    console.log(out);
-  } else {
-    switch (type.uses) {
-      case 'slot':
-        slots.push(type);
-      case 'group':
-        groups.push(type);
-      break;
-      default:
-        console.log('error: Unknown uses', type.uses);
-      break;
-    }
+    console.log(mytemp(type));
   }
 }
 
-console.log(templates.slots({slots}));
+console.log(templates.footer({package:'story', allTypes}));

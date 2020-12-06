@@ -4,17 +4,13 @@ module.exports =
 `// {{Pascal name}} requires various parameters.
 type {{Pascal name}} struct {
 {{#each with.params}}
-  {{#unless (IsAnonymous @key type)}}
-  {{Pascal @key}}
-  {{~/unless~}}
-  {{~#unless (IsSlot type)}} *{{~/unless~}}
-  {{Pascal type}}
+  {{Pascal @key}} {{{Lede this}}}{{Pascal type}}{{{Tail this}}}
 {{/each}}
 }
 {{#if with.slots}}
 
 {{#each with.slots}}
-var _ {{Pascal this}} = (*{{Pascal ../name}})(nil)
+func (*{{Pascal ../name}}) {{Pascal this}}() {}
 {{/each}}
 {{/if}}
 

@@ -7,22 +7,17 @@
 // --- { tokens: [ '$NOUN_NAME' ],
 // - a fully dynamic str ( ex. noun_name )
 // --- { tokens: [ '$NOUN_NAME' ],
-// IsDynamic
+// IsClosed
 //
 module.exports =
-`type {{Pascal name}} string
-{{#if (IsDynamic this)}}
+`// {{Pascal name}} requires a user-specified string.
+type {{Pascal name}} string
 
-func (*{{Pascal name}}) Dynamic() string {
-  return "{{Lower name}}";
-}
-{{/if}}{{#if (IsEnumerated this)}}
-func (*{{Pascal name}}) Choices() []string {
-  return []string{
-    {{#each (Choices this)}}"{{this}}", {{/each}}
+func (*{{Pascal name}}) Str() (closed bool, choices []string) {
+  return {{#if (IsClosed this)}}true{{else}}false{{/if}}, []string{
+    {{#each (Choices @this)~}}"{{this}}",{{/each}}
   }
 }
-{{/if}}
 
 {{>spec spec=this}}
 `;
@@ -30,9 +25,8 @@ func (*{{Pascal name}}) Choices() []string {
 /*
 type Something string
 
-func (*Something) Dynamic() string {}
-func (*Something) Choices() []string {
-  return []string{
+func (*Something) Choices() (closed bool, choices[] string {}) {
+  return true, []string{
      "a", "b", "c",
   }
 }

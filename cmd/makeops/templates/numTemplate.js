@@ -2,10 +2,16 @@
 'use strict';
 
 module.exports =
-`type {{Pascal name}} float64
-{{~#if desc}}
+`// {{Pascal name}} requires a user-specified number.
+type {{Pascal name}} float64
+
+func (*{{Pascal name}}) Num() (closed bool, choices []float64) {
+    return {{#if (IsClosed this)}}true{{else}}false{{/if}}, []float64{
+    {{#each (Choices @this)~}}"{{this}}",{{/each}}
+  }
+}
+
 {{>spec spec=this}}
-{{/if}}
 `;
 
 /* input: { name: 'number', uses: 'num', group: [] },

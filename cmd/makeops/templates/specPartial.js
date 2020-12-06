@@ -1,9 +1,8 @@
 // spec.js
 'use strict';
-
 module.exports =`func (*{{Pascal name}}) Compose() composer.Spec {
   return composer.Spec{
-    Name:  "{{name}}",
+    Name: "{{name}}",
 {{#if desc}}
     Desc: \`{{{DescOf this}}}\`,
 {{/if}}
