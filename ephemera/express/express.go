@@ -309,8 +309,8 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 					}
 					//
 					getField = &core.Field{
-						Obj:   obj,
-						Field: field,
+						Object: obj,
+						Field:  field,
 					}
 				}
 				c.buildOne(getField)

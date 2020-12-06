@@ -11,7 +11,6 @@ import (
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/types"
-	"github.com/kr/pretty"
 )
 
 func imp_render_template(k *Importer, r reader.Map) (ret interface{}, err error) {
@@ -29,7 +28,7 @@ func imp_render_template(k *Importer, r reader.Map) (ret interface{}, err error)
 			err = errutil.Fmt("render template has unknown expression %T", got)
 		} else {
 			ret = &render.Template{eval}
-			pretty.Println(eval)
+			// pretty.Println(eval)
 		}
 	}
 	return

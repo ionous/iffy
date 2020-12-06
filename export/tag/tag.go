@@ -5,21 +5,35 @@ import (
 	"strings"
 )
 
+// ReadTag parses tags of the format `if:"internal"`.
 func ReadTag(f r.StructTag) StructTag {
 	return StructTag(f.Get("if"))
 }
 
+// StructTag in go are, by convention, key:"value" pairs;
+// this extends that for sub-tags within the value part of the pair.
 type StructTag string
 
+// String returns the entire value of the golang key:"value" pair.
 func (t StructTag) String() string {
 	return string(t)
 }
 
+// Split returns the comma separate subparts of the tag's value.
 func (t StructTag) Split() []string {
 	s := string(t)
 	return strings.Split(s, ",")
 }
 
+// Exists returns true if Find returns true.
+func (t StructTag) Exists(key string) (okay bool) {
+	_, okay = t.Find(key)
+	return
+}
+
+// Find finds the named key within the struct tag.
+// ex. for the tag, `if:"internal"` Find("internal") returns "internal".
+// the tag, `if:"beep:boop"` Find("beep") return "boop".
 func (t StructTag) Find(key string) (ret string, okay bool) {
 	s := string(t)
 	for {

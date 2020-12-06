@@ -17,6 +17,9 @@ type Text struct {
 type Record struct {
 	Name, Kind string
 }
+type Object struct {
+	Name, Kind string
+}
 type NumList struct {
 	Name string
 }
@@ -51,6 +54,19 @@ func (n *Text) String() string {
 
 func (n *Text) Prepare(run rt.Runtime, p *Terms) (err error) {
 	p.AddTerm(n.Name, affine.Text, "")
+	return
+}
+
+func (n *Object) String() string {
+	return n.Name
+}
+
+func (n *Object) Prepare(run rt.Runtime, p *Terms) (err error) {
+	if k, e := run.GetKindByName(n.Kind); e != nil {
+		err = e
+	} else {
+		p.AddTerm(n.Name, affine.Object, k.Name())
+	}
 	return
 }
 

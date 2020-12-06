@@ -2,6 +2,7 @@ package qna
 
 import (
 	"database/sql"
+	"strings"
 
 	r "reflect"
 
@@ -319,13 +320,25 @@ func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
 		}
 
 	case object.Value:
-		// given a name, find an object (id) and make sure it should be available
-		if b, e := n.cacheQuery(key, n.fields.objOf, field); e != nil {
-			err = e
-		} else if obj, _ := b.snapper.(*qnaObject); obj == nil || !n.activeNouns.isActive(obj.id) {
-			err = g.UnknownObject(field)
+		// fix: internal object handling needs some love.
+		if strings.HasPrefix(field, "#") {
+			if !n.activeNouns.isActive(field) {
+				// fix: differentiate b/t unknown and unavailable?
+				err = g.UnknownObject(field)
+			} else {
+				ret = n.store(key, affine.Object, &qnaObject{
+					n: n, id: field,
+				})
+			}
 		} else {
-			ret = b
+			// given a name, find an object (id) and make sure it should be available
+			if b, e := n.cacheQuery(key, n.fields.objOf, field); e != nil {
+				err = e
+			} else if obj, _ := b.snapper.(*qnaObject); obj == nil || !n.activeNouns.isActive(obj.id) {
+				err = g.UnknownObject(field)
+			} else {
+				ret = b
+			}
 		}
 
 	case object.Aspect:

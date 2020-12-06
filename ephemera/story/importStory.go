@@ -41,6 +41,13 @@ func ImportStories(src string, db *sql.DB, ms []reader.Map) (err error) {
 		{(*core.StoppingText)(nil), k.BindRet(imp_stopping_text)},
 		//
 		{(*render.Template)(nil), k.BindRet(imp_render_template)},
+		// temp:
+		// {(*core.CompareText)(nil), k.BindRet(func(i *Importer, m reader.Map) (ret interface{}, err error) {
+		// 	op := new(core.CompareText)
+		// 	dec.ReadFields(reader.At(m), r.ValueOf(op).Elem(), m.MapOf(reader.ItemValue))
+		// 	ret = op
+		// 	return
+		// })},
 	})
 	//
 	for _, m := range ms {

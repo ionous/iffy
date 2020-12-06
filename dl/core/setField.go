@@ -7,9 +7,9 @@ import (
 )
 
 type SetField struct {
-	Obj   rt.ObjectEval
-	Field string
-	From  Assignment
+	Object rt.ObjectEval
+	Field  string
+	From   Assignment
 }
 
 func (*SetField) Compose() composer.Spec {
@@ -28,7 +28,7 @@ func (op *SetField) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *SetField) setField(run rt.Runtime) (err error) {
-	if obj, e := safe.GetObject(run, op.Obj); e != nil {
+	if obj, e := safe.GetObject(run, op.Object); e != nil {
 		err = e
 	} else if val, e := GetAssignedValue(run, op.From); e != nil {
 		err = e

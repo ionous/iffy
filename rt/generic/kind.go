@@ -38,7 +38,8 @@ func (k *Kind) IsStaleKind(kinds Kinds) bool {
 }
 
 func (k *Kind) NewRecord() *Record {
-	return &Record{kind: k, values: make([]interface{}, len(k.fields))}
+	// we make a bunch of nil value placeholders which we fill by caching on demand.
+	return &Record{kind: k, values: make([]Value, len(k.fields))}
 }
 
 func (k *Kind) Path() (ret []string) {

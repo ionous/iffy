@@ -23,7 +23,7 @@ func TestObjectType(t *testing.T) {
 func TestVariableTypePrimitive(t *testing.T) {
 	k, db := newTestImporter(t, testdb.Memory)
 	defer db.Close()
-	if varType, e := imp_variable_type(k, _variable_type); e != nil {
+	if varType, _, e := imp_variable_type(k, _variable_type); e != nil {
 		t.Fatal(e)
 	} else if varType.String() != "text_eval" {
 		t.Fatal(varType)
@@ -34,12 +34,12 @@ func TestVariableTypePrimitive(t *testing.T) {
 func TestVariableDeclObject(t *testing.T) {
 	k, db := newTestImporter(t, testdb.Memory)
 	defer db.Close()
-	if varName, typeName, e := imp_variable_decl(k, tables.NAMED_PARAMETER, _variable_decl); e != nil {
+	if val, e := imp_variable_decl(k, tables.NAMED_PARAMETER, _variable_decl); e != nil {
 		t.Fatal(e)
-	} else if varName.String() != "pet" {
-		t.Fatal(varName)
-	} else if typeName.String() != "animal" {
-		t.Fatal(typeName)
+	} else if vn := val.name.String(); vn != "pet" {
+		t.Fatal(vn)
+	} else if vt := val.typeName.String(); vt != "animal" {
+		t.Fatal(vt)
 	}
 }
 
@@ -51,7 +51,7 @@ func TestPatternVariablesDecl(t *testing.T) {
 	} else {
 		var buf strings.Builder
 		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
-		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
+		tables.WriteCsv(db, &buf, "select idNamedPattern,idNamedParam,idNamedType,idProg from eph_pattern", 4)
 		if have, want := buf.String(), lines(
 			"corral,pattern",       // 1
 			"pet,parameter",        // 2
@@ -113,7 +113,7 @@ func TestPatternDecl(t *testing.T) {
 	} else {
 		var buf strings.Builder
 		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
-		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
+		tables.WriteCsv(db, &buf, "select idNamedPattern,idNamedParam,idNamedType,idProg from eph_pattern", 4)
 		if have, want := buf.String(), lines(
 			"corral,pattern", // 1
 			"execute,type",   // 2

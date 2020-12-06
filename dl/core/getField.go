@@ -10,8 +10,8 @@ import (
 
 // Field a property value from an object by name.
 type Field struct {
-	Obj   rt.ObjectEval
-	Field string
+	Object rt.ObjectEval
+	Field  string
 }
 
 func (*Field) Compose() composer.Spec {
@@ -67,7 +67,7 @@ func (op *Field) GetRecordList(run rt.Runtime) (g.Value, error) {
 }
 
 func (op *Field) getField(run rt.Runtime, aff affine.Affinity) (ret g.Value, err error) {
-	if v, e := safe.Field(run, op.Obj, op.Field, aff); e != nil {
+	if v, e := safe.Field(run, op.Object, op.Field, aff); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v

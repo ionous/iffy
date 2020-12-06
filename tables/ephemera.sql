@@ -29,7 +29,7 @@ idProg holds program initialization for locals ( and possibly default parameter 
 for now idProg < 0 is a pattern or pattern parameter reference;
 the "category" of idNamedParam also indicates reference vs. declaration
 */
-create table eph_pattern( idNamedPattern int, idNamedParam int, idNamedType int, idProg int );
+create table eph_pattern( idNamedPattern int, idNamedParam int, idNamedType int, affinity text, idProg int );
 /* rule for the collective name of a singular word */
 create table eph_plural( idNamedPlural int, idNamedSingluar int );
 /* type is the name of the command container for de-serialization of the prog

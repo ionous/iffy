@@ -5,6 +5,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/lang"
@@ -287,28 +288,38 @@ func imp_trait_phrase(k *Importer, r reader.Map) (ret []ephemera.Named, err erro
 	return
 }
 
+type variableDecl struct {
+	name, typeName ephemera.Named
+	affinity       string
+}
+
 // "{type:variable_type} ( called {name:variable_name|quote} )"
-func imp_variable_decl(k *Importer, cat string, r reader.Map) (retName, retType ephemera.Named, err error) {
+func imp_variable_decl(k *Importer, cat string, r reader.Map) (ret variableDecl, err error) {
 	if m, e := reader.Unpack(r, "variable_decl"); e != nil {
 		err = e
 	} else if n, e := imp_variable_name(k, cat, m.MapOf("$NAME")); e != nil {
 		err = e
-	} else if t, e := imp_variable_type(k, m.MapOf("$TYPE")); e != nil {
+	} else if t, aff, e := imp_variable_type(k, m.MapOf("$TYPE")); e != nil {
 		err = e
 	} else {
-		retName, retType = n, t
+		ret = variableDecl{n, t, aff}
 	}
 	return
 }
 
-func imp_variable_type(k *Importer, r reader.Map) (ret ephemera.Named, err error) {
+func imp_variable_type(k *Importer, r reader.Map) (retType ephemera.Named, retAffinity string, err error) {
 	err = reader.Option(r, "variable_type", reader.ReadMaps{
 		"$PRIMITIVE": func(m reader.Map) (err error) {
-			ret, err = imp_primitive_var(k, m)
+			retType, err = imp_primitive_var(k, m)
 			return
 		},
 		"$OBJECT": func(m reader.Map) (err error) {
-			ret, err = imp_object_type(k, m)
+			retType, err = imp_object_type(k, m)
+			retAffinity = affine.Object.String()
+			return
+		},
+		"$EXT": func(m reader.Map) (err error) {
+			err = errutil.New("extension types not implemented")
 			return
 		},
 	})

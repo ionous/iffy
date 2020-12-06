@@ -838,7 +838,7 @@ const spec = [
       "variables"
     ],
     "name": "get_var",
-    "spec": "the {name:text_eval}",
+    "spec": "the {name:text}",
     "uses": "run",
     "with": {
       "slots": [
@@ -945,8 +945,8 @@ const spec = [
           "label": "kind",
           "type": "text_eval"
         },
-        "$OBJ": {
-          "label": "obj",
+        "$OBJECT": {
+          "label": "object",
           "type": "object_eval"
         }
       },
@@ -955,7 +955,7 @@ const spec = [
       ],
       "tokens": [
         "is exact kind of",
-        "$OBJ",
+        "$OBJECT",
         "$KIND"
       ]
     }
@@ -966,7 +966,7 @@ const spec = [
       "objects"
     ],
     "name": "is_kind_of",
-    "spec": "Is {object%obj:object_eval} a kind of {kind:singular_kind}",
+    "spec": "Is {object:object_eval} a kind of {kind:singular_kind}",
     "uses": "run",
     "with": {
       "slots": [
@@ -1046,7 +1046,7 @@ const spec = [
       "objects"
     ],
     "name": "kind_of",
-    "spec": "kind of {object%obj:object_eval}",
+    "spec": "kind of {object:object_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -1483,7 +1483,7 @@ const spec = [
       "objects"
     ],
     "name": "name_of",
-    "spec": "name of {object%obj:object_eval}",
+    "spec": "name of {object:object_eval}",
     "uses": "run",
     "with": {
       "slots": [
@@ -1756,8 +1756,8 @@ const spec = [
           "label": "from",
           "type": "assignment"
         },
-        "$OBJ": {
-          "label": "obj",
+        "$OBJECT": {
+          "label": "object",
           "type": "object_eval"
         }
       },
@@ -1766,7 +1766,7 @@ const spec = [
       ],
       "tokens": [
         "set field",
-        "$OBJ",
+        "$OBJECT",
         "$FIELD",
         "$FROM"
       ]

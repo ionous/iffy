@@ -22,31 +22,31 @@ type ObjectName struct {
 // tbd: this isnt currently exposed....
 // this also could be done by IsKindOf("kind")
 type ObjectExists struct {
-	Obj rt.ObjectEval
+	Object rt.ObjectEval
 }
 
 // NameOf returns the full name of an object as declared by the author.
 // It doesnt change over the course of play. To change the name use the "printed name" property.
 type NameOf struct {
-	Obj rt.ObjectEval
+	Object rt.ObjectEval
 }
 
 // KindOf returns the class of an object.
 type KindOf struct {
-	Obj rt.ObjectEval
+	Object rt.ObjectEval
 }
 
 // IsKindOf is less about caring, and more about sharing;
 // it returns true when the object is compatible with the named kind.
 type IsKindOf struct {
-	Obj  rt.ObjectEval
-	Kind rt.TextEval
+	Object rt.ObjectEval
+	Kind   rt.TextEval
 }
 
 // IsExactKindOf returns true when the object is of exactly the named kind.
 type IsExactKindOf struct {
-	Obj  rt.ObjectEval
-	Kind rt.TextEval
+	Object rt.ObjectEval
+	Kind   rt.TextEval
 }
 
 func (*ObjectName) Compose() composer.Spec {
@@ -79,7 +79,7 @@ func (*ObjectExists) Compose() composer.Spec {
 }
 
 func (op *ObjectExists) GetBool(run rt.Runtime) (ret g.Value, err error) {
-	if _, e := safe.GetObject(run, op.Obj); e != nil {
+	if _, e := safe.GetObject(run, op.Object); e != nil {
 		ret = g.False
 	} else {
 		ret = g.True
@@ -87,7 +87,7 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	return
 
 	// fix? b/c of cmdError ( errutil.multierror) we can't test the error type like this.
-	// switch _, e := safe.GetObject(run, op.Obj); e.(type) {
+	// switch _, e := safe.GetObject(run, op.Object); e.(type) {
 	// case nil:
 	// 	ret = g.True
 	// case g.UnknownObject:
@@ -113,12 +113,12 @@ func (*NameOf) Compose() composer.Spec {
 		Name:  "name_of",
 		Group: "objects",
 		Desc:  "Name Of: Full name of the object.",
-		Spec:  "name of {object%obj:object_eval}",
+		Spec:  "name of {object:object_eval}",
 	}
 }
 
 func (op *NameOf) GetText(run rt.Runtime) (ret g.Value, err error) {
-	if v, e := safe.Field(run, op.Obj, object.Name, affine.Text); e != nil {
+	if v, e := safe.Field(run, op.Object, object.Name, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -131,12 +131,12 @@ func (*KindOf) Compose() composer.Spec {
 		Name:  "kind_of",
 		Group: "objects",
 		Desc:  "Kind Of: Friendly name of the object's kind.",
-		Spec:  "kind of {object%obj:object_eval}",
+		Spec:  "kind of {object:object_eval}",
 	}
 }
 
 func (op *KindOf) GetText(run rt.Runtime) (ret g.Value, err error) {
-	if v, e := safe.Field(run, op.Obj, object.Kind, affine.Text); e != nil {
+	if v, e := safe.Field(run, op.Object, object.Kind, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -147,7 +147,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 func (*IsKindOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "is_kind_of",
-		Spec:  "Is {object%obj:object_eval} a kind of {kind:singular_kind}",
+		Spec:  "Is {object:object_eval} a kind of {kind:singular_kind}",
 		Group: "objects",
 		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",
 	}
@@ -156,7 +156,7 @@ func (*IsKindOf) Compose() composer.Spec {
 func (op *IsKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	if tgtKind, e := safe.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if fullPath, e := safe.Field(run, op.Obj, object.Kinds, affine.Text); e != nil {
+	} else if fullPath, e := safe.Field(run, op.Object, object.Kinds, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
 		// Contains reports whether second is within first.
@@ -177,7 +177,7 @@ func (*IsExactKindOf) Compose() composer.Spec {
 func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	if tgtKind, e := safe.GetText(run, op.Kind); e != nil {
 		err = cmdError(op, e)
-	} else if kind, e := safe.Field(run, op.Obj, object.Kind, affine.Text); e != nil {
+	} else if kind, e := safe.Field(run, op.Object, object.Kind, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
 		b := tgtKind.String() == kind.String()

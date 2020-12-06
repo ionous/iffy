@@ -23,8 +23,10 @@ var Support = []interface{}{
 	(*term.Bool)(nil),
 	(*term.Text)(nil),
 	(*term.Record)(nil),
+	(*term.Object)(nil),
 	(*term.NumList)(nil),
 	(*term.TextList)(nil),
+	(*term.RecordList)(nil),
 }
 
 var Slats = []composer.Slat{

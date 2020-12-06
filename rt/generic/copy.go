@@ -58,7 +58,7 @@ func CopyValue(val Value) (ret interface{}, err error) {
 // assumes in value is a record.
 func copyRecord(v *Record) (ret *Record, err error) {
 	cnt := v.kind.NumField()
-	values := make([]interface{}, cnt, cnt)
+	values := make([]Value, cnt, cnt)
 	for i := 0; i < cnt; i++ {
 		if el, e := v.GetFieldByIndex(i); e != nil {
 			err = e
@@ -67,7 +67,8 @@ func copyRecord(v *Record) (ret *Record, err error) {
 			err = e
 			break
 		} else {
-			values[i] = cpy
+			// fix: CopyValue should really return a value
+			values[i] = makeValue(el.Affinity(), el.Type(), cpy)
 		}
 	}
 	if err == nil {

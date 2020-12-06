@@ -21,35 +21,35 @@ var isMatchingGroup = pattern.BoolPattern{
 		&core.Always{}, &core.Bool{true}}, {
 		&core.CompareText{
 			&core.Field{
-				Obj:   &core.Var{Name: "a"},
-				Field: "Label",
+				Object: &core.Var{Name: "a"},
+				Field:  "Label",
 			},
 			&core.NotEqualTo{},
 			&core.Field{
-				Obj:   &core.Var{Name: "b"},
-				Field: "Label",
+				Object: &core.Var{Name: "b"},
+				Field:  "Label",
 			},
 		}, &core.Bool{Bool: false}}, {
 		&core.CompareText{
 			&core.Field{
-				Obj:   &core.Var{Name: "a"},
-				Field: "Innumerable",
+				Object: &core.Var{Name: "a"},
+				Field:  "Innumerable",
 			},
 			&core.NotEqualTo{},
 			&core.Field{
-				Obj:   &core.Var{Name: "b"},
-				Field: "Innumerable",
+				Object: &core.Var{Name: "b"},
+				Field:  "Innumerable",
 			},
 		}, &core.Bool{Bool: false}}, {
 		&core.CompareText{
 			&core.Field{
-				Obj:   &core.Var{Name: "a"},
-				Field: "GroupOptions",
+				Object: &core.Var{Name: "a"},
+				Field:  "GroupOptions",
 			},
 			&core.NotEqualTo{},
 			&core.Field{
-				Obj:   &core.Var{Name: "b"},
-				Field: "GroupOptions",
+				Object: &core.Var{Name: "b"},
+				Field:  "GroupOptions",
 			},
 		}, &core.Bool{Bool: false}},
 	},

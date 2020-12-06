@@ -235,35 +235,22 @@
                                       "type": "get_field",
                                       "value": {
                                         "$FIELD": {
-                                          "id": "id-17494737044-24",
-                                          "type": "text_eval",
-                                          "value": {
-                                            "id": "id-17494737044-26",
-                                            "type": "text_value",
-                                            "value": {
-                                              "$TEXT": {
-                                                "id": "id-17494737044-27",
+
                                                 "type": "text",
                                                 "value": "printed plural name"
-                                              }
-                                            }
-                                          }
+                                              
+                                        
                                         },
-                                        "$OBJ": {
+                                        "$OBJECT": {
                                           "id": "id-17494737044-25",
                                           "type": "object_eval",
                                           "value": {
                                             "id": "id-17494737044-28",
-                                            "type": "named_noun",
+                                            "type": "get_var",
                                             "value": {
-                                              "$DETERMINER": {
-                                                "id": "id-17494737044-29",
-                                                "type": "determiner",
-                                                "value": "$THE"
-                                              },
                                               "$NAME": {
                                                 "id": "id-17494737044-30",
-                                                "type": "noun_name",
+                                                "type": "text",
                                                 "value": "target"
                                               }
                                             }

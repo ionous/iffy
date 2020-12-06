@@ -22,9 +22,9 @@ var groupTogether = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		{Execute: &core.Activity{[]rt.Execute{
 			&core.SetField{
-				Obj:   &core.Var{Name: "out"},
-				Field: "Name",
-				From:  &core.Var{Name: "in"}, // fix? this is no way ensures that the object is valid.
+				Object: &core.Var{Name: "out"},
+				Field:  "Name",
+				From:   &core.Var{Name: "in"}, // fix? this is no way ensures that the object is valid.
 			},
 			&core.Choose{
 				If: &core.Matches{
@@ -32,9 +32,9 @@ var groupTogether = pattern.ActivityPattern{
 					Pattern: "^thing"},
 				True: core.NewActivity(
 					&core.SetField{
-						Obj:   &core.Var{Name: "out"},
-						Field: "Label",
-						From:  &core.FromText{&core.Text{"thingies"}},
+						Object: &core.Var{Name: "out"},
+						Field:  "Label",
+						From:   &core.FromText{&core.Text{"thingies"}},
 					},
 				),
 			},

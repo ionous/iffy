@@ -116,11 +116,3 @@ func joinStrings(vs []string) (ret string) {
 	}
 	return
 }
-
-// func (lt *listTime) SetField(target, field string, value g.Value) (err error) {
-// 	return lt.ScopeStack.SetField(target, field, value)
-// }
-
-// func (lt *listTime) GetKindByName(name string) (*g.Kind, error) {
-// 	return lt.kinds.GetKindByName(name)
-// }

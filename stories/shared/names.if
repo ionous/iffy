@@ -484,21 +484,16 @@
                                                       "id": "id-1743bd78458-3",
                                                       "type": "kind_of",
                                                       "value": {
-                                                        "$OBJ": {
+                                                        "$OBJECT": {
                                                           "id": "id-1743bd78458-4",
                                                           "type": "object_eval",
                                                           "value": {
                                                             "id": "id-1743bd78458-5",
-                                                            "type": "named_noun",
+                                                            "type": "get_var",
                                                             "value": {
-                                                              "$DETERMINER": {
-                                                                "id": "id-1743bd78458-6",
-                                                                "type": "determiner",
-                                                                "value": "$THE"
-                                                              },
                                                               "$NAME": {
                                                                 "id": "id-1743bd78458-7",
-                                                                "type": "noun_name",
+                                                                "type": "text",
                                                                 "value": "target"
                                                               }
                                                             }
@@ -531,21 +526,16 @@
                                 "id": "id-17494737044-3",
                                 "type": "has_trait",
                                 "value": {
-                                  "$OBJ": {
+                                  "$OBJECT": {
                                     "id": "id-17494737044-4",
                                     "type": "object_eval",
                                     "value": {
                                       "id": "id-17494737044-6",
-                                      "type": "named_noun",
+                                      "type": "get_var",
                                       "value": {
-                                        "$DETERMINER": {
-                                          "id": "id-17494737044-7",
-                                          "type": "determiner",
-                                          "value": "$THE"
-                                        },
                                         "$NAME": {
                                           "id": "id-17494737044-8",
-                                          "type": "noun_name",
+                                          "type": "text",
                                           "value": "target"
                                         }
                                       }
@@ -591,17 +581,14 @@
                                               "value": {
                                                   "type": "name_of",
                                                   "value": {
-                                                    "$OBJ": {
+                                                    "$OBJECT": {
                                                       "type": "object_eval",
                                                       "value": {
-                                                        "type": "named_noun",
+                                                        "type": "get_var",
                                                         "value": {
-                                                          "$DETERMINER": {
-                                                            "type": "determiner",
-                                                            "value": "$THE"
-                                                          },
+                                                          
                                                           "$NAME": {
-                                                            "type": "noun_name",
+                                                            "type": "text",
                                                             "value": "target"
                                                           }
                                                         }
@@ -641,35 +628,20 @@
                                       "type": "get_field",
                                       "value": {
                                         "$FIELD": {
-                                          "id": "id-174941fde22-14",
-                                          "type": "text_eval",
-                                          "value": {
-                                            "id": "id-174941fde22-16",
-                                            "type": "text_value",
-                                            "value": {
-                                              "$TEXT": {
-                                                "id": "id-174941fde22-17",
-                                                "type": "text",
-                                                "value": "printed name"
-                                              }
-                                            }
-                                          }
+                                          "id": "id-174941fde22-17",
+                                          "type": "text",
+                                          "value": "printed name"
                                         },
-                                        "$OBJ": {
+                                        "$OBJECT": {
                                           "id": "id-174941fde22-15",
                                           "type": "object_eval",
                                           "value": {
                                             "id": "id-174941fde22-20",
-                                            "type": "named_noun",
+                                            "type": "get_var",
                                             "value": {
-                                              "$DETERMINER": {
-                                                "id": "id-174941fde22-21",
-                                                "type": "determiner",
-                                                "value": "$THE"
-                                              },
                                               "$NAME": {
                                                 "id": "id-174941fde22-22",
-                                                "type": "noun_name",
+                                                "type": "text",
                                                 "value": "target"
                                               }
                                             }
@@ -729,35 +701,20 @@
                                                 "type": "get_field",
                                                 "value": {
                                                   "$FIELD": {
-                                                    "id": "id-172fbe17c49-22",
-                                                    "type": "text_eval",
-                                                    "value": {
-                                                      "id": "id-172fbe17c49-27",
-                                                      "type": "text_value",
-                                                      "value": {
-                                                        "$TEXT": {
-                                                          "id": "id-172fbe17c49-26",
-                                                          "type": "text",
-                                                          "value": "printed name"
-                                                        }
-                                                      }
-                                                    }
+                                                    "id": "id-172fbe17c49-26",
+                                                    "type": "text",
+                                                    "value": "printed name"
                                                   },
-                                                  "$OBJ": {
+                                                  "$OBJECT": {
                                                     "id": "id-173f8fba4ff-30",
                                                     "type": "object_eval",
                                                     "value": {
                                                       "id": "id-173f8fba4ff-31",
-                                                      "type": "named_noun",
+                                                      "type": "get_var",
                                                       "value": {
-                                                        "$DETERMINER": {
-                                                          "id": "id-173f8fba4ff-32",
-                                                          "type": "determiner",
-                                                          "value": "$THE"
-                                                        },
                                                         "$NAME": {
                                                           "id": "id-173f8fba4ff-33",
-                                                          "type": "noun_name",
+                                                          "type": "text",
                                                           "value": "target"
                                                         }
                                                       }

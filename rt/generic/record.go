@@ -8,7 +8,7 @@ import (
 
 type Record struct {
 	kind   *Kind
-	values []interface{}
+	values []Value
 }
 
 func (d *Record) Kind() *Kind {
@@ -50,7 +50,7 @@ func (d *Record) GetNamedField(field string) (ret Value, err error) {
 // GetFieldByIndex cant ask for traits, only their aspects.
 func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 	if fv, ft := d.values[i], d.kind.fields[i]; fv != nil {
-		ret = makeValue(ft.Affinity, ft.Type, fv)
+		ret = fv
 	} else {
 		if ft.Type == "aspect" {
 			if k, e := d.kind.kinds.GetKindByName(ft.Name); e != nil {
@@ -58,27 +58,15 @@ func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 			} else {
 				firstTrait := k.Field(0) // first trait is the default
 				nv := StringFrom(firstTrait.Name, ft.Type)
-				ret, err = d.cache(i, nv)
+				ret, d.values[i] = nv, nv
 			}
 		} else {
 			if nv, e := NewDefaultValue(d.kind.kinds, ft.Affinity, ft.Type); e != nil {
 				err = e
 			} else {
-				ret, err = d.cache(i, nv)
+				ret, d.values[i] = nv, nv
 			}
 		}
-	}
-	return
-}
-
-// this is a little ugly.
-// fix? if NewDefaultValue returned a raw value maybe this could be cleaned up.
-// -or- if record.values stored refValues ( though that is random extra storage )
-func (d *Record) cache(i int, nv Value) (ret Value, err error) {
-	if el, ok := nv.(refValue); !ok {
-		err = errutil.New("unexpected error storing %v(%T)", nv, nv)
-	} else {
-		ret, d.values[i] = el, el.i
 	}
 	return
 }
@@ -89,13 +77,14 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 		err = UnknownField{k.name, field}
 	} else {
 		ft := k.fields[i]
-		if isTrait := ft.Type == "aspect" && ft.Name != field; !isTrait {
+		isTrait := ft.Type == "aspect" && ft.Name != field
+		if !isTrait {
 			err = d.SetFieldByIndex(i, val)
 		} else if yes := val.Affinity() == affine.Bool && val.Bool(); !yes {
 			err = errutil.Fmt("error setting trait: couldn't determine the meaning of %q %s %v", field, val.Affinity(), val)
 		} else {
 			// set the aspect to the value of the requested trait
-			d.values[i] = field
+			d.values[i] = StringFrom(field, "aspect")
 		}
 	}
 	return
@@ -106,7 +95,7 @@ func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	if a, t := val.Affinity(), val.Type(); !matchTypes(d.kind.kinds, ft.Affinity, ft.Type, a, t) {
 		err = errutil.Fmt("%s of %s is not %s of %s", a, t, ft.Affinity, ft.Type)
 	} else {
-		_, err = d.cache(i, val)
+		d.values[i] = val
 	}
 	return
 }

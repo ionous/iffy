@@ -559,7 +559,7 @@ function getStory() {
                                                       "id": "id-1743bd78458-3",
                                                       "type": "kind_of",
                                                       "value": {
-                                                        "$OBJ": {
+                                                        "$OBJECT": {
                                                           "id": "id-1743bd78458-4",
                                                           "type": "object_eval",
                                                           "value": {
@@ -606,7 +606,7 @@ function getStory() {
                                 "id": "id-17494737044-3",
                                 "type": "has_trait",
                                 "value": {
-                                  "$OBJ": {
+                                  "$OBJECT": {
                                     "id": "id-17494737044-4",
                                     "type": "object_eval",
                                     "value": {
@@ -682,7 +682,7 @@ function getStory() {
                                                       }
                                                     }
                                                   },
-                                                  "$OBJ": {
+                                                  "$OBJECT": {
                                                     "id": "id-1743bd78458-32",
                                                     "type": "object_eval",
                                                     "value": {
@@ -748,7 +748,7 @@ function getStory() {
                                             }
                                           }
                                         },
-                                        "$OBJ": {
+                                        "$OBJECT": {
                                           "id": "id-174941fde22-15",
                                           "type": "object_eval",
                                           "value": {
@@ -836,7 +836,7 @@ function getStory() {
                                                       }
                                                     }
                                                   },
-                                                  "$OBJ": {
+                                                  "$OBJECT": {
                                                     "id": "id-173f8fba4ff-30",
                                                     "type": "object_eval",
                                                     "value": {
@@ -1079,7 +1079,7 @@ function getStory() {
                                             }
                                           }
                                         },
-                                        "$OBJ": {
+                                        "$OBJECT": {
                                           "id": "id-17494737044-25",
                                           "type": "object_eval",
                                           "value": {
@@ -2165,7 +2165,7 @@ function getStory() {
                                 "id": "id-174bd1dc16a-107",
                                 "type": "set_field",
                                 "value": {
-                                  "$OBJ": {
+                                  "$OBJECT": {
                                     "id": "id-174bd1dc16a-108",
                                     "type": "object_eval",
                                     "value": {

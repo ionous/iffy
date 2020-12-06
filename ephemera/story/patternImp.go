@@ -15,7 +15,7 @@ func imp_pattern_type(k *Importer, r reader.Map) (ret ephemera.Named, err error)
 			return
 		},
 		"$VALUE": func(m reader.Map) (err error) {
-			ret, err = imp_variable_type(k, m)
+			ret, _, err = imp_variable_type(k, m)
 			return
 		},
 	})

@@ -40,7 +40,7 @@ func ephemeraTemplate() string {
 		"for now idProg < 0 is a pattern or pattern parameter reference;\n" +
 		"the \"category\" of idNamedParam also indicates reference vs. declaration\n" +
 		"*/\n" +
-		"create table eph_pattern( idNamedPattern int, idNamedParam int, idNamedType int, idProg int );\n" +
+		"create table eph_pattern( idNamedPattern int, idNamedParam int, idNamedType int, affinity text, idProg int );\n" +
 		"/* rule for the collective name of a singular word */\n" +
 		"create table eph_plural( idNamedPlural int, idNamedSingluar int );\n" +
 		"/* type is the name of the command container for de-serialization of the prog\n" +

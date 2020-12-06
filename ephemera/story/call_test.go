@@ -30,7 +30,7 @@ func TestDetermineNum(t *testing.T) {
 		var buf strings.Builder
 		tables.WriteCsv(db, &buf, "select count() from eph_prog", 1)
 		tables.WriteCsv(db, &buf, "select count() from eph_rule", 1)
-		tables.WriteCsv(db, &buf, "select * from eph_pattern", 4)
+		tables.WriteCsv(db, &buf, "select idNamedPattern,idNamedParam,idNamedType,idProg from eph_pattern", 4)
 		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
 		if have, want := buf.String(), lines(
 			// eph_prog count

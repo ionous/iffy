@@ -137,7 +137,7 @@ For example: animals, containers, etc.`);
     make.run("variable_decl", "{type:variable_type} called {name:variable_name}");
     make.str("variable_name");
 
-    make.opt("variable_type", "a {simple value%primitive:primitive_type} or an {object:object_type}");
+    make.opt("variable_type", "a {simple value%primitive:primitive_type}, an {object:object_type}, or {other value%ext:ext_type}");
     make.run("object_type",  "{an} {kind of%kind:singular_kind}");
   });
 
@@ -174,14 +174,25 @@ For example: animals, containers, etc.`);
   });
 
   // primitive types
-  make.group("Primitive Types", function() {
+  make.group("Values", function() {
     make.run("primitive_phrase", "{primitive_type} called {property}");
+
     make.str("primitive_type", "{a number%number}, {some text%text}, or {a true/false value%bool}");
     make.opt("primitive_value", "{text%boxed_text} or {number%boxed_number}");
+
+    // a list of numbers, a list of text, a record, or a list of records.
+    make.opt("ext_type", "a list of {numbers:number_list}, a list of {text%text_list}, a {record:record_type} or a list of {records:record_list}.")
+
+    make.run("record_type",  "a record of {kind%kind:singular_kind}");
+    make.run("record_list",  "a list of {kind%kind:singular_kind} records");
 
     make.run("boxed_text", "{text}");
     make.run("boxed_number", "{number}");
     make.run("boxed_boolean", "{bool}");
+
+    // constants
+    make.str("text_list", "{a list of text%text_list}");
+    make.str("number_list", "{a list of numbers%number_list}");
 
     make.str("bool", "{true} or {false}");
     make.str("text", "{text} or {empty}", `A sequence of characters of any length, all on one line.

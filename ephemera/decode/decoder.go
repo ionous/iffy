@@ -7,6 +7,7 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/export"
+	"github.com/ionous/iffy/export/tag"
 	"github.com/ionous/iffy/lang"
 )
 
@@ -14,6 +15,7 @@ import (
 type ReadRet func(reader.Map) (interface{}, error)
 
 type cmdRec struct {
+	name         string
 	elem         r.Type
 	customReader ReadRet
 }
@@ -49,7 +51,7 @@ func (dec *Decoder) AddCallback(cmd composer.Slat, cb ReadRet) {
 		panic(errutil.Fmt("conflicting name for spec %q %q!=%T", n, was.elem, cmd))
 	} else {
 		elem := r.TypeOf(cmd).Elem()
-		dec.cmds[n] = cmdRec{elem, cb}
+		dec.cmds[n] = cmdRec{n, elem, cb}
 	}
 }
 
@@ -118,20 +120,23 @@ func (dec *Decoder) readNew(cmd cmdRec, m reader.Map) (ret r.Value, err error) {
 		err = errutil.New("expected a struct")
 	} else {
 		ptr := r.New(cmd.elem)
-		dec.readFields(reader.At(m), ptr.Elem(), m.MapOf(reader.ItemValue))
+		dec.ReadFields(reader.At(m), ptr.Elem(), m.MapOf(reader.ItemValue))
 		ret = ptr
 	}
 	return
 }
 
-func (dec *Decoder) readFields(at string, out r.Value, in reader.Map) {
+func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 	var fields []string
 	export.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
 		token := export.Tokenize(f)
 		fields = append(fields, token)
 		// we report on missing properties below.
 		if inVal, ok := in[token]; !ok {
-			dec.report(at, errutil.Fmt("missing %q", token))
+			// log only if the field is required. not optional.
+			if t := tag.ReadTag(f.Tag); !t.Exists("internal") && !t.Exists("optional") {
+				dec.report(at, errutil.Fmt("missing %q", token))
+			}
 		} else {
 			outAt := out.FieldByIndex(path)
 			if e := dec.importValue(outAt, inVal); e != nil {
@@ -220,10 +225,10 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 	case r.Ptr:
 		if slat, ok := inVal.(map[string]interface{}); !ok {
 			err = errutil.New("value not a slot")
-		} else if v, e := dec.importSlot(slat, outAt.Type()); e != nil {
+		} else if newVal, e := dec.importSlot(slat, outAt.Type()); e != nil {
 			dec.report(reader.At(slat), e)
 		} else {
-			outAt.Set(v)
+			outAt.Set(newVal)
 		}
 
 	case r.Interface:
@@ -232,10 +237,10 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
 				err = errutil.New("value not a slot")
-			} else if v, e := dec.importSlot(slot, outAt.Type()); e != nil {
+			} else if newVal, e := dec.importSlot(slot, outAt.Type()); e != nil {
 				dec.report(reader.At(slot), e)
 			} else {
-				outAt.Set(v)
+				outAt.Set(newVal)
 			}
 			return
 		}); e != nil {

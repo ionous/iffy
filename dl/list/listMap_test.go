@@ -128,13 +128,13 @@ var reverseRecords = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{
 			Execute: &core.SetField{
-				Obj:   V("out"),
-				Field: "Name",
+				Object: V("out"),
+				Field:  "Name",
 				From: &core.FromText{
 					&core.MakeReversed{
 						&core.Field{
-							Obj:   V("in"),
-							Field: "Name",
+							Object: V("in"),
+							Field:  "Name",
 						},
 					},
 				},

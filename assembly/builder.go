@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/lang"
@@ -56,11 +57,11 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 	// build the pattern cache
 	out := make(patternCache)
 	var patternName, paramName, category, typeName string
-	var kind sql.NullString
+	var kind, affinity sql.NullString
 	var prog []byte
 	var last *patternEntry
 	if e := tables.QueryAll(db,
-		`select ap.pattern, ap.param, ap.cat, ap.type, ap.kind, ep.prog
+		`select ap.pattern, ap.param, ap.cat, ap.type, ap.affinity, ap.kind, ep.prog
 		from asm_pattern_decl ap
 		left join eph_prog ep
 		on (ep.rowid = ap.idProg)`,
@@ -79,31 +80,36 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				// fix: these should probably be tables.PRIM_ names
 				// ie. "text" not "text_eval" -- tests and other things have to be adjusted
 				paramName := lang.Camelize(paramName)
-				//
+
+				var p term.Preparer
 				switch typeName {
 				case "text_eval":
-					p := term.Text{Name: paramName}
-					err = last.AddParam(category, &p)
+					p = &term.Text{Name: paramName}
 				case "number_eval":
-					p := term.Number{Name: paramName}
-					err = last.AddParam(category, &p)
+					p = &term.Number{Name: paramName}
 				case "bool_eval":
-					p := term.Bool{Name: paramName}
-					err = last.AddParam(category, &p)
+					p = &term.Bool{Name: paramName}
 				default:
 					// the type might be some sort of kind...
 					if kind := kind.String; len(kind) > 0 {
-						p := term.Record{Name: paramName, Kind: kind}
-						err = last.AddParam(category, &p)
-					} else {
-						err = errutil.Fmt("pattern %q parameter %q has unknown type %q ( expected an eval .)",
-							patternName, paramName, typeName)
+						switch aff := affinity.String; aff {
+						case string(affine.Object):
+							p = &term.Object{Name: paramName, Kind: kind}
+						case string(affine.Record):
+							p = &term.Record{Name: paramName, Kind: kind}
+						}
 					}
+				}
+				if p != nil {
+					err = last.AddParam(category, p)
+				} else {
+					err = errutil.Fmt("pattern %q parameter %q has unknown type %q(%s)",
+						patternName, paramName, typeName, affinity)
 				}
 			}
 			return
 		},
-		&patternName, &paramName, &category, &typeName, &kind, &prog); e != nil {
+		&patternName, &paramName, &category, &typeName, &affinity, &kind, &prog); e != nil {
 		err = e
 	} else {
 		ret = out

@@ -129,19 +129,11 @@
                                       "type": "get_var",
                                       "value": {
                                         "$NAME": {
-                                          "id": "id-174cdb223ae-4",
-                                          "type": "text_eval",
-                                          "value": {
-                                            "id": "id-174cdb223ae-5",
-                                            "type": "text_value",
-                                            "value": {
-                                              "$TEXT": {
-                                                "id": "id-174cdb223ae-6",
+
                                                 "type": "text",
                                                 "value": "text"
-                                              }
-                                            }
-                                          }
+                                              
+                                        
                                         }
                                       }
                                     }
@@ -214,19 +206,10 @@
                                       "type": "get_var",
                                       "value": {
                                         "$NAME": {
-                                          "id": "id-174cdb223ae-32",
-                                          "type": "text_eval",
-                                          "value": {
-                                            "id": "id-174cdb223ae-33",
-                                            "type": "text_value",
-                                            "value": {
-                                              "$TEXT": {
-                                                "id": "id-174cdb223ae-34",
+
                                                 "type": "text",
                                                 "value": "text"
-                                              }
-                                            }
-                                          }
+
                                         }
                                       }
                                     }
@@ -299,19 +282,11 @@
                                       "type": "get_var",
                                       "value": {
                                         "$NAME": {
-                                          "id": "id-174cdb223ae-39",
-                                          "type": "text_eval",
-                                          "value": {
-                                            "id": "id-174cdb223ae-40",
-                                            "type": "text_value",
-                                            "value": {
-                                              "$TEXT": {
-                                                "id": "id-174cdb223ae-41",
+                                          
                                                 "type": "text",
                                                 "value": "text"
-                                              }
-                                            }
-                                          }
+                                              
+                                          
                                         }
                                       }
                                     }

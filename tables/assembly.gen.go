@@ -115,6 +115,7 @@ func assemblyTemplate() string {
 		"\tselect pn.name as pattern,\n" +
 		"\tkn.name as param, \n" +
 		"\ttn.name as type, \n" +
+		"\tep.affinity as affinity,\n" +
 		"\tep.idProg >=0 as decl, \n" +
 		"\tep.rowid as ogid,\n" +
 		"\tkn.category as cat,\n" +
@@ -132,7 +133,7 @@ func assemblyTemplate() string {
 		" */\n" +
 		"create temp view \n" +
 		"asm_pattern_decl as \n" +
-		"select pattern, param, type, ogid,\n" +
+		"select pattern, param, type, affinity, ogid,\n" +
 		"\t( select mk.kind\n" +
 		"\tfrom mdl_kind mk \n" +
 		"\tjoin mdl_plural mp\n" +
@@ -247,6 +248,7 @@ func assemblyTemplate() string {
 		"order by pattern, type, idProg;\n" +
 		"\n" +
 		"/* patterns and rules with similar names and possibly different types\n" +
+		"* fix: does this need to be updated with affinity?\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_rule_match as \n" +

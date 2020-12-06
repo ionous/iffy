@@ -9,8 +9,8 @@ import (
 
 // HasTrait a property value from an object by name.
 type HasTrait struct {
-	Obj   rt.ObjectEval
-	Trait rt.TextEval
+	Object rt.ObjectEval
+	Trait  rt.TextEval
 }
 
 // should be "When the target is publicly named"
@@ -24,7 +24,7 @@ func (*HasTrait) Compose() composer.Spec {
 }
 
 func (op *HasTrait) GetBool(run rt.Runtime) (ret g.Value, err error) {
-	if obj, e := safe.GetObject(run, op.Obj); e != nil {
+	if obj, e := safe.GetObject(run, op.Object); e != nil {
 		err = cmdError(op, e)
 	} else if trait, e := safe.GetText(run, op.Trait); e != nil {
 		err = cmdError(op, e)

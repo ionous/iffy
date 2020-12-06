@@ -72,14 +72,14 @@ func checkPatternSetup(db *sql.DB) (err error) {
 	} else {
 		// search for other conflicts
 		if e := tables.QueryAll(db,
-			`select distinct pattern, param, type, decl from asm_pattern
-			order by pattern, param, type, decl desc`,
+			`select distinct pattern, param, type, affinity, decl from asm_pattern
+			order by pattern, param, type, affinity, decl desc`,
 			func() error {
 				e := now.compare(&last, &declaredReturn)
 				last = now
 				return e
 			},
-			&now.pat, &now.arg, &now.typ, &now.decl); e != nil {
+			&now.pat, &now.arg, &now.typ, &now.aff, &now.decl); e != nil {
 			err = e
 		} else if e := last.flush(&declaredReturn); e != nil {
 			err = e
@@ -89,8 +89,8 @@ func checkPatternSetup(db *sql.DB) (err error) {
 }
 
 type patternInfo struct {
-	pat, arg, typ string
-	decl          bool
+	pat, arg, typ, aff string
+	decl               bool
 }
 
 func (now *patternInfo) flush(pret *string) (err error) {
@@ -115,6 +115,9 @@ func (now *patternInfo) compare(was *patternInfo, pret *string) (err error) {
 		} else if !change && (now.typ != was.typ) {
 			// regardless -- types should be consistent.
 			err = errutil.Fmt("Pattern %q's %q type conflict, was %q now %q", now.pat, now.arg, was.typ, now.typ)
+		} else if !change && (now.aff != was.aff) && (len(now.aff) > 0 || len(was.aff) > 0) {
+			// regardless -- types should be consistent.
+			err = errutil.Fmt("Pattern %q's %q affinities conflict, was %q now %q", now.pat, now.arg, was.aff, now.aff)
 		} else if now.decl && now.pat == now.arg {
 			// assuming everything's ok, a decl where pat and arg match means the type of the pattern itself.
 			*pret = now.typ

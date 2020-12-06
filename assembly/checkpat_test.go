@@ -231,9 +231,9 @@ func addEphPattern(rec *ephemera.Recorder, els ...string) {
 		typ := rec.NewName(els[i+2], tables.NAMED_TYPE, strconv.Itoa(i))
 
 		if dec {
-			rec.NewPatternDecl(pat, arg, typ, ephemera.Prog{})
+			rec.NewPatternDecl(pat, arg, typ, "", ephemera.Prog{})
 		} else {
-			rec.NewPatternRef(pat, arg, typ)
+			rec.NewPatternRef(pat, arg, typ, "")
 		}
 	}
 }

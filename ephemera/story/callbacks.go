@@ -82,7 +82,7 @@ func fromPattern(k *Importer,
 	} else {
 		// fix: object type names will need adaption of some sort re plural_kinds
 		patternType := k.NewName(evalType, tables.NAMED_TYPE, reader.At(m))
-		k.NewPatternRef(patternName, patternName, patternType)
+		k.NewPatternRef(patternName, patternName, patternType, "")
 		// assign results
 		from.Pattern = patternName.String()
 		from.Arguments = ps
@@ -125,7 +125,7 @@ func imp_argument(k *Importer, patternName ephemera.Named, r reader.Map) (ret *c
 	} else {
 		if len(slotName) > 0 {
 			paramType := k.NewName(slotName, tables.NAMED_TYPE, reader.At(m))
-			k.NewPatternRef(patternName, paramName, paramType)
+			k.NewPatternRef(patternName, paramName, paramType, "")
 		}
 		ret = &core.Argument{Name: paramName.String(), From: a}
 	}

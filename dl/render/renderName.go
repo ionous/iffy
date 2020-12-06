@@ -51,14 +51,21 @@ func (op *Name) getName(run rt.Runtime) (ret g.Value, err error) {
 			// if there was no such variable, then it's probably an object name
 			ret, err = op.getPrintedNamedOf(run, name)
 		case nil:
-			if aff := v.Affinity(); aff != affine.Text {
-				err = errutil.New("variable %q is %s not text", op.Name, aff)
-			} else if n := v.String(); strings.HasPrefix(n, "#") {
-				// if its an object id, get its printed name
-				ret, err = op.getPrintedNamedOf(run, n)
-			} else {
-				// if its not, just assume the author was asking for the variable's text
-				ret = v
+			switch aff := v.Affinity(); aff {
+			default:
+				err = errutil.Fmt("variable %q is %s not text or object", op.Name, aff)
+
+			case affine.Object:
+				ret, err = op.getPrintedNamedOf(run, v.String())
+
+			case affine.Text:
+				if n := v.String(); strings.HasPrefix(n, "#") {
+					// if its an object id, get its printed name
+					ret, err = op.getPrintedNamedOf(run, n)
+				} else {
+					// if its not, just assume the author was asking for the variable's text
+					ret = v
+				}
 			}
 		}
 	}
@@ -68,10 +75,8 @@ func (op *Name) getName(run rt.Runtime) (ret g.Value, err error) {
 func (op *Name) getPrintedNamedOf(run rt.Runtime, objectName string) (ret g.Value, err error) {
 	if printedName, e := safe.GetText(run, &core.Buffer{core.NewActivity(
 		&pattern.DetermineAct{
-			Pattern: "printName",
-			Arguments: core.Args(&core.CopyFrom{
-				Name:  objectName,
-				Flags: 0}),
+			Pattern:   "printName",
+			Arguments: core.Args(&core.FromObject{&core.ObjectName{&core.Text{objectName}}}),
 		})}); e != nil {
 		err = e
 	} else {

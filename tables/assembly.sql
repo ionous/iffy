@@ -104,6 +104,7 @@ asm_pattern as
 	select pn.name as pattern,
 	kn.name as param, 
 	tn.name as type, 
+	ep.affinity as affinity,
 	ep.idProg >=0 as decl, 
 	ep.rowid as ogid,
 	kn.category as cat,
@@ -121,7 +122,7 @@ left join eph_named tn
  */
 create temp view 
 asm_pattern_decl as 
-select pattern, param, type, ogid,
+select pattern, param, type, affinity, ogid,
 	( select mk.kind
 	from mdl_kind mk 
 	join mdl_plural mp
@@ -236,6 +237,7 @@ join eph_prog ep
 order by pattern, type, idProg;
 
 /* patterns and rules with similar names and possibly different types
+* fix: does this need to be updated with affinity?
  */
 create temp view 
 asm_rule_match as 
