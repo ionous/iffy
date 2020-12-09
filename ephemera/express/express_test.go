@@ -65,16 +65,18 @@ func TestExpressions(t *testing.T) {
 	t.Run("logic", func(t *testing.T) {
 		if e := testExpression(
 			"true and (false or {isNot: true})",
-			&core.AllTrue{[]rt.BoolEval{
-				True,
-				&core.AnyTrue{[]rt.BoolEval{
-					False,
-					// isNot requires command parsing
-					&core.IsNotTrue{
-						True,
-					},
-				}},
-			}}); e != nil {
+			&core.AllTrue{
+				Test: []rt.BoolEval{
+					&core.Bool{true},
+					&core.AnyTrue{
+						Test: []rt.BoolEval{
+							&core.Bool{false},
+							// isNot requires command parsing
+							&core.IsNotTrue{
+								&core.Bool{true},
+							},
+						}},
+				}}); e != nil {
 			t.Fatal(e)
 		}
 	})
