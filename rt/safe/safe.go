@@ -13,7 +13,7 @@ func List(run rt.Runtime, n string) (ret g.Value, err error) {
 	if vs, e := run.GetField(object.Variables, n); e != nil {
 		err = e
 	} else if a := vs.Affinity(); !affine.IsList(a) {
-		err = errutil.Fmt("%s of %q is not a list", a, n)
+		err = errutil.Fmt("%s of %q is not a list", n, a)
 	} else {
 		ret = vs
 	}
@@ -25,7 +25,7 @@ func Scalar(run rt.Runtime, n string) (ret g.Value, err error) {
 	if vs, e := run.GetField(object.Variables, n); e != nil {
 		err = e
 	} else if a := vs.Affinity(); !affine.IsList(a) {
-		err = errutil.Fmt("%s of %q is not a scalar", n)
+		err = errutil.Fmt("%s of %q is not a scalar", n, a)
 	} else {
 		ret = vs
 	}

@@ -104,7 +104,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 					err = last.AddParam(category, p)
 				} else {
 					err = errutil.Fmt("pattern %q parameter %q has unknown type %q(%s)",
-						patternName, paramName, typeName, affinity)
+						patternName, paramName, typeName, affinity.String)
 				}
 			}
 			return
