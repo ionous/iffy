@@ -288,11 +288,6 @@ func imp_trait_phrase(k *Importer, r reader.Map) (ret []ephemera.Named, err erro
 	return
 }
 
-type variableDecl struct {
-	name, typeName ephemera.Named
-	affinity       string
-}
-
 // "{type:variable_type} ( called {name:variable_name|quote} )"
 func imp_variable_decl(k *Importer, cat string, r reader.Map) (ret variableDecl, err error) {
 	if m, e := reader.Unpack(r, "variable_decl"); e != nil {

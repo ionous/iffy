@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
@@ -25,24 +26,7 @@ func ImportStories(src string, db *sql.DB, ms []reader.Map) (err error) {
 	for _, slats := range iffy.AllSlats {
 		dec.AddDefaultCallbacks(slats)
 	}
-	// for _, slat := range Slats {
-	// 	if _, ok := slat.(Imported); !ok {
-	// 		dec.AddCallback(slat, nil)
-	// 	} else {
-	// 		dec.AddCallback(slat, func(m reader.Map) (ret interface{}, err error) {
-	// 			slatElm := r.TypeOf(slat).Elem()
-	// 			slatPtr := r.New(slatElm)
-	// 			dec.ReadFields(reader.At(m), slatPtr.Elem(), m.MapOf(reader.ItemValue))
-	// 			op := slatPtr.Interface().(Imported)
-	// 			if e := op.Imported(k); e != nil {
-	// 				err = e
-	// 			} else {
-	// 				ret = op
-	// 			}
-	// 			return
-	// 		})
-	// 	}
-	// }
+	dec.AddDefaultCallbacks(Slats)
 	dec.AddDefaultCallbacks(core.Slats)
 	dec.AddCallbacks([]decode.Override{
 		// {(*core.Activity)(nil), k.BindRet(func(i *Importer, m reader.Map) (interface{}, error) {
@@ -62,26 +46,19 @@ func ImportStories(src string, db *sql.DB, ms []reader.Map) (err error) {
 		//
 		{(*render.Template)(nil), k.BindRet(imp_render_template)},
 	})
-
+	//
 	for _, m := range ms {
-		if e := imp_story(k, m); e != nil {
+		if i, e := dec.ReadSpec(m); e != nil {
+			err = e
+			break
+		} else if story, ok := i.(*Story); !ok {
+			err = errutil.Fmt("imported spec wasn't a story %T", i)
+			break
+		} else if e := story.ImportStory(k); e != nil {
 			err = e
 			break
 		}
 	}
-	// for _, m := range ms {
-	// 	if i, e := dec.ReadSpec(m); e != nil {
-	// 		err = e
-	// 		break
-	// 	} else {
-	// 		pretty.Println(i)
-	// 	}
-	// }
 	reader.PrintDilemmas(log.Writer(), ds)
-
 	return
-}
-
-type Imported interface {
-	Imported(*Importer) (err error)
 }

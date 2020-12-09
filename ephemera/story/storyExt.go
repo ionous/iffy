@@ -8,4 +8,5 @@ import (
 type NumberEval rt.NumberEval
 type TextEval rt.TextEval
 type BoolEval rt.BoolEval
+type ObjectEval rt.ObjectEval
 type Activity core.Activity

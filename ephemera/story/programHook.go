@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
+// generates rules based on guards
 type programHook interface {
 	SlotType() string
 	// gob requirement: return a pointer to the interface
