@@ -236,20 +236,81 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		}
 
 	case r.Struct:
-		if swap, ok := outAt.Addr().Interface().(swapType); ok {
+		// b/c of the way optional values are specified,
+		// going from r.Struct is easier than from r.Ptr.
+		switch spec := outAt.Addr().Interface().(type) {
+		case StrType:
+			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+				if str, ok := v.(string); !ok {
+					err = errutil.New("value not a slat")
+				} else {
+					// validate choice.
+					if closed, vs := spec.Choices(); closed {
+						var found bool
+						for _, choice := range vs {
+							if str == "$"+strings.ToUpper(choice) {
+								str = choice
+								found = true
+								break
+							}
+						}
+						if !found {
+							err = errutil.New("unknown string", str)
+						}
+					}
+					if err == nil {
+						outAt.Field(outAt.NumField() - 1).SetString(str)
+					}
+				}
+				return
+			}); e != nil {
+				err = e
+			}
+
+		case NumType:
+			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+				if num, ok := v.(float64); !ok {
+					err = errutil.New("value not a slat")
+				} else {
+					// validate choice; fix: tolerance?
+					if closed, vs := spec.Choices(); closed {
+						var found bool
+						for _, choice := range vs {
+							if num == choice {
+								found = true
+								break
+							}
+						}
+						if !found {
+							err = errutil.New("unknown value", num)
+						}
+					}
+					if err == nil {
+						// handle conversion b/t floats and ints of different widths
+						tgt := outAt.Field(outAt.NumField() - 1)
+						v := r.ValueOf(num).Convert(tgt.Type())
+						tgt.Set(v)
+					}
+				}
+				return
+			}); e != nil {
+				err = e
+			}
+
+		case SwapType:
 			if e := dec.unpack(inVal, func(v interface{}) (err error) {
 				if data, ok := v.(map[string]interface{}); !ok {
 					err = errutil.New("value not a slat")
 				} else {
 					found := false
-					for k, elType := range swap.Swap() {
+					for k, typePtr := range spec.Choices() {
 						token := "$" + strings.ToUpper(k)
 						if contents, ok := data[token]; ok {
-							ptr := r.New(r.TypeOf(elType).Elem())
+							ptr := r.New(r.TypeOf(typePtr).Elem())
 							if e := dec.importValue(ptr.Elem(), contents); e != nil {
 								err = e
 							} else {
-								outAt.Field(0).Set(ptr.Elem())
+								outAt.Field(outAt.NumField() - 1).Set(ptr)
 							}
 							found = true
 							break
@@ -261,10 +322,10 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 				}
 				return
 			}); e != nil {
-				err = errutil.Append(err, e)
+				err = e
 			}
 
-		} else {
+		default:
 			if e := dec.unpack(inVal, func(v interface{}) (err error) {
 				if slot, ok := v.(map[string]interface{}); !ok {
 					err = errutil.New("value not a slat")
@@ -273,7 +334,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 				}
 				return
 			}); e != nil {
-				err = errutil.Append(err, e)
+				err = e
 			}
 		}
 
@@ -289,7 +350,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			}
 			return
 		}); e != nil {
-			err = errutil.Append(err, e)
+			err = e
 		}
 
 	case r.Slice:
@@ -335,27 +396,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 	return
 }
 
-type swapType interface {
-	Swap() map[string]interface{}
-}
-
-type strType interface {
-	Str() (bool, []string)
-}
-
-type numType interface {
-	Num() (bool, []string)
-}
-
-func at(inVal interface{}) (ret string) {
-	if item, ok := inVal.(map[string]interface{}); !ok {
-		ret = reader.At(item)
-	} else {
-		ret = "???"
-	}
-	return
-}
-
+// cast inVal to a map, and call setter with contents of "value"
 func (dec *Decoder) unpack(inVal interface{}, setter func(interface{}) error) (err error) {
 	if item, ok := inVal.(map[string]interface{}); !ok {
 		err = errutil.New("expected an item, got:", inVal)
