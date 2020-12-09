@@ -3,21 +3,20 @@
 
 const Handlebars = require('handlebars'); // for templates
 const allTypes= require('./model.js'); // iffy language file
-//console.log(JSON.stringify(allTypes, 0,2 ));
-//return
-
-// change lower case to pascal-cased ( golang public )
-const pascal= function(name) {
-  if (name && name[0]=== '$') {
-    name= name.slice(1).toLowerCase();
-  }
-  const els= name.split('_').map(el=> el.charAt(0).toUpperCase() + el.slice(1));
-  return els.join('');
-};
+// console.log(JSON.stringify(allTypes, 0,2 )); return;
 
 const lower= function(name) {
-  return name.slice(1).toLowerCase();
-}
+  if (name && name[0]=== '$') {
+    name= name.slice(1);
+  }
+  return name.toLowerCase();
+};
+
+// change to pascal-cased ( golang public )
+const pascal= function(name) {
+  const els= lower(name).split('_').map(el=> el.charAt(0).toUpperCase() + el.slice(1));
+  return els.join('');
+};
 
 // given a strType with the specified pascal'd name, return its list of choice
 const strChoices= function(name, strType) {
@@ -63,6 +62,8 @@ Handlebars.registerHelper('Lede', function(param) {
     out+= "[]";
   }
   out+= (name.indexOf("_eval") >= 0) ? "rt." :"";
+  // out+= (name.indexOf("_eval") >= 0) ? "rt." :
+  //       (type.uses !== 'slot')? "*": "";
   return out;
 });
 
@@ -121,11 +122,12 @@ Handlebars.registerHelper('GroupOf', function (desc) {
 
 // load each js file as a handlebars template
 const partials= ['spec'];
-const sources= ['header', 'num', 'txt', 'opt', 'run', 'str', 'slot', 'footer'];
+const sources= ['header', 'num', 'opt', 'run', 'str', 'slot', 'footer'];
 partials.forEach(k=> Handlebars.registerPartial(k, require(`./templates/${k}Partial.js`)));
 const templates= Object.fromEntries(sources.map(k=> [k,
-Handlebars.compile(require(`./templates/${k}Template.js`))]));
-
+  Handlebars.compile(require(`./templates/${k}Template.js`))])
+);
+templates['txt']= templates['str']; // fix: txt really shouldnt even exist i think
 console.log(templates.header({package:'story'}));
 
 // switch to partials?

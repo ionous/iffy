@@ -6,6 +6,7 @@ package {{package}}
 
 import (
   "github.com/ionous/iffy/dl/composer"
+  "github.com/ionous/iffy/ephemera/reader"
   "github.com/ionous/iffy/rt"
 )
 `

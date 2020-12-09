@@ -1,4 +1,4 @@
-// spec.js
+// specPartial.js
 'use strict';
 module.exports =`func (*{{Pascal name}}) Compose() composer.Spec {
   return composer.Spec{
