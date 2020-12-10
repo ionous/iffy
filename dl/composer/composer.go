@@ -3,6 +3,7 @@ package composer
 // Spec for display in composer
 type Spec struct {
 	Name, Spec, Group, Desc string
+	Stub                    bool // generate a custom loading struct.
 	Locals                  []string
 }
 

@@ -14,6 +14,7 @@ import (
 
 type Collect struct {
 	all    []export.Dict
+	stubs  []string
 	slots  []r.Type
 	groups Groups
 }
@@ -75,6 +76,9 @@ func (c *Collect) AddSlat(cmd composer.Slat) {
 			with["params"] = params
 			with["tokens"] = updateTokens(spec.Spec, tokens)
 		}
+		if spec.Stub {
+			c.stubs = append(c.stubs, spec.Name)
+		}
 		addDesc(out, spec.Desc)
 		c.AddGroup(out, spec.Group)
 		c.all = append(c.all, out)
@@ -104,4 +108,15 @@ func (c *Collect) Sort() {
 
 func (c *Collect) Marshal() (ret []byte, err error) {
 	return json.MarshalIndent(c.all, "", "  ")
+}
+
+func (c *Collect) Stubs() (ret []byte) {
+	if len(c.stubs) == 0 {
+		ret = []byte(`""`)
+	} else if b, e := json.MarshalIndent(c.stubs, "", "  "); e != nil {
+		ret = []byte("// " + e.Error())
+	} else {
+		ret = b
+	}
+	return
 }

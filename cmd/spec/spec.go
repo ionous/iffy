@@ -10,7 +10,7 @@ import (
 	"github.com/ionous/iffy/cmd/spec/internal"
 )
 
-// go run spec.go > /Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/compose/www/data/lang/spec.js
+// go run spec.go > ../compose/www/data/lang/spec.js
 func main() {
 	var c internal.Collect
 	for _, slots := range iffy.AllSlots {
@@ -30,6 +30,10 @@ func main() {
 	} else {
 		fmt.Println("/* generated using github.com/ionous/iffy/cmd/spec/spec.go */")
 		fmt.Print("const spec = ")
-		fmt.Println(string(b))
+		fmt.Print(string(b))
+		fmt.Println(";")
+		fmt.Print("const stub = ")
+		fmt.Print(string(c.Stubs()))
+		fmt.Println(";")
 	}
 }

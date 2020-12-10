@@ -2032,4 +2032,5 @@ const spec = [
     "name": "variables",
     "uses": "group"
   }
-]
+];
+const stub = "";
