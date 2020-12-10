@@ -47,6 +47,7 @@ func (op *LocalDecl) ImportPattern(k *Importer, patternName ephemera.Named) (err
 	return
 }
 
+// returns "prog" as the name of a type  ( eases the difference b/t user named kinds, and internally named types )
 func (op *PatternedActivity) ImportActivity(k *Importer) (ret ephemera.Named, err error) {
 	ret = k.NewName("execute", tables.NAMED_TYPE, op.At.String())
 	return

@@ -10,9 +10,12 @@ type GenericImport interface {
 	Import(*Importer) error
 }
 
+type StoryStatement interface {
+	ImportPhrase(k *Importer) error
+}
+
+// story is a bunch of paragraphs
 func (op *Story) ImportStory(k *Importer) (err error) {
-	// pretty.Println(op
-	//
 	if els := op.Paragraph; els != nil {
 		for _, el := range *els {
 			if e := el.ImportParagraph(k); e != nil {
@@ -23,6 +26,7 @@ func (op *Story) ImportStory(k *Importer) (err error) {
 	return
 }
 
+// paragraph is a bunch of statements on the same line
 func (op *Paragraph) ImportParagraph(k *Importer) (err error) {
 	if els := op.StoryStatement; els != nil {
 		for _, el := range *els {
@@ -32,10 +36,6 @@ func (op *Paragraph) ImportParagraph(k *Importer) (err error) {
 		}
 	}
 	return
-}
-
-type StoryStatement interface {
-	ImportPhrase(k *Importer) error
 }
 
 // (the) colors are red, blue, or green.
@@ -48,6 +48,7 @@ func (op *AspectTraits) ImportPhrase(k *Importer) (err error) {
 	return
 }
 
+// horses are usually fast.
 func (op *Certainties) ImportPhrase(k *Importer) (err error) {
 	if certainty, e := op.Certainty.ImportString(k); e != nil {
 		err = e
@@ -65,6 +66,8 @@ func (op *Comment) ImportPhrase(k *Importer) (err error) {
 	// do nothing for now.
 	return
 }
+
+// ex. colors are a kind of value
 func (op *KindsOfAspect) ImportPhrase(k *Importer) (err error) {
 	if a, e := op.Aspect.NewName(k); e != nil {
 		err = e
@@ -73,6 +76,8 @@ func (op *KindsOfAspect) ImportPhrase(k *Importer) (err error) {
 	}
 	return
 }
+
+// ex. "cats are a kind of animal"
 func (op *KindsOfKind) ImportPhrase(k *Importer) (err error) {
 	if kind, e := op.PluralKinds.NewName(k); e != nil {
 		err = e
@@ -83,6 +88,9 @@ func (op *KindsOfKind) ImportPhrase(k *Importer) (err error) {
 	}
 	return
 }
+
+// ex. cats have some text called breed.
+// ex. horses have an aspect called speed.
 func (op *KindsPossessProperties) ImportPhrase(k *Importer) (err error) {
 	if kind, e := op.PluralKinds.NewName(k); e != nil {
 		err = e
@@ -92,6 +100,8 @@ func (op *KindsPossessProperties) ImportPhrase(k *Importer) (err error) {
 	// fix: handle determiner?
 	return
 }
+
+// ex. The description of the nets is xxx
 func (op *NounAssignment) ImportPhrase(k *Importer) (err error) {
 	if prop, e := op.Property.NewName(k); e != nil {
 		err = e
@@ -142,6 +152,8 @@ func (op *PatternActions) ImportPhrase(k *Importer) (err error) {
 	}
 	return
 }
+
+// Adds a new pattern declaration and optionally some associated pattern parameters.
 func (op *PatternDecl) ImportPhrase(k *Importer) (err error) {
 	if patternName, e := op.Name.NewName(k); e != nil {
 		err = e
@@ -166,6 +178,7 @@ func (op *PatternVariablesDecl) ImportPhrase(k *Importer) (err error) {
 	if patternName, e := op.PatternName.NewName(k); e != nil {
 		err = e
 	} else {
+		// fix: shouldnt this be called pattern parameters?
 		for _, el := range op.VariableDecl {
 			if val, e := el.ImportVariable(k, tables.NAMED_PARAMETER); e != nil {
 				err = errutil.Append(err, e)

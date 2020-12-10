@@ -42,8 +42,6 @@ func (op *ObjectType) ImportType(k *Importer) (ret ephemera.Named, err error) {
 	return op.Kind.NewName(k)
 }
 
-// returns one of the evalType(s) as a "Named" value --
-// we return a name to normalize references to object kinds which are also used as variables
 func (op *PrimitiveType) ImportPrim(k *Importer) (ret string, err error) {
 	if str := op.Str; decode.IndexOfChoice(op, str) < 0 {
 		err = ImportError(op, op.At, errutil.Fmt("%w for %T", InvalidValue, op.Str))

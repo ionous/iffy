@@ -39,7 +39,7 @@ func (op *AspectPhrase) ImportProperty(k *Importer, kind ephemera.Named) (err er
 		// ( ex. in case the same aspect is assigned twice, or twice at difference depths )
 		// for now the name of the field is the name of the aspect
 		if op.OptionalProperty != nil {
-			err = ImportError(op, op.At, errutil.Fmt("%w %s", InvalidValue, "optional property names aren't supported for aspects"))
+			err = ImportError(op, op.At, errutil.Fmt("%w optional property names aren't supported for aspects", InvalidValue))
 		} else {
 			k.NewField(kind, aspect, tables.PRIM_ASPECT)
 		}
