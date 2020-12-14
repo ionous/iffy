@@ -6,21 +6,15 @@ type SwapType interface {
 
 type StrType interface {
 	String() string
-	Choices() (closed bool, vals []string)
+	Choices() (closed bool, choices map[string]string)
 }
 
 type NumType interface {
 	Choices() (closed bool, vals []float64)
 }
 
-func IndexOfChoice(op StrType, choice string) (ret int) {
-	ret = -1 // if not found
-	_, keys := op.Choices()
-	for i, k := range keys {
-		if choice == k {
-			ret = i
-			break
-		}
-	}
-	return
+func FindChoice(op StrType, choice string) (ret string, okay bool) {
+	closed, keys := op.Choices()
+	str, ok := keys[choice]
+	return str, ok || !closed
 }

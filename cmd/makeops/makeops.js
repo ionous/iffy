@@ -5,6 +5,12 @@ const Handlebars = require('handlebars'); // for templates
 const allTypes= require('./model.js'); // iffy language file
 // console.log(JSON.stringify(allTypes, 0,2 )); return;
 
+// change to tokenized like name
+const tokenize= function(name) {
+  return '$'+ name.toUpperCase();
+};
+
+// change to lower case name
 const lower= function(name) {
   if (name && name[0]=== '$') {
     name= name.slice(1);
@@ -18,17 +24,16 @@ const pascal= function(name) {
   return els.join('');
 };
 
-// given a strType with the specified pascal'd name, return its list of choice
-const strChoices= function(name, strType) {
+// given a strType with the specified $TOKEN, return its list of choice
+const strChoices= function(token, strType) {
   const out=[];
   const { with : {params= {}}= {} } = strType;
   if (params) {
     for (const k in params) {
-      const p=lower(k);
-      if (p === name) {
-        out.unshift(p); // move the dynamic key to the front
+      if (k === token) {
+        out.unshift(k); // move the dynamic key to the front
       } else {
-        out.push(p);
+        out.push(k);
       }
     }
   }
@@ -84,18 +89,17 @@ Handlebars.registerHelper('IsSlat', function(name) {
 
 // for uses='str'
 Handlebars.registerHelper('IsClosed', function(strType) {
-  const name= lower(strType.name);
-  const cs= strChoices(name, strType);
-  return cs.length && cs[0] !== name;
+  const token= tokenize(strType.name);
+  const cs= strChoices(token, strType);
+  return cs.length && cs[0] !== token;
 });
 
 // for uses='str'
 Handlebars.registerHelper('Choices', function(strType) {
-  const name= lower(strType.name);
-  const cs= strChoices(name, strType);
-  return cs[0]===name? cs.slice(1): cs; // remove the dynamic key
+  const token= tokenize(strType.name);
+  const cs= strChoices(token, strType);
+  return cs[0]===token? cs.slice(1): cs; // remove the dynamic key
 });
-
 
 // flatten desc
 Handlebars.registerHelper('DescOf', function (x) {

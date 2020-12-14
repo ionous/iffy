@@ -15,6 +15,10 @@
                 "id": "id-173f8fba4ff-13",
                 "type": "kinds_possess_properties",
                 "value": {
+                  "$DETERMINER": {
+                    "type": "determiner",
+                    "value": "$A"
+                  },
                   "$PLURAL_KINDS": {
                     "id": "id-173f8fba4ff-14",
                     "type": "plural_kinds",

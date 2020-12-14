@@ -17,9 +17,9 @@ func (op *An) String() string {
   return op.Str
 }
 
-func (*An) Choices() (closed bool, choices []string) {
-  return false, []string{
-    "a",
+func (*An) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    "$A": "a",
   }
 }
 
@@ -40,9 +40,9 @@ func (op *AreAn) String() string {
   return op.Str
 }
 
-func (*AreAn) Choices() (closed bool, choices []string) {
-  return true, []string{
-    "are", "area", "arean", "is", "isa", "isan",
+func (*AreAn) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$ARE": "are", "$AREA": "area", "$AREAN": "arean", "$IS": "is", "$ISA": "isa", "$ISAN": "isan",
   }
 }
 
@@ -63,9 +63,9 @@ func (op *AreBeing) String() string {
   return op.Str
 }
 
-func (*AreBeing) Choices() (closed bool, choices []string) {
-  return true, []string{
-    "are", "is",
+func (*AreBeing) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$ARE": "are", "$IS": "is",
   }
 }
 
@@ -86,9 +86,9 @@ func (op *AreEither) String() string {
   return op.Str
 }
 
-func (*AreEither) Choices() (closed bool, choices []string) {
-  return true, []string{
-    "canbe", "either",
+func (*AreEither) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$CANBE": "canbe", "$EITHER": "either",
   }
 }
 
@@ -96,6 +96,33 @@ func (*AreEither) Compose() composer.Spec {
   return composer.Spec{
     Name: "are_either",
     Spec: "{can be%canbe} {are either%either}",
+  }
+}
+
+// Argument requires various parameters.
+type Argument struct {
+  At reader.Position `if:"internal"`
+  Name VariableName
+  From Assignment
+}
+
+func (*Argument) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "argument",
+    Group: "patterns",
+  }
+}
+
+// Arguments requires various parameters.
+type Arguments struct {
+  At reader.Position `if:"internal"`
+  Args []Argument
+}
+
+func (*Arguments) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "arguments",
+    Group: "patterns",
   }
 }
 
@@ -109,8 +136,10 @@ func (op *Aspect) String() string {
   return op.Str
 }
 
-func (*Aspect) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*Aspect) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*Aspect) Compose() composer.Spec {
@@ -122,8 +151,8 @@ func (*Aspect) Compose() composer.Spec {
 
 // AspectPhrase requires various parameters.
 type AspectPhrase struct {
-  At               reader.Position `if:"internal"`
-  Aspect           Aspect
+  At reader.Position `if:"internal"`
+  Aspect Aspect
   OptionalProperty *OptionalProperty
 }
 
@@ -136,12 +165,10 @@ func (*AspectPhrase) Compose() composer.Spec {
 
 // AspectTraits requires various parameters.
 type AspectTraits struct {
-  At          reader.Position `if:"internal"`
-  Aspect      Aspect
+  At reader.Position `if:"internal"`
+  Aspect Aspect
   TraitPhrase TraitPhrase
 }
-
-var _ StoryStatement = (*AspectTraits)(nil)
 
 func (*AspectTraits) Compose() composer.Spec {
   return composer.Spec{
@@ -160,9 +187,9 @@ func (op *Bool) String() string {
   return op.Str
 }
 
-func (*Bool) Choices() (closed bool, choices []string) {
-  return true, []string{
-    "true", "false",
+func (*Bool) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$TRUE": "true", "$FALSE": "false",
   }
 }
 
@@ -175,7 +202,7 @@ func (*Bool) Compose() composer.Spec {
 
 // BoxedBoolean requires various parameters.
 type BoxedBoolean struct {
-  At   reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Bool Bool
 }
 
@@ -188,7 +215,7 @@ func (*BoxedBoolean) Compose() composer.Spec {
 
 // BoxedNumber requires various parameters.
 type BoxedNumber struct {
-  At     reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Number Number
 }
 
@@ -201,7 +228,7 @@ func (*BoxedNumber) Compose() composer.Spec {
 
 // BoxedText requires various parameters.
 type BoxedText struct {
-  At   reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Text Text
 }
 
@@ -214,14 +241,12 @@ func (*BoxedText) Compose() composer.Spec {
 
 // Certainties requires various parameters.
 type Certainties struct {
-  At          reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   PluralKinds PluralKinds
-  AreBeing    AreBeing
-  Certainty   Certainty
-  Trait       Trait
+  AreBeing AreBeing
+  Certainty Certainty
+  Trait Trait
 }
-
-var _ StoryStatement = (*Certainties)(nil)
 
 func (*Certainties) Compose() composer.Spec {
   return composer.Spec{
@@ -240,9 +265,9 @@ func (op *Certainty) String() string {
   return op.Str
 }
 
-func (*Certainty) Choices() (closed bool, choices []string) {
-  return true, []string{
-    "usually", "always", "seldom", "never",
+func (*Certainty) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$USUALLY": "usually", "$ALWAYS": "always", "$SELDOM": "seldom", "$NEVER": "never",
   }
 }
 
@@ -256,11 +281,9 @@ func (*Certainty) Compose() composer.Spec {
 
 // Comment requires various parameters.
 type Comment struct {
-  At    reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Lines Lines
 }
-
-var _ StoryStatement = (*Comment)(nil)
 
 func (*Comment) Compose() composer.Spec {
   return composer.Spec{
@@ -272,7 +295,7 @@ func (*Comment) Compose() composer.Spec {
 
 // Comments requires various parameters.
 type Comments struct {
-  At    reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Lines Lines
 }
 
@@ -280,6 +303,110 @@ func (*Comments) Compose() composer.Spec {
   return composer.Spec{
     Name: "comments",
     Spec: "{lines|quote}",
+  }
+}
+
+// CycleText requires various parameters.
+type CycleText struct {
+  At reader.Position `if:"internal"`
+  Parts []rt.TextEval
+}
+
+func (*CycleText) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "cycle_text",
+    Desc: `Cycle text: When called multiple times, returns each of its inputs in turn.`,
+    Group: "cycle",
+  }
+}
+
+// DetermineAct requires various parameters.
+type DetermineAct struct {
+  At reader.Position `if:"internal"`
+  Name PatternName
+  Arguments *Arguments
+}
+
+func (*DetermineAct) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "determine_act",
+    Desc: `Determine an activity`,
+    Group: "patterns",
+  }
+}
+
+// DetermineBool requires various parameters.
+type DetermineBool struct {
+  At reader.Position `if:"internal"`
+  Name PatternName
+  Arguments *Arguments
+}
+
+func (*DetermineBool) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "determine_bool",
+    Desc: `Determine a true/false value`,
+    Group: "patterns",
+  }
+}
+
+// DetermineNum requires various parameters.
+type DetermineNum struct {
+  At reader.Position `if:"internal"`
+  Name PatternName
+  Arguments *Arguments
+}
+
+func (*DetermineNum) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "determine_num",
+    Desc: `Determine a number`,
+    Group: "patterns",
+  }
+}
+
+// DetermineNumList requires various parameters.
+type DetermineNumList struct {
+  At reader.Position `if:"internal"`
+  Name PatternName
+  Arguments *Arguments
+}
+
+func (*DetermineNumList) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "determine_num_list",
+    Desc: `Determine a list of numbers`,
+    Group: "patterns",
+  }
+}
+
+// DetermineText requires various parameters.
+type DetermineText struct {
+  At reader.Position `if:"internal"`
+  Name PatternName
+  Arguments *Arguments
+}
+
+func (*DetermineText) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "determine_text",
+    Desc: `Determine some text`,
+    Group: "patterns",
+  }
+}
+
+// DetermineTextList requires various parameters.
+type DetermineTextList struct {
+  At reader.Position `if:"internal"`
+  Name PatternName
+  Arguments *Arguments
+}
+
+func (*DetermineTextList) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "determine_text_list",
+    Desc: `Determine a list of text`,
+    Group: "patterns",
   }
 }
 
@@ -293,9 +420,9 @@ func (op *Determiner) String() string {
   return op.Str
 }
 
-func (*Determiner) Choices() (closed bool, choices []string) {
-  return false, []string{
-    "a", "an", "the", "our",
+func (*Determiner) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    "$A": "a", "$AN": "an", "$THE": "the", "$OUR": "our",
   }
 }
 
@@ -321,20 +448,20 @@ func (*ExtType) Compose() composer.Spec {
 }
 
 func (*ExtType) Choices() map[string]interface{} {
-  return map[string]interface{}{
-    "numbers":   (*NumberList)(nil),
+  return map[string]interface{} {
+    "numbers": (*NumberList)(nil),
     "text_list": (*TextList)(nil),
-    "record":    (*RecordType)(nil),
-    "records":   (*RecordList)(nil),
+    "record": (*RecordType)(nil),
+    "records": (*RecordList)(nil),
   }
 }
 
 // KindOfNoun requires various parameters.
 type KindOfNoun struct {
-  At           reader.Position `if:"internal"`
-  AreAn        AreAn
-  Trait        *[]Trait
-  Kind         SingularKind
+  At reader.Position `if:"internal"`
+  AreAn AreAn
+  Trait *[]Trait
+  Kind SingularKind
   NounRelation *NounRelation
 }
 
@@ -347,11 +474,9 @@ func (*KindOfNoun) Compose() composer.Spec {
 
 // KindsOfAspect requires various parameters.
 type KindsOfAspect struct {
-  At     reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Aspect Aspect
 }
-
-var _ StoryStatement = (*KindsOfAspect)(nil)
 
 func (*KindsOfAspect) Compose() composer.Spec {
   return composer.Spec{
@@ -362,12 +487,10 @@ func (*KindsOfAspect) Compose() composer.Spec {
 
 // KindsOfKind requires various parameters.
 type KindsOfKind struct {
-  At           reader.Position `if:"internal"`
-  PluralKinds  PluralKinds
+  At reader.Position `if:"internal"`
+  PluralKinds PluralKinds
   SingularKind SingularKind
 }
-
-var _ StoryStatement = (*KindsOfKind)(nil)
 
 func (*KindsOfKind) Compose() composer.Spec {
   return composer.Spec{
@@ -378,13 +501,11 @@ func (*KindsOfKind) Compose() composer.Spec {
 
 // KindsPossessProperties requires various parameters.
 type KindsPossessProperties struct {
-  At             reader.Position `if:"internal"`
-  PluralKinds    PluralKinds
-  Determiner     Determiner
+  At reader.Position `if:"internal"`
+  PluralKinds PluralKinds
+  Determiner Determiner
   PropertyPhrase PropertyPhrase
 }
-
-var _ StoryStatement = (*KindsPossessProperties)(nil)
 
 func (*KindsPossessProperties) Compose() composer.Spec {
   return composer.Spec{
@@ -395,8 +516,8 @@ func (*KindsPossessProperties) Compose() composer.Spec {
 
 // Lede requires various parameters.
 type Lede struct {
-  At         reader.Position `if:"internal"`
-  Nouns      []NamedNoun
+  At reader.Position `if:"internal"`
+  Nouns []NamedNoun
   NounPhrase NounPhrase
 }
 
@@ -418,8 +539,10 @@ func (op *Lines) String() string {
   return op.Str
 }
 
-func (*Lines) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*Lines) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*Lines) Compose() composer.Spec {
@@ -433,8 +556,8 @@ See also: text.`,
 
 // LocalDecl requires various parameters.
 type LocalDecl struct {
-  At            reader.Position `if:"internal"`
-  VariableDecl  VariableDecl
+  At reader.Position `if:"internal"`
+  VariableDecl VariableDecl
   ProgramResult ProgramResult
 }
 
@@ -448,12 +571,10 @@ func (*LocalDecl) Compose() composer.Spec {
 
 // NamedNoun requires various parameters.
 type NamedNoun struct {
-  At         reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Determiner Determiner
-  Name       NounName
+  Name NounName
 }
-
-// var _ ObjectEval= (*NamedNoun)(nil)
 
 func (*NamedNoun) Compose() composer.Spec {
   return composer.Spec{
@@ -464,13 +585,11 @@ func (*NamedNoun) Compose() composer.Spec {
 
 // NounAssignment requires various parameters.
 type NounAssignment struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Property Property
-  Nouns    []NamedNoun
-  Lines    Lines
+  Nouns []NamedNoun
+  Lines Lines
 }
-
-var _ StoryStatement = (*NounAssignment)(nil)
 
 func (*NounAssignment) Compose() composer.Spec {
   return composer.Spec{
@@ -490,8 +609,10 @@ func (op *NounName) String() string {
   return op.Str
 }
 
-func (*NounName) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*NounName) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*NounName) Compose() composer.Spec {
@@ -518,19 +639,19 @@ func (*NounPhrase) Compose() composer.Spec {
 }
 
 func (*NounPhrase) Choices() map[string]interface{} {
-  return map[string]interface{}{
-    "kind_of_noun":  (*KindOfNoun)(nil),
-    "noun_traits":   (*NounTraits)(nil),
+  return map[string]interface{} {
+    "kind_of_noun": (*KindOfNoun)(nil),
+    "noun_traits": (*NounTraits)(nil),
     "noun_relation": (*NounRelation)(nil),
   }
 }
 
 // NounRelation requires various parameters.
 type NounRelation struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   AreBeing *AreBeing
   Relation Relation
-  Nouns    []NamedNoun
+  Nouns []NamedNoun
 }
 
 func (*NounRelation) Compose() composer.Spec {
@@ -542,13 +663,11 @@ func (*NounRelation) Compose() composer.Spec {
 
 // NounStatement requires various parameters.
 type NounStatement struct {
-  At      reader.Position `if:"internal"`
-  Lede    Lede
-  Tail    *[]Tail
+  At reader.Position `if:"internal"`
+  Lede Lede
+  Tail *[]Tail
   Summary *Summary
 }
-
-var _ StoryStatement = (*NounStatement)(nil)
 
 func (*NounStatement) Compose() composer.Spec {
   return composer.Spec{
@@ -560,9 +679,9 @@ func (*NounStatement) Compose() composer.Spec {
 
 // NounTraits requires various parameters.
 type NounTraits struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   AreBeing AreBeing
-  Trait    []Trait
+  Trait []Trait
 }
 
 func (*NounTraits) Compose() composer.Spec {
@@ -574,8 +693,8 @@ func (*NounTraits) Compose() composer.Spec {
 
 // NounType requires various parameters.
 type NounType struct {
-  At    reader.Position `if:"internal"`
-  An    An
+  At reader.Position `if:"internal"`
+  An An
   Kinds PluralKinds
 }
 
@@ -588,12 +707,15 @@ func (*NounType) Compose() composer.Spec {
 
 // Number requires a user-specified number.
 type Number struct {
-  At  reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Val float64
 }
 
+
 func (*Number) Num() (closed bool, choices []float64) {
-  return false, []float64{}
+    return false, []float64{
+    
+  }
 }
 
 func (*Number) Compose() composer.Spec {
@@ -612,8 +734,10 @@ func (op *NumberList) String() string {
   return op.Str
 }
 
-func (*NumberList) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*NumberList) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*NumberList) Compose() composer.Spec {
@@ -625,21 +749,21 @@ func (*NumberList) Compose() composer.Spec {
 
 // ObjectFunc requires various parameters.
 type ObjectFunc struct {
-  At       reader.Position `if:"internal"`
-  TextEval rt.TextEval
+  At reader.Position `if:"internal"`
+  Name rt.TextEval
 }
 
 func (*ObjectFunc) Compose() composer.Spec {
   return composer.Spec{
     Name: "object_func",
-    Spec: "an object named {name%text_eval}",
+    Spec: "an object named {name:text_eval}",
   }
 }
 
 // ObjectType requires various parameters.
 type ObjectType struct {
-  At   reader.Position `if:"internal"`
-  An   An
+  At reader.Position `if:"internal"`
+  An An
   Kind SingularKind
 }
 
@@ -652,7 +776,7 @@ func (*ObjectType) Compose() composer.Spec {
 
 // OptionalProperty requires various parameters.
 type OptionalProperty struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Property Property
 }
 
@@ -665,7 +789,7 @@ func (*OptionalProperty) Compose() composer.Spec {
 
 // Paragraph requires various parameters.
 type Paragraph struct {
-  At             reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   StoryStatement *[]StoryStatement
 }
 
@@ -679,13 +803,11 @@ func (*Paragraph) Compose() composer.Spec {
 
 // PatternActions requires various parameters.
 type PatternActions struct {
-  At            reader.Position `if:"internal"`
-  Name          PatternName
+  At reader.Position `if:"internal"`
+  Name PatternName
   PatternLocals *PatternLocals
-  PatternRules  PatternRules
+  PatternRules PatternRules
 }
-
-var _ StoryStatement = (*PatternActions)(nil)
 
 func (*PatternActions) Compose() composer.Spec {
   return composer.Spec{
@@ -697,14 +819,12 @@ func (*PatternActions) Compose() composer.Spec {
 
 // PatternDecl requires various parameters.
 type PatternDecl struct {
-  At      reader.Position `if:"internal"`
-  Name    PatternName
-  Type    PatternType
+  At reader.Position `if:"internal"`
+  Name PatternName
+  Type PatternType
   Optvars *PatternVariablesTail
-  About   *Comments
+  About *Comments
 }
-
-var _ StoryStatement = (*PatternDecl)(nil)
 
 func (*PatternDecl) Compose() composer.Spec {
   return composer.Spec{
@@ -716,7 +836,7 @@ func (*PatternDecl) Compose() composer.Spec {
 
 // PatternLocals requires various parameters.
 type PatternLocals struct {
-  At        reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   LocalDecl *[]LocalDecl
 }
 
@@ -737,8 +857,10 @@ func (op *PatternName) String() string {
   return op.Str
 }
 
-func (*PatternName) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*PatternName) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*PatternName) Compose() composer.Spec {
@@ -750,9 +872,9 @@ func (*PatternName) Compose() composer.Spec {
 
 // PatternRule requires various parameters.
 type PatternRule struct {
-  At    reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Guard rt.BoolEval
-  Hook  ProgramHook
+  Hook ProgramHook
 }
 
 func (*PatternRule) Compose() composer.Spec {
@@ -765,7 +887,7 @@ func (*PatternRule) Compose() composer.Spec {
 
 // PatternRules requires various parameters.
 type PatternRules struct {
-  At          reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   PatternRule *[]PatternRule
 }
 
@@ -790,20 +912,18 @@ func (*PatternType) Compose() composer.Spec {
 }
 
 func (*PatternType) Choices() map[string]interface{} {
-  return map[string]interface{}{
+  return map[string]interface{} {
     "activity": (*PatternedActivity)(nil),
-    "value":    (*VariableType)(nil),
+    "value": (*VariableType)(nil),
   }
 }
 
 // PatternVariablesDecl requires various parameters.
 type PatternVariablesDecl struct {
-  At           reader.Position `if:"internal"`
-  PatternName  PatternName
+  At reader.Position `if:"internal"`
+  PatternName PatternName
   VariableDecl []VariableDecl
 }
-
-var _ StoryStatement = (*PatternVariablesDecl)(nil)
 
 func (*PatternVariablesDecl) Compose() composer.Spec {
   return composer.Spec{
@@ -815,7 +935,7 @@ func (*PatternVariablesDecl) Compose() composer.Spec {
 
 // PatternVariablesTail requires various parameters.
 type PatternVariablesTail struct {
-  At           reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   VariableDecl []VariableDecl
 }
 
@@ -837,9 +957,9 @@ func (op *PatternedActivity) String() string {
   return op.Str
 }
 
-func (*PatternedActivity) Choices() (closed bool, choices []string) {
-  return true, []string{
-    "activity",
+func (*PatternedActivity) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$ACTIVITY": "activity",
   }
 }
 
@@ -860,8 +980,10 @@ func (op *PluralKinds) String() string {
   return op.Str
 }
 
-func (*PluralKinds) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*PluralKinds) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*PluralKinds) Compose() composer.Spec {
@@ -886,18 +1008,18 @@ func (*PrimitiveFunc) Compose() composer.Spec {
 }
 
 func (*PrimitiveFunc) Choices() map[string]interface{} {
-  return map[string]interface{}{
+  return map[string]interface{} {
     "number_eval": (*NumberEval)(nil),
-    "text_eval":   (*TextEval)(nil),
-    "bool_eval":   (*BoolEval)(nil),
+    "text_eval": (*TextEval)(nil),
+    "bool_eval": (*BoolEval)(nil),
   }
 }
 
 // PrimitivePhrase requires various parameters.
 type PrimitivePhrase struct {
-  At            reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   PrimitiveType PrimitiveType
-  Property      Property
+  Property Property
 }
 
 func (*PrimitivePhrase) Compose() composer.Spec {
@@ -917,9 +1039,9 @@ func (op *PrimitiveType) String() string {
   return op.Str
 }
 
-func (*PrimitiveType) Choices() (closed bool, choices []string) {
-  return true, []string{
-    "number", "text", "bool",
+func (*PrimitiveType) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$NUMBER": "number", "$TEXT": "text", "$BOOL": "bool",
   }
 }
 
@@ -944,8 +1066,8 @@ func (*PrimitiveValue) Compose() composer.Spec {
 }
 
 func (*PrimitiveValue) Choices() map[string]interface{} {
-  return map[string]interface{}{
-    "boxed_text":   (*BoxedText)(nil),
+  return map[string]interface{} {
+    "boxed_text": (*BoxedText)(nil),
     "boxed_number": (*BoxedNumber)(nil),
   }
 }
@@ -964,9 +1086,9 @@ func (*ProgramHook) Compose() composer.Spec {
 }
 
 func (*ProgramHook) Choices() map[string]interface{} {
-  return map[string]interface{}{
+  return map[string]interface{} {
     "activity": (*Activity)(nil),
-    "result":   (*ProgramReturn)(nil),
+    "result": (*ProgramReturn)(nil),
   }
 }
 
@@ -984,15 +1106,15 @@ func (*ProgramResult) Compose() composer.Spec {
 }
 
 func (*ProgramResult) Choices() map[string]interface{} {
-  return map[string]interface{}{
+  return map[string]interface{} {
     "primitive": (*PrimitiveFunc)(nil),
-    "object":    (*ObjectFunc)(nil),
+    "object": (*ObjectFunc)(nil),
   }
 }
 
 // ProgramReturn requires various parameters.
 type ProgramReturn struct {
-  At     reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Result ProgramResult
 }
 
@@ -1013,9 +1135,9 @@ func (op *Pronoun) String() string {
   return op.Str
 }
 
-func (*Pronoun) Choices() (closed bool, choices []string) {
-  return false, []string{
-    "it", "they",
+func (*Pronoun) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    "$IT": "it", "$THEY": "they",
   }
 }
 
@@ -1036,8 +1158,10 @@ func (op *Property) String() string {
   return op.Str
 }
 
-func (*Property) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*Property) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*Property) Compose() composer.Spec {
@@ -1061,15 +1185,15 @@ func (*PropertyPhrase) Compose() composer.Spec {
 }
 
 func (*PropertyPhrase) Choices() map[string]interface{} {
-  return map[string]interface{}{
+  return map[string]interface{} {
     "primitive_phrase": (*PrimitivePhrase)(nil),
-    "aspect_phrase":    (*AspectPhrase)(nil),
+    "aspect_phrase": (*AspectPhrase)(nil),
   }
 }
 
 // RecordList requires various parameters.
 type RecordList struct {
-  At   reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Kind SingularKind
 }
 
@@ -1082,7 +1206,7 @@ func (*RecordList) Compose() composer.Spec {
 
 // RecordType requires various parameters.
 type RecordType struct {
-  At   reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Kind SingularKind
 }
 
@@ -1103,8 +1227,10 @@ func (op *Relation) String() string {
   return op.Str
 }
 
-func (*Relation) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*Relation) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*Relation) Compose() composer.Spec {
@@ -1116,19 +1242,45 @@ func (*Relation) Compose() composer.Spec {
 
 // RelativeToNoun requires various parameters.
 type RelativeToNoun struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Relation Relation
-  Nouns    []NamedNoun
+  Nouns []NamedNoun
   AreBeing AreBeing
-  Nouns1   []NamedNoun
+  Nouns1 []NamedNoun
 }
-
-var _ StoryStatement = (*RelativeToNoun)(nil)
 
 func (*RelativeToNoun) Compose() composer.Spec {
   return composer.Spec{
     Name: "relative_to_noun",
     Spec: "{relation} {nouns+named_noun} {are_being} {nouns+named_noun}.",
+  }
+}
+
+// RenderTemplate requires various parameters.
+type RenderTemplate struct {
+  At reader.Position `if:"internal"`
+  Template Lines
+}
+
+func (*RenderTemplate) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "render_template",
+    Desc: `Render template: Parse text using iffy templates. See: https://github.com/ionous/iffy/wiki/Templates`,
+    Group: "format",
+  }
+}
+
+// ShuffleText requires various parameters.
+type ShuffleText struct {
+  At reader.Position `if:"internal"`
+  Parts []rt.TextEval
+}
+
+func (*ShuffleText) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "shuffle_text",
+    Desc: `Shuffle text: When called multiple times returns its inputs at random.`,
+    Group: "format",
   }
 }
 
@@ -1142,8 +1294,10 @@ func (op *SingularKind) String() string {
   return op.Str
 }
 
-func (*SingularKind) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*SingularKind) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*SingularKind) Compose() composer.Spec {
@@ -1154,9 +1308,23 @@ func (*SingularKind) Compose() composer.Spec {
   }
 }
 
+// StoppingText requires various parameters.
+type StoppingText struct {
+  At reader.Position `if:"internal"`
+  Parts []rt.TextEval
+}
+
+func (*StoppingText) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "stopping_text",
+    Desc: `Stopping text: When called multiple times returns each of its inputs in turn, sticking to the last one.`,
+    Group: "format",
+  }
+}
+
 // Story requires various parameters.
 type Story struct {
-  At        reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Paragraph *[]Paragraph
 }
 
@@ -1167,9 +1335,10 @@ func (*Story) Compose() composer.Spec {
   }
 }
 
+
 // Summary requires various parameters.
 type Summary struct {
-  At    reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Lines Lines
 }
 
@@ -1182,8 +1351,8 @@ func (*Summary) Compose() composer.Spec {
 
 // Tail requires various parameters.
 type Tail struct {
-  At         reader.Position `if:"internal"`
-  Pronoun    Pronoun
+  At reader.Position `if:"internal"`
+  Pronoun Pronoun
   NounPhrase NounPhrase
 }
 
@@ -1205,9 +1374,9 @@ func (op *TestName) String() string {
   return op.Str
 }
 
-func (*TestName) Choices() (closed bool, choices []string) {
-  return false, []string{
-    "current_test",
+func (*TestName) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    "$CURRENT_TEST": "current_test",
   }
 }
 
@@ -1220,11 +1389,9 @@ func (*TestName) Compose() composer.Spec {
 
 // TestOutput requires various parameters.
 type TestOutput struct {
-  At    reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Lines Lines
 }
-
-var _ Testing = (*TestOutput)(nil)
 
 func (*TestOutput) Compose() composer.Spec {
   return composer.Spec{
@@ -1236,12 +1403,10 @@ func (*TestOutput) Compose() composer.Spec {
 
 // TestRule requires various parameters.
 type TestRule struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   TestName TestName
-  Hook     ProgramHook
+  Hook ProgramHook
 }
-
-var _ StoryStatement = (*TestRule)(nil)
 
 func (*TestRule) Compose() composer.Spec {
   return composer.Spec{
@@ -1252,12 +1417,10 @@ func (*TestRule) Compose() composer.Spec {
 
 // TestScene requires various parameters.
 type TestScene struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   TestName TestName
-  Story    Story
+  Story Story
 }
-
-var _ StoryStatement = (*TestScene)(nil)
 
 func (*TestScene) Compose() composer.Spec {
   return composer.Spec{
@@ -1268,12 +1431,10 @@ func (*TestScene) Compose() composer.Spec {
 
 // TestStatement requires various parameters.
 type TestStatement struct {
-  At       reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   TestName TestName
-  Test     Testing
+  Test Testing
 }
-
-var _ StoryStatement = (*TestStatement)(nil)
 
 func (*TestStatement) Compose() composer.Spec {
   return composer.Spec{
@@ -1281,6 +1442,7 @@ func (*TestStatement) Compose() composer.Spec {
     Spec: "Expect {test_name} to {expectation%test:testing}",
   }
 }
+
 
 // Text requires a user-specified string.
 type Text struct {
@@ -1292,9 +1454,9 @@ func (op *Text) String() string {
   return op.Str
 }
 
-func (*Text) Choices() (closed bool, choices []string) {
-  return false, []string{
-    "empty",
+func (*Text) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    "$EMPTY": "empty",
   }
 }
 
@@ -1318,8 +1480,10 @@ func (op *TextList) String() string {
   return op.Str
 }
 
-func (*TextList) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*TextList) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*TextList) Compose() composer.Spec {
@@ -1339,8 +1503,10 @@ func (op *Trait) String() string {
   return op.Str
 }
 
-func (*Trait) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*Trait) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*Trait) Compose() composer.Spec {
@@ -1352,9 +1518,9 @@ func (*Trait) Compose() composer.Spec {
 
 // TraitPhrase requires various parameters.
 type TraitPhrase struct {
-  At        reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   AreEither AreEither
-  Trait     []Trait
+  Trait []Trait
 }
 
 func (*TraitPhrase) Compose() composer.Spec {
@@ -1366,7 +1532,7 @@ func (*TraitPhrase) Compose() composer.Spec {
 
 // VariableDecl requires various parameters.
 type VariableDecl struct {
-  At   reader.Position `if:"internal"`
+  At reader.Position `if:"internal"`
   Type VariableType
   Name VariableName
 }
@@ -1388,8 +1554,10 @@ func (op *VariableName) String() string {
   return op.Str
 }
 
-func (*VariableName) Choices() (closed bool, choices []string) {
-  return false, []string{}
+func (*VariableName) Choices() (closed bool, choices map[string]string) {
+  return false, map[string]string{
+    
+  }
 }
 
 func (*VariableName) Compose() composer.Spec {
@@ -1413,10 +1581,10 @@ func (*VariableType) Compose() composer.Spec {
 }
 
 func (*VariableType) Choices() map[string]interface{} {
-  return map[string]interface{}{
+  return map[string]interface{} {
     "primitive": (*PrimitiveType)(nil),
-    "object":    (*ObjectType)(nil),
-    "ext":       (*ExtType)(nil),
+    "object": (*ObjectType)(nil),
+    "ext": (*ExtType)(nil),
   }
 }
 
@@ -1433,11 +1601,13 @@ var Slots = []composer.Slot{
   },
 }
 
-var Slats = []composer.Slat{
+var Model = []composer.Slat{
   (*An)(nil),
   (*AreAn)(nil),
   (*AreBeing)(nil),
   (*AreEither)(nil),
+  (*Argument)(nil),
+  (*Arguments)(nil),
   (*Aspect)(nil),
   (*AspectPhrase)(nil),
   (*AspectTraits)(nil),
@@ -1449,6 +1619,13 @@ var Slats = []composer.Slat{
   (*Certainty)(nil),
   (*Comment)(nil),
   (*Comments)(nil),
+  (*CycleText)(nil),
+  (*DetermineAct)(nil),
+  (*DetermineBool)(nil),
+  (*DetermineNum)(nil),
+  (*DetermineNumList)(nil),
+  (*DetermineText)(nil),
+  (*DetermineTextList)(nil),
   (*Determiner)(nil),
   (*ExtType)(nil),
   (*KindOfNoun)(nil),
@@ -1497,7 +1674,10 @@ var Slats = []composer.Slat{
   (*RecordType)(nil),
   (*Relation)(nil),
   (*RelativeToNoun)(nil),
+  (*RenderTemplate)(nil),
+  (*ShuffleText)(nil),
   (*SingularKind)(nil),
+  (*StoppingText)(nil),
   (*Story)(nil),
   (*Summary)(nil),
   (*Tail)(nil),

@@ -8,6 +8,7 @@ import (
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 )
@@ -16,25 +17,20 @@ func lines(s ...string) string {
 	return strings.Join(s, "\n") + "\n"
 }
 
-func newTestImporter(t *testing.T, where string) (ret *Importer, retDB *sql.DB) {
-	return newTestImporterDecoder(t, nil, where)
-}
-
-func newTestDecoder(t *testing.T, where string) (ret *Importer, retDB *sql.DB) {
-	iffy.RegisterGobs()
-	//
-	dec := decode.NewDecoder()
-	dec.AddDefaultCallbacks(core.Slats)
-	return newTestImporterDecoder(t, dec, where)
-}
-
-func newTestImporterDecoder(t *testing.T, dec *decode.Decoder, where string) (ret *Importer, retDB *sql.DB) {
+// for tests where we need a default decoder to read json
+func newImporter(t *testing.T, where string) (ret *Importer, retDB *sql.DB) {
 	db := newImportDB(t, where)
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create ephemera", e)
 	} else {
-		ret = NewImporterDecoder(t.Name(), db, dec)
-		retDB = db
+		iffy.RegisterGobs()
+		dec := decode.NewDecoderReporter(t.Name(), func(pos reader.Position, err error) {
+			t.Errorf("%s at %s", err, pos)
+		})
+		k := NewImporterDecoder(t.Name(), db, dec)
+		dec.AddDefaultCallbacks(core.Slats)
+		k.AddModel(Model)
+		ret, retDB = k, db
 	}
 	return
 }

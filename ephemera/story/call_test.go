@@ -20,9 +20,10 @@ func TestDetermineNum(t *testing.T) {
 			"num", &core.FromNum{
 				&core.Number{3},
 			})}
-	k, db := newTestDecoder(t, testdb.Memory)
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if rule, e := imp_determine_num(k, debug.FactorialDetermineNum); e != nil {
+	//
+	if rule, e := k.decoder.ReadSpec(debug.FactorialDetermineNum); e != nil {
 		t.Fatal(e)
 	} else if diff := pretty.Diff(rule, &expect); len(diff) != 0 {
 		t.Fatal(diff)

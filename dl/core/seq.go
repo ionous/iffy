@@ -64,6 +64,7 @@ func (*CycleText) Compose() composer.Spec {
 		Name:  "cycle_text",
 		Group: "cycle",
 		Desc:  "Cycle Text: When called multiple times, returns each of its inputs in turn.",
+		Stub:  true,
 	}
 }
 
@@ -81,6 +82,7 @@ func (*ShuffleText) Compose() composer.Spec {
 		Name:  "shuffle_text",
 		Group: "format",
 		Desc:  "Shuffle Text: When called multiple times returns its inputs at random.",
+		Stub:  true,
 	}
 }
 
@@ -117,6 +119,7 @@ func (*StoppingText) Compose() composer.Spec {
 		Name:  "stopping_text",
 		Group: "format",
 		Desc:  "Stopping Text: When called multiple times returns each of its inputs in turn, sticking to the last one.",
+		Stub:  true,
 	}
 }
 

@@ -19,7 +19,9 @@ func TestImportStory(t *testing.T) {
 		t.Fatal("read json", e)
 	} else if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create tables", e)
-	} else if e := ImportStory(t.Name(), db, in); e != nil {
+	} else if e := ImportStory(t.Name(), db, in, func(pos reader.Position, err error) {
+		t.Errorf("%s at %s", err, pos)
+	}); e != nil {
 		t.Fatal("import", e)
 	} else {
 		t.Log("ok")

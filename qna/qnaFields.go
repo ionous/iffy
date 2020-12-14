@@ -250,17 +250,21 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 		rval := r.ValueOf(eval)
 		outVal.Set(rval)
 	} else {
-		var store interface{}
+		var val snapper
 		switch e := n.fields.progBytes.QueryRow(key.target, key.field).Scan(&tables.GobScanner{outVal}); e {
 		case nil:
-			store = outVal.Interface()
+			store := outVal.Interface()
+			val = patternValue{store}
+			// pretty.Println(store)
 		case sql.ErrNoRows:
 			err = key.unknown()
+			val = errorValue{err}
 		default:
 			err = e
+			val = errorValue{err}
 		}
 		// see notes: in theory GetEvalByName with
-		n.pairs[key] = qnaValue{snapper: patternValue{store}}
+		n.pairs[key] = qnaValue{snapper: val}
 	}
 	return
 }

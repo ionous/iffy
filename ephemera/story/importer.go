@@ -2,9 +2,10 @@ package story
 
 import (
 	"database/sql"
+	r "reflect"
 	"strconv"
 
-	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/reader"
@@ -45,6 +46,33 @@ func NewImporterDecoder(srcURI string, db *sql.DB, dec *decode.Decoder) *Importe
 	}
 }
 
+//
+func (k *Importer) AddModel(model []composer.Slat) {
+	type stubImporter interface {
+		ImportStub(k *Importer) (ret interface{}, err error)
+	}
+	dec := k.decoder
+	for _, cmd := range model {
+		if _, ok := cmd.(stubImporter); !ok {
+			dec.AddCallback(cmd, nil)
+		} else {
+			// need to pin the loop variable for the callback
+			// so pin the type. why not.
+			rtype := r.TypeOf(cmd).Elem()
+			dec.AddCallback(cmd, func(m reader.Map) (ret interface{}, err error) {
+				// create an instance of the stub
+				op := r.New(rtype)
+				// read it in
+				dec.ReadFields(reader.At(m), op.Elem(), m.MapOf(reader.ItemValue))
+				// convert it
+				stub := op.Interface().(stubImporter)
+				return stub.ImportStub(k)
+			})
+		}
+	}
+}
+
+//
 func (k *Importer) NewName(name, category, ofs string) ephemera.Named {
 	domain := k.Current.Domain
 	if !domain.IsValid() {
@@ -68,49 +96,6 @@ func (k *Importer) Once(s string) (ret bool) {
 	}
 	return
 }
-
-// adapt an importer friendly function to the ephemera reader callback
-func (k *Importer) Bind(cb func(*Importer, reader.Map) (err error)) reader.ReadMap {
-	return func(m reader.Map) error {
-		return cb(k, m)
-	}
-}
-
-// adapt an importer friendly function to the ephemera reader callback
-func (k *Importer) BindRet(cb func(*Importer, reader.Map) (ret interface{}, err error)) decode.ReadRet {
-	return func(m reader.Map) (interface{}, error) {
-		return cb(k, m)
-	}
-}
-
-// read the passed map as if it contained a slot. ex bool_eval, etc.
-func (k *Importer) DecodeSlot(m reader.Map, slotType string, outPtr interface{}) (err error) {
-	if m, e := reader.Unpack(m, slotType); e != nil {
-		err = e // reuses: "slat" to unpack the contained map.
-	} else {
-		err = k.DecodeAny(m, outPtr)
-	}
-	return
-}
-
-func (k *Importer) DecodeAny(m reader.Map, outPtr interface{}) (err error) {
-	if k.decoder == nil {
-		err = errutil.New("no decoder initialized")
-	} else if m != nil {
-		err = k.decoder.ReadProg(m, outPtr)
-	}
-	return
-}
-
-// // NewImplicitField declares an assembler specified field
-// func (k *Importer) NewImplicitField(field, kind, fieldType string) {
-// 	if src := "implicit " + kind + "." + field; k.Once(src) {
-// 		domain := k.gameDomain()
-// 		kKind := k.NewDomainName(domain, kind, tables.NAMED_KINDS, src)
-// 		kField := k.NewDomainName(domain, field, tables.NAMED_FIELD, src)
-// 		k.NewField(kKind, kField, fieldType)
-// 	}
-// }
 
 // NewImplicitAspect declares an assembler specified aspect and its traits
 func (k *Importer) NewImplicitAspect(aspect, kind string, traits ...string) {

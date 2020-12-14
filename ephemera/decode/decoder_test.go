@@ -5,7 +5,6 @@ import (
 
   "github.com/ionous/iffy/dl/core"
   "github.com/ionous/iffy/ephemera/debug"
-  "github.com/ionous/iffy/rt"
   "github.com/kr/pretty"
 )
 
@@ -15,8 +14,7 @@ func TestDecode(t *testing.T) {
   // register creation functions for all the slats.
   dec.AddDefaultCallbacks(core.Slats)
   // read say story data
-  var prog rt.Execute
-  if e := dec.ReadProg(debug.SayHelloGoodbyeData, &prog); e != nil {
+  if prog, e := dec.ReadSpec(debug.SayHelloGoodbyeData); e != nil {
     t.Fatal(e)
   } else if diff := pretty.Diff(debug.SayHelloGoodbye, prog); len(diff) > 0 {
     t.Fatal(diff)

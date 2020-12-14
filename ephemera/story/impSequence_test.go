@@ -10,10 +10,10 @@ import (
 )
 
 func TestImportSequence(t *testing.T) {
-	k, db := newTestDecoder(t, testdb.Memory)
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if cmd, e := imp_cycle_text(k, _cycle_text); e != nil {
-		t.Fatal(e)
+	if cmd, e := k.decoder.ReadSpec(_cycle_text); e != nil {
+		t.Fatal("failed to read sequence", e)
 	} else if diff := pretty.Diff(cmd, &core.CycleText{
 		Sequence: core.Sequence{
 			Seq: "seq#1",

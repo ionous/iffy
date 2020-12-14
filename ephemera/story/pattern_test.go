@@ -8,46 +8,33 @@ import (
 	"github.com/ionous/iffy/test/testdb"
 )
 
-// import an object type description
-func TestObjectType(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
-	defer db.Close()
-	if n, e := imp_object_type(k, _object_type); e != nil {
-		t.Fatal(e)
-	} else if n.String() != "animal" {
-		t.Fatal(n)
+func TestPatternVars(t *testing.T) {
+	patternVariables := &PatternVariablesDecl{
+		PatternName: PatternName{
+			Str: "corral",
+		},
+		VariableDecl: []VariableDecl{{
+			Type: VariableType{
+				Opt: &ObjectType{
+					An: An{
+						Str: "$AN",
+					},
+					Kind: SingularKind{
+						Str: "animal",
+					},
+				},
+			},
+			Name: VariableName{
+				Str: "pet",
+			},
+		},
+		},
 	}
-}
-
-// import a variable type description
-func TestVariableTypePrimitive(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if varType, _, e := imp_variable_type(k, _variable_type); e != nil {
-		t.Fatal(e)
-	} else if varType.String() != "text_eval" {
-		t.Fatal(varType)
-	}
-}
 
-// import a variable declaration
-func TestVariableDeclObject(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
-	defer db.Close()
-	if val, e := imp_variable_decl(k, tables.NAMED_PARAMETER, _variable_decl); e != nil {
-		t.Fatal(e)
-	} else if vn := val.name.String(); vn != "pet" {
-		t.Fatal(vn)
-	} else if vt := val.typeName.String(); vt != "animal" {
-		t.Fatal(vt)
-	}
-}
-
-func TestPatternVariablesDecl(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
-	defer db.Close()
-	if e := imp_pattern_variables_decl(k, _pattern_variables_decl); e != nil {
-		t.Fatal(e)
+	if e := patternVariables.ImportPhrase(k); e != nil {
+		t.Log(e)
 	} else {
 		var buf strings.Builder
 		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
@@ -58,57 +45,28 @@ func TestPatternVariablesDecl(t *testing.T) {
 			"animal,singular_kind", // 3
 			"2,3,4,0",              // NewPatternDecl
 		); have != want {
-			t.Fatal("mismatch", have)
+			t.Fatal("mismatch, have:", have)
 		} else {
 			t.Log("ok")
 		}
 	}
 }
 
-func TestPrimitiveType(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
-	defer db.Close()
-	if typ, e := imp_primitive_var(k, _primitive_type); e != nil {
-		t.Fatal(e)
-	} else if typ.String() != "bool_eval" {
-		t.Fatal(typ)
-	}
-}
-
-func TestPatternType_Activity(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
-	defer db.Close()
-	if typ, e := imp_pattern_type(k, _pattern_type_activity); e != nil {
-		t.Fatal(e)
-	} else if typ.String() != "execute" {
-		t.Fatal(typ)
-	}
-}
-
-func TestPatternType_Primitive(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
-	defer db.Close()
-	if typ, e := imp_pattern_type(k, _pattern_type_primitive); e != nil {
-		t.Fatal(e)
-	} else if typ.String() != "bool_eval" {
-		t.Fatal(typ)
-	}
-}
-
-func TestPatternName(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
-	defer db.Close()
-	if n, e := imp_pattern_name(k, _pattern_name); e != nil {
-		t.Fatal(e)
-	} else if n.String() != "corral" {
-		t.Fatal(n)
-	}
-}
-
 func TestPatternDecl(t *testing.T) {
-	k, db := newTestImporter(t, testdb.Memory)
+	patternDecl := &PatternDecl{
+		Name: PatternName{
+			Str: "corral",
+		},
+		Type: PatternType{
+			Opt: &PatternedActivity{
+				Str: "$ACTIVITY",
+			},
+		},
+	}
+
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if e := imp_pattern_decl(k, _pattern_decl); e != nil {
+	if e := patternDecl.ImportPhrase(k); e != nil {
 		t.Fatal(e)
 	} else {
 		var buf strings.Builder
@@ -124,97 +82,4 @@ func TestPatternDecl(t *testing.T) {
 			t.Log("ok")
 		}
 	}
-}
-
-var _pattern_decl = map[string]interface{}{
-	"type": "pattern_decl",
-	"value": map[string]interface{}{
-		"$NAME": _pattern_name,
-		"$TYPE": _pattern_type_activity,
-	},
-}
-
-var _pattern_name = map[string]interface{}{
-	"type":  "pattern_name",
-	"value": "corral",
-}
-
-var _pattern_type_activity = map[string]interface{}{
-	"type": "pattern_type",
-	"value": map[string]interface{}{
-		"$ACTIVITY": map[string]interface{}{
-			"type":  "patterned_activity",
-			"value": "$ACTIVITY",
-		},
-	},
-}
-
-var _pattern_type_primitive = map[string]interface{}{
-	"type": "pattern_type",
-	"value": map[string]interface{}{
-		"$VALUE": map[string]interface{}{
-			"type": "variable_type",
-			"value": map[string]interface{}{
-				"$PRIMITIVE": _primitive_type,
-			},
-		},
-	},
-}
-
-var _primitive_type = map[string]interface{}{
-	"type":  "primitive_type",
-	"value": "$BOOL",
-}
-
-var _pattern_variables_decl = map[string]interface{}{
-	"type": "pattern_variables_decl",
-	"value": map[string]interface{}{
-		"$PATTERN_NAME": map[string]interface{}{
-			"type":  "pattern_name",
-			"value": "corral",
-		},
-		"$VARIABLE_DECL": []interface{}{
-			_variable_decl,
-		},
-	},
-}
-
-var _variable_decl = map[string]interface{}{
-	"type": "variable_decl",
-	"value": map[string]interface{}{
-		"$TYPE": map[string]interface{}{
-			"type": "variable_type",
-			"value": map[string]interface{}{
-				"$OBJECT": _object_type,
-			},
-		},
-		"$NAME": map[string]interface{}{
-			"type":  "variable_name",
-			"value": "pet",
-		},
-	},
-}
-
-var _variable_type = map[string]interface{}{
-	"type": "variable_type",
-	"value": map[string]interface{}{
-		"$PRIMITIVE": map[string]interface{}{
-			"type":  "primitive_type",
-			"value": "$TEXT",
-		},
-	},
-}
-
-var _object_type = map[string]interface{}{
-	"type": "object_type",
-	"value": map[string]interface{}{
-		"$AN": map[string]interface{}{
-			"type":  "an",
-			"value": "$AN",
-		},
-		"$KIND": map[string]interface{}{
-			"type":  "singular_kind",
-			"value": "animal",
-		},
-	},
 }

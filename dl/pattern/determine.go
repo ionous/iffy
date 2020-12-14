@@ -88,8 +88,10 @@ func (op *FromPattern) newLocals(run rt.Runtime, pat Pattern) (ret *g.Kind, err 
 func (*DetermineAct) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine_act",
+		Spec:  "determine {activity%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine an activity",
+		Stub:  true,
 	}
 }
 
@@ -110,6 +112,7 @@ func (*DetermineNum) Compose() composer.Spec {
 		Spec:  "the {number pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a number",
+		Stub:  true,
 	}
 }
 
@@ -131,6 +134,7 @@ func (*DetermineText) Compose() composer.Spec {
 		Spec:  "the {text pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine some text",
+		Stub:  true,
 	}
 }
 
@@ -152,6 +156,7 @@ func (*DetermineBool) Compose() composer.Spec {
 		Spec:  "the {true/false pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a true/false value",
+		Stub:  true,
 	}
 }
 
@@ -173,6 +178,7 @@ func (*DetermineNumList) Compose() composer.Spec {
 		Spec:  "the {number list pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a list of numbers",
+		Stub:  true,
 	}
 }
 
@@ -193,6 +199,7 @@ func (*DetermineTextList) Compose() composer.Spec {
 		Spec:  "the {text list pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Determine a list of text",
+		Stub:  true,
 	}
 }
 

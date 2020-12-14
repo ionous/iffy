@@ -9,8 +9,8 @@ func WalkProperties(rtype r.Type, fn PropertyFunc) (done bool) {
 }
 
 func walkProperties(rtype r.Type, base []int, fn PropertyFunc) (done bool) {
-	if rtype.Kind() != r.Struct {
-		panic(rtype.String() + " not a struct")
+	if walking := rtype.String(); rtype.Kind() != r.Struct {
+		panic(walking + " not a struct")
 	} else {
 		for i := 0; i < rtype.NumField(); i++ {
 			field := rtype.Field(i)

@@ -20,12 +20,12 @@ type PropertyImporter interface {
 }
 
 func (op *PrimitivePhrase) ImportProperty(k *Importer, kind ephemera.Named) (err error) {
-	if prop, e := op.Property.NewName(k); e != nil {
+	if fieldName, e := op.Property.NewName(k); e != nil {
 		err = e
-	} else if prim, e := op.PrimitiveType.ImportPrim(k); e != nil {
+	} else if primType, e := op.PrimitiveType.ImportPrim(k); e != nil {
 		err = e
 	} else {
-		k.NewField(kind, prop, prim)
+		k.NewField(kind, fieldName, primType)
 	}
 	return
 }

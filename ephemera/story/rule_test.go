@@ -16,11 +16,13 @@ import (
 
 // import an object type description
 func TestObjectFunc(t *testing.T) {
-	k, db := newTestDecoder(t, testdb.Memory)
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if rule, e := imp_object_func(k, _object_func); e != nil {
+	if i, e := k.decoder.ReadSpec(_object_func); e != nil {
 		t.Fatal(e)
-	} else if text, e := safe.GetText(nil, *rule.CmdPtr().(*rt.TextEval)); e != nil {
+	} else if rule, ok := i.(*ObjectFunc); !ok {
+		t.Fatalf("unexpected import %T", rule)
+	} else if text, e := safe.GetText(nil, rule.Name); e != nil {
 		t.Fatal(e)
 	} else if text := text.String(); text != "hello" {
 		t.Fatal(text)
@@ -28,11 +30,12 @@ func TestObjectFunc(t *testing.T) {
 }
 
 func TestPatternActivity(t *testing.T) {
-	k, db := newTestDecoder(t, testdb.Memory)
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	var exe rt.Execute
-	if e := k.DecodeAny(_pattern_activity, &exe); e != nil {
+	if prog, e := k.decoder.ReadSpec(_pattern_activity); e != nil {
 		t.Fatal(e)
+	} else if exe, ok := prog.(rt.Execute); !ok {
+		t.Fatalf("cant cast %T to execute", exe)
 	} else {
 		var run testRuntime
 		out := print.NewLines()
@@ -47,9 +50,13 @@ func TestPatternActivity(t *testing.T) {
 }
 
 func TestPatternRule(t *testing.T) {
-	k, db := newTestDecoder(t, testdb.Memory)
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if e := imp_pattern_actions(k, _pattern_actions); e != nil {
+	if i, e := k.decoder.ReadSpec(_pattern_actions); e != nil {
+		t.Fatal(e)
+	} else if act, ok := i.(*PatternActions); !ok {
+		t.Fatalf("cant cast %T to pattern actions", i)
+	} else if e := act.ImportPhrase(k); e != nil {
 		t.Fatal(e)
 	} else {
 		var buf strings.Builder
@@ -102,8 +109,10 @@ var _pattern_actions = map[string]interface{}{
 }
 
 var _object_func = map[string]interface{}{
-	"type":  "object_func",
-	"value": _text_eval,
+	"type": "object_func",
+	"value": map[string]interface{}{
+		"$NAME": _text_eval,
+	},
 }
 
 var _pattern_activity = map[string]interface{}{

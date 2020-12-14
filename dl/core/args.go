@@ -23,6 +23,7 @@ func (*Argument) Compose() composer.Spec {
 		Name:  "argument",
 		Spec:  "its {name:variable_name} is {from:assignment}",
 		Group: "patterns",
+		Stub:  true,
 	}
 }
 
@@ -31,6 +32,7 @@ func (*Arguments) Compose() composer.Spec {
 		Name:  "arguments",
 		Spec:  " when {arguments%args+argument}",
 		Group: "patterns",
+		Stub:  true,
 	}
 }
 

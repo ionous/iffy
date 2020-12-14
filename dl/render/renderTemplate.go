@@ -17,6 +17,7 @@ func (*Template) Compose() composer.Spec {
 		Spec:  "the template {lines%template:lines|quote}",
 		Group: "format",
 		Desc:  "Render Template: Parse text using iffy templates. See: https://github.com/ionous/iffy/wiki/Templates",
+		Stub:  true,
 	}
 }
 

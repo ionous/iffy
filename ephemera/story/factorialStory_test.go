@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ionous/iffy/ephemera/debug"
+	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 )
@@ -15,7 +16,9 @@ func TestFactorialStory(t *testing.T) {
 	defer db.Close()
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create tables", e)
-	} else if e := ImportStory(t.Name(), db, debug.FactorialStory); e != nil {
+	} else if e := ImportStory(t.Name(), db, debug.FactorialStory, func(pos reader.Position, err error) {
+		t.Errorf("%s at %s", err, pos)
+	}); e != nil {
 		t.Fatal("import", e)
 	} else {
 		var buf strings.Builder

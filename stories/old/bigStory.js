@@ -201,7 +201,7 @@ function getStory() {
                       "type": "are_being",
                       "value": "$IS"
                     },
-                    "$NOUN1": [
+                    "$NOUNS1": [
                       {
                         "id": "id-16f156a8166-3",
                         "type": "noun",
@@ -563,7 +563,7 @@ function getStory() {
                       "type": "are_being",
                       "value": "$ARE"
                     },
-                    "$NOUN1": [
+                    "$NOUNS1": [
                       {
                         "id": "id-16f165d636d-4",
                         "type": "noun",

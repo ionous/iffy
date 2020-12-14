@@ -7,7 +7,7 @@ import (
 // read simple unit test story into sqlite, extract as a golang struct
 // fix.... tests require not just output but rules now.
 func xTestProcessProg(t *testing.T) {
-	// k, db := newTestDecoder(t, testdb.Memory)
+	// k, db := newImporter(t, testdb.Memory)
 	// defer db.Close()
 	// if e := imp_test_output(k, k.NewName("test", t.Name(), ""), debug.SayHelloGoodbyeData); e != nil {
 	// 	t.Fatal(e)

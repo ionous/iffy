@@ -6,8 +6,8 @@ import (
 )
 
 func (op *Certainty) ImportString(k *Importer) (ret string, err error) {
-	if str := op.Str; decode.IndexOfChoice(op, op.Str) < 0 {
-		err = ImportError(op, op.At, errutil.Fmt("%w %q", InvalidValue, str))
+	if str, ok := decode.FindChoice(op, op.Str); !ok || len(str) == 0 {
+		err = ImportError(op, op.At, errutil.Fmt("%w %q", InvalidValue, op.Str))
 	} else {
 		ret = str
 	}

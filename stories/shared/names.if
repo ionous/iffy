@@ -35,6 +35,10 @@
                 "id": "id-c-21",
                 "type": "kinds_possess_properties",
                 "value": {
+                  "$DETERMINER": {
+                    "type": "determiner",
+                    "value": "$A"
+                  },
                   "$PLURAL_KINDS": {
                     "id": "id-c-18",
                     "type": "plural_kinds",

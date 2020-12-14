@@ -16,14 +16,8 @@ import (
 type ReadRet func(reader.Map) (interface{}, error)
 
 type cmdRec struct {
-	name         string
 	elem         r.Type
 	customReader ReadRet
-}
-
-type Override struct {
-	Spec     composer.Slat
-	Callback ReadRet
 }
 
 // Decoder reads programs from json.
@@ -39,32 +33,21 @@ func NewDecoder() *Decoder {
 	return NewDecoderReporter("decoder", reportNothing)
 }
 
-func (dec *Decoder) AddCallbacks(overrides []Override) {
-	for _, n := range overrides {
-		dec.AddCallback(n.Spec, n.Callback)
-	}
-}
-
 // AddCallback registers a command parser.
 func (dec *Decoder) AddCallback(cmd composer.Slat, cb ReadRet) {
-	n := specName(cmd)
+	var n string
+	if spec := cmd.Compose(); len(spec.Name) > 0 {
+		n = spec.Name
+	} else {
+		elem := r.TypeOf(cmd).Elem()
+		n = lang.Underscore(elem.Name())
+	}
 	if was, exists := dec.cmds[n]; exists && was.customReader != nil {
 		panic(errutil.Fmt("conflicting name for spec %q %q!=%T", n, was.elem, cmd))
 	} else {
 		elem := r.TypeOf(cmd).Elem()
-		dec.cmds[n] = cmdRec{n, elem, cb}
+		dec.cmds[n] = cmdRec{elem, cb}
 	}
-}
-
-func specName(cmd composer.Slat) (ret string) {
-	spec := cmd.Compose()
-	if n := spec.Name; len(n) > 0 {
-		ret = n
-	} else {
-		elem := r.TypeOf(cmd).Elem()
-		ret = lang.Underscore(elem.Name())
-	}
-	return
 }
 
 // AddDefaultCallbacks registers default command parsers.
@@ -75,54 +58,34 @@ func (dec *Decoder) AddDefaultCallbacks(slats []composer.Slat) {
 }
 
 func (dec *Decoder) ReadSpec(m reader.Map) (ret interface{}, err error) {
-	if rptr, e := dec.read(m); e != nil {
+	if val, e := dec.importItem(m); e != nil {
 		err = e
 	} else {
-		ret = rptr.Interface()
+		ret = val.Interface()
 	}
 	return
 }
 
-// ReadProg attempts to parse the passed json data as a golang program.
-func (dec *Decoder) ReadProg(m reader.Map, outPtr interface{}) (err error) {
-	if rptr, e := dec.read(m); e != nil {
-		err = e
-	} else {
-		out := r.ValueOf(outPtr).Elem()
-		outType := out.Type()
-		if rtype := rptr.Type(); !rtype.AssignableTo(outType) {
-			err = errutil.New("incompatible types", rtype.String(), "not assignable to", outType.String())
-		} else {
-			out.Set(rptr)
-		}
-	}
-	return
-}
-
-func (dec *Decoder) read(m reader.Map) (ret r.Value, err error) {
+// returns a ptr r.Value
+func (dec *Decoder) importItem(m reader.Map) (ret r.Value, err error) {
 	itemValue, itemType := m, m.StrOf(reader.ItemType)
 	if cmd, ok := dec.cmds[itemType]; !ok {
-		err = errutil.Fmt("unknown type %q with reading a program at %s", itemType, reader.At(m))
+		err = errutil.Fmt("unknown type %q at %q", itemType, reader.At(m))
 	} else {
-		ret, err = dec.readNew(cmd, itemValue)
-	}
-	return
-}
-
-// m is the contents of slotType is a concrete command; returns a pointer to the command
-func (dec *Decoder) readNew(cmd cmdRec, m reader.Map) (ret r.Value, err error) {
-	if read := cmd.customReader; read != nil {
-		if res, e := read(m); e != nil {
-			err = e
+		m := itemValue
+		if custom := cmd.customReader; custom != nil {
+			if res, e := custom(m); e != nil {
+				err = e
+			} else {
+				ret = r.ValueOf(res)
+			}
+		} else if cmd.elem.Kind() != r.Struct {
+			err = errutil.New("expected a struct", itemType, "is a", cmd.elem.String())
 		} else {
-			ret = r.ValueOf(res)
+			ptr := r.New(cmd.elem)
+			dec.ReadFields(reader.At(m), ptr.Elem(), m.MapOf(reader.ItemValue))
+			ret = ptr
 		}
-	} else if cmd.elem.Kind() != r.Struct {
-		err = errutil.New("expected a struct", cmd.name, "is a", cmd.elem.String())
-	} else {
-		ptr := r.New(cmd.elem)
-		dec.ReadFields(reader.At(m), ptr.Elem(), m.MapOf(reader.ItemValue))
-		ret = ptr
 	}
 	return
 }
@@ -138,7 +101,7 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 			if t := tag.ReadTag(f.Tag); !t.Exists("internal") && !t.Exists("optional") {
 				// and even then only if its a fixed field
 				if f.Type.Kind() != r.Ptr {
-					dec.report(at, errutil.Fmt("missing %q", token))
+					dec.report(at, errutil.Fmt("missing %q at %s", token, at))
 				}
 			}
 		} else {
@@ -162,22 +125,6 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 			dec.report(at, errutil.Fmt("unprocessed %q", token))
 		}
 	}
-}
-
-// returns a ptr r.Value
-func (dec *Decoder) importSlot(m reader.Map, slotType r.Type) (ret r.Value, err error) {
-	itemValue, itemType := m, m.StrOf(reader.ItemType)
-	slotName := slotType.Name() // here for debugging; ex. "Comparator"
-	if cmd, ok := dec.cmds[itemType]; !ok {
-		err = errutil.Fmt("unknown type %q while importing slot %q", itemType, slotName)
-	} else if rptr, e := dec.readNew(cmd, itemValue); e != nil {
-		err = e
-	} else if rtype := rptr.Type(); !rtype.AssignableTo(slotType) {
-		err = errutil.New("incompatible types", rtype.String(), "not assignable to", slotName)
-	} else {
-		ret = rptr
-	}
-	return
 }
 
 func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
@@ -244,23 +191,8 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 				if str, ok := v.(string); !ok {
 					err = errutil.New("value not a slat")
 				} else {
-					// validate choice.
-					if closed, vs := spec.Choices(); closed {
-						var found bool
-						for _, choice := range vs {
-							if str == "$"+strings.ToUpper(choice) {
-								str = choice
-								found = true
-								break
-							}
-						}
-						if !found {
-							err = errutil.New("unknown string", str)
-						}
-					}
-					if err == nil {
-						outAt.Field(outAt.NumField() - 1).SetString(str)
-					}
+					// fix? validate choice here?
+					outAt.Field(outAt.NumField() - 1).SetString(str)
 				}
 				return
 			}); e != nil {
@@ -273,24 +205,10 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 					err = errutil.New("value not a slat")
 				} else {
 					// validate choice; fix: tolerance?
-					if closed, vs := spec.Choices(); closed {
-						var found bool
-						for _, choice := range vs {
-							if num == choice {
-								found = true
-								break
-							}
-						}
-						if !found {
-							err = errutil.New("unknown value", num)
-						}
-					}
-					if err == nil {
-						// handle conversion b/t floats and ints of different widths
-						tgt := outAt.Field(outAt.NumField() - 1)
-						v := r.ValueOf(num).Convert(tgt.Type())
-						tgt.Set(v)
-					}
+					// handle conversion b/t floats and ints of different widths
+					tgt := outAt.Field(outAt.NumField() - 1)
+					v := r.ValueOf(num).Convert(tgt.Type())
+					tgt.Set(v)
 				}
 				return
 			}); e != nil {
@@ -343,10 +261,12 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
 				err = errutil.New("value not a slot")
-			} else if newVal, e := dec.importSlot(slot, outAt.Type()); e != nil {
+			} else if val, e := dec.importItem(slot); e != nil {
 				dec.report(reader.At(slot), e)
+			} else if rtype := val.Type(); !rtype.AssignableTo(outAt.Type()) {
+				err = errutil.New(rtype, "not assignable to", outType)
 			} else {
-				outAt.Set(newVal)
+				outAt.Set(val)
 			}
 			return
 		}); e != nil {
@@ -377,11 +297,12 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 								if v != nil {
 									err = errutil.Fmt("item data not a slot %T", itemData)
 								}
-
-							} else if v, e := dec.importSlot(itemData, elType); e != nil {
+							} else if val, e := dec.importItem(itemData); e != nil {
 								err = e // elType is ex. *story.Paragraph; itemData has a member $STORY_STATEMENT
+							} else if rtype := val.Type(); !rtype.AssignableTo(elType) {
+								err = errutil.New(rtype, "not assignable to", elType)
 							} else {
-								slice = r.Append(slice, v)
+								slice = r.Append(slice, val)
 							}
 							return
 						}); e != nil {

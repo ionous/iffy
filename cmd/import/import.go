@@ -58,11 +58,14 @@ func distill(outFile, inFile string) (err error) {
 		if outDB, e := sql.Open(tables.DefaultDriver, outFile); e != nil {
 			err = errutil.New("couldn't create output file", outFile, e)
 		} else {
+			var ds reader.Dilemmas
 			defer outDB.Close()
 			if e := tables.CreateEphemera(outDB); e != nil {
 				err = errutil.New("couldn't create tables", outFile, e)
-			} else if e := story.ImportStories(inFile, outDB, inData); e != nil {
+			} else if e := story.ImportStories(inFile, outDB, inData, ds.Report); e != nil {
 				err = errutil.New("couldn't import story", e)
+			} else {
+				reader.PrintDilemmas(log.Writer(), ds)
 			}
 		}
 	}

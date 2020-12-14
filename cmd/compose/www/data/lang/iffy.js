@@ -105,7 +105,7 @@ function localLang(make) {
 
     make.opt("program_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
     make.opt("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}");
-    make.run("object_func", "an object named {name%text_eval}");
+    make.run("object_func", "an object named {name:text_eval}");
   });
 
   make.group("Relations", function() {
@@ -188,7 +188,6 @@ For example: animals, containers, etc.`);
 
     make.run("boxed_text", "{text}");
     make.run("boxed_number", "{number}");
-    make.run("boxed_boolean", "{bool}");
 
     // constants
     make.str("text_list", "{a list of text%text_list}");

@@ -43,8 +43,8 @@ func (op *ObjectType) ImportType(k *Importer) (ret ephemera.Named, err error) {
 }
 
 func (op *PrimitiveType) ImportPrim(k *Importer) (ret string, err error) {
-	if str := op.Str; decode.IndexOfChoice(op, str) < 0 {
-		err = ImportError(op, op.At, errutil.Fmt("%w for %T", InvalidValue, op.Str))
+	if str, ok := decode.FindChoice(op, op.Str); !ok || len(str) == 0 {
+		err = ImportError(op, op.At, errutil.Fmt("%w %q", InvalidValue, op.Str))
 	} else {
 		ret = str
 	}
@@ -54,13 +54,15 @@ func (op *PrimitiveType) ImportPrim(k *Importer) (ret string, err error) {
 // returns one of the evalType(s) as a "Named" value --
 // we return a name to normalize references to object kinds which are also used as variables
 func (op *PrimitiveType) ImportEval(k *Importer) (ret ephemera.Named, err error) {
+	// fix -- shouldnt this be a different type ??
+	// ie. we should be able to use FindChoie here.
 	var namedType string
 	switch str := op.Str; str {
-	case "number":
+	case "$NUMBER":
 		namedType = "number_eval"
-	case "text":
+	case "$TEXT":
 		namedType = "text_eval"
-	case "bool":
+	case "$BOOL":
 		namedType = "bool_eval"
 	default:
 		err = ImportError(op, op.At, errutil.Fmt("%w for %T", InvalidValue, op.Str))

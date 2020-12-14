@@ -7,14 +7,19 @@ import (
 )
 
 func (op *Lede) Import(k *Importer) (err error) {
-	return k.Recent.Nouns.CollectSubjects(func() (err error) {
+	if e := k.Recent.Nouns.CollectSubjects(func() (err error) {
 		for _, nn := range op.Nouns {
-			if _, e := nn.Name.NewName(k); e != nil {
+			if e := nn.Import(k); e != nil {
 				err = errutil.Append(err, e)
 			}
 		}
 		return
-	})
+	}); e != nil {
+		err = e
+	} else {
+		err = op.NounPhrase.Import(k)
+	}
+	return
 }
 
 func (op *Summary) Import(k *Importer) (err error) {

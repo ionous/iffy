@@ -91,7 +91,7 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 		k.NewValue(noun, typeTrait, true)
 
 		// record any custom determiner
-		if ind := decode.IndexOfChoice(&op.Determiner, op.Determiner.Str); ind < 0 {
+		if str, ok := decode.FindChoice(&op.Determiner, op.Determiner.Str); ok && len(str) == 0 {
 			// set the indefinite article field
 			article := k.NewName("indefinite article", tables.NAMED_FIELD, op.At.String())
 			k.NewValue(noun, article, op.Determiner.Str)

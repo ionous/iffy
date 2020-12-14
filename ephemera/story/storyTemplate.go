@@ -1,35 +1,25 @@
 package story
 
 import (
-	"log"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/render"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/express"
-	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/types"
 )
 
-func imp_render_template(k *Importer, r reader.Map) (ret interface{}, err error) {
-	if m, e := reader.Unpack(r, "render_template"); e != nil {
+func (op *RenderTemplate) ImportStub(k *Importer) (ret interface{}, err error) {
+	if xs, e := template.Parse(op.Template.Str); e != nil {
 		err = e
-	} else if str, e := imp_lines(k, m.MapOf("$TEMPLATE")); e != nil {
-		err = e
-	} else if xs, e := template.Parse(str); e != nil {
-		err = e
+	} else if got, e := express.Convert(xs); e != nil {
+		err = errutil.New(e, xs)
+	} else if eval, ok := got.(rt.TextEval); !ok {
+		err = errutil.Fmt("render template has unknown expression %T", got)
 	} else {
-		log.Println("imported template:", xs)
-		if got, e := express.Convert(xs); e != nil {
-			err = errutil.New(e, xs)
-		} else if eval, ok := got.(rt.TextEval); !ok {
-			err = errutil.Fmt("render template has unknown expression %T", got)
-		} else {
-			ret = &render.Template{eval}
-			// pretty.Println(eval)
-		}
+		ret = &render.Template{eval}
+		// pretty.Println(eval)
 	}
 	return
 }

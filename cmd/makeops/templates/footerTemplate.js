@@ -12,7 +12,7 @@ module.exports =
 {{~/if}}{{/each}}
 }
 
-var Slats = []composer.Slat{
+var Model = []composer.Slat{
 {{~#each allTypes}}{{#if (IsSlat name)}}
   (*{{Pascal name}})(nil),
 {{~/if}}{{/each}}

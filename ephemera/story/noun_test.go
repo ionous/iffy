@@ -10,7 +10,7 @@ import (
 )
 
 func TestImportNamedNouns(t *testing.T) {
-	k, db := newTestDecoder(t, testdb.Memory)
+	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()
 	//
 	nouns := []string{
@@ -21,8 +21,8 @@ func TestImportNamedNouns(t *testing.T) {
 		"a gaggle of", "robot sheep",
 	}
 	for i := 0; i < len(nouns); i += 2 {
-		det, name := nouns[i], nouns[i+1]
-		if e := imp_named_noun(k, makeNoun(det, name)); e != nil {
+		n := makeNoun(nouns[i], nouns[i+1])
+		if e := n.Import(k); e != nil {
 			t.Fatal(e, "at", i)
 		}
 	}
@@ -54,6 +54,7 @@ order by noun collate nocase, trait`, 2)
 		//
 		"apple,commonNamed",
 		"apple,indefiniteArticle",
+		//
 		"robot sheep,commonNamed",
 		"robot sheep,indefiniteArticle",
 		"square#1,counted",
@@ -85,22 +86,11 @@ order by noun collate nocase, trait`, 2)
 	if diff := pretty.Diff(have, want); len(diff) > 0 {
 		t.Fatal(have)
 	}
-
 }
 
-func makeNoun(det, name string) map[string]interface{} {
-	// test all three named noun types
-	return map[string]interface{}{
-		"type": "named_noun",
-		"value": map[string]interface{}{
-			"$DETERMINER": map[string]interface{}{
-				"type":  "determiner",
-				"value": det,
-			},
-			"$NAME": map[string]interface{}{
-				"type":  "noun_name",
-				"value": name,
-			},
-		},
+func makeNoun(det, name string) NamedNoun {
+	return NamedNoun{
+		Determiner: Determiner{Str: det},
+		Name:       NounName{Str: name},
 	}
 }

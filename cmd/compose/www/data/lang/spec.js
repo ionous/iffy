@@ -607,25 +607,11 @@ const spec = [
       "patterns"
     ],
     "name": "determine_act",
+    "spec": "determine {activity%name:pattern_name}{?arguments}",
     "uses": "run",
     "with": {
-      "params": {
-        "$ARGUMENTS": {
-          "label": "arguments",
-          "type": "arguments"
-        },
-        "$PATTERN": {
-          "label": "pattern",
-          "type": "text"
-        }
-      },
       "slots": [
         "execute"
-      ],
-      "tokens": [
-        "determine act",
-        "$PATTERN",
-        "$ARGUMENTS"
       ]
     }
   },
@@ -2033,4 +2019,17 @@ const spec = [
     "uses": "group"
   }
 ];
-const stub = "";
+const stub = [
+  "cycle_text",
+  "shuffle_text",
+  "stopping_text",
+  "arguments",
+  "argument",
+  "render_template",
+  "determine_act",
+  "determine_num",
+  "determine_text",
+  "determine_bool",
+  "determine_num_list",
+  "determine_text_list"
+];
