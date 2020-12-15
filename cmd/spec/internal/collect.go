@@ -65,7 +65,7 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 		}
 		out := export.Dict{
 			"name": spec.Name,
-			"uses": "run",
+			"uses": "flow",
 			"with": with,
 		}
 		// missing spec, missing slots.

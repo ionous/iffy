@@ -174,7 +174,7 @@ Vue.component('mk-browser', {
           continue; // typeName collection
         }
       }
-      if (type.uses==='run') {
+      if (type.uses==='flow') {
         const spec= type.with;
         const slotNames = spec.slots || [];
         for (const slot of slotNames) {

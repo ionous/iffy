@@ -173,7 +173,7 @@ function nodeTests() {
   // "is a" container ( td9 is an "are_an" in a noun phrase, in a lede )
   testMutation("td9", {
     left: [{
-      // lede is a run: run("lede", "{+noun|comma-and} {noun_phrase}.")
+      // lede is a flow: flow("lede", "{+noun|comma-and} {noun_phrase}.")
       // to the left of the phrase is a repeating noun slot ( filled a common noun "the box" )
       // so we should be able to add a noun to the end of that array.
       "parent": "td4",

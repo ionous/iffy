@@ -25,9 +25,9 @@ function directiveTests() {
         }
       }
     });
-    test(make.run("root", "{traits}"),{
+    test(make.flow("root", "{traits}"),{
       name: "root",
-      uses: "run",
+      uses: "flow",
       with: {
         tokens: ["$TRAITS"],
         params: {
@@ -38,11 +38,11 @@ function directiveTests() {
         }
       }
     });
-    test(make.run("traits", "{one or more traits%TRAIT*trait}",
+    test(make.flow("traits", "{one or more traits%TRAIT*trait}",
                   "a list of states describing a noun"), {
       name: "traits",
       desc: "a list of states describing a noun",
-      uses: "run",
+      uses: "flow",
       with: {
         tokens: ["$TRAIT"],
         params: {
@@ -127,28 +127,28 @@ function directiveTests() {
         }
       }
     });
-    test(make.run("kind_of_noun", "", "the classification of nouns by type"), {
+    test(make.flow("kind_of_noun", "", "the classification of nouns by type"), {
       name: "kind_of_noun",
       desc: "the classification of nouns by type",
-      uses: "run",
+      uses: "flow",
       with: {
         tokens: [],
         params: {},
       }
     });
-    test(make.run("noun_traits", "", "the status of a noun"), {
+    test(make.flow("noun_traits", "", "the status of a noun"), {
       name: "noun_traits",
       desc: "the status of a noun",
-      uses: "run",
+      uses: "flow",
       with: {
         tokens: [],
         params: {},
       }
     });
-  test(make.run("noun_relation", "", "the relation of nouns to other nouns."), {
+  test(make.flow("noun_relation", "", "the relation of nouns to other nouns."), {
     name: "noun_relation",
     desc: "the relation of nouns to other nouns.",
-    uses: "run",
+    uses: "flow",
     with: {
       tokens: [],
       params: {},
@@ -159,9 +159,9 @@ function directiveTests() {
     desc: "Sentences are the primary unit of stories.",
     uses: "slot"
   });
-  test(make.run("noun_statement", "story_statement"), {
+  test(make.flow("noun_statement", "story_statement"), {
       name: "noun_statement",
-      uses: "run",
+      uses: "flow",
       with: {
         slots: ["story_statement"],
         tokens: [],

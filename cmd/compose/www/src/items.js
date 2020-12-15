@@ -68,7 +68,7 @@ class Types {
     const all= allTypes.all;
     for (const typeName in all) {
       const type= all[typeName];
-      if (type.uses === 'run') {
+      if (type.uses === 'flow') {
         const spec= type.with;
         const slots= spec.slots;
         if (slots && slots.includes(slotTypeName)) {
@@ -112,7 +112,7 @@ class Types {
     }
     const { uses } =  type;
     switch (uses) {
-      case "run": {
+      case "flow": {
         const data= {};
         const spec= type.with;
         const { params } = spec;
@@ -154,7 +154,7 @@ class Types {
         if (tokens.length === 1) {
           const t= tokens[0];
           const param= params[t];
-          // FIX: no .... this is in the "run"... the container of the str.
+          // FIX: no .... this is in the "flow"... the container of the str.
           // if (param.filterVals && ('default' in param.filterVals)) {
           //   defaultValue= param.filterVals['default'];
           // } else {

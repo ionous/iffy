@@ -54,7 +54,7 @@ class Node {
 };
 
 // A set of conceptually related nodes.
-class RunNode extends Node {
+class Flow extends Node {
   constructor(parent, itemType, itemId) {
     super(parent, itemType, itemId);
     // sparse map of token to node
@@ -318,7 +318,7 @@ class Nodes {
   newNode(parent, typeName, itemId) {
     const newNode= {
       opt: (...args) => new SwapNode(...args),
-      run: (...args)  => new RunNode(...args),
+      flow: (...args)  => new Flow(...args),
       slot: (...args) => new SlotNode(...args),
       num: (...args)  => new PrimNode(...args),
       str: (...args)  => new PrimNode(...args),

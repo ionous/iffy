@@ -126,7 +126,7 @@ Handlebars.registerHelper('GroupOf', function (desc) {
 
 // load each js file as a handlebars template
 const partials= ['spec'];
-const sources= ['header', 'num', 'opt', 'run', 'str', 'slot', 'footer'];
+const sources= ['header', 'num', 'opt', 'flow', 'str', 'slot', 'footer'];
 partials.forEach(k=> Handlebars.registerPartial(k, require(`./templates/${k}Partial.js`)));
 const templates= Object.fromEntries(sources.map(k=> [k,
   Handlebars.compile(require(`./templates/${k}Template.js`))])

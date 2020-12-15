@@ -1,6 +1,6 @@
 // a sampling of string pickings:
 function makeLang(make) {
-  make.run("story", "here's a test {string}");
+  make.flow("story", "here's a test {string}");
 
   // a user editable string:
   // - issue: the popup is slightly edge too far to the left

@@ -1,12 +1,12 @@
-// a run ( aka a slat ) contains an array of parameters.
-Vue.component('mk-run-ctrl', {
+// a flow contains an array of parameters.
+Vue.component('mk-flow-ctrl', {
   template:
     `<span
     :class="bemBlock()"
     :data-tag="node.type"
     ><span
       v-for="el in els"
-      class="mk-run-param"
+      class="mk-flow-param"
       :data-dot="el.plain"
       :data-tag="el.param && el.param.type"
       >{{el.opener}}<mk-switch
@@ -52,7 +52,7 @@ Vue.component('mk-run-ctrl', {
   },
   mixins: [bemMixin()],
   props: {
-    node: RunNode,
+    node: Flow,
     param: Object,
     token: String,
   }

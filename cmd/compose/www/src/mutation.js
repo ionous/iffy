@@ -102,11 +102,11 @@ class Mutation {
       }
     });
   }
-  // we can generically create optional members of runs
-  // cursor c, must target a member of a run
+  // we can generically create optional members of a flow
+  // cursor c, must target a member of a flow
   newAt(at, leftSide= false) {
     if (!("kids" in at.parent)) {
-      throw new Error("cursor should target the field of a run");
+      throw new Error("cursor should target the field of a flow");
     }
     if (at.isRepeatable()) {
       this._newElem(at, leftSide);

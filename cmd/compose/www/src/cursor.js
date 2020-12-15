@@ -42,7 +42,7 @@ class Cursor  {
     if (!token) {
       ret= true;
     } else {
-      // otherwise we have a parent run
+      // otherwise we have a parent flow
       // ( there's never a parent prim )
       const { param }= this;
       if (param.optional) {

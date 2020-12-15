@@ -76,7 +76,7 @@ module.exports = class Make {
   // typeName string, [ slot or slots string(s) ], msg string, desc multi-part string.
   // msg is a "format string" -- with token, types, etc.
   // desc is a description with the form: "label: short description. long description...".
-  run(name, ...slotMsgDesc) {
+  flow(name, ...slotMsgDesc) {
     const [b,c,d]= slotMsgDesc;
     var tags, slots, desc;
     // assume msg is the first parameter
@@ -97,7 +97,7 @@ module.exports = class Make {
         desc= d;
       }
     }
-    return this.newType(name, "run", desc,  {
+    return this.newType(name, "flow", desc,  {
         slots: slots,
         tokens: tags.keys,
         params: tags.args,

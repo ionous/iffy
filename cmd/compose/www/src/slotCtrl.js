@@ -1,5 +1,5 @@
 // when empty, present a dropdown of possible runs used to fill this slot
-// otherwise expands into the selected run.
+// otherwise expands into the selected flow.
 Vue.component('mk-slot-ctrl', {
   template:
   `<span
