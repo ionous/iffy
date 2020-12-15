@@ -14,7 +14,7 @@ var Slots = []composer.Slot{{
 	Desc: "Assignments: Helper used when setting variables.",
 }}
 
-var Slats = []composer.Slat{
+var Slats = []composer.Composer{
 	(*Activity)(nil),
 	(*Always)(nil),
 	(*AllTrue)(nil),

@@ -16,7 +16,7 @@ import (
 var tokenPlaceholders = regexp.MustCompile(`^\$([0-9]+)$`)
 
 func getSpec(ptrValue interface{}) (ret composer.Spec) {
-	if c, ok := ptrValue.(composer.Slat); ok {
+	if c, ok := ptrValue.(composer.Composer); ok {
 		ret = c.Compose()
 	}
 	return

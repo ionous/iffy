@@ -6,7 +6,7 @@ import (
 )
 
 type CommandError struct {
-	Cmd composer.Slat
+	Cmd composer.Composer
 	Ctx string
 }
 
@@ -19,10 +19,10 @@ func (e *CommandError) Error() string {
 	return errutil.Sprintf("error in command %q%s%s", cmd.Name, padding, e.Ctx)
 }
 
-func cmdError(op composer.Slat, e error) error {
+func cmdError(op composer.Composer, e error) error {
 	return errutil.Append(&CommandError{Cmd: op}, e)
 }
 
-func cmdErrorCtx(op composer.Slat, ctx string, e error) error {
+func cmdErrorCtx(op composer.Composer, ctx string, e error) error {
 	return errutil.Append(&CommandError{Cmd: op, Ctx: ctx}, e)
 }

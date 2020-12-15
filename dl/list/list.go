@@ -8,7 +8,7 @@ import (
 	g "github.com/ionous/iffy/rt/generic"
 )
 
-var Slats = []composer.Slat{
+var Slats = []composer.Composer{
 	(*At)(nil),
 	(*Each)(nil),
 	(*Len)(nil),
@@ -21,7 +21,7 @@ var Slats = []composer.Slat{
 	(*Splice)(nil),
 }
 
-func cmdError(op composer.Slat, e error) error {
+func cmdError(op composer.Composer, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }
 

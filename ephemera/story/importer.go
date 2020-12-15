@@ -47,7 +47,7 @@ func NewImporterDecoder(srcURI string, db *sql.DB, dec *decode.Decoder) *Importe
 }
 
 //
-func (k *Importer) AddModel(model []composer.Slat) {
+func (k *Importer) AddModel(model []composer.Composer) {
 	type stubImporter interface {
 		ImportStub(k *Importer) (ret interface{}, err error)
 	}

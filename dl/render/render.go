@@ -6,11 +6,11 @@ import (
 	"github.com/ionous/iffy/dl/core"
 )
 
-var Slats = []composer.Slat{
+var Slats = []composer.Composer{
 	(*Name)(nil),
 	(*Template)(nil),
 }
 
-func cmdError(op composer.Slat, e error) error {
+func cmdError(op composer.Composer, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }

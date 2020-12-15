@@ -7,7 +7,7 @@ import (
 )
 
 type OpError struct {
-	Op  composer.Slat
+	Op  composer.Composer
 	At  reader.Position
 	Err error
 }
@@ -16,7 +16,7 @@ const UnhandledSwap = errutil.Error("unhandled swap")
 const MissingSlot = errutil.Error("missing slot")
 const InvalidValue = errutil.Error("invalid value")
 
-func ImportError(op composer.Slat, at reader.Position, e error) error {
+func ImportError(op composer.Composer, at reader.Position, e error) error {
 	return &OpError{op, at, e}
 }
 

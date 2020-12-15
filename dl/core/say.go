@@ -130,7 +130,7 @@ func (op *Commas) GetText(run rt.Runtime) (g.Value, error) {
 
 type stringer interface{ String() string }
 
-func writeSpan(run rt.Runtime, span stringer, op composer.Slat, act *Activity, w writer.Output) (ret g.Value, err error) {
+func writeSpan(run rt.Runtime, span stringer, op composer.Composer, act *Activity, w writer.Output) (ret g.Value, err error) {
 	if e := rt.WritersBlock(run, w, func() error {
 		return safe.Run(run, act)
 	}); e != nil {

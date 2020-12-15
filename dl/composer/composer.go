@@ -7,7 +7,7 @@ type Spec struct {
 	Locals                  []string
 }
 
-type Slat interface {
+type Composer interface {
 	Compose() Spec
 }
 

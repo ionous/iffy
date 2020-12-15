@@ -34,7 +34,7 @@ func NewDecoder() *Decoder {
 }
 
 // AddCallback registers a command parser.
-func (dec *Decoder) AddCallback(cmd composer.Slat, cb ReadRet) {
+func (dec *Decoder) AddCallback(cmd composer.Composer, cb ReadRet) {
 	var n string
 	if spec := cmd.Compose(); len(spec.Name) > 0 {
 		n = spec.Name
@@ -51,7 +51,7 @@ func (dec *Decoder) AddCallback(cmd composer.Slat, cb ReadRet) {
 }
 
 // AddDefaultCallbacks registers default command parsers.
-func (dec *Decoder) AddDefaultCallbacks(slats []composer.Slat) {
+func (dec *Decoder) AddDefaultCallbacks(slats []composer.Composer) {
 	for _, cmd := range slats {
 		dec.AddCallback(cmd, nil)
 	}

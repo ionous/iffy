@@ -29,7 +29,7 @@ var Support = []interface{}{
 	(*term.RecordList)(nil),
 }
 
-var Slats = []composer.Slat{
+var Slats = []composer.Composer{
 	(*DetermineAct)(nil),
 	(*DetermineNum)(nil),
 	(*DetermineText)(nil),
@@ -38,6 +38,6 @@ var Slats = []composer.Slat{
 	(*DetermineTextList)(nil),
 }
 
-func cmdError(op composer.Slat, e error) error {
+func cmdError(op composer.Composer, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }

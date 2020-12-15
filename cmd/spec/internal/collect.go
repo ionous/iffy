@@ -52,7 +52,7 @@ func (c *Collect) AddSlot(slot composer.Slot) {
 	}
 }
 
-func (c *Collect) AddSlat(cmd composer.Slat) {
+func (c *Collect) AddSlat(cmd composer.Composer) {
 	if spec := cmd.Compose(); spec.Group != "internal" {
 		rtype := r.TypeOf(cmd).Elem()
 		if len(spec.Name) == 0 {

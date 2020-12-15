@@ -12,7 +12,7 @@ import (
 )
 
 var AllSlots = [][]composer.Slot{rt.Slots, core.Slots}
-var AllSlats = [][]composer.Slat{core.Slats, render.Slats, pattern.Slats, list.Slats}
+var AllSlats = [][]composer.Composer{core.Slats, render.Slats, pattern.Slats, list.Slats}
 
 func RegisterGobs() {
 	registerGob()
