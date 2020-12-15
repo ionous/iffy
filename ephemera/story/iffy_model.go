@@ -200,19 +200,6 @@ func (*Bool) Compose() composer.Spec {
   }
 }
 
-// BoxedBoolean requires various parameters.
-type BoxedBoolean struct {
-  At reader.Position `if:"internal"`
-  Bool Bool
-}
-
-func (*BoxedBoolean) Compose() composer.Spec {
-  return composer.Spec{
-    Name: "boxed_boolean",
-    Spec: "{bool}",
-  }
-}
-
 // BoxedNumber requires various parameters.
 type BoxedNumber struct {
   At reader.Position `if:"internal"`
@@ -1493,6 +1480,20 @@ func (*TextList) Compose() composer.Spec {
   }
 }
 
+// TextValue requires various parameters.
+type TextValue struct {
+  At reader.Position `if:"internal"`
+  Text Text
+}
+
+func (*TextValue) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "text_value",
+    Desc: `Text value: specify a small bit of text.`,
+    Group: "literals",
+  }
+}
+
 // Trait requires a user-specified string.
 type Trait struct {
   At  reader.Position `if:"internal"`
@@ -1612,7 +1613,6 @@ var Model = []composer.Slat{
   (*AspectPhrase)(nil),
   (*AspectTraits)(nil),
   (*Bool)(nil),
-  (*BoxedBoolean)(nil),
   (*BoxedNumber)(nil),
   (*BoxedText)(nil),
   (*Certainties)(nil),
@@ -1688,6 +1688,7 @@ var Model = []composer.Slat{
   (*TestStatement)(nil),
   (*Text)(nil),
   (*TextList)(nil),
+  (*TextValue)(nil),
   (*Trait)(nil),
   (*TraitPhrase)(nil),
   (*VariableDecl)(nil),

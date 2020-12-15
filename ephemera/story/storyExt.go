@@ -13,6 +13,7 @@ type NumberEval rt.NumberEval
 type ObjectEval rt.ObjectEval
 type TextEval rt.TextEval
 
+// fix: this doesnt work because story importer doesnt trigger callbacks for str types
 func (op *Text) ImportStub(k *Importer) (ret interface{}, err error) {
 	var text string
 	if t := op.Str; t != "$EMPTY" {
@@ -20,4 +21,9 @@ func (op *Text) ImportStub(k *Importer) (ret interface{}, err error) {
 	}
 	ret = &core.Text{text}
 	return
+}
+
+// handle the import of text literals, this is a patch for handling "empty" in string values.
+func (op *TextValue) ImportStub(k *Importer) (ret interface{}, err error) {
+	return op.Text.ImportStub(k)
 }

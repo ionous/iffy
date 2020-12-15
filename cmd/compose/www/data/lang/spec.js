@@ -2020,6 +2020,7 @@ const spec = [
   }
 ];
 const stub = [
+  "text_value",
   "cycle_text",
   "shuffle_text",
   "stopping_text",

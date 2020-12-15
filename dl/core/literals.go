@@ -95,6 +95,7 @@ func (*Text) Compose() composer.Spec {
 		Spec:  "{text}",
 		Group: "literals",
 		Desc:  "Text Value: specify a small bit of text.",
+		Stub:  true,
 	}
 }
 
