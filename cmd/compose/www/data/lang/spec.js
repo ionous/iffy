@@ -1326,7 +1326,7 @@ const spec = [
       "list"
     ],
     "name": "list_slice",
-    "spec": "slice {list:text} {from entry%start?number} {ending before entry%eend?number}",
+    "spec": "slice {list:text} {from entry%start?number} {ending before entry%end?number}",
     "uses": "flow",
     "with": {
       "slots": [

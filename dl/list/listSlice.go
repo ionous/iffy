@@ -26,7 +26,7 @@ func (*Slice) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "list_slice",
 		Group: "list",
-		Spec:  "slice {list:text} {from entry%start?number} {ending before entry%eend?number}",
+		Spec:  "slice {list:text} {from entry%start?number} {ending before entry%end?number}",
 		Desc:  "Slice of List: Create a new list from a section of another list.",
 	}
 }
