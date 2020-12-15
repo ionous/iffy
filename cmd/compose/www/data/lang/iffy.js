@@ -5,10 +5,10 @@ function localLang(make) {
     make.slot("story_statement", "Phrase");
     //
     make.flow("noun_statement", "story_statement", "{:lede} {*tail} {?summary}",
-             "Noun statement: Describes people, places, or things.");
+             "Declare a noun: Describes people, places, or things.");
 
     make.flow("comment", "story_statement", "Note: {comment%lines}",
-      "Comment: Information about the story not used by the story.")
+      "Add a comment: Information about the story for you and other authors.")
   });
 
   make.group("Tests", function() {
@@ -16,13 +16,16 @@ function localLang(make) {
     make.slot("testing", "Run a series of tests.");
 
     make.flow("test_statement", "story_statement",
-      "Expect {test_name} to {expectation%test:testing}");
+      "Expect {test_name} to {expectation%test:testing}",
+      "Describe test results");
 
     make.flow("test_scene", "story_statement",
-      "While testing {test_name}: {story}");
+      "While testing {test_name}: {story}",
+      "Create a scene for testing");
 
     make.flow("test_rule", "story_statement",
-      "To test {test_name}: {do%hook:program_hook}");
+      "To test {test_name}: {do%hook:program_hook}",
+      "Add actions to a test");
 
     make.flow("test_output", "testing",
       "output {lines|quote}.",
@@ -43,10 +46,10 @@ function localLang(make) {
     // make.flow("summary", "{The [summary] is:: %lines}");
     make.flow("summary", "The summary is: {summary%lines|quote}");
 
-    make.opt("noun_phrase", "{kind_of_noun}, {noun_traits}, or {noun_relation}");
+    make.swap("noun_phrase", "{kind_of_noun}, {noun_traits}, or {noun_relation}");
 
     // fix: think this should always be "are" never "is"
-    make.flow("kind_of_noun", "{are_an} {trait*trait|comma-and} kind of {kind:singular_kind} {?noun_relation}");
+    make.flow("kind_of_noun", "{are_an} {*trait|comma-and} kind of {kind:singular_kind} {?noun_relation}");
 
     make.flow("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
 
@@ -82,13 +85,13 @@ function localLang(make) {
     make.flow("pattern_variables_tail", "It requires {+variable_decl|comma-and}.",
        `Pattern variables: Storage for values used during the execution of a pattern.`);
 
-    make.opt("pattern_type", "an {activity:patterned_activity} or a {value:variable_type}");
+    make.swap("pattern_type", "an {activity:patterned_activity} or a {value:variable_type}");
     make.str("patterned_activity", "{an activity%activity}");
     make.str("pattern_name");
 
     make.flow("pattern_actions", "story_statement",
       "To {pattern name%name:pattern_name}: {?pattern_locals} {pattern_rules}",
-      "Pattern Actions: Actions to take when using a pattern.");
+      "Add actions to a pattern: Actions to take when using a pattern.");
 
     make.flow("pattern_rules", "{*pattern_rule}");
     make.flow("pattern_rule", `When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}`,
@@ -98,13 +101,14 @@ function localLang(make) {
     make.flow("local_decl",  "Where {variable_decl} = {value%program_result}",
       "Local: local variables can use the parameters of a pattern to compute temporary values.");
 
-    make.opt("program_hook", "flow an {activity} or return a {result:program_return}");
+    make.swap("program_hook", "flow an {activity} or return a {result:program_return}");
 
     // fix? activity and program_return both exist for the sake of appearance only.
     make.flow("program_return", "return {result:program_result}");
 
-    make.opt("program_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
-    make.opt("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}");
+    make.swap("program_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
+
+    make.swap("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}");
     make.flow("object_func", "an object named {name:text_eval}");
   });
 
@@ -112,17 +116,20 @@ function localLang(make) {
     make.flow("noun_relation",  "{?are_being} {relation} {nouns+named_noun|comma-and}");
 
     make.flow("relative_to_noun", "story_statement",
-            "{relation} {nouns+named_noun} {are_being} {nouns+named_noun}.");
+            "{relation} {nouns+named_noun} {are_being} {nouns+named_noun}.",
+            "Relate nouns to each other");
 
     make.str("relation");
   });
 
   make.group("Kinds", function() {
     make.flow("kinds_of_kind", "story_statement",
-         "{plural_kinds} are a kind of {singular_kind}.");
+         "{plural_kinds} are a kind of {singular_kind}.",
+         "Declare a kind");
 
     make.flow("kinds_possess_properties", "story_statement",
-              "{plural_kinds} have {determiner} {property_phrase}.");
+              "{plural_kinds} have {determiner} {property_phrase}.",
+              "Add properties to a kind");
 
     make.str("singular_kind",
       `Kind: Describes a type of similar nouns.
@@ -137,16 +144,18 @@ For example: animals, containers, etc.`);
     make.flow("variable_decl", "{type:variable_type} called {name:variable_name}");
     make.str("variable_name");
 
-    make.opt("variable_type", "a {simple value%primitive:primitive_type}, an {object:object_type}, or {other value%ext:ext_type}");
+    make.swap("variable_type", "a {simple value%primitive:primitive_type}, an {object:object_type}, or {other value%ext:ext_type}");
     make.flow("object_type",  "{an} {kind of%kind:singular_kind}");
   });
 
   make.group("Traits", function() {
-    make.flow("kinds_of_aspect", "story_statement", "{aspect} is a kind of value.");
-    make.flow("aspect_traits", "story_statement", "{aspect} {trait_phrase}");
-    make.flow("trait_phrase", "{are_either} {trait+trait|comma-or}.");
+    make.flow("kinds_of_aspect", "story_statement", "{aspect} is a kind of value.",
+      "Declare an aspect");
+    make.flow("aspect_traits", "story_statement", "{aspect} {trait_phrase}",
+      "Add traits to an aspect");
+    make.flow("trait_phrase", "{are_either} {+trait|comma-or}.");
 
-    make.flow("noun_traits", "{are_being} {trait+trait|comma-and}");
+    make.flow("noun_traits", "{are_being} {+trait|comma-and}");
     make.str("aspect");
     make.str("trait");
   });
@@ -156,14 +165,14 @@ For example: animals, containers, etc.`);
     make.flow("noun_assignment", "story_statement",
             // "The {property} of {+noun} is the {[text]:: %lines}",
             "The {property} of {nouns+named_noun} is {the text%lines|summary}",
-            "Noun Assignment: Assign text. Gives a noun one or more lines of text.");
+            "Assign text to a noun: Assign text. Gives a noun one or more lines of text.");
 
-    make.opt("property_phrase", "{primitive_phrase} or {aspect_phrase}");
+    make.swap("property_phrase", "{primitive_phrase} or {aspect_phrase}");
     make.flow("aspect_phrase", "{aspect} {?optional_property}");
     make.flow("optional_property", "called {property}");
-
     make.flow("certainties", "story_statement",
-              "{plural_kinds} {are_being} {certainty} {trait}.");
+              "{plural_kinds} {are_being} {certainty} {trait}.",
+              "Give a kind a trait");
 
     make.str("are_either", "{can be%canbe} {are either%either}");
 
@@ -178,10 +187,10 @@ For example: animals, containers, etc.`);
     make.flow("primitive_phrase", "{primitive_type} called {property}");
 
     make.str("primitive_type", "{a number%number}, {some text%text}, or {a true/false value%bool}");
-    make.opt("primitive_value", "{text%boxed_text} or {number%boxed_number}");
+    make.swap("primitive_value", "{text%boxed_text} or {number%boxed_number}");
 
     // a list of numbers, a list of text, a record, or a list of records.
-    make.opt("ext_type", "a list of {numbers:number_list}, a list of {text%text_list}, a {record:record_type} or a list of {records:record_list}.")
+    make.swap("ext_type", "a list of {numbers:number_list}, a list of {text%text_list}, a {record:record_type} or a list of {records:record_list}.")
 
     make.flow("record_type",  "a record of {kind%kind:singular_kind}");
     make.flow("record_list",  "a list of {kind%kind:singular_kind} records");

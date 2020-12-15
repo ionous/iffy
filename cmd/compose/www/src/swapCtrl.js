@@ -1,5 +1,5 @@
 
-Vue.component('mk-opt-ctrl', {
+Vue.component('mk-swap-ctrl', {
   template:
   `<span
       :class="bemBlock()"
@@ -27,7 +27,7 @@ Vue.component('mk-opt-ctrl', {
       if (!param) {
         throw new Error(`unknown token picked '${token}'`);
       }
-      const typeName= param.type || param; // an opt's param can map straight to their type.
+      const typeName= param.type || param; // an swap's param can map straight to their type.
       const newNode= this.$root.nodes.newFromType(typeName);
       this.node.setSwap(token, newNode);
     },

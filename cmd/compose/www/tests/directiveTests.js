@@ -103,12 +103,12 @@ function directiveTests() {
         }
       }
     });
-    test(make.opt("noun_phrase",
+    test(make.swap("noun_phrase",
       "the {kind:kind_of_noun}, {traits%traits:noun_traits}, or {relationships%rel:noun_relation} of a noun.",
       "characteristics of the preceding noun or nouns"), {
       name: "noun_phrase",
       desc: "characteristics of the preceding noun or nouns",
-      uses: "opt",
+      uses: "swap",
       with: {
         tokens: ["the ", "$KIND", ", ", "$TRAITS", ", or ", "$REL", " of a noun."],
         params: {

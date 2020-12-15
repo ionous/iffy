@@ -106,7 +106,7 @@ Vue.component('mk-browser', {
           :data-drag-idx="idx"
           draggable="true"
           @activate="onItem(k.name)"
-        >{{k.label| titlecase}}</mk-a-button
+        >{{k.label}}</mk-a-button
       ></span
       ><span v-else>&nbsp;{{k.label| titlecase}}</span
     ></li

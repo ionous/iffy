@@ -9,7 +9,7 @@ import (
 // these definitions mirror modeling statements in iffy.js
 // right now, common noun and proper noun implement ObjectEval directly.
 // it'd be nice to make them swaps just like they are in the modeling section.
-// future: make.opt("noun", "{proper_noun} or {named_noun}");
+// future: make.swap("noun", "{proper_noun} or {named_noun}");
 
 // SimpleNoun implements ObjectEval
 type SimpleNoun struct {

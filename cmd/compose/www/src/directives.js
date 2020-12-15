@@ -63,9 +63,9 @@ class Make {
   }
 
   // displays types inline ( vs. slot and slat dropdowns )
-  opt( name, msg, desc= null ) {
+  swap( name, msg, desc= null ) {
     const tags= TagParser.parse(msg);
-    return this.newType(name, "opt", desc, {
+    return this.newType(name, "swap", desc, {
         tokens: tags.keys,
         params: tags.args
     });

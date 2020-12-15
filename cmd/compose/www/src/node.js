@@ -317,8 +317,8 @@ class Nodes {
   }
   newNode(parent, typeName, itemId) {
     const newNode= {
-      opt: (...args) => new SwapNode(...args),
       flow: (...args)  => new Flow(...args),
+      swap: (...args) => new SwapNode(...args),
       slot: (...args) => new SlotNode(...args),
       num: (...args)  => new PrimNode(...args),
       str: (...args)  => new PrimNode(...args),

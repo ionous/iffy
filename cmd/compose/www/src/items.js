@@ -131,7 +131,7 @@ class Types {
       }
       break;
       case "slot":
-      case "opt": {
+      case "swap": {
         // note: "initially", if any, is: object { string type; object value; }
         // FIX: "initially" wont work properly for opts.
         // slots dont have a $TOKEN entry, but options do.
