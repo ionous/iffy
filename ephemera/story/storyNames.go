@@ -2,6 +2,7 @@ package story
 
 import (
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -38,9 +39,16 @@ func (op *SingularKind) NewName(k *Importer) (ret ephemera.Named, err error) {
 }
 
 func (op *TestName) NewName(k *Importer) (ret ephemera.Named, err error) {
-	k.OverrideNameDuring("$CURRENT_TEST", k.StoryEnv.Recent.Test, func() {
-		ret = k.NewName(op.Str, tables.NAMED_TEST, op.At.String())
-	})
+	// fix? all names should probably munge their own strings
+	// ( see ephemera's NewDomainName for the current hack )
+	// things that would need work are:
+	// tests, autogen fields, and control over the domain ( ie. NewName vs. NewDowmainName )
+	if op.Str == "$CURRENT_TEST" {
+		ret = k.StoryEnv.Recent.Test
+	} else {
+		name := lang.Camelize(op.Str)
+		ret = k.NewName(name, tables.NAMED_TEST, op.At.String())
+	}
 	return
 }
 

@@ -16,7 +16,7 @@ const (
 	NAMED_CERTAINTY    = "certainty"
 	NAMED_FIELD        = "field"
 	NAMED_KIND         = "singular_kind"
-	NAMED_KINDS        = "kind"
+	NAMED_KINDS        = "kind" // FIX: why are only the auto-generated types using this?
 	NAMED_PLURAL_KINDS = "plural_kinds"
 	NAMED_PROPERTY     = "prop" // field, trait, or aspect
 	NAMED_NOUN         = "noun"

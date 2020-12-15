@@ -65,7 +65,7 @@ func (op *PrimitiveType) ImportEval(k *Importer) (ret ephemera.Named, err error)
 	case "$BOOL":
 		namedType = "bool_eval"
 	default:
-		err = ImportError(op, op.At, errutil.Fmt("%w for %T", InvalidValue, op.Str))
+		err = ImportError(op, op.At, errutil.Fmt("%w for %T", InvalidValue, str))
 	}
 	if err == nil {
 		ret = k.NewName(namedType, tables.NAMED_TYPE, op.At.String())

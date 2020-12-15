@@ -9,55 +9,55 @@ import (
 )
 
 func (op *DetermineAct) ImportStub(k *Importer) (ret interface{}, err error) {
-	if args, e := importCall(k, "execute", op.Name, op.Arguments); e != nil {
+	if p, args, e := importCall(k, "execute", op.Name, op.Arguments); e != nil {
 		err = ImportError(op, op.At, e)
 	} else {
-		ret = &pattern.DetermineAct{Pattern: op.Name.Str, Arguments: args}
+		ret = &pattern.DetermineAct{Pattern: p.String(), Arguments: args}
 	}
 	return
 }
 func (op *DetermineNum) ImportStub(k *Importer) (ret interface{}, err error) {
-	if args, e := importCall(k, "number_eval", op.Name, op.Arguments); e != nil {
+	if p, args, e := importCall(k, "number_eval", op.Name, op.Arguments); e != nil {
 		err = ImportError(op, op.At, e)
 	} else {
-		ret = &pattern.DetermineNum{Pattern: op.Name.Str, Arguments: args}
+		ret = &pattern.DetermineNum{Pattern: p.String(), Arguments: args}
 	}
 	return
 }
 func (op *DetermineText) ImportStub(k *Importer) (ret interface{}, err error) {
-	if args, e := importCall(k, "text_eval", op.Name, op.Arguments); e != nil {
+	if p, args, e := importCall(k, "text_eval", op.Name, op.Arguments); e != nil {
 		err = ImportError(op, op.At, e)
 	} else {
-		ret = &pattern.DetermineText{Pattern: op.Name.Str, Arguments: args}
+		ret = &pattern.DetermineText{Pattern: p.String(), Arguments: args}
 	}
 	return
 }
 func (op *DetermineBool) ImportStub(k *Importer) (ret interface{}, err error) {
-	if args, e := importCall(k, "bool_eval", op.Name, op.Arguments); e != nil {
+	if p, args, e := importCall(k, "bool_eval", op.Name, op.Arguments); e != nil {
 		err = ImportError(op, op.At, e)
 	} else {
-		ret = &pattern.DetermineBool{Pattern: op.Name.Str, Arguments: args}
+		ret = &pattern.DetermineBool{Pattern: p.String(), Arguments: args}
 	}
 	return
 }
 func (op *DetermineNumList) ImportStub(k *Importer) (ret interface{}, err error) {
-	if args, e := importCall(k, "num_list_eval", op.Name, op.Arguments); e != nil {
+	if p, args, e := importCall(k, "num_list_eval", op.Name, op.Arguments); e != nil {
 		err = ImportError(op, op.At, e)
 	} else {
-		ret = &pattern.DetermineNumList{Pattern: op.Name.Str, Arguments: args}
+		ret = &pattern.DetermineNumList{Pattern: p.String(), Arguments: args}
 	}
 	return
 }
 func (op *DetermineTextList) ImportStub(k *Importer) (ret interface{}, err error) {
-	if args, e := importCall(k, "text_list_eval", op.Name, op.Arguments); e != nil {
+	if p, args, e := importCall(k, "text_list_eval", op.Name, op.Arguments); e != nil {
 		err = ImportError(op, op.At, e)
 	} else {
-		ret = &pattern.DetermineTextList{Pattern: op.Name.Str, Arguments: args}
+		ret = &pattern.DetermineTextList{Pattern: p.String(), Arguments: args}
 	}
 	return
 }
 
-func importCall(k *Importer, slot string, n PatternName, stubs *Arguments) (ret *core.Arguments, err error) {
+func importCall(k *Importer, slot string, n PatternName, stubs *Arguments) (retName ephemera.Named, retArgs *core.Arguments, err error) {
 	if p, e := n.NewName(k); e != nil {
 		err = e
 	} else if args, e := importArgs(k, p, stubs); e != nil {
@@ -67,7 +67,7 @@ func importCall(k *Importer, slot string, n PatternName, stubs *Arguments) (ret 
 		// fix: object type names will need adaption of some sort re plural_kinds
 		patternType := k.NewName(slot, tables.NAMED_TYPE, n.At.String())
 		k.NewPatternRef(p, p, patternType, "")
-		ret = args
+		retName, retArgs = p, args
 	}
 	return
 }
@@ -88,7 +88,7 @@ func importArgs(k *Importer, p ephemera.Named, stubs *Arguments) (ret *core.Argu
 				}
 				// after recording the "fact" of the parameter...
 				// copy the stubbed argument data into the real argument list.
-				newArg := &core.Argument{Name: stub.Name.Str, From: stub.From}
+				newArg := &core.Argument{Name: paramName.String(), From: stub.From}
 				argList = append(argList, newArg)
 			}
 		}

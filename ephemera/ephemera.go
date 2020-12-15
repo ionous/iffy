@@ -11,17 +11,8 @@ import (
 )
 
 type Recorder struct {
-	srcId        int64
-	cache        *tables.Cache
-	nameReplacer nameReplacer
-}
-type nameReplacer struct {
-	key string
-	sub Named
-}
-
-func (n *nameReplacer) matches(s string) bool {
-	return len(s) > 0 && n.key == s
+	srcId int64
+	cache *tables.Cache
 }
 
 func NewRecorder(srcURI string, db *sql.DB) (ret *Recorder) {
@@ -38,30 +29,20 @@ func (r *Recorder) NewName(name, category, ofs string) (ret Named) {
 	return r.NewDomainName(Named{}, name, category, ofs)
 }
 
-// hack for stubbing names
-func (r *Recorder) OverrideNameDuring(key string, sub Named, during func()) {
-	r.nameReplacer = nameReplacer{key, sub}
-	during()
-	r.nameReplacer = nameReplacer{}
-}
-
 func (r *Recorder) NewDomainName(domain Named, name, category, ofs string) (ret Named) {
 	// normalize names in an attempt to simplify lookup of some names
 	// many tests would have to be adjusted to be able to handle normalization wholesale
 	// so for now make this opt-in.
 	norm := strings.TrimSpace(name)
 	// replace things like $CURRENT_TEST with the name of the current test.
-	if norm == r.nameReplacer.key {
-		norm = r.nameReplacer.sub.String()
-	} else if !strings.HasPrefix(norm, "$") {
+	if !strings.HasPrefix(norm, "$") {
 		//
 		switch category {
 		case tables.NAMED_PATTERN:
 			// we want patterns to be at least leading case aware
 			norm = lang.CombineCase(norm)
 
-		case tables.NAMED_TEST,
-			tables.NAMED_ASPECT,
+		case tables.NAMED_ASPECT,
 			tables.NAMED_TRAIT,
 			tables.NAMED_FIELD:
 			norm = lang.Camelize(norm)
