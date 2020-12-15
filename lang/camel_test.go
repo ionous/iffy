@@ -11,6 +11,23 @@ func TestEmptyCamelize(t *testing.T) {
 	}
 }
 
+func TestTrim(t *testing.T) {
+	test := func(pairs ...string) {
+		for i, cnt := 0, len(pairs); i < cnt; i += 2 {
+			a, want := pairs[i], pairs[i+1]
+			if got := Camelize(a); got != want {
+				t.Log(i/2, "got", got, "want", want)
+				t.Fail()
+			}
+		}
+	}
+	test(
+		"apple turnover", "appleTurnover",
+		"  apple turnover", "appleTurnover",
+		"apple turnover  ", "appleTurnover",
+	)
+}
+
 func TestCamelize(t *testing.T) {
 	test := func(pairs ...string) {
 		for i, cnt := 0, len(pairs); i < cnt; i += 2 {
