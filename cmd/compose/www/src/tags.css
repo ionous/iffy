@@ -12,3 +12,11 @@
 .em-shift .em-row--inline.em-row--ghost  {
   display: inline;
 }
+
+.mk-flow-ctrl[data-tag="comment"] .mk-plain-text{
+  font-weight: bold;
+}
+
+.mk-flow-ctrl[data-tag="comment"] .mk-txt-lines {
+  font-style: italic;
+}
