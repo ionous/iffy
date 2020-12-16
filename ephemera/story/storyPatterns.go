@@ -32,18 +32,13 @@ func (op *PatternRule) ImportPattern(k *Importer, patternName ephemera.Named) (e
 }
 
 func (op *PatternLocals) ImportPattern(k *Importer, patternName ephemera.Named) (err error) {
-	if els := op.LocalDecl; els != nil {
-		for _, el := range *els {
-			if e := el.ImportPattern(k, patternName); e != nil {
-				err = errutil.Append(err, e)
-			}
-		}
-	}
-	return
-}
-
-func (op *LocalDecl) ImportPattern(k *Importer, patternName ephemera.Named) (err error) {
-	// fix: not implemented
+	err = errutil.New("not implemented")
+	// FIX!
+	// for _, el := range op.VariableDecl {
+	// 	if e := el.NewLocal(k, patternName); e != nil {
+	// 		err = errutil.Append(err, e)
+	// 	}
+	// }
 	return
 }
 

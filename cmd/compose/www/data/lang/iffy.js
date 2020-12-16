@@ -7,8 +7,8 @@ function localLang(make) {
     make.flow("noun_statement", "story_statement", "{:lede} {*tail} {?summary}",
              "Declare a noun: Describes people, places, or things.");
 
-    make.flow("comment", "story_statement", "Note: {comment%lines}",
-      "Add a comment: Information about the story for you and other authors.")
+    make.flow("comment", ["story_statement", "execute"], "Note: {comment%lines}",
+      "Add a note: Information about the story for you and other authors.")
   });
 
   make.group("Tests", function() {
@@ -71,16 +71,14 @@ function localLang(make) {
 
   make.group("Patterns", function() {
     make.flow("pattern_decl", "story_statement",
-       "The pattern {name:pattern_name|quote} determines {type:pattern_type}. {optvars?pattern_variables_tail} {about?comments}",
+       "The pattern {name:pattern_name|quote} determines {type:pattern_type}. {optvars?pattern_variables_tail} {about?comment}",
        `Declare a pattern: A pattern is a bundle of functions which can either change the game world or provide information about it.
   Each function in a given pattern has "guards" which determine whether the function applies in a particular situtation.`
      );
 
-    make.flow("comments", "{lines|quote}");
-
     make.flow("pattern_variables_decl", "story_statement",
       "The pattern {pattern_name|quote} requires {+variable_decl|comma-and}.",
-       `Declare pattern variables: Storage for values used during the execution of a pattern.`);
+       `Add parameters to a pattern: Values provided when starting pattern.`);
 
     make.flow("pattern_variables_tail", "It requires {+variable_decl|comma-and}.",
        `Pattern variables: Storage for values used during the execution of a pattern.`);
@@ -90,18 +88,17 @@ function localLang(make) {
     make.str("pattern_name");
 
     make.flow("pattern_actions", "story_statement",
-      "To {pattern name%name:pattern_name}: {?pattern_locals} {pattern_rules}",
+      "To {pattern name%name:pattern_name} {?pattern_locals}:{pattern_rules}",
       "Add actions to a pattern: Actions to take when using a pattern.");
 
     make.flow("pattern_rules", "{*pattern_rule}");
     make.flow("pattern_rule", `When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}`,
       "Rule");
 
-    make.flow("pattern_locals", "{*local_decl}");
-    make.flow("local_decl",  "Where {variable_decl} = {value%program_result}",
+    make.flow("pattern_locals", " use {+variable_decl|comma-and}",
       "Local: local variables can use the parameters of a pattern to compute temporary values.");
 
-    make.swap("program_hook", "flow an {activity} or return a {result:program_return}");
+    make.swap("program_hook", "run an {activity} or return a {result:program_return}");
 
     // fix? activity and program_return both exist for the sake of appearance only.
     make.flow("program_return", "return {result:program_result}");
@@ -142,11 +139,11 @@ For example: animals, containers, etc.`);
 
   make.group("Records", function() {
     make.flow("kinds_of_record", "story_statement",
-         "{record_plural} are a kind of record.",
+         "{records%record_plural} are a kind of record.",
          "Declare a record");
 
     make.flow("records_possess_properties", "story_statement",
-              "{record_plural} have {+property_decl|comma-and}.",
+              "{records%record_plural} have {+property_decl|comma-and}.",
               "Add properties to a record");
 
     make.str("record_singular",
@@ -157,7 +154,7 @@ For example: animals, containers, etc.`);
   });
 
   make.group("Variables", function() {
-    make.flow("variable_decl", "{type:variable_type} called {name:variable_name}");
+    make.flow("variable_decl", "{an:determiner} {name:variable_name} ( {type:variable_type}  {comment?lines} )");
     make.str("variable_name");
 
     make.swap("variable_type", "a {simple value%primitive:primitive_type}, an {object:object_type}, or {other value%ext:ext_type}");
@@ -183,7 +180,7 @@ For example: animals, containers, etc.`);
             "The {property} of {nouns+named_noun} is {the text%lines|summary}",
             "Assign text to a noun: Assign text. Gives a noun one or more lines of text.");
 
-    make.flow("property_decl", "{an:ana} {property} ( {property_type} {comment?lines} )");
+    make.flow("property_decl", "{an:determiner} {property} ( {property_type} {comment?lines} )");
     make.swap("property_type", "an {aspect%property_aspect}, {simple value%primitive:primitive_type}, or {other value%ext:ext_type}");
 
     make.str("property_aspect", "{an aspect%aspect}");
@@ -215,8 +212,8 @@ For example: animals, containers, etc.`);
     make.flow("boxed_number", "{number}");
 
     // constants
-    make.str("text_list", "{a list of text%text_list}");
-    make.str("number_list", "{a list of numbers%number_list}");
+    make.str("text_list", "{a list of text%list}");
+    make.str("number_list", "{a list of numbers%list}");
 
     make.str("bool", "{true} or {false}");
     make.str("text", "{text} or {empty}", `A sequence of characters of any length, all on one line.

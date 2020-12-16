@@ -27,7 +27,7 @@
                       "value": {
                         "$AN": {
                           "id": "id-17669095400-0",
-                          "type": "ana",
+                          "type": "determiner",
                           "value": "$AN"
                         },
                         "$PROPERTY": {
@@ -59,7 +59,7 @@
                       "value": {
                         "$AN": {
                           "id": "id-17669095400-1",
-                          "type": "ana",
+                          "type": "determiner",
                           "value": "$A"
                         },
                         "$PROPERTY": {

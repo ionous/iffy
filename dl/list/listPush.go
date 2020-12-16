@@ -18,7 +18,7 @@ func (op *Push) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "list_push",
 		Group: "list",
-		Spec:  "push {list:text} {front} {inserting%insert?assignment}",
+		Spec:  "push {into%list:text} {front?list_edge} {inserting%insert:assignment}",
 		Desc: `Push into list: Add elements to the front or back of a list.
 Returns the new length of the list.`,
 	}

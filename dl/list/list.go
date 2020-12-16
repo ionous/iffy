@@ -19,6 +19,7 @@ var Slats = []composer.Composer{
 	(*Slice)(nil),
 	(*Sort)(nil),
 	(*Splice)(nil),
+	(*Front)(nil),
 }
 
 func cmdError(op composer.Composer, e error) error {

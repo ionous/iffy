@@ -1,6 +1,16 @@
 /* generated using github.com/ionous/iffy/cmd/spec/spec.go */
 const spec = [
   {
+    "desc": "List Edge: Indicate elements at the front or back of a list.",
+    "group": [
+      "list"
+    ],
+    "name": "list_edge",
+    "spec": "{front} or {back}",
+    "uses": "str",
+    "with": {}
+  },
+  {
     "desc": "Assignments: Helper used when setting variables.",
     "name": "assignment",
     "uses": "slot"
@@ -151,7 +161,8 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "all true",
+        "all true ",
+        " test: ",
         "$TEST"
       ]
     }
@@ -169,7 +180,7 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "always"
+        "always "
       ]
     }
   },
@@ -192,7 +203,8 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "any true",
+        "any true ",
+        " test: ",
         "$TEST"
       ]
     }
@@ -211,7 +223,7 @@ const spec = [
       "patterns"
     ],
     "name": "arguments",
-    "spec": " when {arguments%args+argument}",
+    "spec": " when {arguments%args+argument|comma-and}",
     "uses": "flow",
     "with": {}
   },
@@ -247,7 +259,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from bool",
+        "from bool ",
+        " val: ",
         "$VAL"
       ]
     }
@@ -284,7 +297,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from num list",
+        "from num list ",
+        " vals: ",
         "$VALS"
       ]
     }
@@ -307,7 +321,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from object",
+        "from object ",
+        " val: ",
         "$VAL"
       ]
     }
@@ -330,7 +345,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from record",
+        "from record ",
+        " val: ",
         "$VAL"
       ]
     }
@@ -353,7 +369,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from record list",
+        "from record list ",
+        " vals: ",
         "$VALS"
       ]
     }
@@ -376,7 +393,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from text",
+        "from text ",
+        " val: ",
         "$VAL"
       ]
     }
@@ -399,7 +417,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from text list",
+        "from text list ",
+        " vals: ",
         "$VALS"
       ]
     }
@@ -464,7 +483,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "bracket",
+        "bracket ",
+        " go: ",
         "$GO"
       ]
     }
@@ -486,7 +506,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "buffer",
+        "buffer ",
+        " go: ",
         "$GO"
       ]
     }
@@ -527,9 +548,12 @@ const spec = [
         "number_eval"
       ],
       "tokens": [
-        "choose num",
+        "choose num ",
+        " if: ",
         "$IF",
+        ", true: ",
         "$TRUE",
+        ", false: ",
         "$FALSE"
       ]
     }
@@ -560,9 +584,12 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "choose text",
+        "choose text ",
+        " if: ",
         "$IF",
+        ", true: ",
         "$TRUE",
+        ", false: ",
         "$FALSE"
       ]
     }
@@ -585,7 +612,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "commas",
+        "commas ",
+        " go: ",
         "$GO"
       ]
     }
@@ -636,7 +664,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "copy from",
+        "copy from ",
+        " name: ",
         "$NAME"
       ]
     }
@@ -660,7 +689,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "cycle text",
+        "cycle text ",
+        " parts: ",
         "$PARTS"
       ]
     }
@@ -776,7 +806,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "do nothing"
+        "do nothing "
       ]
     }
   },
@@ -820,9 +850,12 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "for each num",
+        "for each num ",
+        " in: ",
         "$IN",
+        ", go: ",
         "$GO",
+        ", else: ",
         "$ELSE"
       ]
     }
@@ -853,9 +886,12 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "for each text",
+        "for each text ",
+        " in: ",
         "$IN",
+        ", go: ",
         "$GO",
+        ", else: ",
         "$ELSE"
       ]
     }
@@ -866,7 +902,7 @@ const spec = [
       "objects"
     ],
     "name": "get_field",
-    "spec": "the {field:text_eval} of {object:object_eval}",
+    "spec": "the {field:text} of {object:object_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -895,6 +931,7 @@ const spec = [
         "bool_eval",
         "number_eval",
         "text_eval",
+        "record_eval",
         "object_eval",
         "num_list_eval",
         "text_list_eval",
@@ -923,7 +960,7 @@ const spec = [
       "objects"
     ],
     "name": "has_trait",
-    "spec": "{object%object:object_eval} is {trait:text_eval}",
+    "spec": "{object:object_eval} is {trait:text_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -953,8 +990,10 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "includes",
+        "includes ",
+        " text: ",
         "$TEXT",
+        ", part: ",
         "$PART"
       ]
     }
@@ -977,7 +1016,8 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "is empty",
+        "is empty ",
+        " text: ",
         "$TEXT"
       ]
     }
@@ -1004,8 +1044,10 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "is exact kind of",
+        "is exact kind of ",
+        " object: ",
         "$OBJECT",
+        ", kind: ",
         "$KIND"
       ]
     }
@@ -1042,7 +1084,8 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "is not true",
+        "is not true ",
+        " test: ",
         "$TEST"
       ]
     }
@@ -1084,8 +1127,10 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "join",
+        "join ",
+        " sep: ",
         "$SEP",
+        ", parts: ",
         "$PARTS"
       ]
     }
@@ -1134,7 +1179,7 @@ const spec = [
       "list"
     ],
     "name": "list_at",
-    "spec": "{list:text} entry {index:number}",
+    "spec": "list {list:text} at {index:number_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1150,35 +1195,11 @@ const spec = [
       "list"
     ],
     "name": "list_each",
+    "spec": "For each {with:text} in {list:text} go:{go:activity} else:{else:activity}",
     "uses": "flow",
     "with": {
-      "params": {
-        "$ELSE": {
-          "label": "else",
-          "type": "activity"
-        },
-        "$GO": {
-          "label": "go",
-          "type": "activity"
-        },
-        "$LIST": {
-          "label": "list",
-          "type": "text"
-        },
-        "$WITH": {
-          "label": "with",
-          "type": "text"
-        }
-      },
       "slots": [
         "execute"
-      ],
-      "tokens": [
-        "each",
-        "$LIST",
-        "$WITH",
-        "$GO",
-        "$ELSE"
       ]
     }
   },
@@ -1222,9 +1243,12 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "map",
+        "map ",
+        " from list: ",
         "$FROM_LIST",
+        ", to list: ",
         "$TO_LIST",
+        ", using pattern: ",
         "$USING_PATTERN"
       ]
     }
@@ -1263,11 +1287,16 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "pop",
+        "pop ",
+        " list: ",
         "$LIST",
+        ", with: ",
         "$WITH",
+        ", front: ",
         "$FRONT",
+        ", go: ",
         "$GO",
+        ", else: ",
         "$ELSE"
       ]
     }
@@ -1278,7 +1307,7 @@ const spec = [
       "list"
     ],
     "name": "list_push",
-    "spec": "push {list:text} {front} {inserting%insert?assignment}",
+    "spec": "push {into%list:text} {front?list_edge} {inserting%insert:assignment}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1296,8 +1325,8 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$ELEMENT": {
-          "label": "element",
+        "$FROM": {
+          "label": "from",
           "type": "assignment"
         },
         "$INDEX": {
@@ -1313,10 +1342,13 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "set",
+        "set ",
+        " list: ",
         "$LIST",
+        ", index: ",
         "$INDEX",
-        "$ELEMENT"
+        ", from: ",
+        "$FROM"
       ]
     }
   },
@@ -1359,8 +1391,10 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "sort",
+        "sort ",
+        " list: ",
         "$LIST",
+        ", pattern: ",
         "$PATTERN"
       ]
     }
@@ -1400,8 +1434,10 @@ const spec = [
         "object_eval"
       ],
       "tokens": [
-        "make",
+        "make ",
+        " name: ",
         "$NAME",
+        ", arguments: ",
         "$ARGUMENTS"
       ]
     }
@@ -1522,7 +1558,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "move from",
+        "move from ",
+        " name: ",
         "$NAME"
       ]
     }
@@ -1574,7 +1611,8 @@ const spec = [
         "num_list_eval"
       ],
       "tokens": [
-        "numbers",
+        "numbers ",
+        " values: ",
         "$VALUES"
       ]
     }
@@ -1619,9 +1657,12 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "pack",
+        "pack ",
+        " record: ",
         "$RECORD",
+        ", field: ",
         "$FIELD",
+        ", from: ",
         "$FROM"
       ]
     }
@@ -1672,7 +1713,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "print num word",
+        "print num word ",
+        " num: ",
         "$NUM"
       ]
     }
@@ -1731,9 +1773,12 @@ const spec = [
         "num_list_eval"
       ],
       "tokens": [
-        "range",
+        "range ",
+        " start: ",
         "$START",
+        ", stop: ",
         "$STOP",
+        ", step: ",
         "$STEP"
       ]
     }
@@ -1784,7 +1829,8 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "say",
+        "say ",
+        " text: ",
         "$TEXT"
       ]
     }
@@ -1815,9 +1861,12 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "set field",
+        "set field ",
+        " object: ",
         "$OBJECT",
+        ", field: ",
         "$FIELD",
+        ", from: ",
         "$FROM"
       ]
     }
@@ -1841,7 +1890,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "shuffle text",
+        "shuffle text ",
+        " parts: ",
         "$PARTS"
       ]
     }
@@ -1878,7 +1928,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "slash",
+        "slash ",
+        " go: ",
         "$GO"
       ]
     }
@@ -1901,7 +1952,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "span",
+        "span ",
+        " go: ",
         "$GO"
       ]
     }
@@ -1925,7 +1977,8 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "stopping text",
+        "stopping text ",
+        " parts: ",
         "$PARTS"
       ]
     }
@@ -1977,7 +2030,8 @@ const spec = [
         "text_list_eval"
       ],
       "tokens": [
-        "texts",
+        "texts ",
+        " values: ",
         "$VALUES"
       ]
     }
@@ -2002,7 +2056,7 @@ const spec = [
       "variables"
     ],
     "name": "unpack",
-    "spec": "unpack {field:text_eval} from {record:record_eval}",
+    "spec": "unpack {field:text} from {record:record_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -2032,5 +2086,6 @@ const stub = [
   "determine_text",
   "determine_bool",
   "determine_num_list",
-  "determine_text_list"
+  "determine_text_list",
+  "list_edge"
 ];

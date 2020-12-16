@@ -2,6 +2,7 @@ package story
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -26,4 +27,16 @@ func (op *Text) ImportStub(k *Importer) (ret interface{}, err error) {
 // handle the import of text literals, this is a patch for handling "empty" in string values.
 func (op *TextValue) ImportStub(k *Importer) (ret interface{}, err error) {
 	return op.Text.ImportStub(k)
+}
+
+// handle the import of text literals, this is a patch for handling "empty" in string values.
+func (op *ListEdge) ImportStub(k *Importer) (ret interface{}, err error) {
+	ret = list.Front(op.Str == "$FRONT")
+	return
+}
+
+// turn comment execution into do nothing statements
+func (op *Comment) ImportStub(k *Importer) (ret interface{}, err error) {
+	ret = &core.DoNothing{}
+	return
 }
