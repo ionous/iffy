@@ -22,6 +22,7 @@ func (op *Each) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "list_each",
 		Group:  "list",
+		Spec:   "For each {with:text} in {list:text} go:{go:activity} else:{else:activity}",
 		Desc:   `For each in list: Loops over the elements in the passed list, or runs the 'else' activity if empty.`,
 		Locals: []string{"index", "first", "last"},
 	}

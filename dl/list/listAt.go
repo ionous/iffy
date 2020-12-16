@@ -18,7 +18,7 @@ func (*At) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "list_at",
 		Group: "list",
-		Spec:  "{list:text} entry {index:number}",
+		Spec:  "list {list:text} at {index:number_eval}",
 		Desc:  "Value of List: Get a value from a list. The first element is is index 1.",
 	}
 }

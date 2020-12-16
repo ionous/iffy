@@ -8,9 +8,9 @@ import (
 )
 
 type Set struct {
-	List    string // variable name
-	Index   rt.NumberEval
-	Element core.Assignment
+	List  string // variable name
+	Index rt.NumberEval
+	From  core.Assignment
 }
 
 func (*Set) Compose() composer.Spec {
@@ -33,7 +33,7 @@ func (op *Set) setAt(run rt.Runtime) (err error) {
 		err = e
 	} else if onedex, e := safe.GetNumber(run, op.Index); e != nil {
 		err = e
-	} else if el, e := core.GetAssignedValue(run, op.Element); e != nil {
+	} else if el, e := core.GetAssignedValue(run, op.From); e != nil {
 		err = e
 	} else if !IsInsertable(el, els) {
 		err = insertError{el, els}
