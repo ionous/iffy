@@ -43,6 +43,10 @@ func (op *Var) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.Number)
 }
 
+func (op *Var) GetRecord(run rt.Runtime) (ret g.Value, err error) {
+	return op.getVar(run, affine.Record)
+}
+
 func (op *Var) GetText(run rt.Runtime) (ret g.Value, err error) {
 	return op.getVar(run, affine.Text)
 }
