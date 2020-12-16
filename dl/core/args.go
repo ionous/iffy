@@ -30,7 +30,7 @@ func (*Argument) Compose() composer.Spec {
 func (*Arguments) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "arguments",
-		Spec:  " when {arguments%args+argument}",
+		Spec:  " when {arguments%args+argument|comma-and}",
 		Group: "patterns",
 		Stub:  true,
 	}

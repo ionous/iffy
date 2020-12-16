@@ -42,7 +42,7 @@ nodeListComponent('mk-pattern-rules-ctrl', {
   listClass: PatternRules // "$PATTERN_RULE", "pattern_rule"
 });
 
-nodeListComponent('mk-pattern-locals-ctrl', {
-  token: "$LOCAL_DECL",
-  type: "local_decl",
-});
+// nodeListComponent('mk-pattern-locals-ctrl', {
+//   token: "$LOCAL_DECL",
+//   type: "local_decl",
+// });
