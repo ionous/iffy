@@ -17,7 +17,7 @@ type Unpack struct {
 func (*Unpack) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "unpack",
-		Spec:  "unpack {field:text_eval} from {record:record_eval}",
+		Spec:  "unpack {field:text} from {record:record_eval}",
 		Group: "variables",
 		Desc:  "Unpack: Get a value from a record.",
 	}

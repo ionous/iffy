@@ -19,7 +19,7 @@ func (*Field) Compose() composer.Spec {
 		Name: "get_field",
 		// fix: should use determiner; that should be a hint... yeah?
 		// but if so... then doesnt field need that determiner?
-		Spec:  "the {field:text_eval} of {object:object_eval}",
+		Spec:  "the {field:text} of {object:object_eval}",
 		Group: "objects",
 		Desc:  "Get Field: Return the value of the named object property.",
 	}
