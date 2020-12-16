@@ -8,7 +8,9 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-var runGroupTogther = list.Map{FromList: "Objects", ToList: "Settings", UsingPattern: "groupTogether"}
+var runGroupTogther = list.Map{
+	FromList: "Objects", ToList: "Settings",
+	UsingPattern: "groupTogether"}
 
 // from a list of object names, build a list of group settings
 var groupTogether = pattern.ActivityPattern{
@@ -21,8 +23,8 @@ var groupTogether = pattern.ActivityPattern{
 	},
 	Rules: []*pattern.ExecuteRule{
 		{Execute: &core.Activity{[]rt.Execute{
-			&core.SetField{
-				Object: &core.Var{Name: "out"},
+			&core.Pack{
+				Record: &core.Var{Name: "out"},
 				Field:  "Name",
 				From:   &core.Var{Name: "in"}, // fix? this is no way ensures that the object is valid.
 			},
@@ -31,8 +33,8 @@ var groupTogether = pattern.ActivityPattern{
 					Text:    &core.Var{Name: "in"},
 					Pattern: "^thing"},
 				True: core.NewActivity(
-					&core.SetField{
-						Object: &core.Var{Name: "out"},
+					&core.Pack{
+						Record: &core.Var{Name: "out"},
 						Field:  "Label",
 						From:   &core.FromText{&core.Text{"thingies"}},
 					},

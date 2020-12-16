@@ -26,12 +26,12 @@ func TestKindsForType(t *testing.T) {
 			{"Innumerable", "text", "aspect"},
 			{"GroupOptions", "text", "aspect"},
 		},
-		"GroupObjects": {
+		"GroupedObjects": {
 			{"Settings", "record", "GroupSettings"},
 			{"Objects", "text_list", "string"},
 		},
 		"GroupCollation": {
-			{"Groups", "record_list", "GroupObjects"},
+			{"Groups", "record_list", "GroupedObjects"},
 		},
 	}); len(diff) > 0 {
 		t.Fatal(pretty.Println(ks.Fields))

@@ -45,10 +45,10 @@ const (
 
 // the pattern collate groups builds a group collation from a list of group settings
 type GroupCollation struct {
-	Groups []GroupObjects
+	Groups []GroupedObjects
 }
 
-type GroupObjects struct {
+type GroupedObjects struct {
 	Settings GroupSettings // the settings of the first object in the group
 	Objects  []string      // the list of objects with the same settings
 }
