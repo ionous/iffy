@@ -6,7 +6,6 @@ import (
 	"encoding/gob"
 	"strings"
 
-	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -34,20 +33,6 @@ func (r *Recorder) NewDomainName(domain Named, name, category, ofs string) (ret 
 	// many tests would have to be adjusted to be able to handle normalization wholesale
 	// so for now make this opt-in.
 	norm := strings.TrimSpace(name)
-	// replace things like $CURRENT_TEST with the name of the current test.
-	if !strings.HasPrefix(norm, "$") {
-		//
-		switch category {
-		case tables.NAMED_PATTERN:
-			// we want patterns to be at least leading case aware
-			norm = lang.CombineCase(norm)
-
-		case tables.NAMED_ASPECT,
-			tables.NAMED_TRAIT,
-			tables.NAMED_FIELD:
-			norm = lang.Camelize(norm)
-		}
-	}
 	namedId := r.cache.Must(eph_named, norm, name, category, domain, r.srcId, ofs)
 	return Named{namedId, norm}
 }

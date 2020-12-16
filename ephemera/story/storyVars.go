@@ -42,7 +42,7 @@ func (op *ObjectType) ImportType(k *Importer) (ret ephemera.Named, err error) {
 	return op.Kind.NewName(k)
 }
 
-func (op *PrimitiveType) ImportPrim(k *Importer) (ret string, err error) {
+func (op *PrimitiveType) ImportPrimType(k *Importer) (ret string, err error) {
 	if str, ok := decode.FindChoice(op, op.Str); !ok || len(str) == 0 {
 		err = ImportError(op, op.At, errutil.Fmt("%w %q", InvalidValue, op.Str))
 	} else {

@@ -190,7 +190,7 @@ function getStory() {
                                   "value": {
                                     "$AN": {
                                       "id": "id-a-11",
-                                      "type": "an",
+                                      "type": "ana",
                                       "value": "$A"
                                     },
                                     "$KIND": {
@@ -925,7 +925,7 @@ function getStory() {
                                   "value": {
                                     "$AN": {
                                       "id": "id-1748e116bbd-13",
-                                      "type": "an",
+                                      "type": "ana",
                                       "value": "$A"
                                     },
                                     "$KIND": {

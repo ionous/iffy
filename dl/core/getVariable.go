@@ -16,7 +16,7 @@ type Var struct {
 	Flags TryAsNoun `if:"internal"`
 }
 
-// Compose implements composer.Slat
+// Compose implements composer.Composer
 func (*Var) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "get_var",

@@ -54,7 +54,7 @@ func TestMissingAspects(t *testing.T) {
 			}
 			asm.rec.NewField(parent, a, tables.PRIM_ASPECT)
 		}
-		expected := []string{"b", "d", "f"}
+		expected := []string{"B", "D", "F"}
 		if missing, e := undeclaredAspects(asm.db); e != nil {
 			t.Fatal(e)
 		} else if matches := reflect.DeepEqual(missing, expected); !matches {

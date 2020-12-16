@@ -51,7 +51,7 @@ function localLang(make) {
     // fix: think this should always be "are" never "is"
     make.flow("kind_of_noun", "{are_an} {*trait|comma-and} kind of {kind:singular_kind} {?noun_relation}");
 
-    make.flow("noun_type",  "{an} {kind of%kinds:plural_kinds} noun");
+    make.flow("noun_type",  "{an:ana} {kind of%kinds:plural_kinds} noun");
 
     make.flow("named_noun", "object_eval", "{determiner} {name:noun_name}");
 
@@ -128,7 +128,7 @@ function localLang(make) {
          "Declare a kind");
 
     make.flow("kinds_possess_properties", "story_statement",
-              "{plural_kinds} have {determiner} {property_phrase}.",
+              "{plural_kinds} have {+property_decl|comma-and}.",
               "Add properties to a kind");
 
     make.str("singular_kind",
@@ -140,12 +140,28 @@ For example: an animal, a container, etc.`);
 For example: animals, containers, etc.`);
   });
 
+  make.group("Records", function() {
+    make.flow("kinds_of_record", "story_statement",
+         "{record_plural} are a kind of record.",
+         "Declare a record");
+
+    make.flow("records_possess_properties", "story_statement",
+              "{record_plural} have {+property_decl|comma-and}.",
+              "Add properties to a record");
+
+    make.str("record_singular",
+      `Record: Describes a common set of properties.`);
+
+    make.str("record_plural",
+      `Records: The plural name for a record.`);
+  });
+
   make.group("Variables", function() {
     make.flow("variable_decl", "{type:variable_type} called {name:variable_name}");
     make.str("variable_name");
 
     make.swap("variable_type", "a {simple value%primitive:primitive_type}, an {object:object_type}, or {other value%ext:ext_type}");
-    make.flow("object_type",  "{an} {kind of%kind:singular_kind}");
+    make.flow("object_type",  "{an:ana} {kind of%kind:singular_kind}");
   });
 
   make.group("Traits", function() {
@@ -167,9 +183,11 @@ For example: animals, containers, etc.`);
             "The {property} of {nouns+named_noun} is {the text%lines|summary}",
             "Assign text to a noun: Assign text. Gives a noun one or more lines of text.");
 
-    make.swap("property_phrase", "{primitive_phrase} or {aspect_phrase}");
-    make.flow("aspect_phrase", "{aspect} {?optional_property}");
-    make.flow("optional_property", "called {property}");
+    make.flow("property_decl", "{an:ana} {property} ( {property_type} {comment?lines} )");
+    make.swap("property_type", "an {aspect%property_aspect}, {simple value%primitive:primitive_type}, or {other value%ext:ext_type}");
+
+    make.str("property_aspect", "{an aspect%aspect}");
+
     make.flow("certainties", "story_statement",
               "{plural_kinds} {are_being} {certainty} {trait}.",
               "Give a kind a trait");
@@ -184,16 +202,14 @@ For example: animals, containers, etc.`);
 
   // primitive types
   make.group("Values", function() {
-    make.flow("primitive_phrase", "{primitive_type} called {property}");
-
     make.str("primitive_type", "{a number%number}, {some text%text}, or {a true/false value%bool}");
     make.swap("primitive_value", "{text%boxed_text} or {number%boxed_number}");
 
     // a list of numbers, a list of text, a record, or a list of records.
     make.swap("ext_type", "a list of {numbers:number_list}, a list of {text%text_list}, a {record:record_type} or a list of {records:record_list}.")
 
-    make.flow("record_type",  "a record of {kind%kind:singular_kind}");
-    make.flow("record_list",  "a list of {kind%kind:singular_kind} records");
+    make.flow("record_type",  "a record of {kind%kind:record_singular}");
+    make.flow("record_list",  "a list of {kind%kind:record_singular} records");
 
     make.flow("boxed_text", "{text}");
     make.flow("boxed_number", "{number}");
@@ -216,7 +232,7 @@ See also: text.`);
   });
 
  make.group("Helper Types", function() {
-    make.str("an", "{a} or {an}");
+    make.str("ana", "{a} or {an}");
     make.str("are_being",  "{are} or {is}");
     make.str("are_an",  "{are}, {are a%area}, {are an%arean}, {is}, {is a%isa}, {is an%isan}");
   });
@@ -234,4 +250,3 @@ function makeLang(make) {
     localLang(make);
   });
 }
-

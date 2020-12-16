@@ -50,7 +50,7 @@
                                   "value": {
                                     "$AN": {
                                       "id": "id-174f629fe91-33",
-                                      "type": "an",
+                                      "type": "ana",
                                       "value": "$A"
                                     },
                                     "$KIND": {

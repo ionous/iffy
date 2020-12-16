@@ -35,37 +35,40 @@
                 "id": "id-c-21",
                 "type": "kinds_possess_properties",
                 "value": {
-                  "$DETERMINER": {
-                    "type": "determiner",
-                    "value": "$A"
-                  },
                   "$PLURAL_KINDS": {
                     "id": "id-c-18",
                     "type": "plural_kinds",
                     "value": " things"
                   },
-                  "$PROPERTY_PHRASE": {
-                    "id": "id-c-20",
-                    "type": "property_phrase",
-                    "value": {
-                      "$PRIMITIVE_PHRASE": {
-                        "id": "id-c-24",
-                        "type": "primitive_phrase",
-                        "value": {
-                          "$PRIMITIVE_TYPE": {
-                            "id": "id-c-22",
-                            "type": "primitive_type",
-                            "value": "$TEXT"
-                          },
-                          "$PROPERTY": {
-                            "id": "id-c-23",
-                            "type": "property",
-                            "value": "printed name"
+                  "$PROPERTY_DECL": [
+                    {
+                      "id": "id-17669044d83-0",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-17669044d83-1",
+                          "type": "ana",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-17669044d83-2",
+                          "type": "property",
+                          "value": "printed name"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-17669044d83-3",
+                          "type": "property_type",
+                          "value": {
+                            "$PRIMITIVE": {
+                              "id": "id-17668e9a683-3",
+                              "type": "primitive_type",
+                              "value": "$TEXT"
+                            }
                           }
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -119,7 +122,7 @@
                                   "value": {
                                     "$AN": {
                                       "id": "id-a-11",
-                                      "type": "an",
+                                      "type": "ana",
                                       "value": "$A"
                                     },
                                     "$KIND": {
@@ -583,25 +586,26 @@
                                               "id": "id-1743bd78458-29",
                                               "type": "text_eval",
                                               "value": {
-                                                  "type": "name_of",
-                                                  "value": {
-                                                    "$OBJECT": {
-                                                      "type": "object_eval",
+                                                "id": "id-17669044d83-4",
+                                                "type": "name_of",
+                                                "value": {
+                                                  "$OBJECT": {
+                                                    "id": "id-17669044d83-5",
+                                                    "type": "object_eval",
+                                                    "value": {
+                                                      "id": "id-17669044d83-6",
+                                                      "type": "get_var",
                                                       "value": {
-                                                        "type": "get_var",
-                                                        "value": {
-                                                          
-                                                          "$NAME": {
-                                                            "type": "text",
-                                                            "value": "target"
-                                                          }
+                                                        "$NAME": {
+                                                          "id": "id-17669044d83-7",
+                                                          "type": "text",
+                                                          "value": "target"
                                                         }
                                                       }
                                                     }
                                                   }
                                                 }
-
-
+                                              }
                                             }
                                           }
                                         }

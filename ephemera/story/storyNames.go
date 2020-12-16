@@ -7,7 +7,8 @@ import (
 )
 
 func (op *Aspect) NewName(k *Importer) (ret ephemera.Named, err error) {
-	return k.NewName(op.Str, tables.NAMED_ASPECT, op.At.String()), nil
+	name := lang.Camelize(op.Str)
+	return k.NewName(name, tables.NAMED_ASPECT, op.At.String()), nil
 }
 
 func (op *NounName) NewName(k *Importer) (ret ephemera.Named, err error) {
@@ -19,7 +20,8 @@ func (op *NounName) AddNameWithCategory(k *Importer, cat string) (ret ephemera.N
 }
 
 func (op *PatternName) NewName(k *Importer) (ret ephemera.Named, err error) {
-	return k.NewName(op.Str, tables.NAMED_PATTERN, op.At.String()), nil
+	name := lang.CombineCase(op.Str)
+	return k.NewName(name, tables.NAMED_PATTERN, op.At.String()), nil
 }
 
 func (op *PluralKinds) NewName(k *Importer) (ret ephemera.Named, err error) {
@@ -27,7 +29,20 @@ func (op *PluralKinds) NewName(k *Importer) (ret ephemera.Named, err error) {
 }
 
 func (op *Property) NewName(k *Importer) (ret ephemera.Named, err error) {
-	return k.NewName(op.Str, tables.NAMED_FIELD, op.At.String()), nil
+	// note: this is linked to NAMED_ASPECT
+	// aspect properties in kinds currently must have the same name as the aspect.
+	name := lang.Camelize(op.Str)
+	return k.NewName(name, tables.NAMED_FIELD, op.At.String()), nil
+}
+
+func (op *RecordSingular) NewName(k *Importer) (ret ephemera.Named, err error) {
+	// fix? for now, we leverage the existing kind assembly
+	return k.NewName(op.Str, tables.NAMED_KIND, op.At.String()), nil
+}
+
+func (op *RecordPlural) NewName(k *Importer) (ret ephemera.Named, err error) {
+	// fix? for now, we leverage the existing kind assembly
+	return k.NewName(op.Str, tables.NAMED_PLURAL_KINDS, op.At.String()), nil
 }
 
 func (op *Relation) NewName(k *Importer) (ret ephemera.Named, err error) {
@@ -53,7 +68,8 @@ func (op *TestName) NewName(k *Importer) (ret ephemera.Named, err error) {
 }
 
 func (op *Trait) NewName(k *Importer) (ret ephemera.Named, err error) {
-	return k.NewName(op.Str, tables.NAMED_TRAIT, op.At.String()), nil
+	name := lang.Camelize(op.Str)
+	return k.NewName(name, tables.NAMED_TRAIT, op.At.String()), nil
 }
 
 func (op *VariableName) NewName(k *Importer, cat string) (ret ephemera.Named, err error) {

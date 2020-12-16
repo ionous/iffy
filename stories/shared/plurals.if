@@ -15,37 +15,40 @@
                 "id": "id-173f8fba4ff-13",
                 "type": "kinds_possess_properties",
                 "value": {
-                  "$DETERMINER": {
-                    "type": "determiner",
-                    "value": "$A"
-                  },
                   "$PLURAL_KINDS": {
                     "id": "id-173f8fba4ff-14",
                     "type": "plural_kinds",
                     "value": " things"
                   },
-                  "$PROPERTY_PHRASE": {
-                    "id": "id-173f8fba4ff-15",
-                    "type": "property_phrase",
-                    "value": {
-                      "$PRIMITIVE_PHRASE": {
-                        "id": "id-173f8fba4ff-16",
-                        "type": "primitive_phrase",
-                        "value": {
-                          "$PRIMITIVE_TYPE": {
-                            "id": "id-173f8fba4ff-17",
-                            "type": "primitive_type",
-                            "value": "$TEXT"
-                          },
-                          "$PROPERTY": {
-                            "id": "id-173f8fba4ff-18",
-                            "type": "property",
-                            "value": "printed plural name"
+                  "$PROPERTY_DECL": [
+                    {
+                      "id": "id-17669095400-6",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-17669095400-7",
+                          "type": "ana",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-17669095400-8",
+                          "type": "property",
+                          "value": "printed plural name"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-17669095400-9",
+                          "type": "property_type",
+                          "value": {
+                            "$PRIMITIVE": {
+                              "id": "id-17668e9a683-3",
+                              "type": "primitive_type",
+                              "value": "$TEXT"
+                            }
                           }
                         }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
@@ -99,7 +102,7 @@
                                   "value": {
                                     "$AN": {
                                       "id": "id-1748e116bbd-13",
-                                      "type": "an",
+                                      "type": "ana",
                                       "value": "$A"
                                     },
                                     "$KIND": {
@@ -239,11 +242,9 @@
                                       "type": "get_field",
                                       "value": {
                                         "$FIELD": {
-
-                                                "type": "text",
-                                                "value": "printed plural name"
-                                              
-                                        
+                                          "id": "id-17669095400-10",
+                                          "type": "text",
+                                          "value": "printed plural name"
                                         },
                                         "$OBJECT": {
                                           "id": "id-17494737044-25",

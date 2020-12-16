@@ -15,10 +15,12 @@ import (
 // . singular kinds ( the definition of kinds should always use plural names )
 // . kinds containing punctuation ( especially "," since that used for the expanded hierarchy )
 // . misspellings, near spellings
-func AssembleAncestry(asm *Assembler, k string) (err error) {
+func AssembleAncestry(asm *Assembler, baseKind string) (err error) {
 	var kinds cachedKinds // collect all kinds
-	if e := kinds.AddDescendentsOf(asm.cache.DB(), k); e != nil {
-		err = errutil.New("couldn't determine ancestry")
+	if e := kinds.AddDescendentsOf(asm.cache.DB(), baseKind); e != nil {
+		err = errutil.New("couldn't determine ancestry of", baseKind)
+	} else if e := kinds.AddDescendentsOf(asm.cache.DB(), "records"); e != nil {
+		err = errutil.New("couldn't determine ancestry of", "records")
 	} else {
 		// write ancestors
 		for k, v := range kinds.cache {

@@ -93,14 +93,14 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 		// record any custom determiner
 		if str, ok := decode.FindChoice(&op.Determiner, op.Determiner.Str); ok && len(str) == 0 {
 			// set the indefinite article field
-			article := k.NewName("indefinite article", tables.NAMED_FIELD, op.At.String())
+			article := k.NewName("indefiniteArticle", tables.NAMED_FIELD, op.At.String())
 			k.NewValue(noun, article, op.Determiner.Str)
 
 			// create a "indefinite article" field for all "things"
 			if once := "named_noun"; k.Once(once) {
 				domain := k.gameDomain()
 				things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
-				indefinite := k.NewDomainName(domain, "indefinite article", tables.NAMED_FIELD, once)
+				indefinite := k.NewDomainName(domain, "indefiniteArticle", tables.NAMED_FIELD, once)
 				k.NewField(things, indefinite, tables.PRIM_TEXT)
 			}
 

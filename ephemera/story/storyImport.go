@@ -89,15 +89,29 @@ func (op *KindsOfKind) ImportPhrase(k *Importer) (err error) {
 	return
 }
 
+// ex. "cats are a kind of record"
+func (op *KindsOfRecord) ImportPhrase(k *Importer) (err error) {
+	if kind, e := op.RecordPlural.NewName(k); e != nil {
+		err = e
+	} else {
+		record := k.NewName("record", tables.NAMED_KIND, op.At.String())
+		k.NewKind(kind, record)
+	}
+	return
+}
+
 // ex. cats have some text called breed.
 // ex. horses have an aspect called speed.
 func (op *KindsPossessProperties) ImportPhrase(k *Importer) (err error) {
 	if kind, e := op.PluralKinds.NewName(k); e != nil {
 		err = e
 	} else {
-		err = op.PropertyPhrase.ImportProperties(k, kind)
+		for _, n := range op.PropertyDecl {
+			if e := n.ImportProperty(k, kind); e != nil {
+				err = errutil.Append(err, e)
+			}
+		}
 	}
-	// fix: handle determiner?
 	return
 }
 

@@ -1,0 +1,260 @@
+{
+  "id": "id-174cda99dde-0",
+  "type": "story",
+  "value": {
+    "$PARAGRAPH": [
+      {
+        "id": "id-17665a6b6dd-0",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-17665a6b6dd-4",
+              "type": "story_statement",
+              "value": {
+                "id": "id-17665a6b6dd-1",
+                "type": "kinds_of_record",
+                "value": {
+                  "$RECORD_PLURAL": {
+                    "id": "id-17665a6b6dd-2",
+                    "type": "record_plural",
+                    "value": " group settings"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-17665a6b6dd-35",
+              "type": "story_statement",
+              "value": {
+                "id": "id-17665a6b6dd-31",
+                "type": "kinds_possess_properties",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-17665a6b6dd-32",
+                    "type": "plural_kinds",
+                    "value": " group settings"
+                  },
+                  "$PROPERTY_DECL": [
+                    {
+                      "id": "id-17668e9a683-0",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-17669095400-2",
+                          "type": "ana",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-17668e9a683-1",
+                          "type": "property",
+                          "value": "name"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-17668e9a683-2",
+                          "type": "property_type",
+                          "value": {
+                            "$PRIMITIVE": {
+                              "id": "id-17668e9a683-3",
+                              "type": "primitive_type",
+                              "value": "$TEXT"
+                            }
+                          }
+                        },
+                        "$COMMENT": {
+                          "id": "id-17668e9a683-4",
+                          "type": "lines",
+                          "value": ", containing the name of the object the settings describe"
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-17668e9a683-25",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-17669095400-3",
+                          "type": "ana",
+                          "value": "$AN"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-17668e9a683-26",
+                          "type": "property",
+                          "value": "innumerable"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-17668e9a683-27",
+                          "type": "property_type",
+                          "value": {
+                            "$PRIMITIVE": {
+                              "id": "id-17668e9a683-28",
+                              "type": "primitive_type",
+                              "value": "$BOOL"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-17668e9a683-20",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-17669095400-4",
+                          "type": "ana",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-17668e9a683-21",
+                          "type": "property",
+                          "value": "group option"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-17668e9a683-22",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-17668e9a683-23",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        },
+                        "$COMMENT": {
+                          "id": "id-17668e9a683-24",
+                          "type": "lines",
+                          "value": ",  controlling the listing of objects in a group"
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-17668e9a683-9",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-17669095400-5",
+                          "type": "ana",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-17668e9a683-10",
+                          "type": "property",
+                          "value": "label"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-17668e9a683-11",
+                          "type": "property_type",
+                          "value": {
+                            "$PRIMITIVE": {
+                              "id": "id-17668e9a683-12",
+                              "type": "primitive_type",
+                              "value": "$TEXT"
+                            }
+                          }
+                        },
+                        "$COMMENT": {
+                          "id": "id-17668e9a683-13",
+                          "type": "lines",
+                          "value": ", objects with the same label are considered to be part of the same group"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-17665a6b6dd-21",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-17665a6b6dd-20",
+              "type": "story_statement",
+              "value": {
+                "id": "id-17665a6b6dd-18",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-17665a6b6dd-19",
+                    "type": "aspect",
+                    "value": " group option"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-17665a6b6dd-27",
+              "type": "story_statement",
+              "value": {
+                "id": "id-17665a6b6dd-22",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-17665a6b6dd-23",
+                    "type": "aspect",
+                    "value": " group option"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-17665a6b6dd-24",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-17665a6b6dd-25",
+                        "type": "are_either",
+                        "value": "$CANBE"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-17665a6b6dd-26",
+                          "type": "trait",
+                          "value": "without objects"
+                        },
+                        {
+                          "id": "id-17665a6b6dd-28",
+                          "type": "trait",
+                          "value": "without articles"
+                        },
+                        {
+                          "id": "id-17665a6b6dd-29",
+                          "type": "trait",
+                          "value": "with articles"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-17667c4452b-4",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-17667c4452b-3",
+              "type": "story_statement",
+              "value": {
+                "id": "id-17667c4452b-0",
+                "type": "kinds_of_record",
+                "value": {
+                  "$RECORD_PLURAL": {
+                    "id": "id-17667c4452b-1",
+                    "type": "plural_kinds",
+                    "value": " grouped objects"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
