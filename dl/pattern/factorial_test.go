@@ -50,9 +50,9 @@ func TestFactorial(t *testing.T) {
 	}
 	if v, e := safe.GetNumber(&run, &det); e != nil {
 		t.Fatal(e)
-	} else if want := 3 * (2 * (1 * 1)); v.Int() != want {
-		t.Fatal("mismatch: expected:", want, "have:", v)
+	} else if got, want := v.Int(), 3*(2*(1*1)); got != want {
+		t.Fatal("mismatch: expected:", want, "have:", got)
 	} else {
-		t.Log("factorial okay", v)
+		t.Log("factorial okay", got)
 	}
 }
