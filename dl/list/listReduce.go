@@ -40,19 +40,20 @@ func (op *Reduce) reduce(run rt.Runtime) (err error) {
 	} else {
 		ps := op.pk.NewRecord()
 		for it := g.ListIt(fromList); it.HasNext(); {
+			in, out := 0, 1
 			if inVal, e := it.GetNext(); e != nil {
 				err = e
 				break
-			} else if e := ps.SetFieldByIndex(op.in, inVal); e != nil {
+			} else if e := ps.SetFieldByIndex(in, inVal); e != nil {
 				err = e
 				break
-			} else if e := ps.SetFieldByIndex(op.out, outVal); e != nil {
+			} else if e := ps.SetFieldByIndex(out, outVal); e != nil {
 				err = e
 				break
 			} else if e := op.call(run, ps); e != nil {
 				err = e
 				break
-			} else if newVal, e := ps.GetFieldByIndex(op.out); e != nil {
+			} else if newVal, e := ps.GetFieldByIndex(out); e != nil {
 				err = e
 				break
 			} else {

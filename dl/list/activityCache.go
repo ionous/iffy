@@ -15,10 +15,7 @@ import (
 type activityCache struct {
 	pat    pattern.ActivityPattern
 	pk, lk *g.Kind
-	// indices within the parameter kind
-	// fix: call by index instead?
-	in, out int
-	run     rt.Runtime
+	run    rt.Runtime
 }
 
 // see also pattern.Stitch
@@ -40,18 +37,16 @@ func (op *activityCache) cacheKinds(run rt.Runtime, pat string) (err error) {
 			err = e
 		} else if lk, e := op.newLocals(run); e != nil {
 			err = e
-		} else if in := pk.FieldIndex("in"); in < 0 {
-			err = errutil.New("pattern expected an 'in' parameter")
-		} else if out := pk.FieldIndex("out"); out < 0 {
-			err = errutil.New("pattern expected an 'out' parameter")
+		} else if pk.NumField() < 2 {
+			err = errutil.New("pattern expected at least two parameters, an input and an output")
 		} else {
-			op.pk, op.lk, op.in, op.out = pk, lk, in, out
+			op.pk, op.lk = pk, lk
 			op.run = run
 		}
 	}
 	return
-
 }
+
 func (op *activityCache) newParams(run rt.Runtime) (ret *g.Kind, err error) {
 	// create variables for all the known parameters
 	if op.pk != nil && !op.pk.IsStaleKind(run) {

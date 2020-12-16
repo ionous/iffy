@@ -40,16 +40,17 @@ func (op *Map) remap(run rt.Runtime) (err error) {
 	} else {
 		for it := g.ListIt(fromList); it.HasNext(); {
 			ps := op.pk.NewRecord() // create a new set of parameters each loop
+			in, out := 0, 1
 			if inVal, e := it.GetNext(); e != nil {
 				err = e
 				break
-			} else if e := ps.SetFieldByIndex(op.in, inVal); e != nil {
+			} else if e := ps.SetFieldByIndex(in, inVal); e != nil {
 				err = e
 				break
 			} else if e := op.call(run, ps); e != nil {
 				err = e
 				break
-			} else if newVal, e := ps.GetFieldByIndex(op.out); e != nil {
+			} else if newVal, e := ps.GetFieldByIndex(out); e != nil {
 				err = e
 				break
 			} else if src, dst := newVal.Affinity(), toList.Affinity(); src != affine.Element(dst) ||
