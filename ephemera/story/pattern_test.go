@@ -16,7 +16,7 @@ func TestPatternVars(t *testing.T) {
 		VariableDecl: []VariableDecl{{
 			Type: VariableType{
 				Opt: &ObjectType{
-					An: An{
+					An: Ana{
 						Str: "$AN",
 					},
 					Kind: SingularKind{

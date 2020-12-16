@@ -136,6 +136,10 @@ var FactorialPatternDecl = map[string]interface{}{
 					map[string]interface{}{
 						"type": "variable_decl",
 						"value": map[string]interface{}{
+							"$AN": map[string]interface{}{
+								"type":  "determiner",
+								"value": "a",
+							},
 							"$TYPE": map[string]interface{}{
 								"type": "variable_type",
 								"value": map[string]interface{}{

@@ -101,7 +101,7 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 			if t := tag.ReadTag(f.Tag); !t.Exists("internal") && !t.Exists("optional") {
 				// and even then only if its a fixed field
 				if f.Type.Kind() != r.Ptr {
-					dec.report(at, errutil.Fmt("missing %q at %s", token, at))
+					dec.report(at, errutil.Fmt("missing %s.%s at %s", out.Type().String(), token, at))
 				}
 			}
 		} else {
