@@ -12,7 +12,7 @@ module.exports =
 {{~/if}}{{/each}}
 }
 
-var Model = []composer.Slat{
+var Model = []composer.Composer{
 {{~#each allTypes}}{{#if (IsSlat name)}}
   (*{{Pascal name}})(nil),
 {{~/if}}{{/each}}
@@ -36,7 +36,7 @@ var Model = []composer.Slat{
   Desc: "Assignments: Helper used when setting variables.",
 }}
 
-var Slats = []composer.Slat{
+var Slats = []composer.Composer{
   (*Something)(nil),
 }
 */

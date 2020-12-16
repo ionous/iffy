@@ -1,4 +1,4 @@
-// optTemplate.js
+// swapTemplate.js
 'use strict';
 module.exports =
 `// {{Pascal name}} swaps between various options
