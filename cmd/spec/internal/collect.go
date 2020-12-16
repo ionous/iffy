@@ -63,9 +63,13 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 		if slotNames := slotsOf(rtype, c.slots); len(slotNames) > 0 {
 			with["slots"] = slotNames
 		}
+		uses := "flow"
+		if len(spec.Uses) > 0 {
+			uses = spec.Uses
+		}
 		out := export.Dict{
 			"name": spec.Name,
-			"uses": "flow",
+			"uses": uses,
 			"with": with,
 		}
 		// missing spec, missing slots.

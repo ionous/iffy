@@ -4,7 +4,6 @@ import (
 	"fmt"
 	r "reflect"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/ionous/iffy"
@@ -28,17 +27,17 @@ func parse(t r.Type) ([]string, export.Dict) {
 	// or could use blank text fields and join in-order
 	prettyType := export.Prettify(t.Name())
 
-	tokens := []string{prettyType}
+	tokens := []string{prettyType + " "}
 	// keyed by token
 	params := make(export.Dict)
-
+	last := " "
 	export.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
 		tags := tag.ReadTag(f.Tag)
 		if _, ok := tags.Find("internal"); !ok {
 			prettyField := export.Prettify(f.Name)
 			key := export.Tokenize(f)
 			typeName, repeats := nameOfType(f.Type)
-			tokens = append(tokens, key)
+			tokens = append(tokens, last+prettyField+": ", key)
 			m := export.Dict{
 				"label": prettyField,
 				"type":  typeName,
@@ -48,29 +47,30 @@ func parse(t r.Type) ([]string, export.Dict) {
 				m["repeats"] = true
 			}
 			params[key] = m
+			last = ", "
 		}
 		return
 	})
 	return tokens, params
 }
 
-// i dont think this works right because it doesnt change the spec
-// i dont think? the composer is either.
 func updateTokens(phrase string, tokens []string) (ret []string) {
 	if len(phrase) == 0 {
 		ret = tokens
 	} else {
 		fields := strings.Fields(phrase)
-		for j, f := range fields {
-			if tokenPlaceholders.MatchString(f) {
-				if i, e := strconv.Atoi(f[1:]); e != nil {
-					panic(e)
-				} else {
-					t := tokens[i]
-					fields[j] = t
-				}
-			}
-		}
+		// replace the fields in a phrase matching $1, etc. with tokens
+		// unused, and would need to handle offset of fields in tokens
+		// for _, f := range fields {
+		// 	if !tokenPlaceholders.MatchString(f) {
+		// 		ret = append(ret, f)
+		// 	} else if i, e := strconv.Atoi(f[1:]); e != nil {
+		// 		panic(e)
+		// 	} else {
+		// 		t := tokens[i]
+		// 		ret = append(ret, t)
+		// 	}
+		// }
 		ret = fields
 	}
 	return

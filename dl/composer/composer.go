@@ -2,9 +2,9 @@ package composer
 
 // Spec for display in composer
 type Spec struct {
-	Name, Spec, Group, Desc string
-	Stub                    bool // generate a custom loading struct.
-	Locals                  []string
+	Name, Spec, Group, Desc, Uses string
+	Stub                          bool // generate a custom loading struct.
+	Locals                        []string
 }
 
 type Composer interface {
