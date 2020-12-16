@@ -130,7 +130,7 @@ class Flow extends Node {
     }
   };
   unroll(nodes, itemValue) {
-    this.forEach(({idx, token, param})=>{
+    itemValue && this.forEach(({idx, token, param})=>{
       if (param) {
         const arg = itemValue[token];
         if (arg !== undefined) {
@@ -219,7 +219,7 @@ class SlotNode extends Node {
     };
   }
   unroll(nodes, itemValue) {
-    if (itemValue.value != null) {
+    if (itemValue && itemValue.value != null) {
       const kid= nodes.newFromItem(this, itemValue);
       this.kid= kid;
     }
@@ -310,9 +310,7 @@ class Nodes {
   }
   newFromItem(parent, item) {
     const kid= this.newNode(parent, item.type, item.id);
-    if (item.value) {
-      kid.unroll(this, item.value);
-    }
+    kid.unroll(this, item.value);
     return kid;
   }
   newNode(parent, typeName, itemId) {
