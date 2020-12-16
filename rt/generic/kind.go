@@ -65,6 +65,7 @@ func (k *Kind) NumField() int {
 	return len(k.fields)
 }
 
+// 0 indexed
 func (k *Kind) Field(i int) Field {
 	k.lastOne = i + 1
 	return k.fields[i]
