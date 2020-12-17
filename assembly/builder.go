@@ -79,16 +79,22 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 			if err == nil && paramName != patternName {
 				// fix: these should probably be tables.PRIM_ names
 				// ie. "text" not "text_eval" -- tests and other things have to be adjusted
+				// it also seems a bad time to be camelizing things.
 				paramName := lang.Camelize(paramName)
 
+				// locals have simple type names, parameters are still using _eval.
 				var p term.Preparer
 				switch typeName {
-				case "text_eval":
+				case "text_eval", "text":
 					p = &term.Text{Name: paramName}
-				case "number_eval":
+				case "number_eval", "number":
 					p = &term.Number{Name: paramName}
-				case "bool_eval":
+				case "bool_eval", "bool":
 					p = &term.Bool{Name: paramName}
+				case "text_list", "text_list_eval":
+					p = &term.TextList{Name: paramName}
+				case "num_list", "num_list_eval":
+					p = &term.NumList{Name: paramName}
 				default:
 					// the type might be some sort of kind...
 					if kind := kind.String; len(kind) > 0 {
@@ -97,6 +103,8 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 							p = &term.Object{Name: paramName, Kind: kind}
 						case string(affine.Record):
 							p = &term.Record{Name: paramName, Kind: kind}
+						case string(affine.RecordList):
+							p = &term.RecordList{Name: paramName, Kind: kind}
 						}
 					}
 				}
