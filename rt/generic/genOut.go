@@ -2,6 +2,8 @@ package generic
 
 import "github.com/ionous/iffy/affine"
 
+// primarily for testing:
+// convert the contents of a bunch of records into a printable format.
 func RecordsToValue(ds []*Record) []interface{} {
 	var els []interface{}
 	for _, d := range ds {
@@ -10,6 +12,8 @@ func RecordsToValue(ds []*Record) []interface{} {
 	return els
 }
 
+// primarily for testing:
+// convert the contents of a record into a printable format.
 // future: json encoding instead
 func RecordToValue(d *Record) map[string]interface{} {
 	m := make(map[string]interface{})
