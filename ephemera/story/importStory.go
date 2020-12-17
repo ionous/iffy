@@ -8,14 +8,18 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/reader"
-	"github.com/kr/pretty"
 )
 
-func ImportStory(src string, db *sql.DB, m reader.Map, reporter decode.IssueReport) (err error) {
-	return ImportStories(src, db, []reader.Map{m}, reporter)
+func ImportStory(src string, db *sql.DB, m reader.Map, reporter decode.IssueReport) (ret *Story, err error) {
+	if xs, e := ImportStories(src, db, []reader.Map{m}, reporter); e != nil {
+		err = e
+	} else {
+		ret = xs[0]
+	}
+	return
 }
 
-func ImportStories(src string, db *sql.DB, ms []reader.Map, reporter decode.IssueReport) (err error) {
+func ImportStories(src string, db *sql.DB, ms []reader.Map, reporter decode.IssueReport) (ret []*Story, err error) {
 	iffy.RegisterGobs()
 	dec := decode.NewDecoderReporter(src, reporter)
 	k := NewImporterDecoder(src, db, dec)
@@ -32,15 +36,14 @@ func ImportStories(src string, db *sql.DB, ms []reader.Map, reporter decode.Issu
 		if i, e := dec.ReadSpec(m); e != nil {
 			err = e
 			break
+		} else if story, ok := i.(*Story); !ok {
+			err = errutil.Fmt("imported spec wasn't a story %T", i)
+			break
+		} else if e := story.ImportStory(k); e != nil {
+			err = e
+			break
 		} else {
-			pretty.Println(i)
-			if story, ok := i.(*Story); !ok {
-				err = errutil.Fmt("imported spec wasn't a story %T", i)
-				break
-			} else if e := story.ImportStory(k); e != nil {
-				err = e
-				break
-			}
+			ret = append(ret, story)
 		}
 	}
 	return

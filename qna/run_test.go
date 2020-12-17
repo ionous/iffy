@@ -36,7 +36,7 @@ func testAll(inFile string, db *sql.DB, m reader.Map, reporter decode.IssueRepor
 	var ds reader.Dilemmas
 	if e := tables.CreateAll(db); e != nil {
 		err = errutil.New("couldn't create tables", e)
-	} else if e := story.ImportStory(inFile, db, m, reporter); e != nil {
+	} else if _, e := story.ImportStory(inFile, db, m, reporter); e != nil {
 		err = errutil.New("couldn't import story", e)
 	} else if e := assembly.AssembleStory(db, "kinds", ds.Add); e != nil {
 		err = errutil.New("couldnt assemble story", e, ds.Err())

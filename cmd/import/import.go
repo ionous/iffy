@@ -16,6 +16,7 @@ import (
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/tables"
+	"github.com/kr/pretty"
 )
 
 // Import reads a json file (from the composer editor)
@@ -23,22 +24,29 @@ import (
 // It uses package export's list of commands for parsing program statements.
 func main() {
 	var inFile, outFile string
+	var printStories bool
 	flag.StringVar(&inFile, "in", "", "input file or directory name (json)")
 	flag.StringVar(&outFile, "out", "", "optional output filename (sqlite3)")
 	flag.BoolVar(&errutil.Panic, "panic", false, "panic on error?")
+	flag.BoolVar(&printStories, "log", false, "write imported stories to console")
 	flag.Parse()
 	if len(outFile) == 0 {
 		dir, _ := filepath.Split(inFile)
 		outFile = filepath.Join(dir, "ephemera.db")
 	}
-	if e := distill(outFile, inFile); e != nil {
+	if xs, e := distill(outFile, inFile); e != nil {
 		log.Fatalln(e)
 	} else {
+		if printStories {
+			for _, x := range xs {
+				pretty.Println(x)
+			}
+		}
 		log.Println("Imported", inFile, "into", outFile)
 	}
 }
 
-func distill(outFile, inFile string) (err error) {
+func distill(outFile, inFile string) (ret []*story.Story, err error) {
 	// fix: write to temp db file then copy the file on success?
 	// currently stray files are left hanging around
 	if inFile, e := filepath.Abs(inFile); e != nil {
@@ -62,9 +70,10 @@ func distill(outFile, inFile string) (err error) {
 			defer outDB.Close()
 			if e := tables.CreateEphemera(outDB); e != nil {
 				err = errutil.New("couldn't create tables", outFile, e)
-			} else if e := story.ImportStories(inFile, outDB, inData, ds.Report); e != nil {
+			} else if xs, e := story.ImportStories(inFile, outDB, inData, ds.Report); e != nil {
 				err = errutil.New("couldn't import story", e)
 			} else {
+				ret = xs
 				reader.PrintDilemmas(log.Writer(), ds)
 			}
 		}

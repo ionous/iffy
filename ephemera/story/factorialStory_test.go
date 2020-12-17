@@ -16,7 +16,7 @@ func TestFactorialStory(t *testing.T) {
 	defer db.Close()
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create tables", e)
-	} else if e := ImportStory(t.Name(), db, debug.FactorialStory, func(pos reader.Position, err error) {
+	} else if _, e := ImportStory(t.Name(), db, debug.FactorialStory, func(pos reader.Position, err error) {
 		t.Errorf("%s at %s", err, pos)
 	}); e != nil {
 		t.Fatal("import", e)
