@@ -21,13 +21,13 @@ func (a *nounLocale) setLocaleOf(id, parent string) {
 	a.cache[id] = parent
 }
 
-func (a *nounLocale) localeOf(id string) (ret string) {
+func (a *nounLocale) localeOf(id string) (ret string, err error) {
 	if el, ok := a.cache[id]; ok {
 		ret = el
 	} else {
 		switch e := a.q.QueryRow(id, "locale").Scan(&el); e {
 		default:
-			panic(e)
+			err = e
 		case nil, sql.ErrNoRows:
 			a.setLocaleOf(id, el)
 			ret = el

@@ -102,9 +102,9 @@ func (run *Runner) RelateTo(a, b, relation string) (err error) {
 		err = g.UnknownObject(a)
 	} else if !run.isActive(b) {
 		err = g.UnknownObject(b)
-	} else if ak, e := run.getField(makeKey(object.Kinds, a)); e != nil {
+	} else if ak, e := run.GetField(object.Kinds, a); e != nil {
 		err = e
-	} else if bk, e := run.getField(makeKey(object.Kinds, b)); e != nil {
+	} else if bk, e := run.GetField(object.Kinds, b); e != nil {
 		err = e
 	} else if rel := run.relativeKind(relation); !compatibleKind(ak.String(), rel.kind) {
 		err = errutil.Fmt("relation %s expects %s doesnt support %s ( a kind of %s )", relation, rel.kind, a, ak.String())

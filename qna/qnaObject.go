@@ -14,7 +14,7 @@ type qnaObject struct {
 	id string
 }
 
-func newObjectValue(run *Runner, v interface{}) (ret snapper, err error) {
+func newObjectValue(run *Runner, v interface{}) (ret qnaValue, err error) {
 	if id, ok := v.(string); !ok {
 		err = errutil.Fmt("expected id value, got %v(%T)", v, v)
 	} else {
@@ -47,15 +47,13 @@ func (q *qnaObject) Type() (ret string) {
 
 func (q *qnaObject) FieldByName(field string) (ret g.Value, err error) {
 	// fix temp:
-	var key keyType
 	switch field {
 	case object.Name, object.Kind, object.Kinds, object.Locale:
-		// sigh
-		key = makeKey(field, q.id)
+		ret, err = q.n.GetField(field, q.id)
 	default:
-		key = makeKey(q.id, field)
+		ret, err = q.n.GetField(q.id, field)
 	}
-	return q.n.getField(key)
+	return
 }
 
 func (q *qnaObject) SetFieldByName(field string, val g.Value) (err error) {

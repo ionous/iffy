@@ -22,8 +22,8 @@ func (k *keyType) unknown() (err error) {
 }
 
 // subField should be one of the package object prefixes
-func (k *keyType) dot(subField string) keyType {
-	return keyType{subField, k.target + "." + k.field}
+func (k *keyType) dot() string {
+	return k.target + "." + k.field
 }
 
 func makeKey(target, field string) keyType {

@@ -15,17 +15,9 @@ import (
 // the meaning of a snapshot changes per value type.
 // ex. snapshots from evals are unique instances,
 // while multiple list snaps share the same slice memory.
-type snapper interface {
+type qnaValue interface {
+	Affinity() affine.Affinity
 	Snapshot(rt.Runtime) (g.Value, error)
-}
-
-type qnaValue struct {
-	affinity affine.Affinity
-	snapper
-}
-
-func (q qnaValue) Affinity() affine.Affinity {
-	return q.affinity
 }
 
 type staticValue struct {
@@ -33,6 +25,9 @@ type staticValue struct {
 	val      interface{}
 }
 
+func (f staticValue) Affinity() affine.Affinity {
+	return f.affinity
+}
 func (f staticValue) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 	switch i, a := f.val, f.affinity; a {
 	case affine.Bool:
@@ -112,13 +107,22 @@ func (f staticValue) Snapshot(run rt.Runtime) (ret g.Value, err error) {
 
 type errorValue struct{ err error }
 
+func (f errorValue) Affinity() affine.Affinity {
+	return ""
+}
 func (f errorValue) Snapshot(run rt.Runtime) (_ g.Value, err error) {
 	err = f.err
 	return
 }
 
 // temp, ideally.
-type patternValue struct{ store interface{} }
+type patternValue struct {
+	store interface{}
+}
+
+func (f patternValue) Affinity() affine.Affinity {
+	return "" // not needed currently
+}
 
 func (f patternValue) Snapshot(run rt.Runtime) (_ g.Value, err error) {
 	err = errutil.New("pattern expected use of GetEvalByName")

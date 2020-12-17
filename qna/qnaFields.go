@@ -16,6 +16,7 @@ import (
 // Fields implements rt.Fields: key,field,value storage for nouns, kinds, and patterns.
 // It reads its data from the play database and caches the results in memory.
 type Fields struct {
+	activeDomains,
 	activeNouns,
 	valueOf,
 	progBytes,
@@ -38,6 +39,8 @@ type Fields struct {
 func NewFields(db *sql.DB) (ret *Fields, err error) {
 	var ps tables.Prep
 	f := &Fields{
+		activeDomains: ps.Prep(db,
+			`select 1 from run_domain where active and domain=?`),
 		activeNouns: ps.Prep(db,
 			// instr(X,Y) finds the first occurrence of string Y in string X
 			`select 1 from 
@@ -45,6 +48,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 			join run_domain rd 
 			where rd.active and instr(mn.noun, '#' || rd.domain || '::') = 1
 			and mn.noun=?`),
+
 		valueOf: ps.Prep(db,
 			`select value, type
 				from run_value 
@@ -61,13 +65,14 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 		// countOf: ps.Prep(db,
 		// 	`select count(), 'bool' from run_noun where noun=?`),
 		ancestorsOf: ps.Prep(db,
-			`select kind || ( case path when '' then ('') else (',' || path) end ) as path, 'text'
+			`select kind || ( case path when '' then ('') else (',' || path) end ) as path
 				from mdl_noun mn 
 				join mdl_kind mk 
 					using (kind)
 				where noun=?`),
+
 		kindOf: ps.Prep(db,
-			`select kind, 'text' 
+			`select kind
 				from mdl_noun 
 				where noun=?`),
 		fieldsFor: ps.Prep(db,
@@ -87,12 +92,12 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				order by rank`),
 		// return the name of the aspect of the specified trait, or the empty string.
 		aspectOf: ps.Prep(db,
-			`select aspect, 'text' 
+			`select aspect
 				from mdl_noun_traits 
 				where (noun||'.'||trait)=?`),
 		// given an id, find the name
 		nameOf: ps.Prep(db,
-			`select name, 'text' 
+			`select name
 				from mdl_name
 				join mdl_noun
 					using (noun)
@@ -101,7 +106,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				limit 1`),
 		// given a name, find the id
 		objOf: ps.Prep(db,
-			`select noun, 'object'
+			`select noun
 				from mdl_name
 				join mdl_noun
 					using (noun)
@@ -184,23 +189,12 @@ func (n *Runner) SetField(target, field string, val g.Value) (err error) {
 		target == object.Counter; !writable {
 		err = errutil.Fmt("can't change reserved field '%s.%s'", target, field)
 	} else {
-		// use nil to indicate an erasure to a default value.
-		// fix? implement a proper move.
-		if val == nil {
-			if x, e := n.GetField(target, field); e != nil {
-				err = e
-			} else {
-				val, err = g.NewDefaultValue(&n.kinds, x.Affinity(), x.Type())
-			}
-		}
-		if err == nil {
-			switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
-			default:
-				err = e
-			case g.UnknownTarget, g.UnknownField:
-				key := makeKey(target, field)
-				err = n.setField(key, val)
-			}
+		switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
+		default:
+			err = e
+		case g.UnknownTarget, g.UnknownField:
+			key := makeKey(target, field)
+			err = n.setField(key, val)
 		}
 	}
 	return
@@ -208,31 +202,30 @@ func (n *Runner) SetField(target, field string, val g.Value) (err error) {
 
 func (n *Runner) setField(key keyType, val g.Value) (err error) {
 	// first, check if the specified field refers to a trait
-	switch q, e := n.getField(key.dot(object.Aspect)); e.(type) {
+	switch aspectOfTrait, e := n.GetField(object.Aspect, key.dot()); e.(type) {
 	default:
 		err = e // there was an unknown error
 	case nil:
-		// get the name of the aspect
-		if aspect, b := q.String(), val.Bool(); !b {
+		if aspectName, b := aspectOfTrait.String(), val.Bool(); !b {
 			// future: might maintain a table of opposite names ( similar to plurals )
 			err = errutil.Fmt("error setting trait: couldn't determine the opposite of %q", key)
 		} else {
 			// recurse...
-			targetAspect := keyType{key.target, aspect}
+			targetAspect := keyType{key.target, aspectName}
 			err = n.setField(targetAspect, g.StringOf(key.field))
 		}
 
 	case g.UnknownField:
 		// didnt refer to a trait, so just set the field normally.
 		// ( to set the field, we get the field to verify it exists, and to check affinity )
-		if q, e := n.cacheField(key); e != nil {
+		if q, e := n.getOrCache(key.target, key.field, n.queryFieldValue); e != nil {
 			err = e
 		} else if a := q.Affinity(); a != val.Affinity() {
 			err = errutil.New("value is not", a)
 		} else if v, e := g.CopyValue(val); e != nil {
 			err = e
 		} else {
-			n.pairs[key] = qnaValue{a, staticValue{a, v}}
+			n.pairs[key] = staticValue{a, v}
 		}
 	}
 	return
@@ -246,11 +239,11 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	// this automatically keeps them from conflicting.
 	key := makeKeyForEval(name, rtype.Name())
 	if q, ok := n.pairs[key]; ok {
-		eval := q.snapper.(patternValue).store
+		eval := q.(patternValue).store
 		rval := r.ValueOf(eval)
 		outVal.Set(rval)
 	} else {
-		var val snapper
+		var val qnaValue
 		switch e := n.fields.progBytes.QueryRow(key.target, key.field).Scan(&tables.GobScanner{outVal}); e {
 		case nil:
 			store := outVal.Interface()
@@ -264,163 +257,194 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 			val = errorValue{err}
 		}
 		// see notes: in theory GetEvalByName with
-		n.pairs[key] = qnaValue{snapper: val}
+		n.pairs[key] = val
 	}
 	return
 }
 
 func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
-	switch v, e := n.ScopeStack.GetField(target, field); e.(type) {
-	default:
-		err = e
-	case nil:
-		ret = v
-	case g.UnknownTarget, g.UnknownField:
-		if q, e := n.getField(makeKey(target, field)); e != nil {
+	switch target {
+	case object.Aspect:
+		// used internally: return the name of an aspect for a trait
+		ret, err = n.getOrCache(object.Aspect, field, func(key keyType) (ret qnaValue, err error) {
+			var val string
+			if e := n.fields.aspectOf.QueryRow(field).Scan(&val); e != nil {
+				err = e
+			} else {
+				ret = staticValue{affine.Text, val}
+			}
+			return
+		})
+
+	case object.Domain:
+		// fix,once there's a domain hierarchy:
+		// store the active path and test using find in path.
+		var b bool
+		if e := n.fields.activeDomains.QueryRow(field).Scan(&b); e != nil {
 			err = e
 		} else {
-			ret = q
+			ret = g.BoolOf(b)
+		}
+
+	case object.Kind:
+		ret, err = n.getOrCache(object.Kind, field, func(key keyType) (ret qnaValue, err error) {
+			var val string
+			if e := n.fields.kindOf.QueryRow(field).Scan(&val); e != nil {
+				err = e
+			} else {
+				ret = staticValue{affine.Text, val}
+			}
+			return
+		})
+
+	case object.Kinds:
+		ret, err = n.getOrCache(object.Kinds, field, func(key keyType) (ret qnaValue, err error) {
+			var val string
+			if e := n.fields.ancestorsOf.QueryRow(field).Scan(&val); e != nil {
+				err = e
+			} else {
+				ret = staticValue{affine.Text, val}
+			}
+			return
+		})
+
+	case object.Locale:
+		// find the name of the parent, then return that cached object
+		if parent, e := n.nounLocale.localeOf(field); e != nil {
+			err = e
+		} else if len(parent) == 0 {
+			err = g.UnknownObject("") // fix: what's the right value for empty value?
+		} else {
+			ret, err = n.GetField(object.Value, parent)
+		}
+
+	case object.Name:
+		// given an id, make sure the object should be available,
+		// then return its author given name.
+		if !n.activeNouns.isActive(field) {
+			err = g.UnknownObject(field)
+		} else {
+			ret, err = n.getOrCache(object.Name, field, func(key keyType) (ret qnaValue, err error) {
+				var val string
+				if e := n.fields.nameOf.QueryRow(field).Scan(&val); e != nil {
+					err = e
+				} else {
+					ret = staticValue{affine.Text, val}
+				}
+				return
+			})
+		}
+
+	case object.Value:
+		// fix: internal object handling needs some love; i dont much like the # test.
+		if strings.HasPrefix(field, "#") {
+			if !n.activeNouns.isActive(field) {
+				// fix: differentiate b/t unknown and unavailable?
+				err = g.UnknownObject(field)
+			} else {
+				ret, err = n.getOrCache(object.Value, field, func(key keyType) (ret qnaValue, err error) {
+					ret = &qnaObject{n: n, id: field}
+					return
+				})
+			}
+		} else {
+			// given a name, find an object (id) and make sure it should be available
+			ret, err = n.getOrCache(object.Value, field, func(key keyType) (ret qnaValue, err error) {
+				var id string
+				if e := n.fields.objOf.QueryRow(field).Scan(&id); e != nil {
+					err = e
+				} else {
+					if !n.activeNouns.isActive(id) {
+						err = g.UnknownObject(id)
+					} else {
+						ret = &qnaObject{n: n, id: id}
+					}
+				}
+				return
+			})
+		}
+
+	default:
+		switch v, e := n.ScopeStack.GetField(target, field); e.(type) {
+		default:
+			err = e
+		case nil:
+			ret = v
+		case g.UnknownTarget, g.UnknownField:
+			key := makeKey(target, field)
+			if q, ok := n.pairs[key]; ok {
+				ret, err = q.Snapshot(n)
+			} else {
+				// first: loop. ask if we are trying to find the value of a trait. ( noun.trait )
+				switch aspectOfTrait, e := n.GetField(object.Aspect, key.dot()); e.(type) {
+				default:
+					err = e
+				case nil:
+					// we found the aspect name from the trait
+					// now we need to ask for the current value of the aspect
+					aspectName := aspectOfTrait.String()
+					if q, e := n.getOrCache(key.target, aspectName, n.queryFieldValue); e != nil {
+						err = e
+					} else {
+						// return whether the object's aspect equals the specified trait.
+						// ( we dont cache this value because multiple things can change it )
+						ret = g.BoolOf(key.field == q.String())
+					}
+				case g.UnknownField:
+					// it wasnt a trait, so query the field value
+					// fix: b/c its more common, should we do this first?
+					ret, err = n.getOrCache(key.target, key.field, n.queryFieldValue)
+				}
+				return
+			}
 		}
 	}
 	return
 }
 
 // check the cache before asking the database for info
-func (n *Runner) getField(key keyType) (ret g.Value, err error) {
+func (n *Runner) getOrCache(target, field string, cache func(key keyType) (ret qnaValue, err error)) (ret g.Value, err error) {
+	key := makeKey(target, field)
 	if q, ok := n.pairs[key]; ok {
 		ret, err = q.Snapshot(n)
-	} else if q, e := n.cacheField(key); e == nil {
-		ret, err = q.Snapshot(n)
 	} else {
-		err = e
-	}
-	return
-}
-
-// when we know that the field is not a reserved field, and we just want to check the value.
-// ie. for aspects
-func (n *Runner) getValue(key keyType) (ret g.Value, err error) {
-	if q, ok := n.pairs[key]; ok {
-		ret, err = q.Snapshot(n)
-	} else if q, e := n.cacheQuery(key, n.fields.valueOf, key.target, key.field); e == nil {
-		ret, err = q.Snapshot(n)
-	} else {
-		err = e
-	}
-	return
-}
-
-func (n *Runner) cacheField(key keyType) (ret qnaValue, err error) {
-	switch target, field := key.target, key.field; target {
-	case object.Name:
-		// given an id, make sure the object should be available,
-		// then return its author given name.
-		if !n.activeNouns.isActive(field) {
-			err = g.UnknownObject(field)
-		} else if b, e := n.cacheQuery(key, n.fields.nameOf, field); e != nil {
-			err = e
-		} else {
-			ret = b
-		}
-
-	case object.Value:
-		// fix: internal object handling needs some love.
-		if strings.HasPrefix(field, "#") {
-			if !n.activeNouns.isActive(field) {
-				// fix: differentiate b/t unknown and unavailable?
-				err = g.UnknownObject(field)
-			} else {
-				ret = n.store(key, affine.Object, &qnaObject{
-					n: n, id: field,
-				})
-			}
-		} else {
-			// given a name, find an object (id) and make sure it should be available
-			if b, e := n.cacheQuery(key, n.fields.objOf, field); e != nil {
-				err = e
-			} else if obj, _ := b.snapper.(*qnaObject); obj == nil || !n.activeNouns.isActive(obj.id) {
-				err = g.UnknownObject(field)
-			} else {
-				ret = b
-			}
-		}
-
-	case object.Aspect:
-		// used internally: return the name of an aspect for a trait
-		ret, err = n.cacheQuery(key, n.fields.aspectOf, field)
-
-	case object.Kind:
-		ret, err = n.cacheQuery(key, n.fields.kindOf, field)
-
-	case object.Kinds:
-		ret, err = n.cacheQuery(key, n.fields.ancestorsOf, field)
-
-	case object.Locale:
-		ret = qnaValue{affine.Object, &qnaObject{n: n, id: n.nounLocale.localeOf(field)}}
-
-	default:
-		// see if the user is asking for the status of a trait
-		switch aspectOfTrait, e := n.getField(key.dot(object.Aspect)); e.(type) {
-		default:
-			err = e
-		case g.UnknownField:
-			ret, err = n.cacheQuery(key, n.fields.valueOf, target, field)
+		switch val, e := cache(key); e {
 		case nil:
-			// we found the aspect name from the trait
-			// now we need to ask for the current value of the aspect
+			ret, err = n.store(key, val)
 
-			aspectName := aspectOfTrait.String()
-			aspectOfTarget := keyType{target, aspectName}
-			if q, e := n.getValue(aspectOfTarget); e != nil {
-				err = e
-			} else {
-				trait := q.String()
-				// return whether the object's aspect equals the specified trait.
-				// ( we dont cache this value because multiple things can change it )
-				ret = qnaValue{affine.Bool, staticValue{affine.Bool, trait == field}}
-			}
+		case sql.ErrNoRows:
+			ret, err = n.store(key, errorValue{key.unknown()})
+
+		default:
+			err = errutil.New("runtime error:", e)
 		}
 	}
 	return
 }
 
-// query the db and store the returned value in the cache.
-// note: all of the queries are expected to return two parts: the value and the typeName.
-func (n *Runner) cacheQuery(key keyType, q *sql.Stmt, args ...interface{}) (ret qnaValue, err error) {
-	var raw interface{}
+// query the db for the value of an noun's field
+func (n *Runner) queryFieldValue(key keyType) (ret qnaValue, err error) {
+	var i interface{}
 	var a affine.Affinity
-	switch e := q.QueryRow(args...).Scan(&raw, &a); e {
-	case nil:
-		switch v := raw.(type) {
+	if e := n.fields.valueOf.QueryRow(key.target, key.field).Scan(&i, &a); e != nil {
+		err = e
+	} else {
+		switch v := i.(type) {
+		default:
+			ret = staticValue{a, v}
 		case []byte:
 			if p, e := newEval(a, v); e != nil {
 				err = e
 			} else {
-				ret = n.store(key, a, p)
-			}
-
-		default:
-			if a == affine.Object {
-				if p, e := newObjectValue(n, raw); e != nil {
-					err = e
-				} else {
-					ret = n.store(key, a, p)
-				}
-			} else {
-				ret = n.store(key, a, staticValue{a, v})
+				ret = p
 			}
 		}
-	case sql.ErrNoRows:
-		// empty storage is okay.
-		ret = n.store(key, a, errorValue{key.unknown()})
-	default:
-		err = errutil.New("runtime error:", e)
 	}
 	return
 }
 
-func (n *Runner) store(key keyType, a affine.Affinity, p snapper) qnaValue {
-	val := qnaValue{a, p}
+// store the passed value generator, and return the latest snapshot of it
+func (n *Runner) store(key keyType, val qnaValue) (ret g.Value, err error) {
 	n.pairs[key] = val
-	return val
+	return val.Snapshot(n)
 }
