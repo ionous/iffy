@@ -10,7 +10,8 @@ type programHook interface {
 	SlotType() string
 	// gob requirement: return a pointer to the interface
 	CmdPtr() interface{}
-	// create a "pattern rule" -- no common interface currently
+	// create a "pattern rule"
+	// each rule returns its own kind of value -- so there's currently no common interface
 	NewRule(guard rt.BoolEval) (string, interface{})
 }
 

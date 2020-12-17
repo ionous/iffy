@@ -19,6 +19,7 @@ var Slats = []composer.Composer{
 	(*Always)(nil),
 	(*AllTrue)(nil),
 	(*AnyTrue)(nil),
+	(*HasDominion)(nil),
 
 	// Assign turns an Assignment a normal statement.
 	(*Assign)(nil),

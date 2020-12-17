@@ -2,7 +2,9 @@ package story
 
 import (
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -71,6 +73,13 @@ func (op *PatternRule) ImportPattern(k *Importer, patternName ephemera.Named) (e
 	if hook, e := op.Hook.ImportProgram(k); e != nil {
 		err = e
 	} else {
+		guard := op.Guard
+		if dom := k.Current.Domain.String(); len(dom) > 0 {
+			guard = &core.AllTrue{[]rt.BoolEval{
+				&core.HasDominion{dom},
+				guard,
+			}}
+		}
 		name, rule := hook.NewRule(op.Guard)
 		if patternProg, e := k.NewGob(name, rule); e != nil {
 			err = e
