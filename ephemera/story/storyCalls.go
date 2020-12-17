@@ -76,14 +76,14 @@ func importArgs(k *Importer, p ephemera.Named, stubs *Arguments) (ret *core.Argu
 	if stubs != nil {
 		var argList []*core.Argument
 		for _, stub := range stubs.Args {
-			// FIX? GetEval should return affinity and type instead...
-			if slotName, e := slotName(stub.From.GetEval()); e != nil {
-				err = e
-			} else if paramName, e := stub.Name.NewName(k, tables.NAMED_ARGUMENT); e != nil {
+			aff := stub.From.Affinity()
+			if paramName, e := stub.Name.NewName(k, tables.NAMED_ARGUMENT); e != nil {
 				err = errutil.Append(err, e)
 			} else {
-				if len(slotName) > 0 {
-					paramType := k.NewName(slotName, tables.NAMED_TYPE, stub.At.String())
+				if aff := string(aff); len(aff) > 0 {
+					// fix: this shouldnt be "eval" here.
+					// see buildPatternCache
+					paramType := k.NewName(aff+"_eval", tables.NAMED_TYPE, stub.At.String())
 					k.NewPatternRef(p, paramName, paramType, "")
 				}
 				// after recording the "fact" of the parameter...

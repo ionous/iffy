@@ -2,8 +2,6 @@ package story
 
 import (
 	"github.com/ionous/errutil"
-	"github.com/ionous/iffy/ephemera"
-	"github.com/ionous/iffy/tables"
 )
 
 type GenericImport interface {
@@ -67,54 +65,6 @@ func (op *Comment) ImportPhrase(k *Importer) (err error) {
 	return
 }
 
-// ex. colors are a kind of value
-func (op *KindsOfAspect) ImportPhrase(k *Importer) (err error) {
-	if a, e := op.Aspect.NewName(k); e != nil {
-		err = e
-	} else {
-		k.NewAspect(a)
-	}
-	return
-}
-
-// ex. "cats are a kind of animal"
-func (op *KindsOfKind) ImportPhrase(k *Importer) (err error) {
-	if kind, e := op.PluralKinds.NewName(k); e != nil {
-		err = e
-	} else if parent, e := op.SingularKind.NewName(k); e != nil {
-		err = e
-	} else {
-		k.NewKind(kind, parent)
-	}
-	return
-}
-
-// ex. "cats are a kind of record"
-func (op *KindsOfRecord) ImportPhrase(k *Importer) (err error) {
-	if kind, e := op.RecordPlural.NewName(k); e != nil {
-		err = e
-	} else {
-		record := k.NewName("record", tables.NAMED_KIND, op.At.String())
-		k.NewKind(kind, record)
-	}
-	return
-}
-
-// ex. cats have some text called breed.
-// ex. horses have an aspect called speed.
-func (op *KindsPossessProperties) ImportPhrase(k *Importer) (err error) {
-	if kind, e := op.PluralKinds.NewName(k); e != nil {
-		err = e
-	} else {
-		for _, n := range op.PropertyDecl {
-			if e := n.ImportProperty(k, kind); e != nil {
-				err = errutil.Append(err, e)
-			}
-		}
-	}
-	return
-}
-
 // ex. The description of the nets is xxx
 func (op *NounAssignment) ImportPhrase(k *Importer) (err error) {
 	if prop, e := op.Property.NewName(k); e != nil {
@@ -150,55 +100,6 @@ func (op *NounStatement) ImportPhrase(k *Importer) (err error) {
 		}
 		if err == nil && op.Summary != nil {
 			err = op.Summary.Import(k)
-		}
-	}
-	return
-}
-func (op *PatternActions) ImportPhrase(k *Importer) (err error) {
-	if patternName, e := op.Name.NewName(k); e != nil {
-		err = e
-	} else if e := op.PatternRules.ImportPattern(k, patternName); e != nil {
-		err = e
-	} else {
-		if els := op.PatternLocals; els != nil {
-			err = els.ImportPattern(k, patternName)
-		}
-	}
-	return
-}
-
-// Adds a new pattern declaration and optionally some associated pattern parameters.
-func (op *PatternDecl) ImportPhrase(k *Importer) (err error) {
-	if patternName, e := op.Name.NewName(k); e != nil {
-		err = e
-	} else if patternType, e := op.Type.ImportType(k); e != nil {
-		err = e
-	} else {
-		k.NewPatternDecl(patternName, patternName, patternType, "", ephemera.Prog{})
-		//
-		if els := op.Optvars; els != nil {
-			for _, el := range els.VariableDecl {
-				if val, e := el.ImportVariable(k, tables.NAMED_PARAMETER); e != nil {
-					err = errutil.Append(err, e)
-				} else {
-					k.NewPatternDecl(patternName, val.name, val.typeName, val.affinity, ephemera.Prog{})
-				}
-			}
-		}
-	}
-	return
-}
-func (op *PatternVariablesDecl) ImportPhrase(k *Importer) (err error) {
-	if patternName, e := op.PatternName.NewName(k); e != nil {
-		err = e
-	} else {
-		// fix: shouldnt this be called pattern parameters?
-		for _, el := range op.VariableDecl {
-			if val, e := el.ImportVariable(k, tables.NAMED_PARAMETER); e != nil {
-				err = errutil.Append(err, e)
-			} else {
-				k.NewPatternDecl(patternName, val.name, val.typeName, val.affinity, ephemera.Prog{})
-			}
 		}
 	}
 	return

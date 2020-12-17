@@ -40,7 +40,7 @@ func (op *PropertyAspect) ImportPropertyType(k *Importer, kind, prop ephemera.Na
 	// record the existence of an aspect with the same name as the property
 	k.NewName(prop.String(), tables.NAMED_ASPECT, op.At.String())
 	// record the use of that property and aspect.
-	k.NewField(kind, prop, tables.PRIM_ASPECT)
+	k.NewField(kind, prop, tables.PRIM_ASPECT, "")
 	return
 }
 
@@ -51,7 +51,7 @@ func (op *PrimitiveType) ImportPropertyType(k *Importer, kind, prop ephemera.Nam
 		if primType, e := op.ImportPrimType(k); e != nil {
 			err = e
 		} else {
-			k.NewField(kind, prop, primType)
+			k.NewField(kind, prop, primType, "")
 		}
 	} else {
 		// ex. innumerable, not innumerable, is innumerable
@@ -62,40 +62,69 @@ func (op *PrimitiveType) ImportPropertyType(k *Importer, kind, prop ephemera.Nam
 			"not"+aspectUpper, // false first
 			"is"+aspectUpper,
 		)
-		k.NewField(kind, prop, tables.PRIM_ASPECT)
+		k.NewField(kind, prop, tables.PRIM_ASPECT, "")
+	}
+	return
+}
+
+// number_list, text_list, record_type, record_list
+func (op *ExtType) ImportVariableType(k *Importer) (retType ephemera.Named, retAff string, err error) {
+	if imp, ok := op.Opt.(primTypeImporter); !ok {
+		err = ImportError(op, op.At, errutil.Fmt("%w for %T", UnhandledSwap, op.Opt))
+	} else if typeName, aff, e := imp.ImportPrimType(k); e != nil {
+		err = e
+	} else {
+		// currently, when affinity is set, the type name is a record ( or object ) kind
+		var cat string
+		if len(aff) > 0 {
+			cat = tables.NAMED_KIND
+		} else {
+			cat = tables.NAMED_TYPE
+		}
+		retType, retAff = k.NewName(typeName, cat, op.At.String()), aff
 	}
 	return
 }
 
 // number_list, text_list, record_type, record_list
 func (op *ExtType) ImportPropertyType(k *Importer, kind, prop ephemera.Named) (err error) {
-	type primTypeImporter interface {
-		ImportPrimType(*Importer) (string, error)
-	}
 	if imp, ok := op.Opt.(primTypeImporter); !ok {
 		err = ImportError(op, op.At, errutil.Fmt("%w for %T", UnhandledSwap, op.Opt))
-	} else if primType, e := imp.ImportPrimType(k); e != nil {
+	} else if primType, primAff, e := imp.ImportPrimType(k); e != nil {
 		err = e
 	} else {
-		k.NewField(kind, prop, primType)
+		// fix: field table ( and the assembler ) need affinity
+		// ( see also record list import )
+		k.NewField(kind, prop, primType, primAff)
 	}
 	return
 }
 
-func (op *NumberList) ImportPrimType(k *Importer) (ret string, err error) {
-	ret = affine.NumList.String()
+type primTypeImporter interface {
+	// unlike the runtime the affinity is usually empty
+	// when it is empty, the type hold the affinity instead.
+	// ( b/c records are glombed on to the existing runtime )
+	ImportPrimType(*Importer) (retType, retAff string, err error)
+}
+
+func (op *NumberList) ImportPrimType(k *Importer) (retType, retAff string, err error) {
+	retType = affine.NumList.String()
 	return
 }
-func (op *TextList) ImportPrimType(k *Importer) (ret string, err error) {
-	ret = affine.TextList.String()
+
+func (op *TextList) ImportPrimType(k *Importer) (retType, retAff string, err error) {
+	retType = affine.TextList.String()
 	return
 }
-func (op *RecordType) ImportPrimType(k *Importer) (ret string, err error) {
-	ret = op.Kind.Str
+
+func (op *RecordType) ImportPrimType(k *Importer) (retType, retAff string, err error) {
+	retType = op.Kind.Str
+	retAff = affine.Record.String()
 	return
 }
-func (op *RecordList) ImportPrimType(k *Importer) (ret string, err error) {
-	// fix: this is fake: probably NewField needs both affinity and type.
-	ret = "*" + op.Kind.Str
+
+func (op *RecordList) ImportPrimType(k *Importer) (retType, retAff string, err error) {
+	retType = op.Kind.Str
+	retAff = affine.RecordList.String()
 	return
 }

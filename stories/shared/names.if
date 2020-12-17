@@ -112,6 +112,10 @@
                           "id": "id-a-9",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-a-7",
                               "type": "variable_type",

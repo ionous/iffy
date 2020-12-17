@@ -71,6 +71,8 @@ func checkPatternSetup(db *sql.DB) (err error) {
 		err = e
 	} else {
 		// search for other conflicts
+		// note: these arent complete b/c we'd need to identify the types of vars and fields and carry those out
+		// ( similar to NewPatternRef )
 		if e := tables.QueryAll(db,
 			`select distinct pattern, param, type, affinity, decl from asm_pattern
 			order by pattern, param, type, affinity, decl desc`,

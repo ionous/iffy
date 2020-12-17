@@ -31,7 +31,6 @@ var Slats = []composer.Composer{
 	(*FromTextList)(nil),
 	(*FromRecordList)(nil),
 	(*CopyFrom)(nil),
-	(*MoveFrom)(nil),
 	(*Make)(nil),
 
 	// FIX: Choose scalar/any?

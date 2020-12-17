@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -12,9 +13,7 @@ import (
 type Assignment interface {
 	// write the results of evaluating this into that.
 	GetAssignedValue(rt.Runtime) (g.Value, error)
-	// fix? for import so we can determine the eval type.
-	// maybe at least change to affinity
-	GetEval() interface{}
+	Affinity() affine.Affinity
 }
 
 func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
@@ -99,8 +98,8 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *FromBool) GetEval() interface{} {
-	return op.Val
+func (op *FromBool) Affinity() affine.Affinity {
+	return affine.Bool
 }
 
 func (*FromNum) Compose() composer.Spec {
@@ -121,8 +120,8 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *FromNum) GetEval() interface{} {
-	return op.Val
+func (op *FromNum) Affinity() affine.Affinity {
+	return affine.Number
 }
 
 func (*FromText) Compose() composer.Spec {
@@ -142,8 +141,8 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *FromText) GetEval() interface{} {
-	return op.Val
+func (op *FromText) Affinity() affine.Affinity {
+	return affine.Text
 }
 
 func (*FromRecord) Compose() composer.Spec {
@@ -163,8 +162,8 @@ func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 	return
 }
 
-func (op *FromRecord) GetEval() interface{} {
-	return op.Val
+func (op *FromRecord) Affinity() affine.Affinity {
+	return affine.Record
 }
 
 func (*FromObject) Compose() composer.Spec {
@@ -184,8 +183,8 @@ func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 	return
 }
 
-func (op *FromObject) GetEval() interface{} {
-	return op.Val
+func (op *FromObject) Affinity() affine.Affinity {
+	return affine.Object
 }
 
 func (*FromNumList) Compose() composer.Spec {
@@ -205,8 +204,8 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error)
 	return
 }
 
-func (op *FromNumList) GetEval() interface{} {
-	return op.Vals
+func (op *FromNumList) Affinity() affine.Affinity {
+	return affine.NumList
 }
 
 func (*FromTextList) Compose() composer.Spec {
@@ -226,8 +225,8 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error
 	return
 }
 
-func (op *FromTextList) GetEval() interface{} {
-	return op.Vals
+func (op *FromTextList) Affinity() affine.Affinity {
+	return affine.TextList
 }
 
 func (*FromRecordList) Compose() composer.Spec {
@@ -247,6 +246,6 @@ func (op *FromRecordList) GetAssignedValue(run rt.Runtime) (ret g.Value, err err
 	return
 }
 
-func (op *FromRecordList) GetEval() interface{} {
-	return op.Vals
+func (op *FromRecordList) Affinity() affine.Affinity {
+	return affine.RecordList
 }

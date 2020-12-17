@@ -92,6 +92,10 @@
                           "id": "id-1748e116bbd-9",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-1748e116bbd-10",
                               "type": "variable_type",

@@ -11,7 +11,7 @@ create table eph_default( idNamedKind int, idNamedProp int, value blob );
 /* test programs and the results they are expected to produce */
 create table eph_expect( idNamedTest int, testType text, expect text );
 /* property name and type associated with a kind of object */
-create table eph_field( primType text, idNamedKind int, idNamedField int );
+create table eph_field( idNamedKind int, idNamedField int, primType text, primAff text );
 /* collection of related nouns, plural named kind, singular named parent
  * ex. cats are a kind of animal.
  */

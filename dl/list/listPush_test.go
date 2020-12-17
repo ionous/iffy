@@ -50,7 +50,8 @@ func push(src []string, front bool, ins []string) (ret string, err error) {
 	if run, vals, e := newListTime(src, nil); e != nil {
 		err = e
 	} else {
-		num := getNum(run, &list.Push{"Source", FromTs(ins), list.Front(front)})
+		front := list.Front(front)
+		num := getNum(run, &list.Push{"Source", FromTs(ins), &front})
 		if strs, e := vals.GetNamedField("Source"); e != nil {
 			err = e
 		} else {

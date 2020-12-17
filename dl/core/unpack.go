@@ -23,9 +23,7 @@ func (*Unpack) Compose() composer.Spec {
 	}
 }
 
-func (op *Unpack) GetEval() interface{} {
-	return op
-}
+func (op *Unpack) Affinity() affine.Affinity { return "" }
 
 // GetAssignedValue implements Assignment so we can SetXXX values from variables without a FromXXX statement in between.
 func (op *Unpack) GetAssignedValue(run rt.Runtime) (g.Value, error) {

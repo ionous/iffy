@@ -105,8 +105,8 @@ func (r *Recorder) NewNoun(noun, kind Named) {
 }
 
 // declare a pattern or pattern parameter
-func (r *Recorder) NewPatternDecl(pattern, param, patternType Named, affinity string, handler Prog) {
-	r.cache.Must(eph_pattern, pattern, param, patternType, affinity, handler)
+func (r *Recorder) NewPatternDecl(pattern, param, patternType Named, affinity string) {
+	r.cache.Must(eph_pattern, pattern, param, patternType, affinity, Prog{})
 }
 
 //
@@ -124,8 +124,8 @@ func (r *Recorder) NewPlural(plural, singluar Named) {
 }
 
 // NewField property in the named kind.
-func (r *Recorder) NewField(kind, prop Named, primType string) {
-	r.cache.Must(eph_field, primType, kind, prop)
+func (r *Recorder) NewField(kind, prop Named, primType, primAff string) {
+	r.cache.Must(eph_field, kind, prop, primType, primAff)
 }
 
 // NewRelation defines a connection between a primary and secondary kind.
@@ -169,7 +169,7 @@ var eph_certainty = tables.Insert("eph_certainty", "certainty", "idNamedTrait", 
 var eph_check = tables.Insert("eph_check", "idNamedTest", "idProg")
 var eph_default = tables.Insert("eph_default", "idNamedKind", "idNamedProp", "value")
 var eph_expect = tables.Insert("eph_expect", "idNamedTest", "testType", "expect")
-var eph_field = tables.Insert("eph_field", "primType", "idNamedKind", "idNamedField")
+var eph_field = tables.Insert("eph_field", "idNamedKind", "idNamedField", "primType", "primAff")
 var eph_rule = tables.Insert("eph_rule", "idNamedPattern", "idProg")
 var eph_kind = tables.Insert("eph_kind", "idNamedKind", "idNamedParent")
 var eph_named = tables.Insert("eph_named", "name", "og", "category", "domain", "idSource", "offset")

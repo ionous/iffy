@@ -101,7 +101,7 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 				domain := k.gameDomain()
 				things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
 				indefinite := k.NewDomainName(domain, "indefiniteArticle", tables.NAMED_FIELD, once)
-				k.NewField(things, indefinite, tables.PRIM_TEXT)
+				k.NewField(things, indefinite, tables.PRIM_TEXT, "")
 			}
 
 		}

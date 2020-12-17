@@ -22,7 +22,7 @@ func ephemeraTemplate() string {
 		"/* test programs and the results they are expected to produce */\n" +
 		"create table eph_expect( idNamedTest int, testType text, expect text );\n" +
 		"/* property name and type associated with a kind of object */\n" +
-		"create table eph_field( primType text, idNamedKind int, idNamedField int );\n" +
+		"create table eph_field( idNamedKind int, idNamedField int, primType text, primAff text );\n" +
 		"/* collection of related nouns, plural named kind, singular named parent\n" +
 		" * ex. cats are a kind of animal.\n" +
 		" */\n" +

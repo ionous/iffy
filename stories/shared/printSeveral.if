@@ -40,6 +40,10 @@
                           "id": "id-174f629fe91-29",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f629fe91-30",
                               "type": "variable_type",
@@ -73,6 +77,10 @@
                           "id": "id-174f629fe91-8",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f629fe91-9",
                               "type": "variable_type",

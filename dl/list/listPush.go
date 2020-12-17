@@ -11,7 +11,7 @@ import (
 type Push struct {
 	List   string // variable name
 	Insert core.Assignment
-	Front  Front
+	Front  *Front
 }
 
 func (op *Push) Compose() composer.Spec {
@@ -49,7 +49,7 @@ func (op *Push) push(run rt.Runtime) (ret int, err error) {
 	} else if !IsAppendable(ins, els) {
 		err = insertError{ins, els}
 	} else {
-		if !op.Front {
+		if op.Front == nil || !*op.Front {
 			els.Append(ins)
 		} else {
 			_, err = els.Splice(0, 0, ins)

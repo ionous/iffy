@@ -413,6 +413,10 @@
                           "id": "id-174f06d08a4-70",
                           "type": "variable_decl",
                           "value": {
+                            "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f06d08a4-71",
                               "type": "variable_type",
@@ -565,6 +569,10 @@
                           "id": "id-174f06d08a4-97",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f06d08a4-98",
                               "type": "variable_type",
@@ -717,6 +725,10 @@
                           "id": "id-174f06d08a4-124",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f06d08a4-125",
                               "type": "variable_type",
@@ -869,6 +881,10 @@
                           "id": "id-174f06d08a4-151",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f06d08a4-152",
                               "type": "variable_type",
@@ -1021,6 +1037,10 @@
                           "id": "id-174f08a1a93-7",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f08a1a93-8",
                               "type": "variable_type",
@@ -1054,6 +1074,10 @@
                           "id": "id-174f08a1a93-13",
                           "type": "variable_decl",
                           "value": {
+                             "$AN": {
+                              "type": "determiner",
+                              "value": "a"
+                            },
                             "$TYPE": {
                               "id": "id-174f08a1a93-14",
                               "type": "variable_type",

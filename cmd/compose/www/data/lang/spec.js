@@ -647,30 +647,6 @@ const spec = [
     }
   },
   {
-    "desc": "Copy Variable: Copy the contents of one variable to another.",
-    "group": [
-      "variables"
-    ],
-    "name": "copy_from",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        }
-      },
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "copy from ",
-        " name: ",
-        "$NAME"
-      ]
-    }
-  },
-  {
     "desc": "Cycle Text: When called multiple times, returns each of its inputs in turn.",
     "group": [
       "cycle"
@@ -801,12 +777,19 @@ const spec = [
     "name": "do_nothing",
     "uses": "flow",
     "with": {
-      "params": {},
+      "params": {
+        "$REASON": {
+          "label": "reason",
+          "type": "text"
+        }
+      },
       "slots": [
         "execute"
       ],
       "tokens": [
-        "do nothing "
+        "do nothing ",
+        " reason: ",
+        "$REASON"
       ]
     }
   },
@@ -1537,30 +1520,6 @@ const spec = [
     "with": {
       "slots": [
         "bool_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Move Variable: Move the contents of one variable to another, leaving the first variable blank.",
-    "group": [
-      "variables"
-    ],
-    "name": "move_from",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "name",
-          "type": "text"
-        }
-      },
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "move from ",
-        " name: ",
-        "$NAME"
       ]
     }
   },

@@ -1,25 +1,28 @@
 package core
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
 
+// fix: can this be removed now?
 type CopyFrom struct {
 	Name  string    // name of the variable or object.
 	Flags TryAsNoun `if:"internal"`
 }
 
+func (*CopyFrom) Affinity() affine.Affinity { return "" }
+
 func (*CopyFrom) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "copy_from",
-		Group: "variables",
+		Group: "internal",
 		Desc:  `Copy Variable: Copy the contents of one variable to another.`,
 	}
 }
 
-func (op *CopyFrom) GetEval() interface{} { return nil }
 func (op *CopyFrom) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := op.copyFrom(run); e != nil {
 		err = cmdError(op, e)

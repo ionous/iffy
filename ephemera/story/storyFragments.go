@@ -31,7 +31,7 @@ func (op *Summary) Import(k *Importer) (err error) {
 			domain := k.gameDomain()
 			things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
 			appear := k.NewDomainName(domain, "appearance", tables.NAMED_FIELD, once)
-			k.NewField(things, appear, tables.PRIM_TEXT)
+			k.NewField(things, appear, tables.PRIM_TEXT, "")
 		}
 		prop := k.NewName("appearance", tables.NAMED_FIELD, op.At.String())
 		noun := LastNameOf(k.Recent.Nouns.Subjects)

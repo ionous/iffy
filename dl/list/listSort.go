@@ -95,7 +95,7 @@ func (op *Sort) sortText(run rt.Runtime, src []string) (err error) {
 }
 
 // similar to express buildPattern
-func makeDet(name string, first, second core.Assignment) rt.BoolEval {
+func makeDet(name string, first, second *core.FromValue) rt.BoolEval {
 	return &pattern.DetermineBool{
 		Pattern: name,
 		Arguments: &core.Arguments{

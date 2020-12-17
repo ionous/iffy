@@ -61,9 +61,9 @@ func (k *Importer) AddModel(model []composer.Composer) {
 			rtype := r.TypeOf(cmd).Elem()
 			dec.AddCallback(cmd, func(m reader.Map) (ret interface{}, err error) {
 				// create an instance of the stub
-				op := r.New(rtype)
+				op, at := r.New(rtype), reader.At(m)
 				// read it in
-				dec.ReadFields(reader.At(m), op.Elem(), m.MapOf(reader.ItemValue))
+				dec.ReadFields(at, op.Elem(), m.MapOf(reader.ItemValue))
 				// convert it
 				stub := op.Interface().(stubImporter)
 				return stub.ImportStub(k)
@@ -104,7 +104,7 @@ func (k *Importer) NewImplicitAspect(aspect, kind string, traits ...string) {
 		kKind := k.NewDomainName(domain, kind, tables.NAMED_KINDS, src)
 		kAspect := k.NewDomainName(domain, aspect, tables.NAMED_ASPECT, src)
 		k.NewAspect(kAspect)
-		k.NewField(kKind, kAspect, tables.PRIM_ASPECT)
+		k.NewField(kKind, kAspect, tables.PRIM_ASPECT, "")
 		for i, trait := range traits {
 			kTrait := k.NewDomainName(domain, trait, tables.NAMED_TRAIT, src)
 			k.NewTrait(kTrait, kAspect, i)
