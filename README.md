@@ -14,7 +14,7 @@ Rough versions of the composer, file export, ephemera database, and gamedb exist
 
 Goals include:
 * continue porting individual patterns 
-** in progress: [grouping objects](https://github.com/ionous/iffy/wiki/Grouping]
+    * in progress: [grouping objects](https://github.com/ionous/iffy/wiki/Grouping)
 * print the contents of a room. 
 * create new event system: user actions, state changes, custom notifications
 * handle the player object 
