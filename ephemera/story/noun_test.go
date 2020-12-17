@@ -58,18 +58,14 @@ order by noun collate nocase, trait`, 2)
 		"robot sheep,commonNamed",
 		"robot sheep,indefiniteArticle",
 		"square#1,counted",
-		"square#1,privatelyNamed",
 		"Trevor,indefiniteArticle",
 		"Trevor,properNamed",
 		"triangles#1,counted",
-		"triangles#1,privatelyNamed",
 		"triangles#2,counted",
-		"triangles#2,privatelyNamed",
 		"triangles#3,counted",
-		"triangles#3,privatelyNamed",
 		//
-		"triangles", // plural
-		"square",    // singular
+		// "triangles", // plural -- disabled in ReadCountedNoun
+		// "square",    // singular -- disabled in ReadCountedNoun
 		// indefinite articles
 		"a gaggle of",
 		"an",

@@ -52,26 +52,23 @@ func (op *NamedNoun) Import(k *Importer) (err error) {
 }
 
 func (op *NamedNoun) ReadCountedNoun(k *Importer, cnt int) (err error) {
-	cat := tables.NAMED_KIND
-	if cnt > 1 {
-		cat = tables.NAMED_PLURAL_KINDS
-	}
-	op.Name.AddNameWithCategory(k, cat)
+	// probably? should have a specific counted noun phrase b/c
+	// and two things are things doesnt make much sense
+	//
+	// cat := tables.NAMED_KIND
+	// if cnt > 1 {
+	// 	cat = tables.NAMED_PLURAL_KINDS
+	// }
+	// op.Name.AddNameWithCategory(k, cat)
 	typeTrait := k.NewName("counted", tables.NAMED_TRAIT, op.At.String())
-	nameTrait := k.NewName("privatelyNamed", tables.NAMED_TRAIT, op.At.String())
-
-	// this isnt right.
-	// even with an in memory map its not quite right because technically ephemera can come from multiple sources
 	// fix: something something noun stacks, not individually duplicated nouns
 	baseName := op.Name.String()
 	for i := 0; i < cnt; i++ {
 		countedNoun := k.autoCounter.next(baseName)
 		noun := k.NewName(countedNoun, "noun", op.At.String())
 		k.Recent.Nouns.Add(noun)
-		k.NewValue(noun, nameTrait, true)
 		k.NewValue(noun, typeTrait, true)
 	}
-
 	return
 }
 
