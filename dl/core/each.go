@@ -9,7 +9,9 @@ import (
 )
 
 // DoNothing implements Execute, but .... does nothing.
-type DoNothing struct{}
+type DoNothing struct {
+	Reason string
+}
 
 // ForEacNum visits values in a list of numbers.
 // For each value visited it executes a block of statements, pushing a NumberCounter object into the scope as @.

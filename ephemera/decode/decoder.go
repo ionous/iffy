@@ -26,6 +26,7 @@ type Decoder struct {
 	cmds       map[string]cmdRec
 	issueFn    IssueReport
 	IssueCount int
+	Path []string
 }
 
 func NewDecoder() *Decoder {
@@ -90,7 +91,12 @@ func (dec *Decoder) importItem(m reader.Map) (ret r.Value, err error) {
 	return
 }
 
+var posType = r.TypeOf((*reader.Position)(nil)).Elem()
+
 func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
+	name:= out.Type().String()
+	dec.Path= append(dec.Path, name)
+	//
 	var fields []string
 	export.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
 		token := export.Tokenize(f)
@@ -98,7 +104,12 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 		// we report on missing properties below.
 		if inVal, ok := in[token]; !ok {
 			// log only if the field is required. not optional.
-			if t := tag.ReadTag(f.Tag); !t.Exists("internal") && !t.Exists("optional") {
+			if t := tag.ReadTag(f.Tag); t.Exists("internal") {
+				if f.Type == posType {
+					outAt := out.FieldByIndex(path)
+					outAt.Set(r.ValueOf(reader.Position{dec.source, at}))
+				}
+			} else if !t.Exists("optional") {
 				// and even then only if its a fixed field
 				if f.Type.Kind() != r.Ptr {
 					dec.report(at, errutil.Fmt("missing %s.%s at %s", out.Type().String(), token, at))
@@ -112,6 +123,7 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 		}
 		return
 	})
+	dec.Path= dec.Path[0:len(dec.Path)-1]
 
 	// walk keys of json dictionary:
 	for token, _ := range in {
@@ -130,7 +142,7 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 	switch outType := outAt.Type(); outType.Kind() {
 	case r.Float32, r.Float64:
-		err = dec.unpack(inVal, func(v interface{}) (err error) {
+		err = dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 			// float64, for JSON numbers
 			if n, ok := v.(float64); !ok {
 				err = errutil.Fmt("expected a number, have %T", v)
@@ -140,7 +152,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			return
 		})
 	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-		err = dec.unpack(inVal, func(v interface{}) (err error) {
+		err = dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 			// float64, for JSON numbers
 			if n, ok := v.(float64); !ok {
 				err = errutil.New("expected a number")
@@ -152,7 +164,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 
 	case r.Bool:
 		// fix? boolean values are stored as enumerations
-		err = dec.unpack(inVal, func(v interface{}) (err error) {
+		err = dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 			// string, for JSON strings
 			if str, ok := v.(string); !ok {
 				err = errutil.New("expected a string")
@@ -163,7 +175,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		})
 
 	case r.String:
-		err = dec.unpack(inVal, func(v interface{}) (err error) {
+		err = dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 			// string, for JSON strings
 			if str, ok := v.(string); !ok {
 				err = errutil.New("expected a string")
@@ -187,7 +199,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		// going from r.Struct is easier than from r.Ptr.
 		switch spec := outAt.Addr().Interface().(type) {
 		case StrType:
-			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if str, ok := v.(string); !ok {
 					err = errutil.New("value not a slat")
 				} else {
@@ -200,7 +212,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			}
 
 		case NumType:
-			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if num, ok := v.(float64); !ok {
 					err = errutil.New("value not a slat")
 				} else {
@@ -216,7 +228,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			}
 
 		case SwapType:
-			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if data, ok := v.(map[string]interface{}); !ok {
 					err = errutil.New("value not a slat")
 				} else {
@@ -244,11 +256,11 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 			}
 
 		default:
-			if e := dec.unpack(inVal, func(v interface{}) (err error) {
+			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if slot, ok := v.(map[string]interface{}); !ok {
 					err = errutil.New("value not a slat")
 				} else {
-					dec.ReadFields(reader.At(slot), outAt, reader.Map(slot))
+					dec.ReadFields(reader.At(p), outAt, reader.Map(slot))
 				}
 				return
 			}); e != nil {
@@ -257,7 +269,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		}
 
 	case r.Interface:
-		if e := dec.unpack(inVal, func(v interface{}) (err error) {
+		if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
 				err = errutil.New("value not a slot")
@@ -290,7 +302,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 						}
 					} else {
 						// note: this skips over the slot itself ( ex execute )
-						if e := dec.unpack(item, func(v interface{}) (err error) {
+						if e := dec.unpack(item, func(p reader.Map, v interface{}) (err error) {
 							// map[string]interface{}, for JSON objects
 							if itemData, ok := v.(map[string]interface{}); !ok {
 								// execute has some single nulls sometimes;
@@ -318,12 +330,12 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 }
 
 // cast inVal to a map, and call setter with contents of "value"
-func (dec *Decoder) unpack(inVal interface{}, setter func(interface{}) error) (err error) {
+func (dec *Decoder) unpack(inVal interface{}, setter func(reader.Map, interface{}) error) (err error) {
 	if item, ok := inVal.(map[string]interface{}); !ok {
 		err = errutil.New("expected an item, got:", inVal)
 	} else {
 		val := item[reader.ItemValue]
-		if e := setter(val); e != nil {
+		if e := setter(item, val); e != nil {
 			dec.report(reader.At(item), e)
 		}
 	}

@@ -35,8 +35,19 @@ func (op *ListEdge) ImportStub(k *Importer) (ret interface{}, err error) {
 	return
 }
 
-// turn comment execution into do nothing statements
+// turn comment execution into empty statements
 func (op *Comment) ImportStub(k *Importer) (ret interface{}, err error) {
-	ret = &core.DoNothing{}
+	var prog bool
+	for _, k := range k.decoder.Path {
+		if k == "story.Activity" {
+			prog = true
+			break
+		}
+	}
+	if prog {
+		ret = &core.DoNothing{Reason: op.Lines.Str}
+	} else {
+		ret = op
+	}
 	return
 }
