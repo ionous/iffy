@@ -26,7 +26,7 @@ type Decoder struct {
 	cmds       map[string]cmdRec
 	issueFn    IssueReport
 	IssueCount int
-	Path []string
+	Path       []string
 }
 
 func NewDecoder() *Decoder {
@@ -94,8 +94,8 @@ func (dec *Decoder) importItem(m reader.Map) (ret r.Value, err error) {
 var posType = r.TypeOf((*reader.Position)(nil)).Elem()
 
 func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
-	name:= out.Type().String()
-	dec.Path= append(dec.Path, name)
+	name := out.Type().String()
+	dec.Path = append(dec.Path, name)
 	//
 	var fields []string
 	export.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
@@ -123,7 +123,7 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 		}
 		return
 	})
-	dec.Path= dec.Path[0:len(dec.Path)-1]
+	dec.Path = dec.Path[0 : len(dec.Path)-1]
 
 	// walk keys of json dictionary:
 	for token, _ := range in {
@@ -201,7 +201,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		case StrType:
 			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if str, ok := v.(string); !ok {
-					err = errutil.New("value not a slat")
+					err = errutil.Fmt("expected string, got %T(%v)", v, v)
 				} else {
 					// fix? validate choice here?
 					outAt.Field(outAt.NumField() - 1).SetString(str)
@@ -214,7 +214,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		case NumType:
 			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if num, ok := v.(float64); !ok {
-					err = errutil.New("value not a slat")
+					err = errutil.Fmt("expected float, got %T(%v)", v, v)
 				} else {
 					// validate choice; fix: tolerance?
 					// handle conversion b/t floats and ints of different widths
@@ -230,7 +230,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		case SwapType:
 			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if data, ok := v.(map[string]interface{}); !ok {
-					err = errutil.New("value not a slat")
+					err = errutil.Fmt("expected swap, got %T(%v)", v, v)
 				} else {
 					found := false
 					for k, typePtr := range spec.Choices() {
@@ -258,7 +258,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		default:
 			if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 				if slot, ok := v.(map[string]interface{}); !ok {
-					err = errutil.New("value not a slat")
+					err = errutil.Fmt("expected map for %T, got %T(%v)", spec, v, v)
 				} else {
 					dec.ReadFields(reader.At(p), outAt, reader.Map(slot))
 				}
@@ -272,7 +272,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		if e := dec.unpack(inVal, func(p reader.Map, v interface{}) (err error) {
 			// map[string]interface{}, for JSON objects
 			if slot, ok := v.(map[string]interface{}); !ok {
-				err = errutil.New("value not a slot")
+				err = errutil.Fmt("expected map for interface, got %T(%v)", v, v)
 			} else if val, e := dec.importItem(slot); e != nil {
 				dec.report(reader.At(slot), e)
 			} else if rtype := val.Type(); !rtype.AssignableTo(outAt.Type()) {

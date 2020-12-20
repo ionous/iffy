@@ -13,7 +13,7 @@ import (
 
 // FromPattern helps runs a pattern
 type FromPattern struct {
-	Pattern   string          // pattern name, i guess a text eval here would be like a function pointer.
+	Pattern   PatternName     // pattern name, i guess a text eval here would be like a function pointer.
 	Arguments *core.Arguments // arguments passed to the pattern. kept as a pointer for composer formatting...
 	// each is a name targeting some parameter, and an "assignment"
 	ps, ls *g.Kind
@@ -30,7 +30,7 @@ type DetermineTextList FromPattern
 // It's an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
 func (op *FromPattern) Stitch(run rt.Runtime, pat Pattern, fn func() error) (err error) {
 	// find the pattern (p), qna's implementation assembles the rules by querying the db.
-	if e := run.GetEvalByName(op.Pattern, pat); e != nil {
+	if e := run.GetEvalByName(op.Pattern.String(), pat); e != nil {
 		err = e
 	} else if pk, e := op.newParams(run, pat); e != nil {
 		err = e

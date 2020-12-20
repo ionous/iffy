@@ -2,6 +2,7 @@ package list
 
 import (
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
@@ -10,13 +11,14 @@ import (
 
 // A normal reduce would return a value, instead we accumulate into a variable
 type Reduce struct {
-	FromList, IntoValue, UsingPattern string // variable names
+	IntoValue, FromList string
+	UsingPattern        pattern.PatternName
 	activityCache
 }
 
 func (*Reduce) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "list_map",
+		Name:  "list_reduce",
 		Group: "list",
 		Desc: `Reduce List: Transform the values from one list by combining them into a single value.
 		The named pattern is called with two parameters: 'in' ( each element of the list ) and 'out' ( ex. a record ).`,

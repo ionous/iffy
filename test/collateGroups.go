@@ -7,7 +7,10 @@ import (
 	"github.com/ionous/iffy/dl/term"
 )
 
-var runCollateGroups = list.Reduce{FromList: "Settings", IntoValue: "Collation", UsingPattern: "collateGroups"}
+var runCollateGroups = list.Reduce{
+	FromList:     "Settings",
+	IntoValue:    "Collation",
+	UsingPattern: "collateGroups"}
 
 var collateGroups = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{

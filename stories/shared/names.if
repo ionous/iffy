@@ -112,9 +112,15 @@
                           "id": "id-a-9",
                           "type": "variable_decl",
                           "value": {
-                             "$AN": {
+                            "$AN": {
+                              "id": "id-1766f3895d1-0",
                               "type": "determiner",
                               "value": "a"
+                            },
+                            "$NAME": {
+                              "id": "id-a-8",
+                              "type": "variable_name",
+                              "value": "target"
                             },
                             "$TYPE": {
                               "id": "id-a-7",
@@ -137,11 +143,6 @@
                                   }
                                 }
                               }
-                            },
-                            "$NAME": {
-                              "id": "id-a-8",
-                              "type": "variable_name",
-                              "value": "target"
                             }
                           }
                         }

@@ -150,6 +150,7 @@ func (*Texts) Compose() composer.Spec {
 		Name:  "texts",
 		Group: "literals",
 		Desc:  "Text List: specifies multiple string values.",
+		Spec:  "text {values*text|comma-and}",
 	}
 }
 

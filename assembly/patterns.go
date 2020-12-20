@@ -2,6 +2,7 @@ package assembly
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/tables"
@@ -70,22 +71,28 @@ func checkPatternSetup(db *sql.DB) (err error) {
 		&now.pat /*, &now.arg, &now.typ, &now.decl */); e != nil {
 		err = e
 	} else {
-		// search for other conflicts
-		// note: these arent complete b/c we'd need to identify the types of vars and fields and carry those out
-		// ( similar to NewPatternRef )
-		if e := tables.QueryAll(db,
-			`select distinct pattern, param, type, affinity, decl from asm_pattern
-			order by pattern, param, type, affinity, decl desc`,
-			func() error {
-				e := now.compare(&last, &declaredReturn)
-				last = now
-				return e
-			},
-			&now.pat, &now.arg, &now.typ, &now.aff, &now.decl); e != nil {
-			err = e
-		} else if e := last.flush(&declaredReturn); e != nil {
-			err = e
-		}
+		// -- disabled for now,
+		// there are various issues including
+		// 	. inconsistent types ( _eval vs. prim )
+		//  . name casing
+		//  . mixing of params and locals ( which will hurt $1 parameter indexing )
+
+		// // search for other conflicts
+		// // note: these arent complete b/c we'd need to identify the types of vars and fields and carry those out
+		// // ( similar to NewPatternRef )
+		// if e := tables.QueryAll(db,
+		// 	`select distinct pattern, param, type, affinity, decl from asm_pattern
+		// 	order by pattern, param, type, affinity, decl desc`,
+		// 	func() error {
+		// 		e := now.compare(&last, &declaredReturn)
+		// 		last = now
+		// 		return e
+		// 	},
+		// 	&now.pat, &now.arg, &now.typ, &now.aff, &now.decl); e != nil {
+		// 	err = e
+		// } else if e := last.flush(&declaredReturn); e != nil {
+		// 	err = e
+		// }
 	}
 	return
 }
@@ -111,6 +118,11 @@ func (now *patternInfo) compare(was *patternInfo, pret *string) (err error) {
 		}
 	}
 	if err == nil {
+		// fix: hack off eval names
+		// ex. pattern	param	type	affinity	decl
+		// objectGroupingTest	objects	text_list		1
+		// objectGroupingTest	objects	text_list_eval		0
+		now.typ, was.typ = strings.TrimSuffix(now.typ, "_eval"), strings.TrimSuffix(was.typ, "_eval")
 		if change := (now.pat != was.pat || now.arg != was.arg); change && !now.decl {
 			// decl(s) come first, so if there's a change... it should only happen with a decl.
 			err = errutil.Fmt("Pattern %q's %q missing declaration", now.pat, now.arg)

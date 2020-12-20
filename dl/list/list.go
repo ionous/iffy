@@ -15,6 +15,7 @@ var Slats = []composer.Composer{
 	(*Map)(nil),
 	(*Pop)(nil),
 	(*Push)(nil),
+	(*Reduce)(nil),
 	(*Set)(nil),
 	(*Slice)(nil),
 	(*Sort)(nil),

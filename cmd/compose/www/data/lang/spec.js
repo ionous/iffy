@@ -938,6 +938,29 @@ const spec = [
     }
   },
   {
+    "group": [
+      "logic"
+    ],
+    "name": "has_dominion",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "bool_eval"
+      ],
+      "tokens": [
+        "has dominion ",
+        " name: ",
+        "$NAME"
+      ]
+    }
+  },
+  {
     "desc": "Has Trait: Return true if noun is currently in the requested state.",
     "group": [
       "objects"
@@ -1227,10 +1250,10 @@ const spec = [
       ],
       "tokens": [
         "map ",
-        " from list: ",
-        "$FROM_LIST",
-        ", to list: ",
+        " to list: ",
         "$TO_LIST",
+        ", from list: ",
+        "$FROM_LIST",
         ", using pattern: ",
         "$USING_PATTERN"
       ]
@@ -1296,6 +1319,42 @@ const spec = [
       "slots": [
         "execute",
         "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Reduce List: Transform the values from one list by combining them into a single value.\n\t\tThe named pattern is called with two parameters: 'in' ( each element of the list ) and 'out' ( ex. a record ).",
+    "group": [
+      "list"
+    ],
+    "name": "list_reduce",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$FROM_LIST": {
+          "label": "from list",
+          "type": "text"
+        },
+        "$INTO_VALUE": {
+          "label": "into value",
+          "type": "text"
+        },
+        "$USING_PATTERN": {
+          "label": "using pattern",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "reduce ",
+        " into value: ",
+        "$INTO_VALUE",
+        ", from list: ",
+        "$FROM_LIST",
+        ", using pattern: ",
+        "$USING_PATTERN"
       ]
     }
   },
@@ -1976,22 +2035,11 @@ const spec = [
       "literals"
     ],
     "name": "texts",
+    "spec": "text {values*text|comma-and}",
     "uses": "flow",
     "with": {
-      "params": {
-        "$VALUES": {
-          "label": "values",
-          "repeats": true,
-          "type": "text"
-        }
-      },
       "slots": [
         "text_list_eval"
-      ],
-      "tokens": [
-        "texts ",
-        " values: ",
-        "$VALUES"
       ]
     }
   },

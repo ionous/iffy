@@ -5,7 +5,6 @@ type SwapType interface {
 }
 
 type StrType interface {
-	String() string
 	Choices() (closed bool, choices map[string]string)
 }
 

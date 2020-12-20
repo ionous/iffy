@@ -15,8 +15,8 @@ import (
 )
 
 type Sort struct {
-	List    string // variable name
-	Pattern string // where the pattern should take a a pair of list elements, and return true if the first is less than the second
+	List    string              // variable name
+	Pattern pattern.PatternName // where the pattern should take a a pair of list elements, and return true if the first is less than the second
 }
 
 func (op *Sort) Compose() composer.Spec {
@@ -95,7 +95,7 @@ func (op *Sort) sortText(run rt.Runtime, src []string) (err error) {
 }
 
 // similar to express buildPattern
-func makeDet(name string, first, second *core.FromValue) rt.BoolEval {
+func makeDet(name pattern.PatternName, first, second *core.FromValue) rt.BoolEval {
 	return &pattern.DetermineBool{
 		Pattern: name,
 		Arguments: &core.Arguments{

@@ -40,9 +40,15 @@
                           "id": "id-174f629fe91-29",
                           "type": "variable_decl",
                           "value": {
-                             "$AN": {
+                            "$AN": {
+                              "id": "id-17672fb43de-15",
                               "type": "determiner",
                               "value": "a"
+                            },
+                            "$NAME": {
+                              "id": "id-174f629fe91-31",
+                              "type": "variable_name",
+                              "value": "target"
                             },
                             "$TYPE": {
                               "id": "id-174f629fe91-30",
@@ -65,11 +71,6 @@
                                   }
                                 }
                               }
-                            },
-                            "$NAME": {
-                              "id": "id-174f629fe91-31",
-                              "type": "variable_name",
-                              "value": "target"
                             }
                           }
                         },
@@ -77,9 +78,15 @@
                           "id": "id-174f629fe91-8",
                           "type": "variable_decl",
                           "value": {
-                             "$AN": {
+                            "$AN": {
+                              "id": "id-17672fb43de-16",
                               "type": "determiner",
                               "value": "a"
+                            },
+                            "$NAME": {
+                              "id": "id-174f629fe91-11",
+                              "type": "variable_name",
+                              "value": "group size"
                             },
                             "$TYPE": {
                               "id": "id-174f629fe91-9",
@@ -91,11 +98,6 @@
                                   "value": "$NUMBER"
                                 }
                               }
-                            },
-                            "$NAME": {
-                              "id": "id-174f629fe91-11",
-                              "type": "variable_name",
-                              "value": "group size"
                             }
                           }
                         }

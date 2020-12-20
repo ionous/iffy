@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
@@ -11,7 +12,8 @@ import (
 )
 
 type Map struct {
-	FromList, ToList, UsingPattern string // variable names
+	ToList, FromList string
+	UsingPattern     pattern.PatternName
 	activityCache
 }
 
@@ -32,11 +34,11 @@ func (op *Map) Execute(run rt.Runtime) (err error) {
 
 func (op *Map) remap(run rt.Runtime) (err error) {
 	if fromList, e := safe.List(run, op.FromList); e != nil {
-		err = e
+		err = errutil.New("from_list:", op.FromList, e)
 	} else if toList, e := safe.List(run, op.ToList); e != nil {
-		err = e
+		err = errutil.New("to_list:", op.ToList, e)
 	} else if e := op.cacheKinds(run, op.UsingPattern); e != nil {
-		err = e
+		err = errutil.New("using_pattern:", op.UsingPattern, e)
 	} else {
 		for it := g.ListIt(fromList); it.HasNext(); {
 			ps := op.pk.NewRecord() // create a new set of parameters each loop

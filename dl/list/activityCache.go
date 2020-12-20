@@ -29,9 +29,9 @@ func (op *activityCache) call(run rt.Runtime, ps *g.Record) (err error) {
 	return
 }
 
-func (op *activityCache) cacheKinds(run rt.Runtime, pat string) (err error) {
+func (op *activityCache) cacheKinds(run rt.Runtime, pat pattern.PatternName) (err error) {
 	if run != op.run {
-		if e := run.GetEvalByName(pat, &op.pat); e != nil {
+		if e := run.GetEvalByName(pat.String(), &op.pat); e != nil {
 			err = e
 		} else if pk, e := op.newParams(run); e != nil {
 			err = e
