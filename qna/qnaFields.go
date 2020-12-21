@@ -182,14 +182,15 @@ func (n *Runner) IsLike(a, b string) (ret bool, err error) {
 	return
 }
 
-func (n *Runner) SetField(target, field string, val g.Value) (err error) {
-	if len(target) == 0 {
-		err = errutil.Fmt("no target specified for field %q", field)
+func (n *Runner) SetField(target, rawField string, val g.Value) (err error) {
+	if len(target) == 0 || len(rawField) == 0 {
+		err = errutil.Fmt("invalid targeted field '%s.%s'", target, rawField)
 	} else if writable := target[0] != object.Prefix ||
 		target == object.Variables ||
 		target == object.Counter; !writable {
-		err = errutil.Fmt("can't change reserved field '%s.%s'", target, field)
+		err = errutil.Fmt("can't change reserved field '%s.%s'", target, rawField)
 	} else {
+		field := optionalBreakcase(rawField)
 		switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
 		default:
 			err = e
@@ -202,7 +203,7 @@ func (n *Runner) SetField(target, field string, val g.Value) (err error) {
 }
 
 func (n *Runner) setField(key keyType, val g.Value) (err error) {
-	// first, check if the specified field refers to a trait
+	// first, check if the specified field refers to a dotted noun trait
 	switch aspectOfTrait, e := n.GetField(object.Aspect, key.dot()); e.(type) {
 	default:
 		err = e // there was an unknown error
@@ -264,13 +265,25 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 	return
 }
 
-func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
+// eventually, these transforms will happen at assembly time
+func optionalBreakcase(field string) (ret string) {
+	if id := field[0]; id == '#' || id == '$' {
+		ret = field
+	} else {
+		ret = lang.Breakcase(field)
+	}
+	return
+}
+
+func (n *Runner) GetField(target, rawField string) (ret g.Value, err error) {
 	switch target {
 	case object.Aspect:
-		// used internally: return the name of an aspect for a trait
-		ret, err = n.getOrCache(object.Aspect, field, func(key keyType) (ret qnaValue, err error) {
+		// used internally: return the name of an aspect for a noun's trait
+		// rawField looks like: #test::apple.w
+		nounDotTrait := rawField
+		ret, err = n.getOrCache(object.Aspect, nounDotTrait, func(key keyType) (ret qnaValue, err error) {
 			var val string
-			if e := n.fields.aspectOf.QueryRow(field).Scan(&val); e != nil {
+			if e := n.fields.aspectOf.QueryRow(nounDotTrait).Scan(&val); e != nil {
 				err = e
 			} else {
 				ret = staticValue{affine.Text, val}
@@ -282,16 +295,18 @@ func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 		// fix,once there's a domain hierarchy:
 		// store the active path and test using find in path.
 		var b bool
-		if e := n.fields.activeDomains.QueryRow(field).Scan(&b); e != nil {
+		domain := lang.Breakcase(rawField)
+		if e := n.fields.activeDomains.QueryRow(domain).Scan(&b); e != nil {
 			err = e
 		} else {
 			ret = g.BoolOf(b)
 		}
 
 	case object.Kind:
-		ret, err = n.getOrCache(object.Kind, field, func(key keyType) (ret qnaValue, err error) {
+		objId := rawField
+		ret, err = n.getOrCache(object.Kind, objId, func(key keyType) (ret qnaValue, err error) {
 			var val string
-			if e := n.fields.kindOf.QueryRow(field).Scan(&val); e != nil {
+			if e := n.fields.kindOf.QueryRow(objId).Scan(&val); e != nil {
 				err = e
 			} else {
 				ret = staticValue{affine.Text, val}
@@ -300,9 +315,10 @@ func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 		})
 
 	case object.Kinds:
-		ret, err = n.getOrCache(object.Kinds, field, func(key keyType) (ret qnaValue, err error) {
+		objId := rawField
+		ret, err = n.getOrCache(object.Kinds, objId, func(key keyType) (ret qnaValue, err error) {
 			var val string
-			if e := n.fields.ancestorsOf.QueryRow(field).Scan(&val); e != nil {
+			if e := n.fields.ancestorsOf.QueryRow(objId).Scan(&val); e != nil {
 				err = e
 			} else {
 				ret = staticValue{affine.Text, val}
@@ -312,7 +328,8 @@ func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 
 	case object.Locale:
 		// find the name of the parent, then return that cached object
-		if parent, e := n.nounLocale.localeOf(field); e != nil {
+		objId := rawField
+		if parent, e := n.nounLocale.localeOf(objId); e != nil {
 			err = e
 		} else if len(parent) == 0 {
 			err = g.UnknownObject("") // fix: what's the right value for empty value?
@@ -323,12 +340,13 @@ func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 	case object.Name:
 		// given an id, make sure the object should be available,
 		// then return its author given name.
-		if !n.activeNouns.isActive(field) {
-			err = g.UnknownObject(field)
+		objId := rawField
+		if !n.activeNouns.isActive(objId) {
+			err = g.UnknownObject(objId)
 		} else {
-			ret, err = n.getOrCache(object.Name, field, func(key keyType) (ret qnaValue, err error) {
+			ret, err = n.getOrCache(object.Name, objId, func(key keyType) (ret qnaValue, err error) {
 				var val string
-				if e := n.fields.nameOf.QueryRow(field).Scan(&val); e != nil {
+				if e := n.fields.nameOf.QueryRow(objId).Scan(&val); e != nil {
 					err = e
 				} else {
 					ret = staticValue{affine.Text, val}
@@ -339,21 +357,23 @@ func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 
 	case object.Value:
 		// fix: internal object handling needs some love; i dont much like the # test.
-		if strings.HasPrefix(field, "#") {
-			if !n.activeNouns.isActive(field) {
+		if strings.HasPrefix(rawField, "#") {
+			objId := rawField
+			if !n.activeNouns.isActive(objId) {
 				// fix: differentiate b/t unknown and unavailable?
-				err = g.UnknownObject(field)
+				err = g.UnknownObject(objId)
 			} else {
-				ret, err = n.getOrCache(object.Value, field, func(key keyType) (ret qnaValue, err error) {
-					ret = &qnaObject{n: n, id: field}
+				ret, err = n.getOrCache(object.Value, objId, func(key keyType) (ret qnaValue, err error) {
+					ret = &qnaObject{n: n, id: objId}
 					return
 				})
 			}
 		} else {
 			// given a name, find an object (id) and make sure it should be available
-			ret, err = n.getOrCache(object.Value, field, func(key keyType) (ret qnaValue, err error) {
+			objName := rawField
+			ret, err = n.getOrCache(object.Value, objName, func(key keyType) (ret qnaValue, err error) {
 				var id string
-				if e := n.fields.objOf.QueryRow(field).Scan(&id); e != nil {
+				if e := n.fields.objOf.QueryRow(objName).Scan(&id); e != nil {
 					err = e
 				} else {
 					if !n.activeNouns.isActive(id) {
@@ -367,13 +387,14 @@ func (n *Runner) GetField(target, field string) (ret g.Value, err error) {
 		}
 
 	default:
-		switch v, e := n.ScopeStack.GetField(target, field); e.(type) {
+		varName := optionalBreakcase(rawField)
+		switch v, e := n.ScopeStack.GetField(target, varName); e.(type) {
 		default:
 			err = e
 		case nil:
 			ret = v
 		case g.UnknownTarget, g.UnknownField:
-			key := makeKey(target, field)
+			key := makeKey(target, varName)
 			if q, ok := n.pairs[key]; ok {
 				ret, err = q.Snapshot(n)
 			} else {

@@ -74,7 +74,7 @@ func (q *qnaObject) SetFieldByName(field string, val g.Value) (err error) {
 	case field[0] == object.Prefix:
 		err = errutil.Fmt("can't change reserved field %q", field)
 	default:
-		key := makeKey(q.id, field)
+		key := makeKey(q.id, optionalBreakcase(field))
 		err = q.n.setField(key, val)
 	}
 	return

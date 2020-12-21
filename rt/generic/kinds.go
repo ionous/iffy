@@ -45,7 +45,7 @@ func NewDefaultValue(ks Kinds, a affine.Affinity, subtype string) (ret Value, er
 		}
 
 	default:
-		err = errutil.New("unhandled affinity", a)
+		err = errutil.New("default value requested for unhandled affinity", a)
 	}
 	return
 }
