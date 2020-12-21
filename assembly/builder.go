@@ -80,7 +80,7 @@ func buildPatternCache(db *sql.DB) (ret patternCache, err error) {
 				// fix: these should probably be tables.PRIM_ names
 				// ie. "text" not "text_eval" -- tests and other things have to be adjusted
 				// it also seems a bad time to be camelizing things.
-				paramName := lang.Camelize(paramName)
+				paramName := lang.Breakcase(paramName)
 
 				// locals have simple type names, parameters are still using _eval.
 				var p term.Preparer

@@ -559,7 +559,7 @@
                                         "$TEMPLATE": {
                                           "id": "id-174bd1dc16a-105",
                                           "type": "lines",
-                                          "value": "{.apple}, {.pen}, {.things#1}, {printPluralName: .apple}, {printPluralName: .pen}, {printPluralName: .things#1}"
+                                          "value": "{.apple}, {.pen}, {.things#1}, {print_plural_name: .apple}, {print_plural_name: .pen}, {print_plural_name: .things#1}"
                                         }
                                       }
                                     }
@@ -644,7 +644,7 @@
                                         "$TEMPLATE": {
                                           "id": "id-174bd1dc16a-122",
                                           "type": "lines",
-                                          "value": ", {printPluralName: .apple}"
+                                          "value": ", {print_plural_name: .apple}"
                                         }
                                       }
                                     }

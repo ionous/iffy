@@ -72,7 +72,7 @@ func TestPairActivation(t *testing.T) {
 				t.Fatal(e)
 			}
 			// run the test:
-			if cnt, e := fields.UpdatePairs("entireGame"); e != nil {
+			if cnt, e := fields.UpdatePairs("entire_game"); e != nil {
 				t.Fatal(e)
 			} else {
 				log.Println("activate domain affected", cnt, "rows")

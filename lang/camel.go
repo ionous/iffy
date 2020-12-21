@@ -6,17 +6,49 @@ import (
 	"unicode"
 )
 
-// Camelize turns spaces, dashes, and underscores into words, capitalizing all but the first word,
-// and lowercasing the rest of the string. likeThisIGuess.
-func Camelize(name string) string {
-	p := combineCase(name, true, true)
-	return p.join()
+// Breakcase turns runs of whitespace into single underscores. It does not change casing.
+// "some   BIG Example" => "some_BIG_Example".
+func Breakcase(name string) string {
+	var b strings.Builder
+	var needBreak, canBreak bool
+	for _, r := range name {
+		brakes := IsBreak(r)
+		if ignorable := !brakes && IsIgnorable(r); ignorable {
+			// consolidate all ignorable characters...
+			// eventually writing a break if we've written something of note.
+			needBreak = canBreak
+		} else {
+			// dont write a consolidated break if we are writing an explicit break
+			// ex. "  _" -> just write a single underscore, not two.
+			if needBreak && !brakes {
+				b.WriteRune(breaker)
+			}
+			b.WriteRune(r)
+			canBreak = !brakes
+			needBreak = false
+		}
+	}
+	return b.String()
 }
 
-// CombineCase is almost exactly like Camelize, only doesnt touch the case of the first rune of the first word.
-func CombineCase(name string) string {
-	p := combineCase(name, false, true)
-	return p.join()
+// IsBreak returns true for the set of characters which breaks words in breakcase
+func IsBreak(r rune) bool {
+	return r == breaker
+}
+
+// IsIgnorable returns true for the set of characters which will be consolidated by breakcase
+func IsIgnorable(r rune) bool {
+	return unicode.IsPunct(r) || unicode.IsSpace(r)
+}
+
+const breaker = '_'
+
+// HasBadPunct returns true for non-breakcase punctuation and spaces.
+func HasBadPunct(s string) bool {
+	return strings.IndexFunc(s, func(r rune) bool {
+		badMatch := !IsBreak(r) && IsIgnorable(r)
+		return badMatch
+	}) >= 0
 }
 
 // Fields is similar to strings.Fields except this splits on dashes, case changes, spaces, and the like:

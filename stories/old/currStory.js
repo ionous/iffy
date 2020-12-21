@@ -1155,7 +1155,7 @@ function getStory() {
                                                   "$TEMPLATE": {
                                                     "id": "id-17494873906-4",
                                                     "type": "lines",
-                                                    "value": "{.target.printedPluralName}"
+                                                    "value": "{.target.printed_plural_name}"
                                                   }
                                                 }
                                               }
@@ -1570,7 +1570,7 @@ function getStory() {
                                                   "$TEMPLATE": {
                                                     "id": "id-174949649ef-13",
                                                     "type": "lines",
-                                                    "value": "{printNumWord: .groupSize} other {if .groupSize > 1}{ printPluralName: .target}{else}{printName: .target}{end}"
+                                                    "value": "{printNumWord: .group_size} other {if .group_size > 1}{ printPluralName: .target}{else}{printName: .target}{end}"
                                                   }
                                                 }
                                               }

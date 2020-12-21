@@ -28,7 +28,7 @@ func AssembleAncestry(asm *Assembler, baseKind string) (err error) {
 			if strings.ToLower(k) != k && len(k) != 2 {
 				e := errutil.Fmt("BUG: there are issues with mixed case kinds (ex. %q)", k)
 				err = errutil.Append(err, e)
-			} else if lang.ContainsPunct(k) {
+			} else if lang.HasBadPunct(k) {
 				e := errutil.New("kind shouldn't contain punctuation", k)
 				err = errutil.Append(err, e)
 			} else if e := asm.WriteAncestor(k, v.GetAncestors()); e != nil {

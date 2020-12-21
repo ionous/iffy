@@ -39,7 +39,7 @@ func (op *IsTrue) GetBool(run rt.Runtime) (ret g.Value, err error) {
 
 func (*IsNotTrue) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "is_not",
+		Name:  "not",
 		Group: "logic",
 		Desc:  "Is Not: Returns the opposite value.",
 	}

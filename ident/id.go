@@ -47,7 +47,7 @@ func NameOf(str string) (ret string) {
 		if str[0] == '#' {
 			ret = str
 		} else {
-			ret = "#" + lang.Camelize(str)
+			ret = "#" + lang.Underscore(str)
 		}
 	}
 	return

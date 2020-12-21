@@ -16,7 +16,7 @@ import (
 func TestGrouping(t *testing.T) {
 	var kinds testutil.Kinds
 	kinds.AddKinds((*Things)(nil), (*Values)(nil))
-	objectNames := sliceOf.String("mildred", "apple", "pen", "thing#1", "thing#2")
+	objectNames := sliceOf.String("mildred", "apple", "pen", "thing_1", "thing_2") // COUNTER:#
 	//
 	if objs, e := objects(kinds.Kind("Things"), objectNames...); e != nil {
 		t.Fatal(e)
@@ -57,12 +57,12 @@ func TestGrouping(t *testing.T) {
 				},
 				map[string]interface{}{
 					"Settings": map[string]interface{}{
-						"Name":         "thing#1",
+						"Name":         "thing_1", // COUNTER:#
 						"Label":        "thingies",
 						"Innumerable":  "NotInnumerable",
 						"GroupOptions": "WithoutObjects",
 					},
-					"Objects": []string{"thing#1", "thing#2"},
+					"Objects": []string{"thing_1", "thing_2"}, // COUNTER:#
 				},
 			}
 			got := g.RecordsToValue(groups.Records())

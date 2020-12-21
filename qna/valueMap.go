@@ -33,7 +33,7 @@ func makeKey(target, field string) keyType {
 	// name translation should be done there.
 	// we'd have to mark up things like text evaluations ( ex. HasTrait )
 	if len(field) > 0 && field[0] != '#' {
-		field = lang.Camelize(field)
+		field = lang.Breakcase(field)
 	}
 	return keyType{target, field}
 }

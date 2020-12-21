@@ -3,12 +3,12 @@ package story
 import (
 	"database/sql"
 	r "reflect"
-	"strconv"
 
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/ident"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -18,18 +18,9 @@ type Importer struct {
 	// sometimes the importer needs to define a singleton like type or instance
 	oneTime     map[string]bool
 	decoder     *decode.Decoder
-	autoCounter autoCounter
+	autoCounter ident.Counters
 	entireGame  ephemera.Named
 	StoryEnv
-}
-
-// helper for making auto variables.
-type autoCounter map[string]uint64
-
-func (m *autoCounter) next(name string) string {
-	c := (*m)[name] + 1
-	(*m)[name] = c
-	return name + "#" + strconv.FormatUint(c, 36)
 }
 
 func NewImporter(srcURI string, db *sql.DB) *Importer {
@@ -42,7 +33,7 @@ func NewImporterDecoder(srcURI string, db *sql.DB, dec *decode.Decoder) *Importe
 		Recorder:    rec,
 		oneTime:     make(map[string]bool),
 		decoder:     dec,
-		autoCounter: make(autoCounter),
+		autoCounter: make(ident.Counters),
 	}
 }
 
@@ -83,7 +74,7 @@ func (k *Importer) NewName(name, category, ofs string) ephemera.Named {
 
 func (k *Importer) gameDomain() ephemera.Named {
 	if !k.entireGame.IsValid() {
-		k.entireGame = k.Recorder.NewName("Entire Game", tables.NAMED_SCENE, "internal")
+		k.entireGame = k.Recorder.NewName("entire_game", tables.NAMED_SCENE, "internal")
 	}
 	return k.entireGame
 }

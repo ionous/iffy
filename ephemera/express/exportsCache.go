@@ -5,7 +5,7 @@ import (
 	"github.com/ionous/iffy/lang"
 )
 
-// maps cmd spec name to a nii pointer to the cmd type in question
+// maps cmd spec name to a nil pointer to the cmd type in question
 // ( nil ptr can be used for reflecting on types )
 type nameCache struct {
 	els map[string]interface{}
@@ -20,7 +20,7 @@ func (k *nameCache) get(n string) (ret interface{}, okay bool) {
 		els := make(map[string]interface{})
 		for _, v := range core.Slats {
 			spec := v.Compose()
-			n := lang.Camelize(spec.Name)
+			n := lang.Breakcase(spec.Name)
 			els[n] = v
 		}
 		k.els = els

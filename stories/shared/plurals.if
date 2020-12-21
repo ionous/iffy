@@ -322,7 +322,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-17494873906-4",
                                                     "type": "lines",
-                                                    "value": "{.target.printedPluralName}"
+                                                    "value": "{.target.printed_plural_name}"
                                                   }
                                                 }
                                               }
@@ -586,7 +586,7 @@
                                         "$TEMPLATE": {
                                           "id": "id-17494ab71d0-33",
                                           "type": "lines",
-                                          "value": "{printPluralName: .flowerpot}, {printPluralName: .dishes}, {printPluralName: .spoon}"
+                                          "value": "{print_plural_name: .flowerpot}, {print_plural_name: .dishes}, {print_plural_name: .spoon}"
                                         }
                                       }
                                     }

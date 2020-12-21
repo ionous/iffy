@@ -11,8 +11,8 @@ import (
 // and a request for an object of a particular name.
 // the full set of possibilities are:
 //   {x}                  - print name of an object.
-//   {kindOf: x}          - call a function with a local variable or object.
-//   {printPluralName: x} - call a user pattern with a local variable or object.
+//   {kind_of: x}          - call a function with a local variable or object.
+//   {print_plural_name: x} - call a user pattern with a local variable or object.
 //
 // where x can be, for instance:
 //    {.target}   - a local variable named target

@@ -159,7 +159,7 @@ func TestFieldAccess(t *testing.T) {
 			t.Fatal(e)
 		}
 		// toy boat.A has an initial value of y
-		if toyBoat, e := q.GetField(object.Value, "toyBoat"); e != nil {
+		if toyBoat, e := q.GetField(object.Value, "toy_boat"); e != nil {
 			t.Fatal(e)
 		} else if e := toyBoat.SetFieldByName("w", g.BoolOf(true)); e != nil {
 			t.Fatal(e)

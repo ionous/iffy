@@ -312,7 +312,7 @@
                                         "$TEMPLATE": {
                                           "id": "id-174f06d08a4-33",
                                           "type": "lines",
-                                          "value": "You can only just make out {a: .lampPost}.\nYou can only just make out {a: .Trevor}.\nYou can only just make out {a: .soldiers}.\n{A: .lampPost} can be made out in the mist.\n{A: .Trevor} can be made out in the mist.\n{A: .soldiers} can be made out in the mist.\nYou can only just make out {the: .lampPost}.\nYou can only just make out {the: .trevor}.\nYou can only just make out {the: .soldiers}.\n{The: .lampPost} may be a trick of the mist.\n{The: .trevor} may be a trick of the mist.\n{The: .soldiers} may be a trick of the mist.\nYou can only just make out {a: .Trevor}."
+                                          "value": "You can only just make out {a: .lamp_post}.\nYou can only just make out {a: .Trevor}.\nYou can only just make out {a: .soldiers}.\n{A: .lamp_post} can be made out in the mist.\n{A: .Trevor} can be made out in the mist.\n{A: .soldiers} can be made out in the mist.\nYou can only just make out {the: .lamp_post}.\nYou can only just make out {the: .trevor}.\nYou can only just make out {the: .soldiers}.\n{The: .lamp_post} may be a trick of the mist.\n{The: .trevor} may be a trick of the mist.\n{The: .soldiers} may be a trick of the mist.\nYou can only just make out {a: .Trevor}."
                                         }
                                       }
                                     }
@@ -365,7 +365,7 @@
                         "$LINES": {
                           "id": "id-174f06d08a4-45",
                           "type": "lines",
-                          "value": "You can only just make out a lamp-post.\nYou can only just make out Trevor.\nYou can only just make out some soldiers.\nA lamp-post can be made out in the mist.\nTrevor can be made out in the mist.\nSome soldiers can be made out in the mist.\nYou can only just make out the lamp-post.\nYou can only just make out Trevor.\nYou can only just make out the soldiers.\nThe lamp-post may be a trick of the mist.\nTrevor may be a trick of the mist.\nThe soldiers may be a trick of the mist.\nYou can only just make out Trevor.\n"
+                          "value": "You can only just make out a lamp post.\nYou can only just make out Trevor.\nYou can only just make out some soldiers.\nA lamp post can be made out in the mist.\nTrevor can be made out in the mist.\nSome soldiers can be made out in the mist.\nYou can only just make out the lamp post.\nYou can only just make out Trevor.\nYou can only just make out the soldiers.\nThe lamp post may be a trick of the mist.\nTrevor may be a trick of the mist.\nThe soldiers may be a trick of the mist.\nYou can only just make out Trevor.\n"
                         }
                       }
                     }
@@ -509,7 +509,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f06d08a4-89",
                                                     "type": "lines",
-                                                    "value": "{printArticle: .noun \"The\"}"
+                                                    "value": "{print_article: .noun \"The\"}"
                                                   }
                                                 }
                                               }
@@ -666,7 +666,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f06d08a4-116",
                                                     "type": "lines",
-                                                    "value": "{printArticle: .noun \"the\"}"
+                                                    "value": "{print_article: .noun \"the\"}"
                                                   }
                                                 }
                                               }
@@ -823,7 +823,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f06d08a4-143",
                                                     "type": "lines",
-                                                    "value": "{printArticle: .noun|makeSentenceCase!}"
+                                                    "value": "{print_article: .noun|make_sentence_case!}"
                                                   }
                                                 }
                                               }
@@ -980,7 +980,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f06d08a4-170",
                                                     "type": "lines",
-                                                    "value": "{printArticle: .noun}"
+                                                    "value": "{print_article: .noun}"
                                                   }
                                                 }
                                               }
@@ -1462,7 +1462,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f0910998-97",
                                                     "type": "lines",
-                                                    "value": "{.target.indefiniteArticle} {.target}"
+                                                    "value": "{.target.indefinite_article} {.target}"
                                                   }
                                                 }
                                               }
@@ -1641,7 +1641,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f2020d9d-45",
                                                     "type": "lines",
-                                                    "value": "{printName: .target|makeTitleCase!}"
+                                                    "value": "{print_name: .target|make_title_case!}"
                                                   }
                                                 }
                                               }
@@ -1929,7 +1929,7 @@
                                                                           "$TEMPLATE": {
                                                                             "id": "id-17672fb43de-202",
                                                                             "type": "lines",
-                                                                            "value": "{printArticle: .object }"
+                                                                            "value": "{print_article: .object }"
                                                                           }
                                                                         }
                                                                       }

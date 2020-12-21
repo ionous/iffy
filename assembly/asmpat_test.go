@@ -70,10 +70,10 @@ func TestRuleAsm(t *testing.T) {
 		defer asm.db.Close()
 		t.Run("normal", func(t *testing.T) {
 			cleanPatterns(asm.db)
-			// sayMe return text, and has one number parameter
+			// say_me return text, and has one number parameter
 			addEphPattern(asm.rec,
-				"sayMe", "", "text_eval", "true",
-				"sayMe", "num", "number_eval", "true")
+				"say_me", "", "text_eval", "true",
+				"say_me", "num", "number_eval", "true")
 
 			for i, rule := range debug.SayPattern.Rules {
 				prog, e := asm.rec.NewGob("text_rule", &rule)
@@ -81,7 +81,7 @@ func TestRuleAsm(t *testing.T) {
 					t.Fatal(e)
 				}
 				asm.rec.NewPatternRule(
-					asm.rec.NewName("sayMe",
+					asm.rec.NewName("say_me",
 						tables.NAMED_PATTERN,
 						strconv.Itoa(i+1)),
 					prog)
@@ -102,7 +102,7 @@ func TestRuleAsm(t *testing.T) {
 						return
 					}, &progName, &typeName, tables.NewGobScanner(&pat)); e != nil {
 					t.Fatal(e)
-				} else if progName != "sayMe" || typeName != "TextPattern" {
+				} else if progName != "say_me" || typeName != "TextPattern" {
 					t.Fatal("mismatched columns")
 				} else if diff := pretty.Diff(debug.SayPattern, pat); len(diff) > 0 {
 					pretty.Println("want:", debug.SayPattern)

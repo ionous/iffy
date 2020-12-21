@@ -64,3 +64,60 @@ func TestInflect(t *testing.T) {
 		}
 	}
 }
+
+// go test --run TestVowels
+func TestVowels(t *testing.T) {
+	if !StartsWithVowel("evil fish") {
+		t.Fatal("error")
+	}
+}
+
+func TestBreakcase(t *testing.T) {
+	const msg = "want %q, got %q"
+	const idempotent = "%q isnt idempotent"
+	if got, want := Breakcase("   "), ""; got != want {
+		t.Fatalf(msg, want, got)
+	} else if Breakcase(got) != got {
+		t.Fatalf(idempotent, got)
+	}
+	if got, want := Breakcase("  x "), "x"; got != want {
+		t.Fatalf(msg, want, got)
+	} else if Breakcase(got) != got {
+		t.Fatalf(idempotent, got)
+	}
+	if got, want := Breakcase(" hello    there "), "hello_there"; got != want {
+		t.Fatalf(msg, want, got)
+	} else if Breakcase(got) != got {
+		t.Fatalf(idempotent, got)
+	}
+	if got, want := Breakcase("hello there world"), "hello_there_world"; got != want {
+		t.Fatalf(msg, want, got)
+	} else if Breakcase(got) != got {
+		t.Fatalf(idempotent, got)
+	}
+	if got, want := Breakcase(" __x_ "), "__x_"; got != want {
+		t.Fatalf(msg, want, got)
+	} else if Breakcase(got) != got {
+		t.Fatalf(idempotent, got)
+	}
+	if got, want := Breakcase(" _ x _ __ x___ "), "_x___x___"; got != want {
+		t.Fatalf(msg, want, got)
+	} else if Breakcase(got) != got {
+		t.Fatalf(idempotent, got)
+	}
+}
+
+func TestIllegalChars(t *testing.T) {
+	if test, contains := "_", false; HasBadPunct(test) != contains {
+		t.Fatal(test, !contains)
+	}
+	if test, contains := "hello_world", false; HasBadPunct(test) != contains {
+		t.Fatal(test, !contains)
+	}
+	if test, contains := "hello world", true; HasBadPunct(test) != contains {
+		t.Fatal(test, !contains)
+	}
+	if test, contains := "boop!", true; HasBadPunct(test) != contains {
+		t.Fatal(test, !contains)
+	}
+}

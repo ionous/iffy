@@ -30,7 +30,7 @@ func (k *ScopeStack) PopScope() {
 func (k *ScopeStack) GetField(target, field string) (ret g.Value, err error) {
 	norm := field
 	if k.NormalizeNames {
-		norm = lang.Camelize(field)
+		norm = lang.Underscore(field)
 	}
 	err = k.visit(target, field, func(scope rt.Scope) (err error) {
 		if v, e := scope.GetField(target, norm); e != nil {
@@ -47,7 +47,7 @@ func (k *ScopeStack) GetField(target, field string) (ret g.Value, err error) {
 func (k *ScopeStack) SetField(target, field string, v g.Value) (err error) {
 	norm := field
 	if k.NormalizeNames {
-		norm = lang.Camelize(field)
+		norm = lang.Underscore(field)
 	}
 	return k.visit(target, field, func(scope rt.Scope) error {
 		return scope.SetField(target, norm, v)

@@ -74,7 +74,7 @@ func DomainNameOf(domain, noun string) string {
 		b.WriteString(domain)
 		b.WriteString("::")
 	}
-	b.WriteString(lang.Camelize(noun))
+	b.WriteString(lang.Breakcase(noun))
 	return b.String()
 }
 
@@ -97,29 +97,37 @@ func (m *Assembler) WriteNounWithNames(domain, noun, kind string) (err error) {
 	if e := m.WriteNoun(id, kind); e != nil {
 		err = errutil.Append(err, e)
 	} else {
+		// COUNTER:#
+		// if counter := strings.Index(noun, "#"); counter > 0 {
+		// 	noun = noun[:counter]
+		// }
+		// the text parser uses lower case names only
 		lower := strings.ToLower(noun)
-		if e := m.WriteName(id, lower, 0); e != nil {
+
+		// we want to divide words on breakcase boundaries
+		noun = lang.Breakcase(lower)
+		split := strings.FieldsFunc(noun, lang.IsBreak)
+		spaces := strings.Join(split, " ")
+
+		// we write the lower breakcased word as spaces  ( toy boat )
+		if e := m.WriteName(id, spaces, 0); e != nil {
 			err = errutil.Append(err, e)
-		} else {
+		} else if cnt := len(split); cnt > 1 {
+			// write the breakcase word if needed ( ex. toy_boat )
 			var ofs int
-			camel := lang.Camelize(noun)
-			if camel != lower {
-				if e := m.WriteName(id, camel, 1); e != nil {
-					err = errutil.Append(err, e)
-				}
+			if spaces != noun {
 				ofs++
+				m.WriteName(id, noun, ofs)
 			}
-			split := lang.Fields(noun)
-			if cnt := len(split); cnt > 1 {
-				cnt += ofs
-				for i, k := range split {
-					rank := cnt - i
-					if e := m.WriteName(id, strings.ToLower(k), rank); e != nil {
-						err = errutil.Append(err, e)
-					}
+			// write the individual words of the split ( ex. toy, boat )
+			for i, k := range split {
+				rank := cnt + ofs - i
+				if e := m.WriteName(id, strings.ToLower(k), rank); e != nil {
+					err = errutil.Append(err, e)
 				}
 			}
 		}
+
 	}
 	return
 }

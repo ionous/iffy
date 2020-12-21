@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+// CombineCase is almost exactly like Camelize, only doesnt touch the case of the first rune of the first word.
+func CombineCase(name string) string {
+	p := combineCase(name, false, true)
+	return p.join()
+}
+
 func TestEmptyCombine(t *testing.T) {
 	// ensure the alg doesnt panic on the empty string
 	if len(CombineCase("")) != 0 {

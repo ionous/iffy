@@ -8,6 +8,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
@@ -128,7 +129,7 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 			from mdl_pair 
 			join mdl_rel mr 
 				using (relation)
-			where ?=ifnull(domain, 'entireGame')
+			where ?=ifnull(domain, 'entire_game')
 			)
 			insert or replace into run_pair
 			select prev.noun, relation, prev.otherNoun, 0
@@ -233,6 +234,7 @@ func (n *Runner) setField(key keyType, val g.Value) (err error) {
 
 // pv is a pointer to a pattern instance, and we copy its contents in.
 func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
+	name = lang.Breakcase(name)
 	outVal := r.ValueOf(pv).Elem() // outVal is a pattern instance who's fields get overwritten
 	rtype := outVal.Type()
 	// note: makeKey camelCases, while go types are PascalCase

@@ -1,11 +1,10 @@
 package story
 
 import (
-	"strings"
-
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 )
 
@@ -57,10 +56,9 @@ func (op *PrimitiveType) ImportPropertyType(k *Importer, kind, prop ephemera.Nam
 		// ex. innumerable, not innumerable, is innumerable
 		// there is an aspect "innumerable
 		aspect := prop.String()
-		aspectUpper := strings.Title(aspect) // manually camel aspects
 		k.NewImplicitAspect(aspect, kind.String(),
-			"not"+aspectUpper, // false first
-			"is"+aspectUpper,
+			"not_"+aspect, // false first
+			"is_"+aspect,
 		)
 		k.NewField(kind, prop, tables.PRIM_ASPECT, "")
 	}
@@ -118,13 +116,13 @@ func (op *TextList) ImportPrimType(k *Importer) (retType, retAff string, err err
 }
 
 func (op *RecordType) ImportPrimType(k *Importer) (retType, retAff string, err error) {
-	retType = op.Kind.Str
+	retType = lang.Breakcase(op.Kind.Str) // fix? not happy that this has to manually match NAMED_KIND munging
 	retAff = affine.Record.String()
 	return
 }
 
 func (op *RecordList) ImportPrimType(k *Importer) (retType, retAff string, err error) {
-	retType = op.Kind.Str
+	retType = lang.Breakcase(op.Kind.Str) // fix? not happy that this has to manually match NAMED_KIND munging
 	retAff = affine.RecordList.String()
 	return
 }

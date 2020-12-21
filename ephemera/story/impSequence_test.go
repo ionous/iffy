@@ -16,7 +16,7 @@ func TestImportSequence(t *testing.T) {
 		t.Fatal("failed to read sequence", e)
 	} else if diff := pretty.Diff(cmd, &core.CycleText{
 		Sequence: core.Sequence{
-			Seq: "seq#1",
+			Seq: "seq_1", // COUNTER:#
 			Parts: []rt.TextEval{
 				&core.Text{Text: "a"},
 				&core.Text{Text: "b"},

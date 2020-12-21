@@ -178,7 +178,7 @@
                                                   "$TEMPLATE": {
                                                     "id": "id-174f629fe91-28",
                                                     "type": "lines",
-                                                    "value": "{printNumWord: .groupSize} other {if .groupSize > 1}{ printPluralName: .target}{else}{printName: .target}{end}"
+                                                    "value": "{print_num_word: .group_size} other {if .group_size > 1}{ print_plural_name: .target}{else}{print_name: .target}{end}"
                                                   }
                                                 }
                                               }
@@ -342,7 +342,7 @@
                                         "$TEMPLATE": {
                                           "id": "id-174f629fe91-45",
                                           "type": "lines",
-                                          "value": "{printSeveral: .books}\n{printSeveral: .books 5}"
+                                          "value": "{print_several: .books}\n{print_several: .books 5}"
                                         }
                                       }
                                     }

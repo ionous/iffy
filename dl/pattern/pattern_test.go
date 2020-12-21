@@ -13,7 +13,7 @@ import (
 func ExampleSayMe() {
 	// rules are run in reverse order.
 	run := patternRuntime{PatternMap: testutil.PatternMap{
-		"sayMe": &debug.SayPattern,
+		"say_me": &debug.SayPattern,
 	}}
 	// say 4 numbers
 	for i := 1; i <= 4; i++ {
@@ -21,15 +21,15 @@ func ExampleSayMe() {
 			fmt.Println("Error:", e)
 			break
 		} else {
-			fmt.Println(fmt.Sprintf("sayMe %d = \"%s\"", i, text))
+			fmt.Println(fmt.Sprintf("say_me %d = \"%s\"", i, text))
 		}
 	}
 
 	// Output:
-	// sayMe 1 = "One!"
-	// sayMe 2 = "Two!"
-	// sayMe 3 = "Three!"
-	// sayMe 4 = "Not between 1 and 3."
+	// say_me 1 = "One!"
+	// say_me 2 = "Two!"
+	// say_me 3 = "Three!"
+	// say_me 4 = "Not between 1 and 3."
 }
 
 type baseRuntime struct {

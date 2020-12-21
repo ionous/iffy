@@ -64,7 +64,7 @@ func TestExpressions(t *testing.T) {
 	// isNot requires command parsing
 	t.Run("logic", func(t *testing.T) {
 		if e := testExpression(
-			"true and (false or {isNot: true})",
+			"true and (false or {not: true})",
 			&core.AllTrue{
 				Test: []rt.BoolEval{
 					&core.Bool{true},
@@ -129,10 +129,10 @@ func testExpression(str string, want interface{}) (err error) {
 // test full templates
 func TestTemplates(t *testing.T) {
 	t.Run("print", func(t *testing.T) {
-		if e := testTemplate("{printNumWord: .groupSize}",
+		if e := testTemplate("{print_num_word: .group_size}",
 			&core.PrintNumWord{
 				Num: &core.Var{
-					Name:  "groupSize",
+					Name:  "group_size",
 					Flags: core.TryAsBoth,
 				},
 			}); e != nil {
@@ -198,7 +198,7 @@ func TestTemplates(t *testing.T) {
 		}
 	})
 	t.Run("filter", func(t *testing.T) {
-		if e := testTemplate("{15|printNum!}",
+		if e := testTemplate("{15|print_num!}",
 			&core.PrintNum{
 				Num: &core.Number{15},
 			}); e != nil {
@@ -208,7 +208,7 @@ func TestTemplates(t *testing.T) {
 	// all of the text in a template gets turned into an expression
 	// plain text between bracketed sections becomes text evals
 	t.Run("span", func(t *testing.T) {
-		if e := testTemplate("{15|printNum!} {if 7=7}boop{end}",
+		if e := testTemplate("{15|print_num!} {if 7=7}boop{end}",
 			&core.Join{
 				Parts: []rt.TextEval{
 					&core.PrintNum{N(15)},

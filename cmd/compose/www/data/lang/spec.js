@@ -1077,7 +1077,7 @@ const spec = [
     "group": [
       "logic"
     ],
-    "name": "is_not",
+    "name": "not",
     "uses": "flow",
     "with": {
       "params": {

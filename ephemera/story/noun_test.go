@@ -52,17 +52,17 @@ order by noun collate nocase, trait`, 2)
 		// we're not actually doing anything with those names.
 		"0",
 		//
-		"apple,commonNamed",
-		"apple,indefiniteArticle",
+		"apple,common_named",
+		"apple,indefinite_article",
 		//
-		"robot sheep,commonNamed",
-		"robot sheep,indefiniteArticle",
-		"square#1,counted",
-		"Trevor,indefiniteArticle",
-		"Trevor,properNamed",
-		"triangles#1,counted",
-		"triangles#2,counted",
-		"triangles#3,counted",
+		"robot_sheep,common_named",
+		"robot_sheep,indefinite_article",
+		"square_1,counted", // COUNTER:#
+		"Trevor,indefinite_article",
+		"Trevor,proper_named", // COUNTER:#
+		"triangles_1,counted",
+		"triangles_2,counted",
+		"triangles_3,counted",
 		//
 		// "triangles", // plural -- disabled in ReadCountedNoun
 		// "square",    // singular -- disabled in ReadCountedNoun
@@ -72,11 +72,11 @@ order by noun collate nocase, trait`, 2)
 		"our",
 		// implicitly generated aspects
 		// listed in rank order (default first)
-		"commonNamed,nounTypes",
-		"properNamed,nounTypes",
-		"counted,nounTypes",
-		"publiclyNamed,privateNames",
-		"privatelyNamed,privateNames",
+		"common_named,noun_types",
+		"proper_named,noun_types",
+		"counted,noun_types",
+		"publicly_named,private_names",
+		"privately_named,private_names",
 		//
 	)
 	if diff := pretty.Diff(have, want); len(diff) > 0 {

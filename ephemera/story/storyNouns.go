@@ -38,9 +38,9 @@ func (op *NamedNoun) Import(k *Importer) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
-		k.NewImplicitAspect("nounTypes", "things", "commonNamed", "properNamed", "counted")
+		k.NewImplicitAspect("noun_types", "things", "common_named", "proper_named", "counted")
 		// whether a player can refer to an object by its name.
-		k.NewImplicitAspect("privateNames", "things", "publiclyNamed", "privatelyNamed")
+		k.NewImplicitAspect("private_names", "things", "publicly_named", "privately_named")
 	}
 	//
 	if cnt, ok := lang.WordsToNum(op.Determiner.Str); !ok {
@@ -64,7 +64,7 @@ func (op *NamedNoun) ReadCountedNoun(k *Importer, cnt int) (err error) {
 	// fix: something something noun stacks, not individually duplicated nouns
 	baseName := op.Name.String()
 	for i := 0; i < cnt; i++ {
-		countedNoun := k.autoCounter.next(baseName)
+		countedNoun := k.autoCounter.Next(baseName)
 		noun := k.NewName(countedNoun, "noun", op.At.String())
 		k.Recent.Nouns.Add(noun)
 		k.NewValue(noun, typeTrait, true)
@@ -80,9 +80,9 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 		// pick common or proper based on noun capitalization.
 		// fix: implicitly generated facts should be considered preliminary
 		// so that authors can override them.
-		traitStr := "commonNamed"
+		traitStr := "common_named"
 		if first, _ := utf8.DecodeRuneInString(noun.String()); unicode.ToUpper(first) == first {
-			traitStr = "properNamed"
+			traitStr = "proper_named"
 		}
 		typeTrait := k.NewName(traitStr, tables.NAMED_TRAIT, op.At.String())
 		k.NewValue(noun, typeTrait, true)
@@ -90,14 +90,14 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 		// record any custom determiner
 		if str, ok := decode.FindChoice(&op.Determiner, op.Determiner.Str); ok && len(str) == 0 {
 			// set the indefinite article field
-			article := k.NewName("indefiniteArticle", tables.NAMED_FIELD, op.At.String())
+			article := k.NewName("indefinite_article", tables.NAMED_FIELD, op.At.String())
 			k.NewValue(noun, article, op.Determiner.Str)
 
 			// create a "indefinite article" field for all "things"
 			if once := "named_noun"; k.Once(once) {
 				domain := k.gameDomain()
 				things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
-				indefinite := k.NewDomainName(domain, "indefiniteArticle", tables.NAMED_FIELD, once)
+				indefinite := k.NewDomainName(domain, "indefinite_article", tables.NAMED_FIELD, once)
 				k.NewField(things, indefinite, tables.PRIM_TEXT, "")
 			}
 
