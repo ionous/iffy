@@ -30,5 +30,5 @@ func (*SimpleNoun) Compose() composer.Spec {
 }
 
 func (op *SimpleNoun) GetObject(run rt.Runtime) (ret g.Value, err error) {
-	return getObjectExactly(run, string(op.Name))
+	return getObjectNamed(run, string(op.Name))
 }

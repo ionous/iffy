@@ -103,11 +103,11 @@ func TestMissingField(t *testing.T) {
 // 		); e != nil {
 // 			t.Fatal(e)
 // 		} else if e := AddTestFields(asm.assembler,
-// 			"Ts", "d", tables.PRIM_DIGI,
-// 			"Ts", "t", tables.PRIM_TEXT,
-// 			"Ts", "t2", tables.PRIM_TEXT,
-// 			"Ps", "p", tables.PRIM_TEXT,
-// 			"Cs", "c", tables.PRIM_TEXT,
+// 			"Ts", "d", tables.PRIM_DIGI,"",
+// 			"Ts", "t", tables.PRIM_TEXT,"",
+// 			"Ts", "t2", tables.PRIM_TEXT,"",
+// 			"Ps", "p", tables.PRIM_TEXT,"",
+// 			"Cs", "c", tables.PRIM_TEXT,"",
 // 		); e != nil {
 // 			t.Fatal(e)
 // 		} else if e := addDefaults(asm.rec,

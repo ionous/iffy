@@ -69,9 +69,12 @@ func AddTestNouns(m *Assembler, els ...string) (err error) {
 
 // create some fake model hierarchy of kind(s), field, fieldType
 func AddTestFields(m *Assembler, els ...string) (err error) {
-	for i, cnt := 0, len(els); i < cnt; i += 3 {
-		kind, field, fieldType := els[i], els[i+1], els[i+2]
-		if e := m.WriteField(kind, field, fieldType); e != nil {
+	if fourWide := len(els) / 4; fourWide*4 != len(els) {
+		panic("AddTestFields: expected sets of 4 els")
+	}
+	for i, cnt := 0, len(els); i < cnt; i += 4 {
+		kind, field, fieldType, aff := els[i], els[i+1], els[i+2], els[i+3]
+		if e := m.WriteField(kind, field, fieldType, aff); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}

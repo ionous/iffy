@@ -29,31 +29,17 @@ func (km *qnaKinds) GetKindByName(name string) (ret *g.Kind, err error) {
 		// creates the kind if it needs to.
 		var fields []g.Field
 		var field, fieldType string
-		// ex. number, text, aspect
+		var affinity affine.Affinity
 		if q, e := km.fieldsFor.Query(name); e != nil {
 			err = e
 		} else if e := tables.ScanAll(q, func() (err error) {
-			var affinity affine.Affinity
-			switch fieldType {
-			default:
-				// by default the type and the affinity are the same
-				// ( just like in go where the type and the kind are the same for primitive types )
+			// by default the type and the affinity are the same
+			// ( like reflect, where type and kind are the same for primitive types )
+			if len(affinity) == 0 {
 				affinity = affine.Affinity(fieldType)
-			case "trait":
-				affinity = affine.Bool
-			case "aspect":
-				// aspects are stored as text in the runtime
-				affinity = affine.Text
-				// we need the aspect record to lookup related traits
-				// fix: generic does this on demand; should there be a way to pre-populate?
-				// if _, e := km.GetKindByName(field); e != nil {
-				// 	err = errutil.New("aspect not found", field, e)
-				// } else {
-				// var aspects []*g.Kind
-				// aspects = append(aspects, aspect)
-				//
-				// }
 			}
+			// note: package generic finds the aspect record to lookup traits on demand.
+			// fix: should there be a way to pre-populate?
 			if err == nil {
 				fields = append(fields, g.Field{
 					Name:     field,
@@ -62,7 +48,7 @@ func (km *qnaKinds) GetKindByName(name string) (ret *g.Kind, err error) {
 				})
 			}
 			return
-		}, &field, &fieldType); e != nil {
+		}, &field, &fieldType, &affinity); e != nil {
 			err = e
 		} else {
 			ret = km.addKind(name, g.NewKind(km, name, fields))

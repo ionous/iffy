@@ -27,12 +27,12 @@ func TestDefaultFieldAssigment(t *testing.T) {
 		); e != nil {
 			t.Fatal(e)
 		} else if e := AddTestFields(asm.assembler,
-			"Ks", "d", tables.PRIM_DIGI,
-			"Ks", "t", tables.PRIM_TEXT,
-			"Ks", "t2", tables.PRIM_TEXT,
-			"Ls", "x", tables.PRIM_TEXT,
-			"Ds", "x", tables.PRIM_TEXT,
-			"Cs", "c", tables.PRIM_TEXT,
+			"Ks", "d", tables.PRIM_DIGI, "",
+			"Ks", "t", tables.PRIM_TEXT, "",
+			"Ks", "t2", tables.PRIM_TEXT, "",
+			"Ls", "x", tables.PRIM_TEXT, "",
+			"Ds", "x", tables.PRIM_TEXT, "",
+			"Cs", "c", tables.PRIM_TEXT, "",
 		); e != nil {
 			t.Fatal(e)
 		} else if e := addDefaults(asm.rec,
@@ -261,11 +261,11 @@ func newDefaultsTest(t *testing.T, path string, defaults ...interface{}) (ret *a
 		); e != nil {
 			err = e
 		} else if e := AddTestFields(asm.assembler,
-			"Ks", "d", tables.PRIM_DIGI,
-			"Ks", "t", tables.PRIM_TEXT,
-			"Ks", "A", tables.PRIM_ASPECT,
-			"Ls", "B", tables.PRIM_ASPECT,
-			"Ns", "B", tables.PRIM_ASPECT,
+			"Ks", "d", tables.PRIM_DIGI, "",
+			"Ks", "t", tables.PRIM_TEXT, "",
+			"Ks", "A", tables.PRIM_ASPECT, "",
+			"Ls", "B", tables.PRIM_ASPECT, "",
+			"Ns", "B", tables.PRIM_ASPECT, "",
 		); e != nil {
 			err = e
 		} else if e := AddTestTraits(asm.assembler,

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
@@ -55,8 +56,12 @@ func (m *Assembler) WriteCheck(name, testType, expect string) error {
 	return e
 }
 
-func (m *Assembler) WriteField(kind, field, fieldType string) error {
-	_, e := m.cache.Exec(mdl_field, kind, field, fieldType)
+func (m *Assembler) WriteField(kind, field, fieldType, aff string) error {
+	// patch till deeper fixes.
+	if len(aff) == 0 && fieldType == "aspect" {
+		aff = string(affine.Text)
+	}
+	_, e := m.cache.Exec(mdl_field, kind, field, fieldType, aff)
 	return e
 }
 
@@ -102,23 +107,16 @@ func (m *Assembler) WriteNounWithNames(domain, noun, kind string) (err error) {
 		// 	noun = noun[:counter]
 		// }
 		// the text parser uses lower case names only
+		// and, we want to divide words on breakcase boundaries
 		lower := strings.ToLower(noun)
+		breaks := lang.Breakcase(lower)
 
-		// we want to divide words on breakcase boundaries
-		noun = lang.Breakcase(lower)
-		split := strings.FieldsFunc(noun, lang.IsBreak)
-		spaces := strings.Join(split, " ")
-
-		// we write the lower breakcased word as spaces  ( toy boat )
-		if e := m.WriteName(id, spaces, 0); e != nil {
+		split := strings.FieldsFunc(breaks, lang.IsBreak)
+		var ofs int
+		if e := m.WriteName(id, breaks, ofs); e != nil {
 			err = errutil.Append(err, e)
 		} else if cnt := len(split); cnt > 1 {
-			// write the breakcase word if needed ( ex. toy_boat )
-			var ofs int
-			if spaces != noun {
-				ofs++
-				m.WriteName(id, noun, ofs)
-			}
+
 			// write the individual words of the split ( ex. toy, boat )
 			for i, k := range split {
 				rank := cnt + ofs - i
@@ -202,7 +200,7 @@ var mdl_aspect = tables.Insert("mdl_aspect", "aspect", "trait", "rank")
 var mdl_check = tables.Insert("mdl_check", "name", "type", "expect")
 var mdl_default = tables.Insert("mdl_default", "kind", "field", "value")
 var mdl_domain = tables.Insert("mdl_domain", "domain", "path")
-var mdl_field = tables.Insert("mdl_field", "kind", "field", "type")
+var mdl_field = tables.Insert("mdl_field", "kind", "field", "type", "affinity")
 var mdl_kind = tables.Insert("mdl_kind", "kind", "path")
 var mdl_name = tables.Insert("mdl_name", "noun", "name", "rank")
 var mdl_noun = tables.Insert("mdl_noun", "noun", "kind")

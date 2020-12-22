@@ -37,7 +37,7 @@ func AssembleFields(asm *Assembler) (err error) {
 
 // we cant read and write to the same db simultaneously
 type pendingField struct {
-	field, target, fieldType string
+	field, target, fieldType, aff string
 }
 type pendingFields struct {
 	list []pendingField
@@ -45,7 +45,7 @@ type pendingFields struct {
 
 func (out *pendingFields) writeFields(m *Assembler) (err error) {
 	for _, f := range out.list {
-		if e := m.WriteField(f.target, f.field, f.fieldType); e != nil {
+		if e := m.WriteField(f.target, f.field, f.fieldType, f.aff); e != nil {
 			err = errutil.Append(err, e)
 		}
 	}
@@ -59,7 +59,7 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 	if e := tables.QueryAll(db,
 		// note: nk is known to refer to kinds b/c it comes from eph_field idNamedKind
 		// therefore, we dont have to filter where category=kind(s).
-		`select nk.name, nf.name, p.primType, a.path
+		`select nk.name, nf.name, p.primType, p.primAff, a.path
 		from eph_field p 
 		join eph_named nk
 			on (p.idNamedKind = nk.rowid)
@@ -91,7 +91,7 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 				last, last.Hierarchy = curr, overlap
 			}
 			return
-		}, &curr.Kind, &curr.Field, &curr.Type, &curr.Parents); e != nil {
+		}, &curr.Kind, &curr.Field, &curr.Type, &curr.Aff, &curr.Parents); e != nil {
 		err = e
 	} else {
 		last.Flush(out)
@@ -161,15 +161,15 @@ func findOverlap(a, b []string) (retCmp int, retOvr []string) {
 }
 
 type fieldInfo struct {
-	Kind, Field, Type, Parents string   // parents depends on type
-	Hierarchy                  []string // hierarchy is derived from type and parents
+	Kind, Field, Type, Aff, Parents string   // parents depends on type
+	Hierarchy                       []string // hierarchy is derived from type and parents
 }
 
 // ancestors holds lca
 func (i *fieldInfo) Flush(out *pendingFields) {
 	if len(i.Kind) > 0 {
 		lca := i.Hierarchy[0]
-		out.list = append(out.list, pendingField{i.Field, lca, i.Type})
+		out.list = append(out.list, pendingField{i.Field, lca, i.Type, i.Aff})
 	}
 }
 

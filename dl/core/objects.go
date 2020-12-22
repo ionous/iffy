@@ -13,7 +13,6 @@ import (
 
 // ObjectName implements ObjectEval, searching for an object named as specified.
 // ex. ObjectName{ "target" } looks for the object named "target".
-// this is an internal command, used by express.... fix: maybe it should live there.
 // and maybe rename to something like "Get/FindObjectId"
 type ObjectName struct {
 	Name rt.TextEval
@@ -52,7 +51,7 @@ type IsExactKindOf struct {
 func (*ObjectName) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "object_name",
-		Group: "internal",
+		Group: "objects",
 		Desc:  "Object Name: Returns a noun's object id.",
 		Spec:  "object named {name:text_eval}",
 	}
@@ -61,7 +60,7 @@ func (*ObjectName) Compose() composer.Spec {
 func (op *ObjectName) GetObject(run rt.Runtime) (ret g.Value, err error) {
 	if name, e := safe.GetText(run, op.Name); e != nil {
 		err = cmdError(op, e)
-	} else if v, e := getObjectExactly(run, name.String()); e != nil {
+	} else if v, e := getObjectNamed(run, name.String()); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -95,17 +94,6 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	// default:
 	// 	err = cmdError(op, e)
 	// }
-}
-
-// find an object with the passed partial name
-func getObjectExactly(run rt.Runtime, name string) (ret g.Value, err error) {
-	switch val, e := run.GetField(object.Value, name); e.(type) {
-	case g.UnknownField:
-		err = g.UnknownObject(name)
-	default:
-		ret, err = val, e
-	}
-	return
 }
 
 func (*NameOf) Compose() composer.Spec {

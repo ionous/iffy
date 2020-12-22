@@ -257,10 +257,10 @@ var FieldTest = struct {
 		"boat", "Fs,Ls,Ks",
 	},
 	/*fields*/ []string{
-		"Ks", "d", tables.PRIM_DIGI,
-		"Ks", "t", tables.PRIM_TEXT,
-		"Ks", "a", tables.PRIM_ASPECT,
-		"Ls", "b", tables.PRIM_ASPECT,
+		"Ks", "d", tables.PRIM_DIGI, "",
+		"Ks", "t", tables.PRIM_TEXT, "",
+		"Ks", "a", tables.PRIM_ASPECT, "",
+		"Ls", "b", tables.PRIM_ASPECT, "",
 	},
 	/*traits*/ []string{
 		"a", "w",

@@ -77,11 +77,11 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				from mdl_noun 
 				where noun=?`),
 		fieldsFor: ps.Prep(db,
-			`select field, type from mdl_field
+			`select field, type, affinity from mdl_field
 			where kind=?1
 				union all
 			select * from (
-				select trait, 'trait' 
+				select trait, 'trait', 'bool' 
 				from mdl_aspect
 				where aspect = ?1
 				order by rank 
@@ -190,7 +190,7 @@ func (n *Runner) SetField(target, rawField string, val g.Value) (err error) {
 		target == object.Counter; !writable {
 		err = errutil.Fmt("can't change reserved field '%s.%s'", target, rawField)
 	} else {
-		field := optionalBreakcase(rawField)
+		field := lang.SpecialBreakcase(rawField)
 		switch e := n.ScopeStack.SetField(target, field, val); e.(type) {
 		default:
 			err = e
@@ -261,16 +261,6 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 		}
 		// see notes: in theory GetEvalByName with
 		n.pairs[key] = val
-	}
-	return
-}
-
-// eventually, these transforms will happen at assembly time
-func optionalBreakcase(field string) (ret string) {
-	if id := field[0]; id == '#' || id == '$' {
-		ret = field
-	} else {
-		ret = lang.Breakcase(field)
 	}
 	return
 }
@@ -370,7 +360,8 @@ func (n *Runner) GetField(target, rawField string) (ret g.Value, err error) {
 			}
 		} else {
 			// given a name, find an object (id) and make sure it should be available
-			objName := rawField
+			// note: currently we're able to get names with spaces here " apple", so we breakcase it.
+			objName := lang.Breakcase(rawField)
 			ret, err = n.getOrCache(object.Value, objName, func(key keyType) (ret qnaValue, err error) {
 				var id string
 				if e := n.fields.objOf.QueryRow(objName).Scan(&id); e != nil {
@@ -387,7 +378,7 @@ func (n *Runner) GetField(target, rawField string) (ret g.Value, err error) {
 		}
 
 	default:
-		varName := optionalBreakcase(rawField)
+		varName := lang.SpecialBreakcase(rawField)
 		switch v, e := n.ScopeStack.GetField(target, varName); e.(type) {
 		default:
 			err = e

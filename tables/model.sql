@@ -13,7 +13,7 @@ create table mdl_default( kind text, field text, value blob );
 /* hierarchy of domains */
 create table mdl_domain( domain text, path text, primary key( domain ));
 /* properties of a kind. type is a PRIM_ */
-create table mdl_field( kind text, field text, type text, primary key( kind, field ));
+create table mdl_field( kind text, field text, type text, affinity text, primary key( kind, field ));
 /* a class of objects with shared characteristics */
 create table mdl_kind( kind text, path text, primary key( kind ));
 /* words which refer to nouns. in cases where two words may refer to the same noun, 

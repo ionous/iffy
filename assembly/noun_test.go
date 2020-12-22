@@ -7,6 +7,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/ephemera"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
@@ -30,14 +31,14 @@ func TestNounFormation(t *testing.T) {
 			); e != nil {
 				t.Fatal(e)
 			} else if e := AssembleNouns(asm.assembler); e != nil {
+				t.Log(asm.dilemmas)
 				t.Fatal(e)
 			} else if e := matchNouns(asm.db, []modeledNoun{
 				{"apple", "Ts", 0},
 				{"pear", "Ts", 0},
-				{"toy boat", "Ts", 0},
-				{"toy_boat", "Ts", 1},
-				{"boat", "Ts", 2},
-				{"toy", "Ts", 3},
+				{"toy_boat", "Ts", 0},
+				{"boat", "Ts", 1},
+				{"toy", "Ts", 2},
 			}); e != nil {
 				t.Fatal(e)
 			}
@@ -58,7 +59,7 @@ func TestNounFormation(t *testing.T) {
 				t.Fatal(e)
 			} else if e := AssembleNouns(asm.assembler); e == nil {
 				t.Fatal("expected error")
-			} else if !containsOnly(asm.dilemmas, `missing noun: "bad apple"`) {
+			} else if !containsOnly(asm.dilemmas, `missing noun: "bad_apple"`) {
 				t.Fatal(asm.dilemmas)
 			}
 		}
@@ -92,7 +93,10 @@ type modeledNoun struct {
 
 func addNounEphemera(rec *ephemera.Recorder, els ...string) (err error) {
 	for i, cnt := 0, len(els); i < cnt; i += 2 {
-		key, value := els[i], els[i+1]
+		// fix: not sure its right that we breakcase the import
+		// ( rather than figure break case during assembly )
+		// but that's the way its done right now.
+		key, value := lang.Breakcase(els[i]), lang.Breakcase(els[i+1])
 		n := rec.NewName(key, tables.NAMED_NOUN, "test")
 		k := rec.NewName(value, tables.NAMED_KIND, "test")
 		rec.NewNoun(n, k)
@@ -178,11 +182,10 @@ func TestNounParts(t *testing.T) {
 		} else if e := AssembleNouns(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(asm.db, []modeledNoun{
-			{"collection of words", "Ts", 0},
-			{"collection_of_words", "Ts", 1},
-			{"words", "Ts", 2},
-			{"of", "Ts", 3},
-			{"collection", "Ts", 4},
+			{"collection_of_words", "Ts", 0},
+			{"words", "Ts", 1},
+			{"of", "Ts", 2},
+			{"collection", "Ts", 3},
 		}); e != nil {
 			t.Fatal(e)
 		}

@@ -25,8 +25,8 @@ func TestInitialFieldAssignment(t *testing.T) {
 		); e != nil {
 			t.Fatal(e)
 		} else if e := AddTestFields(asm.assembler,
-			"Ks", "t", tables.PRIM_TEXT,
-			"Ls", "d", tables.PRIM_DIGI,
+			"Ks", "t", tables.PRIM_TEXT, "",
+			"Ls", "d", tables.PRIM_DIGI, "",
 		); e != nil {
 			t.Fatal(e)
 		} else if e := AddTestNouns(asm.assembler,
@@ -49,7 +49,7 @@ func TestInitialFieldAssignment(t *testing.T) {
 			"apple", "t", "some text",
 			"boat", "t", "more text",
 			"pear", "d", int64(123), // int64, re: go's default scanner.
-			"toy boat", "d", int64(321),
+			"toy_boat", "d", int64(321),
 		); e != nil {
 			t.Fatal(e)
 		}
@@ -70,8 +70,8 @@ func TestInitialTraitAssignment(t *testing.T) {
 		); e != nil {
 			t.Fatal(e)
 		} else if e := AddTestFields(asm.assembler,
-			"Ks", "A", tables.PRIM_ASPECT,
-			"Ls", "B", tables.PRIM_ASPECT,
+			"Ks", "A", tables.PRIM_ASPECT, "",
+			"Ls", "B", tables.PRIM_ASPECT, "",
 		); e != nil {
 			t.Fatal(e)
 		} else if e := AddTestTraits(asm.assembler,
@@ -101,7 +101,7 @@ func TestInitialTraitAssignment(t *testing.T) {
 			"apple", "A", "y",
 			"boat", "B", "z",
 			"pear", "A", "x",
-			"toy boat", "A", "w",
+			"toy_boat", "A", "w",
 		); e != nil {
 			t.Fatal(e)
 		}

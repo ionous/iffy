@@ -24,7 +24,7 @@ func modelTemplate() string {
 		"/* hierarchy of domains */\n" +
 		"create table mdl_domain( domain text, path text, primary key( domain ));\n" +
 		"/* properties of a kind. type is a PRIM_ */\n" +
-		"create table mdl_field( kind text, field text, type text, primary key( kind, field ));\n" +
+		"create table mdl_field( kind text, field text, type text, affinity text, primary key( kind, field ));\n" +
 		"/* a class of objects with shared characteristics */\n" +
 		"create table mdl_kind( kind text, path text, primary key( kind ));\n" +
 		"/* words which refer to nouns. in cases where two words may refer to the same noun, \n" +

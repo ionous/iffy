@@ -9,8 +9,7 @@ import (
 	"github.com/ionous/iffy/rt/safe"
 )
 
-// GetVariable reads a value of the specified name from the current scope.
-// ( ex. loop locals, or -- in a noun scope -- might translate "apple" to "$macintosh" )
+// Var reads the value of the specified name from the current scope.
 type Var struct {
 	Name  string
 	Flags TryAsNoun `if:"internal"`
@@ -60,14 +59,18 @@ func (op *Var) GetObject(run rt.Runtime) (ret g.Value, err error) {
 }
 
 func (op *Var) getObject(run rt.Runtime) (ret g.Value, err error) {
-	if val, e := getVariableValue(run, op.Name, op.Flags); e != nil {
+	// try to get the variable named "name"
+	if val, e := getVariableValue(run, op.Name, affine.Object, op.Flags); e != nil {
 		err = e
 	} else if val != nil {
 		ret = val
 	} else if !op.Flags.tryObject() {
 		err = g.UnknownObject(op.Name)
 	} else {
-		ret, err = getObjectByName(run, op.Name)
+		// try to get the object named "name"
+		// this is for internal use by template rendering;
+		// fix? maybe that should get its own command
+		ret, err = getObjectNamed(run, op.Name)
 	}
 	return
 }
@@ -97,10 +100,10 @@ func (op *Var) getVar(run rt.Runtime, aff affine.Affinity) (ret g.Value, err err
 
 // returns a nil value if the variable couldnt be found
 // returns error only critical errors
-func getVariableValue(run rt.Runtime, text string, flags TryAsNoun) (ret g.Value, err error) {
+func getVariableValue(run rt.Runtime, text string, aff affine.Affinity, flags TryAsNoun) (ret g.Value, err error) {
 	// first resolve the requested variable name into text
 	if flags.tryVariable() {
-		switch val, e := safe.Variable(run, text, ""); e.(type) {
+		switch val, e := safe.Variable(run, text, aff); e.(type) {
 		case nil:
 			ret = val
 		default:
@@ -112,7 +115,8 @@ func getVariableValue(run rt.Runtime, text string, flags TryAsNoun) (ret g.Value
 	return
 }
 
-func getObjectByName(run rt.Runtime, n string) (ret g.Value, err error) {
+// find an object with the passed partial name
+func getObjectNamed(run rt.Runtime, n string) (ret g.Value, err error) {
 	switch val, e := run.GetField(object.Value, n); e.(type) {
 	case g.UnknownField:
 		err = g.UnknownObject(n)

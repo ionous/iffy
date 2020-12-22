@@ -33,12 +33,12 @@ func (op *CopyFrom) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 }
 
 func (op *CopyFrom) copyFrom(run rt.Runtime) (ret g.Value, err error) {
-	if val, e := getVariableValue(run, op.Name, op.Flags); e != nil {
+	if val, e := getVariableValue(run, op.Name, "", op.Flags); e != nil {
 		err = e
 	} else if val != nil {
 		ret = val
 	} else if op.Flags.tryObject() {
-		ret, err = getObjectByName(run, op.Name)
+		ret, err = getObjectNamed(run, op.Name)
 	} else {
 		err = g.UnknownObject(op.Name)
 	}
