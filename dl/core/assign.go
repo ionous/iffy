@@ -43,6 +43,10 @@ type FromText struct {
 	Val rt.TextEval
 }
 
+type FromName struct {
+	Val rt.TextEval
+}
+
 type FromRecord struct {
 	Val rt.RecordEval
 }
@@ -143,6 +147,29 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (op *FromText) Affinity() affine.Affinity {
 	return affine.Text
+}
+
+func (*FromName) Compose() composer.Spec {
+	return composer.Spec{
+		Name:  "assign_name",
+		Group: "variables",
+		Desc:  "Assign Name: Assigns the passed piece of name.",
+	}
+}
+
+func (op *FromName) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+	if val, e := safe.GetText(run, op.Val); e != nil {
+		err = cmdError(op, e)
+	} else if obj, e := getObjectNamed(run, val.String()); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = obj
+	}
+	return
+}
+
+func (op *FromName) Affinity() affine.Affinity {
+	return affine.Object
 }
 
 func (*FromRecord) Compose() composer.Spec {

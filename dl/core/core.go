@@ -26,6 +26,7 @@ var Slats = []composer.Composer{
 	(*FromBool)(nil),
 	(*FromNum)(nil),
 	(*FromText)(nil),
+	(*FromName)(nil),
 	(*FromRecord)(nil),
 	(*FromObject)(nil),
 	(*FromNumList)(nil),

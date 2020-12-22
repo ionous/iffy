@@ -41,6 +41,7 @@ func (*AllTrue) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "all_true",
 		Group: "logic",
+		Spec:  "all true test: {+test|comma-and}",
 		Desc:  "All True: returns true if all of the evaluations are true.",
 	}
 }
