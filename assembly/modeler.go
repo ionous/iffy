@@ -110,12 +110,20 @@ func (m *Assembler) WriteNounWithNames(domain, noun, kind string) (err error) {
 		// and, we want to divide words on breakcase boundaries
 		lower := strings.ToLower(noun)
 		breaks := lang.Breakcase(lower)
-
 		split := strings.FieldsFunc(breaks, lang.IsBreak)
+		spaces := strings.Join(split, " ")
+
+		// the ranked 0 name is used for default display when printing nouns
 		var ofs int
-		if e := m.WriteName(id, breaks, ofs); e != nil {
+		if e := m.WriteName(id, spaces, ofs); e != nil {
 			err = errutil.Append(err, e)
 		} else if cnt := len(split); cnt > 1 {
+			if spaces != breaks {
+				ofs++
+				if e := m.WriteName(id, breaks, ofs); e != nil {
+					err = errutil.Append(err, e)
+				}
+			}
 
 			// write the individual words of the split ( ex. toy, boat )
 			for i, k := range split {

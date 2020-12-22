@@ -36,9 +36,10 @@ func TestNounFormation(t *testing.T) {
 			} else if e := matchNouns(asm.db, []modeledNoun{
 				{"apple", "Ts", 0},
 				{"pear", "Ts", 0},
-				{"toy_boat", "Ts", 0},
-				{"boat", "Ts", 1},
-				{"toy", "Ts", 2},
+				{"toy boat", "Ts", 0},
+				{"toy_boat", "Ts", 1},
+				{"boat", "Ts", 2},
+				{"toy", "Ts", 3},
 			}); e != nil {
 				t.Fatal(e)
 			}
@@ -182,10 +183,11 @@ func TestNounParts(t *testing.T) {
 		} else if e := AssembleNouns(asm.assembler); e != nil {
 			t.Fatal(e)
 		} else if e := matchNouns(asm.db, []modeledNoun{
-			{"collection_of_words", "Ts", 0},
-			{"words", "Ts", 1},
-			{"of", "Ts", 2},
-			{"collection", "Ts", 3},
+			{"collection of words", "Ts", 0},
+			{"collection_of_words", "Ts", 1},
+			{"words", "Ts", 2},
+			{"of", "Ts", 3},
+			{"collection", "Ts", 4},
 		}); e != nil {
 			t.Fatal(e)
 		}

@@ -49,7 +49,7 @@ func TestInitialFieldAssignment(t *testing.T) {
 			"apple", "t", "some text",
 			"boat", "t", "more text",
 			"pear", "d", int64(123), // int64, re: go's default scanner.
-			"toy_boat", "d", int64(321),
+			"toy boat", "d", int64(321),
 		); e != nil {
 			t.Fatal(e)
 		}
@@ -101,7 +101,7 @@ func TestInitialTraitAssignment(t *testing.T) {
 			"apple", "A", "y",
 			"boat", "B", "z",
 			"pear", "A", "x",
-			"toy_boat", "A", "w",
+			"toy boat", "A", "w",
 		); e != nil {
 			t.Fatal(e)
 		}
