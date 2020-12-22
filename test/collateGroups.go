@@ -65,7 +65,7 @@ var collateGroups = pattern.ActivityPattern{
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
-					&core.Assign{"group", &core.FromObject{&list.At{"groups", &core.Var{Name: "idx"}}}},
+					&core.Assign{"group", &core.FromRecord{&list.At{"groups", &core.Var{Name: "idx"}}}},
 					&core.Assign{"names", &core.Unpack{&core.Var{Name: "group"}, "Objects"}},
 					&list.Push{List: "names", Insert: &core.Unpack{&core.Var{Name: "settings"}, "Name"}},
 					&core.Pack{&core.Var{Name: "group"}, "Objects", &core.Var{Name: "names"}},

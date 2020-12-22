@@ -48,9 +48,11 @@ func (op *Field) GetRecord(run rt.Runtime) (g.Value, error) {
 	return op.getField(run, affine.Text)
 }
 
-func (op *Field) GetObject(run rt.Runtime) (g.Value, error) {
-	return op.getField(run, affine.Object)
-}
+// we don't expect records or objects to support fields of object
+// at best they support fields of name.
+// func (op *Field) GetObject(run rt.Runtime) (g.Value, error) {
+// 	return op.getField(run, affine.Object)
+// }
 
 func (op *Field) GetNumList(run rt.Runtime) (g.Value, error) {
 	return op.getField(run, affine.NumList)

@@ -22,7 +22,7 @@ func TestMake(t *testing.T) {
 		Arguments: &core.Arguments{[]*core.Argument{
 			{"WithArticles", &core.FromBool{&core.Bool{true}}},
 		}}}
-	if obj, e := op.GetObject(&testTime); e != nil {
+	if obj, e := op.GetRecord(&testTime); e != nil {
 		t.Fatal(e)
 	} else if diff := pretty.Diff(g.RecordToValue(obj.Record()), map[string]interface{}{
 		"Name":         "",

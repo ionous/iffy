@@ -43,11 +43,7 @@ func (op *Unpack) GetText(run rt.Runtime) (g.Value, error) {
 }
 
 func (op *Unpack) GetRecord(run rt.Runtime) (g.Value, error) {
-	return op.unpack(run, affine.Text)
-}
-
-func (op *Unpack) GetObject(run rt.Runtime) (g.Value, error) {
-	return op.unpack(run, affine.Object)
+	return op.unpack(run, affine.Record)
 }
 
 func (op *Unpack) GetNumList(run rt.Runtime) (g.Value, error) {

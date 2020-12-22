@@ -31,7 +31,7 @@ func (op *At) GetText(run rt.Runtime) (g.Value, error) {
 	return op.getAt(run, affine.TextList)
 }
 
-func (op *At) GetObject(run rt.Runtime) (g.Value, error) {
+func (op *At) GetRecord(run rt.Runtime) (g.Value, error) {
 	return op.getAt(run, affine.RecordList)
 }
 

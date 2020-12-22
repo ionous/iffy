@@ -17,7 +17,7 @@ func (*Make) Compose() composer.Spec {
 	}
 }
 
-func (op *Make) GetObject(run rt.Runtime) (ret g.Value, err error) {
+func (op *Make) GetRecord(run rt.Runtime) (ret g.Value, err error) {
 	if d, e := op.makeRecord(run); e != nil {
 		err = cmdError(op, e)
 	} else {
