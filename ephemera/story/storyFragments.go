@@ -43,7 +43,7 @@ func (op *Summary) Import(k *Importer) (err error) {
 func (op *Tail) Import(k *Importer) (err error) {
 	if e := op.Pronoun.Import(k); e != nil {
 		err = e
-	} else if op.NounPhrase.Import(k); e != nil {
+	} else if e := op.NounPhrase.Import(k); e != nil {
 		err = e
 	}
 	return

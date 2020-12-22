@@ -63,7 +63,7 @@ func (op *Matches) getRegexp() (ret *regexp.Regexp, err error) {
 		err = e
 	} else if exp := op.exp; exp != nil {
 		ret = exp
-	} else if exp, e = regexp.Compile(op.Pattern); e != nil {
+	} else if exp, e := regexp.Compile(op.Pattern); e != nil {
 		op.err = err
 		err = e
 	} else {
