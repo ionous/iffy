@@ -981,12 +981,12 @@
                                                           {
                                                             "id": "id-17672ecd044-41",
                                                             "type": "text",
-                                                            "value": "thing#1"
+                                                            "value": "triangles_1"
                                                           },
                                                           {
                                                             "id": "id-17672fb43de-0",
                                                             "type": "text",
-                                                            "value": "thing#2"
+                                                            "value": "triangles_2"
                                                           }
                                                         ]
                                                       }
@@ -1041,7 +1041,7 @@
                         "$LINES": {
                           "id": "id-17672fb43de-13",
                           "type": "lines",
-                          "value": "Mildred, an empire apple, a pen, and two other things"
+                          "value": "Mildred, an empire apple, a pen, and two triangles"
                         }
                       }
                     }
@@ -1635,7 +1635,7 @@
                                   "$PATTERN": {
                                     "id": "id-176696be8fd-12",
                                     "type": "text",
-                                    "value": "^thing"
+                                    "value": "asdasda^thing"
                                   }
                                 }
                               }

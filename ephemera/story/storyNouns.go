@@ -52,14 +52,16 @@ func (op *NamedNoun) Import(k *Importer) (err error) {
 }
 
 func (op *NamedNoun) ReadCountedNoun(k *Importer, cnt int) (err error) {
+	// declare the existence of the field "printed name"
+	if once := "printed_name"; k.Once(once) {
+		domain := k.gameDomain()
+		things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
+		field := k.NewDomainName(domain, "printed_name", tables.NAMED_FIELD, once)
+		k.NewField(things, field, tables.PRIM_TEXT, "")
+	}
+
 	// probably? should have a specific counted noun phrase b/c
-	// and two things are things doesnt make much sense
-	//
-	// cat := tables.NAMED_KIND
-	// if cnt > 1 {
-	// 	cat = tables.NAMED_PLURAL_KINDS
-	// }
-	// op.Name.AddNameWithCategory(k, cat)
+	// and "two things" are things doesnt make much sense
 	typeTrait := k.NewName("counted", tables.NAMED_TRAIT, op.At.String())
 	// fix: something something noun stacks, not individually duplicated nouns
 	baseName := op.Name.String()
@@ -68,6 +70,9 @@ func (op *NamedNoun) ReadCountedNoun(k *Importer, cnt int) (err error) {
 		noun := k.NewName(countedNoun, "noun", op.At.String())
 		k.Recent.Nouns.Add(noun)
 		k.NewValue(noun, typeTrait, true)
+		//
+		prop := k.NewName("printed_name", tables.NAMED_FIELD, op.At.String())
+		k.NewValue(noun, prop, baseName)
 	}
 	return
 }
