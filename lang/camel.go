@@ -31,6 +31,16 @@ func Breakcase(name string) string {
 	return b.String()
 }
 
+// eventually, these transforms will happen at assembly time
+func SpecialBreakcase(field string) (ret string) {
+	if id := field[0]; id == '#' || id == '$' {
+		ret = field
+	} else {
+		ret = Breakcase(field)
+	}
+	return
+}
+
 // IsBreak returns true for the set of characters which breaks words in breakcase
 func IsBreak(r rune) bool {
 	return r == breaker

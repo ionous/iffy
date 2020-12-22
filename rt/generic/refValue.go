@@ -3,6 +3,7 @@ package generic
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
+	"github.com/ionous/iffy/lang"
 )
 
 // every primitive value is its own unique instance.
@@ -113,7 +114,8 @@ func (n refValue) Index(i int) (ret Value) {
 }
 
 func (n refValue) FieldByName(f string) (ret Value, err error) {
-	if v, e := n.Record().GetNamedField(f); e != nil {
+	name := lang.SpecialBreakcase(f)
+	if v, e := n.Record().GetNamedField(name); e != nil {
 		err = e
 	} else {
 		ret = v
@@ -122,7 +124,8 @@ func (n refValue) FieldByName(f string) (ret Value, err error) {
 }
 
 func (n refValue) SetFieldByName(f string, v Value) (err error) {
-	return n.Record().SetNamedField(f, v)
+	name := lang.SpecialBreakcase(f)
+	return n.Record().SetNamedField(name, v)
 }
 
 func (n refValue) SetIndex(i int, v Value) {

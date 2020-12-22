@@ -3,6 +3,7 @@ package qna
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
@@ -74,7 +75,7 @@ func (q *qnaObject) SetFieldByName(field string, val g.Value) (err error) {
 	case field[0] == object.Prefix:
 		err = errutil.Fmt("can't change reserved field %q", field)
 	default:
-		key := makeKey(q.id, optionalBreakcase(field))
+		key := makeKey(q.id, lang.SpecialBreakcase(field))
 		err = q.n.setField(key, val)
 	}
 	return

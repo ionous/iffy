@@ -101,7 +101,7 @@ func (op *DetermineAct) Execute(run rt.Runtime) (err error) {
 		err = pat.Execute(run)
 		return
 	}); e != nil {
-		err = cmdError(op, e)
+		err = cmdErrorCtx(op, op.Pattern.String(), e)
 	}
 	return
 }
@@ -123,7 +123,7 @@ func (op *DetermineNum) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 		ret, err = pat.GetNumber(run)
 		return
 	}); e != nil {
-		err = cmdError(op, e)
+		err = cmdErrorCtx(op, op.Pattern.String(), e)
 	}
 	return
 }
@@ -145,7 +145,7 @@ func (op *DetermineText) GetText(run rt.Runtime) (ret g.Value, err error) {
 		ret, err = pat.GetText(run)
 		return
 	}); e != nil {
-		err = cmdError(op, e)
+		err = cmdErrorCtx(op, op.Pattern.String(), e)
 	}
 	return
 }
@@ -167,7 +167,7 @@ func (op *DetermineBool) GetBool(run rt.Runtime) (ret g.Value, err error) {
 		ret, err = pat.GetBool(run)
 		return
 	}); e != nil {
-		err = cmdError(op, e)
+		err = cmdErrorCtx(op, op.Pattern.String(), e)
 	}
 	return
 }
@@ -188,7 +188,7 @@ func (op *DetermineNumList) GetNumList(run rt.Runtime) (ret g.Value, err error) 
 		ret, err = pat.GetNumList(run)
 		return
 	}); e != nil {
-		err = cmdError(op, e)
+		err = cmdErrorCtx(op, op.Pattern.String(), e)
 	}
 	return
 }
@@ -209,7 +209,7 @@ func (op *DetermineTextList) GetTextList(run rt.Runtime) (ret g.Value, err error
 		ret, err = pat.GetTextList(run)
 		return
 	}); e != nil {
-		err = cmdError(op, e)
+		err = cmdErrorCtx(op, op.Pattern.String(), e)
 	}
 	return
 }

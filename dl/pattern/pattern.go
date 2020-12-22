@@ -41,3 +41,7 @@ var Slats = []composer.Composer{
 func cmdError(op composer.Composer, e error) error {
 	return errutil.Append(&core.CommandError{Cmd: op}, e)
 }
+
+func cmdErrorCtx(op composer.Composer, ctx string, e error) error {
+	return errutil.Append(&core.CommandError{Cmd: op, Ctx: ctx}, e)
+}

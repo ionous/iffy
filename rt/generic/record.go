@@ -19,6 +19,8 @@ func (d *Record) Type() string {
 	return d.kind.name
 }
 
+// GetNamedField distinguishes itself from Value.FieldByName to help with find in files.
+// Record doesnt directly implement generic.Value, nor any method other than "Type"
 func (d *Record) GetNamedField(field string) (ret Value, err error) {
 	switch k := d.kind; field {
 	case object.Name:
@@ -33,12 +35,11 @@ func (d *Record) GetNamedField(field string) (ret Value, err error) {
 		} else if v, e := d.GetFieldByIndex(i); e != nil {
 			err = e
 		} else {
-			ft := k.fields[i]
+			ft := k.fields[i] // isTrait if we found aspect (a) while looking for field (t)
 			if isTrait := ft.Type == "aspect" && ft.Name != field; !isTrait {
 				ret = v
 			} else {
-				// if the field is an aspect, and the caller was asking for a trait...
-				// return the state of the trait
+				// we were looking for trait (t)
 				trait := v.String()
 				ret = BoolFrom(trait == field, "trait")
 			}
@@ -53,11 +54,12 @@ func (d *Record) GetFieldByIndex(i int) (ret Value, err error) {
 		ret = fv
 	} else {
 		if ft.Type == "aspect" {
+			// if we're asking for an aspect, the default value will be the string of its first trait
 			if k, e := d.kind.kinds.GetKindByName(ft.Name); e != nil {
 				err = e
 			} else {
-				firstTrait := k.Field(0) // first trait is the default
-				nv := StringFrom(firstTrait.Name, ft.Type)
+				firstTrait := k.Field(0)                   // first trait is the default
+				nv := StringFrom(firstTrait.Name, "trait") // better as "aspect", "trait", or something else?
 				ret, d.values[i] = nv, nv
 			}
 		} else {
@@ -76,9 +78,8 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 	if i := k.FieldIndex(field); i < 0 {
 		err = UnknownField{k.name, field}
 	} else {
-		ft := k.fields[i]
-		isTrait := ft.Type == "aspect" && ft.Name != field
-		if !isTrait {
+		ft := k.fields[i] // isTrait if we found aspect (a) while looking for field (t)
+		if isTrait := ft.Type == "aspect" && ft.Name != field; !isTrait {
 			err = d.SetFieldByIndex(i, val)
 		} else if yes := val.Affinity() == affine.Bool && val.Bool(); !yes {
 			err = errutil.Fmt("error setting trait: couldn't determine the meaning of %q %s %v", field, val.Affinity(), val)
@@ -93,7 +94,7 @@ func (d *Record) SetNamedField(field string, val Value) (err error) {
 func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	ft := d.kind.fields[i]
 	if a, t := val.Affinity(), val.Type(); !matchTypes(d.kind.kinds, ft.Affinity, ft.Type, a, t) {
-		err = errutil.Fmt("%s of %s is not %s of %s", a, t, ft.Affinity, ft.Type)
+		err = errutil.Fmt("%s of %s is not %s of %s ( setting field %q )", a, t, ft.Affinity, ft.Type, ft.Name)
 	} else {
 		d.values[i] = val
 	}

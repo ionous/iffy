@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 )
@@ -55,7 +56,7 @@ func (op *Arguments) Distill(run rt.Runtime, out *g.Record) (err error) {
 // fix: this should happen at assembly time...
 func getParamName(k *g.Kind, arg string) (ret string, err error) {
 	if usesIndex := len(arg) > 1 && arg[:1] == "$"; !usesIndex {
-		ret = arg
+		ret = lang.Breakcase(arg)
 	} else if storedIdx, e := strconv.Atoi(arg[1:]); e != nil {
 		err = errutil.New("couldnt parse index", arg)
 	} else if i := storedIdx - 1; i < 0 || i >= k.NumField() {

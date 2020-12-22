@@ -23,7 +23,9 @@ func (op *activityCache) call(run rt.Runtime, ps *g.Record) (err error) {
 	ls := op.lk.NewRecord()
 	run.PushScope(&scope.TargetRecord{object.Variables, ps})
 	run.PushScope(&scope.TargetRecord{object.Variables, ls})
-	err = op.pat.Execute(run)
+	if e := op.pat.Execute(run); e != nil {
+		err = errutil.Append(errutil.Fmt("error in pattern %q", op.pat.Name), e)
+	}
 	run.PopScope()
 	run.PopScope()
 	return
