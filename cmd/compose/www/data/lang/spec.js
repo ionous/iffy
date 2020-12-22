@@ -148,22 +148,11 @@ const spec = [
       "logic"
     ],
     "name": "all_true",
+    "spec": "all true test: {+test|comma-and}",
     "uses": "flow",
     "with": {
-      "params": {
-        "$TEST": {
-          "label": "test",
-          "repeats": true,
-          "type": "bool_eval"
-        }
-      },
       "slots": [
         "bool_eval"
-      ],
-      "tokens": [
-        "all true ",
-        " test: ",
-        "$TEST"
       ]
     }
   },
@@ -260,6 +249,30 @@ const spec = [
       ],
       "tokens": [
         "from bool ",
+        " val: ",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "Assign Name: Assigns the passed piece of name.",
+    "group": [
+      "variables"
+    ],
+    "name": "assign_name",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "text_eval"
+        }
+      },
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "from name ",
         " val: ",
         "$VAL"
       ]
@@ -893,7 +906,6 @@ const spec = [
         "number_eval",
         "text_eval",
         "record_eval",
-        "object_eval",
         "num_list_eval",
         "text_list_eval",
         "record_list_eval",
@@ -1073,30 +1085,6 @@ const spec = [
     }
   },
   {
-    "desc": "Is Not: Returns the opposite value.",
-    "group": [
-      "logic"
-    ],
-    "name": "not",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$TEST": {
-          "label": "test",
-          "type": "bool_eval"
-        }
-      },
-      "slots": [
-        "bool_eval"
-      ],
-      "tokens": [
-        "is not true ",
-        " test: ",
-        "$TEST"
-      ]
-    }
-  },
-  {
     "desc": "Is True: Transparently returns the result of a boolean expression.",
     "group": [
       "logic"
@@ -1191,7 +1179,7 @@ const spec = [
       "slots": [
         "number_eval",
         "text_eval",
-        "object_eval"
+        "record_eval"
       ]
     }
   },
@@ -1473,7 +1461,7 @@ const spec = [
         }
       },
       "slots": [
-        "object_eval"
+        "record_eval"
       ],
       "tokens": [
         "make ",
@@ -1597,6 +1585,30 @@ const spec = [
     }
   },
   {
+    "desc": "Is Not: Returns the opposite value.",
+    "group": [
+      "logic"
+    ],
+    "name": "not",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$TEST": {
+          "label": "test",
+          "type": "bool_eval"
+        }
+      },
+      "slots": [
+        "bool_eval"
+      ],
+      "tokens": [
+        "is not true ",
+        " test: ",
+        "$TEST"
+      ]
+    }
+  },
+  {
     "desc": "Number Value: Specify a particular number.",
     "group": [
       "literals"
@@ -1646,6 +1658,20 @@ const spec = [
     "with": {
       "slots": [
         "bool_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Object Name: Returns a noun's object id.",
+    "group": [
+      "objects"
+    ],
+    "name": "object_name",
+    "spec": "object named {name:text_eval}",
+    "uses": "flow",
+    "with": {
+      "slots": [
+        "object_eval"
       ]
     }
   },
@@ -2071,7 +2097,6 @@ const spec = [
         "number_eval",
         "text_eval",
         "record_eval",
-        "object_eval",
         "num_list_eval",
         "text_list_eval",
         "record_list_eval",
