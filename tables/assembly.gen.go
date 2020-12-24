@@ -234,7 +234,6 @@ func assemblyTemplate() string {
 		"\t\ton (rel.idNamedDependent = nb.rowid);\n" +
 		"\n" +
 		"\n" +
-		"\n" +
 		"/* resolve rules to programs\n" +
 		" */\n" +
 		"create temp view \n" +
@@ -245,7 +244,7 @@ func assemblyTemplate() string {
 		"\ton (er.idNamedPattern = rn.rowid)\n" +
 		"join eph_prog ep\n" +
 		"\ton (er.idProg = ep.rowid)\n" +
-		"order by pattern, type, idProg;\n" +
+		"order by pattern, type, domain, idProg;\n" +
 		"\n" +
 		"/* patterns and rules with similar names and possibly different types\n" +
 		"* fix: does this need to be updated with affinity?\n" +

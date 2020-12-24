@@ -177,11 +177,6 @@ func (n *Fields) UpdatePairs(domain string) (ret int, err error) {
 	return
 }
 
-func (n *Runner) IsLike(a, b string) (ret bool, err error) {
-	err = n.fields.isLike.QueryRow(a, b).Scan(&ret)
-	return
-}
-
 func (n *Runner) SetField(target, rawField string, val g.Value) (err error) {
 	if len(target) == 0 || len(rawField) == 0 {
 		err = errutil.Fmt("invalid targeted field '%s.%s'", target, rawField)
@@ -251,7 +246,7 @@ func (n *Runner) GetEvalByName(name string, pv interface{}) (err error) {
 		case nil:
 			store := outVal.Interface()
 			val = patternValue{store}
-			// pretty.Println(store)
+			// pretty.Println("pattern", name, store)
 		case sql.ErrNoRows:
 			err = key.unknown()
 			val = errorValue{err}
@@ -286,10 +281,11 @@ func (n *Runner) GetField(target, rawField string) (ret g.Value, err error) {
 		// store the active path and test using find in path.
 		var b bool
 		domain := lang.Breakcase(rawField)
-		if e := n.fields.activeDomains.QueryRow(domain).Scan(&b); e != nil {
-			err = e
-		} else {
+		switch e := n.fields.activeDomains.QueryRow(domain).Scan(&b); e {
+		case nil, sql.ErrNoRows:
 			ret = g.BoolOf(b)
+		default:
+			err = errutil.New(target, e)
 		}
 
 	case object.Kind:

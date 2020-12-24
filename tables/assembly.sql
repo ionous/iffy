@@ -223,8 +223,10 @@ left join eph_named nv
 		on (rel.idNamedDependent = nb.rowid);
 
 
-
 /* resolve rules to programs
+ * note: it includes ordering by domain, which is a step towards supporting hierarchical domains
+ * it works because the base domain is always listed first, other domains later, and later rules are more important.
+ * ( and rules include a domain test, better might be selecting/rebuilding rules by domain )
  */
 create temp view 
 asm_rule as 
@@ -234,7 +236,7 @@ join eph_named rn
 	on (er.idNamedPattern = rn.rowid)
 join eph_prog ep
 	on (er.idProg = ep.rowid)
-order by pattern, type, idProg;
+order by pattern, type, domain, idProg;
 
 /* patterns and rules with similar names and possibly different types
 * fix: does this need to be updated with affinity?
