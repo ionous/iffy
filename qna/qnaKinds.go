@@ -3,7 +3,9 @@ package qna
 import (
 	"database/sql"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
+	"github.com/ionous/iffy/lang"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/tables"
 )
@@ -23,6 +25,7 @@ func (km *qnaKinds) addKind(n string, k *g.Kind) *g.Kind {
 }
 
 func (km *qnaKinds) GetKindByName(name string) (ret *g.Kind, err error) {
+	name = lang.Breakcase(name)
 	if k, ok := km.kinds[name]; ok {
 		ret = k
 	} else {
@@ -50,6 +53,8 @@ func (km *qnaKinds) GetKindByName(name string) (ret *g.Kind, err error) {
 			return
 		}, &field, &fieldType, &affinity); e != nil {
 			err = e
+		} else if len(fields) == 0 {
+			err = errutil.Fmt("no such kind %q", name)
 		} else {
 			ret = km.addKind(name, g.NewKind(km, name, fields))
 		}
