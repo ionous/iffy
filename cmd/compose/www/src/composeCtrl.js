@@ -8,7 +8,7 @@ Vue.component('mk-composer', {
       :class="bemBlock(sidebar||'nosidebar')"
       ><mk-navigator
         :initialTab="sidebar"
-        :tabs="['Compose', 'Catalog', 'Test', '(x)']"
+        :tabs="['Catalog', 'Compose', 'Test', '(x)']"
         @navigate="navigate"
       ></mk-navigator>
       <mk-tools
