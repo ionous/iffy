@@ -164,12 +164,14 @@ body {
   cursor: default;
   grid-area: editor;
   overflow-y:scroll;
-  background-color: whitesmoke;
+  background-color: #f2f4d3;
   position: relative;
 
   padding-top: 10px;
   line-height: 25px;
-  background-position: 0px 6px;
+}
+
+.mk-composer > .em-node-table {
   background-color: #f2f6c1;
   background-image: -webkit-repeating-linear-gradient(top, transparent 0%, transparent 24px, rgba(239, 207, 173, 0.7) 24px, rgba(239, 207, 173, 0.7) 25px);
   background-image:  -moz-repeating-linear-gradient(top, transparent 0%, transparent 24px, rgba(239, 207, 173, 0.7) 24px, rgba(239, 207, 173, 0.7) 25px);
