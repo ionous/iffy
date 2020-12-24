@@ -54,10 +54,9 @@ func (op *PrimitiveType) ImportPropertyType(k *Importer, kind, prop ephemera.Nam
 		}
 	} else {
 		// ex. innumerable, not innumerable, is innumerable
-		// there is an aspect "innumerable
 		aspect := prop.String()
 		k.NewImplicitAspect(aspect, kind.String(),
-			"not_"+aspect, // false first
+			"not_"+aspect, // false first ( so that the default is the zero value )
 			"is_"+aspect,
 		)
 		k.NewField(kind, prop, tables.PRIM_ASPECT, "")
