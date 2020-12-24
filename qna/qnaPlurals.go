@@ -29,7 +29,6 @@ func NewPlurals(db *sql.DB) (ret *Plurals, err error) {
 }
 
 type Plurals struct {
-	cache                map[string]string
 	singularOf, pluralOf *sql.Stmt
 }
 
@@ -45,22 +44,18 @@ func (n *Plurals) get(s *sql.Stmt, str string,
 	mani func(string) string) (ret string, err error) {
 	if s == nil {
 		err = errutil.New("invalid statement")
-	} else if cached, ok := n.cache[str]; ok {
-		ret = cached
 	} else {
 		var res string
 		switch e := s.QueryRow(str).Scan(&res); e {
 		case nil:
-			// res was scanned in succesfully.
+			// res was scanned in successfully.
 		case sql.ErrNoRows:
 			res = mani(str)
 		default:
 			res, err = str, e
 		}
-		if n.cache == nil {
-			n.cache = make(map[string]string)
-		}
-		n.cache[str] = res
+		// could cache the results if desired
+		// actually measuring the code and lookup first...
 		ret = res
 	}
 	return
