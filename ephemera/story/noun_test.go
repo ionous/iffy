@@ -52,17 +52,13 @@ order by noun collate nocase, trait`, 2)
 		// we're not actually doing anything with those names.
 		"0",
 		//
-		"apple,common_named",
-		"apple,indefinite_article",
-		//
-		"robot_sheep,common_named",
-		"robot_sheep,indefinite_article",
-		"square_1,counted", // COUNTER:#
-		"Trevor,indefinite_article",
-		"Trevor,proper_named", // COUNTER:#
-		"triangles_1,counted",
-		"triangles_2,counted",
-		"triangles_3,counted",
+		"apple,common_named", "apple,indefinite_article",
+		"robot_sheep,common_named", "robot_sheep,indefinite_article",
+		"square_1,counted", "square_1,printed_name",
+		"Trevor,indefinite_article", "Trevor,proper_named", // COUNTER:#
+		"triangles_1,counted", "triangles_1,printed_name",
+		"triangles_2,counted", "triangles_2,printed_name",
+		"triangles_3,counted", "triangles_3,printed_name",
 		//
 		// "triangles", // plural -- disabled in ReadCountedNoun
 		// "square",    // singular -- disabled in ReadCountedNoun
@@ -70,6 +66,8 @@ order by noun collate nocase, trait`, 2)
 		"a gaggle of",
 		"an",
 		"our",
+		// names:
+		"square", "triangles", "triangles", "triangles",
 		// implicitly generated aspects
 		// listed in rank order (default first)
 		"common_named,noun_types",
@@ -77,7 +75,6 @@ order by noun collate nocase, trait`, 2)
 		"counted,noun_types",
 		"publicly_named,private_names",
 		"privately_named,private_names",
-		//
 	)
 	if diff := pretty.Diff(have, want); len(diff) > 0 {
 		t.Fatal(have)
