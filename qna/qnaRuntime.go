@@ -60,10 +60,10 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 	// and select for current time (even possibly override the sql timer with game round )
 	// or use the domain path.
 	if active {
-		if cnt, e := run.fields.UpdatePairs(domain); e != nil {
+		if _, e := run.fields.UpdatePairs(domain); e != nil {
 			panic(e)
 		} else {
-			log.Println("activate domain", domain, "affected", cnt, "noun pairs")
+			// log.Println("activate domain", domain, "affected", cnt, "noun pairs")
 		}
 	}
 	run.activeNouns.reset()
