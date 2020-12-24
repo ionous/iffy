@@ -40,7 +40,8 @@ func AssembleNouns(asm *Assembler) (err error) {
 				last = curr
 			} else {
 				if last.domain != curr.domain {
-					asm.reportIssuef("noun %q has conflicting domains %q %q",
+					// hmmm... how to handle src and offset here?
+					asm.reportIssuef("", "", "noun %q has conflicting domains %q %q",
 						curr.noun, last.domain, curr.domain)
 					last.domain = curr.domain // silent future warnings
 				}
