@@ -74,6 +74,10 @@ const spec = [
     "uses": "group"
   },
   {
+    "name": "debug",
+    "uses": "group"
+  },
+  {
     "name": "exec",
     "uses": "group"
   },
@@ -1447,6 +1451,35 @@ const spec = [
     }
   },
   {
+    "group": [
+      "debug"
+    ],
+    "name": "log",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$TEXT": {
+          "label": "text",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "log ",
+        " text: ",
+        "$TEXT",
+        ", from: ",
+        "$FROM"
+      ]
+    }
+  },
+  {
     "name": "make",
     "uses": "flow",
     "with": {
@@ -1539,20 +1572,6 @@ const spec = [
     "with": {
       "slots": [
         "text_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Like: Determine whether the specified text is similar to the specified pattern.\n\t\tMatching is case-insensitive ( meaning, \"A\" matches \"a\" ) and there are two symbols with special meaning. \n\t\tA percent sign (\"%\") in the pattern matches any series of zero or more characters in the original text, \n\t\twhile an underscore matches (\"_\") any one single character. ",
-    "group": [
-      "matching"
-    ],
-    "name": "match_like",
-    "spec": "{text:text_eval} is like {pattern:text_eval}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "bool_eval"
       ]
     }
   },

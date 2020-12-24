@@ -80,7 +80,7 @@ func (op *PatternRule) ImportPattern(k *Importer, patternName ephemera.Named) (e
 				guard,
 			}}
 		}
-		name, rule := hook.NewRule(op.Guard)
+		name, rule := hook.NewRule(guard)
 		if patternProg, e := k.NewGob(name, rule); e != nil {
 			err = e
 		} else {

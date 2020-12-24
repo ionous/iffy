@@ -94,7 +94,6 @@ var Slats = []composer.Composer{
 	(*MakeReversed)(nil),
 	//
 	(*Matches)(nil),
-	(*MatchLike)(nil),
 	// sequences
 	(*CycleText)(nil),
 	(*ShuffleText)(nil),
