@@ -128,6 +128,18 @@ func StartsWith(s string, set ...string) (ok bool) {
 	return ok
 }
 
+func Elide(s string, cutAfter int) (ret string) {
+	const ellipse = "..."
+	if cnt := len(s); cnt > 0 && cnt <= cutAfter {
+		ret = s
+	} else if min := len(ellipse); cnt < min {
+		ret = ellipse
+	} else {
+		ret = s[:cutAfter] + ellipse
+	}
+	return
+}
+
 // StartsWithVowel returns true if the passed strings starts with a vowel or vowel sound.
 // http://www.mudconnect.com/SMF/index.php?topic=74725.0
 func StartsWithVowel(str string) (vowelSound bool) {
