@@ -217,7 +217,7 @@ Vue.component('mk-auto-text', {
       const raw= this.input.value;
       let choices = this.getChoices();
       if (raw.length) {
-        choices= choices.filter(w=> w.indexOf(raw)>=0);
+        choices= choices.filter(w=> w.toLowerCase(w).indexOf(raw.toLowerCase())>=0);
       }
       const cls= this.cls;
       this.options= choices.map(c =>  {
