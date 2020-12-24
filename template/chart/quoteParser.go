@@ -67,7 +67,6 @@ func (p *QuoteParser) scanQuote(q rune) (ret State) {
 		}
 		return
 	})
-	return
 }
 
 var escapes = map[rune]rune{
