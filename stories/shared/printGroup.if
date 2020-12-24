@@ -35,6 +35,53 @@
                     "type": "pattern_name",
                     "value": "assign grouping"
                   },
+                  "$PATTERN_LOCALS": {
+                    "id": "id-1769294d227-9",
+                    "type": "pattern_locals",
+                    "value": {
+                      "$VARIABLE_DECL": [
+                        {
+                          "id": "id-1769294d227-10",
+                          "type": "variable_decl",
+                          "value": {
+                            "$AN": {
+                              "id": "id-1769294d227-11",
+                              "type": "determiner",
+                              "value": "$A"
+                            },
+                            "$NAME": {
+                              "id": "id-1769294d227-12",
+                              "type": "variable_name",
+                              "value": "settings"
+                            },
+                            "$TYPE": {
+                              "id": "id-1769294d227-13",
+                              "type": "variable_type",
+                              "value": {
+                                "$EXT": {
+                                  "id": "id-1769294d227-17",
+                                  "type": "ext_type",
+                                  "value": {
+                                    "$RECORD": {
+                                      "id": "id-1769294d227-18",
+                                      "type": "record_type",
+                                      "value": {
+                                        "$KIND": {
+                                          "id": "id-1769294d227-19",
+                                          "type": "record_singular",
+                                          "value": "group settings"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
                   "$PATTERN_RULES": {
                     "id": "id-176928d5991-2",
                     "type": "pattern_rules",
@@ -179,53 +226,6 @@
                                         }
                                       }
                                     ]
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  "$PATTERN_LOCALS": {
-                    "id": "id-1769294d227-9",
-                    "type": "pattern_locals",
-                    "value": {
-                      "$VARIABLE_DECL": [
-                        {
-                          "id": "id-1769294d227-10",
-                          "type": "variable_decl",
-                          "value": {
-                            "$AN": {
-                              "id": "id-1769294d227-11",
-                              "type": "determiner",
-                              "value": "$A"
-                            },
-                            "$NAME": {
-                              "id": "id-1769294d227-12",
-                              "type": "variable_name",
-                              "value": "settings"
-                            },
-                            "$TYPE": {
-                              "id": "id-1769294d227-13",
-                              "type": "variable_type",
-                              "value": {
-                                "$EXT": {
-                                  "id": "id-1769294d227-17",
-                                  "type": "ext_type",
-                                  "value": {
-                                    "$RECORD": {
-                                      "id": "id-1769294d227-18",
-                                      "type": "record_type",
-                                      "value": {
-                                        "$KIND": {
-                                          "id": "id-1769294d227-19",
-                                          "type": "record_singular",
-                                          "value": "group settings"
-                                        }
-                                      }
-                                    }
                                   }
                                 }
                               }
