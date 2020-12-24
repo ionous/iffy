@@ -20,7 +20,7 @@ func TestMake(t *testing.T) {
 	testTime.Kinds.AddKinds((*GroupSettings)(nil))
 	op := &core.Make{Name: "GroupSettings",
 		Arguments: &core.Arguments{[]*core.Argument{
-			{"WithArticles", &core.FromBool{&core.Bool{true}}},
+			{"ObjectsWithArticles", &core.FromBool{&core.Bool{true}}},
 		}}}
 	if obj, e := op.GetRecord(&testTime); e != nil {
 		t.Fatal(e)
@@ -28,7 +28,7 @@ func TestMake(t *testing.T) {
 		"Name":         "",
 		"Label":        "",
 		"Innumerable":  "NotInnumerable",
-		"GroupOptions": "WithArticles",
+		"GroupOptions": "ObjectsWithArticles",
 	}); len(diff) != 0 {
 		t.Fatal(diff)
 	}

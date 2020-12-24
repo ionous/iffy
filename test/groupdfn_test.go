@@ -17,8 +17,8 @@ func TestKindsForType(t *testing.T) {
 		},
 		"GroupOptions": {
 			{"WithoutObjects", "bool", "trait"},
-			{"WithoutArticles", "bool", "trait"},
-			{"WithArticles", "bool", "trait"},
+			{"ObjectsWithArticles", "bool", "trait"},
+			{"ObjectsWithoutArticles", "bool", "trait"},
 		},
 		"GroupSettings": {
 			{"Name", "text", "string"},

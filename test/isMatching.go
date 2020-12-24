@@ -8,9 +8,9 @@ import (
 
 // a pattern for matching groups --
 // we add rules that if things arent equal we return false
-var isMatchingGroup = pattern.BoolPattern{
+var matchGroups = pattern.BoolPattern{
 	CommonPattern: pattern.CommonPattern{
-		Name: "isMatchingGroup",
+		Name: "matchGroups",
 		Prologue: []term.Preparer{
 			&term.Record{Name: "a", Kind: "GroupSettings"},
 			&term.Record{Name: "b", Kind: "GroupSettings"},

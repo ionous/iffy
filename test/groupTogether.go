@@ -10,12 +10,12 @@ import (
 
 var runGroupTogther = list.Map{
 	FromList: "Objects", ToList: "Settings",
-	UsingPattern: "groupTogether"}
+	UsingPattern: "assignGrouping"}
 
 // from a list of object names, build a list of group settings
-var groupTogether = pattern.ActivityPattern{
+var assignGrouping = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{
-		Name: "groupTogether",
+		Name: "assignGrouping",
 		Prologue: []term.Preparer{
 			&term.Text{Name: "in"},
 			&term.Record{Name: "out", Kind: "GroupSettings"},

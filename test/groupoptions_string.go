@@ -9,13 +9,13 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[WithoutObjects-0]
-	_ = x[WithoutArticles-1]
-	_ = x[WithArticles-2]
+	_ = x[ObjectsWithArticles-1]
+	_ = x[ObjectsWithoutArticles-2]
 }
 
-const _GroupOptions_name = "WithoutObjectsWithoutArticlesWithArticles"
+const _GroupOptions_name = "WithoutObjectsObjectsWithArticlesObjectsWithoutArticles"
 
-var _GroupOptions_index = [...]uint8{0, 14, 29, 41}
+var _GroupOptions_index = [...]uint8{0, 14, 33, 55}
 
 func (i GroupOptions) String() string {
 	if i < 0 || i >= GroupOptions(len(_GroupOptions_index)-1) {

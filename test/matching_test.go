@@ -19,13 +19,13 @@ func TestMatching(t *testing.T) {
 	//
 	lt := testTime{Kinds: &kinds,
 		PatternMap: testutil.PatternMap{
-			"isMatchingGroup": &isMatchingGroup,
+			"matchGroups": &matchGroups,
 		},
 	}
 
 	a, b := k.NewRecord(), k.NewRecord()
 	runMatching := &pattern.DetermineBool{
-		Pattern: "isMatchingGroup", Arguments: core.Args(
+		Pattern: "matchGroups", Arguments: core.Args(
 			&core.FromValue{g.RecordOf(a)},
 			&core.FromValue{g.RecordOf(b)},
 		)}
@@ -63,9 +63,9 @@ func TestMatching(t *testing.T) {
 			t.Fatal(e)
 		} else if e := test.SetRecord(b, "IsInnumerable", true); e != nil {
 			t.Fatal(e)
-		} else if e := test.SetRecord(a, "GroupOptions", "WithArticles"); e != nil {
+		} else if e := test.SetRecord(a, "GroupOptions", "ObjectsWithArticles"); e != nil {
 			t.Fatal(e)
-		} else if e := test.SetRecord(b, "GroupOptions", "WithArticles"); e != nil {
+		} else if e := test.SetRecord(b, "GroupOptions", "ObjectsWithArticles"); e != nil {
 			t.Fatal(e)
 		} else if ok, e := runMatching.GetBool(&lt); e != nil {
 			t.Fatal(e)

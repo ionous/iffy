@@ -11,7 +11,7 @@ type Values struct {
 	Collation GroupCollation
 }
 
-// the pattern group together builds a list of group settings from a list of objects
+// the pattern assign grouping builds a list of group settings from a list of objects
 type GroupSettings struct {
 	// the name of the object this record describes
 	// ex. tile X, or tile W ( from a scrabble set )
@@ -35,12 +35,12 @@ const (
 	// indicates we dont want the individual objects in the group
 	// ex. the scrabble tiles, the usual utensils, several things.
 	WithoutObjects GroupOptions = iota
-	// indicates the individual objects shouldnt use articles
-	// ex. tiles X and W from a Scrabble set.
-	WithoutArticles
 	// indicates individual objects should have articles.
 	// ex. the X and the W tiles from a Scrabble set.
-	WithArticles
+	ObjectsWithArticles
+	// indicates the individual objects shouldnt use articles
+	// ex. tiles X and W from a Scrabble set.
+	ObjectsWithoutArticles
 )
 
 // the pattern collate groups builds a group collation from a list of group settings

@@ -36,7 +36,7 @@ var collateGroups = pattern.ActivityPattern{
 				Go: core.NewActivity(
 					&core.Choose{
 						If: &pattern.DetermineBool{
-							Pattern:   "isMatchingGroup",
+							Pattern:   "matchGroups",
 							Arguments: core.Args(&core.Var{Name: "settings"}, &core.Unpack{&core.Var{Name: "el"}, "Settings"})},
 						True: core.NewActivity(
 							&core.Assign{

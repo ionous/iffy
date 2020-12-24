@@ -31,9 +31,9 @@ func TestGrouping(t *testing.T) {
 				},
 			},
 			PatternMap: testutil.PatternMap{
-				"groupTogether":   &groupTogether,
-				"collateGroups":   &collateGroups,
-				"isMatchingGroup": &isMatchingGroup,
+				"assignGrouping": &assignGrouping,
+				"collateGroups":  &collateGroups,
+				"matchGroups":    &matchGroups,
 			},
 		}
 		if e := runGroupTogther.Execute(&lt); e != nil {
