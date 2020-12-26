@@ -431,38 +431,28 @@
                                   "value": {
                                     "$EXE": [
                                       {
-                                        "id": "id-17693c74441-21",
+                                        "id": "id-1769dc86110-8",
                                         "type": "execute",
                                         "value": {
-                                          "id": "id-17693c74441-18",
+                                          "id": "id-1769dc86110-5",
                                           "type": "log",
                                           "value": {
                                             "$TEXT": {
-                                              "id": "id-17693c74441-19",
+                                              "id": "id-1769dc86110-6",
                                               "type": "text",
-                                              "value": "PrintGroup"
+                                              "value": "-- print group --"
                                             },
                                             "$FROM": {
-                                              "id": "id-17693c74441-20",
+                                              "id": "id-1769dc86110-7",
                                               "type": "assignment",
                                               "value": {
-                                                "id": "id-17693c74441-22",
-                                                "type": "assign_record",
+                                                "id": "id-1769dc86110-9",
+                                                "type": "get_var",
                                                 "value": {
-                                                  "$VAL": {
-                                                    "id": "id-17693c74441-23",
-                                                    "type": "record_eval",
-                                                    "value": {
-                                                      "id": "id-17693c74441-24",
-                                                      "type": "get_var",
-                                                      "value": {
-                                                        "$NAME": {
-                                                          "id": "id-17693c74441-25",
-                                                          "type": "text",
-                                                          "value": "group"
-                                                        }
-                                                      }
-                                                    }
+                                                  "$NAME": {
+                                                    "id": "id-1769dc86110-10",
+                                                    "type": "text",
+                                                    "value": "group"
                                                   }
                                                 }
                                               }
@@ -787,7 +777,7 @@
                                                                                                 "$NAME": {
                                                                                                   "id": "id-17692024e5f-88",
                                                                                                   "type": "variable_name",
-                                                                                                  "value": "without articles"
+                                                                                                  "value": "objects without articles"
                                                                                                 },
                                                                                                 "$FROM": {
                                                                                                   "id": "id-17692024e5f-89",
@@ -927,9 +917,19 @@
                                                                                                 "type": "list_len",
                                                                                                 "value": {
                                                                                                   "$LIST": {
-                                                                                                    "id": "id-17693c74441-27",
-                                                                                                    "type": "text",
-                                                                                                    "value": "objects"
+                                                                                                    "id": "id-1769a72b6ea-0",
+                                                                                                    "type": "assignment",
+                                                                                                    "value": {
+                                                                                                      "id": "id-1769a72b6ea-1",
+                                                                                                      "type": "get_var",
+                                                                                                      "value": {
+                                                                                                        "$NAME": {
+                                                                                                          "id": "id-1769a72b6ea-2",
+                                                                                                          "type": "text",
+                                                                                                          "value": "objects"
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
                                                                                                   }
                                                                                                 }
                                                                                               }
@@ -1171,7 +1171,7 @@
                                                                                                                               "$NAME": {
                                                                                                                                 "id": "id-17692024e5f-154",
                                                                                                                                 "type": "variable_name",
-                                                                                                                                "value": "without articles"
+                                                                                                                                "value": "objects without articles"
                                                                                                                               },
                                                                                                                               "$FROM": {
                                                                                                                                 "id": "id-17692024e5f-155",
@@ -1278,7 +1278,7 @@
                                                                                                             "$NAME": {
                                                                                                               "id": "id-17692024e5f-222",
                                                                                                               "type": "variable_name",
-                                                                                                              "value": "without articles"
+                                                                                                              "value": "objects without articles"
                                                                                                             },
                                                                                                             "$FROM": {
                                                                                                               "id": "id-17692024e5f-223",

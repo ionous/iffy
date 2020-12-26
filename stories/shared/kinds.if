@@ -1,6 +1,120 @@
 {
+  "id": "id-1769620fb82-70",
   "type": "story",
   "value": {
-    "$PARAGRAPH": []
+    "$PARAGRAPH": [
+      {
+        "id": "id-1769a72b6ea-44",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1769a72b6ea-45",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1769a72b6ea-46",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-1769a72b6ea-47",
+                    "type": "plural_kinds",
+                    "value": " objects"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-1769a72b6ea-48",
+                    "type": "singular_kind",
+                    "value": "kind"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1769a72b6ea-18",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1769a72b6ea-19",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1769a72b6ea-20",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-1769a72b6ea-21",
+                    "type": "plural_kinds",
+                    "value": " things"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-1769a72b6ea-22",
+                    "type": "singular_kind",
+                    "value": "object"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1769a72b6ea-23",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1769a72b6ea-24",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1769a72b6ea-25",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-1769a72b6ea-26",
+                    "type": "plural_kinds",
+                    "value": " actors"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-1769a72b6ea-27",
+                    "type": "singular_kind",
+                    "value": "thing"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1769a72b6ea-49",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1769a72b6ea-50",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1769a72b6ea-51",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-1769a72b6ea-52",
+                    "type": "plural_kinds",
+                    "value": " props"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-1769a72b6ea-53",
+                    "type": "singular_kind",
+                    "value": "thing"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }

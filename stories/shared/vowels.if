@@ -46,9 +46,15 @@
                           "id": "id-174cda99dde-9",
                           "type": "variable_decl",
                           "value": {
-                             "$AN": {
+                            "$AN": {
+                              "id": "id-1769620fb82-21",
                               "type": "determiner",
                               "value": "a"
+                            },
+                            "$NAME": {
+                              "id": "id-174cda99dde-11",
+                              "type": "variable_name",
+                              "value": "text"
                             },
                             "$TYPE": {
                               "id": "id-174cda99dde-10",
@@ -60,11 +66,6 @@
                                   "value": "$TEXT"
                                 }
                               }
-                            },
-                            "$NAME": {
-                              "id": "id-174cda99dde-11",
-                              "type": "variable_name",
-                              "value": "text"
                             }
                           }
                         }
@@ -133,11 +134,9 @@
                                       "type": "get_var",
                                       "value": {
                                         "$NAME": {
-
-                                                "type": "text",
-                                                "value": "text"
-                                              
-                                        
+                                          "id": "id-1769620fb82-22",
+                                          "type": "text",
+                                          "value": "text"
                                         }
                                       }
                                     }
@@ -210,10 +209,9 @@
                                       "type": "get_var",
                                       "value": {
                                         "$NAME": {
-
-                                                "type": "text",
-                                                "value": "text"
-
+                                          "id": "id-1769620fb82-23",
+                                          "type": "text",
+                                          "value": "text"
                                         }
                                       }
                                     }
@@ -286,11 +284,9 @@
                                       "type": "get_var",
                                       "value": {
                                         "$NAME": {
-                                          
-                                                "type": "text",
-                                                "value": "text"
-                                              
-                                          
+                                          "id": "id-1769620fb82-24",
+                                          "type": "text",
+                                          "value": "text"
                                         }
                                       }
                                     }

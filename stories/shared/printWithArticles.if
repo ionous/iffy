@@ -103,7 +103,7 @@
                         "$NAME": {
                           "id": "id-17691d01da5-247",
                           "type": "variable_name",
-                          "value": "no articles"
+                          "value": "objects without articles"
                         },
                         "$TYPE": {
                           "id": "id-17691d01da5-248",
@@ -253,9 +253,19 @@
                                               "value": "name"
                                             },
                                             "$LIST": {
-                                              "id": "id-17691d01da5-47",
-                                              "type": "text",
-                                              "value": "objects"
+                                              "id": "id-1769620fb82-25",
+                                              "type": "assignment",
+                                              "value": {
+                                                "id": "id-1769620fb82-26",
+                                                "type": "get_var",
+                                                "value": {
+                                                  "$NAME": {
+                                                    "id": "id-1769620fb82-27",
+                                                    "type": "text",
+                                                    "value": "objects"
+                                                  }
+                                                }
+                                              }
                                             },
                                             "$GO": {
                                               "id": "id-17691d01da5-48",
@@ -444,7 +454,7 @@
                                                                           "$TEMPLATE": {
                                                                             "id": "id-17691d01da5-264",
                                                                             "type": "lines",
-                                                                            "value": "{unless .no_articles}{print_article: .object}{otherwise}{print_name: .object}{end}"
+                                                                            "value": "{unless .objects_without_articles}{print_article: .object}{otherwise}{print_name: .object}{end}"
                                                                           }
                                                                         }
                                                                       }
@@ -493,9 +503,19 @@
                                                       "type": "list_len",
                                                       "value": {
                                                         "$LIST": {
-                                                          "id": "id-17691d01da5-94",
-                                                          "type": "text",
-                                                          "value": "no named objects"
+                                                          "id": "id-1769620fb82-31",
+                                                          "type": "assignment",
+                                                          "value": {
+                                                            "id": "id-1769620fb82-32",
+                                                            "type": "get_var",
+                                                            "value": {
+                                                              "$NAME": {
+                                                                "id": "id-1769620fb82-33",
+                                                                "type": "text",
+                                                                "value": "no named objects"
+                                                              }
+                                                            }
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -573,9 +593,19 @@
                                                                             "type": "list_at",
                                                                             "value": {
                                                                               "$LIST": {
-                                                                                "id": "id-17691d01da5-111",
-                                                                                "type": "text",
-                                                                                "value": "no named objects"
+                                                                                "id": "id-1769620fb82-34",
+                                                                                "type": "assignment",
+                                                                                "value": {
+                                                                                  "id": "id-1769620fb82-35",
+                                                                                  "type": "get_var",
+                                                                                  "value": {
+                                                                                    "$NAME": {
+                                                                                      "id": "id-1769620fb82-36",
+                                                                                      "type": "text",
+                                                                                      "value": "no named objects"
+                                                                                    }
+                                                                                  }
+                                                                                }
                                                                               },
                                                                               "$INDEX": {
                                                                                 "id": "id-17691d01da5-112",
@@ -624,9 +654,19 @@
                                                                             "type": "list_len",
                                                                             "value": {
                                                                               "$LIST": {
-                                                                                "id": "id-17691d01da5-121",
-                                                                                "type": "text",
-                                                                                "value": "no named objects"
+                                                                                "id": "id-1769620fb82-37",
+                                                                                "type": "assignment",
+                                                                                "value": {
+                                                                                  "id": "id-1769620fb82-38",
+                                                                                  "type": "get_var",
+                                                                                  "value": {
+                                                                                    "$NAME": {
+                                                                                      "id": "id-1769620fb82-39",
+                                                                                      "type": "text",
+                                                                                      "value": "no named objects"
+                                                                                    }
+                                                                                  }
+                                                                                }
                                                                               }
                                                                             }
                                                                           }

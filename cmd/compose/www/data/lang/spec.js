@@ -1045,42 +1045,12 @@ const spec = [
     }
   },
   {
-    "desc": "Is Exact Kind: True if the object is exactly the named kind.",
-    "group": [
-      "objects"
-    ],
-    "name": "is_exact_class",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$KIND": {
-          "label": "kind",
-          "type": "text_eval"
-        },
-        "$OBJECT": {
-          "label": "object",
-          "type": "object_eval"
-        }
-      },
-      "slots": [
-        "bool_eval"
-      ],
-      "tokens": [
-        "is exact kind of ",
-        " object: ",
-        "$OBJECT",
-        ", kind: ",
-        "$KIND"
-      ]
-    }
-  },
-  {
     "desc": "Is Kind Of: True if the object is compatible with the named kind.",
     "group": [
       "objects"
     ],
     "name": "is_kind_of",
-    "spec": "Is {object:object_eval} a kind of {kind:singular_kind}",
+    "spec": "is {object:object_eval} a kind of {kind:singular_kind}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1177,7 +1147,7 @@ const spec = [
       "list"
     ],
     "name": "list_at",
-    "spec": "list {list:text} at {index:number_eval}",
+    "spec": "list {list:assignment} at {index:number_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1193,7 +1163,7 @@ const spec = [
       "list"
     ],
     "name": "list_each",
-    "spec": "For each {with:text} in {list:text} go:{go:activity} else:{else:activity}",
+    "spec": "For each {with:text} in {list:assignment} go:{go:activity} else:{else:activity}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1207,7 +1177,7 @@ const spec = [
       "list"
     ],
     "name": "list_len",
-    "spec": "length of {list:text}",
+    "spec": "length of {list:assignment}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1226,7 +1196,7 @@ const spec = [
       "params": {
         "$FROM_LIST": {
           "label": "from list",
-          "type": "text"
+          "type": "assignment"
         },
         "$TO_LIST": {
           "label": "to list",
@@ -1274,7 +1244,7 @@ const spec = [
         },
         "$LIST": {
           "label": "list",
-          "type": "text"
+          "type": "assignment"
         },
         "$WITH": {
           "label": "with",
@@ -1325,7 +1295,7 @@ const spec = [
       "params": {
         "$FROM_LIST": {
           "label": "from list",
-          "type": "text"
+          "type": "assignment"
         },
         "$INTO_VALUE": {
           "label": "into value",
@@ -1392,7 +1362,7 @@ const spec = [
       "list"
     ],
     "name": "list_slice",
-    "spec": "slice {list:text} {from entry%start?number} {ending before entry%end?number}",
+    "spec": "slice {list:assignment} {from entry%start?number} {ending before entry%end?number}",
     "uses": "flow",
     "with": {
       "slots": [

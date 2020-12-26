@@ -40,7 +40,7 @@ func (op *Property) NewName(k *Importer) (ret ephemera.Named, err error) {
 
 func (op *RecordSingular) NewName(k *Importer) (ret ephemera.Named, err error) {
 	// fix? for now, we leverage the existing kind assembly
-	name := lang.Breakcase(op.Str)
+	name := lang.LowerBreakcase(op.Str)
 	return k.NewName(name, tables.NAMED_KIND, op.At.String()), nil
 }
 

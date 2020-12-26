@@ -119,7 +119,7 @@
                         "$NAME": {
                           "id": "id-17691b305f6-22",
                           "type": "variable_name",
-                          "value": "without articles"
+                          "value": "objects without articles"
                         },
                         "$TYPE": {
                           "id": "id-17691b305f6-23",
@@ -407,7 +407,7 @@
                                                                   "$NAME": {
                                                                     "id": "id-17691d01da5-295",
                                                                     "type": "variable_name",
-                                                                    "value": "without articles"
+                                                                    "value": "objects without articles"
                                                                   },
                                                                   "$FROM": {
                                                                     "id": "id-17691d01da5-296",
@@ -419,7 +419,7 @@
                                                                         "$NAME": {
                                                                           "id": "id-17691d01da5-298",
                                                                           "type": "text",
-                                                                          "value": "without articles"
+                                                                          "value": "objects without articles"
                                                                         }
                                                                       }
                                                                     }
@@ -509,7 +509,7 @@
                                                                                     "$NAME": {
                                                                                       "id": "id-17691d01da5-315",
                                                                                       "type": "variable_name",
-                                                                                      "value": "without articles"
+                                                                                      "value": "objects without articles"
                                                                                     },
                                                                                     "$FROM": {
                                                                                       "id": "id-17691d01da5-316",
@@ -521,7 +521,7 @@
                                                                                           "$NAME": {
                                                                                             "id": "id-17691d01da5-318",
                                                                                             "type": "text",
-                                                                                            "value": "without articles"
+                                                                                            "value": "objects without articles"
                                                                                           }
                                                                                         }
                                                                                       }
@@ -621,7 +621,7 @@
                         "$NAME": {
                           "id": "id-17691b305f6-94",
                           "type": "variable_name",
-                          "value": "without articles"
+                          "value": "objects without articles"
                         },
                         "$TYPE": {
                           "id": "id-17691b305f6-95",
@@ -789,7 +789,7 @@
                                                       "$NAME": {
                                                         "id": "id-17691d01da5-284",
                                                         "type": "variable_name",
-                                                        "value": "without articles"
+                                                        "value": "objects without articles"
                                                       },
                                                       "$FROM": {
                                                         "id": "id-17691d01da5-285",
@@ -801,7 +801,7 @@
                                                             "$NAME": {
                                                               "id": "id-17691d01da5-291",
                                                               "type": "text",
-                                                              "value": "without articles"
+                                                              "value": "objects without articles"
                                                             }
                                                           }
                                                         }
@@ -864,9 +864,19 @@
                                       "type": "list_len",
                                       "value": {
                                         "$LIST": {
-                                          "id": "id-17691b305f6-150",
-                                          "type": "text",
-                                          "value": "objects"
+                                          "id": "id-1769620fb82-40",
+                                          "type": "assignment",
+                                          "value": {
+                                            "id": "id-1769620fb82-41",
+                                            "type": "get_var",
+                                            "value": {
+                                              "$NAME": {
+                                                "id": "id-1769620fb82-42",
+                                                "type": "text",
+                                                "value": "objects"
+                                              }
+                                            }
+                                          }
                                         }
                                       }
                                     }
