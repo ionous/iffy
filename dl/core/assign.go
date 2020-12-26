@@ -92,7 +92,9 @@ func (*FromBool) Compose() composer.Spec {
 		Desc:  "Assign Boolean: Assigns the passed boolean value.",
 	}
 }
-
+func (op *FromBool) Affinity() affine.Affinity {
+	return affine.Bool
+}
 func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := safe.GetBool(run, op.Val); e != nil {
 		err = cmdError(op, e)
@@ -100,10 +102,6 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 		ret = val
 	}
 	return
-}
-
-func (op *FromBool) Affinity() affine.Affinity {
-	return affine.Bool
 }
 
 func (*FromNum) Compose() composer.Spec {
@@ -114,7 +112,9 @@ func (*FromNum) Compose() composer.Spec {
 		Desc:  "Assign Number: Assigns the passed number.",
 	}
 }
-
+func (op *FromNum) Affinity() affine.Affinity {
+	return affine.Number
+}
 func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := safe.GetNumber(run, op.Val); e != nil {
 		err = cmdError(op, e)
@@ -124,10 +124,6 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *FromNum) Affinity() affine.Affinity {
-	return affine.Number
-}
-
 func (*FromText) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_text",
@@ -135,7 +131,9 @@ func (*FromText) Compose() composer.Spec {
 		Desc:  "Assign Text: Assigns the passed piece of text.",
 	}
 }
-
+func (op *FromText) Affinity() affine.Affinity {
+	return affine.Text
+}
 func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := safe.GetText(run, op.Val); e != nil {
 		err = cmdError(op, e)
@@ -145,10 +143,6 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *FromText) Affinity() affine.Affinity {
-	return affine.Text
-}
-
 func (*FromName) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_name",
@@ -156,7 +150,9 @@ func (*FromName) Compose() composer.Spec {
 		Desc:  "Assign Name: Assigns the passed piece of name.",
 	}
 }
-
+func (op *FromName) Affinity() affine.Affinity {
+	return affine.Object
+}
 func (op *FromName) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := safe.GetText(run, op.Val); e != nil {
 		err = cmdError(op, e)
@@ -168,10 +164,6 @@ func (op *FromName) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *FromName) Affinity() affine.Affinity {
-	return affine.Object
-}
-
 func (*FromRecord) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_record",
@@ -179,7 +171,9 @@ func (*FromRecord) Compose() composer.Spec {
 		Desc:  "Assign Record: Assigns the passed record.",
 	}
 }
-
+func (op *FromRecord) Affinity() affine.Affinity {
+	return affine.Record
+}
 func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if obj, e := safe.GetRecord(run, op.Val); e != nil {
 		err = cmdError(op, e)
@@ -189,10 +183,6 @@ func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 	return
 }
 
-func (op *FromRecord) Affinity() affine.Affinity {
-	return affine.Record
-}
-
 func (*FromObject) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_object",
@@ -200,7 +190,9 @@ func (*FromObject) Compose() composer.Spec {
 		Desc:  "Assign Object: Assigns the passed object",
 	}
 }
-
+func (op *FromObject) Affinity() affine.Affinity {
+	return affine.Object
+}
 func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if obj, e := safe.GetObject(run, op.Val); e != nil {
 		err = cmdError(op, e)
@@ -210,10 +202,6 @@ func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 	return
 }
 
-func (op *FromObject) Affinity() affine.Affinity {
-	return affine.Object
-}
-
 func (*FromNumList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_num_list",
@@ -221,7 +209,9 @@ func (*FromNumList) Compose() composer.Spec {
 		Desc:  "Assign Number List: Assigns the passed number list.",
 	}
 }
-
+func (op *FromNumList) Affinity() affine.Affinity {
+	return affine.NumList
+}
 func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if vals, e := safe.GetNumList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
@@ -231,10 +221,6 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error)
 	return
 }
 
-func (op *FromNumList) Affinity() affine.Affinity {
-	return affine.NumList
-}
-
 func (*FromTextList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_text_list",
@@ -242,7 +228,9 @@ func (*FromTextList) Compose() composer.Spec {
 		Desc:  "Assign Text List: Assigns the passed text list.",
 	}
 }
-
+func (op *FromTextList) Affinity() affine.Affinity {
+	return affine.TextList
+}
 func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if vals, e := safe.GetTextList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
@@ -252,10 +240,6 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error
 	return
 }
 
-func (op *FromTextList) Affinity() affine.Affinity {
-	return affine.TextList
-}
-
 func (*FromRecordList) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "assign_record_list",
@@ -263,7 +247,9 @@ func (*FromRecordList) Compose() composer.Spec {
 		Desc:  "Assign Record List: Assigns the passed record list.",
 	}
 }
-
+func (op *FromRecordList) Affinity() affine.Affinity {
+	return affine.RecordList
+}
 func (op *FromRecordList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if objs, e := safe.GetRecordList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
@@ -271,8 +257,4 @@ func (op *FromRecordList) GetAssignedValue(run rt.Runtime) (ret g.Value, err err
 		ret = objs
 	}
 	return
-}
-
-func (op *FromRecordList) Affinity() affine.Affinity {
-	return affine.RecordList
 }
