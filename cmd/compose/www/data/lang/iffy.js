@@ -49,9 +49,10 @@ function localLang(make) {
     make.swap("noun_phrase", "{kind_of_noun}, {noun_traits}, or {noun_relation}");
 
     // fix: think this should always be "are" never "is"
+    // fix: this shouldnt be "kind of", kind of declares a kind
+    // ( but note singular vs. plural nouns phrases here along with are/is )
+    // probably should have a switch for singular/ plural -- would be nice if are_an could look ahead and mutate with a custom filter maybe.
     make.flow("kind_of_noun", "{are_an} {*trait|comma-and} kind of {kind:singular_kind} {?noun_relation}");
-
-    make.flow("noun_type",  "{an:ana} {kind of%kinds:plural_kinds} noun");
 
     make.flow("named_noun", "object_eval", "{determiner} {name:noun_name}");
 
