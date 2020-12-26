@@ -48,26 +48,25 @@ order by noun collate nocase, trait`, 2)
 	order by na.name, t.rank, nt.name`, 2)
 	// tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
 	have, want := buf.String(), lines(
-		// note: we dont expect actual noun ephemera because we're only parsing names
-		// we're not actually doing anything with those names.
-		"0",
+		"4", // 4 counted nouns were generated
 		//
 		"apple,common_named", "apple,indefinite_article",
 		"robot_sheep,common_named", "robot_sheep,indefinite_article",
 		"square_1,counted", "square_1,printed_name",
 		"Trevor,indefinite_article", "Trevor,proper_named", // COUNTER:#
-		"triangles_1,counted", "triangles_1,printed_name",
-		"triangles_2,counted", "triangles_2,printed_name",
-		"triangles_3,counted", "triangles_3,printed_name",
+		"triangle_1,counted", "triangle_1,printed_name",
+		"triangle_2,counted", "triangle_2,printed_name",
+		"triangle_3,counted", "triangle_3,printed_name",
 		//
-		// "triangles", // plural -- disabled in ReadCountedNoun
-		// "square",    // singular -- disabled in ReadCountedNoun
+		"squares",   // singular -- disabled in ReadCountedNoun
+		"triangles", // plural -- disabled in ReadCountedNoun
+		"square", "thing", "thing", "triangle",
 		// indefinite articles
 		"a gaggle of",
 		"an",
 		"our",
 		// names:
-		"square", "triangles", "triangles", "triangles",
+		"square", "triangle", "triangle", "triangle",
 		// implicitly generated aspects
 		// listed in rank order (default first)
 		"common_named,noun_types",

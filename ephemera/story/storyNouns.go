@@ -51,6 +51,9 @@ func (op *NamedNoun) Import(k *Importer) (err error) {
 	return
 }
 
+// fix? consider a specific counted noun phrase;
+// the noun phrase needs more work.
+// also, we probably want noun stacks not individually duplicated names
 func (op *NamedNoun) ReadCountedNoun(k *Importer, cnt int) (err error) {
 	// declare the existence of the field "printed name"
 	if once := "printed_name"; k.Once(once) {
@@ -60,19 +63,30 @@ func (op *NamedNoun) ReadCountedNoun(k *Importer, cnt int) (err error) {
 		k.NewField(things, field, tables.PRIM_TEXT, "")
 	}
 
-	// probably? should have a specific counted noun phrase b/c
-	// and "two things" are things doesnt make much sense
-	typeTrait := k.NewName("counted", tables.NAMED_TRAIT, op.At.String())
-	// fix: something something noun stacks, not individually duplicated nouns
+	// generate the singular noun name and singular kind name
+	// ex. "two triangles" -> triangle is a kind of thing
 	baseName := op.Name.String()
+	if cnt > 1 {
+		baseName = lang.Singularize(baseName)
+	}
+	namedSingularKind := k.NewName(baseName, tables.NAMED_KIND, op.At.String())
+
+	// ensure that there's a kind of this name. pluralKinds, singularParent
+	pluralKinds := lang.Pluralize(baseName)
+	k.NewKind(k.NewName(lang.Breakcase(pluralKinds), tables.NAMED_PLURAL_KINDS, op.At.String()),
+		k.NewName("thing", tables.NAMED_KIND, op.At.String()))
+	//
+	countedTypeTrait := k.NewName("counted", tables.NAMED_TRAIT, op.At.String())
+	printedNameProp := k.NewName("printed_name", tables.NAMED_FIELD, op.At.String())
+
 	for i := 0; i < cnt; i++ {
 		countedNoun := k.autoCounter.Next(baseName)
 		noun := k.NewName(countedNoun, "noun", op.At.String())
-		k.Recent.Nouns.Add(noun)
-		k.NewValue(noun, typeTrait, true)
+		k.NewNoun(noun, namedSingularKind)
+		k.NewValue(noun, countedTypeTrait, true)
+		k.NewValue(noun, printedNameProp, baseName)
 		//
-		prop := k.NewName("printed_name", tables.NAMED_FIELD, op.At.String())
-		k.NewValue(noun, prop, baseName)
+		// k.Recent.Nouns.Add(noun) -- no need, we're adding them here.
 	}
 	return
 }
