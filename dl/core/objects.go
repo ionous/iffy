@@ -39,13 +39,7 @@ type KindOf struct {
 // it returns true when the object is compatible with the named kind.
 type IsKindOf struct {
 	Object rt.ObjectEval
-	Kind   rt.TextEval
-}
-
-// IsExactKindOf returns true when the object is of exactly the named kind.
-type IsExactKindOf struct {
-	Object rt.ObjectEval
-	Kind   rt.TextEval
+	Kind   string
 }
 
 func (*ObjectName) Compose() composer.Spec {
@@ -135,40 +129,18 @@ func (op *KindOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 func (*IsKindOf) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "is_kind_of",
-		Spec:  "Is {object:object_eval} a kind of {kind:singular_kind}",
+		Spec:  "is {object:object_eval} a kind of {kind:singular_kind}",
 		Group: "objects",
 		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",
 	}
 }
 
 func (op *IsKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
-	if tgtKind, e := safe.GetText(run, op.Kind); e != nil {
-		err = cmdError(op, e)
-	} else if fullPath, e := safe.Field(run, op.Object, object.Kinds, affine.Text); e != nil {
+	if fullPath, e := safe.Field(run, op.Object, object.Kinds, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
 		// Contains reports whether second is within first.
-		b := strings.Contains(fullPath.String()+",", tgtKind.String()+",")
-		ret = g.BoolOf(b)
-	}
-	return
-}
-
-func (*IsExactKindOf) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "is_exact_class",
-		Group: "objects",
-		Desc:  "Is Exact Kind: True if the object is exactly the named kind.",
-	}
-}
-
-func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
-	if tgtKind, e := safe.GetText(run, op.Kind); e != nil {
-		err = cmdError(op, e)
-	} else if kind, e := safe.Field(run, op.Object, object.Kind, affine.Text); e != nil {
-		err = cmdError(op, e)
-	} else {
-		b := tgtKind.String() == kind.String()
+		b := strings.Contains(fullPath.String()+",", op.Kind+",")
 		ret = g.BoolOf(b)
 	}
 	return

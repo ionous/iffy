@@ -24,8 +24,12 @@ func TestObjects(t *testing.T) {
 	}}
 
 	t.Run("exists", func(t *testing.T) {
-		testTrue(t, &run, &ObjectExists{this})
-		testTrue(t, &run, &IsNotTrue{&ObjectExists{nothing}})
+		if e := testTrue(t, &run, &ObjectExists{this}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &IsNotTrue{&ObjectExists{nothing}}); e != nil {
+			t.Fatal(e)
+		}
 	})
 	t.Run("kind_of", func(t *testing.T) {
 		if cls, e := safe.GetText(&run, &KindOf{this}); e != nil {
@@ -35,17 +39,33 @@ func TestObjects(t *testing.T) {
 		}
 	})
 	t.Run("is_kind_of", func(t *testing.T) {
-		testTrue(t, &run, &IsKindOf{this, base})
-		testTrue(t, &run, &IsKindOf{that, base})
+		if e := testTrue(t, &run, &IsKindOf{this, base.Text}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &IsKindOf{that, base.Text}); e != nil {
+			t.Fatal(e)
+		}
 
-		testTrue(t, &run, &IsKindOf{that, derived})
-		testTrue(t, &run, &IsNotTrue{&IsKindOf{this, derived}})
+		if e := testTrue(t, &run, &IsKindOf{that, derived.Text}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &IsNotTrue{&IsKindOf{this, derived.Text}}); e != nil {
+			t.Fatal(e)
+		}
 	})
 	t.Run("is_exact_kind_of", func(t *testing.T) {
-		testTrue(t, &run, &IsExactKindOf{this, base})
-		testTrue(t, &run, &IsNotTrue{&IsExactKindOf{that, base}})
-		testTrue(t, &run, &IsExactKindOf{that, derived})
-		testTrue(t, &run, &IsNotTrue{&IsExactKindOf{this, derived}})
+		if e := testTrue(t, &run, &CompareText{&KindOf{this}, &EqualTo{}, base}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &CompareText{&KindOf{that}, &NotEqualTo{}, base}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &CompareText{&KindOf{that}, &EqualTo{}, derived}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &CompareText{&KindOf{this}, &NotEqualTo{}, derived}); e != nil {
+			t.Fatal(e)
+		}
 	})
 }
 

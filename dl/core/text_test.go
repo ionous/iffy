@@ -3,6 +3,7 @@ package core
 import (
 	"testing"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/safe"
 	"github.com/kr/pretty"
@@ -12,48 +13,65 @@ func TestText(t *testing.T) {
 	var run baseRuntime
 
 	t.Run("is", func(t *testing.T) {
-		testTrue(t, &run, &IsTrue{&Bool{true}})
-		testTrue(t, &run, &IsNotTrue{&Bool{false}})
+		if e := testTrue(t, &run, &IsTrue{&Bool{true}}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &IsNotTrue{&Bool{false}}); e != nil {
+			t.Fatal(e)
+		}
 	})
 
 	t.Run("isEmpty", func(t *testing.T) {
-		testTrue(t, &run, &IsEmpty{&Text{}})
-		testTrue(t, &run, &IsNotTrue{&IsEmpty{&Text{"xxx"}}})
+		if e := testTrue(t, &run, &IsEmpty{&Text{}}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &IsNotTrue{&IsEmpty{&Text{"xxx"}}}); e != nil {
+			t.Fatal(e)
+		}
 	})
 
 	t.Run("includes", func(t *testing.T) {
-		testTrue(t, &run, &Includes{
+		if e := testTrue(t, &run, &Includes{
 			&Text{"full"},
 			&Text{"ll"},
-		})
-		testTrue(t, &run, &IsNotTrue{&Includes{
+		}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &IsNotTrue{&Includes{
 			&Text{"full"},
 			&Text{"bull"},
-		}})
+		}}); e != nil {
+			t.Fatal(e)
+		}
 	})
 
 	t.Run("join", func(t *testing.T) {
-		testTrue(t, &run, &CompareText{
+		if e := testTrue(t, &run, &CompareText{
 			&Join{Parts: []rt.TextEval{
 				&Text{"one"}, &Text{"two"}, &Text{"three"},
 			}},
 			&EqualTo{},
 			&Text{"onetwothree"},
-		})
-		testTrue(t, &run, &CompareText{
+		}); e != nil {
+			t.Fatal(e)
+		}
+		if e := testTrue(t, &run, &CompareText{
 			&Join{&Text{" "}, []rt.TextEval{
 				&Text{"one"}, &Text{"two"}, &Text{"three"},
 			}},
 			&EqualTo{},
 			&Text{"one two three"},
-		})
+		}); e != nil {
+			t.Fatal(e)
+		}
 	})
 }
 
-func testTrue(t *testing.T, run rt.Runtime, eval rt.BoolEval) {
+func testTrue(t *testing.T, run rt.Runtime, eval rt.BoolEval) (err error) {
 	if ok, e := safe.GetBool(run, eval); e != nil {
-		t.Fatal(e)
+		err = e
 	} else if !ok.Bool() {
-		t.Fatal("expected true", pretty.Sprint(eval))
+		err = errutil.New("expected true", pretty.Sprint(eval))
 	}
+	return
 }
