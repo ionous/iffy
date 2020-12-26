@@ -115,7 +115,7 @@ func TestMapRecords(t *testing.T) {
 	}
 }
 
-var remap = list.Map{FromList: "Fruits", ToList: "Results", UsingPattern: "remap"}
+var remap = list.Map{FromList: &core.Var{Name: "Fruits"}, ToList: "Results", UsingPattern: "remap"}
 
 var reverseRecords = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{

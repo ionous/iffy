@@ -7,12 +7,11 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
-	"github.com/ionous/iffy/rt/safe"
 	"github.com/ionous/iffy/rt/scope"
 )
 
 type Each struct {
-	List     string // variable name
+	List     core.Assignment
 	With     string // counter name
 	Go, Else *core.Activity
 	k        *g.Kind
@@ -22,7 +21,7 @@ func (op *Each) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "list_each",
 		Group:  "list",
-		Spec:   "For each {with:text} in {list:text} go:{go:activity} else:{else:activity}",
+		Spec:   "For each {with:text} in {list:assignment} go:{go:activity} else:{else:activity}",
 		Desc:   `For each in list: Loops over the elements in the passed list, or runs the 'else' activity if empty.`,
 		Locals: []string{"index", "first", "last"},
 	}
@@ -36,7 +35,7 @@ func (op *Each) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Each) forEach(run rt.Runtime) (err error) {
-	if vs, e := safe.List(run, op.List); e != nil {
+	if vs, e := core.GetAssignedValue(run, op.List); e != nil {
 		err = e
 	} else {
 		cnt := vs.Len()

@@ -2,6 +2,7 @@ package list
 
 import (
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -11,8 +12,9 @@ import (
 
 // A normal reduce would return a value, instead we accumulate into a variable
 type Reduce struct {
-	IntoValue, FromList string
-	UsingPattern        pattern.PatternName
+	IntoValue    string
+	FromList     core.Assignment
+	UsingPattern pattern.PatternName
 	activityCache
 }
 
@@ -33,7 +35,7 @@ func (op *Reduce) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Reduce) reduce(run rt.Runtime) (err error) {
-	if fromList, e := safe.List(run, op.FromList); e != nil {
+	if fromList, e := core.GetAssignedValue(run, op.FromList); e != nil {
 		err = e
 	} else if outVal, e := safe.Variable(run, op.IntoValue, ""); e != nil {
 		err = e

@@ -24,7 +24,7 @@ func TestPop(t *testing.T) {
 func popTest(front bool, amt int, src ...string) []string {
 	var out []string
 	pop := &list.Pop{
-		List:  "Source",
+		List:  &core.Var{Name: "Source"},
 		With:  "text",
 		Front: list.Front(front),
 		Go:    core.NewActivity(&Write{&out, V("text")}),

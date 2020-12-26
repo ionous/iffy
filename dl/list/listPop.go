@@ -7,12 +7,11 @@ import (
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
-	"github.com/ionous/iffy/rt/safe"
 	"github.com/ionous/iffy/rt/scope"
 )
 
 type Pop struct {
-	List     string // variable name
+	List     core.Assignment
 	With     string // counter name
 	Front    Front
 	Go, Else *core.Activity
@@ -37,7 +36,7 @@ func (op *Pop) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Pop) pop(run rt.Runtime) (err error) {
-	if vs, e := safe.List(run, op.List); e != nil {
+	if vs, e := core.GetAssignedValue(run, op.List); e != nil {
 		err = e
 	} else {
 		if cnt := vs.Len(); cnt == 0 && op.Else != nil {

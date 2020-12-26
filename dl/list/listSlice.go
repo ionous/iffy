@@ -3,13 +3,14 @@ package list
 import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
 )
 
 type Slice struct {
-	List       string        // variable name
+	List       core.Assignment
 	Start, End rt.NumberEval // from start to end (end not included)
 }
 
@@ -26,7 +27,7 @@ func (*Slice) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "list_slice",
 		Group: "list",
-		Spec:  "slice {list:text} {from entry%start?number} {ending before entry%end?number}",
+		Spec:  "slice {list:assignment} {from entry%start?number} {ending before entry%end?number}",
 		Desc:  "Slice of List: Create a new list from a section of another list.",
 	}
 }
@@ -72,7 +73,7 @@ func (op *Slice) GetRecordList(run rt.Runtime) (ret g.Value, err error) {
 }
 
 func (op *Slice) sliceList(run rt.Runtime, aff affine.Affinity) (retVal g.Value, retType string, err error) {
-	if els, e := safe.List(run, op.List); e != nil {
+	if els, e := core.GetAssignedValue(run, op.List); e != nil {
 		err = e
 	} else if e := safe.Check(els, aff); e != nil {
 		err = e

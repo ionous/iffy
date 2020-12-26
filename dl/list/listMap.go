@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
@@ -12,8 +13,9 @@ import (
 )
 
 type Map struct {
-	ToList, FromList string
-	UsingPattern     pattern.PatternName
+	ToList       string
+	FromList     core.Assignment
+	UsingPattern pattern.PatternName
 	activityCache
 }
 
@@ -33,7 +35,7 @@ func (op *Map) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Map) remap(run rt.Runtime) (err error) {
-	if fromList, e := safe.List(run, op.FromList); e != nil {
+	if fromList, e := core.GetAssignedValue(run, op.FromList); e != nil {
 		err = errutil.New("from_list:", op.FromList, e)
 	} else if toList, e := safe.List(run, op.ToList); e != nil {
 		err = errutil.New("to_list:", op.ToList, e)

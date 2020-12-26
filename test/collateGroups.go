@@ -8,7 +8,7 @@ import (
 )
 
 var runCollateGroups = list.Reduce{
-	FromList:     "Settings",
+	FromList:     &core.Var{Name: "Settings"},
 	IntoValue:    "Collation",
 	UsingPattern: "collateGroups"}
 
@@ -31,7 +31,7 @@ var collateGroups = pattern.ActivityPattern{
 			// walk collation.Groups for matching settings
 			&core.Assign{"groups", &core.Unpack{&core.Var{Name: "collation"}, "Groups"}},
 			&list.Each{
-				List: "groups",
+				List: &core.Var{Name: "groups"},
 				With: "el",
 				Go: core.NewActivity(
 					&core.Choose{
@@ -65,11 +65,11 @@ var collateGroups = pattern.ActivityPattern{
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
-					&core.Assign{"group", &core.FromRecord{&list.At{"groups", &core.Var{Name: "idx"}}}},
+					&core.Assign{"group", &core.FromRecord{&list.At{List: &core.Var{Name: "groups"}, Index: &core.Var{Name: "idx"}}}},
 					&core.Assign{"names", &core.Unpack{&core.Var{Name: "group"}, "Objects"}},
 					&list.Push{List: "names", Insert: &core.Unpack{&core.Var{Name: "settings"}, "Name"}},
 					&core.Pack{&core.Var{Name: "group"}, "Objects", &core.Var{Name: "names"}},
-					&list.Set{"groups", &core.Var{Name: "idx"}, &core.Var{Name: "group"}},
+					&list.Set{List: "groups", Index: &core.Var{Name: "idx"}, From: &core.Var{Name: "group"}},
 				), // end false
 			},
 			&core.Pack{&core.Var{Name: "collation"}, "Groups", &core.Var{Name: "groups"}},

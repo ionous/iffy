@@ -9,7 +9,8 @@ import (
 )
 
 var runGroupTogther = list.Map{
-	FromList: "Objects", ToList: "Settings",
+	FromList:     &core.Var{Name: "Objects"},
+	ToList:       "Settings",
 	UsingPattern: "assignGrouping"}
 
 // from a list of object names, build a list of group settings

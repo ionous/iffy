@@ -3,6 +3,7 @@ package list_test
 import (
 	"testing"
 
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
 )
 
@@ -58,7 +59,7 @@ func slice(start, end int, src []string) (ret string) {
 	if run, _, e := newListTime(src, nil); e != nil {
 		ret = e.Error()
 	} else {
-		ret = joinText(run, &list.Slice{"Source", I(start), I(end)})
+		ret = joinText(run, &list.Slice{&core.Var{Name: "Source"}, I(start), I(end)})
 	}
 	return
 }

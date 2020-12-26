@@ -3,13 +3,14 @@ package list
 import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
 )
 
 type At struct {
-	List  string // variable name
+	List  core.Assignment
 	Index rt.NumberEval
 }
 
@@ -18,7 +19,7 @@ func (*At) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "list_at",
 		Group: "list",
-		Spec:  "list {list:text} at {index:number_eval}",
+		Spec:  "list {list:assignment} at {index:number_eval}",
 		Desc:  "Value of List: Get a value from a list. The first element is is index 1.",
 	}
 }
@@ -36,7 +37,9 @@ func (op *At) GetRecord(run rt.Runtime) (g.Value, error) {
 }
 
 func (op *At) getAt(run rt.Runtime, aff affine.Affinity) (ret g.Value, err error) {
-	if vs, e := safe.Variable(run, op.List, aff); e != nil {
+	if vs, e := core.GetAssignedValue(run, op.List); e != nil {
+		err = cmdError(op, e)
+	} else if e := safe.Check(vs, aff); e != nil {
 		err = cmdError(op, e)
 	} else if idx, e := safe.GetNumber(run, op.Index); e != nil {
 		err = cmdError(op, e)
