@@ -5,7 +5,6 @@ import (
 	"flag"
 	"log"
 	"path/filepath"
-	"strings"
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy"
@@ -21,9 +20,7 @@ func main() {
 	flag.BoolVar(&errutil.Panic, "panic", false, "panic on error?")
 	flag.Parse()
 	if cnt, e := checkFile(inFile, testName); e != nil {
-		for _, x := range strings.Split(e.Error(), "\\n") {
-			log.Println(x)
-		}
+		errutil.PrintErrors(e, func(s string) { log.Println(s) })
 		if errutil.Panic {
 			log.Panic("mismatched")
 		}
