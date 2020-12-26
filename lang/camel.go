@@ -6,37 +6,55 @@ import (
 	"unicode"
 )
 
+type BreakcaseOptions uint8
+
+const (
+	BC_SKIPIDS BreakcaseOptions = 1 << iota
+	BC_TOLOWER
+)
+
 // Breakcase turns runs of whitespace into single underscores. It does not change casing.
 // "some   BIG Example" => "some_BIG_Example".
 func Breakcase(name string) string {
-	var b strings.Builder
-	var needBreak, canBreak bool
-	for _, r := range name {
-		brakes := IsBreak(r)
-		if ignorable := !brakes && IsIgnorable(r); ignorable {
-			// consolidate all ignorable characters...
-			// eventually writing a break if we've written something of note.
-			needBreak = canBreak
-		} else {
-			// dont write a consolidated break if we are writing an explicit break
-			// ex. "  _" -> just write a single underscore, not two.
-			if needBreak && !brakes {
-				b.WriteRune(breaker)
-			}
-			b.WriteRune(r)
-			canBreak = !brakes
-			needBreak = false
-		}
-	}
-	return b.String()
+	return OptionCase(name, 0)
+}
+
+func SpecialBreakcase(name string) string {
+	return OptionCase(name, BC_SKIPIDS)
+}
+
+func LowerBreakcase(name string) string {
+	return OptionCase(name, BC_TOLOWER)
 }
 
 // eventually, these transforms will happen at assembly time
-func SpecialBreakcase(field string) (ret string) {
-	if id := field[0]; id == '#' || id == '$' {
-		ret = field
+func OptionCase(name string, opts BreakcaseOptions) (ret string) {
+	if len(name) == 0 || ((opts&BC_SKIPIDS) != 0 && (name[0] == '#' || name[0] == '$')) {
+		ret = name
 	} else {
-		ret = Breakcase(field)
+		var b strings.Builder
+		var needBreak, canBreak bool
+		for _, r := range name {
+			brakes := IsBreak(r)
+			if ignorable := !brakes && IsIgnorable(r); ignorable {
+				// consolidate all ignorable characters...
+				// eventually writing a break if we've written something of note.
+				needBreak = canBreak
+			} else {
+				// dont write a consolidated break if we are writing an explicit break
+				// ex. "  _" -> just write a single underscore, not two.
+				if needBreak && !brakes {
+					b.WriteRune(breaker)
+				}
+				if (opts & BC_TOLOWER) != 0 {
+					r = unicode.ToLower(r)
+				}
+				b.WriteRune(r)
+				canBreak = !brakes
+				needBreak = false
+			}
+		}
+		ret = b.String()
 	}
 	return
 }
