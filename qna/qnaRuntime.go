@@ -21,11 +21,15 @@ func NewRuntime(db *sql.DB) *Runner {
 		panic(e)
 	} else {
 		run = &Runner{
-			db:            db,
-			fields:        fields,
-			plurals:       plurals,
-			pairs:         make(valueMap),
-			kinds:         qnaKinds{fieldsFor: fields.fieldsFor},
+			db:      db,
+			fields:  fields,
+			plurals: plurals,
+			pairs:   make(valueMap),
+			kinds: qnaKinds{
+				typeOf:    fields.typeOf,
+				fieldsFor: fields.fieldsFor,
+				traitsFor: fields.traitsFor,
+			},
 			activeNouns:   activeNouns{q: fields.activeNouns},
 			relativeKinds: relativeKinds{q: fields.relativeKinds},
 			nounLocale:    nounLocale{q: fields.relativesOf},

@@ -24,6 +24,7 @@ type Fields struct {
 	countOf,
 	ancestorsOf,
 	kindOf,
+	typeOf,
 	fieldsFor,
 	traitsFor,
 	aspectOf,
@@ -71,21 +72,19 @@ func NewFields(db *sql.DB) (ret *Fields, err error) {
 				join mdl_kind mk 
 					using (kind)
 				where noun=?`),
-
 		kindOf: ps.Prep(db,
 			`select kind
 				from mdl_noun 
 				where noun=?`),
+		typeOf: ps.Prep(db,
+			`select case 
+				when ( select 1 from mdl_aspect where aspect = ?1 ) then '$aspect'
+				else ( select kind || ( case path when '' then ('') else (',' || path) end ) from mdl_kind where kind = ?1 )
+			end as 'role'`),
 		fieldsFor: ps.Prep(db,
-			`select field, type, affinity from mdl_field
-			where kind=?1
-				union all
-			select * from (
-				select trait, 'trait', 'bool' 
-				from mdl_aspect
-				where aspect = ?1
-				order by rank 
-			)`),
+			`select field, type, affinity 
+			from mdl_field
+			where kind=?`),
 		traitsFor: ps.Prep(db,
 			`select trait
 				from mdl_aspect 

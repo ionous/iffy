@@ -106,6 +106,8 @@ func matchTypes(ks Kinds, fa affine.Affinity, ft string, va affine.Affinity, vt 
 		recordLike := fa == affine.Object || fa == affine.Record || fa == affine.RecordList
 		if !recordLike {
 			okay = true
+		} else if vt == ft {
+			okay = true // direct match
 		} else if vk, e := ks.GetKindByName(vt); e == nil {
 			// a field takes: cats
 			// my value is things, animals, cats, tigers.
