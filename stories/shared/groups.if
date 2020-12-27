@@ -4836,6 +4836,11 @@
                                                   }
                                                 }
                                               },
+                                              "$FLAGS": {
+                                                "id": "id-176a185900d-24",
+                                                "type": "pattern_flags",
+                                                "value": "$BEFORE"
+                                              },
                                               "$HOOK": {
                                                 "id": "id-176a185900d-7",
                                                 "type": "program_hook",
@@ -4874,11 +4879,6 @@
                                                     }
                                                   }
                                                 }
-                                              },
-                                              "$FLAGS": {
-                                                "id": "id-176a185900d-24",
-                                                "type": "pattern_flags",
-                                                "value": "$BEFORE"
                                               }
                                             }
                                           }
@@ -5727,75 +5727,199 @@
                         "value": {
                           "$EXE": [
                             {
-                              "id": "id-176a185900d-118",
+                              "id": "id-176a185900d-212",
                               "type": "execute",
                               "value": {
-                                "id": "id-176a185900d-119",
-                                "type": "determine_act",
+                                "id": "id-176a185900d-213",
+                                "type": "say_text",
                                 "value": {
-                                  "$NAME": {
-                                    "id": "id-176a185900d-120",
-                                    "type": "pattern_name",
-                                    "value": "print nondescript objects"
-                                  },
-                                  "$ARGUMENTS": {
-                                    "id": "id-176a185900d-121",
-                                    "type": "arguments",
+                                  "$TEXT": {
+                                    "id": "id-176a185900d-214",
+                                    "type": "text_eval",
                                     "value": {
-                                      "$ARGS": [
-                                        {
-                                          "id": "id-176a185900d-122",
-                                          "type": "argument",
+                                      "id": "id-176a185900d-215",
+                                      "type": "span_text",
+                                      "value": {
+                                        "$GO": {
+                                          "id": "id-176a185900d-216",
+                                          "type": "activity",
                                           "value": {
-                                            "$NAME": {
-                                              "id": "id-176a185900d-123",
-                                              "type": "variable_name",
-                                              "value": "objects"
-                                            },
-                                            "$FROM": {
-                                              "id": "id-176a185900d-124",
-                                              "type": "assignment",
-                                              "value": {
-                                                "id": "id-176a185900d-125",
-                                                "type": "assign_text_list",
+                                            "$EXE": [
+                                              {
+                                                "id": "id-176a185900d-217",
+                                                "type": "execute",
                                                 "value": {
-                                                  "$VALS": {
-                                                    "id": "id-176a185900d-126",
-                                                    "type": "text_list_eval",
-                                                    "value": {
-                                                      "id": "id-176a185900d-127",
-                                                      "type": "texts",
+                                                  "id": "id-176a185900d-218",
+                                                  "type": "determine_act",
+                                                  "value": {
+                                                    "$NAME": {
+                                                      "id": "id-176a185900d-219",
+                                                      "type": "pattern_name",
+                                                      "value": "print nondescript objects"
+                                                    },
+                                                    "$ARGUMENTS": {
+                                                      "id": "id-176a185900d-220",
+                                                      "type": "arguments",
                                                       "value": {
-                                                        "$VALUES": [
+                                                        "$ARGS": [
                                                           {
-                                                            "id": "id-176a185900d-128",
+                                                            "id": "id-176a185900d-221",
+                                                            "type": "argument",
+                                                            "value": {
+                                                              "$NAME": {
+                                                                "id": "id-176a185900d-222",
+                                                                "type": "variable_name",
+                                                                "value": "objects"
+                                                              },
+                                                              "$FROM": {
+                                                                "id": "id-176a185900d-223",
+                                                                "type": "assignment",
+                                                                "value": {
+                                                                  "id": "id-176a185900d-224",
+                                                                  "type": "assign_text_list",
+                                                                  "value": {
+                                                                    "$VALS": {
+                                                                      "id": "id-176a185900d-225",
+                                                                      "type": "text_list_eval",
+                                                                      "value": {
+                                                                        "id": "id-176a185900d-226",
+                                                                        "type": "texts",
+                                                                        "value": {
+                                                                          "$VALUES": [
+                                                                            {
+                                                                              "id": "id-176a185900d-227",
+                                                                              "type": "text",
+                                                                              "value": "Mildred"
+                                                                            },
+                                                                            {
+                                                                              "id": "id-176a185900d-228",
+                                                                              "type": "text",
+                                                                              "value": " apple"
+                                                                            },
+                                                                            {
+                                                                              "id": "id-176a185900d-229",
+                                                                              "type": "text",
+                                                                              "value": " pen"
+                                                                            },
+                                                                            {
+                                                                              "id": "id-176a185900d-230",
+                                                                              "type": "text",
+                                                                              "value": "triangle_1"
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        ]
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "id": "id-176a185900d-232",
+                                                "type": "execute",
+                                                "value": {
+                                                  "id": "id-176a185900d-233",
+                                                  "type": "say_text",
+                                                  "value": {
+                                                    "$TEXT": {
+                                                      "id": "id-176a185900d-234",
+                                                      "type": "text_eval",
+                                                      "value": {
+                                                        "id": "id-176a185900d-235",
+                                                        "type": "text_value",
+                                                        "value": {
+                                                          "$TEXT": {
+                                                            "id": "id-176a185900d-236",
                                                             "type": "text",
-                                                            "value": "Mildred"
-                                                          },
+                                                            "value": ";"
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "id": "id-176a185900d-237",
+                                                "type": "execute",
+                                                "value": {
+                                                  "id": "id-176a185900d-238",
+                                                  "type": "determine_act",
+                                                  "value": {
+                                                    "$NAME": {
+                                                      "id": "id-176a185900d-239",
+                                                      "type": "pattern_name",
+                                                      "value": "print nondescript objects"
+                                                    },
+                                                    "$ARGUMENTS": {
+                                                      "id": "id-176a185900d-240",
+                                                      "type": "arguments",
+                                                      "value": {
+                                                        "$ARGS": [
                                                           {
-                                                            "id": "id-176a185900d-129",
-                                                            "type": "text",
-                                                            "value": "x"
-                                                          },
-                                                          {
-                                                            "id": "id-176a185900d-130",
-                                                            "type": "text",
-                                                            "value": "w"
-                                                          },
-                                                          {
-                                                            "id": "id-176a185900d-131",
-                                                            "type": "text",
-                                                            "value": "f"
-                                                          },
-                                                          {
-                                                            "id": "id-176a185900d-132",
-                                                            "type": "text",
-                                                            "value": "y"
-                                                          },
-                                                          {
-                                                            "id": "id-176a185900d-133",
-                                                            "type": "text",
-                                                            "value": "z"
+                                                            "id": "id-176a185900d-241",
+                                                            "type": "argument",
+                                                            "value": {
+                                                              "$NAME": {
+                                                                "id": "id-176a185900d-242",
+                                                                "type": "variable_name",
+                                                                "value": "objects"
+                                                              },
+                                                              "$FROM": {
+                                                                "id": "id-176a185900d-243",
+                                                                "type": "assignment",
+                                                                "value": {
+                                                                  "id": "id-176a185900d-244",
+                                                                  "type": "assign_text_list",
+                                                                  "value": {
+                                                                    "$VALS": {
+                                                                      "id": "id-176a185900d-245",
+                                                                      "type": "text_list_eval",
+                                                                      "value": {
+                                                                        "id": "id-176a185900d-246",
+                                                                        "type": "texts",
+                                                                        "value": {
+                                                                          "$VALUES": [
+                                                                            {
+                                                                              "id": "id-176a185900d-247",
+                                                                              "type": "text",
+                                                                              "value": "Mildred"
+                                                                            },
+                                                                            {
+                                                                              "id": "id-176a185900d-248",
+                                                                              "type": "text",
+                                                                              "value": " apple"
+                                                                            },
+                                                                            {
+                                                                              "id": "id-176a185900d-249",
+                                                                              "type": "text",
+                                                                              "value": " pen"
+                                                                            },
+                                                                            {
+                                                                              "id": "id-176a185900d-250",
+                                                                              "type": "text",
+                                                                              "value": "triangle_1"
+                                                                            },
+                                                                            {
+                                                                              "id": "id-176a185900d-251",
+                                                                              "type": "text",
+                                                                              "value": "triangle_2"
+                                                                            }
+                                                                          ]
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
                                                           }
                                                         ]
                                                       }
@@ -5803,10 +5927,10 @@
                                                   }
                                                 }
                                               }
-                                            }
+                                            ]
                                           }
                                         }
-                                      ]
+                                      }
                                     }
                                   }
                                 }
@@ -5850,7 +5974,7 @@
                         "$LINES": {
                           "id": "id-17692f1b70b-841",
                           "type": "lines",
-                          "value": "Mildred and three things ( an empire apple, a pen, and one triangle )"
+                          "value": "Mildred and three things ( an empire apple, a pen, and one triangle ); Mildred and four things ( an empire apple, a pen, and two triangles )"
                         }
                       }
                     }
@@ -5874,163 +5998,224 @@
                     "id": "id-176a185900d-153",
                     "type": "story",
                     "value": {
-                      "$PARAGRAPH": []
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
-        "id": "id-17692f1b70b-842",
-        "type": "paragraph",
-        "value": {
-          "$STORY_STATEMENT": [
-            {
-              "id": "id-17692f1b70b-843",
-              "type": "story_statement",
-              "value": {
-                "id": "id-17692f1b70b-844",
-                "type": "test_rule",
-                "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17692f1b70b-845",
-                    "type": "test_name",
-                    "value": "custom unnamed parenthetical edge"
-                  },
-                  "$HOOK": {
-                    "id": "id-17692f1b70b-846",
-                    "type": "program_hook",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-17692f1b70b-847",
-                        "type": "activity",
-                        "value": {
-                          "$EXE": [
-                            {
-                              "id": "id-17692f1b70b-848",
-                              "type": "execute",
-                              "value": {
-                                "id": "id-17692f1b70b-849",
-                                "type": "determine_act",
+                      "$PARAGRAPH": [
+                        {
+                          "id": "id-176a185900d-252",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
+                              {
+                                "id": "id-176a185900d-253",
+                                "type": "story_statement",
                                 "value": {
-                                  "$NAME": {
-                                    "id": "id-17692f1b70b-850",
-                                    "type": "pattern_name",
-                                    "value": "print nondescript objects"
-                                  },
-                                  "$ARGUMENTS": {
-                                    "id": "id-17692f1b70b-851",
-                                    "type": "arguments",
-                                    "value": {
-                                      "$ARGS": [
-                                        {
-                                          "id": "id-17692f1b70b-852",
-                                          "type": "argument",
-                                          "value": {
-                                            "$NAME": {
-                                              "id": "id-17692f1b70b-853",
-                                              "type": "variable_name",
-                                              "value": "objects"
-                                            },
-                                            "$FROM": {
-                                              "id": "id-17692f1b70b-854",
-                                              "type": "assignment",
-                                              "value": {
-                                                "id": "id-17692f1b70b-855",
-                                                "type": "assign_text_list",
+                                  "id": "id-176a185900d-254",
+                                  "type": "pattern_actions",
+                                  "value": {
+                                    "$NAME": {
+                                      "id": "id-176a185900d-255",
+                                      "type": "pattern_name",
+                                      "value": "assign grouping"
+                                    },
+                                    "$PATTERN_RULES": {
+                                      "id": "id-176a185900d-256",
+                                      "type": "pattern_rules",
+                                      "value": {
+                                        "$PATTERN_RULE": [
+                                          {
+                                            "id": "id-176a185900d-262",
+                                            "type": "pattern_rule",
+                                            "value": {
+                                              "$GUARD": {
+                                                "id": "id-176a185900d-263",
+                                                "type": "bool_eval",
                                                 "value": {
-                                                  "$VALS": {
-                                                    "id": "id-17692f1b70b-856",
-                                                    "type": "text_list_eval",
-                                                    "value": {
-                                                      "id": "id-17692f1b70b-857",
-                                                      "type": "texts",
+                                                  "id": "id-176a185900d-264",
+                                                  "type": "is_kind_of",
+                                                  "value": {
+                                                    "$OBJECT": {
+                                                      "id": "id-176a185900d-265",
+                                                      "type": "object_eval",
                                                       "value": {
-                                                        "$VALUES": [
-                                                          {
-                                                            "id": "id-17692f1b70b-858",
-                                                            "type": "text",
-                                                            "value": "Mildred"
-                                                          },
-                                                          {
-                                                            "id": "id-17692f1b70b-859",
-                                                            "type": "text",
-                                                            "value": " apple"
-                                                          },
-                                                          {
-                                                            "id": "id-17692f1b70b-860",
-                                                            "type": "text",
-                                                            "value": " pen"
-                                                          },
-                                                          {
-                                                            "id": "id-17692f1b70b-861",
-                                                            "type": "text",
-                                                            "value": "triangle_1"
-                                                          },
-                                                          {
-                                                            "id": "id-17692f1b70b-862",
-                                                            "type": "text",
-                                                            "value": "triangle_2"
+                                                        "id": "id-176a185900d-266",
+                                                        "type": "object_name",
+                                                        "value": {
+                                                          "$NAME": {
+                                                            "id": "id-176a185900d-267",
+                                                            "type": "text_eval",
+                                                            "value": {
+                                                              "id": "id-176a185900d-268",
+                                                              "type": "unpack",
+                                                              "value": {
+                                                                "$FIELD": {
+                                                                  "id": "id-176a185900d-269",
+                                                                  "type": "text",
+                                                                  "value": "name"
+                                                                },
+                                                                "$RECORD": {
+                                                                  "id": "id-176a185900d-270",
+                                                                  "type": "record_eval",
+                                                                  "value": {
+                                                                    "id": "id-176a185900d-271",
+                                                                    "type": "get_var",
+                                                                    "value": {
+                                                                      "$NAME": {
+                                                                        "id": "id-176a185900d-272",
+                                                                        "type": "text",
+                                                                        "value": "settings"
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
                                                           }
-                                                        ]
+                                                        }
                                                       }
+                                                    },
+                                                    "$KIND": {
+                                                      "id": "id-176a185900d-273",
+                                                      "type": "singular_kind",
+                                                      "value": "props"
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "$HOOK": {
+                                                "id": "id-176a185900d-274",
+                                                "type": "program_hook",
+                                                "value": {
+                                                  "$ACTIVITY": {
+                                                    "id": "id-176a185900d-275",
+                                                    "type": "activity",
+                                                    "value": {
+                                                      "$EXE": [
+                                                        {
+                                                          "id": "id-176a185900d-276",
+                                                          "type": "execute",
+                                                          "value": {
+                                                            "id": "id-176a185900d-277",
+                                                            "type": "pack",
+                                                            "value": {
+                                                              "$RECORD": {
+                                                                "id": "id-176a185900d-278",
+                                                                "type": "record_eval",
+                                                                "value": {
+                                                                  "id": "id-176a185900d-279",
+                                                                  "type": "get_var",
+                                                                  "value": {
+                                                                    "$NAME": {
+                                                                      "id": "id-176a185900d-280",
+                                                                      "type": "text",
+                                                                      "value": "settings"
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "$FIELD": {
+                                                                "id": "id-176a185900d-281",
+                                                                "type": "text",
+                                                                "value": "label"
+                                                              },
+                                                              "$FROM": {
+                                                                "id": "id-176a185900d-282",
+                                                                "type": "assignment",
+                                                                "value": {
+                                                                  "id": "id-176a185900d-283",
+                                                                  "type": "assign_text",
+                                                                  "value": {
+                                                                    "$VAL": {
+                                                                      "id": "id-176a185900d-284",
+                                                                      "type": "text_eval",
+                                                                      "value": {
+                                                                        "id": "id-176a185900d-285",
+                                                                        "type": "text_value",
+                                                                        "value": {
+                                                                          "$TEXT": {
+                                                                            "id": "id-176a185900d-286",
+                                                                            "type": "text",
+                                                                            "value": "things"
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        {
+                                                          "id": "id-176a185900d-287",
+                                                          "type": "execute",
+                                                          "value": {
+                                                            "id": "id-176a185900d-288",
+                                                            "type": "pack",
+                                                            "value": {
+                                                              "$RECORD": {
+                                                                "id": "id-176a185900d-289",
+                                                                "type": "record_eval",
+                                                                "value": {
+                                                                  "id": "id-176a185900d-290",
+                                                                  "type": "get_var",
+                                                                  "value": {
+                                                                    "$NAME": {
+                                                                      "id": "id-176a185900d-291",
+                                                                      "type": "text",
+                                                                      "value": "settings"
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "$FIELD": {
+                                                                "id": "id-176a185900d-292",
+                                                                "type": "text",
+                                                                "value": "objects with articles"
+                                                              },
+                                                              "$FROM": {
+                                                                "id": "id-176a185900d-293",
+                                                                "type": "assignment",
+                                                                "value": {
+                                                                  "id": "id-176a185900d-294",
+                                                                  "type": "assign_bool",
+                                                                  "value": {
+                                                                    "$VAL": {
+                                                                      "id": "id-176a185900d-295",
+                                                                      "type": "bool_eval",
+                                                                      "value": {
+                                                                        "id": "id-176a185900d-296",
+                                                                        "type": "bool_value",
+                                                                        "value": {
+                                                                          "$BOOL": {
+                                                                            "id": "id-176a185900d-297",
+                                                                            "type": "bool",
+                                                                            "value": "$TRUE"
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      ]
                                                     }
                                                   }
                                                 }
                                               }
                                             }
                                           }
-                                        }
-                                      ]
+                                        ]
+                                      }
                                     }
                                   }
                                 }
                               }
-                            }
-                          ]
+                            ]
+                          }
                         }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
-        "id": "id-17692f1b70b-863",
-        "type": "paragraph",
-        "value": {
-          "$STORY_STATEMENT": [
-            {
-              "id": "id-17692f1b70b-864",
-              "type": "story_statement",
-              "value": {
-                "id": "id-17692f1b70b-865",
-                "type": "test_statement",
-                "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17692f1b70b-866",
-                    "type": "test_name",
-                    "value": "custom unnamed parenthetical edge"
-                  },
-                  "$TEST": {
-                    "id": "id-17692f1b70b-867",
-                    "type": "testing",
-                    "value": {
-                      "id": "id-17692f1b70b-868",
-                      "type": "test_output",
-                      "value": {
-                        "$LINES": {
-                          "id": "id-17692f1b70b-869",
-                          "type": "lines",
-                          "value": "Mildred and four things ( an empire apple, a pen, and two other things )"
-                        }
-                      }
+                      ]
                     }
                   }
                 }

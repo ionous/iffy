@@ -430,36 +430,7 @@
                                   "type": "activity",
                                   "value": {
                                     "$EXE": [
-                                      {
-                                        "id": "id-1769dc86110-8",
-                                        "type": "execute",
-                                        "value": {
-                                          "id": "id-1769dc86110-5",
-                                          "type": "log",
-                                          "value": {
-                                            "$TEXT": {
-                                              "id": "id-1769dc86110-6",
-                                              "type": "text",
-                                              "value": "-- print group --"
-                                            },
-                                            "$FROM": {
-                                              "id": "id-1769dc86110-7",
-                                              "type": "assignment",
-                                              "value": {
-                                                "id": "id-1769dc86110-9",
-                                                "type": "get_var",
-                                                "value": {
-                                                  "$NAME": {
-                                                    "id": "id-1769dc86110-10",
-                                                    "type": "text",
-                                                    "value": "group"
-                                                  }
-                                                }
-                                              }
-                                            }
-                                          }
-                                        }
-                                      },
+                                      
                                       {
                                         "id": "id-17692024e5f-68",
                                         "type": "execute",

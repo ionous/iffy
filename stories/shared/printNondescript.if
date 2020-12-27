@@ -663,36 +663,7 @@
                                                             }
                                                           }
                                                         },
-                                                        {
-                                                          "id": "id-1769a72b6ea-41",
-                                                          "type": "execute",
-                                                          "value": {
-                                                            "id": "id-1769a72b6ea-38",
-                                                            "type": "log",
-                                                            "value": {
-                                                              "$TEXT": {
-                                                                "id": "id-1769a72b6ea-39",
-                                                                "type": "text",
-                                                                "value": "-- groups --"
-                                                              },
-                                                              "$FROM": {
-                                                                "id": "id-1769a72b6ea-40",
-                                                                "type": "assignment",
-                                                                "value": {
-                                                                  "id": "id-1769a72b6ea-42",
-                                                                  "type": "get_var",
-                                                                  "value": {
-                                                                    "$NAME": {
-                                                                      "id": "id-1769a72b6ea-43",
-                                                                      "type": "text",
-                                                                      "value": "collation"
-                                                                    }
-                                                                  }
-                                                                }
-                                                              }
-                                                            }
-                                                          }
-                                                        },
+                                                        
                                                         {
                                                           "id": "id-17672fb43de-108",
                                                           "type": "execute",
