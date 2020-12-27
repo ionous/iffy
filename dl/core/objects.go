@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
@@ -140,7 +141,8 @@ func (op *IsKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
 		err = cmdError(op, e)
 	} else {
 		// Contains reports whether second is within first.
-		b := strings.Contains(fullPath.String()+",", op.Kind+",")
+		kind := lang.Breakcase(op.Kind)
+		b := strings.Contains(fullPath.String()+",", kind+",")
 		ret = g.BoolOf(b)
 	}
 	return
