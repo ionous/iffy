@@ -100,8 +100,10 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 		// fix: implicitly generated facts should be considered preliminary
 		// so that authors can override them.
 		traitStr := "common_named"
-		if first, _ := utf8.DecodeRuneInString(noun.String()); unicode.ToUpper(first) == first {
-			traitStr = "proper_named"
+		if op.Determiner.Str == "$OUR" {
+			if first, _ := utf8.DecodeRuneInString(noun.String()); unicode.ToUpper(first) == first {
+				traitStr = "proper_named"
+			}
 		}
 		typeTrait := k.NewName(traitStr, tables.NAMED_TRAIT, op.At.String())
 		k.NewValue(noun, typeTrait, true)
