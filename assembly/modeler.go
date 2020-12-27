@@ -106,10 +106,8 @@ func (m *Assembler) WriteNounWithNames(domain, noun, kind string) (err error) {
 		// if counter := strings.Index(noun, "#"); counter > 0 {
 		// 	noun = noun[:counter]
 		// }
-		// the text parser uses lower case names only
-		// and, we want to divide words on breakcase boundaries
-		lower := strings.ToLower(noun)
-		breaks := lang.Breakcase(lower)
+		// we want to divide words on breakcase boundaries
+		breaks := lang.Breakcase(noun)
 		split := strings.FieldsFunc(breaks, lang.IsBreak)
 		spaces := strings.Join(split, " ")
 
