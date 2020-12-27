@@ -672,20 +672,6 @@ func (*NounTraits) Compose() composer.Spec {
   }
 }
 
-// NounType requires various parameters.
-type NounType struct {
-  At    reader.Position `if:"internal"`
-  An    Ana
-  Kinds PluralKinds
-}
-
-func (*NounType) Compose() composer.Spec {
-  return composer.Spec{
-    Name: "noun_type",
-    Spec: "{an:ana} {kind of%kinds:plural_kinds} noun",
-  }
-}
-
 // Number requires a user-specified number.
 type Number struct {
   At  reader.Position `if:"internal"`
@@ -799,6 +785,29 @@ func (*PatternDecl) Compose() composer.Spec {
   }
 }
 
+// PatternFlags requires a user-specified string.
+type PatternFlags struct {
+  At  reader.Position `if:"internal"`
+  Str string
+}
+
+func (op *PatternFlags) String() string {
+  return op.Str
+}
+
+func (*PatternFlags) Choices() (closed bool, choices map[string]string) {
+  return true, map[string]string{
+    "$BEFORE": "before", "$AFTER": "after", "$TERMINATE": "terminate",
+  }
+}
+
+func (*PatternFlags) Compose() composer.Spec {
+  return composer.Spec{
+    Name: "pattern_flags",
+    Spec: "{continue before%before}, {continue after%after}, {terminate}",
+  }
+}
+
 // PatternLocals requires various parameters.
 type PatternLocals struct {
   At           reader.Position `if:"internal"`
@@ -838,6 +847,7 @@ func (*PatternName) Compose() composer.Spec {
 type PatternRule struct {
   At    reader.Position `if:"internal"`
   Guard rt.BoolEval
+  Flags *PatternFlags
   Hook  ProgramHook
 }
 
@@ -845,7 +855,7 @@ func (*PatternRule) Compose() composer.Spec {
   return composer.Spec{
     Name: "pattern_rule",
     Desc: `Rule`,
-    Spec: "When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}",
+    Spec: "When {conditions are met%guard:bool_eval}{ continue%flags?pattern_flags}, then: {do%hook:program_hook}",
   }
 }
 
@@ -1695,7 +1705,6 @@ var Model = []composer.Composer{
   (*NounRelation)(nil),
   (*NounStatement)(nil),
   (*NounTraits)(nil),
-  (*NounType)(nil),
   (*Number)(nil),
   (*NumberList)(nil),
   (*ObjectFunc)(nil),
@@ -1703,6 +1712,7 @@ var Model = []composer.Composer{
   (*Paragraph)(nil),
   (*PatternActions)(nil),
   (*PatternDecl)(nil),
+  (*PatternFlags)(nil),
   (*PatternLocals)(nil),
   (*PatternName)(nil),
   (*PatternRule)(nil),

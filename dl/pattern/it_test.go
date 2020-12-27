@@ -13,7 +13,7 @@ import (
 
 func TestTextIteration(t *testing.T) {
 	ps := []*TextListRule{
-		{ListRule{Flags: Infix}, Text("1")},
+		{ListRule{Flags: Terminal}, Text("1")},
 		{ListRule{Flags: Postfix}, Text("2")},
 		{ListRule{Flags: Prefix}, Text("3")},
 		{ListRule{Filter: Skip}, Text("0")},
@@ -62,7 +62,7 @@ func TestTextIteration(t *testing.T) {
 
 func TestNumIteration(t *testing.T) {
 	ps := []*NumListRule{
-		{ListRule{Flags: Infix}, Number(1)},
+		{ListRule{Flags: Terminal}, Number(1)},
 		{ListRule{Filter: Skip}, Number(88)},
 		{ListRule{Flags: Postfix}, Number(2)},
 		{ListRule{Flags: Prefix}, Number(3)},

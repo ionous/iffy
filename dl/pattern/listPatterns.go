@@ -20,11 +20,6 @@ type ActivityPattern struct {
 	Rules []*ExecuteRule
 }
 
-// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps *NumListPattern) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps.Rules[i].GetFlags(run)
-}
-
 func (ps *NumListPattern) GetNumList(run rt.Runtime) (ret g.Value, err error) {
 	if inds, e := splitNumbers(run, ps.Rules); e != nil {
 		err = e
@@ -37,11 +32,6 @@ func (ps *NumListPattern) GetNumList(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps *TextListPattern) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps.Rules[i].GetFlags(run)
-}
-
 func (ps *TextListPattern) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	if inds, e := splitText(run, ps.Rules); e != nil {
 		err = e
@@ -52,11 +42,6 @@ func (ps *TextListPattern) GetTextList(run rt.Runtime) (ret g.Value, err error) 
 		ret, err = g.CompactTexts(x, nil)
 	}
 	return
-}
-
-// ApplyByIndex returns flags if the filters passed, -1 if they did not, error on any error.
-func (ps *ActivityPattern) ApplyByIndex(run rt.Runtime, i int) (ret Flags, err error) {
-	return ps.Rules[i].GetFlags(run)
 }
 
 func (ps *ActivityPattern) Execute(run rt.Runtime) (err error) {

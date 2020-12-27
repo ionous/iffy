@@ -1,8 +1,11 @@
 package story
 
 import (
+	"strings"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/ephemera"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/tables"
@@ -72,6 +75,10 @@ func (op *PatternRules) ImportPattern(k *Importer, patternName ephemera.Named) (
 func (op *PatternRule) ImportPattern(k *Importer, patternName ephemera.Named) (err error) {
 	if hook, e := op.Hook.ImportProgram(k); e != nil {
 		err = e
+	} else if flags, e := op.Flags.ReadFlags(); e != nil {
+		err = e
+	} else if slotType := hook.SlotType(); flags != pattern.Terminal && slotType != "execute" && !strings.HasSuffix(slotType, "_list") {
+		err = errutil.New("didnt expect continuation flags for", slotType, "in", patternName.String())
 	} else {
 		guard := op.Guard
 		if dom := k.Current.Domain.String(); len(dom) > 0 {
@@ -80,11 +87,29 @@ func (op *PatternRule) ImportPattern(k *Importer, patternName ephemera.Named) (e
 				guard,
 			}}
 		}
-		name, rule := hook.NewRule(guard)
-		if patternProg, e := k.NewGob(name, rule); e != nil {
+		ruleType, rule := hook.NewRule(guard, flags)
+		if patternProg, e := k.NewGob(ruleType, rule); e != nil {
 			err = e
 		} else {
 			k.NewPatternRule(patternName, patternProg)
+		}
+	}
+	return
+}
+
+func (op *PatternFlags) ReadFlags() (ret pattern.Flags, err error) {
+	if op != nil {
+		switch str := op.Str; str {
+		case "$BEFORE":
+			// run other matching patterns, and then run this pattern. other...this.
+			ret = pattern.Postfix
+		case "$AFTER":
+			// keep going after running the current pattern. this...others.
+			ret = pattern.Prefix
+		case "$TERMINATE":
+			ret = pattern.Terminal
+		default:
+			err = errutil.New("unknown pattern flags", str)
 		}
 	}
 	return

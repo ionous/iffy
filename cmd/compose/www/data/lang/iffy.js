@@ -93,8 +93,10 @@ function localLang(make) {
       "Add actions to a pattern: Actions to take when using a pattern.");
 
     make.flow("pattern_rules", "{*pattern_rule}");
-    make.flow("pattern_rule", `When {conditions are met%guard:bool_eval}, then: {do%hook:program_hook}`,
+    make.flow("pattern_rule", `When {conditions are met%guard:bool_eval}{ continue%flags?pattern_flags}, then: {do%hook:program_hook}`,
       "Rule");
+
+    make.str("pattern_flags", "{continue before%before}, {continue after%after}, {terminate}");
 
     make.flow("pattern_locals", " use {+variable_decl|comma-and}",
       "Local: local variables can use the parameters of a pattern to compute temporary values.");

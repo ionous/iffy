@@ -24,7 +24,7 @@ func splitRules(run rt.Runtime, cnt int, apply applyByIndex) (ret []int, err err
 			} else {
 				a[pre], pre = i, pre+1
 				// FIX: add Replace as well
-				if flags == Infix {
+				if flags == Terminal {
 					break
 				}
 			}
