@@ -5,13 +5,14 @@ import (
 )
 
 var Slots = []composer.Slot{{
-	Name: "comparator",
 	Type: (*Comparator)(nil),
-	Desc: "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc.",
+	Desc: "Comparison Types: Helper for comparing values.",
 }, {
-	Name: "assignment",
 	Type: (*Assignment)(nil),
-	Desc: "Assignments: Helper used when setting variables.",
+	Desc: "Assignments: Helper for setting variables.",
+}, {
+	Type: (*Fields)(nil),
+	Desc: "Helper for setting fields.",
 }}
 
 var Slats = []composer.Composer{
@@ -119,4 +120,9 @@ var Slats = []composer.Composer{
 
 	(*Arguments)(nil),
 	(*Argument)(nil),
+
+	(*PutAtField)(nil),
+	(*IntoRec)(nil),
+	(*IntoObj)(nil),
+	(*IntoObjNamed)(nil),
 }

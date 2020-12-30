@@ -19,3 +19,4 @@ cmd/spec/spec.js
 cmd/stem/stem
 node_modules
 cmd/makeops/temp.go
+cmd/compose/compose

@@ -87,9 +87,10 @@ func (op *Assign) Execute(run rt.Runtime) (err error) {
 
 func (*FromBool) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_bool",
-		Group: "variables",
-		Desc:  "Assign Boolean: Assigns the passed boolean value.",
+		Name:   "assign_bool",
+		Group:  "variables",
+		Desc:   "From Bool: Assigns the passed boolean value.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromBool) Affinity() affine.Affinity {
@@ -106,10 +107,11 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromNum) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_num",
-		Spec:  "{val:number_eval}",
-		Group: "variables",
-		Desc:  "Assign Number: Assigns the passed number.",
+		Name:   "assign_num",
+		Spec:   "{val:number_eval}",
+		Group:  "variables",
+		Desc:   "From Number: Assigns the passed number.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromNum) Affinity() affine.Affinity {
@@ -126,9 +128,10 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromText) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_text",
-		Group: "variables",
-		Desc:  "Assign Text: Assigns the passed piece of text.",
+		Name:   "assign_text",
+		Group:  "variables",
+		Desc:   "From Text: Assigns the passed piece of text.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromText) Affinity() affine.Affinity {
@@ -145,9 +148,10 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromName) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_name",
-		Group: "variables",
-		Desc:  "Assign Name: Assigns the passed piece of name.",
+		Name:   "assign_name",
+		Group:  "variables",
+		Desc:   "From Name: Assigns the passed piece of name.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromName) Affinity() affine.Affinity {
@@ -166,9 +170,10 @@ func (op *FromName) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromRecord) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_record",
-		Group: "variables",
-		Desc:  "Assign Record: Assigns the passed record.",
+		Name:   "assign_record",
+		Group:  "variables",
+		Desc:   "From Record: Assigns the passed record.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromRecord) Affinity() affine.Affinity {
@@ -185,9 +190,10 @@ func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 
 func (*FromObject) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_object",
-		Group: "variables",
-		Desc:  "Assign Object: Assigns the passed object",
+		Name:   "assign_object",
+		Group:  "variables",
+		Desc:   "From Object: Assigns the passed object",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromObject) Affinity() affine.Affinity {
@@ -204,9 +210,10 @@ func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 
 func (*FromNumList) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_num_list",
-		Group: "variables",
-		Desc:  "Assign Number List: Assigns the passed number list.",
+		Name:   "assign_num_list",
+		Group:  "variables",
+		Desc:   "From Number List: Assigns the passed number list.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromNumList) Affinity() affine.Affinity {
@@ -223,9 +230,10 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error)
 
 func (*FromTextList) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_text_list",
-		Group: "variables",
-		Desc:  "Assign Text List: Assigns the passed text list.",
+		Name:   "assign_text_list",
+		Group:  "variables",
+		Desc:   "From Text List: Assigns the passed text list.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromTextList) Affinity() affine.Affinity {
@@ -242,9 +250,10 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error
 
 func (*FromRecordList) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign_record_list",
-		Group: "variables",
-		Desc:  "Assign Record List: Assigns the passed record list.",
+		Name:   "assign_record_list",
+		Group:  "variables",
+		Desc:   "From Record List: Assigns the passed record list.",
+		Fluent: &composer.Fluency{RunIn: true},
 	}
 }
 func (op *FromRecordList) Affinity() affine.Affinity {

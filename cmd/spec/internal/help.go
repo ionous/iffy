@@ -5,39 +5,53 @@ import (
 	r "reflect"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/export/tag"
+	"github.com/ionous/iffy/lang"
 )
 
 var tokenPlaceholders = regexp.MustCompile(`^\$([0-9]+)$`)
 
-func getSpec(ptrValue interface{}) (ret composer.Spec) {
-	if c, ok := ptrValue.(composer.Composer); ok {
-		ret = c.Compose()
-	}
-	return
+func lowerFirst(s string) (ret string) {
+	rs := []rune(s)
+	rs[0] = unicode.ToLower(rs[0])
+	return string(rs)
 }
 
-func parse(t r.Type) ([]string, export.Dict) {
+func parseSpec(t r.Type, fluency *composer.Fluency) ([]string, export.Dict) {
 	// fix: uppercase $ parameters mixed with text
 	// could possibly get from tags on the original command registration.
 	// or could use blank text fields and join in-order
-	prettyType := export.Prettify(t.Name())
+	name := lowerFirst(t.Name())
+	if fluency != nil {
+		if len(fluency.Name) > 0 {
+			name = fluency.Name
+		}
+		if fluency.RunIn {
+			name += ":"
+		}
+	}
 
-	tokens := []string{prettyType + " "}
+	tokens := []string{name}
 	// keyed by token
 	params := make(export.Dict)
-	last := " "
+	commas := " "
 	export.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
 		tags := tag.ReadTag(f.Tag)
 		if _, ok := tags.Find("internal"); !ok {
-			prettyField := export.Prettify(f.Name)
+			prettyField := lowerFirst(f.Name)
 			key := export.Tokenize(f)
 			typeName, repeats := nameOfType(f.Type)
-			tokens = append(tokens, last+prettyField+": ", key)
+			if fluency == nil || !fluency.RunIn || (len(params) > 0 && f.Type.Kind() != r.Interface) {
+				tokens = append(tokens, commas+prettyField+": ", key)
+			} else {
+				tokens = append(tokens, commas)
+				tokens = append(tokens, key)
+			}
 			m := export.Dict{
 				"label": prettyField,
 				"type":  typeName,
@@ -47,7 +61,7 @@ func parse(t r.Type) ([]string, export.Dict) {
 				m["repeats"] = true
 			}
 			params[key] = m
-			last = ", "
+			commas = ", "
 		}
 		return
 	})
@@ -76,8 +90,11 @@ func updateTokens(phrase string, tokens []string) (ret []string) {
 	return
 }
 
-func addDesc(out export.Dict, desc string) {
+func addDesc(out export.Dict, name, desc string) {
 	if len(desc) > 0 {
+		if strings.Index(desc, ":") < 0 {
+			desc = name + ": " + desc
+		}
 		out["desc"] = desc
 	}
 }
@@ -121,20 +138,28 @@ func nameOfType(t r.Type) (typeName string, repeats bool) {
 
 var reverseLookup map[r.Type]string
 
+func typeName(t r.Type, name string) (ret string) {
+	if len(name) > 0 {
+		ret = name
+	} else {
+		ret = lang.Underscore(t.Name())
+	}
+	return
+}
+
 func findTypeName(t r.Type) (ret string) {
 	if len(reverseLookup) == 0 {
 		reverseLookup = make(map[r.Type]string)
 		for _, slats := range iffy.AllSlats {
 			for _, cmd := range slats {
 				runType := r.TypeOf(cmd).Elem()
-				typeName := cmd.Compose().Name
-				reverseLookup[runType] = typeName
+				reverseLookup[runType] = typeName(runType, cmd.Compose().Name)
 			}
 		}
 		for _, slots := range iffy.AllSlots {
 			for _, slot := range slots {
 				t := r.TypeOf(slot.Type).Elem()
-				reverseLookup[t] = slot.Name
+				reverseLookup[t] = typeName(t, slot.Name)
 			}
 		}
 	}

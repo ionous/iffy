@@ -32,13 +32,6 @@ func (*Slice) Compose() composer.Spec {
 	}
 }
 
-func (op *Slice) Execute(run rt.Runtime) (err error) {
-	if _, _, e := op.sliceList(run, ""); e != nil {
-		err = cmdError(op, e)
-	}
-	return
-}
-
 func (op *Slice) GetNumList(run rt.Runtime) (ret g.Value, err error) {
 	if v, _, e := op.sliceList(run, affine.NumList); e != nil {
 		err = cmdError(op, e)

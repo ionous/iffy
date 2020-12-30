@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
 	"sort"
 	"strings"
 
@@ -27,36 +26,35 @@ func (c *Collect) AddGroup(out export.Dict, group string) {
 }
 
 func (c *Collect) AddSlot(slot composer.Slot) {
-	spec := getSpec(slot.Type)
-	if spec.Group != "internal" {
-		i := r.TypeOf(slot.Type).Elem()
-		//
-		if len(spec.Name) == 0 {
-			spec.Name = slot.Name
-		}
-		if len(spec.Desc) == 0 {
-			spec.Desc = export.Prettify(slot.Name)
-		}
-		if len(spec.Group) == 0 {
-			spec.Group = slot.Group
-		}
-		out := export.Dict{
-			"name": spec.Name,
-			"desc": spec.Desc,
-			"uses": "slot",
-		}
-		addDesc(out, slot.Desc)
-		c.AddGroup(out, spec.Group)
-		c.all = append(c.all, out)
-		c.slots = append(c.slots, i)
+	i := r.TypeOf(slot.Type).Elem()
+	//
+	name := typeName(i, slot.Name)
+	var desc string
+	if len(slot.Desc) > 0 {
+		desc = slot.Desc
+	} else {
+		desc = export.Prettify(name)
 	}
+	out := export.Dict{
+		"name": name,
+		"desc": desc,
+		"uses": "slot",
+	}
+	addDesc(out, name, slot.Desc)
+	//c.AddGroup(out, spec.Group)
+	c.all = append(c.all, out)
+	c.slots = append(c.slots, i)
 }
 
 func (c *Collect) AddSlat(cmd composer.Composer) {
 	if spec := cmd.Compose(); spec.Group != "internal" {
 		rtype := r.TypeOf(cmd).Elem()
-		if len(spec.Name) == 0 {
-			panic(fmt.Sprintln("missing name for type", rtype.Name()))
+		name := typeName(rtype, spec.Name)
+		var header string
+		if spec.Fluent != nil {
+			header = rtype.Name()
+		} else {
+			header = export.Prettify(name)
 		}
 		//
 		with := make(export.Dict)
@@ -68,7 +66,7 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 			uses = spec.Uses
 		}
 		out := export.Dict{
-			"name": spec.Name,
+			"name": name,
 			"uses": uses,
 			"with": with,
 		}
@@ -76,14 +74,15 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 		if len(spec.Spec) != 0 {
 			out["spec"] = spec.Spec
 		} else {
-			tokens, params := parse(rtype)
+			tokens, params := parseSpec(rtype, spec.Fluent)
 			with["params"] = params
 			with["tokens"] = updateTokens(spec.Spec, tokens)
 		}
 		if spec.Stub {
-			c.stubs = append(c.stubs, spec.Name)
+			c.stubs = append(c.stubs, name)
 		}
-		addDesc(out, spec.Desc)
+		// if Desc doesnt have a colon, should add the name, uppercase if not fluent maybe.
+		addDesc(out, header, spec.Desc)
 		c.AddGroup(out, spec.Group)
 		c.all = append(c.all, out)
 	}

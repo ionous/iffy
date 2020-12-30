@@ -11,7 +11,7 @@ const spec = [
     "with": {}
   },
   {
-    "desc": "Assignments: Helper used when setting variables.",
+    "desc": "Assignments: Helper for setting variables.",
     "name": "assignment",
     "uses": "slot"
   },
@@ -21,13 +21,18 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "Comparison Types: Helper used when comparing two numbers, objects, pieces of text, etc.",
+    "desc": "Comparison Types: Helper for comparing values.",
     "name": "comparator",
     "uses": "slot"
   },
   {
     "desc": "Action: Run a series of statements.",
     "name": "execute",
+    "uses": "slot"
+  },
+  {
+    "desc": "fields: Helper for setting fields.",
+    "name": "fields",
     "uses": "slot"
   },
   {
@@ -173,7 +178,7 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "always "
+        "always"
       ]
     }
   },
@@ -196,7 +201,7 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "any true ",
+        "anyTrue",
         " test: ",
         "$TEST"
       ]
@@ -235,7 +240,7 @@ const spec = [
     }
   },
   {
-    "desc": "Assign Boolean: Assigns the passed boolean value.",
+    "desc": "From Bool: Assigns the passed boolean value.",
     "group": [
       "variables"
     ],
@@ -252,14 +257,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from bool ",
-        " val: ",
+        "fromBool:",
+        " ",
         "$VAL"
       ]
     }
   },
   {
-    "desc": "Assign Name: Assigns the passed piece of name.",
+    "desc": "From Name: Assigns the passed piece of name.",
     "group": [
       "variables"
     ],
@@ -276,14 +281,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from name ",
-        " val: ",
+        "fromName:",
+        " ",
         "$VAL"
       ]
     }
   },
   {
-    "desc": "Assign Number: Assigns the passed number.",
+    "desc": "From Number: Assigns the passed number.",
     "group": [
       "variables"
     ],
@@ -297,7 +302,7 @@ const spec = [
     }
   },
   {
-    "desc": "Assign Number List: Assigns the passed number list.",
+    "desc": "From Number List: Assigns the passed number list.",
     "group": [
       "variables"
     ],
@@ -314,14 +319,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from num list ",
-        " vals: ",
+        "fromNumList:",
+        " ",
         "$VALS"
       ]
     }
   },
   {
-    "desc": "Assign Object: Assigns the passed object",
+    "desc": "From Object: Assigns the passed object",
     "group": [
       "variables"
     ],
@@ -338,14 +343,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from object ",
-        " val: ",
+        "fromObject:",
+        " ",
         "$VAL"
       ]
     }
   },
   {
-    "desc": "Assign Record: Assigns the passed record.",
+    "desc": "From Record: Assigns the passed record.",
     "group": [
       "variables"
     ],
@@ -362,14 +367,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from record ",
-        " val: ",
+        "fromRecord:",
+        " ",
         "$VAL"
       ]
     }
   },
   {
-    "desc": "Assign Record List: Assigns the passed record list.",
+    "desc": "From Record List: Assigns the passed record list.",
     "group": [
       "variables"
     ],
@@ -386,14 +391,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from record list ",
-        " vals: ",
+        "fromRecordList:",
+        " ",
         "$VALS"
       ]
     }
   },
   {
-    "desc": "Assign Text: Assigns the passed piece of text.",
+    "desc": "From Text: Assigns the passed piece of text.",
     "group": [
       "variables"
     ],
@@ -410,14 +415,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from text ",
-        " val: ",
+        "fromText:",
+        " ",
         "$VAL"
       ]
     }
   },
   {
-    "desc": "Assign Text List: Assigns the passed text list.",
+    "desc": "From Text List: Assigns the passed text list.",
     "group": [
       "variables"
     ],
@@ -434,8 +439,8 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "from text list ",
-        " vals: ",
+        "fromTextList:",
+        " ",
         "$VALS"
       ]
     }
@@ -500,7 +505,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "bracket ",
+        "bracket",
         " go: ",
         "$GO"
       ]
@@ -523,7 +528,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "buffer ",
+        "buffer",
         " go: ",
         "$GO"
       ]
@@ -565,7 +570,7 @@ const spec = [
         "number_eval"
       ],
       "tokens": [
-        "choose num ",
+        "chooseNum",
         " if: ",
         "$IF",
         ", true: ",
@@ -601,7 +606,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "choose text ",
+        "chooseText",
         " if: ",
         "$IF",
         ", true: ",
@@ -629,7 +634,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "commas ",
+        "commas",
         " go: ",
         "$GO"
       ]
@@ -682,14 +687,14 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "cycle text ",
+        "cycleText",
         " parts: ",
         "$PARTS"
       ]
     }
   },
   {
-    "desc": "Determine an activity",
+    "desc": "determine act: Determine an activity",
     "group": [
       "patterns"
     ],
@@ -703,7 +708,7 @@ const spec = [
     }
   },
   {
-    "desc": "Determine a true/false value",
+    "desc": "determine bool: Determine a true/false value",
     "group": [
       "patterns"
     ],
@@ -717,7 +722,7 @@ const spec = [
     }
   },
   {
-    "desc": "Determine a number",
+    "desc": "determine num: Determine a number",
     "group": [
       "patterns"
     ],
@@ -731,7 +736,7 @@ const spec = [
     }
   },
   {
-    "desc": "Determine a list of numbers",
+    "desc": "determine num list: Determine a list of numbers",
     "group": [
       "patterns"
     ],
@@ -745,7 +750,7 @@ const spec = [
     }
   },
   {
-    "desc": "Determine some text",
+    "desc": "determine text: Determine some text",
     "group": [
       "patterns"
     ],
@@ -759,7 +764,7 @@ const spec = [
     }
   },
   {
-    "desc": "Determine a list of text",
+    "desc": "determine text list: Determine a list of text",
     "group": [
       "patterns"
     ],
@@ -804,7 +809,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "do nothing ",
+        "doNothing",
         " reason: ",
         "$REASON"
       ]
@@ -850,7 +855,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "for each num ",
+        "forEachNum",
         " in: ",
         "$IN",
         ", go: ",
@@ -886,7 +891,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "for each text ",
+        "forEachText",
         " in: ",
         "$IN",
         ", go: ",
@@ -970,7 +975,7 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "has dominion ",
+        "hasDominion",
         " name: ",
         "$NAME"
       ]
@@ -1012,11 +1017,74 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "includes ",
+        "includes",
         " text: ",
         "$TEXT",
         ", part: ",
         "$PART"
+      ]
+    }
+  },
+  {
+    "desc": "IntoObj: Targets an object with a predetermined name",
+    "name": "into_obj",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$OBJ_NAME": {
+          "label": "objName",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "fields"
+      ],
+      "tokens": [
+        "intoObj:",
+        " ",
+        "$OBJ_NAME"
+      ]
+    }
+  },
+  {
+    "desc": "IntoObjNamed: Targets an object with a computed name",
+    "name": "into_obj_named",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$OBJ_NAME": {
+          "label": "objName",
+          "type": "text_eval"
+        }
+      },
+      "slots": [
+        "fields"
+      ],
+      "tokens": [
+        "intoObjNamed:",
+        " ",
+        "$OBJ_NAME"
+      ]
+    }
+  },
+  {
+    "desc": "IntoRec: Targets a record stored in a variable",
+    "name": "into_rec",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR_NAME": {
+          "label": "varName",
+          "type": "text"
+        }
+      },
+      "slots": [
+        "fields"
+      ],
+      "tokens": [
+        "intoRec:",
+        " ",
+        "$VAR_NAME"
       ]
     }
   },
@@ -1038,7 +1106,7 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "is empty ",
+        "isEmpty",
         " text: ",
         "$TEXT"
       ]
@@ -1095,7 +1163,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "join ",
+        "join",
         " sep: ",
         "$SEP",
         ", parts: ",
@@ -1195,15 +1263,15 @@ const spec = [
     "with": {
       "params": {
         "$FROM_LIST": {
-          "label": "from list",
+          "label": "fromList",
           "type": "assignment"
         },
         "$TO_LIST": {
-          "label": "to list",
+          "label": "toList",
           "type": "text"
         },
         "$USING_PATTERN": {
-          "label": "using pattern",
+          "label": "usingPattern",
           "type": "text"
         }
       },
@@ -1211,12 +1279,12 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "map ",
-        " to list: ",
+        "map",
+        " toList: ",
         "$TO_LIST",
-        ", from list: ",
+        ", fromList: ",
         "$FROM_LIST",
-        ", using pattern: ",
+        ", usingPattern: ",
         "$USING_PATTERN"
       ]
     }
@@ -1255,7 +1323,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "pop ",
+        "pop",
         " list: ",
         "$LIST",
         ", with: ",
@@ -1294,15 +1362,15 @@ const spec = [
     "with": {
       "params": {
         "$FROM_LIST": {
-          "label": "from list",
+          "label": "fromList",
           "type": "assignment"
         },
         "$INTO_VALUE": {
-          "label": "into value",
+          "label": "intoValue",
           "type": "text"
         },
         "$USING_PATTERN": {
-          "label": "using pattern",
+          "label": "usingPattern",
           "type": "text"
         }
       },
@@ -1310,12 +1378,12 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "reduce ",
-        " into value: ",
+        "reduce",
+        " intoValue: ",
         "$INTO_VALUE",
-        ", from list: ",
+        ", fromList: ",
         "$FROM_LIST",
-        ", using pattern: ",
+        ", usingPattern: ",
         "$USING_PATTERN"
       ]
     }
@@ -1346,7 +1414,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "set ",
+        "set",
         " list: ",
         "$LIST",
         ", index: ",
@@ -1366,7 +1434,6 @@ const spec = [
     "uses": "flow",
     "with": {
       "slots": [
-        "execute",
         "num_list_eval",
         "text_list_eval",
         "record_list_eval"
@@ -1395,7 +1462,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "sort ",
+        "sort",
         " list: ",
         "$LIST",
         ", pattern: ",
@@ -1441,7 +1508,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "log ",
+        "log",
         " text: ",
         "$TEXT",
         ", from: ",
@@ -1467,7 +1534,7 @@ const spec = [
         "record_eval"
       ],
       "tokens": [
-        "make ",
+        "make",
         " name: ",
         "$NAME",
         ", arguments: ",
@@ -1591,7 +1658,7 @@ const spec = [
         "bool_eval"
       ],
       "tokens": [
-        "is not true ",
+        "isNotTrue",
         " test: ",
         "$TEST"
       ]
@@ -1630,7 +1697,7 @@ const spec = [
         "num_list_eval"
       ],
       "tokens": [
-        "numbers ",
+        "numbers",
         " values: ",
         "$VALUES"
       ]
@@ -1690,7 +1757,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "pack ",
+        "pack",
         " record: ",
         "$RECORD",
         ", field: ",
@@ -1746,7 +1813,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "print num word ",
+        "printNumWord",
         " num: ",
         "$NUM"
       ]
@@ -1763,6 +1830,39 @@ const spec = [
     "with": {
       "slots": [
         "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Put: put a value into the field of an record or object",
+    "name": "put_at_field",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_FIELD": {
+          "label": "atField",
+          "type": "text"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$INTO": {
+          "label": "into",
+          "type": "fields"
+        }
+      },
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "put:",
+        " ",
+        "$FROM",
+        ", ",
+        "$INTO",
+        ", atField: ",
+        "$AT_FIELD"
       ]
     }
   },
@@ -1806,7 +1906,7 @@ const spec = [
         "num_list_eval"
       ],
       "tokens": [
-        "range ",
+        "range",
         " start: ",
         "$START",
         ", stop: ",
@@ -1862,7 +1962,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "say ",
+        "say",
         " text: ",
         "$TEXT"
       ]
@@ -1894,7 +1994,7 @@ const spec = [
         "execute"
       ],
       "tokens": [
-        "set field ",
+        "setField",
         " object: ",
         "$OBJECT",
         ", field: ",
@@ -1923,7 +2023,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "shuffle text ",
+        "shuffleText",
         " parts: ",
         "$PARTS"
       ]
@@ -1961,7 +2061,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "slash ",
+        "slash",
         " go: ",
         "$GO"
       ]
@@ -1985,7 +2085,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "span ",
+        "span",
         " go: ",
         "$GO"
       ]
@@ -2010,7 +2110,7 @@ const spec = [
         "text_eval"
       ],
       "tokens": [
-        "stopping text ",
+        "stoppingText",
         " parts: ",
         "$PARTS"
       ]

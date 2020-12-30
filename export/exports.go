@@ -26,6 +26,9 @@ func Tokenize(f *r.StructField) string {
 
 // Prettify transforms a PascalCased named into lowercase names with spaces.
 // ex. "FieldName" into "field name"
-func Prettify(n string) string {
-	return strings.ToLower(inflect.Humanize(n))
+func Prettify(n string) (ret string) {
+	if len(n) != 0 {
+		ret = strings.ToLower(inflect.Humanize(n))
+	}
+	return
 }
