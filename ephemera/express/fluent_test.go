@@ -16,16 +16,14 @@ import (
 
 // until template parsing gets re-written we cant handle fluid specs ( selector messaging )
 // we can do a basic test to ensure it's possible to build the function signatures from the composer.Spec(s) tho.
-func TestFluency(t *testing.T) {
+func TestFluid(t *testing.T) {
 	v := (*core.PutAtField)(nil)
 	rtype := r.TypeOf(v).Elem()
 	spec := v.Compose()
 	fluid := spec.Fluent
 
 	short := shortName(rtype, fluid.Name)
-	if fluid.RunIn {
-		short += ":"
-	}
+
 	sig := signature{short}
 	// see also: parseSpec
 	var cnt int
@@ -34,7 +32,12 @@ func TestFluency(t *testing.T) {
 		if _, ok := tags.Find("internal"); !ok {
 			cnt++
 			// write the selector:
-			if cnt > 1 || !fluid.RunIn {
+			unlabeled := tags.Exists("unlabeled")
+			if cnt == 1 && unlabeled {
+				sig[0] += ":"
+			}
+
+			if cnt > 1 || !unlabeled {
 				if f.Type.Kind() != r.Interface {
 					//  write camel "fieldName:"
 					name := firstRuneLower(f.Name)

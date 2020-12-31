@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	r "reflect"
 	"regexp"
@@ -23,7 +22,28 @@ func firstRuneLower(s string) (ret string) {
 	return string(rs)
 }
 
-func parseSpec(t r.Type, fluid *composer.Fluency) ([]string, export.Dict) {
+type tokensink struct {
+	els   []string
+	roles []rune
+}
+
+func (ts *tokensink) add(token string, role rune) {
+	ts.els = append(ts.els, token)
+	ts.roles = append(ts.roles, role)
+}
+
+func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) {
+	const (
+		KEY       = 'K' // token $
+		ENUM      = 'E'
+		CMD       = 'C'
+		FUNC      = 'F'
+		SEPARATOR = 'Z'
+		TERMINAL  = 'T'
+		SELECTOR  = 'S'
+		AMBIGUOUS = 'Q' // ambiguous
+		// unstyled = "_"
+	)
 	// fix: uppercase $ parameters mixed with text
 	// could possibly get from tags on the original command registration.
 	// or could use blank text fields and join in-order
@@ -31,18 +51,9 @@ func parseSpec(t r.Type, fluid *composer.Fluency) ([]string, export.Dict) {
 	if fluid != nil {
 		if len(fluid.Name) > 0 {
 			name = fluid.Name
-		} /*else if syl := strings.IndexFunc(name, func(u rune) bool {
-			return unicode.IsUpper(u)
-		}); syl > 0 {
-			name = name[:syl]
-		}*/
-		if fluid.RunIn {
-			name += ":"
 		}
 	}
-
-	tokens := []string{name}
-	// keyed by token
+	var tokens tokensink
 	params := make(export.Dict)
 	commas := " "
 	export.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
@@ -51,12 +62,40 @@ func parseSpec(t r.Type, fluid *composer.Fluency) ([]string, export.Dict) {
 			prettyField := firstRuneLower(f.Name)
 			key := export.Tokenize(f)
 			typeName, repeats := nameOfType(f.Type)
-			if fluid == nil || !fluid.RunIn || (len(params) > 0 && f.Type.Kind() != r.Interface) {
-				tokens = append(tokens, commas+prettyField+": ", key)
-			} else {
-				tokens = append(tokens, commas)
-				tokens = append(tokens, key)
+
+			// label this field?
+			label := !tags.Exists("unlabeled")
+
+			// if havent written the name, we need to write it first.
+			if len(tokens.els) == 0 {
+				role := AMBIGUOUS //
+				if fluid != nil {
+					switch fluid.Role {
+					case composer.Command:
+						role = CMD
+					case composer.Function:
+						role = FUNC
+					case composer.Selector:
+						role = SELECTOR
+					}
+				}
+				tokens.add(name, role)
+				// if we arent labeling the first parameter...
+				// then follow the name directly by a colon.
+				if !label {
+					tokens.add(": ", SEPARATOR)
+					commas = ""
+				}
 			}
+			if len(commas) > 0 {
+				tokens.add(commas, SEPARATOR)
+			}
+			// note: fluid interfaces might defer their selectors to their children
+			if label {
+				tokens.add(prettyField, SELECTOR)
+				tokens.add(": ", SEPARATOR)
+			}
+			tokens.add(key, KEY)
 			m := export.Dict{
 				"label": prettyField,
 				"type":  typeName,
@@ -70,29 +109,13 @@ func parseSpec(t r.Type, fluid *composer.Fluency) ([]string, export.Dict) {
 		}
 		return
 	})
-	return tokens, params
-}
-
-func updateTokens(phrase string, tokens []string) (ret []string) {
-	if len(phrase) == 0 {
-		ret = tokens
-	} else {
-		fields := strings.Fields(phrase)
-		// replace the fields in a phrase matching $1, etc. with tokens
-		// unused, and would need to handle offset of fields in tokens
-		// for _, f := range fields {
-		// 	if !tokenPlaceholders.MatchString(f) {
-		// 		ret = append(ret, f)
-		// 	} else if i, e := strconv.Atoi(f[1:]); e != nil {
-		// 		panic(e)
-		// 	} else {
-		// 		t := tokens[i]
-		// 		ret = append(ret, t)
-		// 	}
-		// }
-		ret = fields
+	// no fields?
+	if len(tokens.els) == 0 {
+		tokens.add(name, ENUM)
+	} else if tokens.roles[0] == CMD {
+		tokens.add(".", TERMINAL)
 	}
-	return
+	return tokens.els, string(tokens.roles), params
 }
 
 func addDesc(out export.Dict, name, desc string) {
@@ -108,8 +131,11 @@ func slotsOf(slat r.Type, slots []r.Type) (ret []string) {
 	ptrType := r.PtrTo(slat)
 	for _, slot := range slots {
 		if ptrType.Implements(slot) {
-			slotName := findTypeName(slot)
-			ret = append(ret, slotName)
+			if slotName := findTypeName(slot); len(slotName) == 0 {
+				log.Panic("unknown slot", slot)
+			} else {
+				ret = append(ret, slotName)
+			}
 		}
 	}
 	return
@@ -118,7 +144,11 @@ func slotsOf(slat r.Type, slots []r.Type) (ret []string) {
 func nameOfType(t r.Type) (typeName string, repeats bool) {
 	switch kind := t.Kind(); kind {
 	case r.Bool:
-		typeName = "bool"
+		if name := findTypeName(t); len(name) > 0 {
+			typeName = name
+		} else {
+			typeName = "bool"
+		}
 	case r.Float32, r.Float64, r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
 		// some sort of type  hint? ex. possibly link to custom types
 		typeName = "number"
@@ -126,16 +156,21 @@ func nameOfType(t r.Type) (typeName string, repeats bool) {
 		typeName, _ = nameOfType(t.Elem())
 		repeats = true
 	case r.Interface: // a reference to another type
-		typeName = findTypeName(t)
+		if name := findTypeName(t); len(name) == 0 {
+			log.Panic("unknown interface", t)
+		} else {
+			typeName = name
+		}
 	case r.String:
 		typeName = "text"
 	default:
-		if kind == r.Ptr && t.Elem().Kind() == r.Struct {
-			typeName = findTypeName(t.Elem())
+		structLike := kind == r.Ptr && t.Elem().Kind() == r.Struct
+		if !structLike {
+			log.Panic("unhandled type", t.String())
+		} else if name := findTypeName(t.Elem()); len(name) == 0 {
+			log.Panic("unknown type", name)
 		} else {
-			// Array, Map, Ptr, Struct
-			// Uint, Uint8, Uint16, Uint32, Uint64
-			panic(fmt.Sprintln("unhandled type", t.String()))
+			typeName = name
 		}
 	}
 	return
@@ -168,11 +203,5 @@ func findTypeName(t r.Type) (ret string) {
 			}
 		}
 	}
-
-	if n, ok := reverseLookup[t]; ok {
-		ret = n
-	} else {
-		log.Panic("unknown type", t.String())
-	}
-	return
+	return reverseLookup[t]
 }

@@ -20,3 +20,45 @@
 .mk-flow-ctrl[data-tag="comment"] .mk-txt-lines {
   font-style: italic;
 }
+.mk-slot-ctrl[data-tag="execute"] {
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 12px;
+  background: white;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  padding: 0px 5px;
+  margin-bottom: 1px;
+}
+
+.mk-num-ctrl {
+  color:rgb(160, 90, 0);
+}
+.mk-str-ctrl[data-tag="text"] {
+  color: rgb(177,0,177); /*ENUM*/
+}
+.mk-str-ctrl {
+  color: rgb(177,0,177); /*ENUM*/
+}
+.mk-flow-param[data-role="E"] {
+  color: rgb(177,0,177); /*ENUM*/
+}
+.mk-flow-param[data-role="C"] {
+  color:rgb(0, 102, 214); /*FUNC*/
+  font-style: bold;
+  font-size: larger;
+}
+.mk-flow-param[data-role="F"] {
+  color:rgb(0, 102, 214); /*FUNC*/
+}
+.mk-flow-param[data-role="Z"] {
+  color:black; /*SEPARATOR*/
+}
+.mk-flow-param[data-role="T"] {
+  color:black; /*TERMINAL*/
+}
+.mk-flow-param[data-role="S"] {
+  color:rgb(255,0, 0); /*SELECTOR*/
+}
+.mk-flow-param[data-role="Q"] {
+  color:orange; /*AMBIGUOUS*/
+}

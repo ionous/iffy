@@ -32,39 +32,39 @@ type Assign struct {
 }
 
 type FromBool struct {
-	Val rt.BoolEval
+	Val rt.BoolEval `if:"unlabeled"`
 }
 
 type FromNum struct {
-	Val rt.NumberEval
+	Val rt.NumberEval `if:"unlabeled"`
 }
 
 type FromText struct {
-	Val rt.TextEval
+	Val rt.TextEval `if:"unlabeled"`
 }
 
 type FromName struct {
-	Val rt.TextEval
+	Val rt.TextEval `if:"unlabeled"`
 }
 
 type FromRecord struct {
-	Val rt.RecordEval
+	Val rt.RecordEval `if:"unlabeled"`
 }
 
 type FromObject struct {
-	Val rt.ObjectEval
+	Val rt.ObjectEval `if:"unlabeled"`
 }
 
 type FromNumList struct {
-	Vals rt.NumListEval
+	Vals rt.NumListEval `if:"unlabeled"`
 }
 
 type FromTextList struct {
-	Vals rt.TextListEval
+	Vals rt.TextListEval `if:"unlabeled"`
 }
 
 type FromRecordList struct {
-	Vals rt.RecordListEval
+	Vals rt.RecordListEval `if:"unlabeled"`
 }
 
 func (*Assign) Compose() composer.Spec {
@@ -90,7 +90,7 @@ func (*FromBool) Compose() composer.Spec {
 		Name:   "assign_bool",
 		Group:  "variables",
 		Desc:   "From Bool: Assigns the passed boolean value.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromBool) Affinity() affine.Affinity {
@@ -111,7 +111,7 @@ func (*FromNum) Compose() composer.Spec {
 		Spec:   "{val:number_eval}",
 		Group:  "variables",
 		Desc:   "From Number: Assigns the passed number.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromNum) Affinity() affine.Affinity {
@@ -131,7 +131,7 @@ func (*FromText) Compose() composer.Spec {
 		Name:   "assign_text",
 		Group:  "variables",
 		Desc:   "From Text: Assigns the passed piece of text.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromText) Affinity() affine.Affinity {
@@ -151,7 +151,7 @@ func (*FromName) Compose() composer.Spec {
 		Name:   "assign_name",
 		Group:  "variables",
 		Desc:   "From Name: Assigns the passed piece of name.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromName) Affinity() affine.Affinity {
@@ -173,7 +173,7 @@ func (*FromRecord) Compose() composer.Spec {
 		Name:   "assign_record",
 		Group:  "variables",
 		Desc:   "From Record: Assigns the passed record.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromRecord) Affinity() affine.Affinity {
@@ -193,7 +193,7 @@ func (*FromObject) Compose() composer.Spec {
 		Name:   "assign_object",
 		Group:  "variables",
 		Desc:   "From Object: Assigns the passed object",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromObject) Affinity() affine.Affinity {
@@ -213,7 +213,7 @@ func (*FromNumList) Compose() composer.Spec {
 		Name:   "assign_num_list",
 		Group:  "variables",
 		Desc:   "From Number List: Assigns the passed number list.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromNumList) Affinity() affine.Affinity {
@@ -233,7 +233,7 @@ func (*FromTextList) Compose() composer.Spec {
 		Name:   "assign_text_list",
 		Group:  "variables",
 		Desc:   "From Text List: Assigns the passed text list.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromTextList) Affinity() affine.Affinity {
@@ -253,7 +253,7 @@ func (*FromRecordList) Compose() composer.Spec {
 		Name:   "assign_record_list",
 		Group:  "variables",
 		Desc:   "From Record List: Assigns the passed record list.",
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
 func (op *FromRecordList) Affinity() affine.Affinity {

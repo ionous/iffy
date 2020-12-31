@@ -8,6 +8,11 @@ import (
 	g "github.com/ionous/iffy/rt/generic"
 )
 
+var Slots = []composer.Slot{{
+	Type: (*ListVar)(nil),
+	Desc: "List Variable Name: Helper for altering lists.",
+}}
+
 var Slats = []composer.Composer{
 	(*At)(nil),
 	(*Each)(nil),
@@ -20,7 +25,13 @@ var Slats = []composer.Composer{
 	(*Slice)(nil),
 	(*Sort)(nil),
 	(*Splice)(nil),
-	(*Front)(nil),
+	(*Edge)(nil),
+	//
+	(*PutAtEdge)(nil),
+	(*PutAtIndex)(nil),
+	(*IntoNumList)(nil),
+	(*IntoRecList)(nil),
+	(*IntoTxtList)(nil),
 }
 
 func cmdError(op composer.Composer, e error) error {

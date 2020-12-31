@@ -6,7 +6,7 @@ const spec = [
       "list"
     ],
     "name": "list_edge",
-    "spec": "{front} or {back}",
+    "spec": "{atFront%front} or {atBack%back}",
     "uses": "str",
     "with": {}
   },
@@ -33,6 +33,11 @@ const spec = [
   {
     "desc": "fields: Helper for setting fields.",
     "name": "fields",
+    "uses": "slot"
+  },
+  {
+    "desc": "List Variable Name: Helper for altering lists.",
+    "name": "list_var",
     "uses": "slot"
   },
   {
@@ -174,6 +179,7 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {},
+      "roles": "E",
       "slots": [
         "bool_eval"
       ],
@@ -197,12 +203,15 @@ const spec = [
           "type": "bool_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
         "anyTrue",
-        " test: ",
+        " ",
+        "test",
+        ": ",
         "$TEST"
       ]
     }
@@ -253,12 +262,13 @@ const spec = [
           "type": "bool_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromBool:",
-        " ",
+        "fromBool",
+        ": ",
         "$VAL"
       ]
     }
@@ -277,12 +287,13 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromName:",
-        " ",
+        "fromName",
+        ": ",
         "$VAL"
       ]
     }
@@ -315,12 +326,13 @@ const spec = [
           "type": "num_list_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromNumList:",
-        " ",
+        "fromNumList",
+        ": ",
         "$VALS"
       ]
     }
@@ -339,12 +351,13 @@ const spec = [
           "type": "object_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromObject:",
-        " ",
+        "fromObject",
+        ": ",
         "$VAL"
       ]
     }
@@ -363,12 +376,13 @@ const spec = [
           "type": "record_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromRecord:",
-        " ",
+        "fromRecord",
+        ": ",
         "$VAL"
       ]
     }
@@ -387,12 +401,13 @@ const spec = [
           "type": "record_list_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromRecordList:",
-        " ",
+        "fromRecordList",
+        ": ",
         "$VALS"
       ]
     }
@@ -411,12 +426,13 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromText:",
-        " ",
+        "fromText",
+        ": ",
         "$VAL"
       ]
     }
@@ -435,12 +451,13 @@ const spec = [
           "type": "text_list_eval"
         }
       },
+      "roles": "FZK",
       "slots": [
         "assignment"
       ],
       "tokens": [
-        "fromTextList:",
-        " ",
+        "fromTextList",
+        ": ",
         "$VALS"
       ]
     }
@@ -501,12 +518,15 @@ const spec = [
           "type": "activity"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "bracket",
-        " go: ",
+        " ",
+        "go",
+        ": ",
         "$GO"
       ]
     }
@@ -524,12 +544,15 @@ const spec = [
           "type": "activity"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "buffer",
-        " go: ",
+        " ",
+        "go",
+        ": ",
         "$GO"
       ]
     }
@@ -566,16 +589,23 @@ const spec = [
           "type": "number_eval"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "number_eval"
       ],
       "tokens": [
         "chooseNum",
-        " if: ",
+        " ",
+        "if",
+        ": ",
         "$IF",
-        ", true: ",
+        ", ",
+        "true",
+        ": ",
         "$TRUE",
-        ", false: ",
+        ", ",
+        "false",
+        ": ",
         "$FALSE"
       ]
     }
@@ -602,16 +632,23 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "chooseText",
-        " if: ",
+        " ",
+        "if",
+        ": ",
         "$IF",
-        ", true: ",
+        ", ",
+        "true",
+        ": ",
         "$TRUE",
-        ", false: ",
+        ", ",
+        "false",
+        ": ",
         "$FALSE"
       ]
     }
@@ -630,12 +667,15 @@ const spec = [
           "type": "activity"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "commas",
-        " go: ",
+        " ",
+        "go",
+        ": ",
         "$GO"
       ]
     }
@@ -683,12 +723,15 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "cycleText",
-        " parts: ",
+        " ",
+        "parts",
+        ": ",
         "$PARTS"
       ]
     }
@@ -805,12 +848,15 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "doNothing",
-        " reason: ",
+        " ",
+        "reason",
+        ": ",
         "$REASON"
       ]
     }
@@ -851,16 +897,23 @@ const spec = [
           "type": "num_list_eval"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "forEachNum",
-        " in: ",
+        " ",
+        "in",
+        ": ",
         "$IN",
-        ", go: ",
+        ", ",
+        "go",
+        ": ",
         "$GO",
-        ", else: ",
+        ", ",
+        "else",
+        ": ",
         "$ELSE"
       ]
     }
@@ -887,16 +940,23 @@ const spec = [
           "type": "text_list_eval"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "forEachText",
-        " in: ",
+        " ",
+        "in",
+        ": ",
         "$IN",
-        ", go: ",
+        ", ",
+        "go",
+        ": ",
         "$GO",
-        ", else: ",
+        ", ",
+        "else",
+        ": ",
         "$ELSE"
       ]
     }
@@ -971,12 +1031,15 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
         "hasDominion",
-        " name: ",
+        " ",
+        "name",
+        ": ",
         "$NAME"
       ]
     }
@@ -1013,15 +1076,42 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZKZSZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
         "includes",
-        " text: ",
+        " ",
+        "text",
+        ": ",
         "$TEXT",
-        ", part: ",
+        ", ",
+        "part",
+        ": ",
         "$PART"
+      ]
+    }
+  },
+  {
+    "desc": "IntoNumList: Targets a list of numbers",
+    "name": "into_num_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR_NAME": {
+          "label": "varName",
+          "type": "text"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_var"
+      ],
+      "tokens": [
+        "intoNumList",
+        ": ",
+        "$VAR_NAME"
       ]
     }
   },
@@ -1036,12 +1126,13 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "SZK",
       "slots": [
         "fields"
       ],
       "tokens": [
-        "intoObj:",
-        " ",
+        "intoObj",
+        ": ",
         "$OBJ_NAME"
       ]
     }
@@ -1057,12 +1148,13 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "SZK",
       "slots": [
         "fields"
       ],
       "tokens": [
-        "intoObjNamed:",
-        " ",
+        "intoObjNamed",
+        ": ",
         "$OBJ_NAME"
       ]
     }
@@ -1078,12 +1170,57 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "SZK",
       "slots": [
         "fields"
       ],
       "tokens": [
-        "intoRec:",
-        " ",
+        "intoRec",
+        ": ",
+        "$VAR_NAME"
+      ]
+    }
+  },
+  {
+    "desc": "IntoRecList: Targets a list of records",
+    "name": "into_rec_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR_NAME": {
+          "label": "varName",
+          "type": "text"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_var"
+      ],
+      "tokens": [
+        "intoRecList",
+        ": ",
+        "$VAR_NAME"
+      ]
+    }
+  },
+  {
+    "desc": "IntoTxtList: Targets a list of text",
+    "name": "into_txt_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR_NAME": {
+          "label": "varName",
+          "type": "text"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_var"
+      ],
+      "tokens": [
+        "intoTxtList",
+        ": ",
         "$VAR_NAME"
       ]
     }
@@ -1102,12 +1239,15 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
         "isEmpty",
-        " text: ",
+        " ",
+        "text",
+        ": ",
         "$TEXT"
       ]
     }
@@ -1159,14 +1299,19 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZKZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "join",
-        " sep: ",
+        " ",
+        "sep",
+        ": ",
         "$SEP",
-        ", parts: ",
+        ", ",
+        "parts",
+        ": ",
         "$PARTS"
       ]
     }
@@ -1275,16 +1420,23 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "map",
-        " toList: ",
+        " ",
+        "toList",
+        ": ",
         "$TO_LIST",
-        ", fromList: ",
+        ", ",
+        "fromList",
+        ": ",
         "$FROM_LIST",
-        ", usingPattern: ",
+        ", ",
+        "usingPattern",
+        ": ",
         "$USING_PATTERN"
       ]
     }
@@ -1304,7 +1456,7 @@ const spec = [
         },
         "$FRONT": {
           "label": "front",
-          "type": "bool"
+          "type": "list_edge"
         },
         "$GO": {
           "label": "go",
@@ -1319,20 +1471,31 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZKZSZKZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "pop",
-        " list: ",
+        " ",
+        "list",
+        ": ",
         "$LIST",
-        ", with: ",
+        ", ",
+        "with",
+        ": ",
         "$WITH",
-        ", front: ",
+        ", ",
+        "front",
+        ": ",
         "$FRONT",
-        ", go: ",
+        ", ",
+        "go",
+        ": ",
         "$GO",
-        ", else: ",
+        ", ",
+        "else",
+        ": ",
         "$ELSE"
       ]
     }
@@ -1374,16 +1537,23 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "reduce",
-        " intoValue: ",
+        " ",
+        "intoValue",
+        ": ",
         "$INTO_VALUE",
-        ", fromList: ",
+        ", ",
+        "fromList",
+        ": ",
         "$FROM_LIST",
-        ", usingPattern: ",
+        ", ",
+        "usingPattern",
+        ": ",
         "$USING_PATTERN"
       ]
     }
@@ -1410,16 +1580,23 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "set",
-        " list: ",
+        " ",
+        "list",
+        ": ",
         "$LIST",
-        ", index: ",
+        ", ",
+        "index",
+        ": ",
         "$INDEX",
-        ", from: ",
+        ", ",
+        "from",
+        ": ",
         "$FROM"
       ]
     }
@@ -1458,14 +1635,19 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "sort",
-        " list: ",
+        " ",
+        "list",
+        ": ",
         "$LIST",
-        ", pattern: ",
+        ", ",
+        "pattern",
+        ": ",
         "$PATTERN"
       ]
     }
@@ -1504,14 +1686,19 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "log",
-        " text: ",
+        " ",
+        "text",
+        ": ",
         "$TEXT",
-        ", from: ",
+        ", ",
+        "from",
+        ": ",
         "$FROM"
       ]
     }
@@ -1530,14 +1717,19 @@ const spec = [
           "type": "text"
         }
       },
+      "roles": "QZSZKZSZK",
       "slots": [
         "record_eval"
       ],
       "tokens": [
         "make",
-        " name: ",
+        " ",
+        "name",
+        ": ",
         "$NAME",
-        ", arguments: ",
+        ", ",
+        "arguments",
+        ": ",
         "$ARGUMENTS"
       ]
     }
@@ -1654,12 +1846,15 @@ const spec = [
           "type": "bool_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
         "isNotTrue",
-        " test: ",
+        " ",
+        "test",
+        ": ",
         "$TEST"
       ]
     }
@@ -1693,12 +1888,15 @@ const spec = [
           "type": "number"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "num_list_eval"
       ],
       "tokens": [
         "numbers",
-        " values: ",
+        " ",
+        "values",
+        ": ",
         "$VALUES"
       ]
     }
@@ -1753,16 +1951,23 @@ const spec = [
           "type": "record_eval"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "pack",
-        " record: ",
+        " ",
+        "record",
+        ": ",
         "$RECORD",
-        ", field: ",
+        ", ",
+        "field",
+        ": ",
         "$FIELD",
-        ", from: ",
+        ", ",
+        "from",
+        ": ",
         "$FROM"
       ]
     }
@@ -1809,12 +2014,15 @@ const spec = [
           "type": "number_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "printNumWord",
-        " num: ",
+        " ",
+        "num",
+        ": ",
         "$NUM"
       ]
     }
@@ -1830,6 +2038,41 @@ const spec = [
     "with": {
       "slots": [
         "number_eval"
+      ]
+    }
+  },
+  {
+    "desc": "Put: add a value to a list",
+    "name": "put_at_edge",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_EDGE": {
+          "label": "atEdge",
+          "type": "list_edge"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$INTO": {
+          "label": "into",
+          "type": "list_var"
+        }
+      },
+      "roles": "CZKZKZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "put",
+        ": ",
+        "$FROM",
+        ", ",
+        "$INTO",
+        ", ",
+        "$AT_EDGE",
+        "."
       ]
     }
   },
@@ -1852,17 +2095,58 @@ const spec = [
           "type": "fields"
         }
       },
+      "roles": "CZKZKZSZKT",
       "slots": [
         "execute"
       ],
       "tokens": [
-        "put:",
-        " ",
+        "put",
+        ": ",
         "$FROM",
         ", ",
         "$INTO",
-        ", atField: ",
-        "$AT_FIELD"
+        ", ",
+        "atField",
+        ": ",
+        "$AT_FIELD",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "Put: replace one value in a list with another",
+    "name": "put_at_index",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_INDEX": {
+          "label": "atIndex",
+          "type": "number_eval"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$INTO": {
+          "label": "into",
+          "type": "list_var"
+        }
+      },
+      "roles": "CZKZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "put",
+        ": ",
+        "$FROM",
+        ", ",
+        "$INTO",
+        ", ",
+        "atIndex",
+        ": ",
+        "$AT_INDEX",
+        "."
       ]
     }
   },
@@ -1902,16 +2186,23 @@ const spec = [
           "type": "number_eval"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "num_list_eval"
       ],
       "tokens": [
         "range",
-        " start: ",
+        " ",
+        "start",
+        ": ",
         "$START",
-        ", stop: ",
+        ", ",
+        "stop",
+        ": ",
         "$STOP",
-        ", step: ",
+        ", ",
+        "step",
+        ": ",
         "$STEP"
       ]
     }
@@ -1958,12 +2249,15 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "say",
-        " text: ",
+        " ",
+        "text",
+        ": ",
         "$TEXT"
       ]
     }
@@ -1990,16 +2284,23 @@ const spec = [
           "type": "object_eval"
         }
       },
+      "roles": "QZSZKZSZKZSZK",
       "slots": [
         "execute"
       ],
       "tokens": [
         "setField",
-        " object: ",
+        " ",
+        "object",
+        ": ",
         "$OBJECT",
-        ", field: ",
+        ", ",
+        "field",
+        ": ",
         "$FIELD",
-        ", from: ",
+        ", ",
+        "from",
+        ": ",
         "$FROM"
       ]
     }
@@ -2019,12 +2320,15 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "shuffleText",
-        " parts: ",
+        " ",
+        "parts",
+        ": ",
         "$PARTS"
       ]
     }
@@ -2057,12 +2361,15 @@ const spec = [
           "type": "activity"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "slash",
-        " go: ",
+        " ",
+        "go",
+        ": ",
         "$GO"
       ]
     }
@@ -2081,12 +2388,15 @@ const spec = [
           "type": "activity"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "span",
-        " go: ",
+        " ",
+        "go",
+        ": ",
         "$GO"
       ]
     }
@@ -2106,12 +2416,15 @@ const spec = [
           "type": "text_eval"
         }
       },
+      "roles": "QZSZK",
       "slots": [
         "text_eval"
       ],
       "tokens": [
         "stoppingText",
-        " parts: ",
+        " ",
+        "parts",
+        ": ",
         "$PARTS"
       ]
     }

@@ -11,7 +11,7 @@ import (
 type Push struct {
 	List   string // variable name
 	Insert core.Assignment
-	Front  *Front
+	Front  *Edge
 }
 
 func (op *Push) Compose() composer.Spec {

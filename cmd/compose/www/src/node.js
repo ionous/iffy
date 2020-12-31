@@ -120,11 +120,14 @@ class Flow extends Node {
   //callback(currentValue [, index [, array]]
   forEach(callback) {
     const spec= this.itemType.with;
-    for (const token of spec.tokens) {
+    for (let i=0; i< spec.tokens.length; ++i) {
+      const token= spec.tokens[i];
+      const role= spec.roles? spec.roles.charAt(i): "_";
       const param= this.getParam(token);
       callback({
         token,
         param,
+        role,
         kid: this.kids[token],
       });
     }

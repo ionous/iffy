@@ -9,6 +9,8 @@ Vue.component('mk-flow-ctrl', {
       class="mk-flow-param"
       :data-dot="el.plain"
       :data-tag="el.param && el.param.type"
+      :data-order="el.order"
+      :data-role="el.role"
       >{{el.opener}}<mk-switch
         :node="el.kid"
         :token="el.token"
@@ -20,7 +22,10 @@ Vue.component('mk-flow-ctrl', {
     els() {
       let els= [];
       const { node, "$root": root  } = this;
-      node.forEach(({token, param, kid})=> {
+
+      // node.itemType -> Type, with.slots
+
+      node.forEach(({token, param, role, kid})=> {
         var opener, closer, plain ;
         // plain text doesnt have param
         if (!param) {
@@ -41,10 +46,12 @@ Vue.component('mk-flow-ctrl', {
         els.push({
           kid,
           token,
+          role,
           plain,
           param,
           opener,
           closer,
+          order: `t${els.length}`,
         });
       });
       return els;

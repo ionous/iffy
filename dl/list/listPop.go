@@ -13,7 +13,7 @@ import (
 type Pop struct {
 	List     core.Assignment
 	With     string // counter name
-	Front    Front
+	Front    Edge
 	Go, Else *core.Activity
 	k        *g.Kind
 }

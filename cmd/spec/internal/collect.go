@@ -74,9 +74,12 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 		if len(spec.Spec) != 0 {
 			out["spec"] = spec.Spec
 		} else {
-			tokens, params := parseSpec(rtype, spec.Fluent)
+			tokens, roles, params := parseSpec(rtype, spec.Fluent)
+			with["tokens"] = tokens
 			with["params"] = params
-			with["tokens"] = updateTokens(spec.Spec, tokens)
+			if len(roles) > 0 {
+				with["roles"] = roles
+			}
 		}
 		if spec.Stub {
 			c.stubs = append(c.stubs, name)

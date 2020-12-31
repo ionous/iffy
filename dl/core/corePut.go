@@ -6,9 +6,14 @@ import (
 	g "github.com/ionous/iffy/rt/generic"
 )
 
+/**
+ * put: eval,
+ * intoObj/intoObjNamed/intoRec: varName,objName,textEval,
+ * atField: string.
+ */
 type PutAtField struct {
-	From    Assignment
-	Into    Fields
+	From    Assignment `if:"unlabeled"`
+	Into    Fields     `if:"unlabeled"`
 	AtField string
 }
 
@@ -20,15 +25,19 @@ type Fields interface {
 	GetFields(run rt.Runtime) (g.Value, error)
 }
 
-type IntoObj struct{ ObjName string }
+type IntoObj struct {
+	ObjName string `if:"unlabeled"`
+}
+type IntoObjNamed struct {
+	ObjName rt.TextEval `if:"unlabeled"`
+}
+type IntoRec struct {
+	VarName string `if:"unlabeled"`
+}
 
 func (op *IntoObj) GetFields(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
-
-type IntoObjNamed struct{ ObjName rt.TextEval }
-
-type IntoRec struct{ VarName string }
 
 func (op *IntoRec) GetFields(run rt.Runtime) (ret g.Value, err error) {
 	return
@@ -40,29 +49,28 @@ func (op *IntoObjNamed) GetFields(run rt.Runtime) (ret g.Value, err error) {
 
 func (*PutAtField) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluency{Name: "put", RunIn: true},
-		// Spec:   "put: {%from:assignment} {%into:fields} atField: {%atField:text}",
-		Desc: "Put: put a value into the field of an record or object",
+		Fluent: &composer.Fluid{Name: "put", Role: composer.Command},
+		Desc:   "Put: put a value into the field of an record or object",
 	}
 }
 
 func (*IntoObj) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Selector},
 		Desc:   "Targets an object with a predetermined name",
 	}
 }
 
 func (*IntoObjNamed) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Selector},
 		Desc:   "Targets an object with a computed name",
 	}
 }
 
 func (*IntoRec) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluency{RunIn: true},
+		Fluent: &composer.Fluid{Role: composer.Selector},
 		Desc:   "Targets a record stored in a variable",
 	}
 }

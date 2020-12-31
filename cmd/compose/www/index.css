@@ -215,11 +215,11 @@ body {
   border: 1px solid #0366d6;
 }
 
-.mk-slot-ctrl__item,
+/*.mk-slot-ctrl__item,
 .mk-pick-inline--pad {
-  margin-right: 0.25em;
+  margin-right: 0.25em; // these cause spaces in front of commas
   margin-left: 0.25em;
-}
+}*/
 .mk-pick-inline__item {
 	display:inline;
 }

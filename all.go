@@ -12,7 +12,7 @@ import (
 	"github.com/ionous/iffy/rt"
 )
 
-var AllSlots = [][]composer.Slot{rt.Slots, core.Slots}
+var AllSlots = [][]composer.Slot{rt.Slots, core.Slots, list.Slots}
 var AllSlats = [][]composer.Composer{core.Slats, debug.Slats, render.Slats, pattern.Slats, list.Slats}
 
 func RegisterGobs() {

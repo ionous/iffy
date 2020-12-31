@@ -31,7 +31,7 @@ func (op *TextValue) ImportStub(k *Importer) (ret interface{}, err error) {
 
 // handle the import of text literals, this is a patch for handling "empty" in string values.
 func (op *ListEdge) ImportStub(k *Importer) (ret interface{}, err error) {
-	ret = list.Front(op.Str == "$FRONT")
+	ret = list.Edge(op.Str == "$FRONT")
 	return
 }
 
