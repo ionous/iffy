@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"log"
 	r "reflect"
 	"regexp"
 	"strings"
@@ -16,22 +17,26 @@ import (
 
 var tokenPlaceholders = regexp.MustCompile(`^\$([0-9]+)$`)
 
-func lowerFirst(s string) (ret string) {
+func firstRuneLower(s string) (ret string) {
 	rs := []rune(s)
 	rs[0] = unicode.ToLower(rs[0])
 	return string(rs)
 }
 
-func parseSpec(t r.Type, fluency *composer.Fluency) ([]string, export.Dict) {
+func parseSpec(t r.Type, fluid *composer.Fluency) ([]string, export.Dict) {
 	// fix: uppercase $ parameters mixed with text
 	// could possibly get from tags on the original command registration.
 	// or could use blank text fields and join in-order
-	name := lowerFirst(t.Name())
-	if fluency != nil {
-		if len(fluency.Name) > 0 {
-			name = fluency.Name
-		}
-		if fluency.RunIn {
+	name := firstRuneLower(t.Name())
+	if fluid != nil {
+		if len(fluid.Name) > 0 {
+			name = fluid.Name
+		} /*else if syl := strings.IndexFunc(name, func(u rune) bool {
+			return unicode.IsUpper(u)
+		}); syl > 0 {
+			name = name[:syl]
+		}*/
+		if fluid.RunIn {
 			name += ":"
 		}
 	}
@@ -43,10 +48,10 @@ func parseSpec(t r.Type, fluency *composer.Fluency) ([]string, export.Dict) {
 	export.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
 		tags := tag.ReadTag(f.Tag)
 		if _, ok := tags.Find("internal"); !ok {
-			prettyField := lowerFirst(f.Name)
+			prettyField := firstRuneLower(f.Name)
 			key := export.Tokenize(f)
 			typeName, repeats := nameOfType(f.Type)
-			if fluency == nil || !fluency.RunIn || (len(params) > 0 && f.Type.Kind() != r.Interface) {
+			if fluid == nil || !fluid.RunIn || (len(params) > 0 && f.Type.Kind() != r.Interface) {
 				tokens = append(tokens, commas+prettyField+": ", key)
 			} else {
 				tokens = append(tokens, commas)
@@ -167,7 +172,7 @@ func findTypeName(t r.Type) (ret string) {
 	if n, ok := reverseLookup[t]; ok {
 		ret = n
 	} else {
-		panic(fmt.Sprintln("unknown type", t.String()))
+		log.Panic("unknown type", t.String())
 	}
 	return
 }
