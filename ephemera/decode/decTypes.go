@@ -12,8 +12,12 @@ type NumType interface {
 	Choices() (closed bool, vals []float64)
 }
 
-func FindChoice(op StrType, choice string) (ret string, okay bool) {
+func FindChoice(op StrType, choice string) (ret string, found bool) {
 	closed, keys := op.Choices()
-	str, ok := keys[choice]
-	return str, ok || !closed
+	if str, ok := keys[choice]; ok {
+		ret, found = str, ok
+	} else if !ok && !closed {
+		ret = choice
+	}
+	return
 }
