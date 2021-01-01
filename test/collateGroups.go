@@ -8,7 +8,7 @@ import (
 )
 
 var runCollateGroups = list.Reduce{
-	FromList:     &core.Var{Name: "Settings"},
+	FromList:     V("Settings"),
 	IntoValue:    "Collation",
 	UsingPattern: "collateGroups"}
 
@@ -29,19 +29,19 @@ var collateGroups = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{Execute: core.NewActivity(
 			// walk collation.Groups for matching settings
-			&core.Assign{"groups", &core.Unpack{&core.Var{Name: "collation"}, "Groups"}},
+			&core.Assign{core.VariableName{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
 			&list.Each{
-				List: &core.Var{Name: "groups"},
+				List: V("groups"),
 				With: "el",
 				Go: core.NewActivity(
 					&core.Choose{
 						If: &pattern.DetermineBool{
 							Pattern:   "matchGroups",
-							Arguments: core.Args(&core.Var{Name: "settings"}, &core.Unpack{&core.Var{Name: "el"}, "Settings"})},
+							Arguments: core.Args(V("settings"), &core.Unpack{V("el"), "Settings"})},
 						True: core.NewActivity(
 							&core.Assign{
-								Name: "idx",
-								From: &core.Var{Name: "index"},
+								Name: N("idx"),
+								From: V("index"),
 							},
 							// implement a "break" for the each that returns a constant error?
 						),
@@ -49,7 +49,7 @@ var collateGroups = pattern.ActivityPattern{
 				)}, // end go-each
 			&core.Choose{
 				If: &core.CompareNum{
-					A:  &core.Var{Name: "idx"},
+					A:  V("idx"),
 					Is: &core.EqualTo{},
 					B:  &core.Number{0},
 				},
@@ -57,22 +57,29 @@ var collateGroups = pattern.ActivityPattern{
 				// pack the object and its settings into it,
 				// push the group into the groups.
 				True: core.NewActivity(
-					&list.Push{List: "names", Insert: &core.Unpack{&core.Var{Name: "settings"}, "Name"}},
-					&core.Pack{&core.Var{Name: "group"}, "Objects", &core.Var{Name: "names"}},
-					&core.Pack{&core.Var{Name: "group"}, "Settings", &core.Var{Name: "settings"}},
-					&list.Push{List: "groups", Insert: &core.Var{Name: "group"}},
+					&list.Push{List: "names", Insert: &core.Unpack{V("settings"), "Name"}},
+					&core.Pack{V("group"), "Objects", V("names")},
+					&core.Pack{V("group"), "Settings", V("settings")},
+					&list.Push{List: "groups", Insert: V("group")},
 				), // end true
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
-					&core.Assign{"group", &core.FromRecord{&list.At{List: &core.Var{Name: "groups"}, Index: &core.Var{Name: "idx"}}}},
-					&core.Assign{"names", &core.Unpack{&core.Var{Name: "group"}, "Objects"}},
-					&list.Push{List: "names", Insert: &core.Unpack{&core.Var{Name: "settings"}, "Name"}},
-					&core.Pack{&core.Var{Name: "group"}, "Objects", &core.Var{Name: "names"}},
-					&list.Set{List: "groups", Index: &core.Var{Name: "idx"}, From: &core.Var{Name: "group"}},
+					&core.Assign{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
+					&core.Assign{N("names"), &core.Unpack{V("group"), "Objects"}},
+					&list.Push{List: "names", Insert: &core.Unpack{V("settings"), "Name"}},
+					&core.Pack{V("group"), "Objects", V("names")},
+					&list.Set{List: "groups", Index: V("idx"), From: V("group")},
 				), // end false
 			},
-			&core.Pack{&core.Var{Name: "collation"}, "Groups", &core.Var{Name: "groups"}},
+			&core.Pack{V("collation"), "Groups", V("groups")},
 		)},
 	},
+}
+
+func V(n string) *core.Var {
+	return &core.Var{Name: n}
+}
+func N(n string) core.VariableName {
+	return core.VariableName{Str: n}
 }

@@ -59,12 +59,17 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 	export.WalkProperties(t, func(f *r.StructField, path []int) (done bool) {
 		tags := tag.ReadTag(f.Tag)
 		if _, ok := tags.Find("internal"); !ok {
-			prettyField := firstRuneLower(f.Name)
+			var label string
+			if l, ok := tags.Find("label"); ok {
+				label = l
+			} else {
+				label = firstRuneLower(f.Name)
+			}
 			key := export.Tokenize(f)
 			typeName, repeats := nameOfType(f.Type)
 
 			// label this field?
-			label := !tags.Exists("unlabeled")
+			unlabeled := tags.Exists("unlabeled")
 
 			// if havent written the name, we need to write it first.
 			if len(tokens.els) == 0 {
@@ -82,7 +87,9 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 				tokens.add(name, role)
 				// if we arent labeling the first parameter...
 				// then follow the name directly by a colon.
-				if !label {
+				// same for implementations of interfaces which are selectors.
+				// ex. (put) intoNumList: or (sort) numbers:
+				if unlabeled || fluid != nil && fluid.Role == composer.Selector {
 					tokens.add(": ", SEPARATOR)
 					commas = ""
 				}
@@ -91,13 +98,13 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 				tokens.add(commas, SEPARATOR)
 			}
 			// note: fluid interfaces might defer their selectors to their children
-			if label {
-				tokens.add(prettyField, SELECTOR)
+			if !unlabeled {
+				tokens.add(label, SELECTOR)
 				tokens.add(": ", SEPARATOR)
 			}
 			tokens.add(key, KEY)
 			m := export.Dict{
-				"label": prettyField,
+				"label": label,
 				"type":  typeName,
 				// optional: tdb
 			}
@@ -157,21 +164,26 @@ func nameOfType(t r.Type) (typeName string, repeats bool) {
 		repeats = true
 	case r.Interface: // a reference to another type
 		if name := findTypeName(t); len(name) == 0 {
-			log.Panic("unknown interface", t)
+			log.Panicln("unknown interface", t)
 		} else {
 			typeName = name
 		}
 	case r.String:
-		typeName = "text"
-	default:
-		structLike := kind == r.Ptr && t.Elem().Kind() == r.Struct
-		if !structLike {
-			log.Panic("unhandled type", t.String())
-		} else if name := findTypeName(t.Elem()); len(name) == 0 {
-			log.Panic("unknown type", name)
+		if name := findTypeName(t); len(name) > 0 {
+			typeName = name
+		} else {
+			typeName = "text"
+		}
+	case r.Struct:
+		if name := findTypeName(t); len(name) == 0 {
+			typeName = lang.Underscore(t.Name())
 		} else {
 			typeName = name
 		}
+	case r.Ptr:
+		typeName, repeats = nameOfType(t.Elem())
+	default:
+		log.Panicln("unhandled type", kind, t.String())
 	}
 	return
 }

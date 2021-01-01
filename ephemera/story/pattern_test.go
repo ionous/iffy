@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 )
@@ -24,11 +25,10 @@ func TestPatternVars(t *testing.T) {
 					},
 				},
 			},
-			Name: VariableName{
+			Name: VariableName{core.VariableName{
 				Str: "pet",
-			},
-		},
-		},
+			}},
+		}},
 	}
 	k, db := newImporter(t, testdb.Memory)
 	defer db.Close()

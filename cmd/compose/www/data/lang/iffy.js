@@ -158,7 +158,7 @@ For example: animals, containers, etc.`);
 
   make.group("Variables", function() {
     make.flow("variable_decl", "{an:determiner} {name:variable_name} ( {type:variable_type}  {comment?lines} )");
-    make.str("variable_name");
+    // make.str("variable_name"); ... hmmm.... declared in core now. fix?
 
     make.swap("variable_type", "a {simple value%primitive:primitive_type}, an {object:object_type}, or {other value%ext:ext_type}");
     make.flow("object_type",  "{an:ana} {kind of%kind:singular_kind}");

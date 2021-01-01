@@ -26,8 +26,11 @@ type Role int
 
 //go:generate stringer -type=Role
 const (
+	// a top-level function, basically execute
 	Command Role = iota + 1
+	// any sub function, basically any eval
 	Function
+	// keyword choices
 	Selector
 )
 

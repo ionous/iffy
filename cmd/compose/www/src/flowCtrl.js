@@ -29,9 +29,9 @@ Vue.component('mk-flow-ctrl', {
         var opener, closer, plain ;
         // plain text doesnt have param
         if (!param) {
-          // handle caps for execute statements in a block.
-          const filter= root.filter(node);
-          token= filter(token);
+          if (!els.length && role && role.charAt(0) == "C") {
+            token= token.charAt(0).toUpperCase() + token.slice(1);
+          }
         } else {
           const type= param.type;
           const filters = param.filters;

@@ -52,7 +52,7 @@ func (op *Pop) pop(run rt.Runtime) (err error) {
 			ls := op.k.NewRecord()
 			//
 			var at int
-			if !op.Front {
+			if !op.Front.Front() {
 				at = cnt - 1
 			}
 			if popped, e := vs.Splice(at, at+1, nil); e != nil {

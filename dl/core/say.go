@@ -13,7 +13,7 @@ import (
 
 // Say some bit of text.
 type Say struct {
-	Text rt.TextEval
+	Text rt.TextEval `if:"unlabeled"`
 }
 
 // Buffer collects text said by other statements and returns them as a string.
@@ -45,9 +45,10 @@ type Commas struct {
 // Compose defines a spec for the composer editor.
 func (*Say) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "say_text",
-		Group: "printing",
-		Desc:  "Say: print some bit of text to the player.",
+		Name:   "say_text",
+		Group:  "printing",
+		Desc:   "Say: print some bit of text to the player.",
+		Fluent: &composer.Fluid{Role: composer.Command},
 	}
 }
 

@@ -13,6 +13,9 @@ type Execute rt.Execute
 type NumberEval rt.NumberEval
 type ObjectEval rt.ObjectEval
 type TextEval rt.TextEval
+type VariableName struct {
+	core.VariableName
+}
 
 // fix: this doesnt work because story importer doesnt trigger callbacks for str types
 func (op *Text) ImportStub(k *Importer) (ret interface{}, err error) {
@@ -29,9 +32,17 @@ func (op *TextValue) ImportStub(k *Importer) (ret interface{}, err error) {
 	return op.Text.ImportStub(k)
 }
 
-// handle the import of text literals, this is a patch for handling "empty" in string values.
+// handle the import of boolean flags
 func (op *ListEdge) ImportStub(k *Importer) (ret interface{}, err error) {
-	ret = list.Edge(op.Str == "$FRONT")
+	ret = list.Edge(op.Str == "$TRUE")
+	return
+} // handle the import of boolean flags
+func (op *ListOrder) ImportStub(k *Importer) (ret interface{}, err error) {
+	ret = list.Order(op.Str == "$TRUE")
+	return
+} // handle the import of boolean flags
+func (op *ListCase) ImportStub(k *Importer) (ret interface{}, err error) {
+	ret = list.Case(op.Str == "$TRUE")
 	return
 }
 

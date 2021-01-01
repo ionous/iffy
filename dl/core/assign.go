@@ -27,7 +27,7 @@ func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 
 // Assign a value to a local variable.
 type Assign struct {
-	Name string // name of variable or parameter we are assigning to.
+	Name VariableName `if:"label:var"`
 	From Assignment
 }
 
@@ -69,17 +69,17 @@ type FromRecordList struct {
 
 func (*Assign) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "assign",
-		Spec:  "let {name:variable_name} be {from:assignment}",
-		Group: "variables",
-		Desc:  "Assignment: Sets a variable to a value.",
+		Name:   "assign",
+		Group:  "variables",
+		Desc:   "Assignment: Sets a variable to a value.",
+		Fluent: &composer.Fluid{Name: "let", Role: composer.Command},
 	}
 }
 
 func (op *Assign) Execute(run rt.Runtime) (err error) {
 	if v, e := GetAssignedValue(run, op.From); e != nil {
 		err = cmdError(op, e)
-	} else if e := run.SetField(object.Variables, op.Name, v); e != nil {
+	} else if e := run.SetField(object.Variables, op.Name.String(), v); e != nil {
 		err = cmdError(op, e)
 	}
 	return

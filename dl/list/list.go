@@ -9,8 +9,13 @@ import (
 )
 
 var Slots = []composer.Slot{{
-	Type: (*ListVar)(nil),
-	Desc: "List Variable Name: Helper for altering lists.",
+	Name: "list_getter",
+	Type: (*ListGetter)(nil),
+	Desc: "List getter: Helper for accessing lists.",
+}, {
+	Name: "list_sorter",
+	Type: (*Sorter)(nil),
+	Desc: "List sorter: Helper for sorting lists.",
 }}
 
 var Slats = []composer.Composer{
@@ -23,15 +28,22 @@ var Slats = []composer.Composer{
 	(*Reduce)(nil),
 	(*Set)(nil),
 	(*Slice)(nil),
-	(*Sort)(nil),
 	(*Splice)(nil),
+	// flags:
+	(*Case)(nil),
 	(*Edge)(nil),
-	//
+	(*Order)(nil),
+	// put:
 	(*PutAtEdge)(nil),
 	(*PutAtIndex)(nil),
 	(*IntoNumList)(nil),
 	(*IntoRecList)(nil),
 	(*IntoTxtList)(nil),
+	//
+	(*Sort)(nil),
+	(*SortNumbers)(nil),
+	(*SortText)(nil),
+	(*SortUsing)(nil),
 }
 
 func cmdError(op composer.Composer, e error) error {

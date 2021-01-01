@@ -24,6 +24,7 @@ var Slats = []composer.Composer{
 
 	// Assign turns an Assignment a normal statement.
 	(*Assign)(nil),
+	(*VariableName)(nil),
 	(*FromBool)(nil),
 	(*FromNum)(nil),
 	(*FromText)(nil),

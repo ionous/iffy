@@ -203,8 +203,9 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 				if str, ok := v.(string); !ok {
 					err = errutil.Fmt("expected string, got %T(%v)", v, v)
 				} else {
-					// fix? validate choice here?
-					outAt.Field(outAt.NumField() - 1).SetString(str)
+					// fix?: by using field by name we "unwrap" embedded structs
+					// ex. VariableName { core.VariableName }
+					outAt.FieldByName("Str").SetString(str)
 				}
 				return
 			}); e != nil {

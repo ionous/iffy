@@ -1,12 +1,38 @@
 /* generated using github.com/ionous/iffy/cmd/spec/spec.go */
 const spec = [
   {
-    "desc": "List Edge: Indicate elements at the front or back of a list.",
+    "desc": "List Case: When sorting, treat uppercase and lowercase versions of letters the same.",
+    "group": [
+      "list"
+    ],
+    "name": "list_case",
+    "spec": "{includeCase%false} or {ignoreCase%true}",
+    "uses": "str",
+    "with": {}
+  },
+  {
+    "desc": "List Edge: Put elements at the front or back of a list.",
     "group": [
       "list"
     ],
     "name": "list_edge",
-    "spec": "{atFront%front} or {atBack%back}",
+    "spec": "{atBack%false} or {atFront%true}",
+    "uses": "str",
+    "with": {}
+  },
+  {
+    "desc": "List Order: Sort larger values towards the end of a list.",
+    "group": [
+      "list"
+    ],
+    "name": "list_order",
+    "spec": "{ascending%false} or {descending%true}",
+    "uses": "str",
+    "with": {}
+  },
+  {
+    "name": "variable_name",
+    "spec": "{variable_name}",
     "uses": "str",
     "with": {}
   },
@@ -36,8 +62,13 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "List Variable Name: Helper for altering lists.",
-    "name": "list_var",
+    "desc": "List getter: Helper for accessing lists.",
+    "name": "list_getter",
+    "uses": "slot"
+  },
+  {
+    "desc": "List sorter: Helper for sorting lists.",
+    "name": "list_sorter",
     "uses": "slot"
   },
   {
@@ -240,11 +271,33 @@ const spec = [
       "variables"
     ],
     "name": "assign",
-    "spec": "let {name:variable_name} be {from:assignment}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$NAME": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "CZSZKZSZKT",
       "slots": [
         "execute"
+      ],
+      "tokens": [
+        "let",
+        " ",
+        "var",
+        ": ",
+        "$NAME",
+        ", ",
+        "from",
+        ": ",
+        "$FROM",
+        "."
       ]
     }
   },
@@ -1106,7 +1159,7 @@ const spec = [
       },
       "roles": "SZK",
       "slots": [
-        "list_var"
+        "list_getter"
       ],
       "tokens": [
         "intoNumList",
@@ -1194,7 +1247,7 @@ const spec = [
       },
       "roles": "SZK",
       "slots": [
-        "list_var"
+        "list_getter"
       ],
       "tokens": [
         "intoRecList",
@@ -1216,7 +1269,7 @@ const spec = [
       },
       "roles": "SZK",
       "slots": [
-        "list_var"
+        "list_getter"
       ],
       "tokens": [
         "intoTxtList",
@@ -1618,7 +1671,7 @@ const spec = [
     }
   },
   {
-    "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
+    "desc": "Sort list: sort a list by one of various methods",
     "group": [
       "list"
     ],
@@ -1626,29 +1679,128 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$LIST": {
-          "label": "list",
-          "type": "text"
+        "$NAME": {
+          "label": "var",
+          "type": "variable_name"
         },
-        "$PATTERN": {
-          "label": "pattern",
-          "type": "text"
+        "$SORTER": {
+          "label": "sorter",
+          "type": "list_sorter"
         }
       },
-      "roles": "QZSZKZSZK",
+      "roles": "CZSZKZKT",
       "slots": [
-        "execute"
+        "execute",
+        "list_sorter"
       ],
       "tokens": [
         "sort",
         " ",
-        "list",
+        "var",
         ": ",
-        "$LIST",
+        "$NAME",
         ", ",
-        "pattern",
+        "$SORTER",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "Sort numbers: .",
+    "group": [
+      "list"
+    ],
+    "name": "list_sort_numbers",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$BY_FIELD": {
+          "label": "byField",
+          "type": "sort_by_field"
+        },
+        "$ORDER": {
+          "label": "order",
+          "type": "list_order"
+        }
+      },
+      "roles": "SZSZKZK",
+      "slots": [
+        "list_sorter"
+      ],
+      "tokens": [
+        "numbers",
         ": ",
-        "$PATTERN"
+        "byField",
+        ": ",
+        "$BY_FIELD",
+        ", ",
+        "$ORDER"
+      ]
+    }
+  },
+  {
+    "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
+    "group": [
+      "list"
+    ],
+    "name": "list_sort_text",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$BY_FIELD": {
+          "label": "byField",
+          "type": "sort_by_field"
+        },
+        "$CASE": {
+          "label": "case",
+          "type": "list_case"
+        },
+        "$ORDER": {
+          "label": "order",
+          "type": "list_order"
+        }
+      },
+      "roles": "SZSZKZKZK",
+      "slots": [
+        "list_sorter"
+      ],
+      "tokens": [
+        "text",
+        ": ",
+        "byField",
+        ": ",
+        "$BY_FIELD",
+        ", ",
+        "$ORDER",
+        ", ",
+        "$CASE"
+      ]
+    }
+  },
+  {
+    "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
+    "group": [
+      "list"
+    ],
+    "name": "list_sort_using",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$USING": {
+          "label": "using",
+          "type": "text"
+        }
+      },
+      "roles": "SZSZK",
+      "slots": [
+        "list_sorter"
+      ],
+      "tokens": [
+        "using",
+        ": ",
+        "using",
+        ": ",
+        "$USING"
       ]
     }
   },
@@ -2057,7 +2209,7 @@ const spec = [
         },
         "$INTO": {
           "label": "into",
-          "type": "list_var"
+          "type": "list_getter"
         }
       },
       "roles": "CZKZKZKT",
@@ -2129,7 +2281,7 @@ const spec = [
         },
         "$INTO": {
           "label": "into",
-          "type": "list_var"
+          "type": "list_getter"
         }
       },
       "roles": "CZKZKZSZKT",
@@ -2249,16 +2401,15 @@ const spec = [
           "type": "text_eval"
         }
       },
-      "roles": "QZSZK",
+      "roles": "CZKT",
       "slots": [
         "execute"
       ],
       "tokens": [
         "say",
-        " ",
-        "text",
         ": ",
-        "$TEXT"
+        "$TEXT",
+        "."
       ]
     }
   },
@@ -2521,5 +2672,7 @@ const stub = [
   "determine_bool",
   "determine_num_list",
   "determine_text_list",
-  "list_edge"
+  "list_case",
+  "list_edge",
+  "list_order"
 ];

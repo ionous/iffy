@@ -14,7 +14,7 @@ import (
  */
 type PutAtEdge struct {
 	From   core.Assignment `if:"unlabeled"`
-	Into   ListVar         `if:"unlabeled"`
+	Into   ListGetter      `if:"unlabeled"`
 	AtEdge Edge            `if:"unlabeled"`
 }
 
@@ -25,7 +25,7 @@ type PutAtEdge struct {
  */
 type PutAtIndex struct {
 	From    core.Assignment `if:"unlabeled"`
-	Into    ListVar         `if:"unlabeled"`
+	Into    ListGetter      `if:"unlabeled"`
 	AtIndex rt.NumberEval
 }
 
@@ -47,19 +47,19 @@ func (op *PutAtIndex) Execute(run rt.Runtime) (err error) {
 	return
 }
 
-type ListVar interface {
-	GetListVar(run rt.Runtime) (g.Value, error)
+type ListGetter interface {
+	GetList(run rt.Runtime) (g.Value, error)
 }
 
-func (op *IntoNumList) GetListVar(run rt.Runtime) (ret g.Value, err error) {
+func (op *IntoNumList) GetList(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *IntoRecList) GetListVar(run rt.Runtime) (ret g.Value, err error) {
+func (op *IntoRecList) GetList(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *IntoTxtList) GetListVar(run rt.Runtime) (ret g.Value, err error) {
+func (op *IntoTxtList) GetList(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
