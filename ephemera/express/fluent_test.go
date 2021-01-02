@@ -7,7 +7,9 @@ import (
 	"unicode"
 
 	"github.com/ionous/iffy"
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/export/tag"
 	"github.com/ionous/iffy/lang"
@@ -17,7 +19,24 @@ import (
 // until template parsing gets re-written we cant handle fluid specs ( selector messaging )
 // we can do a basic test to ensure it's possible to build the function signatures from the composer.Spec(s) tho.
 func TestFluid(t *testing.T) {
-	v := (*core.PutAtField)(nil)
+
+	if got := makeSignature((*core.PutAtField)(nil)); len(pretty.Diff(got, signature{
+		"put:intoRec:atField:",
+		"put:intoObj:atField:",
+		"put:intoObjNamed:atField:"})) > 0 {
+		t.Error(strings.Join(got, ","))
+	}
+	if got := makeSignature((*list.SortText)(nil)); len(pretty.Diff(got, signature{
+		"sort text:ascending|descending!includeCase|ignoreCase!",
+		"sort text:byField:ascending|descending!includeCase|ignoreCase!"})) > 0 {
+		t.Error(strings.Join(got, ","))
+	}
+	if got := makeSignature((*list.SortRecords)(nil)); len(pretty.Diff(got, signature{
+		"sort records:using:"})) > 0 {
+		t.Error(strings.Join(got, ","))
+	}
+}
+func makeSignature(v composer.Composer) signature {
 	rtype := r.TypeOf(v).Elem()
 	spec := v.Compose()
 	fluid := spec.Fluent
@@ -33,30 +52,55 @@ func TestFluid(t *testing.T) {
 			cnt++
 			// write the selector:
 			unlabeled := tags.Exists("unlabeled")
-			if cnt == 1 && unlabeled {
-				sig[0] += ":"
+			if cnt == 1 {
+				var sep string
+				if unlabeled {
+					sep = ":"
+				} else {
+					sep = " "
+				}
+				sig[0] += sep
 			}
 
 			if cnt > 1 || !unlabeled {
-				if f.Type.Kind() != r.Interface {
+				// very specific check for non-optional flags...
+				if x, ok := r.Zero(r.PtrTo(f.Type)).Interface().(composer.Composer); ok {
+					if cs := x.Compose().Choices; len(cs) > 0 {
+						sig = sig.addFlags(cs)
+						return // EARLY RETURN
+					}
+				}
+
+				switch f.Type.Kind() {
+				default:
 					//  write camel "fieldName:"
-					name := firstRuneLower(f.Name)
-					sig = sig.addSelector(name + ":")
-				} else {
+					name := fieldName(f, tags)
+					sig = sig.addSelector(name)
+
+				case r.Ptr:
+					// optional. so duplicate all existing selectors
+					name := fieldName(f, tags)
+					sig = sig.dupSelectors(name)
+
+				case r.Interface:
+					// assumes interfaces are all unlabeled...
 					slats := implementorsOf(f.Type)
 					sig = sig.mulSelectors(slats)
-
 				}
 			}
 
 		}
 		return
 	})
-	//
-	want := signature{"put:intoRec:atField:", "put:intoObj:atField:", "put:intoObjNamed:atField:"}
-	if diff := pretty.Diff(sig, want); len(diff) > 0 {
-		t.Fatal(sig)
+	return sig
+}
+func fieldName(f *r.StructField, tags tag.StructTag) (ret string) {
+	if l, ok := tags.Find("label"); ok {
+		ret = l
+	} else {
+		ret = firstRuneLower(f.Name)
 	}
+	return
 }
 
 func typeName(name string, t r.Type) (ret string) {
@@ -85,6 +129,16 @@ type signature []string
 
 func (sig signature) addSelector(sel string) signature {
 	for i, cnt := 0, len(sig); i < cnt; i++ {
+		sig[i] = sig[i] + sel + ":"
+	}
+	return sig
+}
+
+// to avoid an explosion of selectors for flags, we consider them specially.
+// the signature of flags may differ from how they are specified in use, tbd.
+func (sig signature) addFlags(cs []string) signature {
+	sel := strings.Join(cs, "|") + "!"
+	for i, cnt := 0, len(sig); i < cnt; i++ {
 		sig[i] = sig[i] + sel
 	}
 	return sig
@@ -96,6 +150,14 @@ func (sig signature) mulSelectors(sel []string) signature {
 		for _, sel := range sel {
 			out = append(out, sig[i]+sel+":")
 		}
+	}
+	return out
+}
+
+func (sig signature) dupSelectors(sel string) signature {
+	out := sig
+	for i, cnt := 0, len(sig); i < cnt; i++ {
+		out = append(out, sig[i]+sel+":")
 	}
 	return out
 }

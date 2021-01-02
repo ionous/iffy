@@ -12,10 +12,6 @@ var Slots = []composer.Slot{{
 	Name: "list_getter",
 	Type: (*ListGetter)(nil),
 	Desc: "List getter: Helper for accessing lists.",
-}, {
-	Name: "list_sorter",
-	Type: (*Sorter)(nil),
-	Desc: "List sorter: Helper for sorting lists.",
 }}
 
 var Slats = []composer.Composer{
@@ -40,10 +36,10 @@ var Slats = []composer.Composer{
 	(*IntoRecList)(nil),
 	(*IntoTxtList)(nil),
 	//
-	(*Sort)(nil),
 	(*SortNumbers)(nil),
 	(*SortText)(nil),
-	(*SortUsing)(nil),
+	(*SortRecords)(nil),
+	(*SortByField)(nil),
 }
 
 func cmdError(op composer.Composer, e error) error {

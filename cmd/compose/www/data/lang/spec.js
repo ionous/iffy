@@ -7,8 +7,7 @@ const spec = [
     ],
     "name": "list_case",
     "spec": "{includeCase%false} or {ignoreCase%true}",
-    "uses": "str",
-    "with": {}
+    "uses": "str"
   },
   {
     "desc": "List Edge: Put elements at the front or back of a list.",
@@ -17,8 +16,7 @@ const spec = [
     ],
     "name": "list_edge",
     "spec": "{atBack%false} or {atFront%true}",
-    "uses": "str",
-    "with": {}
+    "uses": "str"
   },
   {
     "desc": "List Order: Sort larger values towards the end of a list.",
@@ -27,14 +25,12 @@ const spec = [
     ],
     "name": "list_order",
     "spec": "{ascending%false} or {descending%true}",
-    "uses": "str",
-    "with": {}
+    "uses": "str"
   },
   {
     "name": "variable_name",
     "spec": "{variable_name}",
-    "uses": "str",
-    "with": {}
+    "uses": "str"
   },
   {
     "desc": "Assignments: Helper for setting variables.",
@@ -64,11 +60,6 @@ const spec = [
   {
     "desc": "List getter: Helper for accessing lists.",
     "name": "list_getter",
-    "uses": "slot"
-  },
-  {
-    "desc": "List sorter: Helper for sorting lists.",
-    "name": "list_sorter",
     "uses": "slot"
   },
   {
@@ -253,8 +244,7 @@ const spec = [
     ],
     "name": "argument",
     "spec": "its {name:variable_name} is {from:assignment}",
-    "uses": "flow",
-    "with": {}
+    "uses": "flow"
   },
   {
     "group": [
@@ -262,8 +252,7 @@ const spec = [
     ],
     "name": "arguments",
     "spec": " when {arguments%args+argument|comma-and}",
-    "uses": "flow",
-    "with": {}
+    "uses": "flow"
   },
   {
     "desc": "Assignment: Sets a variable to a value.",
@@ -568,6 +557,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         }
       },
@@ -594,6 +584,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         }
       },
@@ -717,6 +708,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         }
       },
@@ -939,10 +931,12 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
+          "optional": true,
           "type": "activity"
         },
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         },
         "$IN": {
@@ -982,10 +976,12 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
+          "optional": true,
           "type": "activity"
         },
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         },
         "$IN": {
@@ -1404,8 +1400,7 @@ const spec = [
     ],
     "name": "lines_value",
     "spec": "{lines|quote}",
-    "uses": "flow",
-    "with": {}
+    "uses": "flow"
   },
   {
     "desc": "Value of List: Get a value from a list. The first element is is index 1.",
@@ -1505,6 +1500,7 @@ const spec = [
       "params": {
         "$ELSE": {
           "label": "else",
+          "optional": true,
           "type": "activity"
         },
         "$FRONT": {
@@ -1513,6 +1509,7 @@ const spec = [
         },
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         },
         "$LIST": {
@@ -1671,39 +1668,12 @@ const spec = [
     }
   },
   {
-    "desc": "Sort list: sort a list by one of various methods",
+    "desc": "Sort numbers: .",
     "group": [
       "list"
     ],
-    "name": "list_sort",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$NAME": {
-          "label": "var",
-          "type": "variable_name"
-        },
-        "$SORTER": {
-          "label": "sorter",
-          "type": "list_sorter"
-        }
-      },
-      "roles": "CZSZKZKT",
-      "slots": [
-        "execute",
-        "list_sorter"
-      ],
-      "tokens": [
-        "sort",
-        " ",
-        "var",
-        ": ",
-        "$NAME",
-        ", ",
-        "$SORTER",
-        "."
-      ]
-    }
+    "name": "list_sort_by_field",
+    "uses": "flow"
   },
   {
     "desc": "Sort numbers: .",
@@ -1711,32 +1681,7 @@ const spec = [
       "list"
     ],
     "name": "list_sort_numbers",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$BY_FIELD": {
-          "label": "byField",
-          "type": "sort_by_field"
-        },
-        "$ORDER": {
-          "label": "order",
-          "type": "list_order"
-        }
-      },
-      "roles": "SZSZKZK",
-      "slots": [
-        "list_sorter"
-      ],
-      "tokens": [
-        "numbers",
-        ": ",
-        "byField",
-        ": ",
-        "$BY_FIELD",
-        ", ",
-        "$ORDER"
-      ]
-    }
+    "uses": "flow"
   },
   {
     "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
@@ -1744,38 +1689,7 @@ const spec = [
       "list"
     ],
     "name": "list_sort_text",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$BY_FIELD": {
-          "label": "byField",
-          "type": "sort_by_field"
-        },
-        "$CASE": {
-          "label": "case",
-          "type": "list_case"
-        },
-        "$ORDER": {
-          "label": "order",
-          "type": "list_order"
-        }
-      },
-      "roles": "SZSZKZKZK",
-      "slots": [
-        "list_sorter"
-      ],
-      "tokens": [
-        "text",
-        ": ",
-        "byField",
-        ": ",
-        "$BY_FIELD",
-        ", ",
-        "$ORDER",
-        ", ",
-        "$CASE"
-      ]
-    }
+    "uses": "flow"
   },
   {
     "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
@@ -1783,26 +1697,7 @@ const spec = [
       "list"
     ],
     "name": "list_sort_using",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$USING": {
-          "label": "using",
-          "type": "text"
-        }
-      },
-      "roles": "SZSZK",
-      "slots": [
-        "list_sorter"
-      ],
-      "tokens": [
-        "using",
-        ": ",
-        "using",
-        ": ",
-        "$USING"
-      ]
-    }
+    "uses": "flow"
   },
   {
     "desc": "Splice into list: Modify a list by adding and removing elements.\nNote: the type of the elements being added must match the type of the list. \nText cant be added to a list of numbers, numbers cant be added to a list of text, \nand true/false values can't be added to a list.",
@@ -1862,6 +1757,7 @@ const spec = [
       "params": {
         "$ARGUMENTS": {
           "label": "arguments",
+          "optional": true,
           "type": "arguments"
         },
         "$NAME": {
@@ -2509,6 +2405,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         }
       },
@@ -2536,6 +2433,7 @@ const spec = [
       "params": {
         "$GO": {
           "label": "go",
+          "optional": true,
           "type": "activity"
         }
       },

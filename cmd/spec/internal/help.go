@@ -32,6 +32,7 @@ func (ts *tokensink) add(token string, role rune) {
 	ts.roles = append(ts.roles, role)
 }
 
+// panics if t is not a struct type
 func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) {
 	const (
 		KEY       = 'K' // token $
@@ -106,7 +107,9 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 			m := export.Dict{
 				"label": label,
 				"type":  typeName,
-				// optional: tdb
+			}
+			if f.Type.Kind() == r.Ptr {
+				m["optional"] = true
 			}
 			if repeats {
 				m["repeats"] = true

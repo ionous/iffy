@@ -22,8 +22,8 @@ func (*VariableName) Choices() (closed bool, choices map[string]string) {
 
 func (*VariableName) Compose() composer.Spec {
 	return composer.Spec{
-		Name: "variable_name",
-		Uses: "str",
-		Spec: "{variable_name}",
+		Name:    "variable_name",
+		Choices: []string{},
+		Spec:    "{variable_name}",
 	}
 }

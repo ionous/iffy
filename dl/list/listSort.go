@@ -8,31 +8,25 @@ import (
 	g "github.com/ionous/iffy/rt/generic"
 )
 
-type Sort struct {
-	Name   core.VariableName `if:"label:var"`
-	Sorter `if:"unlabeled"`
-}
-
-type Sorter interface {
-	Sort(rt.Runtime, g.Value) error
-}
-
 // SortNumbers implements Sorter
 type SortNumbers struct {
-	ByField *SortByField
+	Name    core.VariableName `if:"label:numbers"`
+	ByField *SortByField      `if:"unlabeled"`
 	Order   `if:"unlabeled"`
 }
 
 // SortText implements Sorter
 type SortText struct {
-	ByField *SortByField
+	Name    core.VariableName `if:"label:text"`
+	ByField *SortByField      `if:"unlabeled"`
 	Order   `if:"unlabeled"`
 	Case    `if:"unlabeled"`
 }
 
-// SortUsing implements Sorter
-type SortUsing struct {
-	Using pattern.PatternName `if:"unlabeled"`
+// SortRecords implements Sorter
+type SortRecords struct {
+	Var   core.VariableName `if:"label:records"`
+	Using pattern.PatternName
 }
 
 type SortByField struct {
@@ -47,16 +41,16 @@ func (op *SortNumbers) Sort(rt.Runtime, g.Value) (ret error) {
 	return
 }
 
-func (op *SortUsing) Sort(rt.Runtime, g.Value) (ret error) {
+func (op *SortRecords) Sort(rt.Runtime, g.Value) (ret error) {
 	return
 }
 
-func (op *Sort) Compose() composer.Spec {
+func (op *SortByField) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "list_sort",
+		Name:   "list_sort_by_field",
 		Group:  "list",
-		Desc:   `Sort list: sort a list by one of various methods`,
-		Fluent: &composer.Fluid{Name: "sort", Role: composer.Command},
+		Desc:   `Sort numbers: .`,
+		Fluent: &composer.Fluid{Name: "byField", Role: composer.Selector},
 	}
 }
 
@@ -65,7 +59,7 @@ func (op *SortNumbers) Compose() composer.Spec {
 		Name:   "list_sort_numbers",
 		Group:  "list",
 		Desc:   `Sort numbers: .`,
-		Fluent: &composer.Fluid{Name: "numbers", Role: composer.Selector},
+		Fluent: &composer.Fluid{Name: "sort", Role: composer.Command},
 	}
 }
 func (op *SortText) Compose() composer.Spec {
@@ -73,22 +67,16 @@ func (op *SortText) Compose() composer.Spec {
 		Name:   "list_sort_text",
 		Group:  "list",
 		Desc:   `Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.`,
-		Fluent: &composer.Fluid{Name: "text", Role: composer.Selector},
+		Fluent: &composer.Fluid{Name: "sort", Role: composer.Command},
 	}
 }
-func (op *SortUsing) Compose() composer.Spec {
+func (op *SortRecords) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "list_sort_using",
 		Group:  "list",
 		Desc:   `Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.`,
-		Fluent: &composer.Fluid{Name: "using", Role: composer.Selector},
+		Fluent: &composer.Fluid{Name: "sort", Role: composer.Command},
 	}
-}
-func (op *Sort) Execute(run rt.Runtime) (err error) {
-	// if e := op.sort(run); e != nil {
-	// 	err = cmdError(op, e)
-	// }
-	return
 }
 
 // func (op *Sort) sort(run rt.Runtime) (err error) {

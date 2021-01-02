@@ -2,6 +2,8 @@ package internal
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"sort"
 	"strings"
 
@@ -62,24 +64,37 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 			with["slots"] = slotNames
 		}
 		uses := "flow"
-		if len(spec.Uses) > 0 {
-			uses = spec.Uses
+		if cs := spec.Choices; cs != nil {
+			uses = "str"
 		}
 		out := export.Dict{
 			"name": name,
 			"uses": uses,
-			"with": with,
+		}
+		if len(with) > 0 {
+			out["with"] = with
 		}
 		// missing spec, missing slots.
-		if len(spec.Spec) != 0 {
+		if len(spec.Spec) > 0 {
 			out["spec"] = spec.Spec
-		} else {
+		} else if rtype.Kind() == r.Struct {
 			tokens, roles, params := parseSpec(rtype, spec.Fluent)
 			with["tokens"] = tokens
 			with["params"] = params
 			if len(roles) > 0 {
 				with["roles"] = roles
 			}
+		} else if cs := spec.Choices; cs != nil {
+			// a wor in progress for sure...
+			if len(cs) == 0 {
+				out["spec"] = fmt.Sprintf("{%s}", name)
+			} else if len(cs) == 2 {
+				out["spec"] = fmt.Sprintf("{%s%%false} or {%s%%true}", cs[0], cs[1])
+			} else {
+				log.Panicln("unhandled type", rtype.Name())
+			}
+		} else {
+			log.Panicln("unhandled type", rtype.Name())
 		}
 		if spec.Stub {
 			c.stubs = append(c.stubs, name)
