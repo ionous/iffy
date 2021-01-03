@@ -1281,14 +1281,14 @@
                                         "type": "execute",
                                         "value": {
                                           "id": "id-17692f1b70b-333",
-                                          "type": "assign",
+                                          "type": "let",
                                           "value": {
-                                            "$NAME": {
+                                            "$VAR": {
                                               "id": "id-17692f1b70b-334",
                                               "type": "variable_name",
                                               "value": "groups"
                                             },
-                                            "$FROM": {
+                                            "$BE": {
                                               "id": "id-17692f1b70b-335",
                                               "type": "assignment",
                                               "value": {
@@ -1589,14 +1589,14 @@
                                                                             "type": "execute",
                                                                             "value": {
                                                                               "id": "id-17692f1b70b-370",
-                                                                              "type": "assign",
+                                                                              "type": "let",
                                                                               "value": {
-                                                                                "$NAME": {
+                                                                                "$VAR": {
                                                                                   "id": "id-17692f1b70b-371",
                                                                                   "type": "variable_name",
                                                                                   "value": "idx"
                                                                                 },
-                                                                                "$FROM": {
+                                                                                "$BE": {
                                                                                   "id": "id-17692f1b70b-372",
                                                                                   "type": "assignment",
                                                                                   "value": {
@@ -1922,14 +1922,14 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-431",
-                                                      "type": "assign",
+                                                      "type": "let",
                                                       "value": {
-                                                        "$NAME": {
+                                                        "$VAR": {
                                                           "id": "id-17692f1b70b-432",
                                                           "type": "variable_name",
                                                           "value": "group"
                                                         },
-                                                        "$FROM": {
+                                                        "$BE": {
                                                           "id": "id-17692f1b70b-433",
                                                           "type": "assignment",
                                                           "value": {
@@ -1987,14 +1987,14 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-442",
-                                                      "type": "assign",
+                                                      "type": "let",
                                                       "value": {
-                                                        "$NAME": {
+                                                        "$VAR": {
                                                           "id": "id-17692f1b70b-443",
                                                           "type": "variable_name",
                                                           "value": "names"
                                                         },
-                                                        "$FROM": {
+                                                        "$BE": {
                                                           "id": "id-17692f1b70b-444",
                                                           "type": "assignment",
                                                           "value": {

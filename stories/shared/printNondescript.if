@@ -432,14 +432,14 @@
                                                                       "type": "execute",
                                                                       "value": {
                                                                         "id": "id-17692fbc689-14",
-                                                                        "type": "assign",
+                                                                        "type": "let",
                                                                         "value": {
-                                                                          "$NAME": {
+                                                                          "$VAR": {
                                                                             "id": "id-17692fbc689-15",
                                                                             "type": "variable_name",
                                                                             "value": "temp settings"
                                                                           },
-                                                                          "$FROM": {
+                                                                          "$BE": {
                                                                             "id": "id-17692fbc689-16",
                                                                             "type": "assignment",
                                                                             "value": {
@@ -684,14 +684,14 @@
                                                           "type": "execute",
                                                           "value": {
                                                             "id": "id-17672fb43de-50",
-                                                            "type": "assign",
+                                                            "type": "let",
                                                             "value": {
-                                                              "$NAME": {
+                                                              "$VAR": {
                                                                 "id": "id-17672fb43de-51",
                                                                 "type": "variable_name",
                                                                 "value": "groups"
                                                               },
-                                                              "$FROM": {
+                                                              "$BE": {
                                                                 "id": "id-17672fb43de-52",
                                                                 "type": "assignment",
                                                                 "value": {
@@ -761,14 +761,14 @@
                                                                       "type": "execute",
                                                                       "value": {
                                                                         "id": "id-17672fb43de-82",
-                                                                        "type": "assign",
+                                                                        "type": "let",
                                                                         "value": {
-                                                                          "$NAME": {
+                                                                          "$VAR": {
                                                                             "id": "id-17672fb43de-83",
                                                                             "type": "variable_name",
                                                                             "value": "temp objects"
                                                                           },
-                                                                          "$FROM": {
+                                                                          "$BE": {
                                                                             "id": "id-17672fb43de-84",
                                                                             "type": "assignment",
                                                                             "value": {

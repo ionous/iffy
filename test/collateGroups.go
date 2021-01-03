@@ -29,7 +29,7 @@ var collateGroups = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{Execute: core.NewActivity(
 			// walk collation.Groups for matching settings
-			&core.Assign{core.Variable{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
+			&core.Let{core.Variable{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
 			&list.Each{
 				List: V("groups"),
 				With: "el",
@@ -39,9 +39,9 @@ var collateGroups = pattern.ActivityPattern{
 							Pattern:   "matchGroups",
 							Arguments: core.Args(V("settings"), &core.Unpack{V("el"), "Settings"})},
 						True: core.NewActivity(
-							&core.Assign{
-								Name: N("idx"),
-								From: V("index"),
+							&core.Let{
+								Var: N("idx"),
+								Be:  V("index"),
 							},
 							// implement a "break" for the each that returns a constant error?
 						),
@@ -65,8 +65,8 @@ var collateGroups = pattern.ActivityPattern{
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
-					&core.Assign{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
-					&core.Assign{N("names"), &core.Unpack{V("group"), "Objects"}},
+					&core.Let{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
+					&core.Let{N("names"), &core.Unpack{V("group"), "Objects"}},
 					&list.Push{List: "names", Insert: &core.Unpack{V("settings"), "Name"}},
 					&core.Pack{V("group"), "Objects", V("names")},
 					&list.Set{List: "groups", Index: V("idx"), From: V("group")},

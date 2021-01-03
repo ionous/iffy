@@ -66,7 +66,7 @@ package list_test
 // 	},
 // 	Rules: []*pattern.ExecuteRule{
 // 		&pattern.ExecuteRule{
-// 			Execute: &core.Assign{
+// 			Execute: &core.Let{
 // 				Name: "out",
 // 				From: &core.FromText{&core.Join{Sep: T(", "), Parts: []rt.TextEval{
 // 					V("out"),

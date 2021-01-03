@@ -436,14 +436,14 @@
                                         "type": "execute",
                                         "value": {
                                           "id": "id-17692024e5f-65",
-                                          "type": "assign",
+                                          "type": "let",
                                           "value": {
-                                            "$NAME": {
+                                            "$VAR": {
                                               "id": "id-17692024e5f-66",
                                               "type": "variable_name",
                                               "value": "settings"
                                             },
-                                            "$FROM": {
+                                            "$BE": {
                                               "id": "id-17692024e5f-67",
                                               "type": "assignment",
                                               "value": {
@@ -481,14 +481,14 @@
                                         "type": "execute",
                                         "value": {
                                           "id": "id-17693c74441-34",
-                                          "type": "assign",
+                                          "type": "let",
                                           "value": {
-                                            "$NAME": {
+                                            "$VAR": {
                                               "id": "id-17693c74441-35",
                                               "type": "variable_name",
                                               "value": "objects"
                                             },
-                                            "$FROM": {
+                                            "$BE": {
                                               "id": "id-17693c74441-36",
                                               "type": "assignment",
                                               "value": {

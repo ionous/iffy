@@ -264,9 +264,9 @@
                                                                                                         "type": "execute",
                                                                                                         "value": {
                                                                                                             "id": "id-17691d01da5-50",
-                                                                                                            "type": "assign",
+                                                                                                            "type": "let",
                                                                                                             "value": {
-                                                                                                                "$FROM": {
+                                                                                                                "$BE": {
                                                                                                                     "id": "id-17691d01da5-52",
                                                                                                                     "type": "assignment",
                                                                                                                     "value": {
@@ -291,7 +291,7 @@
                                                                                                                         }
                                                                                                                     }
                                                                                                                 },
-                                                                                                                "$NAME": {
+                                                                                                                "$VAR": {
                                                                                                                     "id": "id-17691d01da5-51",
                                                                                                                     "type": "variable_name",
                                                                                                                     "value": "object"

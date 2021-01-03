@@ -25,10 +25,10 @@ func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 	return
 }
 
-// Assign a value to a local variable.
-type Assign struct {
-	Name Variable `if:"label:var"`
-	From Assignment
+// Let assigns a value to a local variable.
+type Let struct {
+	Var Variable `if:"unlabeled"`
+	Be  Assignment
 }
 
 type FromBool struct {
@@ -67,7 +67,7 @@ type FromRecordList struct {
 	Vals rt.RecordListEval `if:"unlabeled"`
 }
 
-func (*Assign) Compose() composer.Spec {
+func (*Let) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "assign",
 		Group:  "variables",
@@ -76,10 +76,10 @@ func (*Assign) Compose() composer.Spec {
 	}
 }
 
-func (op *Assign) Execute(run rt.Runtime) (err error) {
-	if v, e := GetAssignedValue(run, op.From); e != nil {
+func (op *Let) Execute(run rt.Runtime) (err error) {
+	if v, e := GetAssignedValue(run, op.Be); e != nil {
 		err = cmdError(op, e)
-	} else if e := run.SetField(object.Variables, op.Name.String(), v); e != nil {
+	} else if e := run.SetField(object.Variables, op.Var.String(), v); e != nil {
 		err = cmdError(op, e)
 	}
 	return

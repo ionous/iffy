@@ -38,6 +38,8 @@ var Slats = []composer.Composer{
 	(*FromNumList)(nil),
 	(*FromRecList)(nil),
 	(*FromTxtList)(nil),
+	// gather:
+	(*Gather)(nil),
 	// put:
 	(*PutAtEdge)(nil),
 	(*PutAtIndex)(nil),

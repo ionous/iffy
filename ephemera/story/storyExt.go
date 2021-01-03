@@ -39,15 +39,21 @@ func (op *TextValue) ImportStub(k *Importer) (ret interface{}, err error) {
 func (op *ListEdge) ImportStub(k *Importer) (ret interface{}, err error) {
 	ret = list.Edge(op.Str == "$TRUE")
 	return
-} // handle the import of boolean flags
+}
+
+// handle the import of boolean flags
 func (op *ListOrder) ImportStub(k *Importer) (ret interface{}, err error) {
 	ret = list.Order(op.Str == "$TRUE")
 	return
-} // handle the import of boolean flags
+}
+
+// handle the import of boolean flags
 func (op *ListCase) ImportStub(k *Importer) (ret interface{}, err error) {
 	ret = list.Case(op.Str == "$TRUE")
 	return
-} // handle the import of int flags
+}
+
+// handle the import of int flags
 func (op *DebugLevel) ImportStub(k *Importer) (ret interface{}, err error) {
 	if !inProg(k) {
 		ret = op
