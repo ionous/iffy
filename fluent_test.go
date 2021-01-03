@@ -22,38 +22,55 @@ import (
 func TestFluid(t *testing.T) {
 	if got := makeSignature((*core.Let)(nil)); len(pretty.Diff(got, signature{
 		"let:be:"})) > 0 {
-		t.Error(strings.Join(got, ","))
+		t.Error(pretty.Sprint(got))
 	}
 	if got := makeSignature((*core.PutAtField)(nil)); len(pretty.Diff(got, signature{
 		"put:intoRec:atField:",
 		"put:intoObj:atField:",
 		"put:intoObjNamed:atField:"})) > 0 {
-		t.Error(strings.Join(got, ","))
+		t.Error(pretty.Sprint(got))
+	}
+	if got := makeSignature((*list.PutAtIndex)(nil)); len(pretty.Diff(got, signature{
+		"put:intoNumList:atIndex:",
+		"put:intoRecList:atIndex:",
+		"put:intoTxtList:atIndex:",
+	})) > 0 {
+		t.Error(pretty.Sprint(got))
+	}
+	if got := makeSignature((*list.PutAtEdge)(nil)); len(pretty.Diff(got, signature{
+		"put:intoNumList:atBack|atFront!",
+		"put:intoRecList:atBack|atFront!",
+		"put:intoTxtList:atBack|atFront!"})) > 0 {
+		t.Error(pretty.Sprint(got))
 	}
 	if got := makeSignature((*debug.Log)(nil)); len(pretty.Diff(got, signature{
 		"log:note|toDo|warning|fix!"})) > 0 {
-		t.Error(strings.Join(got, ","))
+		t.Error(pretty.Sprint(got))
 	}
 	if got := makeSignature((*list.SortText)(nil)); len(pretty.Diff(got, signature{
 		"sort text:ascending|descending!includeCase|ignoreCase!",
 		"sort text:byField:ascending|descending!includeCase|ignoreCase!"})) > 0 {
-		t.Error(strings.Join(got, ","))
+		t.Error(pretty.Sprint(got))
 	}
 	if got := makeSignature((*list.SortRecords)(nil)); len(pretty.Diff(got, signature{
 		"sort records:using:"})) > 0 {
-		t.Error(strings.Join(got, ","))
+		t.Error(pretty.Sprint(got))
 	}
-	if got := makeSignature((*list.Erase)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSignature((*list.EraseAtIndex)(nil)); len(pretty.Diff(got, signature{
 		"erase:fromNumList:atIndex:",
 		"erase:fromRecList:atIndex:",
 		"erase:fromTxtList:atIndex:"})) > 0 {
-		t.Error(strings.Join(got, ","))
+		t.Error(pretty.Sprint(got))
+	}
+	if got := makeSignature((*list.EraseAtEdge)(nil)); len(pretty.Diff(got, signature{
+		"erase:atBack|atFront!"})) > 0 {
+		t.Error(pretty.Sprint(got))
 	}
 	if got := makeSignature((*list.Gather)(nil)); len(pretty.Diff(got, signature{
 		"gather:fromNumList:using:",
 		"gather:fromRecList:using:",
 		"gather:fromTxtList:using:"})) > 0 {
-		t.Error(strings.Join(got, ","))
+		t.Error(pretty.Sprint(got))
 	}
 }
 
