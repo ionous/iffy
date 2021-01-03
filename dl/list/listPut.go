@@ -4,7 +4,6 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
-	g "github.com/ionous/iffy/rt/generic"
 )
 
 /**
@@ -14,53 +13,8 @@ import (
  */
 type PutAtEdge struct {
 	From   core.Assignment `if:"unlabeled"`
-	Into   ListGetter      `if:"unlabeled"`
+	Into   IntoListTarget  `if:"unlabeled"`
 	AtEdge Edge            `if:"unlabeled"`
-}
-
-/**
- * put: eval(num,txt,rec),
- * intoNum/Txt/RecList: varName,
- * atIndex: numEval.
- */
-type PutAtIndex struct {
-	From    core.Assignment `if:"unlabeled"`
-	Into    ListGetter      `if:"unlabeled"`
-	AtIndex rt.NumberEval
-}
-
-type IntoNumList struct {
-	VarName string `if:"unlabeled"`
-}
-type IntoTxtList struct {
-	VarName string `if:"unlabeled"`
-}
-type IntoRecList struct {
-	VarName string `if:"unlabeled"`
-}
-
-func (op *PutAtEdge) Execute(run rt.Runtime) (err error) {
-	return
-}
-
-func (op *PutAtIndex) Execute(run rt.Runtime) (err error) {
-	return
-}
-
-type ListGetter interface {
-	GetList(run rt.Runtime) (g.Value, error)
-}
-
-func (op *IntoNumList) GetList(run rt.Runtime) (ret g.Value, err error) {
-	return
-}
-
-func (op *IntoRecList) GetList(run rt.Runtime) (ret g.Value, err error) {
-	return
-}
-
-func (op *IntoTxtList) GetList(run rt.Runtime) (ret g.Value, err error) {
-	return
 }
 
 func (*PutAtEdge) Compose() composer.Spec {
@@ -70,6 +24,21 @@ func (*PutAtEdge) Compose() composer.Spec {
 	}
 }
 
+func (op *PutAtEdge) Execute(run rt.Runtime) (err error) {
+	return
+}
+
+/**
+ * put: eval(num,txt,rec),
+ * intoNum/Txt/RecList: varName,
+ * atIndex: numEval.
+ */
+type PutAtIndex struct {
+	From    core.Assignment `if:"unlabeled"`
+	Into    IntoListTarget  `if:"unlabeled"`
+	AtIndex rt.NumberEval
+}
+
 func (*PutAtIndex) Compose() composer.Spec {
 	return composer.Spec{
 		Fluent: &composer.Fluid{Name: "put", Role: composer.Command},
@@ -77,23 +46,6 @@ func (*PutAtIndex) Compose() composer.Spec {
 	}
 }
 
-func (*IntoNumList) Compose() composer.Spec {
-	return composer.Spec{
-		Fluent: &composer.Fluid{Role: composer.Selector},
-		Desc:   "Targets a list of numbers",
-	}
-}
-
-func (*IntoTxtList) Compose() composer.Spec {
-	return composer.Spec{
-		Fluent: &composer.Fluid{Role: composer.Selector},
-		Desc:   "Targets a list of text",
-	}
-}
-
-func (*IntoRecList) Compose() composer.Spec {
-	return composer.Spec{
-		Fluent: &composer.Fluid{Role: composer.Selector},
-		Desc:   "Targets a list of records",
-	}
+func (op *PutAtIndex) Execute(run rt.Runtime) (err error) {
+	return
 }

@@ -10,14 +10,14 @@ import (
 
 // SortNumbers implements Sorter
 type SortNumbers struct {
-	Name    core.Variable `if:"label:numbers"`
+	Var     core.Variable `if:"label:numbers"`
 	ByField *SortByField  `if:"unlabeled"`
 	Order   `if:"unlabeled"`
 }
 
 // SortText implements Sorter
 type SortText struct {
-	Name    core.Variable `if:"label:text"`
+	Var     core.Variable `if:"label:text"`
 	ByField *SortByField  `if:"unlabeled"`
 	Order   `if:"unlabeled"`
 	Case    `if:"unlabeled"`

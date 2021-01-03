@@ -1,4 +1,4 @@
-package express
+package iffy_test
 
 import (
 	r "reflect"
@@ -20,7 +20,6 @@ import (
 // until template parsing gets re-written we cant handle fluid specs ( selector messaging )
 // we can do a basic test to ensure it's possible to build the function signatures from the composer.Spec(s) tho.
 func TestFluid(t *testing.T) {
-
 	if got := makeSignature((*core.PutAtField)(nil)); len(pretty.Diff(got, signature{
 		"put:intoRec:atField:",
 		"put:intoObj:atField:",
@@ -40,7 +39,14 @@ func TestFluid(t *testing.T) {
 		"log:note|toDo|warning|fix!"})) > 0 {
 		t.Error(strings.Join(got, ","))
 	}
+	if got := makeSignature((*list.Erase)(nil)); len(pretty.Diff(got, signature{
+		"erase:fromNumList:atIndex:",
+		"erase:fromRecList:atIndex:",
+		"erase:fromTxtList:atIndex:"})) > 0 {
+		t.Error(strings.Join(got, ","))
+	}
 }
+
 func makeSignature(v composer.Composer) signature {
 	rtype := r.TypeOf(v).Elem()
 	spec := v.Compose()

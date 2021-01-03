@@ -32,7 +32,7 @@ type IntoObjNamed struct {
 	ObjName rt.TextEval `if:"unlabeled"`
 }
 type IntoRec struct {
-	VarName string `if:"unlabeled"`
+	Var Variable `if:"unlabeled"`
 }
 
 func (op *IntoObj) GetFields(run rt.Runtime) (ret g.Value, err error) {

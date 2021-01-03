@@ -9,9 +9,13 @@ import (
 )
 
 var Slots = []composer.Slot{{
-	Name: "list_getter",
-	Type: (*ListGetter)(nil),
-	Desc: "List getter: Helper for accessing lists.",
+	Name: "list_target",
+	Type: (*IntoListTarget)(nil),
+	Desc: "List target: Helper for accessing lists.",
+}, {
+	Name: "list_source",
+	Type: (*FromListSource)(nil),
+	Desc: "List source: Helper for accessing lists.",
 }}
 
 var Slats = []composer.Composer{
@@ -29,13 +33,18 @@ var Slats = []composer.Composer{
 	(*Case)(nil),
 	(*Edge)(nil),
 	(*Order)(nil),
+	// erase:
+	(*Erase)(nil),
+	(*FromNumList)(nil),
+	(*FromRecList)(nil),
+	(*FromTxtList)(nil),
 	// put:
 	(*PutAtEdge)(nil),
 	(*PutAtIndex)(nil),
 	(*IntoNumList)(nil),
 	(*IntoRecList)(nil),
 	(*IntoTxtList)(nil),
-	//
+	// sort:
 	(*SortNumbers)(nil),
 	(*SortText)(nil),
 	(*SortRecords)(nil),
