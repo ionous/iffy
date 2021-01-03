@@ -18,7 +18,7 @@ package list_test
 // 		"sort": &sortPattern,
 // 	}); e != nil {
 // 		err = e
-// 	} else if e := safe.Run(run, &list.Sort{core.VariableName{Str: "Source"}, "sort"}); e != nil {
+// 	} else if e := safe.Run(run, &list.Sort{core.Variable{Str: "Source"}, "sort"}); e != nil {
 // 		err = e
 // 	} else if res, e := values.GetNamedField("Source"); e != nil {
 // 		err = e

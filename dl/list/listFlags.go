@@ -10,7 +10,7 @@ func (*Edge) Compose() composer.Spec {
 	return composer.Spec{
 		Name:    "list_edge",
 		Group:   "list",
-		Choices: []string{"atBack", "atFront"},
+		Strings: []string{"at back", "at front"},
 		Desc:    "List Edge: Put elements at the front or back of a list.",
 		Stub:    true, // the stub parse the flag
 	}
@@ -24,7 +24,7 @@ func (*Order) Compose() composer.Spec {
 	return composer.Spec{
 		Name:    "list_order",
 		Group:   "list",
-		Choices: []string{"ascending", "descending"},
+		Strings: []string{"ascending", "descending"},
 		Desc:    "List Order: Sort larger values towards the end of a list.",
 		Stub:    true, // the stub parse the flag
 	}
@@ -38,7 +38,7 @@ func (*Case) Compose() composer.Spec {
 	return composer.Spec{
 		Name:    "list_case",
 		Group:   "list",
-		Choices: []string{"includeCase", "ignoreCase"},
+		Strings: []string{"include case", "ignore case"},
 		Desc:    "List Case: When sorting, treat uppercase and lowercase versions of letters the same.",
 		Stub:    true, // the stub parse the flag
 	}

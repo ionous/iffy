@@ -11,10 +11,15 @@ type Slot struct {
 // Spec definition for display in composer.
 type Spec struct {
 	Name, Spec, Group, Desc string
-	Choices                 []string // for str types
+	OpenStrings             bool     // for str types
+	Strings                 []string // for str types
 	Stub                    bool     // generate a custom loading struct.
 	Locals                  []string
 	Fluent                  *Fluid
+}
+
+func (x Spec) UsesStr() bool {
+	return x.OpenStrings || len(x.Strings) > 0
 }
 
 type Composer interface {

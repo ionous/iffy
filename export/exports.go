@@ -1,7 +1,6 @@
 package export
 
 import (
-	r "reflect"
 	"strings"
 	"unicode"
 
@@ -12,8 +11,7 @@ type Dict map[string]interface{}
 
 // Tokenize turns the passed struct field into an composer compatible parameter name.
 // ex. FieldName -> $FIELD_NAME
-func Tokenize(f *r.StructField) string {
-	n := Prettify(f.Name)
+func Tokenize(n string) string {
 	return "$" + strings.Map(func(c rune) (ret rune) {
 		if c == ' ' {
 			ret = '_'
@@ -21,7 +19,7 @@ func Tokenize(f *r.StructField) string {
 			ret = unicode.ToUpper(c)
 		}
 		return
-	}, n)
+	}, Prettify(n))
 }
 
 // Prettify transforms a PascalCased named into lowercase names with spaces.

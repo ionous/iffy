@@ -25,7 +25,7 @@ func TestPatternVars(t *testing.T) {
 					},
 				},
 			},
-			Name: VariableName{core.VariableName{
+			Name: VariableName{core.Variable{
 				Str: "pet",
 			}},
 		}},

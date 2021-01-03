@@ -12,19 +12,16 @@ module.exports =`func (*{{Pascal name}}) Compose() composer.Spec {
 {{#if with.spec}}
     Spec: "{{{with.spec}}}",
 {{/if}}
+{{#if (IsStr name)}}
+{{#unless (IsClosed this)}}
+    OpenStrings: true,
+{{/unless}}
+{{#if (Choices this)}}
+    Strings: []string{
+      {{#each (Choices @this)~}}"{{this.label}}",{{#unless @last}} {{/unless}}{{/each}}
+    },
+{{/if}}
+{{/if}}
   }
 }
 `;
-
-/* input: { name: '', dsec: {}, group: {} },
-} */
-
-/* output:
-func (*Number) Compose() composer.Spec {
-    return composer.Spec{
-    Name:  "argument",
-    Spec:  "its {name:variable_name} is {from:assignment}",
-    Group: "patterns",
-  }
-}
-*/

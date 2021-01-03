@@ -29,7 +29,7 @@ var collateGroups = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{Execute: core.NewActivity(
 			// walk collation.Groups for matching settings
-			&core.Assign{core.VariableName{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
+			&core.Assign{core.Variable{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
 			&list.Each{
 				List: V("groups"),
 				With: "el",
@@ -80,6 +80,6 @@ var collateGroups = pattern.ActivityPattern{
 func V(n string) *core.Var {
 	return &core.Var{Name: n}
 }
-func N(n string) core.VariableName {
-	return core.VariableName{Str: n}
+func N(n string) core.Variable {
+	return core.Variable{Str: n}
 }

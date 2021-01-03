@@ -154,7 +154,7 @@ var reverseStrings = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{
 			Execute: &core.Assign{
-				Name: core.VariableName{Str: "out"},
+				Name: core.Variable{Str: "out"},
 				From: &core.FromText{
 					&core.MakeReversed{
 						&core.Var{

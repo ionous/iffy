@@ -10,22 +10,22 @@ import (
 
 // SortNumbers implements Sorter
 type SortNumbers struct {
-	Name    core.VariableName `if:"label:numbers"`
-	ByField *SortByField      `if:"unlabeled"`
+	Name    core.Variable `if:"label:numbers"`
+	ByField *SortByField  `if:"unlabeled"`
 	Order   `if:"unlabeled"`
 }
 
 // SortText implements Sorter
 type SortText struct {
-	Name    core.VariableName `if:"label:text"`
-	ByField *SortByField      `if:"unlabeled"`
+	Name    core.Variable `if:"label:text"`
+	ByField *SortByField  `if:"unlabeled"`
 	Order   `if:"unlabeled"`
 	Case    `if:"unlabeled"`
 }
 
 // SortRecords implements Sorter
 type SortRecords struct {
-	Var   core.VariableName `if:"label:records"`
+	Var   core.Variable `if:"label:records"`
 	Using pattern.PatternName
 }
 

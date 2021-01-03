@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/debug"
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/export/tag"
@@ -35,12 +36,15 @@ func TestFluid(t *testing.T) {
 		"sort records:using:"})) > 0 {
 		t.Error(strings.Join(got, ","))
 	}
+	if got := makeSignature((*debug.Log)(nil)); len(pretty.Diff(got, signature{
+		"log:note|toDo|warning|fix!"})) > 0 {
+		t.Error(strings.Join(got, ","))
+	}
 }
 func makeSignature(v composer.Composer) signature {
 	rtype := r.TypeOf(v).Elem()
 	spec := v.Compose()
 	fluid := spec.Fluent
-
 	short := shortName(rtype, fluid.Name)
 
 	sig := signature{short}
@@ -65,24 +69,26 @@ func makeSignature(v composer.Composer) signature {
 			if cnt > 1 || !unlabeled {
 				// very specific check for non-optional flags...
 				if x, ok := r.Zero(r.PtrTo(f.Type)).Interface().(composer.Composer); ok {
-					if cs := x.Compose().Choices; len(cs) > 0 {
-						sig = sig.addFlags(cs)
-						return // EARLY RETURN
+					if spec := x.Compose(); spec.UsesStr() {
+						if cs := spec.Strings; len(cs) > 0 {
+							sig = sig.addFlags(cs)
+							return // EARLY RETURN
+						}
 					}
 				}
 
-				switch f.Type.Kind() {
+				switch n, k := f.Type.Name(), f.Type.Kind(); {
 				default:
 					//  write camel "fieldName:"
 					name := fieldName(f, tags)
 					sig = sig.addSelector(name)
 
-				case r.Ptr:
+				case k == r.Ptr:
 					// optional. so duplicate all existing selectors
 					name := fieldName(f, tags)
 					sig = sig.dupSelectors(name)
 
-				case r.Interface:
+				case k == r.Interface && !strings.HasSuffix(n, "Eval") && n != "Assignment":
 					// assumes interfaces are all unlabeled...
 					slats := implementorsOf(f.Type)
 					sig = sig.mulSelectors(slats)
@@ -137,7 +143,15 @@ func (sig signature) addSelector(sel string) signature {
 // to avoid an explosion of selectors for flags, we consider them specially.
 // the signature of flags may differ from how they are specified in use, tbd.
 func (sig signature) addFlags(cs []string) signature {
-	sel := strings.Join(cs, "|") + "!"
+	var b strings.Builder
+	for i, c := range cs {
+		writeCamel(&b, c)
+		if (i + 1) < len(cs) {
+			b.WriteRune('|')
+		}
+	}
+	b.WriteRune('!')
+	sel := b.String()
 	for i, cnt := 0, len(sig); i < cnt; i++ {
 		sig[i] = sig[i] + sel
 	}
@@ -189,4 +203,20 @@ func firstSyl(s string) (ret string) {
 		}
 	}
 	return b.String()
+}
+
+func writeCamel(b *strings.Builder, s string) {
+	nextUpper := false
+	for i, u := range s {
+		if i == 0 {
+			b.WriteRune(unicode.ToLower(u))
+		} else if u == '_' || u == ' ' {
+			nextUpper = true
+		} else if nextUpper {
+			b.WriteRune(unicode.ToUpper(u))
+			nextUpper = false
+		} else {
+			b.WriteRune(u)
+		}
+	}
 }

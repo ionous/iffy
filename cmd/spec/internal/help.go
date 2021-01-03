@@ -66,7 +66,7 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 			} else {
 				label = firstRuneLower(f.Name)
 			}
-			key := export.Tokenize(f)
+			key := export.Tokenize(f.Name)
 			typeName, repeats := nameOfType(f.Type)
 
 			// label this field?

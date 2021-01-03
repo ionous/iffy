@@ -99,7 +99,7 @@ func (dec *Decoder) ReadFields(at string, out r.Value, in reader.Map) {
 	//
 	var fields []string
 	export.WalkProperties(out.Type(), func(f *r.StructField, path []int) (done bool) {
-		token := export.Tokenize(f)
+		token := export.Tokenize(f.Name)
 		fields = append(fields, token)
 		// we report on missing properties below.
 		if inVal, ok := in[token]; !ok {
@@ -204,7 +204,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 					err = errutil.Fmt("expected string, got %T(%v)", v, v)
 				} else {
 					// fix?: by using field by name we "unwrap" embedded structs
-					// ex. VariableName { core.VariableName }
+					// ex. VariableName { core.Variable }
 					outAt.FieldByName("Str").SetString(str)
 				}
 				return

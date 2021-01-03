@@ -1,8 +1,11 @@
 package story
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/debug"
 	"github.com/ionous/iffy/dl/list"
+	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -14,7 +17,7 @@ type NumberEval rt.NumberEval
 type ObjectEval rt.ObjectEval
 type TextEval rt.TextEval
 type VariableName struct {
-	core.VariableName
+	core.Variable
 }
 
 // fix: this doesnt work because story importer doesnt trigger callbacks for str types
@@ -44,21 +47,35 @@ func (op *ListOrder) ImportStub(k *Importer) (ret interface{}, err error) {
 func (op *ListCase) ImportStub(k *Importer) (ret interface{}, err error) {
 	ret = list.Case(op.Str == "$TRUE")
 	return
+} // handle the import of int flags
+func (op *DebugLevel) ImportStub(k *Importer) (ret interface{}, err error) {
+	if !inProg(k) {
+		ret = op
+	} else if _, found := decode.FindChoice(op, op.Str); found < 0 {
+		err = errutil.Fmt("choice %s not found in %T", op.Str, op)
+	} else {
+		ret = found
+	}
+	return
 }
 
 // turn comment execution into empty statements
 func (op *Comment) ImportStub(k *Importer) (ret interface{}, err error) {
-	var prog bool
+	if !inProg(k) {
+		ret = op
+	} else {
+		ret = &debug.Log{Level: debug.Note, Value: &core.FromText{&core.Text{op.Lines.Str}}}
+	}
+	return
+}
+
+// a hopefully temporary hack
+func inProg(k *Importer) (ret bool) {
 	for _, k := range k.decoder.Path {
 		if k == "story.Activity" {
-			prog = true
+			ret = true
 			break
 		}
-	}
-	if prog {
-		ret = &core.DoNothing{Reason: op.Lines.Str}
-	} else {
-		ret = op
 	}
 	return
 }

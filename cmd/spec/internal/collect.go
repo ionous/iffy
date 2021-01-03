@@ -2,8 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"sort"
 	"strings"
 
@@ -11,6 +9,7 @@ import (
 
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/export"
+	"github.com/ionous/iffy/lang"
 )
 
 type Collect struct {
@@ -64,37 +63,44 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 			with["slots"] = slotNames
 		}
 		uses := "flow"
-		if cs := spec.Choices; cs != nil {
+		if spec.UsesStr() {
 			uses = "str"
 		}
 		out := export.Dict{
 			"name": name,
 			"uses": uses,
 		}
-		if len(with) > 0 {
-			out["with"] = with
-		}
 		// missing spec, missing slots.
 		if len(spec.Spec) > 0 {
 			out["spec"] = spec.Spec
-		} else if rtype.Kind() == r.Struct {
-			tokens, roles, params := parseSpec(rtype, spec.Fluent)
+		} else {
+			var tokens []string
+			var roles string
+			params := export.Dict{}
+			if spec.UsesStr() {
+				if cs := spec.Strings; len(cs) == 2 && spec.OpenStrings {
+					tokens, params = choices(cs, []string{"false", "true"})
+				} else if len(cs) > 0 {
+					tokens, params = choices(cs, cs)
+				}
+				if spec.OpenStrings {
+					t := export.Tokenize(name)
+					tokens = append([]string{t}, tokens...)
+					params[t] = lang.Lowerspace(name)
+				}
+			} else if rtype.Kind() == r.Struct {
+				tokens, roles, params = parseSpec(rtype, spec.Fluent)
+				if len(roles) > 0 {
+					with["roles"] = roles
+				}
+			} else {
+				panic(name)
+			}
 			with["tokens"] = tokens
 			with["params"] = params
-			if len(roles) > 0 {
-				with["roles"] = roles
-			}
-		} else if cs := spec.Choices; cs != nil {
-			// a wor in progress for sure...
-			if len(cs) == 0 {
-				out["spec"] = fmt.Sprintf("{%s}", name)
-			} else if len(cs) == 2 {
-				out["spec"] = fmt.Sprintf("{%s%%false} or {%s%%true}", cs[0], cs[1])
-			} else {
-				log.Panicln("unhandled type", rtype.Name())
-			}
-		} else {
-			log.Panicln("unhandled type", rtype.Name())
+		}
+		if len(with) > 0 {
+			out["with"] = with
 		}
 		if spec.Stub {
 			c.stubs = append(c.stubs, name)
@@ -138,6 +144,19 @@ func (c *Collect) Stubs() (ret []byte) {
 		ret = []byte("// " + e.Error())
 	} else {
 		ret = b
+	}
+	return
+}
+
+func choices(vs, ts []string) (retTokens []string, retParams export.Dict) {
+	retParams = make(export.Dict)
+	for i, el := range ts {
+		t := "$" + lang.UpperBreakcase(el)
+		retTokens = append(retTokens, t)
+		if i+1 < len(vs) {
+			retTokens = append(retTokens, " or ")
+		}
+		retParams[t] = vs[i]
 	}
 	return
 }

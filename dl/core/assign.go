@@ -27,7 +27,7 @@ func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 
 // Assign a value to a local variable.
 type Assign struct {
-	Name VariableName `if:"label:var"`
+	Name Variable `if:"label:var"`
 	From Assignment
 }
 

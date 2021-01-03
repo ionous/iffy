@@ -7,9 +7,8 @@ type {{Pascal name}} struct {
   Val float64
 }
 
-
-func (*{{Pascal name}}) Num() (closed bool, choices []float64) {
-    return {{#if (IsClosed this)}}true{{else}}false{{/if}}, []float64{
+func (*{{Pascal name}}) Num()  []float64 {
+    return []float64{
     {{#each (Choices @this)~}}"{{this}}",{{/each}}
   }
 }

@@ -199,8 +199,10 @@ module.exports = class Make {
     );
     if (d.spec) {
       const tags= TagParser.parse(d.spec);
-      d["with"].tokens= tags.keys;
-      d["with"].params= tags.args;
+      const w= d.with || {};
+      w.tokens= tags.keys;
+      w.params= tags.args;
+      d["with"]= w;
     }
     this.types.newType(d);
   }

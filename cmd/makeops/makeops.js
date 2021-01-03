@@ -24,20 +24,19 @@ const pascal= function(name) {
   return els.join('');
 };
 
-// given a strType with the specified $TOKEN, return its list of choice
 const strChoices= function(token, strType) {
   const out=[];
-  const { with : {params= {}}= {} } = strType;
-  if (params) {
-    for (const k in params) {
-      if (k === token) {
-        out.unshift(k); // move the dynamic key to the front
-      } else {
-        out.push(k);
-      }
-    }
-  }
-  return out;
+  const { with : {params= {}, tokens=[]}= {} } = strType;
+  return tokens.filter(t=>t[0]=='$' && t!==token).map((t,i)=> {
+    const d= params[t]; // for str this should always be a string, but... directives.js
+    return { label: d.label || d , index:i, token:t };
+  });
+};
+
+const isClosed= function(token, strType) {
+  const out=[];
+  const { with : { tokens=[]}= {} } = strType;
+  return tokens.indexOf(token) < 0;
 };
 
 Handlebars.registerHelper('Pascal', pascal);
@@ -87,18 +86,21 @@ Handlebars.registerHelper('IsSlat', function(name) {
   return uses !== 'slot' && uses !== 'group';
 });
 
+Handlebars.registerHelper('IsStr', function(name) {
+  const { uses }= allTypes[name];
+  return uses === 'str';
+});
+
 // for uses='str'
 Handlebars.registerHelper('IsClosed', function(strType) {
   const token= tokenize(strType.name);
-  const cs= strChoices(token, strType);
-  return cs.length && cs[0] !== token;
+  return isClosed(token, strType);
 });
 
 // for uses='str'
 Handlebars.registerHelper('Choices', function(strType) {
   const token= tokenize(strType.name);
-  const cs= strChoices(token, strType);
-  return cs[0]===token? cs.slice(1): cs; // remove the dynamic key
+  return strChoices(token, strType);
 });
 
 // flatten desc

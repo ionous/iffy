@@ -8,11 +8,6 @@ import (
 	"github.com/ionous/iffy/rt/scope"
 )
 
-// DoNothing implements Execute, but .... does nothing.
-type DoNothing struct {
-	Reason string
-}
-
 // ForEacNum visits values in a list of numbers.
 // For each value visited it executes a block of statements, pushing a NumberCounter object into the scope as @.
 // If the list is empty, it executes an alternative block of statements.
@@ -28,16 +23,6 @@ type ForEachText struct {
 	In       rt.TextListEval
 	Go, Else *Activity
 }
-
-func (*DoNothing) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "do_nothing",
-		Group: "exec",
-		Desc:  "Do Nothing: Statement which does nothing.",
-	}
-}
-
-func (DoNothing) Execute(rt.Runtime) error { return nil }
 
 func (*ForEachNum) Compose() composer.Spec {
 	return composer.Spec{

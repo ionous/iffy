@@ -24,7 +24,7 @@ var Slats = []composer.Composer{
 
 	// Assign turns an Assignment a normal statement.
 	(*Assign)(nil),
-	(*VariableName)(nil),
+	(*Variable)(nil),
 	(*FromBool)(nil),
 	(*FromNum)(nil),
 	(*FromText)(nil),
@@ -45,7 +45,6 @@ var Slats = []composer.Composer{
 	(*CompareNum)(nil),
 	(*CompareText)(nil),
 
-	(*DoNothing)(nil),
 	(*ForEachNum)(nil),
 	(*ForEachText)(nil),
 

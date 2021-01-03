@@ -9,8 +9,9 @@ import (
 type BreakcaseOptions uint8
 
 const (
-	BC_SKIPIDS BreakcaseOptions = 1 << iota
-	BC_TOLOWER
+	OPT_SKIPIDS BreakcaseOptions = 1 << iota
+	OPT_LOWER
+	OPT_UPPER
 )
 
 // Breakcase turns runs of whitespace into single underscores. It does not change casing.
@@ -20,16 +21,20 @@ func Breakcase(name string) string {
 }
 
 func SpecialBreakcase(name string) string {
-	return OptionCase(name, BC_SKIPIDS)
+	return OptionCase(name, OPT_SKIPIDS)
 }
 
 func LowerBreakcase(name string) string {
-	return OptionCase(name, BC_TOLOWER)
+	return OptionCase(name, OPT_LOWER)
+}
+
+func UpperBreakcase(name string) string {
+	return OptionCase(name, OPT_UPPER)
 }
 
 // eventually, these transforms will happen at assembly time
 func OptionCase(name string, opts BreakcaseOptions) (ret string) {
-	if len(name) == 0 || ((opts&BC_SKIPIDS) != 0 && (name[0] == '#' || name[0] == '$')) {
+	if len(name) == 0 || ((opts&OPT_SKIPIDS) != 0 && (name[0] == '#' || name[0] == '$')) {
 		ret = name
 	} else {
 		var b strings.Builder
@@ -46,8 +51,10 @@ func OptionCase(name string, opts BreakcaseOptions) (ret string) {
 				if needBreak && !brakes {
 					b.WriteRune(breaker)
 				}
-				if (opts & BC_TOLOWER) != 0 {
+				if (opts & OPT_LOWER) != 0 {
 					r = unicode.ToLower(r)
+				} else if (opts & OPT_UPPER) != 0 {
+					r = unicode.ToUpper(r)
 				}
 				b.WriteRune(r)
 				canBreak = !brakes

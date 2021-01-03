@@ -1,13 +1,48 @@
 /* generated using github.com/ionous/iffy/cmd/spec/spec.go */
 const spec = [
   {
+    "desc": "debug level: Debug level.",
+    "group": [
+      "list"
+    ],
+    "name": "debug_level",
+    "uses": "str",
+    "with": {
+      "params": {
+        "$FIX": "fix",
+        "$NOTE": "note",
+        "$TO_DO": "to do",
+        "$WARNING": "warning"
+      },
+      "tokens": [
+        "$NOTE",
+        " or ",
+        "$TO_DO",
+        " or ",
+        "$WARNING",
+        " or ",
+        "$FIX"
+      ]
+    }
+  },
+  {
     "desc": "List Case: When sorting, treat uppercase and lowercase versions of letters the same.",
     "group": [
       "list"
     ],
     "name": "list_case",
-    "spec": "{includeCase%false} or {ignoreCase%true}",
-    "uses": "str"
+    "uses": "str",
+    "with": {
+      "params": {
+        "$IGNORE_CASE": "ignore case",
+        "$INCLUDE_CASE": "include case"
+      },
+      "tokens": [
+        "$INCLUDE_CASE",
+        " or ",
+        "$IGNORE_CASE"
+      ]
+    }
   },
   {
     "desc": "List Edge: Put elements at the front or back of a list.",
@@ -15,8 +50,18 @@ const spec = [
       "list"
     ],
     "name": "list_edge",
-    "spec": "{atBack%false} or {atFront%true}",
-    "uses": "str"
+    "uses": "str",
+    "with": {
+      "params": {
+        "$AT_BACK": "at back",
+        "$AT_FRONT": "at front"
+      },
+      "tokens": [
+        "$AT_BACK",
+        " or ",
+        "$AT_FRONT"
+      ]
+    }
   },
   {
     "desc": "List Order: Sort larger values towards the end of a list.",
@@ -24,13 +69,30 @@ const spec = [
       "list"
     ],
     "name": "list_order",
-    "spec": "{ascending%false} or {descending%true}",
-    "uses": "str"
+    "uses": "str",
+    "with": {
+      "params": {
+        "$ASCENDING": "ascending",
+        "$DESCENDING": "descending"
+      },
+      "tokens": [
+        "$ASCENDING",
+        " or ",
+        "$DESCENDING"
+      ]
+    }
   },
   {
     "name": "variable_name",
-    "spec": "{variable_name}",
-    "uses": "str"
+    "uses": "str",
+    "with": {
+      "params": {
+        "$VARIABLE_NAME": "variable name"
+      },
+      "tokens": [
+        "$VARIABLE_NAME"
+      ]
+    }
   },
   {
     "desc": "Assignments: Helper for setting variables.",
@@ -778,6 +840,37 @@ const spec = [
         "parts",
         ": ",
         "$PARTS"
+      ]
+    }
+  },
+  {
+    "group": [
+      "debug"
+    ],
+    "name": "debug_log",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$LEVEL": {
+          "label": "level",
+          "type": "number"
+        },
+        "$VALUE": {
+          "label": "value",
+          "type": "assignment"
+        }
+      },
+      "roles": "CZKZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "log",
+        ": ",
+        "$VALUE",
+        ", ",
+        "$LEVEL",
+        "."
       ]
     }
   },
@@ -1673,7 +1766,21 @@ const spec = [
       "list"
     ],
     "name": "list_sort_by_field",
-    "uses": "flow"
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        }
+      },
+      "roles": "SZK",
+      "tokens": [
+        "byField",
+        ": ",
+        "$NAME"
+      ]
+    }
   },
   {
     "desc": "Sort numbers: .",
@@ -1681,7 +1788,37 @@ const spec = [
       "list"
     ],
     "name": "list_sort_numbers",
-    "uses": "flow"
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$BY_FIELD": {
+          "label": "byField",
+          "optional": true,
+          "type": "list_sort_by_field"
+        },
+        "$NAME": {
+          "label": "numbers",
+          "type": "variable_name"
+        },
+        "$ORDER": {
+          "label": "order",
+          "type": "list_order"
+        }
+      },
+      "roles": "CZSZKZKZKT",
+      "tokens": [
+        "sort",
+        " ",
+        "numbers",
+        ": ",
+        "$NAME",
+        ", ",
+        "$BY_FIELD",
+        ", ",
+        "$ORDER",
+        "."
+      ]
+    }
   },
   {
     "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
@@ -1689,7 +1826,43 @@ const spec = [
       "list"
     ],
     "name": "list_sort_text",
-    "uses": "flow"
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$BY_FIELD": {
+          "label": "byField",
+          "optional": true,
+          "type": "list_sort_by_field"
+        },
+        "$CASE": {
+          "label": "case",
+          "type": "list_case"
+        },
+        "$NAME": {
+          "label": "text",
+          "type": "variable_name"
+        },
+        "$ORDER": {
+          "label": "order",
+          "type": "list_order"
+        }
+      },
+      "roles": "CZSZKZKZKZKT",
+      "tokens": [
+        "sort",
+        " ",
+        "text",
+        ": ",
+        "$NAME",
+        ", ",
+        "$BY_FIELD",
+        ", ",
+        "$ORDER",
+        ", ",
+        "$CASE",
+        "."
+      ]
+    }
   },
   {
     "desc": "Sort list: rearrange the elements in the named list by using the designated pattern to test pairs of elements.",
@@ -1697,7 +1870,32 @@ const spec = [
       "list"
     ],
     "name": "list_sort_using",
-    "uses": "flow"
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$USING": {
+          "label": "using",
+          "type": "text"
+        },
+        "$VAR": {
+          "label": "records",
+          "type": "variable_name"
+        }
+      },
+      "roles": "CZSZKZSZKT",
+      "tokens": [
+        "sort",
+        " ",
+        "records",
+        ": ",
+        "$VAR",
+        ", ",
+        "using",
+        ": ",
+        "$USING",
+        "."
+      ]
+    }
   },
   {
     "desc": "Splice into list: Modify a list by adding and removing elements.\nNote: the type of the elements being added must match the type of the list. \nText cant be added to a list of numbers, numbers cant be added to a list of text, \nand true/false values can't be added to a list.",
@@ -1713,40 +1911,6 @@ const spec = [
         "num_list_eval",
         "text_list_eval",
         "record_list_eval"
-      ]
-    }
-  },
-  {
-    "group": [
-      "debug"
-    ],
-    "name": "log",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$TEXT": {
-          "label": "text",
-          "type": "text"
-        }
-      },
-      "roles": "QZSZKZSZK",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "log",
-        " ",
-        "text",
-        ": ",
-        "$TEXT",
-        ", ",
-        "from",
-        ": ",
-        "$FROM"
       ]
     }
   },
@@ -2563,6 +2727,7 @@ const stub = [
   "stopping_text",
   "arguments",
   "argument",
+  "debug_level",
   "render_template",
   "determine_act",
   "determine_num",
