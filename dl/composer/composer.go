@@ -18,7 +18,7 @@ type Spec struct {
 	Fluent                  *Fluid
 }
 
-func (x Spec) UsesStr() bool {
+func (x *Spec) UsesStr() bool {
 	return x.OpenStrings || len(x.Strings) > 0
 }
 

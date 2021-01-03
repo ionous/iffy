@@ -25,6 +25,7 @@ func (*Level) Compose() composer.Spec {
 		Stub:    true, // the stub parse the flag
 	}
 }
+
 func (lvl *Level) Header() string {
 	return strings.Repeat("#", 1+int(*lvl)) + " " + lvl.String() + ":"
 }
