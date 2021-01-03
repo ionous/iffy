@@ -69,7 +69,7 @@ type FromRecordList struct {
 
 func (*Let) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign",
+		Name:   "let",
 		Group:  "variables",
 		Desc:   "Assignment: Sets a variable to a value.",
 		Fluent: &composer.Fluid{Name: "let", Role: composer.Command},

@@ -11,9 +11,9 @@ func (op *{{Pascal name}}) String() string {
   return op.Str
 }
 
-func (*{{Pascal name}}) Choices() []string {
-  return []string{
-    {{#each (Choices @this)~}}"{{this.token}}",{{#unless @last}} {{/unless}}{{/each}}
+func (*{{Pascal name}}) Choices() (choices map[string]string) {
+  return map[string]string{
+    {{#each (Choices @this)~}}"{{this.token}}": "{{this.value}}",{{#unless @last}} {{/unless}}{{/each}}
   }
 }
 

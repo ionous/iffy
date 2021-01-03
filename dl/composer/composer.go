@@ -11,8 +11,8 @@ type Slot struct {
 // Spec definition for display in composer.
 type Spec struct {
 	Name, Spec, Group, Desc string
-	OpenStrings             bool     // for str types
-	Strings                 []string // for str types
+	OpenStrings             bool     // for str types, whether any value is permitted
+	Strings                 []string // values for str types, generates tokens, labels, and selectors.
 	Stub                    bool     // generate a custom loading struct.
 	Locals                  []string
 	Fluent                  *Fluid

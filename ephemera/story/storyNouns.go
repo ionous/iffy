@@ -100,7 +100,7 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 		// fix: implicitly generated facts should be considered preliminary
 		// so that authors can override them.
 		traitStr := "common_named"
-		detStr, detIdx := decode.FindChoice(&op.Determiner, op.Determiner.Str)
+		detStr, detFound := decode.FindChoice(&op.Determiner, op.Determiner.Str)
 		if detStr == "our" {
 			if first, _ := utf8.DecodeRuneInString(noun.String()); unicode.ToUpper(first) == first {
 				traitStr = "proper_named"
@@ -110,7 +110,7 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 		k.NewValue(noun, typeTrait, true)
 
 		// record any custom determiner
-		if detIdx < 0 {
+		if !detFound {
 			// set the indefinite article field
 			article := k.NewName("indefinite_article", tables.NAMED_FIELD, op.At.String())
 			k.NewValue(noun, article, detStr)

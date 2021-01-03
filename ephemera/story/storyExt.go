@@ -57,10 +57,21 @@ func (op *ListCase) ImportStub(k *Importer) (ret interface{}, err error) {
 func (op *DebugLevel) ImportStub(k *Importer) (ret interface{}, err error) {
 	if !inProg(k) {
 		ret = op
-	} else if _, found := decode.FindChoice(op, op.Str); found < 0 {
+	} else if str, found := decode.FindChoice(op, op.Str); !found {
 		err = errutil.Fmt("choice %s not found in %T", op.Str, op)
 	} else {
-		ret = found
+		found := -1
+		for i, v := range op.Compose().Strings {
+			if v == str {
+				found = i
+				break
+			}
+		}
+		if found < 0 {
+			err = errutil.Fmt("index %s not found in %T", op.Str, op)
+		} else {
+			ret = found
+		}
 	}
 	return
 }

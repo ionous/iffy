@@ -28,8 +28,8 @@ const strChoices= function(token, strType) {
   const out=[];
   const { with : {params= {}, tokens=[]}= {} } = strType;
   return tokens.filter(t=>t[0]=='$' && t!==token).map((t,i)=> {
-    const d= params[t]; // for str this should always be a string, but... directives.js
-    return { label: d.label || d , index:i, token:t };
+    const d= params[t];
+    return { label: d.label || d , index:i, token:t, value: d.value || d };
   });
 };
 

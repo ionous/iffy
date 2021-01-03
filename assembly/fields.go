@@ -81,7 +81,7 @@ func (out *pendingFields) determineFields(db *sql.DB, missingAspects []string) (
 			} else if last.Type != curr.Type {
 				// field is the same but the type of the field differs
 				// future: allow the same named field in different kinds.
-				e := errutil.New("type mismatch", last.Field, last.Type, "!=", curr.Type)
+				e := errutil.Fmt("type mismatch. %q(%s) != %s", last.Field, last.Type, curr.Type)
 				err = e
 			} else if last.Kind != curr.Kind {
 				// field and type are the same, kind differs; find a common type for the field.

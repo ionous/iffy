@@ -11,10 +11,13 @@ type Variable struct {
 	Str string
 }
 
+// String returns user defined variable name.
 func (op *Variable) String() string { return op.Str }
 
-func (*Variable) Choices() []string { return nil }
+// Choices: variable names have no predetermined choices.
+func (*Variable) Choices() map[string]string { return nil }
 
+// Compose returns info for the modeling language.
 func (*Variable) Compose() composer.Spec {
 	return composer.Spec{
 		Name:        "variable_name",

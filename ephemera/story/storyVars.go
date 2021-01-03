@@ -44,7 +44,7 @@ func (op *ObjectType) ImportVariableType(k *Importer) (retType ephemera.Named, r
 }
 
 func (op *PrimitiveType) ImportPrimType(k *Importer) (ret string, err error) {
-	if str, idx := decode.FindChoice(op, op.Str); idx < 0 {
+	if str, ok := decode.FindChoice(op, op.Str); !ok {
 		err = ImportError(op, op.At, errutil.Fmt("%w %q", InvalidValue, op.Str))
 	} else {
 		ret = str

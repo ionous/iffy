@@ -18,7 +18,7 @@ module.exports =`func (*{{Pascal name}}) Compose() composer.Spec {
 {{/unless}}
 {{#if (Choices this)}}
     Strings: []string{
-      {{#each (Choices @this)~}}"{{this.label}}",{{#unless @last}} {{/unless}}{{/each}}
+      {{#each (Choices @this)~}}"{{this.value}}",{{#unless @last}} {{/unless}}{{/each}}
     },
 {{/if}}
 {{/if}}
