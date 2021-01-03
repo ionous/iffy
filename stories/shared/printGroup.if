@@ -113,24 +113,24 @@
                                         "type": "execute",
                                         "value": {
                                           "id": "id-1769294d227-5",
-                                          "type": "pack",
+                                          "type": "put_at_field",
                                           "value": {
-                                            "$RECORD": {
+                                            "$INTO": {
                                               "id": "id-1769294d227-6",
-                                              "type": "record_eval",
+                                              "type": "fields",
                                               "value": {
                                                 "id": "id-1769294d227-27",
-                                                "type": "get_var",
+                                                "type": "into_rec",
                                                 "value": {
-                                                  "$NAME": {
+                                                  "$VAR": {
                                                     "id": "id-1769294d227-28",
-                                                    "type": "text",
+                                                    "type": "variable_name",
                                                     "value": "settings"
                                                   }
                                                 }
                                               }
                                             },
-                                            "$FIELD": {
+                                            "$AT_FIELD": {
                                               "id": "id-1769294d227-7",
                                               "type": "text",
                                               "value": "label"

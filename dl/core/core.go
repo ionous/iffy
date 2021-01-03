@@ -100,9 +100,7 @@ var Slats = []composer.Composer{
 	(*StoppingText)(nil),
 
 	(*Field)(nil),
-	(*SetField)(nil),
 	(*Unpack)(nil),
-	(*Pack)(nil),
 	(*Var)(nil),
 	(*HasTrait)(nil),
 

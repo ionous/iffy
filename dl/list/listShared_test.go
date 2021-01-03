@@ -60,10 +60,11 @@ func newListTime(src []string, p testutil.PatternMap) (ret rt.Runtime, vals *g.R
 	return
 }
 
-func B(i bool) rt.BoolEval   { return &core.Bool{i} }
-func I(i int) rt.NumberEval  { return &core.Number{float64(i)} }
-func T(i string) rt.TextEval { return &core.Text{i} }
-func V(i string) *core.Var   { return &core.Var{Name: i} }
+func B(i bool) rt.BoolEval     { return &core.Bool{i} }
+func I(i int) rt.NumberEval    { return &core.Number{float64(i)} }
+func T(i string) rt.TextEval   { return &core.Text{i} }
+func V(i string) *core.Var     { return &core.Var{Name: i} }
+func N(n string) core.Variable { return core.Variable{Str: n} }
 
 func FromTs(vs []string) (ret core.Assignment) {
 	if len(vs) == 1 {

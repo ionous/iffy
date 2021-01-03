@@ -572,23 +572,16 @@
                               "type": "execute",
                               "value": {
                                 "id": "id-174bd1dc16a-107",
-                                "type": "set_field",
+                                "type": "put_at_field",
                                 "value": {
-                                  "$OBJECT": {
+                                  "$INTO": {
                                     "id": "id-174bd1dc16a-108",
-                                    "type": "object_eval",
+                                    "type": "fields",
                                     "value": {
                                       "id": "id-174bd1dc16a-111",
-                                      "type": "named_noun",
+                                      "type": "into_obj",
                                       "value": {
-                                        "$DETERMINER": {
-                                          "id": "id-174bd1dc16a-112",
-                                          "type": "determiner",
-                                          "value": "$THE"
-                                        },
-                                        "$NAME": {
-                                          "id": "id-174bd1dc16a-113",
-                                          "type": "noun_name",
+                                          "type": "text",
                                           "value": "apple"
                                         }
                                       }

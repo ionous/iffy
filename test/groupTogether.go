@@ -24,21 +24,13 @@ var assignGrouping = pattern.ActivityPattern{
 	},
 	Rules: []*pattern.ExecuteRule{
 		{Execute: &core.Activity{[]rt.Execute{
-			&core.Pack{
-				Record: &core.Var{Name: "out"},
-				Field:  "Name",
-				From:   &core.Var{Name: "in"}, // fix? this is no way ensures that the object is valid.
-			},
+			Put("out", "Name", V("in")),
 			&core.Choose{
 				If: &core.Matches{
 					Text:    &core.Var{Name: "in"},
 					Pattern: "^thing"},
 				True: core.NewActivity(
-					&core.Pack{
-						Record: &core.Var{Name: "out"},
-						Field:  "Label",
-						From:   &core.FromText{&core.Text{"thingies"}},
-					},
+					Put("out", "Label", &core.FromText{&core.Text{"thingies"}}),
 				),
 			},
 		}}},

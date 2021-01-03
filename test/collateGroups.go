@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
+	"github.com/ionous/iffy/rt"
 )
 
 var runCollateGroups = list.Reduce{
@@ -58,8 +59,8 @@ var collateGroups = pattern.ActivityPattern{
 				// push the group into the groups.
 				True: core.NewActivity(
 					&list.Push{List: "names", Insert: &core.Unpack{V("settings"), "Name"}},
-					&core.Pack{V("group"), "Objects", V("names")},
-					&core.Pack{V("group"), "Settings", V("settings")},
+					Put("group", "Objects", V("names")),
+					Put("group", "Settings", V("settings")),
 					&list.Push{List: "groups", Insert: V("group")},
 				), // end true
 				// found a matching group?
@@ -68,11 +69,11 @@ var collateGroups = pattern.ActivityPattern{
 					&core.Let{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
 					&core.Let{N("names"), &core.Unpack{V("group"), "Objects"}},
 					&list.Push{List: "names", Insert: &core.Unpack{V("settings"), "Name"}},
-					&core.Pack{V("group"), "Objects", V("names")},
+					Put("group", "Objects", V("names")),
 					&list.Set{List: "groups", Index: V("idx"), From: V("group")},
 				), // end false
 			},
-			&core.Pack{V("collation"), "Groups", V("groups")},
+			Put("collation", "Groups", V("groups")),
 		)},
 	},
 }
@@ -82,4 +83,7 @@ func V(n string) *core.Var {
 }
 func N(n string) core.Variable {
 	return core.Variable{Str: n}
+}
+func Put(rec, field string, from core.Assignment) rt.Execute {
+	return &core.PutAtField{Into: &core.IntoRec{Var: N(rec)}, AtField: field, From: from}
 }
