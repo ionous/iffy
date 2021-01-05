@@ -11,6 +11,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/debug"
 	"github.com/ionous/iffy/dl/list"
+	"github.com/ionous/iffy/dl/rel"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/export/tag"
 	"github.com/kr/pretty"
@@ -87,6 +88,12 @@ func TestFluid(t *testing.T) {
 	) {
 		t.Error(got)
 	}
+	if got := makeSig((*rel.Relate)(nil)); !got.equals(
+		"relate obj:toObj:via:",
+	) {
+		t.Error(got)
+	}
+
 }
 
 func (sig signature) equals(bs ...string) bool {

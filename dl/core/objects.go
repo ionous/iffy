@@ -55,7 +55,7 @@ func (*ObjectName) Compose() composer.Spec {
 func (op *ObjectName) GetObject(run rt.Runtime) (ret g.Value, err error) {
 	if name, e := safe.GetText(run, op.Name); e != nil {
 		err = cmdError(op, e)
-	} else if v, e := getObjectNamed(run, name.String()); e != nil {
+	} else if v, e := safe.ObjectFromString(run, name.String()); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v

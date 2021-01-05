@@ -208,3 +208,23 @@ func GetRecordList(run rt.Runtime, eval rt.RecordListEval) (ret g.Value, err err
 	}
 	return
 }
+
+func ObjectFromText(run rt.Runtime, txt rt.TextEval) (ret g.Value, err error) {
+	if t, e := GetText(run, txt); e != nil {
+		err = e
+	} else {
+		ret, err = ObjectFromString(run, t.String())
+	}
+	return
+}
+
+// find an object with the passed partial name
+func ObjectFromString(run rt.Runtime, n string) (ret g.Value, err error) {
+	switch val, e := run.GetField(object.Value, n); e.(type) {
+	case g.UnknownField:
+		err = g.UnknownObject(n)
+	default:
+		ret, err = val, e
+	}
+	return
+}

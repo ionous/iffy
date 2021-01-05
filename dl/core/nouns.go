@@ -4,6 +4,7 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // these definitions mirror modeling statements in iffy.js
@@ -30,5 +31,5 @@ func (*SimpleNoun) Compose() composer.Spec {
 }
 
 func (op *SimpleNoun) GetObject(run rt.Runtime) (ret g.Value, err error) {
-	return getObjectNamed(run, string(op.Name))
+	return safe.ObjectFromString(run, string(op.Name))
 }

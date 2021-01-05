@@ -604,11 +604,19 @@
                                     "type": "fields",
                                     "value": {
                                       "id": "id-174bd1dc16a-111",
-                                      "type": "into_obj",
+                                      "type": "into_obj_named",
                                       "value": {
-                                        "type": "text",
-                                        "value": "apple"
-                                      }
+  "type": "text_eval",
+  "value": {
+    "type": "text_value",
+    "value": {
+      "$TEXT": {
+        "type": "text",
+        "value": "apple"
+      }
+    }
+  }
+}
                                     }
                                   }
                                 }

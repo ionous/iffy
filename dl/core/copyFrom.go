@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 // fix: can this be removed now?
@@ -38,7 +39,7 @@ func (op *CopyFrom) copyFrom(run rt.Runtime) (ret g.Value, err error) {
 	} else if val != nil {
 		ret = val
 	} else if op.Flags.tryObject() {
-		ret, err = getObjectNamed(run, op.Name)
+		ret, err = safe.ObjectFromString(run, op.Name)
 	} else {
 		err = g.UnknownObject(op.Name)
 	}

@@ -3,7 +3,6 @@ package core
 import (
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/object"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
@@ -70,7 +69,7 @@ func (op *Var) getObject(run rt.Runtime) (ret g.Value, err error) {
 		// try to get the object named "name"
 		// this is for internal use by template rendering;
 		// fix? maybe that should get its own command
-		ret, err = getObjectNamed(run, op.Name)
+		ret, err = safe.ObjectFromString(run, op.Name)
 	}
 	return
 }
@@ -111,17 +110,6 @@ func getVariableValue(run rt.Runtime, text string, aff affine.Affinity, flags Tr
 		case g.UnknownTarget, g.UnknownField:
 			ret = nil // no such variable....
 		}
-	}
-	return
-}
-
-// find an object with the passed partial name
-func getObjectNamed(run rt.Runtime, n string) (ret g.Value, err error) {
-	switch val, e := run.GetField(object.Value, n); e.(type) {
-	case g.UnknownField:
-		err = g.UnknownObject(n)
-	default:
-		ret, err = val, e
 	}
 	return
 }

@@ -7,15 +7,15 @@ import (
 )
 
 type Relate struct {
-	A, B     rt.ObjectEval
-	Relation string
+	Obj, ToObj rt.TextEval
+	Via        string // fix: a relation string.
 }
 
 func (*Relate) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "rel_relate",
-		Group: "relations",
-		Desc:  "Relate: Relate two nouns.",
+		Fluent: &composer.Fluid{Name: "relate", Role: composer.Command},
+		Group:  "relations",
+		Desc:   "Relate: Relate two nouns.",
 	}
 }
 
@@ -27,12 +27,12 @@ func (op *Relate) Execute(run rt.Runtime) (err error) {
 }
 
 func (op *Relate) setRelation(run rt.Runtime) (err error) {
-	if a, e := safe.GetObject(run, op.A); e != nil {
+	if a, e := safe.ObjectFromText(run, op.Obj); e != nil {
 		err = e
-	} else if b, e := safe.GetObject(run, op.B); e != nil {
+	} else if b, e := safe.ObjectFromText(run, op.ToObj); e != nil {
 		err = e
 	} else {
-		err = run.RelateTo(a.String(), b.String(), op.Relation)
+		err = run.RelateTo(a.String(), b.String(), op.Via)
 	}
 	return
 }

@@ -159,7 +159,7 @@ func (op *FromName) Affinity() affine.Affinity {
 func (op *FromName) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if val, e := safe.GetText(run, op.Val); e != nil {
 		err = cmdError(op, e)
-	} else if obj, e := getObjectNamed(run, val.String()); e != nil {
+	} else if obj, e := safe.ObjectFromString(run, val.String()); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = obj
