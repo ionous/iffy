@@ -49,7 +49,7 @@ func TestLocale(t *testing.T) {
 			t.Fatal(e)
 		} else {
 			run := NewRuntime(db)
-			if e := safe.Run(run, &rel.SetLocale{&core.ObjectName{&core.Text{"q"}}, &core.ObjectName{&core.Text{"p"}}}); e != nil {
+			if e := safe.Run(run, &rel.Reparent{&core.Text{"q"}, &core.Text{"p"}}); e != nil {
 				t.Fatal(e)
 			} else if v, e := safe.GetObject(run, &rel.Locale{&core.ObjectName{&core.Text{"q"}}}); e != nil {
 				t.Fatal(e)

@@ -10,7 +10,7 @@ var Slats = []composer.Composer{
 	(*Relate)(nil),
 	(*Relatives)(nil),
 	(*Locale)(nil),
-	(*SetLocale)(nil),
+	(*Reparent)(nil),
 }
 
 func cmdError(op composer.Composer, e error) error {

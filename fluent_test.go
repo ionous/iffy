@@ -93,6 +93,11 @@ func TestFluid(t *testing.T) {
 	) {
 		t.Error(got)
 	}
+	if got := makeSig((*rel.Reparent)(nil)); !got.equals(
+		"reparent childObj:toParentObj:",
+	) {
+		t.Error(got)
+	}
 
 }
 
