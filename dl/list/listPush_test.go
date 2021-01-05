@@ -1,9 +1,12 @@
 package list_test
 
 import (
+	"strconv"
 	"testing"
 
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
+	"github.com/ionous/iffy/rt/safe"
 )
 
 func TestPush(t *testing.T) {
@@ -51,12 +54,14 @@ func push(src []string, front bool, ins []string) (ret string, err error) {
 		err = e
 	} else {
 		front := list.Edge(front)
-		num := getNum(run, &list.Push{"Source", FromTs(ins), &front})
-		if strs, e := vals.GetNamedField("Source"); e != nil {
+		if e := safe.Run(run, &list.PutEdge{Into: &list.IntoTxtList{core.Variable{Str: "Source"}}, From: FromTs(ins), AtEdge: front}); e != nil {
+			err = e
+		} else if strs, e := vals.GetNamedField("Source"); e != nil {
 			err = e
 		} else {
-			next := joinStrings(strs.Strings()) // get the variable set by splice
-			ret = num + "; " + next
+			strs := strs.Strings()
+			next := joinStrings(strs) // get the variable set by splice
+			ret = strconv.Itoa(len(strs)) + "; " + next
 		}
 	}
 	return

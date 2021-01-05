@@ -11,8 +11,8 @@ import (
  * atIndex: num,
  */
 type EraseAtIndex struct {
-	Count   rt.NumberEval  `if:"unlabeled"`
-	From    FromListSource `if:"unlabeled"`
+	Count   rt.NumberEval `if:"unlabeled"`
+	From    ListSource    `if:"unlabeled"`
 	AtIndex rt.NumberEval
 }
 
@@ -33,8 +33,8 @@ func (op *EraseAtIndex) Execute(run rt.Runtime) (err error) {
  * atIndex: num,
  */
 type EraseAtEdge struct {
-	From   FromListSource `if:"unlabeled"`
-	AtEdge Edge           `if:"unlabeled"`
+	From   ListSource `if:"unlabeled"`
+	AtEdge Edge       `if:"unlabeled"`
 }
 
 func (*EraseAtEdge) Compose() composer.Spec {

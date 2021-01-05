@@ -1810,9 +1810,13 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-451",
-                                                      "type": "list_push",
+                                                      "type": "list_put_edge",
                                                       "value": {
-                                                        "$INSERT": {
+                                                        "$AT_EDGE": {
+                                                          "type": "list_edge",
+                                                          "value": "$FALSE"
+                                                        },
+                                                        "$FROM": {
                                                           "id": "id-17692f1b70b-453",
                                                           "type": "assignment",
                                                           "value": {
@@ -1842,10 +1846,17 @@
                                                             }
                                                           }
                                                         },
-                                                        "$LIST": {
-                                                          "id": "id-17692f1b70b-452",
-                                                          "type": "text",
-                                                          "value": "names"
+                                                        "$INTO": {
+                                                          "type": "list_target",
+                                                          "value": {
+                                                            "type": "into_rec_list",
+                                                            "value": {
+                                                              "$VAR": {
+                                                                "type": "variable_name",
+                                                                "value": "groups"
+                                                              }
+                                                            }
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -2002,9 +2013,13 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-394",
-                                                      "type": "list_push",
+                                                      "type": "list_put_edge",
                                                       "value": {
-                                                        "$INSERT": {
+                                                        "$AT_EDGE": {
+                                                          "type": "list_edge",
+                                                          "value": "$FALSE"
+                                                        },
+                                                        "$FROM": {
                                                           "id": "id-17692f1b70b-396",
                                                           "type": "assignment",
                                                           "value": {
@@ -2034,10 +2049,17 @@
                                                             }
                                                           }
                                                         },
-                                                        "$LIST": {
-                                                          "id": "id-17692f1b70b-395",
-                                                          "type": "text",
-                                                          "value": "names"
+                                                        "$INTO": {
+                                                          "type": "list_target",
+                                                          "value": {
+                                                            "type": "into_rec_list",
+                                                            "value": {
+                                                              "$VAR": {
+                                                                "type": "variable_name",
+                                                                "value": "groups"
+                                                              }
+                                                            }
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -2137,9 +2159,13 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-421",
-                                                      "type": "list_push",
+                                                      "type": "list_put_edge",
                                                       "value": {
-                                                        "$INSERT": {
+                                                        "$AT_EDGE": {
+                                                          "type": "list_edge",
+                                                          "value": "$FALSE"
+                                                        },
+                                                        "$FROM": {
                                                           "id": "id-17692f1b70b-423",
                                                           "type": "assignment",
                                                           "value": {
@@ -2154,10 +2180,17 @@
                                                             }
                                                           }
                                                         },
-                                                        "$LIST": {
-                                                          "id": "id-17692f1b70b-422",
-                                                          "type": "text",
-                                                          "value": "groups"
+                                                        "$INTO": {
+                                                          "type": "list_target",
+                                                          "value": {
+                                                            "type": "into_rec_list",
+                                                            "value": {
+                                                              "$VAR": {
+                                                                "type": "variable_name",
+                                                                "value": "groups"
+                                                              }
+                                                            }
+                                                          }
                                                         }
                                                       }
                                                     }

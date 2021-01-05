@@ -10,11 +10,11 @@ import (
 
 var Slots = []composer.Slot{{
 	Name: "list_target",
-	Type: (*IntoListTarget)(nil),
+	Type: (*ListTarget)(nil),
 	Desc: "List target: Helper for accessing lists.",
 }, {
 	Name: "list_source",
-	Type: (*FromListSource)(nil),
+	Type: (*ListSource)(nil),
 	Desc: "List source: Helper for accessing lists.",
 }}
 
@@ -24,7 +24,6 @@ var Slats = []composer.Composer{
 	(*Len)(nil),
 	(*Map)(nil),
 	(*Pop)(nil),
-	(*Push)(nil),
 	(*Reduce)(nil),
 	(*Set)(nil),
 	(*Slice)(nil),
@@ -42,8 +41,8 @@ var Slats = []composer.Composer{
 	// gather:
 	(*Gather)(nil),
 	// put:
-	(*PutAtEdge)(nil),
-	(*PutAtIndex)(nil),
+	(*PutEdge)(nil),
+	(*PutIndex)(nil),
 	(*IntoNumList)(nil),
 	(*IntoRecList)(nil),
 	(*IntoTxtList)(nil),

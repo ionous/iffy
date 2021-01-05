@@ -13,7 +13,6 @@ import (
 	"github.com/ionous/iffy/dl/list"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/export/tag"
-	"github.com/ionous/iffy/lang"
 	"github.com/kr/pretty"
 )
 
@@ -30,14 +29,14 @@ func TestFluid(t *testing.T) {
 		"put:intoObjNamed:atField:"})) > 0 {
 		t.Error(pretty.Sprint(got))
 	}
-	if got := makeSignature((*list.PutAtIndex)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSignature((*list.PutIndex)(nil)); len(pretty.Diff(got, signature{
 		"put:intoNumList:atIndex:",
 		"put:intoRecList:atIndex:",
 		"put:intoTxtList:atIndex:",
 	})) > 0 {
 		t.Error(pretty.Sprint(got))
 	}
-	if got := makeSignature((*list.PutAtEdge)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSignature((*list.PutEdge)(nil)); len(pretty.Diff(got, signature{
 		"put:intoNumList:atBack|atFront!",
 		"put:intoRecList:atBack|atFront!",
 		"put:intoTxtList:atBack|atFront!"})) > 0 {
@@ -138,15 +137,6 @@ func fieldName(f *r.StructField, tags tag.StructTag) (ret string) {
 		ret = l
 	} else {
 		ret = firstRuneLower(f.Name)
-	}
-	return
-}
-
-func typeName(name string, t r.Type) (ret string) {
-	if len(name) > 0 {
-		ret = name
-	} else {
-		ret = lang.Underscore(t.Name())
 	}
 	return
 }

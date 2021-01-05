@@ -19,7 +19,7 @@ type Var struct {
 func (*Var) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "get_var",
-		Spec:  "the {name:text}",
+		Spec:  "var: {name:text}",
 		Group: "variables",
 		Desc:  "Get Variable: Return the value of the named variable.",
 	}

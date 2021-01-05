@@ -404,9 +404,13 @@
                                                                 "type": "execute",
                                                                 "value": {
                                                                   "id": "id-17691d01da5-72",
-                                                                  "type": "list_push",
+                                                                  "type": "list_put_edge",
                                                                   "value": {
-                                                                    "$INSERT": {
+                                                                    "$AT_EDGE": {
+                                                                      "type": "list_edge",
+                                                                      "value": "$FALSE"
+                                                                    },
+                                                                    "$FROM": {
                                                                       "id": "id-17691d01da5-74",
                                                                       "type": "assignment",
                                                                       "value": {
@@ -441,10 +445,17 @@
                                                                         }
                                                                       }
                                                                     },
-                                                                    "$LIST": {
-                                                                      "id": "id-17691d01da5-73",
-                                                                      "type": "text",
-                                                                      "value": "no named objects"
+                                                                    "$INTO": {
+                                                                      "type": "list_target",
+                                                                      "value": {
+                                                                        "type": "into_rec_list",
+                                                                        "value": {
+                                                                          "$VAR": {
+                                                                            "type": "variable_name",
+                                                                            "value": "no named objects"
+                                                                          }
+                                                                        }
+                                                                      }
                                                                     }
                                                                   }
                                                                 }

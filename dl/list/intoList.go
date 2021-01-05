@@ -1,13 +1,15 @@
 package list
 
 import (
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
+	"github.com/ionous/iffy/rt/safe"
 )
 
-type IntoListTarget interface {
+type ListTarget interface {
 	GetListTarget(run rt.Runtime) (g.Value, error)
 }
 
@@ -43,13 +45,28 @@ func (*IntoRecList) Compose() composer.Spec {
 }
 
 func (op *IntoNumList) GetListTarget(run rt.Runtime) (ret g.Value, err error) {
+	if v, e := safe.Variable(run, op.Var.String(), affine.NumList); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = v
+	}
 	return
 }
 
 func (op *IntoRecList) GetListTarget(run rt.Runtime) (ret g.Value, err error) {
+	if v, e := safe.Variable(run, op.Var.String(), affine.RecordList); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = v
+	}
 	return
 }
 
 func (op *IntoTxtList) GetListTarget(run rt.Runtime) (ret g.Value, err error) {
+	if v, e := safe.Variable(run, op.Var.String(), affine.TextList); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = v
+	}
 	return
 }

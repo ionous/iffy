@@ -11,7 +11,10 @@ const spec = [
       "params": {
         "$FIX": "fix",
         "$NOTE": "note",
-        "$TO_DO": "to do",
+        "$TO_DO": {
+          "label": "toDo",
+          "value": "to do"
+        },
         "$WARNING": "warning"
       },
       "tokens": [
@@ -34,13 +37,19 @@ const spec = [
     "uses": "str",
     "with": {
       "params": {
-        "$IGNORE_CASE": "ignore case",
-        "$INCLUDE_CASE": "include case"
+        "$FALSE": {
+          "label": "includeCase",
+          "value": "include_case"
+        },
+        "$TRUE": {
+          "label": "ignoreCase",
+          "value": "ignore_case"
+        }
       },
       "tokens": [
-        "$INCLUDE_CASE",
+        "$FALSE",
         " or ",
-        "$IGNORE_CASE"
+        "$TRUE"
       ]
     }
   },
@@ -53,13 +62,19 @@ const spec = [
     "uses": "str",
     "with": {
       "params": {
-        "$AT_BACK": "at back",
-        "$AT_FRONT": "at front"
+        "$FALSE": {
+          "label": "atBack",
+          "value": "at_back"
+        },
+        "$TRUE": {
+          "label": "atFront",
+          "value": "at_front"
+        }
       },
       "tokens": [
-        "$AT_BACK",
+        "$FALSE",
         " or ",
-        "$AT_FRONT"
+        "$TRUE"
       ]
     }
   },
@@ -72,13 +87,13 @@ const spec = [
     "uses": "str",
     "with": {
       "params": {
-        "$ASCENDING": "ascending",
-        "$DESCENDING": "descending"
+        "$FALSE": "ascending",
+        "$TRUE": "descending"
       },
       "tokens": [
-        "$ASCENDING",
+        "$FALSE",
         " or ",
-        "$DESCENDING"
+        "$TRUE"
       ]
     }
   },
@@ -120,8 +135,13 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "List getter: Helper for accessing lists.",
-    "name": "list_getter",
+    "desc": "List source: Helper for accessing lists.",
+    "name": "list_source",
+    "uses": "slot"
+  },
+  {
+    "desc": "List target: Helper for accessing lists.",
+    "name": "list_target",
     "uses": "slot"
   },
   {
@@ -315,42 +335,6 @@ const spec = [
     "name": "arguments",
     "spec": " when {arguments%args+argument|comma-and}",
     "uses": "flow"
-  },
-  {
-    "desc": "Assignment: Sets a variable to a value.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$NAME": {
-          "label": "var",
-          "type": "variable_name"
-        }
-      },
-      "roles": "CZSZKZSZKT",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "let",
-        " ",
-        "var",
-        ": ",
-        "$NAME",
-        ", ",
-        "from",
-        ": ",
-        "$FROM",
-        "."
-      ]
-    }
   },
   {
     "desc": "From Bool: Assigns the passed boolean value.",
@@ -1014,6 +998,72 @@ const spec = [
     }
   },
   {
+    "desc": "Erase: remove one or more values from a list",
+    "name": "erase_at_edge",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_EDGE": {
+          "label": "atEdge",
+          "type": "list_edge"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "list_source"
+        }
+      },
+      "roles": "CZKZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "erase",
+        ": ",
+        "$FROM",
+        ", ",
+        "$AT_EDGE",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "Erase: remove one or more values from a list",
+    "name": "erase_at_index",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_INDEX": {
+          "label": "atIndex",
+          "type": "number_eval"
+        },
+        "$COUNT": {
+          "label": "count",
+          "type": "number_eval"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "list_source"
+        }
+      },
+      "roles": "CZKZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "erase",
+        ": ",
+        "$COUNT",
+        ", ",
+        "$FROM",
+        ", ",
+        "atIndex",
+        ": ",
+        "$AT_INDEX",
+        "."
+      ]
+    }
+  },
+  {
     "desc": "For Each Number: Loops over the passed list of numbers, or runs the 'else' activity if empty.",
     "group": [
       "exec"
@@ -1104,6 +1154,72 @@ const spec = [
     }
   },
   {
+    "desc": "FromNumList: Targets a list of numbers",
+    "name": "from_num_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_source"
+      ],
+      "tokens": [
+        "fromNumList",
+        ": ",
+        "$VAR"
+      ]
+    }
+  },
+  {
+    "desc": "FromRecList: Targets a list of records",
+    "name": "from_rec_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_source"
+      ],
+      "tokens": [
+        "fromRecList",
+        ": ",
+        "$VAR"
+      ]
+    }
+  },
+  {
+    "desc": "FromTxtList: Targets a list of text",
+    "name": "from_txt_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_source"
+      ],
+      "tokens": [
+        "fromTxtList",
+        ": ",
+        "$VAR"
+      ]
+    }
+  },
+  {
     "desc": "Get Field: Return the value of the named object property.",
     "group": [
       "objects"
@@ -1130,7 +1246,7 @@ const spec = [
       "variables"
     ],
     "name": "get_var",
-    "spec": "the {name:text}",
+    "spec": "var: {name:text}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1241,19 +1357,19 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$VAR_NAME": {
-          "label": "varName",
-          "type": "text"
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
         }
       },
       "roles": "SZK",
       "slots": [
-        "list_getter"
+        "list_target"
       ],
       "tokens": [
         "intoNumList",
         ": ",
-        "$VAR_NAME"
+        "$VAR"
       ]
     }
   },
@@ -1307,9 +1423,9 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$VAR_NAME": {
-          "label": "varName",
-          "type": "text"
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
         }
       },
       "roles": "SZK",
@@ -1319,7 +1435,7 @@ const spec = [
       "tokens": [
         "intoRec",
         ": ",
-        "$VAR_NAME"
+        "$VAR"
       ]
     }
   },
@@ -1329,19 +1445,19 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$VAR_NAME": {
-          "label": "varName",
-          "type": "text"
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
         }
       },
       "roles": "SZK",
       "slots": [
-        "list_getter"
+        "list_target"
       ],
       "tokens": [
         "intoRecList",
         ": ",
-        "$VAR_NAME"
+        "$VAR"
       ]
     }
   },
@@ -1351,19 +1467,19 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$VAR_NAME": {
-          "label": "varName",
-          "type": "text"
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
         }
       },
       "roles": "SZK",
       "slots": [
-        "list_getter"
+        "list_target"
       ],
       "tokens": [
         "intoTxtList",
         ": ",
-        "$VAR_NAME"
+        "$VAR"
       ]
     }
   },
@@ -1487,6 +1603,40 @@ const spec = [
     }
   },
   {
+    "desc": "Assignment: Sets a variable to a value.",
+    "group": [
+      "variables"
+    ],
+    "name": "let",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$BE": {
+          "label": "be",
+          "type": "assignment"
+        },
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "CZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "let",
+        ": ",
+        "$VAR",
+        ", ",
+        "be",
+        ": ",
+        "$BE",
+        "."
+      ]
+    }
+  },
+  {
     "desc": "Lines Value: specify one or more lines of text.",
     "group": [
       "literals"
@@ -1522,6 +1672,43 @@ const spec = [
     "with": {
       "slots": [
         "execute"
+      ]
+    }
+  },
+  {
+    "desc": "Gather list: Transform the values from a list.\n\t\tThe named pattern gets called once for each value in the list.\n\t\tIt get called with two parameters: 'in' as each value from the list, \n\t\tand 'out' as the var passed to the gather.",
+    "group": [
+      "list"
+    ],
+    "name": "list_gather",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$FROM": {
+          "label": "from",
+          "type": "list_source"
+        },
+        "$USING": {
+          "label": "using",
+          "type": "text"
+        },
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "CZKZKZSZKT",
+      "tokens": [
+        "gather",
+        ": ",
+        "$VAR",
+        ", ",
+        "$FROM",
+        ", ",
+        "using",
+        ": ",
+        "$USING",
+        "."
       ]
     }
   },
@@ -1644,17 +1831,74 @@ const spec = [
     }
   },
   {
-    "desc": "Push into list: Add elements to the front or back of a list.\nReturns the new length of the list.",
-    "group": [
-      "list"
-    ],
-    "name": "list_push",
-    "spec": "push {into%list:text} {front?list_edge} {inserting%insert:assignment}",
+    "desc": "Put: add a value to a list",
+    "name": "list_put_edge",
     "uses": "flow",
     "with": {
+      "params": {
+        "$AT_EDGE": {
+          "label": "atEdge",
+          "type": "list_edge"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$INTO": {
+          "label": "into",
+          "type": "list_target"
+        }
+      },
+      "roles": "CZKZKZKT",
       "slots": [
-        "execute",
-        "number_eval"
+        "execute"
+      ],
+      "tokens": [
+        "put",
+        ": ",
+        "$FROM",
+        ", ",
+        "$INTO",
+        ", ",
+        "$AT_EDGE",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "Put: replace one value in a list with another",
+    "name": "list_put_index",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_INDEX": {
+          "label": "atIndex",
+          "type": "number_eval"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$INTO": {
+          "label": "into",
+          "type": "list_target"
+        }
+      },
+      "roles": "CZKZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "put",
+        ": ",
+        "$FROM",
+        ", ",
+        "$INTO",
+        ", ",
+        "atIndex",
+        ": ",
+        "$AT_INDEX",
+        "."
       ]
     }
   },
@@ -1796,13 +2040,13 @@ const spec = [
           "optional": true,
           "type": "list_sort_by_field"
         },
-        "$NAME": {
-          "label": "numbers",
-          "type": "variable_name"
-        },
         "$ORDER": {
           "label": "order",
           "type": "list_order"
+        },
+        "$VAR": {
+          "label": "numbers",
+          "type": "variable_name"
         }
       },
       "roles": "CZSZKZKZKT",
@@ -1811,7 +2055,7 @@ const spec = [
         " ",
         "numbers",
         ": ",
-        "$NAME",
+        "$VAR",
         ", ",
         "$BY_FIELD",
         ", ",
@@ -1838,13 +2082,13 @@ const spec = [
           "label": "case",
           "type": "list_case"
         },
-        "$NAME": {
-          "label": "text",
-          "type": "variable_name"
-        },
         "$ORDER": {
           "label": "order",
           "type": "list_order"
+        },
+        "$VAR": {
+          "label": "text",
+          "type": "variable_name"
         }
       },
       "roles": "CZSZKZKZKZKT",
@@ -1853,7 +2097,7 @@ const spec = [
         " ",
         "text",
         ": ",
-        "$NAME",
+        "$VAR",
         ", ",
         "$BY_FIELD",
         ", ",
@@ -2142,49 +2386,6 @@ const spec = [
     }
   },
   {
-    "desc": "Pack: Puts a value into a record.",
-    "group": [
-      "variables"
-    ],
-    "name": "pack",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$FIELD": {
-          "label": "field",
-          "type": "text"
-        },
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$RECORD": {
-          "label": "record",
-          "type": "record_eval"
-        }
-      },
-      "roles": "QZSZKZSZKZSZK",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "pack",
-        " ",
-        "record",
-        ": ",
-        "$RECORD",
-        ", ",
-        "field",
-        ": ",
-        "$FIELD",
-        ", ",
-        "from",
-        ": ",
-        "$FROM"
-      ]
-    }
-  },
-  {
     "desc": "Pluralize: Returns the plural form of a singular word. (ex.  apples for apple. )",
     "group": [
       "format"
@@ -2254,41 +2455,6 @@ const spec = [
     }
   },
   {
-    "desc": "Put: add a value to a list",
-    "name": "put_at_edge",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$AT_EDGE": {
-          "label": "atEdge",
-          "type": "list_edge"
-        },
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$INTO": {
-          "label": "into",
-          "type": "list_getter"
-        }
-      },
-      "roles": "CZKZKZKT",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "put",
-        ": ",
-        "$FROM",
-        ", ",
-        "$INTO",
-        ", ",
-        "$AT_EDGE",
-        "."
-      ]
-    }
-  },
-  {
     "desc": "Put: put a value into the field of an record or object",
     "name": "put_at_field",
     "uses": "flow",
@@ -2321,43 +2487,6 @@ const spec = [
         "atField",
         ": ",
         "$AT_FIELD",
-        "."
-      ]
-    }
-  },
-  {
-    "desc": "Put: replace one value in a list with another",
-    "name": "put_at_index",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$AT_INDEX": {
-          "label": "atIndex",
-          "type": "number_eval"
-        },
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$INTO": {
-          "label": "into",
-          "type": "list_getter"
-        }
-      },
-      "roles": "CZKZKZSZKT",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "put",
-        ": ",
-        "$FROM",
-        ", ",
-        "$INTO",
-        ", ",
-        "atIndex",
-        ": ",
-        "$AT_INDEX",
         "."
       ]
     }
@@ -2470,49 +2599,6 @@ const spec = [
         ": ",
         "$TEXT",
         "."
-      ]
-    }
-  },
-  {
-    "desc": "Set Field: Sets the named field to the assigned value.",
-    "group": [
-      "objects"
-    ],
-    "name": "set_field",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$FIELD": {
-          "label": "field",
-          "type": "text"
-        },
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$OBJECT": {
-          "label": "object",
-          "type": "object_eval"
-        }
-      },
-      "roles": "QZSZKZSZKZSZK",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "setField",
-        " ",
-        "object",
-        ": ",
-        "$OBJECT",
-        ", ",
-        "field",
-        ": ",
-        "$FIELD",
-        ", ",
-        "from",
-        ": ",
-        "$FROM"
       ]
     }
   },

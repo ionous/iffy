@@ -7,7 +7,7 @@ import (
 	g "github.com/ionous/iffy/rt/generic"
 )
 
-type FromListSource interface {
+type ListSource interface {
 	GetListSource(run rt.Runtime) (g.Value, error)
 }
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"sort"
 	"strings"
+	"unicode"
 
 	r "reflect"
 
@@ -78,10 +79,10 @@ func (c *Collect) AddSlat(cmd composer.Composer) {
 			var roles string
 			params := export.Dict{}
 			if spec.UsesStr() {
-				if cs := spec.Strings; len(cs) == 2 && spec.OpenStrings {
-					tokens, params = choices(cs, []string{"false", "true"})
+				if cs := spec.Strings; len(cs) == 2 && !spec.OpenStrings {
+					tokens, params = makeStrChoices(cs, []string{"false", "true"})
 				} else if len(cs) > 0 {
-					tokens, params = choices(cs, cs)
+					tokens, params = makeStrChoices(cs, cs)
 				}
 				if spec.OpenStrings {
 					t := export.Tokenize(name)
@@ -148,7 +149,9 @@ func (c *Collect) Stubs() (ret []byte) {
 	return
 }
 
-func choices(vs, ts []string) (retTokens []string, retParams export.Dict) {
+// vs: string values from spec.Strings
+// ts: lowercase tokens to use -- mostly for binary true false backwards compat.
+func makeStrChoices(vs, ts []string) (retTokens []string, retParams export.Dict) {
 	retParams = make(export.Dict)
 	for i, el := range ts {
 		t := "$" + lang.UpperBreakcase(el)
@@ -156,7 +159,39 @@ func choices(vs, ts []string) (retTokens []string, retParams export.Dict) {
 		if i+1 < len(vs) {
 			retTokens = append(retTokens, " or ")
 		}
-		retParams[t] = vs[i]
+		// fix: could make this contingent on "is fluent"
+		label := camelize(vs[i])
+		if value := vs[i]; label == value {
+			retParams[t] = value
+		} else {
+			retParams[t] = map[string]string{
+				"label": label,
+				"value": value,
+			}
+		}
 	}
 	return
+}
+
+func camelize(s string) string {
+	var b strings.Builder
+	writeCamel(&b, s)
+	return b.String()
+}
+
+// see also fluent_test
+func writeCamel(b *strings.Builder, s string) {
+	nextUpper := false
+	for i, u := range s {
+		if i == 0 {
+			b.WriteRune(unicode.ToLower(u))
+		} else if u == '_' || u == ' ' {
+			nextUpper = true
+		} else if nextUpper {
+			b.WriteRune(unicode.ToUpper(u))
+			nextUpper = false
+		} else {
+			b.WriteRune(u)
+		}
+	}
 }

@@ -58,17 +58,17 @@ var collateGroups = pattern.ActivityPattern{
 				// pack the object and its settings into it,
 				// push the group into the groups.
 				True: core.NewActivity(
-					&list.Push{List: "names", Insert: &core.Unpack{V("settings"), "Name"}},
+					&list.PutEdge{Into: &list.IntoTxtList{N("names")}, From: &core.Unpack{V("settings"), "Name"}},
 					Put("group", "Objects", V("names")),
 					Put("group", "Settings", V("settings")),
-					&list.Push{List: "groups", Insert: V("group")},
+					&list.PutEdge{Into: &list.IntoRecList{N("groups")}, From: V("group")},
 				), // end true
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				False: core.NewActivity(
 					&core.Let{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
 					&core.Let{N("names"), &core.Unpack{V("group"), "Objects"}},
-					&list.Push{List: "names", Insert: &core.Unpack{V("settings"), "Name"}},
+					&list.PutEdge{Into: &list.IntoTxtList{N("names")}, From: &core.Unpack{V("settings"), "Name"}},
 					Put("group", "Objects", V("names")),
 					&list.Set{List: "groups", Index: V("idx"), From: V("group")},
 				), // end false
