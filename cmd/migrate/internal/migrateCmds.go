@@ -3,9 +3,6 @@ package internal
 import (
 	"encoding/json"
 	"strings"
-
-	"github.com/ionous/errutil"
-	"github.com/kr/pretty"
 )
 
 type Target struct {
@@ -49,34 +46,24 @@ func (t Target) dequote() string {
 
 //
 type Migration interface {
-	Migrate(doc interface{}) error
+	Migrate(doc interface{}) (int, error)
 }
 
-func Migrate(doc interface{}, ops ...Migration) (err error) {
-	for i, op := range ops {
-		if e := op.Migrate(doc); e != nil {
-			err = errutil.Fmt("error %v @%d=%v", e, i, pretty.Sprint(op))
-			break
-		}
-	}
-	return
-}
-
-func (op *Copy) Migrate(doc interface{}) error {
+func (op *Copy) Migrate(doc interface{}) (ret int, err error) {
 	return replicate(doc,
 		op.From.dequote(), op.From.Field,
 		op.To.dequote(), op.To.Field)
 }
 
-func (op *Replace) Migrate(doc interface{}) (err error) {
+func (op *Replace) Migrate(doc interface{}) (ret int, err error) {
 	if e, ok := op.With.(error); ok {
 		err = e
 	} else {
-		err = op.replace(doc, op.With)
+		ret, err = op.replace(doc, op.With)
 	}
 	return
 }
 
-func (op *Replace) replace(doc interface{}, val interface{}) error {
+func (op *Replace) replace(doc interface{}, val interface{}) (int, error) {
 	return replace(doc, op.From.dequote(), op.From.Field, val)
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/ionous/errutil"
+	"github.com/kr/pretty"
 )
 
 type Patch []PatchCommand
@@ -13,11 +14,13 @@ type PatchCommand struct {
 	Migration `json:"migration"`
 }
 
-func (p Patch) Migrate(doc interface{}) (err error) {
-	for _, op := range p {
-		if e := op.Migrate(doc); e != nil {
-			err = e
+func (p Patch) Migrate(doc interface{}) (ret int, err error) {
+	for i, op := range p {
+		if cnt, e := op.Migrate(doc); e != nil {
+			err = errutil.Fmt("error %v @%d=%v", e, i, pretty.Sprint(op))
 			break
+		} else {
+			ret += cnt
 		}
 	}
 	return

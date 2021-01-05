@@ -6,7 +6,7 @@ import (
 )
 
 //
-func replicate(doc interface{}, fromParent, fromField, toParent, toField string) (err error) {
+func replicate(doc interface{}, fromParent, fromField, toParent, toField string) (ret int, err error) {
 	if src, e := jsonpath.Get(fromParent, doc); e != nil {
 		err = e
 	} else if fromEls, ok := src.([]interface{}); !ok {
@@ -28,13 +28,14 @@ func replicate(doc interface{}, fromParent, fromField, toParent, toField string)
 				break
 			} else {
 				to[toField] = from[fromField]
+				ret++
 			}
 		}
 	}
 	return
 }
 
-func replace(doc interface{}, parent, field string, value interface{}) (err error) {
+func replace(doc interface{}, parent, field string, value interface{}) (ret int, err error) {
 	if tgt, e := jsonpath.Get(parent, doc); e != nil {
 		err = e
 	} else if els, ok := tgt.([]interface{}); !ok {
@@ -44,36 +45,15 @@ func replace(doc interface{}, parent, field string, value interface{}) (err erro
 			if obj, ok := el.(map[string]interface{}); !ok {
 				err = errutil.Fmt("expected a slice of objects; got %T", el)
 				break
-			} else if value == nil {
-				delete(obj, field)
 			} else {
-				obj[field] = value
+				if value == nil {
+					delete(obj, field)
+				} else {
+					obj[field] = value
+				}
+				ret++
 			}
 		}
 	}
 	return
 }
-
-//
-// func rename(doc interface{}, parent, field, newField string) (err error) {
-// 	if tgt, e := jsonpath.Get(parent, doc); e != nil {
-// 		err = e
-// 	} else if els, ok := tgt.([]interface{}); !ok {
-// 		err = errutil.Fmt("unknown target %T", tgt)
-// 	} else {
-// 		for _, el := range els {
-// 			if obj, ok := el.(map[string]interface{}); !ok {
-// 				err = errutil.Fmt("expected a slice of objects; got %T", el)
-// 				break
-// 			} else {
-// 				if len(newField) > 0 {
-// 					obj[newField] = obj[field]
-// 				}
-// 				delete(obj, field)
-// 			}
-// 		}
-// 	}
-// 	return
-// }
-
-//

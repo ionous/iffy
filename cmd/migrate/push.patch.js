@@ -25,8 +25,8 @@
         "value": {
           "type": "into_rec_list",
           "value": {
-            "$VAR_NAME": {
-              "type": "text"
+            "$VAR": {
+              "type": "variable_name"
             }
           }
         }
@@ -41,7 +41,7 @@
         "field": "value"
       },
       "to": {
-        "parent": "$..[?(@.type=='list_push')].value['$INTO']..['$VAR_NAME']",
+        "parent": "$..[?(@.type=='list_push')].value['$INTO']..['$VAR']",
         "field": "value"
       }
     }
@@ -86,7 +86,7 @@
         "parent": "$..[?(@.type=='list_push')]",
         "field": "type"
       },
-      "with": "list_put_at_edge"
+      "with": "list_put_edge"
     }
   }
 ]

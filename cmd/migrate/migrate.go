@@ -15,7 +15,7 @@ import (
 
 func main() {
 	paths := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/stories"
-	patchPath := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/migrate/push.js"
+	patchPath := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/migrate/push.patch.js"
 
 	flag.StringVar(&paths, "in", paths, "comma separated input files or directory names")
 	flag.StringVar(&patchPath, "patch", patchPath, "patch file")
@@ -33,17 +33,19 @@ func main() {
 func migratePaths(paths string, patch Migration) (err error) {
 	return readPaths(paths, func(path string, doc interface{}) (err error) {
 		log.Printf("migrating %q...", path)
-		if e := patch.Migrate(doc); e != nil {
+		if cnt, e := patch.Migrate(doc); e != nil {
 			err = e
+		} else if cnt == 0 {
+			log.Println("unchanged.")
 		} else {
-			if f, e := os.Create(path + ".next.js"); e != nil {
+			if f, e := os.Create(path); e != nil {
 				err = e
 			} else {
 				defer f.Close()
 				j := json.NewEncoder(f)
-				j.SetIndent("", " ")
+				j.SetIndent("", "  ")
 				err = j.Encode(doc)
-				log.Printf("migrated %q.", path)
+				log.Println("migrated.")
 			}
 		}
 		return //
