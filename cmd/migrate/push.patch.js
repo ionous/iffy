@@ -86,7 +86,7 @@
         "parent": "$..[?(@.type=='list_push')]",
         "field": "type"
       },
-      "with": "list_put_edge"
+      "with": "put_edge"
     }
   }
 ]

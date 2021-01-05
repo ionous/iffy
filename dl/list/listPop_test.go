@@ -3,32 +3,46 @@ package list_test
 import (
 	"testing"
 
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/list"
 	"github.com/kr/pretty"
 )
 
-func TestPop(t *testing.T) {
+func TestPopping(t *testing.T) {
+	errutil.Panic = true
 	// pop from the front of a list
-	front := popTest(true, 5, "Orange", "Lemon", "Mango")
-	if d := pretty.Diff(front, []string{"Orange", "Lemon", "Mango", "x", "x"}); len(d) > 0 {
-		t.Fatal(d)
-	}
+	// front := popTest(true, 5, "Orange", "Lemon", "Mango")
+	// if d := pretty.Diff(front, []string{"Orange", "Lemon", "Mango", "x", "x"}); len(d) > 0 {
+	// 	t.Fatal("pop front", front)
+	// }
 	// pop from the back of a list
 	back := popTest(false, 5, "Orange", "Lemon", "Mango")
 	if d := pretty.Diff(back, []string{"Mango", "Lemon", "Orange", "x", "x"}); len(d) > 0 {
-		t.Fatal(d)
+		t.Fatal("pop back", back)
 	}
 }
 
 func popTest(front bool, amt int, src ...string) []string {
 	var out []string
-	pop := &list.Pop{
-		List:  &core.Var{Name: "Source"},
-		With:  "text",
-		Front: list.Edge(front),
-		Go:    core.NewActivity(&Write{&out, V("text")}),
-		Else:  core.NewActivity(&Write{&out, T("x")}),
+	var start int
+	if front {
+		start = 1
+	} else {
+		start = -1
+	}
+	pop := &list.Erasing{
+		EraseIndex: list.EraseIndex{
+			Count:   I(1),
+			AtIndex: I(start),
+			From:    &list.FromTxtList{N("Source")},
+		},
+		As: "text",
+		Do: *core.NewActivity(&core.Choose{
+			If:    &core.CompareNum{&list.Len{V("text")}, &core.EqualTo{}, I(0)},
+			True:  core.NewActivity(&Write{&out, T("x")}),
+			False: core.NewActivity(&Write{&out, &list.At{V("text"), I(1)}}),
+		}),
 	}
 	if run, _, e := newListTime(src, nil); e != nil {
 		panic(e)

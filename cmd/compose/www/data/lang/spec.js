@@ -998,8 +998,8 @@ const spec = [
     }
   },
   {
-    "desc": "Erase: remove one or more values from a list",
-    "name": "erase_at_edge",
+    "desc": "Erase: Remove one or more values from a list",
+    "name": "erase_edge",
     "uses": "flow",
     "with": {
       "params": {
@@ -1028,7 +1028,7 @@ const spec = [
   },
   {
     "desc": "Erase: remove one or more values from a list",
-    "name": "erase_at_index",
+    "name": "erase_index",
     "uses": "flow",
     "with": {
       "params": {
@@ -1059,6 +1059,62 @@ const spec = [
         "atIndex",
         ": ",
         "$AT_INDEX",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "Erasing from list: Erase elements from the front or back of a list.\nRuns an activity with a list containing the erased values; the list can be empty if nothing was erased.",
+    "group": [
+      "list"
+    ],
+    "name": "erasing",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AS": {
+          "label": "as",
+          "type": "text"
+        },
+        "$AT_INDEX": {
+          "label": "atIndex",
+          "type": "number_eval"
+        },
+        "$COUNT": {
+          "label": "count",
+          "type": "number_eval"
+        },
+        "$DO": {
+          "label": "do",
+          "type": "activity"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "list_source"
+        }
+      },
+      "roles": "CZKZKZSZKZSZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "erasing",
+        ": ",
+        "$COUNT",
+        ", ",
+        "$FROM",
+        ", ",
+        "atIndex",
+        ": ",
+        "$AT_INDEX",
+        ", ",
+        "as",
+        ": ",
+        "$AS",
+        ", ",
+        "do",
+        ": ",
+        "$DO",
         "."
       ]
     }
@@ -1154,7 +1210,7 @@ const spec = [
     }
   },
   {
-    "desc": "FromNumList: Targets a list of numbers",
+    "desc": "FromNumList: Uses a list of numbers",
     "name": "from_num_list",
     "uses": "flow",
     "with": {
@@ -1176,7 +1232,7 @@ const spec = [
     }
   },
   {
-    "desc": "FromRecList: Targets a list of records",
+    "desc": "FromRecList: Uses a list of records",
     "name": "from_rec_list",
     "uses": "flow",
     "with": {
@@ -1198,7 +1254,7 @@ const spec = [
     }
   },
   {
-    "desc": "FromTxtList: Targets a list of text",
+    "desc": "FromTxtList: Uses a list of text",
     "name": "from_txt_list",
     "uses": "flow",
     "with": {
@@ -1766,139 +1822,6 @@ const spec = [
         "usingPattern",
         ": ",
         "$USING_PATTERN"
-      ]
-    }
-  },
-  {
-    "desc": "Pop from list: Remove an element from the front or back of a list.\nRuns an activity with the popped value, or runs the 'else' activity if the list was empty.",
-    "group": [
-      "list"
-    ],
-    "name": "list_pop",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$ELSE": {
-          "label": "else",
-          "optional": true,
-          "type": "activity"
-        },
-        "$FRONT": {
-          "label": "front",
-          "type": "list_edge"
-        },
-        "$GO": {
-          "label": "go",
-          "optional": true,
-          "type": "activity"
-        },
-        "$LIST": {
-          "label": "list",
-          "type": "assignment"
-        },
-        "$WITH": {
-          "label": "with",
-          "type": "text"
-        }
-      },
-      "roles": "QZSZKZSZKZSZKZSZKZSZK",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "pop",
-        " ",
-        "list",
-        ": ",
-        "$LIST",
-        ", ",
-        "with",
-        ": ",
-        "$WITH",
-        ", ",
-        "front",
-        ": ",
-        "$FRONT",
-        ", ",
-        "go",
-        ": ",
-        "$GO",
-        ", ",
-        "else",
-        ": ",
-        "$ELSE"
-      ]
-    }
-  },
-  {
-    "desc": "Put: add a value to a list",
-    "name": "list_put_edge",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$AT_EDGE": {
-          "label": "atEdge",
-          "type": "list_edge"
-        },
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$INTO": {
-          "label": "into",
-          "type": "list_target"
-        }
-      },
-      "roles": "CZKZKZKT",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "put",
-        ": ",
-        "$FROM",
-        ", ",
-        "$INTO",
-        ", ",
-        "$AT_EDGE",
-        "."
-      ]
-    }
-  },
-  {
-    "desc": "Put: replace one value in a list with another",
-    "name": "list_put_index",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$AT_INDEX": {
-          "label": "atIndex",
-          "type": "number_eval"
-        },
-        "$FROM": {
-          "label": "from",
-          "type": "assignment"
-        },
-        "$INTO": {
-          "label": "into",
-          "type": "list_target"
-        }
-      },
-      "roles": "CZKZKZSZKT",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "put",
-        ": ",
-        "$FROM",
-        ", ",
-        "$INTO",
-        ", ",
-        "atIndex",
-        ": ",
-        "$AT_INDEX",
-        "."
       ]
     }
   },
@@ -2487,6 +2410,78 @@ const spec = [
         "atField",
         ": ",
         "$AT_FIELD",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "Put: add a value to a list",
+    "name": "put_edge",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_EDGE": {
+          "label": "atEdge",
+          "type": "list_edge"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$INTO": {
+          "label": "into",
+          "type": "list_target"
+        }
+      },
+      "roles": "CZKZKZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "put",
+        ": ",
+        "$FROM",
+        ", ",
+        "$INTO",
+        ", ",
+        "$AT_EDGE",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "Put: replace one value in a list with another",
+    "name": "put_index",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$AT_INDEX": {
+          "label": "atIndex",
+          "type": "number_eval"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "assignment"
+        },
+        "$INTO": {
+          "label": "into",
+          "type": "list_target"
+        }
+      },
+      "roles": "CZKZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "put",
+        ": ",
+        "$FROM",
+        ", ",
+        "$INTO",
+        ", ",
+        "atIndex",
+        ": ",
+        "$AT_INDEX",
         "."
       ]
     }

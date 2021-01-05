@@ -19,61 +19,85 @@ import (
 // until template parsing gets re-written we cant handle fluid specs ( selector messaging )
 // we can do a basic test to ensure it's possible to build the function signatures from the composer.Spec(s) tho.
 func TestFluid(t *testing.T) {
-	if got := makeSignature((*core.Let)(nil)); len(pretty.Diff(got, signature{
-		"let:be:"})) > 0 {
-		t.Error(pretty.Sprint(got))
+	if got := makeSig((*core.Let)(nil)); !got.equals(
+		"let:be:",
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*core.PutAtField)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSig((*core.PutAtField)(nil)); !got.equals(
 		"put:intoRec:atField:",
 		"put:intoObj:atField:",
-		"put:intoObjNamed:atField:"})) > 0 {
-		t.Error(pretty.Sprint(got))
+		"put:intoObjNamed:atField:",
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*list.PutIndex)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSig((*list.PutIndex)(nil)); !got.equals(
 		"put:intoNumList:atIndex:",
 		"put:intoRecList:atIndex:",
 		"put:intoTxtList:atIndex:",
-	})) > 0 {
-		t.Error(pretty.Sprint(got))
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*list.PutEdge)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSig((*list.PutEdge)(nil)); !got.equals(
 		"put:intoNumList:atBack|atFront!",
 		"put:intoRecList:atBack|atFront!",
-		"put:intoTxtList:atBack|atFront!"})) > 0 {
-		t.Error(pretty.Sprint(got))
+		"put:intoTxtList:atBack|atFront!",
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*debug.Log)(nil)); len(pretty.Diff(got, signature{
-		"log:note|toDo|warning|fix!"})) > 0 {
-		t.Error(pretty.Sprint(got))
+	if got := makeSig((*debug.Log)(nil)); !got.equals(
+		"log:note|toDo|warning|fix!",
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*list.SortText)(nil)); len(pretty.Diff(got, signature{
-		"sort text:ascending|descending!includeCase|ignoreCase!",
-		"sort text:byField:ascending|descending!includeCase|ignoreCase!"})) > 0 {
-		t.Error(pretty.Sprint(got))
+	if got := makeSig((*list.Erasing)(nil)); !got.equals(
+		"erasing:fromNumList:atIndex:as:do:",
+		"erasing:fromRecList:atIndex:as:do:",
+		"erasing:fromTxtList:atIndex:as:do:",
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*list.SortRecords)(nil)); len(pretty.Diff(got, signature{
-		"sort records:using:"})) > 0 {
-		t.Error(pretty.Sprint(got))
-	}
-	if got := makeSignature((*list.EraseAtIndex)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSig((*list.EraseIndex)(nil)); !got.equals(
 		"erase:fromNumList:atIndex:",
 		"erase:fromRecList:atIndex:",
-		"erase:fromTxtList:atIndex:"})) > 0 {
-		t.Error(pretty.Sprint(got))
+		"erase:fromTxtList:atIndex:",
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*list.EraseAtEdge)(nil)); len(pretty.Diff(got, signature{
-		"erase:atBack|atFront!"})) > 0 {
-		t.Error(pretty.Sprint(got))
+	if got := makeSig((*list.EraseEdge)(nil)); !got.equals(
+		"erase:atBack|atFront!",
+	) {
+		t.Error(got)
 	}
-	if got := makeSignature((*list.Gather)(nil)); len(pretty.Diff(got, signature{
+	if got := makeSig((*list.Gather)(nil)); !got.equals(
 		"gather:fromNumList:using:",
 		"gather:fromRecList:using:",
-		"gather:fromTxtList:using:"})) > 0 {
-		t.Error(pretty.Sprint(got))
+		"gather:fromTxtList:using:",
+	) {
+		t.Error(got)
+	}
+	if got := makeSig((*list.SortText)(nil)); !got.equals(
+		"sort text:ascending|descending!includeCase|ignoreCase!",
+		"sort text:byField:ascending|descending!includeCase|ignoreCase!",
+	) {
+		t.Error(got)
+	}
+	if got := makeSig((*list.SortRecords)(nil)); !got.equals(
+		"sort records:using:",
+	) {
+		t.Error(got)
 	}
 }
 
-func makeSignature(v composer.Composer) signature {
+func (sig signature) equals(bs ...string) bool {
+	return len(pretty.Diff(sig, signature(bs))) == 0
+}
+
+func (sig signature) String() string {
+	return pretty.Sprint(sig)
+}
+
+func makeSig(v composer.Composer) signature {
 	rtype := r.TypeOf(v).Elem()
 	spec := v.Compose()
 	fluid := spec.Fluent

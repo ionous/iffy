@@ -1810,7 +1810,7 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-451",
-                                                      "type": "list_put_edge",
+                                                      "type": "put_edge",
                                                       "value": {
                                                         "$AT_EDGE": {
                                                           "type": "list_edge",
@@ -2013,7 +2013,7 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-394",
-                                                      "type": "list_put_edge",
+                                                      "type": "put_edge",
                                                       "value": {
                                                         "$AT_EDGE": {
                                                           "type": "list_edge",
@@ -2159,7 +2159,7 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17692f1b70b-421",
-                                                      "type": "list_put_edge",
+                                                      "type": "put_edge",
                                                       "value": {
                                                         "$AT_EDGE": {
                                                           "type": "list_edge",

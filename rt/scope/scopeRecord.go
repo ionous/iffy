@@ -1,6 +1,8 @@
 package scope
 
-import g "github.com/ionous/iffy/rt/generic"
+import (
+	g "github.com/ionous/iffy/rt/generic"
+)
 
 type TargetRecord struct {
 	Target string

@@ -48,7 +48,8 @@ type Value interface {
 	// Unlike go, the slices are distinct.
 	Slice(i, j int) (Value, error)
 	// Splice cuts elements from start to end, adding new elements at the start of the cut point
-	// As a special case, passing a nil value only cuts elements.
-	// Returns an error if the start and end indices are bad; panics if the element/s to add are of an incompatible type.
+	// As a special case, passing a nil value to add only cuts elements.
+	// Returns the cut elements, or an error if the start and end indices are bad;
+	// panics if the element/s to add are of an incompatible type.
 	Splice(start, end int, add Value) (Value, error)
 }

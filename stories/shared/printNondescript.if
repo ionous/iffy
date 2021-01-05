@@ -565,7 +565,7 @@
                                                                       "type": "execute",
                                                                       "value": {
                                                                         "id": "id-17692fbc689-39",
-                                                                        "type": "list_put_edge",
+                                                                        "type": "put_edge",
                                                                         "value": {
                                                                           "$FROM": {
                                                                             "id": "id-17692fbc689-41",
@@ -891,7 +891,7 @@
                                                                                   "type": "execute",
                                                                                   "value": {
                                                                                     "id": "id-17672fb43de-96",
-                                                                                    "type": "list_put_edge",
+                                                                                    "type": "put_edge",
                                                                                     "value": {
                                                                                       "$FROM": {
                                                                                         "id": "id-17672fb43de-98",

@@ -404,7 +404,7 @@
                                                                 "type": "execute",
                                                                 "value": {
                                                                   "id": "id-17691d01da5-72",
-                                                                  "type": "list_put_edge",
+                                                                  "type": "put_edge",
                                                                   "value": {
                                                                     "$AT_EDGE": {
                                                                       "type": "list_edge",

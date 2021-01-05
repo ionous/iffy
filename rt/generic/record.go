@@ -101,6 +101,8 @@ func (d *Record) SetFieldByIndex(i int, val Value) (err error) {
 	return
 }
 
+// fix: if type includes path then this Kinds isnt necessary, which sure would be nce
+// ( of course, for normal records Implements() doesnt matter anyway. records dont have hierarchy )
 func matchTypes(ks Kinds, fa affine.Affinity, ft string, va affine.Affinity, vt string) (okay bool) {
 	if fa == va {
 		recordLike := fa == affine.Object || fa == affine.Record || fa == affine.RecordList
