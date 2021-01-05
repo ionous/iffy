@@ -193,28 +193,19 @@ func nameOfType(t r.Type) (typeName string, repeats bool) {
 
 var reverseLookup map[r.Type]string
 
-func typeName(t r.Type, name string) (ret string) {
-	if len(name) > 0 {
-		ret = name
-	} else {
-		ret = lang.Underscore(t.Name())
-	}
-	return
-}
-
 func findTypeName(t r.Type) (ret string) {
 	if len(reverseLookup) == 0 {
 		reverseLookup = make(map[r.Type]string)
 		for _, slats := range iffy.AllSlats {
 			for _, cmd := range slats {
-				runType := r.TypeOf(cmd).Elem()
-				reverseLookup[runType] = typeName(runType, cmd.Compose().Name)
+				t := r.TypeOf(cmd).Elem()
+				reverseLookup[t] = composer.SpecName(cmd)
 			}
 		}
 		for _, slots := range iffy.AllSlots {
 			for _, slot := range slots {
 				t := r.TypeOf(slot.Type).Elem()
-				reverseLookup[t] = typeName(t, slot.Name)
+				reverseLookup[t] = composer.SlotName(slot)
 			}
 		}
 	}

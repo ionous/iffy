@@ -9,7 +9,6 @@ import (
 	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/export/tag"
-	"github.com/ionous/iffy/lang"
 )
 
 // ReadRet is similar to reader.ReadMap, except it returns a value.
@@ -36,13 +35,7 @@ func NewDecoder() *Decoder {
 
 // AddCallback registers a command parser.
 func (dec *Decoder) AddCallback(cmd composer.Composer, cb ReadRet) {
-	var n string
-	if spec := cmd.Compose(); len(spec.Name) > 0 {
-		n = spec.Name
-	} else {
-		elem := r.TypeOf(cmd).Elem()
-		n = lang.Underscore(elem.Name())
-	}
+	n := composer.SpecName(cmd)
 	if was, exists := dec.cmds[n]; exists && was.customReader != nil {
 		panic(errutil.Fmt("conflicting name for spec %q %q!=%T", n, was.elem, cmd))
 	} else {

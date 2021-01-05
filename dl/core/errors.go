@@ -11,12 +11,12 @@ type CommandError struct {
 }
 
 func (e *CommandError) Error() string {
-	cmd := e.Cmd.Compose()
+	name := composer.SpecName(e.Cmd)
 	var padding string
 	if len(e.Ctx) > 0 {
 		padding = " "
 	}
-	return errutil.Sprintf("error in command %q%s%s", cmd.Name, padding, e.Ctx)
+	return errutil.Sprintf("error in command %q%s%s", name, padding, e.Ctx)
 }
 
 func cmdError(op composer.Composer, e error) error {

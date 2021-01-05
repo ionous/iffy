@@ -29,7 +29,7 @@ func (c *Collect) AddGroup(out export.Dict, group string) {
 func (c *Collect) AddSlot(slot composer.Slot) {
 	i := r.TypeOf(slot.Type).Elem()
 	//
-	name := typeName(i, slot.Name)
+	name := composer.SlotName(slot)
 	var desc string
 	if len(slot.Desc) > 0 {
 		desc = slot.Desc
@@ -50,7 +50,7 @@ func (c *Collect) AddSlot(slot composer.Slot) {
 func (c *Collect) AddSlat(cmd composer.Composer) {
 	if spec := cmd.Compose(); spec.Group != "internal" {
 		rtype := r.TypeOf(cmd).Elem()
-		name := typeName(rtype, spec.Name)
+		name := composer.SpecName(cmd)
 		var header string
 		if spec.Fluent != nil {
 			header = rtype.Name()
