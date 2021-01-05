@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	paths := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/stories/shared/printNondescript.if"
+	paths := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/stories"
 	patchPath := "/Users/ionous/Dev/go/src/github.com/ionous/iffy/cmd/migrate/push.js"
 
 	flag.StringVar(&paths, "in", paths, "comma separated input files or directory names")

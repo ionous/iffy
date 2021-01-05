@@ -15,11 +15,6 @@
                 "id": "id-174bd1dc16a-0",
                 "type": "test_scene",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174bd1dc16a-1",
-                    "type": "test_name",
-                    "value": "thingaverse"
-                  },
                   "$STORY": {
                     "id": "id-174bd1dc16a-2",
                     "type": "story",
@@ -152,12 +147,12 @@
                                                   "type": "are_an",
                                                   "value": "$ARE"
                                                 },
-                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-31",
                                                   "type": "singular_kind",
                                                   "value": "things"
-                                                }
+                                                },
+                                                "$TRAIT": []
                                               }
                                             }
                                           }
@@ -230,12 +225,12 @@
                                                   "type": "are_an",
                                                   "value": "$ISA"
                                                 },
-                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-47",
                                                   "type": "singular_kind",
                                                   "value": "container"
-                                                }
+                                                },
+                                                "$TRAIT": []
                                               }
                                             }
                                           }
@@ -288,12 +283,12 @@
                                                   "type": "are_an",
                                                   "value": "$ISAN"
                                                 },
-                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-57",
                                                   "type": "singular_kind",
                                                   "value": "actor"
-                                                }
+                                                },
+                                                "$TRAIT": []
                                               }
                                             }
                                           }
@@ -450,12 +445,12 @@
                                                   "type": "are_an",
                                                   "value": "$ARE"
                                                 },
-                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174bd1dc16a-87",
                                                   "type": "singular_kind",
                                                   "value": "scrabble tiles"
-                                                }
+                                                },
+                                                "$TRAIT": []
                                               }
                                             }
                                           }
@@ -473,10 +468,10 @@
                                   "id": "id-174bd1dc16a-89",
                                   "type": "noun_assignment",
                                   "value": {
-                                    "$PROPERTY": {
-                                      "id": "id-174bd1dc16a-90",
-                                      "type": "property",
-                                      "value": "printed name"
+                                    "$LINES": {
+                                      "id": "id-174bd1dc16a-94",
+                                      "type": "lines",
+                                      "value": "empire apple"
                                     },
                                     "$NOUNS": [
                                       {
@@ -496,10 +491,10 @@
                                         }
                                       }
                                     ],
-                                    "$LINES": {
-                                      "id": "id-174bd1dc16a-94",
-                                      "type": "lines",
-                                      "value": "empire apple"
+                                    "$PROPERTY": {
+                                      "id": "id-174bd1dc16a-90",
+                                      "type": "property",
+                                      "value": "printed name"
                                     }
                                   }
                                 }
@@ -509,6 +504,11 @@
                         }
                       ]
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174bd1dc16a-1",
+                    "type": "test_name",
+                    "value": "thingaverse"
                   }
                 }
               }
@@ -528,11 +528,6 @@
                 "id": "id-174bd1dc16a-95",
                 "type": "test_rule",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174bd1dc16a-96",
-                    "type": "test_name",
-                    "value": "thingaverse"
-                  },
                   "$HOOK": {
                     "id": "id-174bd1dc16a-97",
                     "type": "program_hook",
@@ -571,6 +566,36 @@
                               "id": "id-174bd1dc16a-106",
                               "type": "execute",
                               "value": {
+                                "$FIELD": {
+                                  "id": "id-174bd1dc16a-109",
+                                  "type": "text",
+                                  "value": "printed plural name"
+                                },
+                                "$FROM": {
+                                  "id": "id-176269672f6-0",
+                                  "type": "assignment",
+                                  "value": {
+                                    "id": "id-176269672f6-1",
+                                    "type": "assign_text",
+                                    "value": {
+                                      "$VAL": {
+                                        "id": "id-176269672f6-2",
+                                        "type": "text_eval",
+                                        "value": {
+                                          "id": "id-176269672f6-3",
+                                          "type": "text_value",
+                                          "value": {
+                                            "$TEXT": {
+                                              "id": "id-176269672f6-4",
+                                              "type": "text",
+                                              "value": "party favors"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
                                 "id": "id-174bd1dc16a-107",
                                 "type": "put_at_field",
                                 "value": {
@@ -581,39 +606,8 @@
                                       "id": "id-174bd1dc16a-111",
                                       "type": "into_obj",
                                       "value": {
-                                          "type": "text",
-                                          "value": "apple"
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "$FIELD": {
-                                    "id": "id-174bd1dc16a-109",
-                                    "type": "text",
-                                    "value": "printed plural name"
-                                  },
-                                  "$FROM": {
-                                    "id": "id-176269672f6-0",
-                                    "type": "assignment",
-                                    "value": {
-                                      "id": "id-176269672f6-1",
-                                      "type": "assign_text",
-                                      "value": {
-                                        "$VAL": {
-                                          "id": "id-176269672f6-2",
-                                          "type": "text_eval",
-                                          "value": {
-                                            "id": "id-176269672f6-3",
-                                            "type": "text_value",
-                                            "value": {
-                                              "$TEXT": {
-                                                "id": "id-176269672f6-4",
-                                                "type": "text",
-                                                "value": "party favors"
-                                              }
-                                            }
-                                          }
-                                        }
+                                        "type": "text",
+                                        "value": "apple"
                                       }
                                     }
                                   }
@@ -649,6 +643,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174bd1dc16a-96",
+                    "type": "test_name",
+                    "value": "thingaverse"
                   }
                 }
               }
@@ -668,11 +667,6 @@
                 "id": "id-174bd1dc16a-128",
                 "type": "test_statement",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174bd1dc16a-129",
-                    "type": "test_name",
-                    "value": "thingaverse"
-                  },
                   "$TEST": {
                     "id": "id-174bd1dc16a-130",
                     "type": "testing",
@@ -687,6 +681,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174bd1dc16a-129",
+                    "type": "test_name",
+                    "value": "thingaverse"
                   }
                 }
               }
