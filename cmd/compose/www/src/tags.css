@@ -13,11 +13,12 @@
   display: inline;
 }
 
-.mk-flow-ctrl[data-tag="comment"] .mk-plain-text{
+.mk-flow-ctrl[data-tag="comment"] .mk-plain-text {
   font-weight: bold;
 }
 
 .mk-flow-ctrl[data-tag="comment"] .mk-txt-lines {
+  color: #0b8400; /*green*/
   font-style: italic;
 }
 .mk-slot-ctrl[data-tag="execute"] {
@@ -31,34 +32,40 @@
 }
 
 .mk-num-ctrl {
-  color:rgb(160, 90, 0);
+  color:rgb(160, 90, 0); /*brown*/
 }
 .mk-str-ctrl[data-tag="text"] {
-  color: rgb(177,0,177); /*ENUM*/
+  color: #0b8400; /*green*/ 
 }
-.mk-str-ctrl {
-  color: rgb(177,0,177); /*ENUM*/
+.mk-str-ctrl[data-tag="variable_name"] {
+  color: rgb(177,0,177); /*purple*/
 }
+/* role: ENUM */
 .mk-flow-param[data-role="E"] {
-  color: rgb(177,0,177); /*ENUM*/
+  color: black; 
 }
+/* role: CMD */
 .mk-flow-param[data-role="C"] {
-  color:rgb(0, 102, 214); /*FUNC*/
+  color:rgb(0, 102, 214);   /* blue*/
+  /*color: red;*/
   font-style: bold;
   font-size: larger;
 }
-.mk-flow-param[data-role="F"] {
-  color:rgb(0, 102, 214); /*FUNC*/
-}
+/* role: SEPARATOR */
 .mk-flow-param[data-role="Z"] {
-  color:black; /*SEPARATOR*/
+  color:black; /**/
 }
+/* role: TERMINAL */
 .mk-flow-param[data-role="T"] {
-  color:black; /*TERMINAL*/
+  color:black; /**/
 }
-.mk-flow-param[data-role="S"] {
-  color:rgb(255,0, 0); /*SELECTOR*/
+/* role: SELECTOR, TOKEN, FUNCTION */
+.mk-flow-param[data-role="S"],
+.mk-flow-param[data-role="K"], 
+.mk-flow-param[data-role="F"] {
+  color:#c90000;
 }
+/* role: AMBIGUOUS */
 .mk-flow-param[data-role="Q"] {
-  color:orange; /*AMBIGUOUS*/
+  color: orange; 
 }
