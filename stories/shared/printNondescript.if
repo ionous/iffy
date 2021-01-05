@@ -602,7 +602,7 @@
                                                                                 "$VAR": {
                                                                                   "id": "id-176d01c2791-2",
                                                                                   "type": "variable_name",
-                                                                                  "value": "ungrouped objects"
+                                                                                  "value": "settings"
                                                                                 }
                                                                               }
                                                                             }
@@ -948,7 +948,7 @@
                                                                                         "type": "list_target",
                                                                                         "value": {
                                                                                           "id": "id-176d01c2791-5",
-                                                                                          "type": "into_rec_list",
+                                                                                          "type": "into_txt_list",
                                                                                           "value": {
                                                                                             "$VAR": {
                                                                                               "id": "id-176d01c2791-6",

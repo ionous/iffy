@@ -1849,11 +1849,11 @@
                                                         "$INTO": {
                                                           "type": "list_target",
                                                           "value": {
-                                                            "type": "into_rec_list",
+                                                            "type": "into_txt_list",
                                                             "value": {
                                                               "$VAR": {
                                                                 "type": "variable_name",
-                                                                "value": "groups"
+                                                                "value": "names"
                                                               }
                                                             }
                                                           }
@@ -2052,11 +2052,11 @@
                                                         "$INTO": {
                                                           "type": "list_target",
                                                           "value": {
-                                                            "type": "into_rec_list",
+                                                            "type": "into_txt_list",
                                                             "value": {
                                                               "$VAR": {
                                                                 "type": "variable_name",
-                                                                "value": "groups"
+                                                                "value": "names"
                                                               }
                                                             }
                                                           }
