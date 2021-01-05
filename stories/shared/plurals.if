@@ -72,17 +72,6 @@
                     "type": "pattern_name",
                     "value": "print plural name"
                   },
-                  "$TYPE": {
-                    "id": "id-1748e116bbd-4",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-1748e116bbd-7",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
-                  },
                   "$OPTVARS": {
                     "id": "id-1748e116bbd-8",
                     "type": "pattern_variables_tail",
@@ -127,6 +116,17 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$TYPE": {
+                    "id": "id-1748e116bbd-4",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-1748e116bbd-7",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
                     }
                   }
                 }
@@ -269,15 +269,6 @@
                                       }
                                     }
                                   },
-                                  "$IS": {
-                                    "id": "id-17494737044-17",
-                                    "type": "comparator",
-                                    "value": {
-                                      "id": "id-17494737044-31",
-                                      "type": "unequal",
-                                      "value": {}
-                                    }
-                                  },
                                   "$B": {
                                     "id": "id-17494737044-18",
                                     "type": "text_eval",
@@ -291,6 +282,15 @@
                                           "value": "$EMPTY"
                                         }
                                       }
+                                    }
+                                  },
+                                  "$IS": {
+                                    "id": "id-17494737044-17",
+                                    "type": "comparator",
+                                    "value": {
+                                      "id": "id-17494737044-31",
+                                      "type": "unequal",
+                                      "value": {}
                                     }
                                   }
                                 }
@@ -358,11 +358,6 @@
                 "id": "id-17494a3a882-0",
                 "type": "test_scene",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17494a3a882-1",
-                    "type": "test_name",
-                    "value": "plural name printing"
-                  },
                   "$STORY": {
                     "id": "id-17494a3a882-2",
                     "type": "story",
@@ -447,12 +442,12 @@
                                                   "type": "are_an",
                                                   "value": "$ARE"
                                                 },
-                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-17494a3a882-32",
                                                   "type": "singular_kind",
                                                   "value": "thing"
-                                                }
+                                                },
+                                                "$TRAIT": []
                                               }
                                             }
                                           }
@@ -470,10 +465,10 @@
                                   "id": "id-17494ab71d0-1",
                                   "type": "noun_assignment",
                                   "value": {
-                                    "$PROPERTY": {
-                                      "id": "id-17494ab71d0-2",
-                                      "type": "property",
-                                      "value": "printed plural name"
+                                    "$LINES": {
+                                      "id": "id-17494ab71d0-4",
+                                      "type": "lines",
+                                      "value": "broken flower pots"
                                     },
                                     "$NOUNS": [
                                       {
@@ -493,10 +488,10 @@
                                         }
                                       }
                                     ],
-                                    "$LINES": {
-                                      "id": "id-17494ab71d0-4",
-                                      "type": "lines",
-                                      "value": "broken flower pots"
+                                    "$PROPERTY": {
+                                      "id": "id-17494ab71d0-2",
+                                      "type": "property",
+                                      "value": "printed plural name"
                                     }
                                   }
                                 }
@@ -506,6 +501,11 @@
                         }
                       ]
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-17494a3a882-1",
+                    "type": "test_name",
+                    "value": "plural name printing"
                   }
                 }
               }
@@ -525,11 +525,6 @@
                 "id": "id-17494ab71d0-13",
                 "type": "test_statement",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17494ab71d0-14",
-                    "type": "test_name",
-                    "value": "plural name printing"
-                  },
                   "$TEST": {
                     "id": "id-17494ab71d0-15",
                     "type": "testing",
@@ -544,6 +539,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-17494ab71d0-14",
+                    "type": "test_name",
+                    "value": "plural name printing"
                   }
                 }
               }
@@ -555,11 +555,6 @@
                 "id": "id-17494ab71d0-24",
                 "type": "test_rule",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17494ab71d0-25",
-                    "type": "test_name",
-                    "value": "$CURRENT_TEST"
-                  },
                   "$HOOK": {
                     "id": "id-17494ab71d0-26",
                     "type": "program_hook",
@@ -598,6 +593,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-17494ab71d0-25",
+                    "type": "test_name",
+                    "value": "$CURRENT_TEST"
                   }
                 }
               }

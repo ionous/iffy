@@ -20,17 +20,6 @@
                     "type": "pattern_name",
                     "value": "print several"
                   },
-                  "$TYPE": {
-                    "id": "id-174f629fe91-5",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-174f629fe91-6",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
-                  },
                   "$OPTVARS": {
                     "id": "id-174f629fe91-7",
                     "type": "pattern_variables_tail",
@@ -102,6 +91,17 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$TYPE": {
+                    "id": "id-174f629fe91-5",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-174f629fe91-6",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
                     }
                   }
                 }
@@ -214,11 +214,6 @@
                 "id": "id-174f629fe91-46",
                 "type": "test_scene",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174f629fe91-47",
-                    "type": "test_name",
-                    "value": "print several"
-                  },
                   "$STORY": {
                     "id": "id-174f629fe91-48",
                     "type": "story",
@@ -271,12 +266,12 @@
                                                   "type": "are_an",
                                                   "value": "$AREA"
                                                 },
-                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174f629fe91-61",
                                                   "type": "singular_kind",
                                                   "value": "thing"
-                                                }
+                                                },
+                                                "$TRAIT": []
                                               }
                                             }
                                           }
@@ -292,6 +287,11 @@
                         }
                       ]
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174f629fe91-47",
+                    "type": "test_name",
+                    "value": "print several"
                   }
                 }
               }
@@ -311,11 +311,6 @@
                 "id": "id-174f629fe91-35",
                 "type": "test_rule",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174f629fe91-36",
-                    "type": "test_name",
-                    "value": "print several"
-                  },
                   "$HOOK": {
                     "id": "id-174f629fe91-37",
                     "type": "program_hook",
@@ -354,6 +349,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174f629fe91-36",
+                    "type": "test_name",
+                    "value": "print several"
                   }
                 }
               }
@@ -373,11 +373,6 @@
                 "id": "id-174f629fe91-67",
                 "type": "test_statement",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174f629fe91-68",
-                    "type": "test_name",
-                    "value": "print several"
-                  },
                   "$TEST": {
                     "id": "id-174f629fe91-69",
                     "type": "testing",
@@ -392,6 +387,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174f629fe91-68",
+                    "type": "test_name",
+                    "value": "print several"
                   }
                 }
               }

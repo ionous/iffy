@@ -92,17 +92,6 @@
                     "type": "pattern_name",
                     "value": "print name"
                   },
-                  "$TYPE": {
-                    "id": "id-a-4",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-a-6",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
-                  },
                   "$OPTVARS": {
                     "id": "id-a-10",
                     "type": "pattern_variables_tail",
@@ -148,6 +137,17 @@
                         }
                       ]
                     }
+                  },
+                  "$TYPE": {
+                    "id": "id-a-4",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-a-6",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
+                    }
                   }
                 }
               }
@@ -167,11 +167,6 @@
                 "id": "id-1740db6898f-2",
                 "type": "test_scene",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17464fa730d-0",
-                    "type": "test_name",
-                    "value": "name of a kind"
-                  },
                   "$STORY": {
                     "id": "id-1748e116bbd-0",
                     "type": "story",
@@ -317,6 +312,11 @@
                         }
                       ]
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-17464fa730d-0",
+                    "type": "test_name",
+                    "value": "name of a kind"
                   }
                 }
               }
@@ -336,11 +336,6 @@
                 "id": "id-a-30",
                 "type": "test_statement",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17464fa730d-3",
-                    "type": "test_name",
-                    "value": "name of a kind"
-                  },
                   "$TEST": {
                     "id": "id-a-29",
                     "type": "testing",
@@ -355,6 +350,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-17464fa730d-3",
+                    "type": "test_name",
+                    "value": "name of a kind"
                   }
                 }
               }
@@ -381,11 +381,6 @@
                 "id": "id-17460c01f70-1",
                 "type": "test_rule",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-17464fa730d-6",
-                    "type": "test_name",
-                    "value": "name of a kind"
-                  },
                   "$HOOK": {
                     "id": "id-17460cc7b6c-0",
                     "type": "program_hook",
@@ -424,6 +419,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-17464fa730d-6",
+                    "type": "test_name",
+                    "value": "name of a kind"
                   }
                 }
               }
@@ -663,15 +663,6 @@
                                       }
                                     }
                                   },
-                                  "$IS": {
-                                    "id": "id-174941fde22-5",
-                                    "type": "comparator",
-                                    "value": {
-                                      "id": "id-174941fde22-23",
-                                      "type": "unequal",
-                                      "value": {}
-                                    }
-                                  },
                                   "$B": {
                                     "id": "id-174941fde22-6",
                                     "type": "text_eval",
@@ -685,6 +676,15 @@
                                           "value": "$EMPTY"
                                         }
                                       }
+                                    }
+                                  },
+                                  "$IS": {
+                                    "id": "id-174941fde22-5",
+                                    "type": "comparator",
+                                    "value": {
+                                      "id": "id-174941fde22-23",
+                                      "type": "unequal",
+                                      "value": {}
                                     }
                                   }
                                 }
