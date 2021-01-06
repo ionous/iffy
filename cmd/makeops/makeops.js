@@ -1,4 +1,4 @@
-// node makeops.js > ../../ephemera/story/iffy_model.go
+// node makeops.js | gofmt -e -s > ../../ephemera/story/iffy_model.go
 'use strict';
 
 const Handlebars = require('handlebars'); // for templates
