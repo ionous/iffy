@@ -13,8 +13,8 @@ import (
  * atIndex: num,
  */
 type EraseIndex struct {
-	Count   rt.NumberEval `if:"unlabeled"`
-	From    ListSource    `if:"unlabeled"`
+	Count   rt.NumberEval `if:"selector"`
+	From    ListSource    `if:"selector"`
 	AtIndex rt.NumberEval
 }
 

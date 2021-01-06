@@ -11,8 +11,8 @@ import (
  * atIndex: num,
  */
 type EraseEdge struct {
-	From   ListSource `if:"unlabeled"`
-	AtEdge Edge       `if:"unlabeled"`
+	From   ListSource `if:"selector"`
+	AtEdge Edge       `if:"selector"`
 }
 
 func (*EraseEdge) Compose() composer.Spec {

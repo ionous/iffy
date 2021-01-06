@@ -13,6 +13,9 @@ var Slots = []composer.Slot{{
 }, {
 	Type: (*Fields)(nil),
 	Desc: "Helper for setting fields.",
+}, {
+	Type: (*Brancher)(nil),
+	Desc: "Helper for choose action.",
 }}
 
 var Slats = []composer.Composer{
@@ -118,9 +121,13 @@ var Slats = []composer.Composer{
 
 	(*Arguments)(nil),
 	(*Argument)(nil),
-
+	// put at field
 	(*PutAtField)(nil),
 	(*IntoRec)(nil),
 	(*IntoObj)(nil),
 	(*IntoObjNamed)(nil),
+	// choose action
+	(*ChooseAction)(nil),
+	(*ChooseMore)(nil),
+	(*ChooseNothingElse)(nil),
 }

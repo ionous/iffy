@@ -11,13 +11,13 @@ import (
 )
 
 type FromNumList struct {
-	Var core.Variable `if:"unlabeled"`
+	Var core.Variable `if:"selector"`
 }
 type FromTxtList struct {
-	Var core.Variable `if:"unlabeled"`
+	Var core.Variable `if:"selector"`
 }
 type FromRecList struct {
-	Var core.Variable `if:"unlabeled"`
+	Var core.Variable `if:"selector"`
 }
 
 type ListSource interface {

@@ -61,16 +61,15 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 		tags := tag.ReadTag(f.Tag)
 		if _, ok := tags.Find("internal"); !ok {
 			var label string
-			if l, ok := tags.Find("label"); ok {
-				label = l
+			var unlabeled bool
+			if selector, ok := tags.Find("selector"); ok && len(selector) > 0 {
+				label = selector
 			} else {
 				label = firstRuneLower(f.Name)
+				unlabeled = ok
 			}
 			key := export.Tokenize(f.Name)
 			typeName, repeats := nameOfType(f.Type)
-
-			// label this field?
-			unlabeled := tags.Exists("unlabeled")
 
 			// if havent written the name, we need to write it first.
 			if len(tokens.els) == 0 {
@@ -102,6 +101,9 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 			if !unlabeled {
 				tokens.add(label, SELECTOR)
 				tokens.add(": ", SEPARATOR)
+			}
+			if pholder, ok := tags.Find("placeholder"); ok {
+				label = pholder
 			}
 			tokens.add(key, KEY)
 			m := export.Dict{

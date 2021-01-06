@@ -98,6 +98,13 @@ func TestFluid(t *testing.T) {
 	) {
 		t.Error(got)
 	}
+	if got := makeSig((*core.ChooseAction)(nil)); !got.equals(
+		"if:do:",
+		"if:do:elseIf:", // fix: sort!?
+		"if:do:elseDo:",
+	) {
+		t.Error(got)
+	}
 
 }
 
@@ -123,7 +130,14 @@ func makeSig(v composer.Composer) signature {
 		if _, ok := tags.Find("internal"); !ok {
 			cnt++
 			// write the selector:
-			unlabeled := tags.Exists("unlabeled")
+			var label string
+			var unlabeled bool
+			if selector, ok := tags.Find("selector"); ok && len(selector) > 0 {
+				label = selector
+			} else {
+				label = firstRuneLower(f.Name)
+				unlabeled = ok
+			}
 			if cnt == 1 {
 				var sep string
 				if unlabeled {
@@ -144,22 +158,19 @@ func makeSig(v composer.Composer) signature {
 						}
 					}
 				}
-
 				switch n, k := f.Type.Name(), f.Type.Kind(); {
 				default:
 					//  write camel "fieldName:"
-					name := fieldName(f, tags)
-					sig = sig.addSelector(name)
+					sig = sig.addSelector(label)
 
 				case k == r.Ptr:
 					// optional. so duplicate all existing selectors
-					name := fieldName(f, tags)
-					sig = sig.dupSelectors(name)
+					sig = sig.dupSelectors(label)
 
 				case k == r.Interface && !strings.HasSuffix(n, "Eval") && n != "Assignment":
 					// assumes interfaces are all unlabeled...
 					slats := implementorsOf(f.Type)
-					sig = sig.mulSelectors(slats)
+					sig = sig.mulSelectors(slats, tags.Exists("optional"))
 				}
 			}
 
@@ -168,22 +179,18 @@ func makeSig(v composer.Composer) signature {
 	})
 	return sig
 }
-func fieldName(f *r.StructField, tags tag.StructTag) (ret string) {
-	if l, ok := tags.Find("label"); ok {
-		ret = l
-	} else {
-		ret = firstRuneLower(f.Name)
-	}
-	return
-}
 
 // return the command structs supported by the passed slot
 func implementorsOf(slot r.Type) (ret []string) {
 	for _, slats := range iffy.AllSlats {
 		for _, slat := range slats {
-			slat := r.TypeOf(slat)
-			if slat.Implements(slot) {
-				ret = append(ret, firstRuneLower(slat.Elem().Name()))
+			rtype := r.TypeOf(slat)
+			if rtype.Implements(slot) {
+				name := composer.SpecName(slat)
+				if spec := slat.Compose(); spec.Fluent != nil && len(spec.Fluent.Name) > 0 {
+					name = spec.Fluent.Name
+				}
+				ret = append(ret, camelize(name))
 			}
 		}
 	}
@@ -217,8 +224,11 @@ func (sig signature) addFlags(cs []string) signature {
 	return sig
 }
 
-func (sig signature) mulSelectors(sel []string) signature {
+func (sig signature) mulSelectors(sel []string, optional bool) signature {
 	var out signature
+	if optional {
+		out = sig
+	}
 	for i, cnt := 0, len(sig); i < cnt; i++ {
 		for _, sel := range sel {
 			out = append(out, sig[i]+sel+":")
@@ -261,6 +271,12 @@ func firstSyl(s string) (ret string) {
 			break
 		}
 	}
+	return b.String()
+}
+
+func camelize(s string) string {
+	var b strings.Builder
+	writeCamel(&b, s)
 	return b.String()
 }
 

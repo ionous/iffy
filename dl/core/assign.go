@@ -27,44 +27,44 @@ func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 
 // Let assigns a value to a local variable.
 type Let struct {
-	Var Variable `if:"unlabeled"`
+	Var Variable `if:"selector"`
 	Be  Assignment
 }
 
 type FromBool struct {
-	Val rt.BoolEval `if:"unlabeled"`
+	Val rt.BoolEval `if:"selector"`
 }
 
 type FromNum struct {
-	Val rt.NumberEval `if:"unlabeled"`
+	Val rt.NumberEval `if:"selector"`
 }
 
 type FromText struct {
-	Val rt.TextEval `if:"unlabeled"`
+	Val rt.TextEval `if:"selector"`
 }
 
 type FromName struct {
-	Val rt.TextEval `if:"unlabeled"`
+	Val rt.TextEval `if:"selector"`
 }
 
 type FromRecord struct {
-	Val rt.RecordEval `if:"unlabeled"`
+	Val rt.RecordEval `if:"selector"`
 }
 
 type FromObject struct {
-	Val rt.ObjectEval `if:"unlabeled"`
+	Val rt.ObjectEval `if:"selector"`
 }
 
 type FromNumList struct {
-	Vals rt.NumListEval `if:"unlabeled"`
+	Vals rt.NumListEval `if:"selector"`
 }
 
 type FromTextList struct {
-	Vals rt.TextListEval `if:"unlabeled"`
+	Vals rt.TextListEval `if:"selector"`
 }
 
 type FromRecordList struct {
-	Vals rt.RecordListEval `if:"unlabeled"`
+	Vals rt.RecordListEval `if:"selector"`
 }
 
 func (*Let) Compose() composer.Spec {

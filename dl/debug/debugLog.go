@@ -13,8 +13,8 @@ import (
 )
 
 type Log struct {
-	Value core.Assignment `if:"unlabeled"`
-	Level Level           `if:"unlabeled"`
+	Value core.Assignment `if:"selector"`
+	Level Level           `if:"selector"`
 }
 
 func (op *Log) Compose() composer.Spec {

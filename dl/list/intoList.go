@@ -14,13 +14,13 @@ type ListTarget interface {
 }
 
 type IntoNumList struct {
-	Var core.Variable `if:"unlabeled"`
+	Var core.Variable `if:"selector"`
 }
 type IntoTxtList struct {
-	Var core.Variable `if:"unlabeled"`
+	Var core.Variable `if:"selector"`
 }
 type IntoRecList struct {
-	Var core.Variable `if:"unlabeled"`
+	Var core.Variable `if:"selector"`
 }
 
 func (*IntoNumList) Compose() composer.Spec {

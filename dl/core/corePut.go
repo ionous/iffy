@@ -11,8 +11,8 @@ import (
  * atField: string.
  */
 type PutAtField struct {
-	From    Assignment `if:"unlabeled"`
-	Into    Fields     `if:"unlabeled"`
+	From    Assignment `if:"selector"`
+	Into    Fields     `if:"selector"`
 	AtField string
 }
 

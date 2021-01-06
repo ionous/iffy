@@ -10,27 +10,27 @@ import (
 
 // SortNumbers implements Sorter
 type SortNumbers struct {
-	Var     core.Variable `if:"label:numbers"`
-	ByField *SortByField  `if:"unlabeled"`
-	Order   `if:"unlabeled"`
+	Var     core.Variable `if:"selector=numbers"`
+	ByField *SortByField  `if:"selector"`
+	Order   `if:"selector"`
 }
 
 // SortText implements Sorter
 type SortText struct {
-	Var     core.Variable `if:"label:text"`
-	ByField *SortByField  `if:"unlabeled"`
-	Order   `if:"unlabeled"`
-	Case    `if:"unlabeled"`
+	Var     core.Variable `if:"selector=text"`
+	ByField *SortByField  `if:"selector"`
+	Order   `if:"selector"`
+	Case    `if:"selector"`
 }
 
 // SortRecords implements Sorter
 type SortRecords struct {
-	Var   core.Variable `if:"label:records"`
+	Var   core.Variable `if:"selector=records"`
 	Using pattern.PatternName
 }
 
 type SortByField struct {
-	Name string `if:"unlabeled"`
+	Name string `if:"selector"`
 }
 
 func (op *SortText) Sort(rt.Runtime, g.Value) (ret error) {

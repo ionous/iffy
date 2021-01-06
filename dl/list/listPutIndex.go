@@ -12,8 +12,8 @@ import (
  * atIndex: numEval.
  */
 type PutIndex struct {
-	From    core.Assignment `if:"unlabeled"`
-	Into    ListTarget      `if:"unlabeled"`
+	From    core.Assignment `if:"selector"`
+	Into    ListTarget      `if:"selector"`
 	AtIndex rt.NumberEval
 }
 

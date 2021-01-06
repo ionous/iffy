@@ -13,7 +13,7 @@ import (
 
 // Say some bit of text.
 type Say struct {
-	Text rt.TextEval `if:"unlabeled"`
+	Text rt.TextEval `if:"selector"`
 }
 
 // Buffer collects text said by other statements and returns them as a string.

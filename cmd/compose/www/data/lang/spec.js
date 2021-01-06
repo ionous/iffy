@@ -120,6 +120,11 @@ const spec = [
     "uses": "slot"
   },
   {
+    "desc": "brancher: Helper for choose action.",
+    "name": "brancher",
+    "uses": "slot"
+  },
+  {
     "desc": "Comparison Types: Helper for comparing values.",
     "name": "comparator",
     "uses": "slot"
@@ -654,6 +659,98 @@ const spec = [
     "with": {
       "slots": [
         "execute"
+      ]
+    }
+  },
+  {
+    "name": "choose_action",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$DO": {
+          "label": "do",
+          "type": "activity"
+        },
+        "$ELSE": {
+          "label": "else",
+          "type": "brancher"
+        },
+        "$IF": {
+          "label": "choose",
+          "type": "bool_eval"
+        }
+      },
+      "roles": "CZKZSZKZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "if",
+        ": ",
+        "$IF",
+        ", ",
+        "do",
+        ": ",
+        "$DO",
+        ", ",
+        "$ELSE",
+        "."
+      ]
+    }
+  },
+  {
+    "name": "choose_more",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$DO": {
+          "label": "do",
+          "type": "activity"
+        },
+        "$ELSE": {
+          "label": "else",
+          "type": "brancher"
+        },
+        "$IF": {
+          "label": "choose",
+          "type": "bool_eval"
+        }
+      },
+      "roles": "SZKZSZKZK",
+      "slots": [
+        "brancher"
+      ],
+      "tokens": [
+        "elseIf",
+        ": ",
+        "$IF",
+        ", ",
+        "do",
+        ": ",
+        "$DO",
+        ", ",
+        "$ELSE"
+      ]
+    }
+  },
+  {
+    "name": "choose_nothing_else",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$DO": {
+          "label": "do",
+          "type": "activity"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "brancher"
+      ],
+      "tokens": [
+        "elseDo",
+        ": ",
+        "$DO"
       ]
     }
   },
@@ -1435,9 +1532,9 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$OBJ_NAME": {
-          "label": "objName",
-          "type": "text"
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
         }
       },
       "roles": "SZK",
@@ -1447,7 +1544,7 @@ const spec = [
       "tokens": [
         "intoObj",
         ": ",
-        "$OBJ_NAME"
+        "$VAR"
       ]
     }
   },

@@ -9,8 +9,8 @@ import (
 )
 
 type Gather struct {
-	Var   core.Variable `if:"unlabeled"`
-	From  ListSource    `if:"unlabeled"`
+	Var   core.Variable `if:"selector"`
+	From  ListSource    `if:"selector"`
 	Using pattern.PatternName
 }
 

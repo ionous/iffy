@@ -12,9 +12,9 @@ import (
  * atBack|atFront.
  */
 type PutEdge struct {
-	From   core.Assignment `if:"unlabeled"`
-	Into   ListTarget      `if:"unlabeled"`
-	AtEdge Edge            `if:"unlabeled"`
+	From   core.Assignment `if:"selector"`
+	Into   ListTarget      `if:"selector"`
+	AtEdge Edge            `if:"selector"`
 }
 
 func (*PutEdge) Compose() composer.Spec {

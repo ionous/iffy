@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// ReadTag parses tags of the format `if:"internal"`.
+// ReadTag parses tags of the format `if:"one,two,key=value"`.
 func ReadTag(f r.StructTag) StructTag {
 	return StructTag(f.Get("if"))
 }
@@ -33,7 +33,7 @@ func (t StructTag) Exists(key string) (okay bool) {
 
 // Find finds the named key within the struct tag.
 // ex. for the tag, `if:"internal"` Find("internal") returns "internal".
-// the tag, `if:"beep:boop"` Find("beep") return "boop".
+// the tag, `if:"beep=boop"` Find("beep") return "boop".
 func (t StructTag) Find(key string) (ret string, okay bool) {
 	s := string(t)
 	for {
@@ -50,7 +50,7 @@ func (t StructTag) Find(key string) (ret string, okay bool) {
 				break
 			} else {
 				// after the key is a value separator? extract the value
-				if s[0] == ':' {
+				if s[0] == '=' {
 					if end := strings.Index(s, ","); end < 0 {
 						ret = s[1:] // no new separator before the end, use everything after the :
 					} else {

@@ -14,17 +14,17 @@ type Fields interface {
 
 // Targets a recorded stored in a variable.
 type IntoRec struct {
-	Var Variable `if:"unlabeled"`
+	Var Variable `if:"selector"`
 }
 
 // Targets an object stored in a variable.
 type IntoObj struct {
-	Var Variable `if:"unlabeled"`
+	Var Variable `if:"selector"`
 }
 
 // Targets an object with a computed name.
 type IntoObjNamed struct {
-	ObjName rt.TextEval `if:"unlabeled"`
+	ObjName rt.TextEval `if:"selector"`
 }
 
 func (*IntoRec) Compose() composer.Spec {
