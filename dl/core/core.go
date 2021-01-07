@@ -41,7 +41,6 @@ var Slats = []composer.Composer{
 	(*Make)(nil),
 
 	// FIX: Choose scalar/any?
-	(*Choose)(nil),
 	(*ChooseNum)(nil),
 	(*ChooseText)(nil),
 	// FIX: compare scalar?
@@ -126,7 +125,7 @@ var Slats = []composer.Composer{
 	(*IntoRec)(nil),
 	(*IntoObj)(nil),
 	(*IntoObjNamed)(nil),
-	// choose action
+	// choose action (if)
 	(*ChooseAction)(nil),
 	(*ChooseMore)(nil),
 	(*ChooseNothingElse)(nil),

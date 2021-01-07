@@ -38,10 +38,12 @@ func popTest(front bool, amt int, src ...string) []string {
 			From:    &list.FromTxtList{N("Source")},
 		},
 		As: "text",
-		Do: *core.NewActivity(&core.Choose{
-			If:    &core.CompareNum{&list.Len{V("text")}, &core.EqualTo{}, I(0)},
-			True:  core.NewActivity(&Write{&out, T("x")}),
-			False: core.NewActivity(&Write{&out, &list.At{V("text"), I(1)}}),
+		Do: *core.NewActivity(&core.ChooseAction{
+			If: &core.CompareNum{&list.Len{V("text")}, &core.EqualTo{}, I(0)},
+			Do: core.MakeActivity(&Write{&out, T("x")}),
+			Else: &core.ChooseNothingElse{
+				Do: core.MakeActivity(&Write{&out, &list.At{V("text"), I(1)}}),
+			},
 		}),
 	}
 	if run, _, e := newListTime(src, nil); e != nil {

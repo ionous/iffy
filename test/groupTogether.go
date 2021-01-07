@@ -25,11 +25,11 @@ var assignGrouping = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		{Execute: &core.Activity{[]rt.Execute{
 			Put("out", "Name", V("in")),
-			&core.Choose{
+			&core.ChooseAction{
 				If: &core.Matches{
 					Text:    &core.Var{Name: "in"},
 					Pattern: "^thing"},
-				True: core.NewActivity(
+				Do: core.MakeActivity(
 					Put("out", "Label", &core.FromText{&core.Text{"thingies"}}),
 				),
 			},

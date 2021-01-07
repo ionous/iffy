@@ -5,7 +5,6 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
 	"github.com/ionous/iffy/dl/term"
-	"github.com/ionous/iffy/ephemera/reader"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
@@ -54,68 +53,73 @@ var SayPattern = pattern.TextPattern{
 }
 
 var SayHelloGoodbye = core.NewActivity(
-	&core.Choose{
+	&core.ChooseAction{
 		If: &core.Bool{true},
-		True: core.NewActivity(&core.Say{
+		Do: core.MakeActivity(&core.Say{
 			Text: &core.Text{"hello"},
 		}),
-		False: core.NewActivity(&core.Say{
-			Text: &core.Text{"goodbye"},
-		}),
+		Else: &core.ChooseNothingElse{
+			core.MakeActivity(&core.Say{
+				Text: &core.Text{"goodbye"},
+			}),
+		},
 	})
 
-var SayHelloGoodbyeData = reader.Map{
-	"type": "activity",
-	"value": map[string]interface{}{
-		"$EXE": []interface{}{
-			map[string]interface{}{
-				"type": "execute",
-				"value": map[string]interface{}{
-					"type": "choose",
-					"value": map[string]interface{}{
-						"$FALSE": map[string]interface{}{
-							"type": "activity",
-							"value": map[string]interface{}{
-								"$EXE": []interface{}{
-									map[string]interface{}{
-										"type": "execute",
-										"value": map[string]interface{}{
-											"type": "say_text",
-											"value": map[string]interface{}{
-												"$TEXT": map[string]interface{}{
-													"type": "text_eval",
-													"value": map[string]interface{}{
-														"type": "text_value",
-														"value": map[string]interface{}{
-															"$TEXT": map[string]interface{}{
-																"type":  "text",
-																"value": "goodbye",
-															}}}}}}}}}},
-						"$IF": map[string]interface{}{
-							"type": "bool_eval",
-							"value": map[string]interface{}{
-								"type": "bool_value",
-								"value": map[string]interface{}{
-									"$BOOL": map[string]interface{}{
-										"type":  "bool",
-										"value": "$TRUE",
-									}}}},
-						"$TRUE": map[string]interface{}{
-							"type": "activity",
-							"value": map[string]interface{}{
-								"$EXE": []interface{}{
-									map[string]interface{}{
-										"type": "execute",
-										"value": map[string]interface{}{
-											"type": "say_text",
-											"value": map[string]interface{}{
-												"$TEXT": map[string]interface{}{
-													"type": "text_eval",
-													"value": map[string]interface{}{
-														"type": "text_value",
-														"value": map[string]interface{}{
-															"$TEXT": map[string]interface{}{
-																"type":  "text",
-																"value": "hello",
-															}}}}}}}}}}}}}}},
-}
+var SayHelloGoodbyeData = `{
+  "type": "activity",
+  "value": {
+    "$EXE": [{
+        "type": "execute",
+        "value": {
+          "type": "choose_action",
+          "value": {
+            "$DO": {
+              "type": "activity",
+              "value": {
+                "$EXE": [{
+                    "type": "execute",
+                    "value": {
+                      "type": "say_text",
+                      "value": {
+                        "$TEXT": {
+                          "type": "text_eval",
+                          "value": {
+                            "type": "text_value",
+                            "value": {
+                              "$TEXT": {
+                                "type": "text",
+                                "value": "hello"
+                              }}}}}}}]}},
+            "$ELSE": {
+              "type": "brancher",
+              "value": {
+                "type": "choose_nothing_else",
+                "value": {
+                  "$DO": {
+                    "type": "activity",
+                    "value": {
+                      "$EXE": [
+                        {
+                          "type": "execute",
+                          "value": {
+                            "type": "say_text",
+                            "value": {
+                              "$TEXT": {
+                                "type": "text_eval",
+                                "value": {
+                                  "type": "text_value",
+                                  "value": {
+                                    "$TEXT": {
+                                      "type": "text",
+                                      "value": "goodbye"
+                                    }}}}}}}]}}}}},
+            "$IF": {
+              "type": "bool_eval",
+              "value": {
+                "type": "bool_value",
+                "value": {
+                  "$BOOL": {
+                    "type": "bool",
+                    "value": "$TRUE"
+                  }}}}}}}]}}
+`

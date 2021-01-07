@@ -1,6 +1,7 @@
 package decode
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/ionous/iffy/dl/core"
@@ -14,11 +15,14 @@ func TestDecode(t *testing.T) {
 	// register creation functions for all the slats.
 	dec.AddDefaultCallbacks(core.Slats)
 	// read say story data
-	if prog, e := dec.ReadSpec(debug.SayHelloGoodbyeData); e != nil {
+	var spec map[string]interface{}
+	if e := json.Unmarshal([]byte(debug.SayHelloGoodbyeData), &spec); e != nil {
+		t.Fatal(e)
+	} else if prog, e := dec.ReadSpec(spec); e != nil {
 		t.Fatal(e)
 	} else if diff := pretty.Diff(debug.SayHelloGoodbye, prog); len(diff) > 0 {
-		t.Fatal(diff)
+		t.Fatal(pretty.Sprint(prog))
 	} else {
-		t.Log(pretty.Sprint(prog))
+		t.Log("ok. decoded story matches expected story")
 	}
 }

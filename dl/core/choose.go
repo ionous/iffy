@@ -7,12 +7,6 @@ import (
 	"github.com/ionous/iffy/rt/safe"
 )
 
-// Choose to execute one of two blocks based on a boolean test.
-type Choose struct {
-	If          rt.BoolEval
-	True, False *Activity
-}
-
 // Choose one of two number evaluations based on a boolean test.
 type ChooseNum struct {
 	If          rt.BoolEval
@@ -23,33 +17,6 @@ type ChooseNum struct {
 type ChooseText struct {
 	If          rt.BoolEval
 	True, False rt.TextEval
-}
-
-func (*Choose) Compose() composer.Spec {
-	return composer.Spec{
-		Name: "choose",
-		Spec: "if {choose%if:bool_eval} then: {true:activity} else: {false:activity}",
-	}
-}
-
-// Execute evals, eats the returns
-func (op *Choose) Execute(run rt.Runtime) (err error) {
-	if b, e := safe.GetBool(run, op.If); e != nil {
-		err = cmdError(op, e)
-	} else {
-		var next *Activity
-		if b.Bool() {
-			next = op.True
-		} else {
-			next = op.False
-		}
-		if next != nil {
-			if e := safe.Run(run, next); e != nil {
-				err = cmdError(op, e)
-			}
-		}
-	}
-	return
 }
 
 func (*ChooseNum) Compose() composer.Spec {

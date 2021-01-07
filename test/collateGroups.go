@@ -35,11 +35,11 @@ var collateGroups = pattern.ActivityPattern{
 				List: V("groups"),
 				With: "el",
 				Go: core.NewActivity(
-					&core.Choose{
+					&core.ChooseAction{
 						If: &pattern.DetermineBool{
 							Pattern:   "matchGroups",
 							Arguments: core.Args(V("settings"), &core.Unpack{V("el"), "Settings"})},
-						True: core.NewActivity(
+						Do: core.MakeActivity(
 							&core.Let{
 								Var: N("idx"),
 								Be:  V("index"),
@@ -48,7 +48,7 @@ var collateGroups = pattern.ActivityPattern{
 						),
 					},
 				)}, // end go-each
-			&core.Choose{
+			&core.ChooseAction{
 				If: &core.CompareNum{
 					A:  V("idx"),
 					Is: &core.EqualTo{},
@@ -57,7 +57,7 @@ var collateGroups = pattern.ActivityPattern{
 				// havent found a matching group?
 				// pack the object and its settings into it,
 				// push the group into the groups.
-				True: core.NewActivity(
+				Do: core.MakeActivity(
 					&list.PutEdge{Into: &list.IntoTxtList{N("names")}, From: &core.Unpack{V("settings"), "Name"}},
 					Put("group", "Objects", V("names")),
 					Put("group", "Settings", V("settings")),
@@ -65,13 +65,14 @@ var collateGroups = pattern.ActivityPattern{
 				), // end true
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
-				False: core.NewActivity(
+				Else: &core.ChooseNothingElse{core.MakeActivity(
 					&core.Let{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
 					&core.Let{N("names"), &core.Unpack{V("group"), "Objects"}},
 					&list.PutEdge{Into: &list.IntoTxtList{N("names")}, From: &core.Unpack{V("settings"), "Name"}},
 					Put("group", "Objects", V("names")),
 					&list.Set{List: "groups", Index: V("idx"), From: V("group")},
 				), // end false
+				},
 			},
 			Put("collation", "Groups", V("groups")),
 		)},

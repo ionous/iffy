@@ -10,6 +10,10 @@ func NewActivity(exe ...rt.Execute) *Activity {
 	return &Activity{Exe: exe}
 }
 
+func MakeActivity(exe ...rt.Execute) Activity {
+	return Activity{Exe: exe}
+}
+
 func Args(from ...Assignment) *Arguments {
 	var p Arguments
 	for i, from := range from {

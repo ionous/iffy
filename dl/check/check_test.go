@@ -14,14 +14,15 @@ func TestCheck(t *testing.T) {
 		Name:   "hello",
 		Expect: "hello",
 		Test: core.NewActivity(
-			&core.Choose{
+			&core.ChooseAction{
 				If: &core.Bool{Bool: true},
-				True: core.NewActivity(&core.Say{
+				Do: core.MakeActivity(&core.Say{
 					Text: &core.Text{"hello"},
 				}),
-				False: core.NewActivity(&core.Say{
-					Text: &core.Text{"goodbye"},
-				}),
+				Else: &core.ChooseNothingElse{
+					Do: core.MakeActivity(&core.Say{
+						Text: &core.Text{"goodbye"},
+					})},
 			}),
 	}
 	if e := runTest(prog); e != nil {
