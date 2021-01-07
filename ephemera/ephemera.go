@@ -119,8 +119,8 @@ func (r *Recorder) NewPatternRule(pattern Named, handler Prog) {
 }
 
 // NewPlural maps the plural form of a name to its singular form.
-func (r *Recorder) NewPlural(plural, singluar Named) {
-	r.cache.Must(eph_plural, plural, singluar)
+func (r *Recorder) NewPlural(plural, singular Named) {
+	r.cache.Must(eph_plural, plural, singular)
 }
 
 // NewField property in the named kind.
