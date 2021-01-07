@@ -41,7 +41,7 @@ func ValueOf(i interface{}) (ret g.Value, err error) {
 	case *g.Record:
 		ret = g.RecordOf(i)
 	default:
-		err = errutil.New("unhandled value %v(%T)", i, i)
+		err = errutil.Fmt("unhandled value %v(%T)", i, i)
 	}
 	return
 }
