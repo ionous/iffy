@@ -37,7 +37,7 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 				field.Set(slice)
 			}
 		}
-		return err != nil // returns "done" when there is an error.
+		return done || err != nil // returns "done" when there is an error.
 	})
 	if err == nil && len(args) > 0 {
 		err = errutil.New("unable to consume all args")
