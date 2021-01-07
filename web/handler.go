@@ -78,5 +78,5 @@ func FindResource(res Resource, path string) (ret Resource, err error) {
 	if err == nil {
 		ret = res
 	}
-	return res, err
+	return
 }
