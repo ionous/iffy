@@ -1,13 +1,16 @@
 # iffy
-iffy is a reimplmentation of the sashimi interactive fiction engine with some lessons learned. 
+This is a reimplmentation of the Sashimi interactive fiction engine with some lessons learned. 
 
 The flow of story creation is:
 1. Use the web-based "Composer" to write stories and supporting scripts.
-2. Let the tools generate "ephemera" from the story files
-  ( other sources, for instance art files, can generate ephemera too. )
-3. Use the tools to "assemble" a game database from the ephemera.
-4. The "Story Engine" reads and writes to the gamedb during play.
-5. A "Game Client" ( command line, browser based like ["Alice and the Galactic Traveler"](https://evermany.itch.io/alice), or someday Unity, etc. ) sends commands to ( and listens for events from ) the story engine to progress play.
+2. Use the tools to: 
+    - first, generate "ephemera" from the story files ( other sources -- ie. art assets --- can generate ephemera, too. )
+    - second, to "assemble" a game database from the ephemera.
+3. The "Story Engine" reads and writes to the gamedb during play.
+4. A "Game Client" then sends commands to ( and listens for events from ) the story engine to progress play.
+    - Clients can be command line like traditional interactive fiction;
+    - Custom like ["Alice and the Galactic Traveler"](https://evermany.itch.io/alice) which used Sashimi's engine;
+    - or someday Unity, etc.
 
 Rough versions of the iffy Composer, ephemera and gamedb exist. 
 
