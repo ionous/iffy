@@ -15,7 +15,11 @@ type Each struct {
 	List core.Assignment `if:"selector"`
 	As   ListIterator    `if:"selector"`
 	Do   core.Activity
-	Else *core.Activity `if:"optional,selector=elseIfEmptyDo"`
+	Else *ElseIfEmpty `if:"optional,selector"`
+}
+
+type ElseIfEmpty struct {
+	Do core.Activity `if:"selector"`
 }
 
 func (op *Each) Compose() composer.Spec {
@@ -25,6 +29,15 @@ func (op *Each) Compose() composer.Spec {
 		Fluent: &composer.Fluid{Name: "visiting", Role: composer.Command},
 		Desc:   `For each in list: Loops over the elements in the passed list, or runs the 'else' activity if empty.`,
 		Locals: []string{"index", "first", "last"},
+	}
+}
+
+func (op *ElseIfEmpty) Compose() composer.Spec {
+	return composer.Spec{
+		Name:   "list_empty_do",
+		Group:  "list",
+		Fluent: &composer.Fluid{Name: "elseIfEmptyDo", Role: composer.Selector},
+		Desc:   `Runs an activity when a list is empty.`,
 	}
 }
 
@@ -40,7 +53,7 @@ func (op *Each) forEach(run rt.Runtime) (err error) {
 		err = e
 	} else {
 		if cnt, otherwise := vs.Len(), op.Else; otherwise != nil && cnt == 0 {
-			err = op.Else.Execute(run)
+			err = op.Else.Do.Execute(run)
 		} else if cnt > 0 {
 			//
 			if it := op.As; it == nil {

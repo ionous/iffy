@@ -1803,16 +1803,16 @@ const spec = [
           "type": "activity"
         },
         "$ELSE": {
-          "label": "elseIfEmptyDo",
+          "label": "else",
           "optional": true,
-          "type": "activity"
+          "type": "list_empty_do"
         },
         "$LIST": {
           "label": "list",
           "type": "assignment"
         }
       },
-      "roles": "CZKZKZSZKZSZKT",
+      "roles": "CZKZKZSZKZKT",
       "slots": [
         "execute"
       ],
@@ -1827,10 +1827,30 @@ const spec = [
         ": ",
         "$DO",
         ", ",
-        "elseIfEmptyDo",
-        ": ",
         "$ELSE",
         "."
+      ]
+    }
+  },
+  {
+    "desc": "ElseIfEmpty: Runs an activity when a list is empty.",
+    "group": [
+      "list"
+    ],
+    "name": "list_empty_do",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$DO": {
+          "label": "do",
+          "type": "activity"
+        }
+      },
+      "roles": "SZK",
+      "tokens": [
+        "elseIfEmptyDo",
+        ": ",
+        "$DO"
       ]
     }
   },

@@ -39,6 +39,7 @@ var Slats = []composer.Composer{
 	(*AsNum)(nil),
 	(*AsTxt)(nil),
 	(*AsRec)(nil),
+	(*ElseIfEmpty)(nil),
 	// erase:
 	(*Erasing)(nil),
 	(*EraseEdge)(nil),
