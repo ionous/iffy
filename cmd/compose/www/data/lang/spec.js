@@ -140,6 +140,11 @@ const spec = [
     "uses": "slot"
   },
   {
+    "desc": "List iterator: Helper for accessing lists.",
+    "name": "list_iterator",
+    "uses": "slot"
+  },
+  {
     "desc": "List source: Helper for accessing lists.",
     "name": "list_source",
     "uses": "slot"
@@ -340,6 +345,72 @@ const spec = [
     "name": "arguments",
     "spec": " when {arguments%args+argument|comma-and}",
     "uses": "flow"
+  },
+  {
+    "desc": "AsNum: Define the name of a number variable.",
+    "name": "as_num",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_iterator"
+      ],
+      "tokens": [
+        "asNum",
+        ": ",
+        "$VAR"
+      ]
+    }
+  },
+  {
+    "desc": "AsRec: Define the name of a record variable.",
+    "name": "as_rec",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_iterator"
+      ],
+      "tokens": [
+        "asRec",
+        ": ",
+        "$VAR"
+      ]
+    }
+  },
+  {
+    "desc": "AsTxt: Define the name of a text variable.",
+    "name": "as_txt",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "list_iterator"
+      ],
+      "tokens": [
+        "asTxt",
+        ": ",
+        "$VAR"
+      ]
+    }
   },
   {
     "desc": "From Bool: Assigns the passed boolean value.",
@@ -649,16 +720,6 @@ const spec = [
         "go",
         ": ",
         "$GO"
-      ]
-    }
-  },
-  {
-    "name": "choose",
-    "spec": "if {choose%if:bool_eval} then: {true:activity} else: {false:activity}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "execute"
       ]
     }
   },
@@ -1217,96 +1278,6 @@ const spec = [
     }
   },
   {
-    "desc": "For Each Number: Loops over the passed list of numbers, or runs the 'else' activity if empty.",
-    "group": [
-      "exec"
-    ],
-    "name": "for_each_num",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$ELSE": {
-          "label": "else",
-          "optional": true,
-          "type": "activity"
-        },
-        "$GO": {
-          "label": "go",
-          "optional": true,
-          "type": "activity"
-        },
-        "$IN": {
-          "label": "in",
-          "type": "num_list_eval"
-        }
-      },
-      "roles": "QZSZKZSZKZSZK",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "forEachNum",
-        " ",
-        "in",
-        ": ",
-        "$IN",
-        ", ",
-        "go",
-        ": ",
-        "$GO",
-        ", ",
-        "else",
-        ": ",
-        "$ELSE"
-      ]
-    }
-  },
-  {
-    "desc": "For Each Text: Loops over the passed list of text, or runs the 'else' activity if empty.",
-    "group": [
-      "exec"
-    ],
-    "name": "for_each_text",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$ELSE": {
-          "label": "else",
-          "optional": true,
-          "type": "activity"
-        },
-        "$GO": {
-          "label": "go",
-          "optional": true,
-          "type": "activity"
-        },
-        "$IN": {
-          "label": "in",
-          "type": "text_list_eval"
-        }
-      },
-      "roles": "QZSZKZSZKZSZK",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "forEachText",
-        " ",
-        "in",
-        ": ",
-        "$IN",
-        ", ",
-        "go",
-        ": ",
-        "$GO",
-        ", ",
-        "else",
-        ": ",
-        "$ELSE"
-      ]
-    }
-  },
-  {
     "desc": "FromNumList: Uses a list of numbers",
     "name": "from_num_list",
     "uses": "flow",
@@ -1820,11 +1791,46 @@ const spec = [
       "list"
     ],
     "name": "list_each",
-    "spec": "For each {with:text} in {list:assignment} go:{go:activity} else:{else:activity}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$AS": {
+          "label": "as",
+          "type": "list_iterator"
+        },
+        "$DO": {
+          "label": "do",
+          "type": "activity"
+        },
+        "$ELSE": {
+          "label": "elseIfEmptyDo",
+          "optional": true,
+          "type": "activity"
+        },
+        "$LIST": {
+          "label": "list",
+          "type": "assignment"
+        }
+      },
+      "roles": "CZKZKZSZKZSZKT",
       "slots": [
         "execute"
+      ],
+      "tokens": [
+        "visiting",
+        ": ",
+        "$LIST",
+        ", ",
+        "$AS",
+        ", ",
+        "do",
+        ": ",
+        "$DO",
+        ", ",
+        "elseIfEmptyDo",
+        ": ",
+        "$ELSE",
+        "."
       ]
     }
   },

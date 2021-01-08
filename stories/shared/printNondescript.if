@@ -402,14 +402,19 @@
                                                             "id": "id-17692fbc689-0",
                                                             "type": "list_each",
                                                             "value": {
-                                                              "$ELSE": {
-                                                                "id": "id-17692fbc689-4",
-                                                                "type": "activity",
+                                                              "$AS": {
+                                                                "type": "list_iterator",
                                                                 "value": {
-                                                                  "$EXE": []
+                                                                  "type": "as_txt",
+                                                                  "value": {
+                                                                    "$VAR": {
+                                                                      "type": "variable_name",
+                                                                      "value": "object"
+                                                                    }
+                                                                  }
                                                                 }
                                                               },
-                                                              "$GO": {
+                                                              "$DO": {
                                                                 "id": "id-17692fbc689-3",
                                                                 "type": "activity",
                                                                 "value": {
@@ -619,11 +624,6 @@
                                                                     }
                                                                   }
                                                                 }
-                                                              },
-                                                              "$WITH": {
-                                                                "id": "id-17692fbc689-1",
-                                                                "type": "text",
-                                                                "value": "object"
                                                               }
                                                             }
                                                           }
@@ -745,14 +745,19 @@
                                                             "id": "id-17672fb43de-59",
                                                             "type": "list_each",
                                                             "value": {
-                                                              "$ELSE": {
-                                                                "id": "id-17672fb43de-63",
-                                                                "type": "activity",
+                                                              "$AS": {
+                                                                "type": "list_iterator",
                                                                 "value": {
-                                                                  "$EXE": []
+                                                                  "type": "as_rec",
+                                                                  "value": {
+                                                                    "$VAR": {
+                                                                      "type": "variable_name",
+                                                                      "value": "group"
+                                                                    }
+                                                                  }
                                                                 }
                                                               },
-                                                              "$GO": {
+                                                              "$DO": {
                                                                 "id": "id-17672fb43de-62",
                                                                 "type": "activity",
                                                                 "value": {
@@ -975,11 +980,6 @@
                                                                     }
                                                                   }
                                                                 }
-                                                              },
-                                                              "$WITH": {
-                                                                "id": "id-17672fb43de-60",
-                                                                "type": "text",
-                                                                "value": "group"
                                                               }
                                                             }
                                                           }
@@ -1055,14 +1055,19 @@
                                                             "id": "id-17692b598b2-2",
                                                             "type": "list_each",
                                                             "value": {
-                                                              "$ELSE": {
-                                                                "id": "id-17692b598b2-40",
-                                                                "type": "activity",
+                                                              "$AS": {
+                                                                "type": "list_iterator",
                                                                 "value": {
-                                                                  "$EXE": []
+                                                                  "type": "as_rec",
+                                                                  "value": {
+                                                                    "$VAR": {
+                                                                      "type": "variable_name",
+                                                                      "value": "group"
+                                                                    }
+                                                                  }
                                                                 }
                                                               },
-                                                              "$GO": {
+                                                              "$DO": {
                                                                 "id": "id-17692b598b2-5",
                                                                 "type": "activity",
                                                                 "value": {
@@ -1424,11 +1429,6 @@
                                                                     }
                                                                   }
                                                                 }
-                                                              },
-                                                              "$WITH": {
-                                                                "id": "id-17692b598b2-3",
-                                                                "type": "text",
-                                                                "value": "group"
                                                               }
                                                             }
                                                           }

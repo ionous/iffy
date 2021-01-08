@@ -1343,14 +1343,19 @@
                                           "id": "id-17692f1b70b-345",
                                           "type": "list_each",
                                           "value": {
-                                            "$ELSE": {
-                                              "id": "id-17692f1b70b-376",
-                                              "type": "activity",
+                                            "$AS": {
+                                              "type": "list_iterator",
                                               "value": {
-                                                "$EXE": []
+                                                "type": "as_rec",
+                                                "value": {
+                                                  "$VAR": {
+                                                    "type": "variable_name",
+                                                    "value": "el"
+                                                  }
+                                                }
                                               }
                                             },
-                                            "$GO": {
+                                            "$DO": {
                                               "id": "id-17692f1b70b-348",
                                               "type": "activity",
                                               "value": {
@@ -1628,11 +1633,6 @@
                                                   }
                                                 }
                                               }
-                                            },
-                                            "$WITH": {
-                                              "id": "id-17692f1b70b-346",
-                                              "type": "text",
-                                              "value": "el"
                                             }
                                           }
                                         }

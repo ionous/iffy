@@ -16,11 +16,14 @@ var Slots = []composer.Slot{{
 	Name: "list_source",
 	Type: (*ListSource)(nil),
 	Desc: "List source: Helper for accessing lists.",
+}, {
+	Name: "list_iterator",
+	Type: (*ListIterator)(nil),
+	Desc: "List iterator: Helper for accessing lists.",
 }}
 
 var Slats = []composer.Composer{
 	(*At)(nil),
-	(*Each)(nil),
 	(*Len)(nil),
 	(*Map)(nil),
 	(*Reduce)(nil),
@@ -31,6 +34,11 @@ var Slats = []composer.Composer{
 	(*Case)(nil),
 	(*Edge)(nil),
 	(*Order)(nil),
+	// each:
+	(*Each)(nil),
+	(*AsNum)(nil),
+	(*AsTxt)(nil),
+	(*AsRec)(nil),
 	// erase:
 	(*Erasing)(nil),
 	(*EraseEdge)(nil),

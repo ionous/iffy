@@ -16,6 +16,7 @@ type Execute rt.Execute
 type NumberEval rt.NumberEval
 type ObjectEval rt.ObjectEval
 type TextEval rt.TextEval
+
 type VariableName struct {
 	core.Variable
 }

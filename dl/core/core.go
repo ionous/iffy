@@ -47,9 +47,6 @@ var Slats = []composer.Composer{
 	(*CompareNum)(nil),
 	(*CompareText)(nil),
 
-	(*ForEachNum)(nil),
-	(*ForEachText)(nil),
-
 	(*IsTrue)(nil),    // transparent pass-through of a bool eval
 	(*IsNotTrue)(nil), // inverts a bool eval
 

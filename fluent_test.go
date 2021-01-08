@@ -8,10 +8,7 @@ import (
 
 	"github.com/ionous/iffy"
 	"github.com/ionous/iffy/dl/composer"
-	"github.com/ionous/iffy/dl/core"
-	"github.com/ionous/iffy/dl/debug"
 	"github.com/ionous/iffy/dl/list"
-	"github.com/ionous/iffy/dl/rel"
 	"github.com/ionous/iffy/export"
 	"github.com/ionous/iffy/export/tag"
 	"github.com/kr/pretty"
@@ -20,91 +17,104 @@ import (
 // until template parsing gets re-written we cant handle fluid specs ( selector messaging )
 // we can do a basic test to ensure it's possible to build the function signatures from the composer.Spec(s) tho.
 func TestFluid(t *testing.T) {
-	if got := makeSig((*core.Let)(nil)); !got.equals(
-		"let:be:",
+	if got := makeSig((*list.Each)(nil)); !got.equals(
+		"visiting:asNum:do:",
+		"visiting:asTxt:do:",
+		"visiting:asRec:do:",
+		"visiting:asNum:do:elseIfEmptyDo:",
+		"visiting:asTxt:do:elseIfEmptyDo:",
+		"visiting:asRec:do:elseIfEmptyDo:",
 	) {
 		t.Error(got)
 	}
-	if got := makeSig((*core.PutAtField)(nil)); !got.equals(
-		"put:intoRec:atField:",
-		"put:intoObj:atField:",
-		"put:intoObjNamed:atField:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.PutIndex)(nil)); !got.equals(
-		"put:intoNumList:atIndex:",
-		"put:intoRecList:atIndex:",
-		"put:intoTxtList:atIndex:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.PutEdge)(nil)); !got.equals(
-		"put:intoNumList:atBack|atFront!",
-		"put:intoRecList:atBack|atFront!",
-		"put:intoTxtList:atBack|atFront!",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*debug.Log)(nil)); !got.equals(
-		"log:note|toDo|warning|fix!",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.Erasing)(nil)); !got.equals(
-		"erasing:fromNumList:atIndex:as:do:",
-		"erasing:fromRecList:atIndex:as:do:",
-		"erasing:fromTxtList:atIndex:as:do:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.EraseIndex)(nil)); !got.equals(
-		"erase:fromNumList:atIndex:",
-		"erase:fromRecList:atIndex:",
-		"erase:fromTxtList:atIndex:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.EraseEdge)(nil)); !got.equals(
-		"erase:atBack|atFront!",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.Gather)(nil)); !got.equals(
-		"gather:fromNumList:using:",
-		"gather:fromRecList:using:",
-		"gather:fromTxtList:using:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.SortText)(nil)); !got.equals(
-		"sort text:ascending|descending!includeCase|ignoreCase!",
-		"sort text:byField:ascending|descending!includeCase|ignoreCase!",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*list.SortRecords)(nil)); !got.equals(
-		"sort records:using:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*rel.Relate)(nil)); !got.equals(
-		"relate obj:toObj:via:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*rel.Reparent)(nil)); !got.equals(
-		"reparent childObj:toParentObj:",
-	) {
-		t.Error(got)
-	}
-	if got := makeSig((*core.ChooseAction)(nil)); !got.equals(
-		"if:do:",
-		"if:do:elseIf:", // fix: sort!?
-		"if:do:elseDo:",
-	) {
-		t.Error(got)
-	}
+	// if got := makeSig((*core.ChooseAction)(nil)); !got.equals(
+	// 	"if:do:",
+	// 	"if:do:elseIf:", // fix: sort!?
+	// 	"if:do:elseDo:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*core.Let)(nil)); !got.equals(
+	// 	"let:be:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*core.PutAtField)(nil)); !got.equals(
+	// 	"put:intoRec:atField:",
+	// 	"put:intoObj:atField:",
+	// 	"put:intoObjNamed:atField:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// // list:
+	// if got := makeSig((*list.PutIndex)(nil)); !got.equals(
+	// 	"put:intoNumList:atIndex:",
+	// 	"put:intoRecList:atIndex:",
+	// 	"put:intoTxtList:atIndex:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*list.PutEdge)(nil)); !got.equals(
+	// 	"put:intoNumList:atBack|atFront!",
+	// 	"put:intoRecList:atBack|atFront!",
+	// 	"put:intoTxtList:atBack|atFront!",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*debug.Log)(nil)); !got.equals(
+	// 	"log:note|toDo|warning|fix!",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*list.Erasing)(nil)); !got.equals(
+	// 	"erasing:fromNumList:atIndex:as:do:",
+	// 	"erasing:fromRecList:atIndex:as:do:",
+	// 	"erasing:fromTxtList:atIndex:as:do:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*list.EraseIndex)(nil)); !got.equals(
+	// 	"erase:fromNumList:atIndex:",
+	// 	"erase:fromRecList:atIndex:",
+	// 	"erase:fromTxtList:atIndex:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*list.EraseEdge)(nil)); !got.equals(
+	// 	"erase:atBack|atFront!",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*list.Gather)(nil)); !got.equals(
+	// 	"gather:fromNumList:using:",
+	// 	"gather:fromRecList:using:",
+	// 	"gather:fromTxtList:using:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*list.SortText)(nil)); !got.equals(
+	// 	"sort text:ascending|descending!includeCase|ignoreCase!",
+	// 	"sort text:byField:ascending|descending!includeCase|ignoreCase!",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*list.SortRecords)(nil)); !got.equals(
+	// 	"sort records:using:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// // rel
+	// if got := makeSig((*rel.Relate)(nil)); !got.equals(
+	// 	"relate obj:toObj:via:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	// if got := makeSig((*rel.Reparent)(nil)); !got.equals(
+	// 	"reparent childObj:toParentObj:",
+	// ) {
+	// 	t.Error(got)
+	// }
+	//
 
 }
 
@@ -169,8 +179,11 @@ func makeSig(v composer.Composer) signature {
 
 				case k == r.Interface && !strings.HasSuffix(n, "Eval") && n != "Assignment":
 					// assumes interfaces are all unlabeled...
-					slats := implementorsOf(f.Type)
-					sig = sig.mulSelectors(slats, tags.Exists("optional"))
+					if slats := implementorsOf(f.Type); len(slats) == 0 {
+						panic("no slats found") // mul will return nil
+					} else {
+						sig = sig.mulSelectors(slats, tags.Exists("optional"))
+					}
 				}
 			}
 
