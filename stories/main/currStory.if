@@ -576,7 +576,7 @@
                                   "type": "assignment",
                                   "value": {
                                     "id": "id-176269672f6-1",
-                                    "type": "assign_text",
+                                    "type": "from_text",
                                     "value": {
                                       "$VAL": {
                                         "id": "id-176269672f6-2",

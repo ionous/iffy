@@ -26,7 +26,7 @@ var Slats = []composer.Composer{
 	(*HasDominion)(nil),
 
 	// Assign turns an Assignment a normal statement.
-	(*Let)(nil),
+	(*Assign)(nil),
 	(*Variable)(nil),
 	(*FromBool)(nil),
 	(*FromNum)(nil),
@@ -74,8 +74,6 @@ var Slats = []composer.Composer{
 	(*PrintNum)(nil),
 	(*PrintNumWord)(nil),
 
-	(*Range)(nil),
-
 	// FIX: should take a speaker, and we should have a default speaker
 	(*Say)(nil),
 	(*Buffer)(nil),
@@ -94,6 +92,7 @@ var Slats = []composer.Composer{
 	//
 	(*Matches)(nil),
 	// sequences
+	(*While)(nil),
 	(*CycleText)(nil),
 	(*ShuffleText)(nil),
 	(*StoppingText)(nil),

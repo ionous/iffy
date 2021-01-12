@@ -7,10 +7,12 @@ import (
 )
 
 var Slats = []composer.Composer{
+	(*Relation)(nil),
 	(*Relate)(nil),
-	(*Relatives)(nil),
-	(*Locale)(nil),
-	(*Reparent)(nil),
+	(*RelativeOf)(nil),
+	(*RelativesOf)(nil),
+	(*ReciprocalOf)(nil),
+	(*ReciprocalsOf)(nil),
 }
 
 func cmdError(op composer.Composer, e error) error {

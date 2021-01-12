@@ -269,14 +269,14 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17691d01da5-50",
-                                                      "type": "let",
+                                                      "type": "assign",
                                                       "value": {
-                                                        "$BE": {
+                                                        "$FROM": {
                                                           "id": "id-17691d01da5-52",
                                                           "type": "assignment",
                                                           "value": {
                                                             "id": "id-17691d01da5-53",
-                                                            "type": "assign_name",
+                                                            "type": "from_name",
                                                             "value": {
                                                               "$VAL": {
                                                                 "id": "id-17691d01da5-54",
@@ -346,7 +346,7 @@
                                                                       "type": "assignment",
                                                                       "value": {
                                                                         "id": "id-17691d01da5-75",
-                                                                        "type": "assign_text",
+                                                                        "type": "from_text",
                                                                         "value": {
                                                                           "$VAL": {
                                                                             "id": "id-17691d01da5-76",
@@ -531,7 +531,7 @@
                                                                     "type": "assignment",
                                                                     "value": {
                                                                       "id": "id-17691d01da5-108",
-                                                                      "type": "assign_name",
+                                                                      "type": "from_name",
                                                                       "value": {
                                                                         "$VAL": {
                                                                           "id": "id-17691d01da5-109",
@@ -592,7 +592,7 @@
                                                                     "type": "assignment",
                                                                     "value": {
                                                                       "id": "id-17691d01da5-118",
-                                                                      "type": "assign_num",
+                                                                      "type": "from_num",
                                                                       "value": {
                                                                         "$VAL": {
                                                                           "id": "id-17691d01da5-119",

@@ -1,0 +1,670 @@
+{
+  "id": "id-176f34db27a-0",
+  "type": "story",
+  "value": {
+    "$PARAGRAPH": [
+      {
+        "id": "id-176f34db27a-1",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-176f34db27a-2",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f34db27a-3",
+                "type": "kind_of_relation",
+                "value": {
+                  "$RELATION": {
+                    "id": "id-176f34db27a-4",
+                    "type": "relation_name",
+                    "value": "whereabouts"
+                  },
+                  "$RELATION_CARDINALITY": {
+                    "id": "id-176f34db27a-5",
+                    "type": "relation_cardinality",
+                    "value": {
+                      "$ONE_TO_MANY": {
+                        "id": "id-176f34db27a-6",
+                        "type": "one_to_many",
+                        "value": {
+                          "$SINGULAR_KIND": {
+                            "id": "id-176f34db27a-7",
+                            "type": "singular_kind",
+                            "value": "object"
+                          },
+                          "$PLURAL_KINDS": {
+                            "id": "id-176f34db27a-8",
+                            "type": "plural_kinds",
+                            "value": "objects"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f427859d-2",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f427859d-3",
+                "type": "comment",
+                "value": {
+                  "$LINES": {
+                    "id": "id-176f427859d-4",
+                    "type": "lines",
+                    "value": "The placement of objects in the game world.  "
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-176f4124f37-0",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-176f4124f37-1",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f4124f37-2",
+                "type": "pattern_decl",
+                "value": {
+                  "$NAME": {
+                    "id": "id-176f4124f37-3",
+                    "type": "pattern_name",
+                    "value": "parentOf"
+                  },
+                  "$TYPE": {
+                    "id": "id-176f4124f37-4",
+                    "type": "pattern_type",
+                    "value": {
+                      "$VALUE": {
+                        "id": "id-176f4124f37-5",
+                        "type": "variable_type",
+                        "value": {
+                          "$OBJECT": {
+                            "id": "id-176f4124f37-6",
+                            "type": "object_type",
+                            "value": {
+                              "$AN": {
+                                "id": "id-176f4124f37-7",
+                                "type": "ana",
+                                "value": "$AN"
+                              },
+                              "$KIND": {
+                                "id": "id-176f4124f37-8",
+                                "type": "singular_kind",
+                                "value": "object"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "$OPTVARS": {
+                    "id": "id-176f427859d-41",
+                    "type": "pattern_variables_tail",
+                    "value": {
+                      "$VARIABLE_DECL": [
+                        {
+                          "id": "id-176f427859d-42",
+                          "type": "variable_decl",
+                          "value": {
+                            "$AN": {
+                              "id": "id-176f427859d-43",
+                              "type": "determiner",
+                              "value": "$AN"
+                            },
+                            "$NAME": {
+                              "id": "id-176f427859d-44",
+                              "type": "variable_name",
+                              "value": "obj"
+                            },
+                            "$TYPE": {
+                              "id": "id-176f427859d-45",
+                              "type": "variable_type",
+                              "value": {
+                                "$OBJECT": {
+                                  "id": "id-176f427859d-46",
+                                  "type": "object_type",
+                                  "value": {
+                                    "$AN": {
+                                      "id": "id-176f427859d-47",
+                                      "type": "ana",
+                                      "value": "$A"
+                                    },
+                                    "$KIND": {
+                                      "id": "id-176f427859d-48",
+                                      "type": "singular_kind",
+                                      "value": "thing"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "$ABOUT": {
+                    "id": "id-176f427859d-0",
+                    "type": "comment",
+                    "value": {
+                      "$LINES": {
+                        "id": "id-176f427859d-1",
+                        "type": "lines",
+                        "value": "An object indicating the position or ownership of another: a kitchen containing a cook, a cook holding a sack, a sack containing some flour."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f4124f37-9",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f4124f37-10",
+                "type": "pattern_actions",
+                "value": {
+                  "$NAME": {
+                    "id": "id-176f4124f37-11",
+                    "type": "pattern_name",
+                    "value": "parentOf"
+                  },
+                  "$PATTERN_RULES": {
+                    "id": "id-176f4124f37-12",
+                    "type": "pattern_rules",
+                    "value": {
+                      "$PATTERN_RULE": [
+                        {
+                          "id": "id-176f4124f37-13",
+                          "type": "pattern_rule",
+                          "value": {
+                            "$GUARD": {
+                              "id": "id-176f4124f37-14",
+                              "type": "bool_eval",
+                              "value": {
+                                "id": "id-176f4124f37-16",
+                                "type": "always",
+                                "value": {}
+                              }
+                            },
+                            "$HOOK": {
+                              "id": "id-176f4124f37-15",
+                              "type": "program_hook",
+                              "value": {
+                                "$RESULT": {
+                                  "id": "id-176f4124f37-17",
+                                  "type": "program_return",
+                                  "value": {
+                                    "$RESULT": {
+                                      "id": "id-176f4124f37-18",
+                                      "type": "program_result",
+                                      "value": {
+                                        "$OBJECT": {
+                                          "id": "id-176f4124f37-19",
+                                          "type": "object_func",
+                                          "value": {
+                                            "$NAME": {
+                                              "id": "id-176f4124f37-20",
+                                              "type": "text_eval",
+                                              "value": {
+                                                "id": "id-176f41e005a-0",
+                                                "type": "reciprocal_of",
+                                                "value": {
+                                                  "$OBJ": {
+                                                    "id": "id-176f41e005a-1",
+                                                    "type": "text_eval",
+                                                    "value": {
+                                                      "id": "id-176f41e005a-25",
+                                                      "type": "get_var",
+                                                      "value": {
+                                                        "$NAME": {
+                                                          "id": "id-176f41e005a-26",
+                                                          "type": "text",
+                                                          "value": "obj"
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "$VIA": {
+                                                    "id": "id-176f41e005a-2",
+                                                    "type": "relation_name",
+                                                    "value": "whereabouts"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "id": "id-176f52bb1b6-8",
+                          "type": "pattern_rule",
+                          "value": {
+                            "$GUARD": {
+                              "id": "id-176f52bb1b6-9",
+                              "type": "bool_eval",
+                              "value": {
+                                "id": "id-176f52bb1b6-11",
+                                "type": "always",
+                                "value": {}
+                              }
+                            },
+                            "$HOOK": {
+                              "id": "id-176f52bb1b6-10",
+                              "type": "program_hook",
+                              "value": {
+                                "$ACTIVITY": {
+                                  "id": "id-176f52bb1b6-12",
+                                  "type": "activity",
+                                  "value": {
+                                    "$EXE": [
+                                      {
+                                        "id": "id-176f52bb1b6-13",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-176f52bb1b6-14",
+                                          "type": "assign",
+                                          "value": {
+                                            "$VAR": {
+                                              "id": "id-176f52bb1b6-15",
+                                              "type": "variable_name",
+                                              "value": "parent"
+                                            },
+                                            "$FROM": {
+                                              "id": "id-176f52bb1b6-16",
+                                              "type": "assignment",
+                                              "value": {
+                                                "id": "id-176f52bb1b6-17",
+                                                "type": "from_text",
+                                                "value": {
+                                                  "$VAL": {
+                                                    "id": "id-176f52bb1b6-18",
+                                                    "type": "text_eval",
+                                                    "value": {
+                                                      "id": "id-176f52bb1b6-19",
+                                                      "type": "reciprocal_of",
+                                                      "value": {
+                                                        "$OBJ": {
+                                                          "id": "id-176f52bb1b6-20",
+                                                          "type": "text_eval",
+                                                          "value": {
+                                                            "id": "id-176f52bb1b6-22",
+                                                            "type": "get_var",
+                                                            "value": {
+                                                              "$NAME": {
+                                                                "id": "id-176f52bb1b6-23",
+                                                                "type": "text",
+                                                                "value": "obj"
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        "$VIA": {
+                                                          "id": "id-176f52bb1b6-21",
+                                                          "type": "relation_name",
+                                                          "value": "whereabouts"
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "$PATTERN_RETURN": {
+                    "id": "id-176f52bb1b6-0",
+                    "type": "pattern_return",
+                    "value": {
+                      "$RESULT": {
+                        "id": "id-176f52bb1b6-1",
+                        "type": "variable_decl",
+                        "value": {
+                          "$AN": {
+                            "id": "id-176f52bb1b6-2",
+                            "type": "determiner",
+                            "value": "$THE"
+                          },
+                          "$NAME": {
+                            "id": "id-176f52bb1b6-3",
+                            "type": "variable_name",
+                            "value": "parent"
+                          },
+                          "$TYPE": {
+                            "id": "id-176f52bb1b6-4",
+                            "type": "variable_type",
+                            "value": {
+                              "$OBJECT": {
+                                "id": "id-176f52bb1b6-5",
+                                "type": "object_type",
+                                "value": {
+                                  "$AN": {
+                                    "id": "id-176f52bb1b6-6",
+                                    "type": "ana",
+                                    "value": "$AN"
+                                  },
+                                  "$KIND": {
+                                    "id": "id-176f52bb1b6-7",
+                                    "type": "singular_kind",
+                                    "value": "object"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-176f427859d-5",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-176f427859d-6",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f427859d-7",
+                "type": "pattern_decl",
+                "value": {
+                  "$NAME": {
+                    "id": "id-176f427859d-8",
+                    "type": "pattern_name",
+                    "value": "locationOf"
+                  },
+                  "$TYPE": {
+                    "id": "id-176f427859d-9",
+                    "type": "pattern_type",
+                    "value": {
+                      "$VALUE": {
+                        "id": "id-176f427859d-10",
+                        "type": "variable_type",
+                        "value": {
+                          "$OBJECT": {
+                            "id": "id-176f427859d-11",
+                            "type": "object_type",
+                            "value": {
+                              "$AN": {
+                                "id": "id-176f427859d-12",
+                                "type": "ana",
+                                "value": "$A"
+                              },
+                              "$KIND": {
+                                "id": "id-176f427859d-13",
+                                "type": "singular_kind",
+                                "value": "room"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "$ABOUT": {
+                    "id": "id-176f427859d-14",
+                    "type": "comment",
+                    "value": {
+                      "$LINES": {
+                        "id": "id-176f427859d-15",
+                        "type": "lines",
+                        "value": "Specifically, the room in which an object can be found"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f427859d-16",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f427859d-17",
+                "type": "pattern_actions",
+                "value": {
+                  "$NAME": {
+                    "id": "id-176f427859d-18",
+                    "type": "pattern_name",
+                    "value": "locationOf"
+                  },
+                  "$PATTERN_RETURN": {
+                    "id": "id-176f4970550-0",
+                    "type": "pattern_return",
+                    "value": {
+                      "$RESULT": {
+                        "id": "id-176f4970550-1",
+                        "type": "variable_decl",
+                        "value": {
+                          "$AN": {
+                            "id": "id-176f4970550-2",
+                            "type": "determiner",
+                            "value": "$THE"
+                          },
+                          "$NAME": {
+                            "id": "id-176f4970550-3",
+                            "type": "variable_name",
+                            "value": "location"
+                          },
+                          "$TYPE": {
+                            "id": "id-176f4970550-4",
+                            "type": "variable_type",
+                            "value": {
+                              "$OBJECT": {
+                                "id": "id-176f4970550-5",
+                                "type": "object_type",
+                                "value": {
+                                  "$AN": {
+                                    "id": "id-176f4970550-6",
+                                    "type": "ana",
+                                    "value": "$A"
+                                  },
+                                  "$KIND": {
+                                    "id": "id-176f4970550-7",
+                                    "type": "singular_kind",
+                                    "value": "room"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "$PATTERN_RULES": {
+                    "id": "id-176f427859d-27",
+                    "type": "pattern_rules",
+                    "value": {
+                      "$PATTERN_RULE": [
+                        {
+                          "id": "id-176f427859d-28",
+                          "type": "pattern_rule",
+                          "value": {
+                            "$GUARD": {
+                              "id": "id-176f427859d-29",
+                              "type": "bool_eval",
+                              "value": {
+                                "id": "id-176f427859d-30",
+                                "type": "always",
+                                "value": {}
+                              }
+                            },
+                            "$HOOK": {
+                              "id": "id-176f427859d-31",
+                              "type": "program_hook",
+                              "value": {
+                                "$RESULT": {
+                                  "id": "id-176f427859d-32",
+                                  "type": "program_return",
+                                  "value": {
+                                    "$RESULT": {
+                                      "id": "id-176f427859d-33",
+                                      "type": "program_result",
+                                      "value": {
+                                        "$OBJECT": {
+                                          "id": "id-176f427859d-34",
+                                          "type": "object_func",
+                                          "value": {
+                                            "$NAME": {
+                                              "id": "id-176f427859d-35",
+                                              "type": "text_eval",
+                                              "value": {
+                                                "id": "id-176f427859d-36",
+                                                "type": "reciprocal_of",
+                                                "value": {
+                                                  "$OBJ": {
+                                                    "id": "id-176f427859d-37",
+                                                    "type": "text_eval",
+                                                    "value": {
+                                                      "id": "id-176f427859d-38",
+                                                      "type": "get_var",
+                                                      "value": {
+                                                        "$NAME": {
+                                                          "id": "id-176f427859d-39",
+                                                          "type": "text",
+                                                          "value": "obj"
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "$VIA": {
+                                                    "id": "id-176f427859d-40",
+                                                    "type": "relation_name",
+                                                    "value": "whereabouts"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "id": "id-176f4970550-8",
+                          "type": "pattern_rule",
+                          "value": {
+                            "$GUARD": {
+                              "id": "id-176f4970550-9",
+                              "type": "bool_eval",
+                              "value": {
+                                "id": "id-176f4970550-12",
+                                "type": "always",
+                                "value": {}
+                              }
+                            },
+                            "$HOOK": {
+                              "id": "id-176f4970550-10",
+                              "type": "program_hook",
+                              "value": {
+                                "$ACTIVITY": {
+                                  "id": "id-176f4970550-11",
+                                  "type": "activity",
+                                  "value": {
+                                    "$EXE": [
+                                      {
+                                        "id": "id-176f52712f5-3",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-176f52712f5-0",
+                                          "type": "while",
+                                          "value": {
+                                            "$TRUE": {
+                                              "id": "id-176f52712f5-1",
+                                              "type": "bool_eval",
+                                              "value": {
+                                                "id": "id-176f52712f5-4",
+                                                "type": "is_empty",
+                                                "value": {
+                                                  "$TEXT": {
+                                                    "id": "id-176f52712f5-5",
+                                                    "type": "text_eval",
+                                                    "value": {
+                                                      "id": "id-176f52712f5-6",
+                                                      "type": "get_var",
+                                                      "value": {
+                                                        "$NAME": {
+                                                          "id": "id-176f52712f5-7",
+                                                          "type": "text",
+                                                          "value": "location"
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "$DO": {
+                                              "id": "id-176f52712f5-2",
+                                              "type": "activity",
+                                              "value": {
+                                                "$EXE": []
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "id": "id-176f4970550-13",
+                                        "type": "execute",
+                                        "value": null
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

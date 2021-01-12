@@ -98,6 +98,18 @@ const spec = [
     }
   },
   {
+    "name": "relation_name",
+    "uses": "str",
+    "with": {
+      "params": {
+        "$RELATION_NAME": "relation name"
+      },
+      "tokens": [
+        "$RELATION_NAME"
+      ]
+    }
+  },
+  {
     "name": "variable_name",
     "uses": "str",
     "with": {
@@ -247,6 +259,10 @@ const spec = [
   },
   {
     "name": "printing",
+    "uses": "group"
+  },
+  {
+    "name": "relations",
     "uses": "group"
   },
   {
@@ -413,216 +429,36 @@ const spec = [
     }
   },
   {
-    "desc": "From Bool: Assigns the passed boolean value.",
+    "desc": "Assignment: Sets a variable to a value.",
     "group": [
       "variables"
     ],
-    "name": "assign_bool",
+    "name": "assign",
     "uses": "flow",
     "with": {
       "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "bool_eval"
+        "$FROM": {
+          "label": "be",
+          "type": "assignment"
+        },
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
         }
       },
-      "roles": "FZK",
+      "roles": "CZKZSZKT",
       "slots": [
-        "assignment"
+        "execute"
       ],
       "tokens": [
-        "fromBool",
+        "let",
         ": ",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "From Name: Assigns the passed piece of name.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_name",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "text_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromName",
+        "$VAR",
+        ", ",
+        "be",
         ": ",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "From Number: Assigns the passed number.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_num",
-    "spec": "{val:number_eval}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "assignment"
-      ]
-    }
-  },
-  {
-    "desc": "From Number List: Assigns the passed number list.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_num_list",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VALS": {
-          "label": "vals",
-          "type": "num_list_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromNumList",
-        ": ",
-        "$VALS"
-      ]
-    }
-  },
-  {
-    "desc": "From Object: Assigns the passed object",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_object",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "object_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromObject",
-        ": ",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "From Record: Assigns the passed record.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_record",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "record_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromRecord",
-        ": ",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "From Record List: Assigns the passed record list.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_record_list",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VALS": {
-          "label": "vals",
-          "type": "record_list_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromRecordList",
-        ": ",
-        "$VALS"
-      ]
-    }
-  },
-  {
-    "desc": "From Text: Assigns the passed piece of text.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_text",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "text_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromText",
-        ": ",
-        "$VAL"
-      ]
-    }
-  },
-  {
-    "desc": "From Text List: Assigns the passed text list.",
-    "group": [
-      "variables"
-    ],
-    "name": "assign_text_list",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VALS": {
-          "label": "vals",
-          "type": "text_list_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromTextList",
-        ": ",
-        "$VALS"
+        "$FROM",
+        "."
       ]
     }
   },
@@ -1278,6 +1114,95 @@ const spec = [
     }
   },
   {
+    "desc": "From Bool: Assigns the passed boolean value.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_bool",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "bool_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromBool",
+        ": ",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "From Name: Assigns the passed piece of name.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_name",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "text_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromName",
+        ": ",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "From Number: Assigns the passed number.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_num",
+    "spec": "{val:number_eval}",
+    "uses": "flow",
+    "with": {
+      "slots": [
+        "assignment"
+      ]
+    }
+  },
+  {
+    "desc": "From Number List: Assigns the passed number list.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_num_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VALS": {
+          "label": "vals",
+          "type": "num_list_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromNumList",
+        ": ",
+        "$VALS"
+      ]
+    }
+  },
+  {
     "desc": "FromNumList: Uses a list of numbers",
     "name": "from_num_list",
     "uses": "flow",
@@ -1300,6 +1225,31 @@ const spec = [
     }
   },
   {
+    "desc": "From Object: Assigns the passed object",
+    "group": [
+      "variables"
+    ],
+    "name": "from_object",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "object_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromObject",
+        ": ",
+        "$VAL"
+      ]
+    }
+  },
+  {
     "desc": "FromRecList: Uses a list of records",
     "name": "from_rec_list",
     "uses": "flow",
@@ -1318,6 +1268,106 @@ const spec = [
         "fromRecList",
         ": ",
         "$VAR"
+      ]
+    }
+  },
+  {
+    "desc": "From Record: Assigns the passed record.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_record",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "record_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromRecord",
+        ": ",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "From Record List: Assigns the passed record list.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_record_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VALS": {
+          "label": "vals",
+          "type": "record_list_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromRecordList",
+        ": ",
+        "$VALS"
+      ]
+    }
+  },
+  {
+    "desc": "From Text: Assigns the passed piece of text.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_text",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "text_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromText",
+        ": ",
+        "$VAL"
+      ]
+    }
+  },
+  {
+    "desc": "From Text List: Assigns the passed text list.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_text_list",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VALS": {
+          "label": "vals",
+          "type": "text_list_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromTextList",
+        ": ",
+        "$VALS"
       ]
     }
   },
@@ -1621,14 +1671,12 @@ const spec = [
           "type": "text_eval"
         }
       },
-      "roles": "QZSZK",
+      "roles": "FZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
         "isEmpty",
-        " ",
-        "text",
         ": ",
         "$TEXT"
       ]
@@ -1727,40 +1775,6 @@ const spec = [
     }
   },
   {
-    "desc": "Assignment: Sets a variable to a value.",
-    "group": [
-      "variables"
-    ],
-    "name": "let",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$BE": {
-          "label": "be",
-          "type": "assignment"
-        },
-        "$VAR": {
-          "label": "var",
-          "type": "variable_name"
-        }
-      },
-      "roles": "CZKZSZKT",
-      "slots": [
-        "execute"
-      ],
-      "tokens": [
-        "let",
-        ": ",
-        "$VAR",
-        ", ",
-        "be",
-        ": ",
-        "$BE",
-        "."
-      ]
-    }
-  },
-  {
     "desc": "Lines Value: specify one or more lines of text.",
     "group": [
       "literals"
@@ -1808,16 +1822,18 @@ const spec = [
           "type": "list_empty_do"
         },
         "$LIST": {
-          "label": "list",
+          "label": "across",
           "type": "assignment"
         }
       },
-      "roles": "CZKZKZSZKZKT",
+      "roles": "CZSZKZKZSZKZKT",
       "slots": [
         "execute"
       ],
       "tokens": [
-        "visiting",
+        "repeating",
+        " ",
+        "across",
         ": ",
         "$LIST",
         ", ",
@@ -2628,41 +2644,215 @@ const spec = [
     "group": [
       "flow"
     ],
-    "name": "range_over",
+    "name": "range",
     "uses": "flow",
     "with": {
       "params": {
-        "$START": {
-          "label": "start",
+        "$BY_STEP": {
+          "label": "byStep",
           "type": "number_eval"
         },
-        "$STEP": {
-          "label": "step",
+        "$FROM": {
+          "label": "from",
           "type": "number_eval"
         },
-        "$STOP": {
-          "label": "stop",
+        "$TO": {
+          "label": "to",
           "type": "number_eval"
         }
       },
-      "roles": "QZSZKZSZKZSZK",
+      "roles": "FZKZSZKZSZK",
       "slots": [
         "num_list_eval"
       ],
       "tokens": [
         "range",
+        ": ",
+        "$TO",
+        ", ",
+        "from",
+        ": ",
+        "$FROM",
+        ", ",
+        "byStep",
+        ": ",
+        "$BY_STEP"
+      ]
+    }
+  },
+  {
+    "desc": "ReciprocalOf: Returns the implied relative of a noun (ex. the source in a one-to-many relation.)",
+    "group": [
+      "relations"
+    ],
+    "name": "reciprocal_of",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        },
+        "$VIA": {
+          "label": "via",
+          "type": "relation_name"
+        }
+      },
+      "roles": "FZKZSZK",
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "reciprocalOf",
+        ": ",
+        "$OBJ",
+        ", ",
+        "via",
+        ": ",
+        "$VIA"
+      ]
+    }
+  },
+  {
+    "desc": "ReciprocalsOf: Returns the implied relative of a noun (ex. the sources of a many-to-many relation.)",
+    "group": [
+      "relations"
+    ],
+    "name": "reciprocals_of",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        },
+        "$VIA": {
+          "label": "via",
+          "type": "relation_name"
+        }
+      },
+      "roles": "FZKZSZK",
+      "slots": [
+        "text_list_eval"
+      ],
+      "tokens": [
+        "reciprocalsOf",
+        ": ",
+        "$OBJ",
+        ", ",
+        "via",
+        ": ",
+        "$VIA"
+      ]
+    }
+  },
+  {
+    "desc": "Relate: Relate two nouns.",
+    "group": [
+      "relations"
+    ],
+    "name": "relate",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        },
+        "$TO_OBJ": {
+          "label": "toObj",
+          "type": "text_eval"
+        },
+        "$VIA": {
+          "label": "via",
+          "type": "relation_name"
+        }
+      },
+      "roles": "CZSZKZSZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "relate",
         " ",
-        "start",
+        "obj",
         ": ",
-        "$START",
+        "$OBJ",
         ", ",
-        "stop",
+        "toObj",
         ": ",
-        "$STOP",
+        "$TO_OBJ",
         ", ",
-        "step",
+        "via",
         ": ",
-        "$STEP"
+        "$VIA",
+        "."
+      ]
+    }
+  },
+  {
+    "desc": "RelativeOf: Returns the relative of a noun (ex. the target of a one-to-one relation.)",
+    "group": [
+      "relations"
+    ],
+    "name": "relative_of",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        },
+        "$VIA": {
+          "label": "via",
+          "type": "relation_name"
+        }
+      },
+      "roles": "FZKZSZK",
+      "slots": [
+        "text_eval"
+      ],
+      "tokens": [
+        "relativeOf",
+        ": ",
+        "$OBJ",
+        ", ",
+        "via",
+        ": ",
+        "$VIA"
+      ]
+    }
+  },
+  {
+    "desc": "RelativesOf: Returns the relatives of a noun as a list of names (ex. the targets of one-to-many relation).",
+    "group": [
+      "relations"
+    ],
+    "name": "relatives_of",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$OBJ": {
+          "label": "obj",
+          "type": "text_eval"
+        },
+        "$VIA": {
+          "label": "via",
+          "type": "relation_name"
+        }
+      },
+      "roles": "FZKZSZK",
+      "slots": [
+        "text_list_eval"
+      ],
+      "tokens": [
+        "relativesOf",
+        ": ",
+        "$OBJ",
+        ", ",
+        "via",
+        ": ",
+        "$VIA"
       ]
     }
   },
@@ -2920,6 +3110,42 @@ const spec = [
         "text_list_eval",
         "record_list_eval",
         "assignment"
+      ]
+    }
+  },
+  {
+    "desc": "While: Repeat a series of statements while a conditional is true.",
+    "group": [
+      "flow"
+    ],
+    "name": "while",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$DO": {
+          "label": "do",
+          "type": "activity"
+        },
+        "$TRUE": {
+          "label": "while",
+          "type": "bool_eval"
+        }
+      },
+      "roles": "CZSZKZSZKT",
+      "slots": [
+        "execute"
+      ],
+      "tokens": [
+        "repeating",
+        " ",
+        "while",
+        ": ",
+        "$TRUE",
+        ", ",
+        "do",
+        ": ",
+        "$DO",
+        "."
       ]
     }
   }

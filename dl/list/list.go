@@ -55,6 +55,8 @@ var Slats = []composer.Composer{
 	(*IntoNumList)(nil),
 	(*IntoRecList)(nil),
 	(*IntoTxtList)(nil),
+	// range:
+	(*Range)(nil),
 	// sort:
 	(*SortNumbers)(nil),
 	(*SortText)(nil),

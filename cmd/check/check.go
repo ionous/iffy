@@ -12,7 +12,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-// ex. go run check.go -in /Users/ionous/Documents/Iffy/3ruwyfdnk4umh/play.db
+// ex. go run check.go -in /Users/ionous/Documents/Iffy/scratch/shared/play.db
 func main() {
 	var inFile, testName string
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")

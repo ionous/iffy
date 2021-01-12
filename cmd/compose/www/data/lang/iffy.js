@@ -89,7 +89,7 @@ function localLang(make) {
     make.str("pattern_name");
 
     make.flow("pattern_actions", "story_statement",
-      "To {pattern name%name:pattern_name} {?pattern_locals}:{pattern_rules}",
+      "To determine {pattern name%name:pattern_name} {?pattern_locals} {?pattern_return} do:{pattern_rules}",
       "Add actions to a pattern: Actions to take when using a pattern.");
 
     make.flow("pattern_rules", "{*pattern_rule}");
@@ -98,13 +98,15 @@ function localLang(make) {
 
     make.str("pattern_flags", "{continue before%before}, {continue after%after}, {terminate}");
 
-    make.flow("pattern_locals", " use {+variable_decl|comma-and}",
+    make.flow("pattern_locals", " using {+variable_decl|comma-and}",
       "Local: local variables can use the parameters of a pattern to compute temporary values.");
 
     make.swap("program_hook", "run an {activity} or return a {result:program_return}");
 
+    make.flow("pattern_return", "returning {result:variable_decl}");
+
     // fix? activity and program_return both exist for the sake of appearance only.
-    make.flow("program_return", "return {result:program_result}");
+    make.flow("program_return", "returning {result:program_result}");
 
     make.swap("program_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
 
@@ -113,13 +115,20 @@ function localLang(make) {
   });
 
   make.group("Relations", function() {
-    make.flow("noun_relation",  "{?are_being} {relation} {nouns+named_noun|comma-and}");
+    make.flow("kind_of_relation", "story_statement", "{relation:relation_name} relates {relation_cardinality}");
+    make.swap("relation_cardinality", "{one_to_one}, {one_to_many}, {many_to_one}, or {many_to_many}");
+    make.flow("one_to_one",  "one {singular_kind} to one {singular_kind}");
+    make.flow("one_to_many", "one {singular_kind} to many {plural_kinds}");
+    make.flow("many_to_one", "many {plural_kinds} to one {singular_kind}");
+    make.flow("many_to_many", "many {plural_kinds} to many {plural_kinds}");
+
+    make.flow("noun_relation",  "{?are_being} {relation:relation_name} {nouns+named_noun|comma-and}");
 
     make.flow("relative_to_noun", "story_statement",
-            "{relation} {nouns+named_noun} {are_being} {nouns+named_noun}.",
+            "{relation:relation_name} {nouns+named_noun} {are_being} {nouns+named_noun}.",
             "Relate nouns to each other");
 
-    make.str("relation");
+    // make.str("relation_name"); // also declared in rel.go
   });
 
   make.group("Kinds", function() {
@@ -158,7 +167,7 @@ For example: animals, containers, etc.`);
 
   make.group("Variables", function() {
     make.flow("variable_decl", "{an:determiner} {name:variable_name} ( {type:variable_type}  {comment?lines} )");
-    // make.str("variable_name"); ... hmmm.... declared in core now. fix?
+    // make.str("variable_name"); // also declared in core.
 
     make.swap("variable_type", "a {simple value%primitive:primitive_type}, an {object:object_type}, or {other value%ext:ext_type}");
     make.flow("object_type",  "{an:ana} {kind of%kind:singular_kind}");

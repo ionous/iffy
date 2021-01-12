@@ -70,6 +70,9 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 			// log.Println("activate domain", domain, "affected", cnt, "noun pairs")
 		}
 	}
+	// FIX? maybe better than an active list would be just keep the noun's domain path
+	// then, we can just strcmp the noun's path and the active domain to match
+	// maybe even a generalized "hierarchy" test  ( re: kinds ) -- could be even just a string type.
 	run.activeNouns.reset()
 	run.nounLocale.reset()
 }
@@ -139,7 +142,7 @@ func (run *Runner) RelativesOf(a, relation string) (ret []string, err error) {
 }
 
 // assumes b is a valid noun
-func (run *Runner) ReciprocalOf(b, relation string) (ret []string, err error) {
+func (run *Runner) ReciprocalsOf(b, relation string) (ret []string, err error) {
 	if !run.isActive(b) {
 		err = g.UnknownObject(b)
 	} else if rows, e := run.fields.reciprocalOf.Query(b, relation); e != nil {

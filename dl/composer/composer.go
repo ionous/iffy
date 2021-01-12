@@ -34,9 +34,10 @@ type Role int
 const (
 	// a top-level function, basically execute
 	Command Role = iota + 1
-	// any sub function, basically any eval
+	// a non-top level command, basically any eval
 	Function
-	// keyword choices
+	// commands that fill interfaces only in a small set of cases
+	// example. the elseIf in an if.
 	Selector
 )
 

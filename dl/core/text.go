@@ -12,7 +12,7 @@ import (
 
 // IsEmpty determines whether the text contains any characters at all.
 type IsEmpty struct {
-	Text rt.TextEval
+	Text rt.TextEval `if:"selector"`
 }
 
 // Includes determines whether text contains part.
@@ -29,9 +29,9 @@ type Join struct {
 
 func (*IsEmpty) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "is_empty",
-		Group: "strings",
-		Desc:  "Is Empty: True if the text is empty.",
+		Fluent: &composer.Fluid{Role: composer.Function},
+		Group:  "strings",
+		Desc:   "Is Empty: True if the text is empty.",
 	}
 }
 

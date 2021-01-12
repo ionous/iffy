@@ -8,7 +8,7 @@ import (
 
 type Relate struct {
 	Obj, ToObj rt.TextEval
-	Via        string // fix: a relation string.
+	Via        Relation
 }
 
 func (*Relate) Compose() composer.Spec {
@@ -32,7 +32,7 @@ func (op *Relate) setRelation(run rt.Runtime) (err error) {
 	} else if b, e := safe.ObjectFromText(run, op.ToObj); e != nil {
 		err = e
 	} else {
-		err = run.RelateTo(a.String(), b.String(), op.Via)
+		err = run.RelateTo(a.String(), b.String(), op.Via.String())
 	}
 	return
 }

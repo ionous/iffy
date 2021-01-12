@@ -26,9 +26,9 @@ func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 }
 
 // Let assigns a value to a local variable.
-type Let struct {
-	Var Variable `if:"selector"`
-	Be  Assignment
+type Assign struct {
+	Var  Variable   `if:"selector"`
+	From Assignment `if:"selector=be"`
 }
 
 type FromBool struct {
@@ -67,7 +67,7 @@ type FromRecordList struct {
 	Vals rt.RecordListEval `if:"selector"`
 }
 
-func (*Let) Compose() composer.Spec {
+func (*Assign) Compose() composer.Spec {
 	return composer.Spec{
 		Group:  "variables",
 		Desc:   "Assignment: Sets a variable to a value.",
@@ -75,8 +75,8 @@ func (*Let) Compose() composer.Spec {
 	}
 }
 
-func (op *Let) Execute(run rt.Runtime) (err error) {
-	if v, e := GetAssignedValue(run, op.Be); e != nil {
+func (op *Assign) Execute(run rt.Runtime) (err error) {
+	if v, e := GetAssignedValue(run, op.From); e != nil {
 		err = cmdError(op, e)
 	} else if e := run.SetField(object.Variables, op.Var.String(), v); e != nil {
 		err = cmdError(op, e)
@@ -86,7 +86,7 @@ func (op *Let) Execute(run rt.Runtime) (err error) {
 
 func (*FromBool) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_bool",
+		Name:   "from_bool",
 		Group:  "variables",
 		Desc:   "From Bool: Assigns the passed boolean value.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -106,7 +106,7 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromNum) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_num",
+		Name:   "from_num",
 		Spec:   "{val:number_eval}",
 		Group:  "variables",
 		Desc:   "From Number: Assigns the passed number.",
@@ -127,7 +127,7 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromText) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_text",
+		Name:   "from_text",
 		Group:  "variables",
 		Desc:   "From Text: Assigns the passed piece of text.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -147,7 +147,7 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromName) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_name",
+		Name:   "from_name",
 		Group:  "variables",
 		Desc:   "From Name: Assigns the passed piece of name.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -169,7 +169,7 @@ func (op *FromName) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromRecord) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_record",
+		Name:   "from_record",
 		Group:  "variables",
 		Desc:   "From Record: Assigns the passed record.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -189,7 +189,7 @@ func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 
 func (*FromObject) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_object",
+		Name:   "from_object",
 		Group:  "variables",
 		Desc:   "From Object: Assigns the passed object",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -209,7 +209,7 @@ func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 
 func (*FromNumList) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_num_list",
+		Name:   "from_num_list",
 		Group:  "variables",
 		Desc:   "From Number List: Assigns the passed number list.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -229,7 +229,7 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error)
 
 func (*FromTextList) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_text_list",
+		Name:   "from_text_list",
 		Group:  "variables",
 		Desc:   "From Text List: Assigns the passed text list.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -249,7 +249,7 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error
 
 func (*FromRecordList) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "assign_record_list",
+		Name:   "from_record_list",
 		Group:  "variables",
 		Desc:   "From Record List: Assigns the passed record list.",
 		Fluent: &composer.Fluid{Role: composer.Function},

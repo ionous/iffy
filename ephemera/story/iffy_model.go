@@ -482,6 +482,20 @@ func (*KindOfNoun) Compose() composer.Spec {
 	}
 }
 
+// KindOfRelation requires various parameters.
+type KindOfRelation struct {
+	At                  reader.Position `if:"internal"`
+	Relation            RelationName
+	RelationCardinality RelationCardinality
+}
+
+func (*KindOfRelation) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "kind_of_relation",
+		Spec: "{relation:relation_name} relates {relation_cardinality}",
+	}
+}
+
 // KindsOfAspect requires various parameters.
 type KindsOfAspect struct {
 	At     reader.Position `if:"internal"`
@@ -659,6 +673,34 @@ func (*ListOrder) Compose() composer.Spec {
 	}
 }
 
+// ManyToMany requires various parameters.
+type ManyToMany struct {
+	At           reader.Position `if:"internal"`
+	PluralKinds  PluralKinds
+	PluralKinds1 PluralKinds
+}
+
+func (*ManyToMany) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "many_to_many",
+		Spec: "many {plural_kinds} to many {plural_kinds}",
+	}
+}
+
+// ManyToOne requires various parameters.
+type ManyToOne struct {
+	At           reader.Position `if:"internal"`
+	PluralKinds  PluralKinds
+	SingularKind SingularKind
+}
+
+func (*ManyToOne) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "many_to_one",
+		Spec: "many {plural_kinds} to one {singular_kind}",
+	}
+}
+
 // NamedNoun requires various parameters.
 type NamedNoun struct {
 	At         reader.Position `if:"internal"`
@@ -739,14 +781,14 @@ func (*NounPhrase) Choices() map[string]interface{} {
 type NounRelation struct {
 	At       reader.Position `if:"internal"`
 	AreBeing *AreBeing
-	Relation Relation
+	Relation RelationName
 	Nouns    []NamedNoun
 }
 
 func (*NounRelation) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "noun_relation",
-		Spec: "{?are_being} {relation} {nouns+named_noun|comma-and}",
+		Spec: "{?are_being} {relation:relation_name} {nouns+named_noun|comma-and}",
 	}
 }
 
@@ -849,6 +891,34 @@ func (*ObjectType) Compose() composer.Spec {
 	}
 }
 
+// OneToMany requires various parameters.
+type OneToMany struct {
+	At           reader.Position `if:"internal"`
+	SingularKind SingularKind
+	PluralKinds  PluralKinds
+}
+
+func (*OneToMany) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "one_to_many",
+		Spec: "one {singular_kind} to many {plural_kinds}",
+	}
+}
+
+// OneToOne requires various parameters.
+type OneToOne struct {
+	At            reader.Position `if:"internal"`
+	SingularKind  SingularKind
+	SingularKind1 SingularKind
+}
+
+func (*OneToOne) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "one_to_one",
+		Spec: "one {singular_kind} to one {singular_kind}",
+	}
+}
+
 // Paragraph requires various parameters.
 type Paragraph struct {
 	At             reader.Position `if:"internal"`
@@ -868,6 +938,7 @@ type PatternActions struct {
 	At            reader.Position `if:"internal"`
 	Name          PatternName
 	PatternLocals *PatternLocals
+	PatternReturn *PatternReturn
 	PatternRules  PatternRules
 }
 
@@ -875,7 +946,7 @@ func (*PatternActions) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "pattern_actions",
 		Desc: `Add actions to a pattern: Actions to take when using a pattern.`,
-		Spec: "To {pattern name%name:pattern_name} {?pattern_locals}:{pattern_rules}",
+		Spec: "To determine {pattern name%name:pattern_name} {?pattern_locals} {?pattern_return} do:{pattern_rules}",
 	}
 }
 
@@ -932,7 +1003,7 @@ func (*PatternLocals) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "pattern_locals",
 		Desc: `Local: local variables can use the parameters of a pattern to compute temporary values.`,
-		Spec: " use {+variable_decl|comma-and}",
+		Spec: " using {+variable_decl|comma-and}",
 	}
 }
 
@@ -955,6 +1026,19 @@ func (*PatternName) Compose() composer.Spec {
 		Name:        "pattern_name",
 		Spec:        "{pattern_name}",
 		OpenStrings: true,
+	}
+}
+
+// PatternReturn requires various parameters.
+type PatternReturn struct {
+	At     reader.Position `if:"internal"`
+	Result VariableDecl
+}
+
+func (*PatternReturn) Compose() composer.Spec {
+	return composer.Spec{
+		Name: "pattern_return",
+		Spec: "returning {result:variable_decl}",
 	}
 }
 
@@ -1201,7 +1285,7 @@ type ProgramReturn struct {
 func (*ProgramReturn) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "program_return",
-		Spec: "return {result:program_result}",
+		Spec: "returning {result:program_result}",
 	}
 }
 
@@ -1404,32 +1488,32 @@ func (*RecordsPossessProperties) Compose() composer.Spec {
 	}
 }
 
-// Relation requires a user-specified string.
-type Relation struct {
+// RelationCardinality swaps between various options
+type RelationCardinality struct {
 	At  reader.Position `if:"internal"`
-	Str string
+	Opt interface{}
 }
 
-func (op *Relation) String() string {
-	return op.Str
-}
-
-func (*Relation) Choices() (choices map[string]string) {
-	return map[string]string{}
-}
-
-func (*Relation) Compose() composer.Spec {
+func (*RelationCardinality) Compose() composer.Spec {
 	return composer.Spec{
-		Name:        "relation",
-		Spec:        "{relation}",
-		OpenStrings: true,
+		Name: "relation_cardinality",
+		Spec: "{one_to_one}, {one_to_many}, {many_to_one}, or {many_to_many}",
+	}
+}
+
+func (*RelationCardinality) Choices() map[string]interface{} {
+	return map[string]interface{}{
+		"one_to_one":   (*OneToOne)(nil),
+		"one_to_many":  (*OneToMany)(nil),
+		"many_to_one":  (*ManyToOne)(nil),
+		"many_to_many": (*ManyToMany)(nil),
 	}
 }
 
 // RelativeToNoun requires various parameters.
 type RelativeToNoun struct {
 	At       reader.Position `if:"internal"`
-	Relation Relation
+	Relation RelationName
 	Nouns    []NamedNoun
 	AreBeing AreBeing
 	Nouns1   []NamedNoun
@@ -1439,7 +1523,7 @@ func (*RelativeToNoun) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "relative_to_noun",
 		Desc: `Relate nouns to each other`,
-		Spec: "{relation} {nouns+named_noun} {are_being} {nouns+named_noun}.",
+		Spec: "{relation:relation_name} {nouns+named_noun} {are_being} {nouns+named_noun}.",
 	}
 }
 
@@ -1817,6 +1901,7 @@ var Model = []composer.Composer{
 	(*Determiner)(nil),
 	(*ExtType)(nil),
 	(*KindOfNoun)(nil),
+	(*KindOfRelation)(nil),
 	(*KindsOfAspect)(nil),
 	(*KindsOfKind)(nil),
 	(*KindsOfRecord)(nil),
@@ -1826,6 +1911,8 @@ var Model = []composer.Composer{
 	(*ListCase)(nil),
 	(*ListEdge)(nil),
 	(*ListOrder)(nil),
+	(*ManyToMany)(nil),
+	(*ManyToOne)(nil),
 	(*NamedNoun)(nil),
 	(*NounAssignment)(nil),
 	(*NounName)(nil),
@@ -1837,12 +1924,15 @@ var Model = []composer.Composer{
 	(*NumberList)(nil),
 	(*ObjectFunc)(nil),
 	(*ObjectType)(nil),
+	(*OneToMany)(nil),
+	(*OneToOne)(nil),
 	(*Paragraph)(nil),
 	(*PatternActions)(nil),
 	(*PatternDecl)(nil),
 	(*PatternFlags)(nil),
 	(*PatternLocals)(nil),
 	(*PatternName)(nil),
+	(*PatternReturn)(nil),
 	(*PatternRule)(nil),
 	(*PatternRules)(nil),
 	(*PatternType)(nil),
@@ -1866,7 +1956,7 @@ var Model = []composer.Composer{
 	(*RecordSingular)(nil),
 	(*RecordType)(nil),
 	(*RecordsPossessProperties)(nil),
-	(*Relation)(nil),
+	(*RelationCardinality)(nil),
 	(*RelativeToNoun)(nil),
 	(*RenderTemplate)(nil),
 	(*ShuffleText)(nil),

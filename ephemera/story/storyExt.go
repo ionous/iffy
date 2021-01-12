@@ -5,6 +5,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/debug"
 	"github.com/ionous/iffy/dl/list"
+	"github.com/ionous/iffy/dl/rel"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/rt"
 )
@@ -19,6 +20,10 @@ type TextEval rt.TextEval
 
 type VariableName struct {
 	core.Variable
+}
+
+type RelationName struct {
+	rel.Relation
 }
 
 // fix: this doesnt work because story importer doesnt trigger callbacks for str types

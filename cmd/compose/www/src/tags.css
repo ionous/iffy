@@ -47,9 +47,12 @@
 /* role: CMD */
 .mk-flow-param[data-role="C"] {
   color:rgb(0, 102, 214);   /* blue*/
-  /*color: red;*/
   font-style: bold;
   font-size: larger;
+} 
+.mk-flow-param[data-role="F"] {
+  color:rgb(0, 102, 214);   /* blue*/
+  font-style: bold;
 }
 /* role: SEPARATOR */
 .mk-flow-param[data-role="Z"] {
@@ -61,8 +64,7 @@
 }
 /* role: SELECTOR, TOKEN, FUNCTION */
 .mk-flow-param[data-role="S"],
-.mk-flow-param[data-role="K"], 
-.mk-flow-param[data-role="F"] {
+.mk-flow-param[data-role="K"] {
   color:#c90000;
 }
 /* role: AMBIGUOUS */

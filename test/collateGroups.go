@@ -30,19 +30,19 @@ var collateGroups = pattern.ActivityPattern{
 	Rules: []*pattern.ExecuteRule{
 		&pattern.ExecuteRule{Execute: core.NewActivity(
 			// walk collation.Groups for matching settings
-			&core.Let{core.Variable{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
+			&core.Assign{core.Variable{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
 			&list.Each{
 				List: V("groups"),
-				With: "el",
-				Go: core.NewActivity(
+				As:   &list.AsRec{N("el")},
+				Do: core.MakeActivity(
 					&core.ChooseAction{
 						If: &pattern.DetermineBool{
 							Pattern:   "matchGroups",
 							Arguments: core.Args(V("settings"), &core.Unpack{V("el"), "Settings"})},
 						Do: core.MakeActivity(
-							&core.Let{
-								Var: N("idx"),
-								Be:  V("index"),
+							&core.Assign{
+								Var:  N("idx"),
+								From: V("index"),
 							},
 							// implement a "break" for the each that returns a constant error?
 						),
@@ -66,8 +66,8 @@ var collateGroups = pattern.ActivityPattern{
 				// found a matching group?
 				// unpack it, add the object to it, then pack it up again.
 				Else: &core.ChooseNothingElse{core.MakeActivity(
-					&core.Let{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
-					&core.Let{N("names"), &core.Unpack{V("group"), "Objects"}},
+					&core.Assign{N("group"), &core.FromRecord{&list.At{List: V("groups"), Index: V("idx")}}},
+					&core.Assign{N("names"), &core.Unpack{V("group"), "Objects"}},
 					&list.PutEdge{Into: &list.IntoTxtList{N("names")}, From: &core.Unpack{V("settings"), "Name"}},
 					Put("group", "Objects", V("names")),
 					&list.Set{List: "groups", Index: V("idx"), From: V("group")},

@@ -95,7 +95,7 @@ var FactorialDetermineNum = map[string]interface{}{
 							"$FROM": map[string]interface{}{
 								"type": "assignment",
 								"value": map[string]interface{}{
-									"type": "assign_num",
+									"type": "from_num",
 									"value": map[string]interface{}{
 										"$VAL": map[string]interface{}{
 											"type": "number_eval",

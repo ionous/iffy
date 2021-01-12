@@ -50,7 +50,7 @@ func (op *RecordPlural) NewName(k *Importer) (ret ephemera.Named, err error) {
 	return k.NewName(name, tables.NAMED_PLURAL_KINDS, op.At.String()), nil
 }
 
-func (op *Relation) NewName(k *Importer) (ret ephemera.Named, err error) {
+func (op *RelationName) NewName(k *Importer) (ret ephemera.Named, err error) {
 	name := lang.Breakcase(op.Str)
 	return k.NewName(name, tables.NAMED_VERB, op.At.String()), nil
 }

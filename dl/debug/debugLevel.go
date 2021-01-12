@@ -10,10 +10,11 @@ type Level int
 
 //go:generate stringer -type=Level
 const (
-	Note Level = iota
+	Note Level = iota + 1
 	ToDo
 	Warning
 	Fix
+	Error
 )
 
 func (*Level) Compose() composer.Spec {

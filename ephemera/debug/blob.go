@@ -123,7 +123,7 @@ var Blob = `{
                             "value": {
                               "$RELATION": {
                                 "id": "id23",
-                                "type": "relation",
+                                "type": "relation_name",
                                 "value": "contains"
                               },
                               "$NOUNS": [
@@ -164,7 +164,7 @@ var Blob = `{
                 "value": {
                   "$RELATION": {
                     "id": "id-16f156a8166-0",
-                    "type": "relation",
+                    "type": "relation_name",
                     "value": "In"
                   },
                   "$NOUNS": [
@@ -391,7 +391,7 @@ var Blob = `{
                             "value": {
                               "$RELATION": {
                                 "id": "id-16f156a8166-53",
-                                "type": "relation",
+                                "type": "relation_name",
                                 "value": "unlocks"
                               },
                               "$NOUNS": [
@@ -464,7 +464,7 @@ var Blob = `{
                             "value": {
                               "$RELATION": {
                                 "id": "id-16f156a8166-72",
-                                "type": "relation",
+                                "type": "relation_name",
                                 "value": "in"
                               },
                               "$NOUNS": [
@@ -510,7 +510,7 @@ var Blob = `{
                 "value": {
                   "$RELATION": {
                     "id": "id-16f165d636d-1",
-                    "type": "relation",
+                    "type": "relation_name",
                     "value": "On"
                   },
                   "$NOUNS": [

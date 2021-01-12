@@ -55,6 +55,188 @@
                   }
                 }
               }
+            },
+            {
+              "id": "id-176f2cddbd4-20",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-21",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-22",
+                    "type": "aspect",
+                    "value": " possession status"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-23",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-24",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-25",
+                    "type": "aspect",
+                    "value": " possession status"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-26",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-27",
+                        "type": "are_either",
+                        "value": "$CANBE"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-28",
+                          "type": "trait",
+                          "value": "dispossessed"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-30",
+                          "type": "trait",
+                          "value": "carried"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-29",
+                          "type": "trait",
+                          "value": "worn"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-31",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-32",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-33",
+                    "type": "aspect",
+                    "value": " portability"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-34",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-35",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-36",
+                    "type": "aspect",
+                    "value": " portability"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-37",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-38",
+                        "type": "are_either",
+                        "value": "$EITHER"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-39",
+                          "type": "trait",
+                          "value": "portable"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-40",
+                          "type": "trait",
+                          "value": "fixed in place"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-41",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-53",
+                "type": "kinds_possess_properties",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-176f2cddbd4-54",
+                    "type": "plural_kinds",
+                    "value": " things"
+                  },
+                  "$PROPERTY_DECL": [
+                    {
+                      "id": "id-176f2cddbd4-55",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-56",
+                          "type": "determiner",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-57",
+                          "type": "property",
+                          "value": "portability"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-58",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-59",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-176f2cddbd4-60",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-61",
+                          "type": "determiner",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-62",
+                          "type": "property",
+                          "value": "possession status"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-63",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-64",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
@@ -108,6 +290,632 @@
                     "id": "id-1769a72b6ea-53",
                     "type": "singular_kind",
                     "value": "thing"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-176f2cddbd4-0",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-176f2cddbd4-1",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-2",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-176f2cddbd4-3",
+                    "type": "plural_kinds",
+                    "value": " openers"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-176f2cddbd4-4",
+                    "type": "singular_kind",
+                    "value": "prop"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-65",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-66",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-67",
+                    "type": "aspect",
+                    "value": " open status"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-68",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-71",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-72",
+                    "type": "aspect",
+                    "value": " open status"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-73",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-74",
+                        "type": "are_either",
+                        "value": "$EITHER"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-75",
+                          "type": "trait",
+                          "value": "open"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-76",
+                          "type": "trait",
+                          "value": "closed"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-77",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-78",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-79",
+                    "type": "aspect",
+                    "value": " openability"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-80",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-81",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-82",
+                    "type": "aspect",
+                    "value": " openability"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-83",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-84",
+                        "type": "are_either",
+                        "value": "$EITHER"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-85",
+                          "type": "trait",
+                          "value": "unopenable"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-86",
+                          "type": "trait",
+                          "value": "openable"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-87",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-88",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-89",
+                    "type": "aspect",
+                    "value": " locked status"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-90",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-91",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-92",
+                    "type": "aspect",
+                    "value": " locked status"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-93",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-94",
+                        "type": "are_either",
+                        "value": "$EITHER"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-95",
+                          "type": "trait",
+                          "value": "unlockable"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-96",
+                          "type": "trait",
+                          "value": "locked"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-97",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-98",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-99",
+                    "type": "aspect",
+                    "value": " lockable status"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-100",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-101",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-102",
+                    "type": "aspect",
+                    "value": " lockable status"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-103",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-104",
+                        "type": "are_either",
+                        "value": "$EITHER"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-105",
+                          "type": "trait",
+                          "value": "lockable"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-106",
+                          "type": "trait",
+                          "value": "not lockable"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-127",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-128",
+                "type": "kinds_possess_properties",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-176f2cddbd4-129",
+                    "type": "plural_kinds",
+                    "value": " openers"
+                  },
+                  "$PROPERTY_DECL": [
+                    {
+                      "id": "id-176f2cddbd4-130",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-131",
+                          "type": "determiner",
+                          "value": "$AN"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-132",
+                          "type": "property",
+                          "value": "open status"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-133",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-134",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-176f2cddbd4-135",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-136",
+                          "type": "determiner",
+                          "value": "$AN"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-137",
+                          "type": "property",
+                          "value": "openability"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-138",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-139",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-176f2cddbd4-141",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-142",
+                          "type": "determiner",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-143",
+                          "type": "property",
+                          "value": "locked status"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-144",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-145",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-176f2cddbd4-146",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-147",
+                          "type": "determiner",
+                          "value": "$A"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-148",
+                          "type": "property",
+                          "value": "lockable status"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-149",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-150",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-176f2cddbd4-7",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-176f2cddbd4-8",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-9",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-176f2cddbd4-10",
+                    "type": "plural_kinds",
+                    "value": " containers"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-176f2cddbd4-11",
+                    "type": "singular_kind",
+                    "value": "opener"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-107",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-108",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-109",
+                    "type": "aspect",
+                    "value": " enterability"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-110",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-111",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-112",
+                    "type": "aspect",
+                    "value": " enterability"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-113",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-114",
+                        "type": "are_either",
+                        "value": "$CANBE"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-115",
+                          "type": "trait",
+                          "value": "enterable"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-116",
+                          "type": "trait",
+                          "value": "not enterable"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-117",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-118",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-119",
+                    "type": "aspect",
+                    "value": " opacity"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-120",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-121",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-176f2cddbd4-122",
+                    "type": "aspect",
+                    "value": " opacity"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-176f2cddbd4-123",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-176f2cddbd4-124",
+                        "type": "are_either",
+                        "value": "$EITHER"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-176f2cddbd4-125",
+                          "type": "trait",
+                          "value": "opaque"
+                        },
+                        {
+                          "id": "id-176f2cddbd4-126",
+                          "type": "trait",
+                          "value": "transparent"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-176f2cddbd4-151",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-152",
+                "type": "kinds_possess_properties",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-176f2cddbd4-153",
+                    "type": "plural_kinds",
+                    "value": " containers"
+                  },
+                  "$PROPERTY_DECL": [
+                    {
+                      "id": "id-176f2cddbd4-154",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-155",
+                          "type": "determiner",
+                          "value": "$AN"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-156",
+                          "type": "property",
+                          "value": "enterability"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-157",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-158",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "id": "id-176f2cddbd4-159",
+                      "type": "property_decl",
+                      "value": {
+                        "$AN": {
+                          "id": "id-176f2cddbd4-160",
+                          "type": "determiner",
+                          "value": "$AN"
+                        },
+                        "$PROPERTY": {
+                          "id": "id-176f2cddbd4-161",
+                          "type": "property",
+                          "value": "opacity"
+                        },
+                        "$PROPERTY_TYPE": {
+                          "id": "id-176f2cddbd4-162",
+                          "type": "property_type",
+                          "value": {
+                            "$PROPERTY_ASPECT": {
+                              "id": "id-176f2cddbd4-163",
+                              "type": "property_aspect",
+                              "value": "$ASPECT"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-176f2cddbd4-5",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-176f2cddbd4-6",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-12",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-176f2cddbd4-13",
+                    "type": "plural_kinds",
+                    "value": " supporters"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-176f2cddbd4-14",
+                    "type": "singular_kind",
+                    "value": "prop"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-176f2cddbd4-15",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-176f2cddbd4-16",
+              "type": "story_statement",
+              "value": {
+                "id": "id-176f2cddbd4-17",
+                "type": "kinds_of_kind",
+                "value": {
+                  "$PLURAL_KINDS": {
+                    "id": "id-176f2cddbd4-18",
+                    "type": "plural_kinds",
+                    "value": " rooms"
+                  },
+                  "$SINGULAR_KIND": {
+                    "id": "id-176f2cddbd4-19",
+                    "type": "singular_kind",
+                    "value": "object"
                   }
                 }
               }

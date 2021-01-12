@@ -15,6 +15,7 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
+// ex. go run asm.go -in /Users/ionous/Documents/Iffy/scratch/shared/ephemera.db -out /Users/ionous/Documents/Iffy/scratch/shared/play.db
 func main() {
 	var inFile, outFile string
 	flag.StringVar(&inFile, "in", "", "input file name (sqlite3)")

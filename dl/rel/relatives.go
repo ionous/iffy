@@ -1,27 +1,89 @@
 package rel
 
 import (
+	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
 )
 
-type Relatives struct {
-	Object   rt.ObjectEval
-	Relation string
+type RelativeOf struct {
+	Obj rt.TextEval `if:"selector"`
+	Via Relation
 }
 
-func (*Relatives) Compose() composer.Spec {
+type RelativesOf struct {
+	Obj rt.TextEval `if:"selector"`
+	Via Relation
+}
+
+type ReciprocalOf struct {
+	Obj rt.TextEval `if:"selector"`
+	Via Relation
+}
+
+type ReciprocalsOf struct {
+	Obj rt.TextEval `if:"selector"`
+	Via Relation
+}
+
+func (*RelativeOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "rel_relatives",
-		Group: "relations",
-		Desc:  "Relatives: Returns the relatives of a noun as a list of names.",
+		Fluent: &composer.Fluid{Role: composer.Function},
+		Group:  "relations",
+		Desc:   "RelativeOf: Returns the relative of a noun (ex. the target of a one-to-one relation.)",
+	}
+}
+func (*RelativesOf) Compose() composer.Spec {
+	return composer.Spec{
+		Fluent: &composer.Fluid{Role: composer.Function},
+		Group:  "relations",
+		Desc:   "RelativesOf: Returns the relatives of a noun as a list of names (ex. the targets of one-to-many relation).",
 	}
 }
 
-func (op *Relatives) GetTextList(run rt.Runtime) (ret g.Value, err error) {
-	if vs, e := op.relatives(run); e != nil {
+func (*ReciprocalOf) Compose() composer.Spec {
+	return composer.Spec{
+		Fluent: &composer.Fluid{Role: composer.Function},
+		Group:  "relations",
+		Desc:   "ReciprocalOf: Returns the implied relative of a noun (ex. the source in a one-to-many relation.)",
+	}
+}
+
+func (*ReciprocalsOf) Compose() composer.Spec {
+	return composer.Spec{
+		Fluent: &composer.Fluid{Role: composer.Function},
+		Group:  "relations",
+		Desc:   "ReciprocalsOf: Returns the implied relative of a noun (ex. the sources of a many-to-many relation.)",
+	}
+}
+
+func (op *RelativeOf) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if a, e := safe.ObjectFromText(run, op.Obj); e != nil {
+		err = cmdError(op, e)
+	} else {
+		noun, rel := a.String(), op.Via.String()
+		if vs, e := run.ReciprocalsOf(noun, rel); e != nil {
+			err = cmdError(op, e)
+		} else if cnt := len(vs); cnt > 1 {
+			e := errutil.New("expected at most one relative for", noun, "in", rel)
+			err = cmdError(op, e)
+		} else {
+			var rel string
+			if cnt != 0 {
+				rel = vs[0]
+			}
+			ret = g.StringOf(rel)
+		}
+	}
+	return
+}
+
+func (op *RelativesOf) GetTextList(run rt.Runtime) (ret g.Value, err error) {
+	if a, e := safe.ObjectFromText(run, op.Obj); e != nil {
+		err = cmdError(op, e)
+	} else if vs, e := run.RelativesOf(a.String(), op.Via.String()); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = g.StringsOf(vs)
@@ -29,11 +91,34 @@ func (op *Relatives) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *Relatives) relatives(run rt.Runtime) (ret []string, err error) {
-	if a, e := safe.GetObject(run, op.Object); e != nil {
-		err = e
+func (op *ReciprocalOf) GetText(run rt.Runtime) (ret g.Value, err error) {
+	if a, e := safe.ObjectFromText(run, op.Obj); e != nil {
+		err = cmdError(op, e)
 	} else {
-		ret, err = run.RelativesOf(a.String(), op.Relation)
+		noun, rel := a.String(), op.Via.String()
+		if vs, e := run.ReciprocalsOf(noun, rel); e != nil {
+			err = cmdError(op, e)
+		} else if cnt := len(vs); cnt > 1 {
+			e := errutil.New("expected at most one reciprocal for", noun, "in", rel)
+			err = cmdError(op, e)
+		} else {
+			var rel string
+			if cnt != 0 {
+				rel = vs[0]
+			}
+			ret = g.StringOf(rel)
+		}
+	}
+	return
+}
+
+func (op *ReciprocalsOf) GetTextList(run rt.Runtime) (ret g.Value, err error) {
+	if a, e := safe.ObjectFromText(run, op.Obj); e != nil {
+		err = cmdError(op, e)
+	} else if vs, e := run.ReciprocalsOf(a.String(), op.Via.String()); e != nil {
+		err = cmdError(op, e)
+	} else {
+		ret = g.StringsOf(vs)
 	}
 	return
 }

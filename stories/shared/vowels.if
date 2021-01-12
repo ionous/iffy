@@ -458,7 +458,7 @@
                                                           "type": "assignment",
                                                           "value": {
                                                             "id": "id-174cdd39e3a-6",
-                                                            "type": "assign_text",
+                                                            "type": "from_text",
                                                             "value": {
                                                               "$VAL": {
                                                                 "id": "id-174cdd39e3a-7",
@@ -567,7 +567,7 @@
                                                           "type": "assignment",
                                                           "value": {
                                                             "id": "id-174d0e35aff-11",
-                                                            "type": "assign_text",
+                                                            "type": "from_text",
                                                             "value": {
                                                               "$VAL": {
                                                                 "id": "id-174d0e35aff-12",
@@ -676,7 +676,7 @@
                                                           "type": "assignment",
                                                           "value": {
                                                             "id": "id-174d0e35aff-42",
-                                                            "type": "assign_text",
+                                                            "type": "from_text",
                                                             "value": {
                                                               "$VAL": {
                                                                 "id": "id-174d0e35aff-43",
@@ -785,7 +785,7 @@
                                                           "type": "assignment",
                                                           "value": {
                                                             "id": "id-174d0e35aff-63",
-                                                            "type": "assign_text",
+                                                            "type": "from_text",
                                                             "value": {
                                                               "$VAL": {
                                                                 "id": "id-174d0e35aff-64",

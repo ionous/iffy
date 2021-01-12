@@ -12,7 +12,7 @@ import (
 )
 
 type Each struct {
-	List core.Assignment `if:"selector"`
+	List core.Assignment `if:"selector=across"`
 	As   ListIterator    `if:"selector"`
 	Do   core.Activity
 	Else *ElseIfEmpty `if:"optional,selector"`
@@ -24,9 +24,11 @@ type ElseIfEmpty struct {
 
 func (op *Each) Compose() composer.Spec {
 	return composer.Spec{
+		// fix: once the fluent interface is decided, rename the command, and remove the name.
+		// alt: the compact format could use the fluent names and then the actual command name doesnt matter much
 		Name:   "list_each",
 		Group:  "list",
-		Fluent: &composer.Fluid{Name: "visiting", Role: composer.Command},
+		Fluent: &composer.Fluid{Name: "repeating", Role: composer.Command},
 		Desc:   `For each in list: Loops over the elements in the passed list, or runs the 'else' activity if empty.`,
 		Locals: []string{"index", "first", "last"},
 	}

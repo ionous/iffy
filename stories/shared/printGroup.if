@@ -115,17 +115,12 @@
                                           "id": "id-1769294d227-5",
                                           "type": "put_at_field",
                                           "value": {
-                                            "$AT_FIELD": {
-                                              "id": "id-1769294d227-7",
-                                              "type": "text",
-                                              "value": "label"
-                                            },
                                             "$FROM": {
                                               "id": "id-1769294d227-8",
                                               "type": "assignment",
                                               "value": {
                                                 "id": "id-1769294d227-29",
-                                                "type": "assign_text",
+                                                "type": "from_text",
                                                 "value": {
                                                   "$VAL": {
                                                     "id": "id-1769294d227-30",
@@ -204,6 +199,11 @@
                                                   }
                                                 }
                                               }
+                                            },
+                                            "$AT_FIELD": {
+                                              "id": "id-1769294d227-7",
+                                              "type": "text",
+                                              "value": "label"
                                             }
                                           }
                                         }
@@ -435,9 +435,14 @@
                                         "type": "execute",
                                         "value": {
                                           "id": "id-17692024e5f-65",
-                                          "type": "let",
+                                          "type": "assign",
                                           "value": {
-                                            "$BE": {
+                                            "$VAR": {
+                                              "id": "id-17692024e5f-66",
+                                              "type": "variable_name",
+                                              "value": "settings"
+                                            },
+                                            "$FROM": {
                                               "id": "id-17692024e5f-67",
                                               "type": "assignment",
                                               "value": {
@@ -466,11 +471,6 @@
                                                   }
                                                 }
                                               }
-                                            },
-                                            "$VAR": {
-                                              "id": "id-17692024e5f-66",
-                                              "type": "variable_name",
-                                              "value": "settings"
                                             }
                                           }
                                         }
@@ -480,9 +480,14 @@
                                         "type": "execute",
                                         "value": {
                                           "id": "id-17693c74441-34",
-                                          "type": "let",
+                                          "type": "assign",
                                           "value": {
-                                            "$BE": {
+                                            "$VAR": {
+                                              "id": "id-17693c74441-35",
+                                              "type": "variable_name",
+                                              "value": "objects"
+                                            },
+                                            "$FROM": {
                                               "id": "id-17693c74441-36",
                                               "type": "assignment",
                                               "value": {
@@ -511,11 +516,6 @@
                                                   }
                                                 }
                                               }
-                                            },
-                                            "$VAR": {
-                                              "id": "id-17693c74441-35",
-                                              "type": "variable_name",
-                                              "value": "objects"
                                             }
                                           }
                                         }
@@ -576,7 +576,72 @@
                                                             "id": "id-17692024e5f-35",
                                                             "type": "choose_action",
                                                             "value": {
+                                                              "$IF": {
+                                                                "id": "id-17692024e5f-36",
+                                                                "type": "bool_eval",
+                                                                "value": {
+                                                                  "id": "id-17692024e5f-37",
+                                                                  "type": "compare_text",
+                                                                  "value": {
+                                                                    "$A": {
+                                                                      "id": "id-17692024e5f-38",
+                                                                      "type": "text_eval",
+                                                                      "value": {
+                                                                        "id": "id-17692024e5f-39",
+                                                                        "type": "unpack",
+                                                                        "value": {
+                                                                          "$FIELD": {
+                                                                            "id": "id-17692024e5f-40",
+                                                                            "type": "text",
+                                                                            "value": "label"
+                                                                          },
+                                                                          "$RECORD": {
+                                                                            "id": "id-17692024e5f-41",
+                                                                            "type": "record_eval",
+                                                                            "value": {
+                                                                              "id": "id-17692024e5f-79",
+                                                                              "type": "get_var",
+                                                                              "value": {
+                                                                                "$NAME": {
+                                                                                  "id": "id-17692024e5f-80",
+                                                                                  "type": "text",
+                                                                                  "value": "settings"
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    },
+                                                                    "$IS": {
+                                                                      "id": "id-17692024e5f-44",
+                                                                      "type": "comparator",
+                                                                      "value": {
+                                                                        "id": "id-17692024e5f-45",
+                                                                        "type": "equal",
+                                                                        "value": {}
+                                                                      }
+                                                                    },
+                                                                    "$B": {
+                                                                      "id": "id-17692024e5f-46",
+                                                                      "type": "text_eval",
+                                                                      "value": {
+                                                                        "id": "id-17692024e5f-47",
+                                                                        "type": "text_value",
+                                                                        "value": {
+                                                                          "$TEXT": {
+                                                                            "id": "id-17692024e5f-48",
+                                                                            "type": "text",
+                                                                            "value": "$EMPTY"
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
                                                               "$DO": {
+                                                                "id": "id-176f4124f37-45",
                                                                 "type": "activity",
                                                                 "value": {
                                                                   "$EXE": [
@@ -587,103 +652,6 @@
                                                                         "id": "id-17692024e5f-91",
                                                                         "type": "choose_action",
                                                                         "value": {
-                                                                          "$DO": {
-                                                                            "type": "activity",
-                                                                            "value": {
-                                                                              "$EXE": [
-                                                                                {
-                                                                                  "id": "id-17692024e5f-54",
-                                                                                  "type": "execute",
-                                                                                  "value": {
-                                                                                    "id": "id-17692024e5f-55",
-                                                                                    "type": "determine_act",
-                                                                                    "value": {
-                                                                                      "$ARGUMENTS": {
-                                                                                        "id": "id-17692024e5f-81",
-                                                                                        "type": "arguments",
-                                                                                        "value": {
-                                                                                          "$ARGS": [
-                                                                                            {
-                                                                                              "id": "id-17692024e5f-82",
-                                                                                              "type": "argument",
-                                                                                              "value": {
-                                                                                                "$FROM": {
-                                                                                                  "id": "id-17692024e5f-84",
-                                                                                                  "type": "assignment",
-                                                                                                  "value": {
-                                                                                                    "id": "id-17692024e5f-85",
-                                                                                                    "type": "get_var",
-                                                                                                    "value": {
-                                                                                                      "$NAME": {
-                                                                                                        "id": "id-17692024e5f-86",
-                                                                                                        "type": "text",
-                                                                                                        "value": "objects"
-                                                                                                      }
-                                                                                                    }
-                                                                                                  }
-                                                                                                },
-                                                                                                "$NAME": {
-                                                                                                  "id": "id-17692024e5f-83",
-                                                                                                  "type": "variable_name",
-                                                                                                  "value": "objects"
-                                                                                                }
-                                                                                              }
-                                                                                            },
-                                                                                            {
-                                                                                              "id": "id-17692024e5f-87",
-                                                                                              "type": "argument",
-                                                                                              "value": {
-                                                                                                "$FROM": {
-                                                                                                  "id": "id-17692024e5f-89",
-                                                                                                  "type": "assignment",
-                                                                                                  "value": {
-                                                                                                    "id": "id-17692024e5f-109",
-                                                                                                    "type": "unpack",
-                                                                                                    "value": {
-                                                                                                      "$FIELD": {
-                                                                                                        "id": "id-17692024e5f-110",
-                                                                                                        "type": "text",
-                                                                                                        "value": "objects without articles"
-                                                                                                      },
-                                                                                                      "$RECORD": {
-                                                                                                        "id": "id-17692024e5f-111",
-                                                                                                        "type": "record_eval",
-                                                                                                        "value": {
-                                                                                                          "id": "id-17692024e5f-112",
-                                                                                                          "type": "get_var",
-                                                                                                          "value": {
-                                                                                                            "$NAME": {
-                                                                                                              "id": "id-17692024e5f-113",
-                                                                                                              "type": "text",
-                                                                                                              "value": "settings"
-                                                                                                            }
-                                                                                                          }
-                                                                                                        }
-                                                                                                      }
-                                                                                                    }
-                                                                                                  }
-                                                                                                },
-                                                                                                "$NAME": {
-                                                                                                  "id": "id-17692024e5f-88",
-                                                                                                  "type": "variable_name",
-                                                                                                  "value": "objects without articles"
-                                                                                                }
-                                                                                              }
-                                                                                            }
-                                                                                          ]
-                                                                                        }
-                                                                                      },
-                                                                                      "$NAME": {
-                                                                                        "id": "id-17692024e5f-56",
-                                                                                        "type": "pattern_name",
-                                                                                        "value": "print objects"
-                                                                                      }
-                                                                                    }
-                                                                                  }
-                                                                                }
-                                                                              ]
-                                                                            }
-                                                                          },
                                                                           "$IF": {
                                                                             "id": "id-17692024e5f-92",
                                                                             "type": "bool_eval",
@@ -723,6 +691,104 @@
                                                                                 }
                                                                               }
                                                                             }
+                                                                          },
+                                                                          "$DO": {
+                                                                            "id": "id-176f4124f37-46",
+                                                                            "type": "activity",
+                                                                            "value": {
+                                                                              "$EXE": [
+                                                                                {
+                                                                                  "id": "id-17692024e5f-54",
+                                                                                  "type": "execute",
+                                                                                  "value": {
+                                                                                    "id": "id-17692024e5f-55",
+                                                                                    "type": "determine_act",
+                                                                                    "value": {
+                                                                                      "$NAME": {
+                                                                                        "id": "id-17692024e5f-56",
+                                                                                        "type": "pattern_name",
+                                                                                        "value": "print objects"
+                                                                                      },
+                                                                                      "$ARGUMENTS": {
+                                                                                        "id": "id-17692024e5f-81",
+                                                                                        "type": "arguments",
+                                                                                        "value": {
+                                                                                          "$ARGS": [
+                                                                                            {
+                                                                                              "id": "id-17692024e5f-82",
+                                                                                              "type": "argument",
+                                                                                              "value": {
+                                                                                                "$NAME": {
+                                                                                                  "id": "id-17692024e5f-83",
+                                                                                                  "type": "variable_name",
+                                                                                                  "value": "objects"
+                                                                                                },
+                                                                                                "$FROM": {
+                                                                                                  "id": "id-17692024e5f-84",
+                                                                                                  "type": "assignment",
+                                                                                                  "value": {
+                                                                                                    "id": "id-17692024e5f-85",
+                                                                                                    "type": "get_var",
+                                                                                                    "value": {
+                                                                                                      "$NAME": {
+                                                                                                        "id": "id-17692024e5f-86",
+                                                                                                        "type": "text",
+                                                                                                        "value": "objects"
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            },
+                                                                                            {
+                                                                                              "id": "id-17692024e5f-87",
+                                                                                              "type": "argument",
+                                                                                              "value": {
+                                                                                                "$NAME": {
+                                                                                                  "id": "id-17692024e5f-88",
+                                                                                                  "type": "variable_name",
+                                                                                                  "value": "objects without articles"
+                                                                                                },
+                                                                                                "$FROM": {
+                                                                                                  "id": "id-17692024e5f-89",
+                                                                                                  "type": "assignment",
+                                                                                                  "value": {
+                                                                                                    "id": "id-17692024e5f-109",
+                                                                                                    "type": "unpack",
+                                                                                                    "value": {
+                                                                                                      "$FIELD": {
+                                                                                                        "id": "id-17692024e5f-110",
+                                                                                                        "type": "text",
+                                                                                                        "value": "objects without articles"
+                                                                                                      },
+                                                                                                      "$RECORD": {
+                                                                                                        "id": "id-17692024e5f-111",
+                                                                                                        "type": "record_eval",
+                                                                                                        "value": {
+                                                                                                          "id": "id-17692024e5f-112",
+                                                                                                          "type": "get_var",
+                                                                                                          "value": {
+                                                                                                            "$NAME": {
+                                                                                                              "id": "id-17692024e5f-113",
+                                                                                                              "type": "text",
+                                                                                                              "value": "settings"
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          ]
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              ]
+                                                                            }
                                                                           }
                                                                         }
                                                                       }
@@ -731,8 +797,10 @@
                                                                 }
                                                               },
                                                               "$ELSE": {
+                                                                "id": "id-176f4124f37-47",
                                                                 "type": "brancher",
                                                                 "value": {
+                                                                  "id": "id-176f4124f37-48",
                                                                   "type": "choose_nothing_else",
                                                                   "value": {
                                                                     "$DO": {
@@ -762,7 +830,38 @@
                                                                               "id": "id-17692024e5f-120",
                                                                               "type": "choose_action",
                                                                               "value": {
+                                                                                "$IF": {
+                                                                                  "id": "id-17692024e5f-121",
+                                                                                  "type": "bool_eval",
+                                                                                  "value": {
+                                                                                    "id": "id-17692024e5f-202",
+                                                                                    "type": "unpack",
+                                                                                    "value": {
+                                                                                      "$FIELD": {
+                                                                                        "id": "id-17692024e5f-203",
+                                                                                        "type": "text",
+                                                                                        "value": "not innumerable"
+                                                                                      },
+                                                                                      "$RECORD": {
+                                                                                        "id": "id-17692024e5f-204",
+                                                                                        "type": "record_eval",
+                                                                                        "value": {
+                                                                                          "id": "id-17692024e5f-205",
+                                                                                          "type": "get_var",
+                                                                                          "value": {
+                                                                                            "$NAME": {
+                                                                                              "id": "id-17692024e5f-206",
+                                                                                              "type": "text",
+                                                                                              "value": "settings"
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    }
+                                                                                  }
+                                                                                },
                                                                                 "$DO": {
+                                                                                  "id": "id-176f4124f37-49",
                                                                                   "type": "activity",
                                                                                   "value": {
                                                                                     "$EXE": [
@@ -812,36 +911,6 @@
                                                                                         }
                                                                                       }
                                                                                     ]
-                                                                                  }
-                                                                                },
-                                                                                "$IF": {
-                                                                                  "id": "id-17692024e5f-121",
-                                                                                  "type": "bool_eval",
-                                                                                  "value": {
-                                                                                    "id": "id-17692024e5f-202",
-                                                                                    "type": "unpack",
-                                                                                    "value": {
-                                                                                      "$FIELD": {
-                                                                                        "id": "id-17692024e5f-203",
-                                                                                        "type": "text",
-                                                                                        "value": "not innumerable"
-                                                                                      },
-                                                                                      "$RECORD": {
-                                                                                        "id": "id-17692024e5f-204",
-                                                                                        "type": "record_eval",
-                                                                                        "value": {
-                                                                                          "id": "id-17692024e5f-205",
-                                                                                          "type": "get_var",
-                                                                                          "value": {
-                                                                                            "$NAME": {
-                                                                                              "id": "id-17692024e5f-206",
-                                                                                              "type": "text",
-                                                                                              "value": "settings"
-                                                                                            }
-                                                                                          }
-                                                                                        }
-                                                                                      }
-                                                                                    }
                                                                                   }
                                                                                 }
                                                                               }
@@ -909,284 +978,6 @@
                                                                               "id": "id-17692024e5f-177",
                                                                               "type": "choose_action",
                                                                               "value": {
-                                                                                "$DO": {
-                                                                                  "type": "activity",
-                                                                                  "value": {
-                                                                                    "$EXE": [
-                                                                                      {
-                                                                                        "id": "id-17692024e5f-188",
-                                                                                        "type": "execute",
-                                                                                        "value": {
-                                                                                          "id": "id-17692024e5f-189",
-                                                                                          "type": "choose_action",
-                                                                                          "value": {
-                                                                                            "$DO": {
-                                                                                              "type": "activity",
-                                                                                              "value": {
-                                                                                                "$EXE": [
-                                                                                                  {
-                                                                                                    "id": "id-17692024e5f-139",
-                                                                                                    "type": "execute",
-                                                                                                    "value": {
-                                                                                                      "id": "id-17692024e5f-140",
-                                                                                                      "type": "say_text",
-                                                                                                      "value": {
-                                                                                                        "$TEXT": {
-                                                                                                          "id": "id-17692024e5f-141",
-                                                                                                          "type": "text_eval",
-                                                                                                          "value": {
-                                                                                                            "id": "id-17692024e5f-142",
-                                                                                                            "type": "bracket_text",
-                                                                                                            "value": {
-                                                                                                              "$GO": {
-                                                                                                                "id": "id-17692024e5f-143",
-                                                                                                                "type": "activity",
-                                                                                                                "value": {
-                                                                                                                  "$EXE": [
-                                                                                                                    {
-                                                                                                                      "id": "id-17692024e5f-144",
-                                                                                                                      "type": "execute",
-                                                                                                                      "value": {
-                                                                                                                        "id": "id-17692024e5f-145",
-                                                                                                                        "type": "determine_act",
-                                                                                                                        "value": {
-                                                                                                                          "$ARGUMENTS": {
-                                                                                                                            "id": "id-17692024e5f-147",
-                                                                                                                            "type": "arguments",
-                                                                                                                            "value": {
-                                                                                                                              "$ARGS": [
-                                                                                                                                {
-                                                                                                                                  "id": "id-17692024e5f-148",
-                                                                                                                                  "type": "argument",
-                                                                                                                                  "value": {
-                                                                                                                                    "$FROM": {
-                                                                                                                                      "id": "id-17692024e5f-150",
-                                                                                                                                      "type": "assignment",
-                                                                                                                                      "value": {
-                                                                                                                                        "id": "id-17692024e5f-151",
-                                                                                                                                        "type": "get_var",
-                                                                                                                                        "value": {
-                                                                                                                                          "$NAME": {
-                                                                                                                                            "id": "id-17692024e5f-152",
-                                                                                                                                            "type": "text",
-                                                                                                                                            "value": "objects"
-                                                                                                                                          }
-                                                                                                                                        }
-                                                                                                                                      }
-                                                                                                                                    },
-                                                                                                                                    "$NAME": {
-                                                                                                                                      "id": "id-17692024e5f-149",
-                                                                                                                                      "type": "variable_name",
-                                                                                                                                      "value": "objects"
-                                                                                                                                    }
-                                                                                                                                  }
-                                                                                                                                },
-                                                                                                                                {
-                                                                                                                                  "id": "id-17692024e5f-153",
-                                                                                                                                  "type": "argument",
-                                                                                                                                  "value": {
-                                                                                                                                    "$FROM": {
-                                                                                                                                      "id": "id-17692024e5f-155",
-                                                                                                                                      "type": "assignment",
-                                                                                                                                      "value": {
-                                                                                                                                        "id": "id-17692024e5f-207",
-                                                                                                                                        "type": "unpack",
-                                                                                                                                        "value": {
-                                                                                                                                          "$FIELD": {
-                                                                                                                                            "id": "id-17692024e5f-208",
-                                                                                                                                            "type": "text",
-                                                                                                                                            "value": "objects without articles"
-                                                                                                                                          },
-                                                                                                                                          "$RECORD": {
-                                                                                                                                            "id": "id-17692024e5f-209",
-                                                                                                                                            "type": "record_eval",
-                                                                                                                                            "value": {
-                                                                                                                                              "id": "id-17692024e5f-210",
-                                                                                                                                              "type": "get_var",
-                                                                                                                                              "value": {
-                                                                                                                                                "$NAME": {
-                                                                                                                                                  "id": "id-17692024e5f-211",
-                                                                                                                                                  "type": "text",
-                                                                                                                                                  "value": "settings"
-                                                                                                                                                }
-                                                                                                                                              }
-                                                                                                                                            }
-                                                                                                                                          }
-                                                                                                                                        }
-                                                                                                                                      }
-                                                                                                                                    },
-                                                                                                                                    "$NAME": {
-                                                                                                                                      "id": "id-17692024e5f-154",
-                                                                                                                                      "type": "variable_name",
-                                                                                                                                      "value": "objects without articles"
-                                                                                                                                    }
-                                                                                                                                  }
-                                                                                                                                }
-                                                                                                                              ]
-                                                                                                                            }
-                                                                                                                          },
-                                                                                                                          "$NAME": {
-                                                                                                                            "id": "id-17692024e5f-146",
-                                                                                                                            "type": "pattern_name",
-                                                                                                                            "value": "print objects"
-                                                                                                                          }
-                                                                                                                        }
-                                                                                                                      }
-                                                                                                                    }
-                                                                                                                  ]
-                                                                                                                }
-                                                                                                              }
-                                                                                                            }
-                                                                                                          }
-                                                                                                        }
-                                                                                                      }
-                                                                                                    }
-                                                                                                  }
-                                                                                                ]
-                                                                                              }
-                                                                                            },
-                                                                                            "$ELSE": {
-                                                                                              "type": "brancher",
-                                                                                              "value": {
-                                                                                                "type": "choose_nothing_else",
-                                                                                                "value": {
-                                                                                                  "$DO": {
-                                                                                                    "id": "id-17692024e5f-192",
-                                                                                                    "type": "activity",
-                                                                                                    "value": {
-                                                                                                      "$EXE": [
-                                                                                                        {
-                                                                                                          "id": "id-17692024e5f-212",
-                                                                                                          "type": "execute",
-                                                                                                          "value": {
-                                                                                                            "id": "id-17692024e5f-213",
-                                                                                                            "type": "determine_act",
-                                                                                                            "value": {
-                                                                                                              "$ARGUMENTS": {
-                                                                                                                "id": "id-17692024e5f-215",
-                                                                                                                "type": "arguments",
-                                                                                                                "value": {
-                                                                                                                  "$ARGS": [
-                                                                                                                    {
-                                                                                                                      "id": "id-17692024e5f-216",
-                                                                                                                      "type": "argument",
-                                                                                                                      "value": {
-                                                                                                                        "$FROM": {
-                                                                                                                          "id": "id-17692024e5f-218",
-                                                                                                                          "type": "assignment",
-                                                                                                                          "value": {
-                                                                                                                            "id": "id-17692024e5f-219",
-                                                                                                                            "type": "get_var",
-                                                                                                                            "value": {
-                                                                                                                              "$NAME": {
-                                                                                                                                "id": "id-17692024e5f-220",
-                                                                                                                                "type": "text",
-                                                                                                                                "value": "objects"
-                                                                                                                              }
-                                                                                                                            }
-                                                                                                                          }
-                                                                                                                        },
-                                                                                                                        "$NAME": {
-                                                                                                                          "id": "id-17692024e5f-217",
-                                                                                                                          "type": "variable_name",
-                                                                                                                          "value": "objects"
-                                                                                                                        }
-                                                                                                                      }
-                                                                                                                    },
-                                                                                                                    {
-                                                                                                                      "id": "id-17692024e5f-221",
-                                                                                                                      "type": "argument",
-                                                                                                                      "value": {
-                                                                                                                        "$FROM": {
-                                                                                                                          "id": "id-17692024e5f-223",
-                                                                                                                          "type": "assignment",
-                                                                                                                          "value": {
-                                                                                                                            "id": "id-17692024e5f-224",
-                                                                                                                            "type": "unpack",
-                                                                                                                            "value": {
-                                                                                                                              "$FIELD": {
-                                                                                                                                "id": "id-17692024e5f-225",
-                                                                                                                                "type": "text",
-                                                                                                                                "value": "objects without articles"
-                                                                                                                              },
-                                                                                                                              "$RECORD": {
-                                                                                                                                "id": "id-17692024e5f-226",
-                                                                                                                                "type": "record_eval",
-                                                                                                                                "value": {
-                                                                                                                                  "id": "id-17692024e5f-227",
-                                                                                                                                  "type": "get_var",
-                                                                                                                                  "value": {
-                                                                                                                                    "$NAME": {
-                                                                                                                                      "id": "id-17692024e5f-228",
-                                                                                                                                      "type": "text",
-                                                                                                                                      "value": "settings"
-                                                                                                                                    }
-                                                                                                                                  }
-                                                                                                                                }
-                                                                                                                              }
-                                                                                                                            }
-                                                                                                                          }
-                                                                                                                        },
-                                                                                                                        "$NAME": {
-                                                                                                                          "id": "id-17692024e5f-222",
-                                                                                                                          "type": "variable_name",
-                                                                                                                          "value": "objects without articles"
-                                                                                                                        }
-                                                                                                                      }
-                                                                                                                    }
-                                                                                                                  ]
-                                                                                                                }
-                                                                                                              },
-                                                                                                              "$NAME": {
-                                                                                                                "id": "id-17692024e5f-214",
-                                                                                                                "type": "pattern_name",
-                                                                                                                "value": "print objects"
-                                                                                                              }
-                                                                                                            }
-                                                                                                          }
-                                                                                                        }
-                                                                                                      ]
-                                                                                                    }
-                                                                                                  }
-                                                                                                }
-                                                                                              }
-                                                                                            },
-                                                                                            "$IF": {
-                                                                                              "id": "id-17692024e5f-190",
-                                                                                              "type": "bool_eval",
-                                                                                              "value": {
-                                                                                                "id": "id-17692024e5f-197",
-                                                                                                "type": "unpack",
-                                                                                                "value": {
-                                                                                                  "$FIELD": {
-                                                                                                    "id": "id-17692024e5f-198",
-                                                                                                    "type": "text",
-                                                                                                    "value": "not innumerable"
-                                                                                                  },
-                                                                                                  "$RECORD": {
-                                                                                                    "id": "id-17692024e5f-199",
-                                                                                                    "type": "record_eval",
-                                                                                                    "value": {
-                                                                                                      "id": "id-17692024e5f-200",
-                                                                                                      "type": "get_var",
-                                                                                                      "value": {
-                                                                                                        "$NAME": {
-                                                                                                          "id": "id-17692024e5f-201",
-                                                                                                          "type": "text",
-                                                                                                          "value": "settings"
-                                                                                                        }
-                                                                                                      }
-                                                                                                    }
-                                                                                                  }
-                                                                                                }
-                                                                                              }
-                                                                                            }
-                                                                                          }
-                                                                                        }
-                                                                                      }
-                                                                                    ]
-                                                                                  }
-                                                                                },
                                                                                 "$IF": {
                                                                                   "id": "id-17692024e5f-178",
                                                                                   "type": "bool_eval",
@@ -1226,75 +1017,293 @@
                                                                                       }
                                                                                     }
                                                                                   }
+                                                                                },
+                                                                                "$DO": {
+                                                                                  "id": "id-176f4124f37-50",
+                                                                                  "type": "activity",
+                                                                                  "value": {
+                                                                                    "$EXE": [
+                                                                                      {
+                                                                                        "id": "id-17692024e5f-188",
+                                                                                        "type": "execute",
+                                                                                        "value": {
+                                                                                          "id": "id-17692024e5f-189",
+                                                                                          "type": "choose_action",
+                                                                                          "value": {
+                                                                                            "$IF": {
+                                                                                              "id": "id-17692024e5f-190",
+                                                                                              "type": "bool_eval",
+                                                                                              "value": {
+                                                                                                "id": "id-17692024e5f-197",
+                                                                                                "type": "unpack",
+                                                                                                "value": {
+                                                                                                  "$FIELD": {
+                                                                                                    "id": "id-17692024e5f-198",
+                                                                                                    "type": "text",
+                                                                                                    "value": "not innumerable"
+                                                                                                  },
+                                                                                                  "$RECORD": {
+                                                                                                    "id": "id-17692024e5f-199",
+                                                                                                    "type": "record_eval",
+                                                                                                    "value": {
+                                                                                                      "id": "id-17692024e5f-200",
+                                                                                                      "type": "get_var",
+                                                                                                      "value": {
+                                                                                                        "$NAME": {
+                                                                                                          "id": "id-17692024e5f-201",
+                                                                                                          "type": "text",
+                                                                                                          "value": "settings"
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            },
+                                                                                            "$DO": {
+                                                                                              "id": "id-176f4124f37-51",
+                                                                                              "type": "activity",
+                                                                                              "value": {
+                                                                                                "$EXE": [
+                                                                                                  {
+                                                                                                    "id": "id-17692024e5f-139",
+                                                                                                    "type": "execute",
+                                                                                                    "value": {
+                                                                                                      "id": "id-17692024e5f-140",
+                                                                                                      "type": "say_text",
+                                                                                                      "value": {
+                                                                                                        "$TEXT": {
+                                                                                                          "id": "id-17692024e5f-141",
+                                                                                                          "type": "text_eval",
+                                                                                                          "value": {
+                                                                                                            "id": "id-17692024e5f-142",
+                                                                                                            "type": "bracket_text",
+                                                                                                            "value": {
+                                                                                                              "$GO": {
+                                                                                                                "id": "id-17692024e5f-143",
+                                                                                                                "type": "activity",
+                                                                                                                "value": {
+                                                                                                                  "$EXE": [
+                                                                                                                    {
+                                                                                                                      "id": "id-17692024e5f-144",
+                                                                                                                      "type": "execute",
+                                                                                                                      "value": {
+                                                                                                                        "id": "id-17692024e5f-145",
+                                                                                                                        "type": "determine_act",
+                                                                                                                        "value": {
+                                                                                                                          "$NAME": {
+                                                                                                                            "id": "id-17692024e5f-146",
+                                                                                                                            "type": "pattern_name",
+                                                                                                                            "value": "print objects"
+                                                                                                                          },
+                                                                                                                          "$ARGUMENTS": {
+                                                                                                                            "id": "id-17692024e5f-147",
+                                                                                                                            "type": "arguments",
+                                                                                                                            "value": {
+                                                                                                                              "$ARGS": [
+                                                                                                                                {
+                                                                                                                                  "id": "id-17692024e5f-148",
+                                                                                                                                  "type": "argument",
+                                                                                                                                  "value": {
+                                                                                                                                    "$NAME": {
+                                                                                                                                      "id": "id-17692024e5f-149",
+                                                                                                                                      "type": "variable_name",
+                                                                                                                                      "value": "objects"
+                                                                                                                                    },
+                                                                                                                                    "$FROM": {
+                                                                                                                                      "id": "id-17692024e5f-150",
+                                                                                                                                      "type": "assignment",
+                                                                                                                                      "value": {
+                                                                                                                                        "id": "id-17692024e5f-151",
+                                                                                                                                        "type": "get_var",
+                                                                                                                                        "value": {
+                                                                                                                                          "$NAME": {
+                                                                                                                                            "id": "id-17692024e5f-152",
+                                                                                                                                            "type": "text",
+                                                                                                                                            "value": "objects"
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                },
+                                                                                                                                {
+                                                                                                                                  "id": "id-17692024e5f-153",
+                                                                                                                                  "type": "argument",
+                                                                                                                                  "value": {
+                                                                                                                                    "$NAME": {
+                                                                                                                                      "id": "id-17692024e5f-154",
+                                                                                                                                      "type": "variable_name",
+                                                                                                                                      "value": "objects without articles"
+                                                                                                                                    },
+                                                                                                                                    "$FROM": {
+                                                                                                                                      "id": "id-17692024e5f-155",
+                                                                                                                                      "type": "assignment",
+                                                                                                                                      "value": {
+                                                                                                                                        "id": "id-17692024e5f-207",
+                                                                                                                                        "type": "unpack",
+                                                                                                                                        "value": {
+                                                                                                                                          "$FIELD": {
+                                                                                                                                            "id": "id-17692024e5f-208",
+                                                                                                                                            "type": "text",
+                                                                                                                                            "value": "objects without articles"
+                                                                                                                                          },
+                                                                                                                                          "$RECORD": {
+                                                                                                                                            "id": "id-17692024e5f-209",
+                                                                                                                                            "type": "record_eval",
+                                                                                                                                            "value": {
+                                                                                                                                              "id": "id-17692024e5f-210",
+                                                                                                                                              "type": "get_var",
+                                                                                                                                              "value": {
+                                                                                                                                                "$NAME": {
+                                                                                                                                                  "id": "id-17692024e5f-211",
+                                                                                                                                                  "type": "text",
+                                                                                                                                                  "value": "settings"
+                                                                                                                                                }
+                                                                                                                                              }
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              ]
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                  ]
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  }
+                                                                                                ]
+                                                                                              }
+                                                                                            },
+                                                                                            "$ELSE": {
+                                                                                              "id": "id-176f4124f37-52",
+                                                                                              "type": "brancher",
+                                                                                              "value": {
+                                                                                                "id": "id-176f4124f37-53",
+                                                                                                "type": "choose_nothing_else",
+                                                                                                "value": {
+                                                                                                  "$DO": {
+                                                                                                    "id": "id-17692024e5f-192",
+                                                                                                    "type": "activity",
+                                                                                                    "value": {
+                                                                                                      "$EXE": [
+                                                                                                        {
+                                                                                                          "id": "id-17692024e5f-212",
+                                                                                                          "type": "execute",
+                                                                                                          "value": {
+                                                                                                            "id": "id-17692024e5f-213",
+                                                                                                            "type": "determine_act",
+                                                                                                            "value": {
+                                                                                                              "$NAME": {
+                                                                                                                "id": "id-17692024e5f-214",
+                                                                                                                "type": "pattern_name",
+                                                                                                                "value": "print objects"
+                                                                                                              },
+                                                                                                              "$ARGUMENTS": {
+                                                                                                                "id": "id-17692024e5f-215",
+                                                                                                                "type": "arguments",
+                                                                                                                "value": {
+                                                                                                                  "$ARGS": [
+                                                                                                                    {
+                                                                                                                      "id": "id-17692024e5f-216",
+                                                                                                                      "type": "argument",
+                                                                                                                      "value": {
+                                                                                                                        "$NAME": {
+                                                                                                                          "id": "id-17692024e5f-217",
+                                                                                                                          "type": "variable_name",
+                                                                                                                          "value": "objects"
+                                                                                                                        },
+                                                                                                                        "$FROM": {
+                                                                                                                          "id": "id-17692024e5f-218",
+                                                                                                                          "type": "assignment",
+                                                                                                                          "value": {
+                                                                                                                            "id": "id-17692024e5f-219",
+                                                                                                                            "type": "get_var",
+                                                                                                                            "value": {
+                                                                                                                              "$NAME": {
+                                                                                                                                "id": "id-17692024e5f-220",
+                                                                                                                                "type": "text",
+                                                                                                                                "value": "objects"
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                      "id": "id-17692024e5f-221",
+                                                                                                                      "type": "argument",
+                                                                                                                      "value": {
+                                                                                                                        "$NAME": {
+                                                                                                                          "id": "id-17692024e5f-222",
+                                                                                                                          "type": "variable_name",
+                                                                                                                          "value": "objects without articles"
+                                                                                                                        },
+                                                                                                                        "$FROM": {
+                                                                                                                          "id": "id-17692024e5f-223",
+                                                                                                                          "type": "assignment",
+                                                                                                                          "value": {
+                                                                                                                            "id": "id-17692024e5f-224",
+                                                                                                                            "type": "unpack",
+                                                                                                                            "value": {
+                                                                                                                              "$FIELD": {
+                                                                                                                                "id": "id-17692024e5f-225",
+                                                                                                                                "type": "text",
+                                                                                                                                "value": "objects without articles"
+                                                                                                                              },
+                                                                                                                              "$RECORD": {
+                                                                                                                                "id": "id-17692024e5f-226",
+                                                                                                                                "type": "record_eval",
+                                                                                                                                "value": {
+                                                                                                                                  "id": "id-17692024e5f-227",
+                                                                                                                                  "type": "get_var",
+                                                                                                                                  "value": {
+                                                                                                                                    "$NAME": {
+                                                                                                                                      "id": "id-17692024e5f-228",
+                                                                                                                                      "type": "text",
+                                                                                                                                      "value": "settings"
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                  ]
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        }
+                                                                                                      ]
+                                                                                                    }
+                                                                                                  }
+                                                                                                }
+                                                                                              }
+                                                                                            }
+                                                                                          }
+                                                                                        }
+                                                                                      }
+                                                                                    ]
+                                                                                  }
                                                                                 }
                                                                               }
                                                                             }
                                                                           }
                                                                         ]
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              },
-                                                              "$IF": {
-                                                                "id": "id-17692024e5f-36",
-                                                                "type": "bool_eval",
-                                                                "value": {
-                                                                  "id": "id-17692024e5f-37",
-                                                                  "type": "compare_text",
-                                                                  "value": {
-                                                                    "$A": {
-                                                                      "id": "id-17692024e5f-38",
-                                                                      "type": "text_eval",
-                                                                      "value": {
-                                                                        "id": "id-17692024e5f-39",
-                                                                        "type": "unpack",
-                                                                        "value": {
-                                                                          "$FIELD": {
-                                                                            "id": "id-17692024e5f-40",
-                                                                            "type": "text",
-                                                                            "value": "label"
-                                                                          },
-                                                                          "$RECORD": {
-                                                                            "id": "id-17692024e5f-41",
-                                                                            "type": "record_eval",
-                                                                            "value": {
-                                                                              "id": "id-17692024e5f-79",
-                                                                              "type": "get_var",
-                                                                              "value": {
-                                                                                "$NAME": {
-                                                                                  "id": "id-17692024e5f-80",
-                                                                                  "type": "text",
-                                                                                  "value": "settings"
-                                                                                }
-                                                                              }
-                                                                            }
-                                                                          }
-                                                                        }
-                                                                      }
-                                                                    },
-                                                                    "$B": {
-                                                                      "id": "id-17692024e5f-46",
-                                                                      "type": "text_eval",
-                                                                      "value": {
-                                                                        "id": "id-17692024e5f-47",
-                                                                        "type": "text_value",
-                                                                        "value": {
-                                                                          "$TEXT": {
-                                                                            "id": "id-17692024e5f-48",
-                                                                            "type": "text",
-                                                                            "value": "$EMPTY"
-                                                                          }
-                                                                        }
-                                                                      }
-                                                                    },
-                                                                    "$IS": {
-                                                                      "id": "id-17692024e5f-44",
-                                                                      "type": "comparator",
-                                                                      "value": {
-                                                                        "id": "id-17692024e5f-45",
-                                                                        "type": "equal",
-                                                                        "value": {}
                                                                       }
                                                                     }
                                                                   }

@@ -22,6 +22,8 @@ import (
 // Import reads a json file (from the composer editor)
 // and creates a new sqlite database of "ephemera".
 // It uses package export's list of commands for parsing program statements.
+
+// ex. go run import.go -in /Users/ionous/Documents/Iffy/stories/shared -out /Users/ionous/Documents/Iffy/scratch/shared/ephemera.db
 func main() {
 	var inFile, outFile string
 	var printStories bool
