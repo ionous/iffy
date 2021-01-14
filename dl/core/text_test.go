@@ -13,7 +13,7 @@ func TestText(t *testing.T) {
 	var run baseRuntime
 
 	t.Run("is", func(t *testing.T) {
-		if e := testTrue(t, &run, &IsTrue{&Bool{true}}); e != nil {
+		if e := testTrue(t, &run, &Bool{true}); e != nil {
 			t.Fatal(e)
 		}
 		if e := testTrue(t, &run, &IsNotTrue{&Bool{false}}); e != nil {

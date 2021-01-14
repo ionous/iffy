@@ -180,6 +180,50 @@
                     "type": "pattern_name",
                     "value": "parentOf"
                   },
+                  "$PATTERN_RETURN": {
+                    "id": "id-176f52bb1b6-0",
+                    "type": "pattern_return",
+                    "value": {
+                      "$RESULT": {
+                        "id": "id-176f52bb1b6-1",
+                        "type": "variable_decl",
+                        "value": {
+                          "$AN": {
+                            "id": "id-176f52bb1b6-2",
+                            "type": "determiner",
+                            "value": "$THE"
+                          },
+                          "$NAME": {
+                            "id": "id-176f52bb1b6-3",
+                            "type": "variable_name",
+                            "value": "parent"
+                          },
+                          "$TYPE": {
+                            "id": "id-176f52bb1b6-4",
+                            "type": "variable_type",
+                            "value": {
+                              "$OBJECT": {
+                                "id": "id-176f52bb1b6-5",
+                                "type": "object_type",
+                                "value": {
+                                  "$AN": {
+                                    "id": "id-176f52bb1b6-6",
+                                    "type": "ana",
+                                    "value": "$AN"
+                                  },
+                                  "$KIND": {
+                                    "id": "id-176f52bb1b6-7",
+                                    "type": "singular_kind",
+                                    "value": "object"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
                   "$PATTERN_RULES": {
                     "id": "id-176f4124f37-12",
                     "type": "pattern_rules",
@@ -340,50 +384,6 @@
                         }
                       ]
                     }
-                  },
-                  "$PATTERN_RETURN": {
-                    "id": "id-176f52bb1b6-0",
-                    "type": "pattern_return",
-                    "value": {
-                      "$RESULT": {
-                        "id": "id-176f52bb1b6-1",
-                        "type": "variable_decl",
-                        "value": {
-                          "$AN": {
-                            "id": "id-176f52bb1b6-2",
-                            "type": "determiner",
-                            "value": "$THE"
-                          },
-                          "$NAME": {
-                            "id": "id-176f52bb1b6-3",
-                            "type": "variable_name",
-                            "value": "parent"
-                          },
-                          "$TYPE": {
-                            "id": "id-176f52bb1b6-4",
-                            "type": "variable_type",
-                            "value": {
-                              "$OBJECT": {
-                                "id": "id-176f52bb1b6-5",
-                                "type": "object_type",
-                                "value": {
-                                  "$AN": {
-                                    "id": "id-176f52bb1b6-6",
-                                    "type": "ana",
-                                    "value": "$AN"
-                                  },
-                                  "$KIND": {
-                                    "id": "id-176f52bb1b6-7",
-                                    "type": "singular_kind",
-                                    "value": "object"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
                   }
                 }
               }
@@ -434,6 +434,52 @@
                           }
                         }
                       }
+                    }
+                  },
+                  "$OPTVARS": {
+                    "id": "id-176f7f50aeb-35",
+                    "type": "pattern_variables_tail",
+                    "value": {
+                      "$VARIABLE_DECL": [
+                        {
+                          "id": "id-176f7f50aeb-36",
+                          "type": "variable_decl",
+                          "value": {
+                            "$AN": {
+                              "id": "id-176f7f50aeb-37",
+                              "type": "determiner",
+                              "value": "$AN"
+                            },
+                            "$NAME": {
+                              "id": "id-176f7f50aeb-38",
+                              "type": "variable_name",
+                              "value": "obj"
+                            },
+                            "$TYPE": {
+                              "id": "id-176f7f50aeb-39",
+                              "type": "variable_type",
+                              "value": {
+                                "$OBJECT": {
+                                  "id": "id-176f7f50aeb-40",
+                                  "type": "object_type",
+                                  "value": {
+                                    "$AN": {
+                                      "id": "id-176f7f50aeb-41",
+                                      "type": "ana",
+                                      "value": "$AN"
+                                    },
+                                    "$KIND": {
+                                      "id": "id-176f7f50aeb-42",
+                                      "type": "singular_kind",
+                                      "value": "object"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ]
                     }
                   },
                   "$ABOUT": {
@@ -603,30 +649,45 @@
                                   "value": {
                                     "$EXE": [
                                       {
-                                        "id": "id-176f52712f5-3",
+                                        "id": "id-176f7f50aeb-3",
                                         "type": "execute",
                                         "value": {
-                                          "id": "id-176f52712f5-0",
+                                          "id": "id-176f7f50aeb-4",
                                           "type": "while",
                                           "value": {
                                             "$TRUE": {
-                                              "id": "id-176f52712f5-1",
+                                              "id": "id-176f7f50aeb-5",
                                               "type": "bool_eval",
                                               "value": {
-                                                "id": "id-176f52712f5-4",
-                                                "type": "is_empty",
+                                                "id": "id-176f7f50aeb-10",
+                                                "type": "not",
                                                 "value": {
-                                                  "$TEXT": {
-                                                    "id": "id-176f52712f5-5",
-                                                    "type": "text_eval",
+                                                  "$TEST": {
+                                                    "id": "id-176f7f50aeb-11",
+                                                    "type": "bool_eval",
                                                     "value": {
-                                                      "id": "id-176f52712f5-6",
-                                                      "type": "get_var",
+                                                      "id": "id-176f7f50aeb-12",
+                                                      "type": "is_kind_of",
                                                       "value": {
-                                                        "$NAME": {
-                                                          "id": "id-176f52712f5-7",
-                                                          "type": "text",
-                                                          "value": "location"
+                                                        "$OBJECT": {
+                                                          "id": "id-176f7f50aeb-13",
+                                                          "type": "object_eval",
+                                                          "value": {
+                                                            "id": "id-176f7f50aeb-15",
+                                                            "type": "get_var",
+                                                            "value": {
+                                                              "$NAME": {
+                                                                "id": "id-176f7f50aeb-16",
+                                                                "type": "text",
+                                                                "value": "location"
+                                                              }
+                                                            }
+                                                          }
+                                                        },
+                                                        "$KIND": {
+                                                          "id": "id-176f7f50aeb-14",
+                                                          "type": "singular_kind",
+                                                          "value": "room"
                                                         }
                                                       }
                                                     }
@@ -635,19 +696,89 @@
                                               }
                                             },
                                             "$DO": {
-                                              "id": "id-176f52712f5-2",
+                                              "id": "id-176f7f50aeb-6",
                                               "type": "activity",
                                               "value": {
-                                                "$EXE": []
+                                                "$EXE": [
+                                                  {
+                                                    "id": "id-176f4970550-13",
+                                                    "type": "execute",
+                                                    "value": {
+                                                      "id": "id-176f7f50aeb-0",
+                                                      "type": "assign",
+                                                      "value": {
+                                                        "$VAR": {
+                                                          "id": "id-176f7f50aeb-1",
+                                                          "type": "variable_name",
+                                                          "value": "location"
+                                                        },
+                                                        "$FROM": {
+                                                          "id": "id-176f7f50aeb-2",
+                                                          "type": "assignment",
+                                                          "value": {
+                                                            "id": "id-176f7f50aeb-19",
+                                                            "type": "from_name",
+                                                            "value": {
+                                                              "$VAL": {
+                                                                "id": "id-176f7f50aeb-20",
+                                                                "type": "text_eval",
+                                                                "value": {
+                                                                  "id": "id-176f7f50aeb-21",
+                                                                  "type": "determine_text",
+                                                                  "value": {
+                                                                    "$NAME": {
+                                                                      "id": "id-176f7f50aeb-22",
+                                                                      "type": "pattern_name",
+                                                                      "value": "parentOf"
+                                                                    },
+                                                                    "$ARGUMENTS": {
+                                                                      "id": "id-176f7f50aeb-23",
+                                                                      "type": "arguments",
+                                                                      "value": {
+                                                                        "$ARGS": [
+                                                                          {
+                                                                            "id": "id-176f7f50aeb-24",
+                                                                            "type": "argument",
+                                                                            "value": {
+                                                                              "$NAME": {
+                                                                                "id": "id-176f7f50aeb-25",
+                                                                                "type": "variable_name",
+                                                                                "value": "obj"
+                                                                              },
+                                                                              "$FROM": {
+                                                                                "id": "id-176f7f50aeb-26",
+                                                                                "type": "assignment",
+                                                                                "value": {
+                                                                                  "id": "id-176f7f50aeb-27",
+                                                                                  "type": "get_var",
+                                                                                  "value": {
+                                                                                    "$NAME": {
+                                                                                      "id": "id-176f7f50aeb-28",
+                                                                                      "type": "text",
+                                                                                      "value": "location"
+                                                                                    }
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                ]
                                               }
                                             }
                                           }
                                         }
-                                      },
-                                      {
-                                        "id": "id-176f4970550-13",
-                                        "type": "execute",
-                                        "value": null
                                       }
                                     ]
                                   }

@@ -39,8 +39,13 @@ type KindOf struct {
 // IsKindOf is less about caring, and more about sharing;
 // it returns true when the object is compatible with the named kind.
 type IsKindOf struct {
-	Object rt.ObjectEval
-	Kind   string
+	Object rt.ObjectEval `if:"selector"`
+	Kind   string        `if:"selector=is"`
+}
+
+type IsExactKindOf struct {
+	Object rt.ObjectEval `if:"selector"`
+	Kind   string        `if:"selector=isExactly"`
 }
 
 func (*ObjectName) Compose() composer.Spec {
@@ -129,14 +134,33 @@ func (op *KindOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 
 func (*IsKindOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "is_kind_of",
-		Spec:  "is {object:object_eval} a kind of {kind:singular_kind}",
-		Group: "objects",
-		Desc:  "Is Kind Of: True if the object is compatible with the named kind.",
+		Group:  "objects",
+		Fluent: &composer.Fluid{Name: "kindOf", Role: composer.Function},
+		Desc:   "Is Kind Of: True if the object is compatible with the named kind.",
 	}
 }
 
 func (op *IsKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
+	if fullPath, e := safe.Field(run, op.Object, object.Kinds, affine.Text); e != nil {
+		err = cmdError(op, e)
+	} else {
+		// Contains reports whether second is within first.
+		kind := lang.Breakcase(op.Kind)
+		b := strings.Contains(fullPath.String()+",", kind+",")
+		ret = g.BoolOf(b)
+	}
+	return
+}
+
+func (*IsExactKindOf) Compose() composer.Spec {
+	return composer.Spec{
+		Fluent: &composer.Fluid{Name: "kindOf", Role: composer.Function},
+		Group:  "objects",
+		Desc:   "Is Kind Of: True if the object is compatible with the named kind.",
+	}
+}
+
+func (op *IsExactKindOf) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	if fullPath, e := safe.Field(run, op.Object, object.Kinds, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {

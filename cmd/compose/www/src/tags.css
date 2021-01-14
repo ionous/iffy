@@ -34,10 +34,8 @@
 .mk-num-ctrl {
   color:rgb(160, 90, 0); /*brown*/
 }
-.mk-str-ctrl[data-tag="text"] {
-  color: #0b8400; /*green*/ 
-}
-.mk-str-ctrl[data-tag="variable_name"] {
+
+.mk-flow-param[data-role="K"] {
   color: rgb(177,0,177); /*purple*/
 }
 /* role: ENUM */
@@ -47,12 +45,11 @@
 /* role: CMD */
 .mk-flow-param[data-role="C"] {
   color:rgb(0, 102, 214);   /* blue*/
-  font-style: bold;
+  font-weight: bold;
   font-size: larger;
 } 
 .mk-flow-param[data-role="F"] {
   color:rgb(0, 102, 214);   /* blue*/
-  font-style: bold;
 }
 /* role: SEPARATOR */
 .mk-flow-param[data-role="Z"] {
@@ -63,11 +60,14 @@
   color:black; /**/
 }
 /* role: SELECTOR, TOKEN, FUNCTION */
-.mk-flow-param[data-role="S"],
-.mk-flow-param[data-role="K"] {
+.mk-flow-param[data-role="S"] {
   color:#c90000;
 }
 /* role: AMBIGUOUS */
 .mk-flow-param[data-role="Q"] {
   color: orange; 
+}
+.mk-str-ctrl[data-tag="pattern_name"] {
+  text-transform: capitalize;
+  color:rgb(0, 102, 214);   /* blue*/  
 }

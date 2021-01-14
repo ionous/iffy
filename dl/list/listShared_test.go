@@ -70,7 +70,7 @@ func FromTs(vs []string) (ret core.Assignment) {
 	if len(vs) == 1 {
 		ret = &core.FromText{&core.Text{vs[0]}}
 	} else {
-		ret = &core.FromTextList{&core.Texts{vs}}
+		ret = &core.FromTexts{&core.Texts{vs}}
 	}
 	return
 }

@@ -29,6 +29,7 @@ func (op *Log) Compose() composer.Spec {
 		Fluent: &composer.Fluid{Name: "log", Role: composer.Command},
 	}
 }
+
 func (op *Log) Execute(run rt.Runtime) (err error) {
 	// fix? at this time we cant guarantee a lack of side-effects
 	// so we always eval even if we don't print.

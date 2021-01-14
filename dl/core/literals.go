@@ -42,7 +42,7 @@ type Texts struct {
 func (*Bool) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "bool_value",
-		Spec:  "{bool|quote}",
+		Spec:  "{bool}",
 		Group: "literals",
 		Desc:  "Bool Value: specify an explicit true or false value.",
 	}

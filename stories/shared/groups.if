@@ -2663,7 +2663,7 @@
                                               "type": "assignment",
                                               "value": {
                                                 "id": "id-17692f1b70b-519",
-                                                "type": "from_text_list",
+                                                "type": "from_texts",
                                                 "value": {
                                                   "$VALS": {
                                                     "id": "id-17692f1b70b-520",
@@ -2917,7 +2917,7 @@
                                               "type": "assignment",
                                               "value": {
                                                 "id": "id-17692f1b70b-547",
-                                                "type": "from_text_list",
+                                                "type": "from_texts",
                                                 "value": {
                                                   "$VALS": {
                                                     "id": "id-17692f1b70b-548",
@@ -3092,7 +3092,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-17692f1b70b-603",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-17692f1b70b-604",
@@ -3198,7 +3198,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-1769dc19ed4-12",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-1769dc19ed4-13",
@@ -3757,7 +3757,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-1769e087ca0-61",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-1769e087ca0-62",
@@ -3863,7 +3863,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-1769e087ca0-81",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-1769e087ca0-82",
@@ -4271,7 +4271,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-1769e215da7-12",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-1769e215da7-13",
@@ -4377,7 +4377,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-1769e215da7-60",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-1769e215da7-61",
@@ -5001,7 +5001,7 @@
                                               "type": "assignment",
                                               "value": {
                                                 "id": "id-176a185900d-93",
-                                                "type": "from_text_list",
+                                                "type": "from_texts",
                                                 "value": {
                                                   "$VALS": {
                                                     "id": "id-176a185900d-94",
@@ -5401,7 +5401,7 @@
                                               "type": "assignment",
                                               "value": {
                                                 "id": "id-176a185900d-141",
-                                                "type": "from_text_list",
+                                                "type": "from_texts",
                                                 "value": {
                                                   "$VALS": {
                                                     "id": "id-176a185900d-142",
@@ -5820,7 +5820,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-176a185900d-224",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-176a185900d-225",
@@ -5921,7 +5921,7 @@
                                                                 "type": "assignment",
                                                                 "value": {
                                                                   "id": "id-176a185900d-244",
-                                                                  "type": "from_text_list",
+                                                                  "type": "from_texts",
                                                                   "value": {
                                                                     "$VALS": {
                                                                       "id": "id-176a185900d-245",

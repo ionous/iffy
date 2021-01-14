@@ -21,6 +21,7 @@ func (*Relation) Choices() map[string]string { return nil }
 func (*Relation) Compose() composer.Spec {
 	return composer.Spec{
 		Name:        "relation_name",
+		Fluent:      &composer.Fluid{Role: composer.Function},
 		OpenStrings: true,
 	}
 }

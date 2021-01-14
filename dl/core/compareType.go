@@ -45,19 +45,21 @@ const (
 
 func (*EqualTo) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "equal",
-		Spec:  "is",
-		Group: "comparison",
-		Desc:  "Equal: Two values exactly match.",
+		Name:   "equal",
+		Spec:   "==",
+		Fluent: &composer.Fluid{Name: "equalTo", Role: composer.Selector},
+		Group:  "comparison",
+		Desc:   "Equal: Two values exactly match.",
 	}
 }
 
 func (*NotEqualTo) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "unequal",
-		Spec:  "is not",
-		Group: "comparison",
-		Desc:  "Not Equal To: Two values don't match exactly.",
+		Name:   "unequal",
+		Spec:   "<>",
+		Fluent: &composer.Fluid{Name: "otherThan", Role: composer.Selector},
+		Group:  "comparison",
+		Desc:   "Not Equal To: Two values don't match exactly.",
 	}
 }
 

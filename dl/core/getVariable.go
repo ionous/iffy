@@ -10,17 +10,17 @@ import (
 
 // Var reads the value of the specified name from the current scope.
 type Var struct {
-	Name  string
+	Name  string    `if:"selector"`
 	Flags TryAsNoun `if:"internal"`
 }
 
 // Compose implements composer.Composer
 func (*Var) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "get_var",
-		Spec:  "var: {name:text}",
-		Group: "variables",
-		Desc:  "Get Variable: Return the value of the named variable.",
+		Name:   "get_var",
+		Group:  "variables",
+		Desc:   "Get Variable: Return the value of the named variable.",
+		Fluent: &composer.Fluid{Name: "var", Role: composer.Function},
 	}
 }
 

@@ -351,7 +351,7 @@ const spec = [
       "patterns"
     ],
     "name": "argument",
-    "spec": "its {name:variable_name} is {from:assignment}",
+    "spec": " {name:variable_name}: {from:assignment}",
     "uses": "flow"
   },
   {
@@ -359,7 +359,7 @@ const spec = [
       "patterns"
     ],
     "name": "arguments",
-    "spec": " when {arguments%args+argument|comma-and}",
+    "spec": " {arguments%args+argument|comma-and}",
     "uses": "flow"
   },
   {
@@ -496,7 +496,7 @@ const spec = [
       "literals"
     ],
     "name": "bool_value",
-    "spec": "{bool|quote}",
+    "spec": "{bool}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -771,11 +771,36 @@ const spec = [
       "logic"
     ],
     "name": "compare_num",
-    "spec": "{a:number_eval} {is:comparator} {b:number_eval}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$A": {
+          "label": "num",
+          "type": "number_eval"
+        },
+        "$B": {
+          "label": "b",
+          "type": "number_eval"
+        },
+        "$IS": {
+          "label": "is",
+          "type": "comparator"
+        }
+      },
+      "roles": "FZSZKZKZK",
       "slots": [
         "bool_eval"
+      ],
+      "tokens": [
+        "is",
+        " ",
+        "num",
+        ": ",
+        "$A",
+        ", ",
+        "$IS",
+        ", ",
+        "$B"
       ]
     }
   },
@@ -785,11 +810,36 @@ const spec = [
       "logic"
     ],
     "name": "compare_text",
-    "spec": "{a:text_eval} {is:comparator} {b:text_eval}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$A": {
+          "label": "txt",
+          "type": "text_eval"
+        },
+        "$B": {
+          "label": "b",
+          "type": "text_eval"
+        },
+        "$IS": {
+          "label": "is",
+          "type": "comparator"
+        }
+      },
+      "roles": "FZSZKZKZK",
       "slots": [
         "bool_eval"
+      ],
+      "tokens": [
+        "is",
+        " ",
+        "txt",
+        ": ",
+        "$A",
+        ", ",
+        "$IS",
+        ", ",
+        "$B"
       ]
     }
   },
@@ -914,7 +964,7 @@ const spec = [
       "patterns"
     ],
     "name": "determine_text",
-    "spec": "the {text pattern%name:pattern_name}{?arguments}",
+    "spec": "{text pattern%name:pattern_name}{?arguments}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -983,7 +1033,7 @@ const spec = [
       "comparison"
     ],
     "name": "equal",
-    "spec": "is",
+    "spec": "==",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1114,7 +1164,7 @@ const spec = [
     }
   },
   {
-    "desc": "From Bool: Assigns the passed boolean value.",
+    "desc": "From Bool: Assigns the calculated boolean value.",
     "group": [
       "variables"
     ],
@@ -1139,7 +1189,7 @@ const spec = [
     }
   },
   {
-    "desc": "From Name: Assigns the passed piece of name.",
+    "desc": "From Name: Assigns the calculated piece of name.",
     "group": [
       "variables"
     ],
@@ -1164,7 +1214,7 @@ const spec = [
     }
   },
   {
-    "desc": "From Number: Assigns the passed number.",
+    "desc": "From Number: Assigns the calculated number.",
     "group": [
       "variables"
     ],
@@ -1174,31 +1224,6 @@ const spec = [
     "with": {
       "slots": [
         "assignment"
-      ]
-    }
-  },
-  {
-    "desc": "From Number List: Assigns the passed number list.",
-    "group": [
-      "variables"
-    ],
-    "name": "from_num_list",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VALS": {
-          "label": "vals",
-          "type": "num_list_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromNumList",
-        ": ",
-        "$VALS"
       ]
     }
   },
@@ -1225,7 +1250,32 @@ const spec = [
     }
   },
   {
-    "desc": "From Object: Assigns the passed object",
+    "desc": "From Numbers: Assigns the calculated numbers.",
+    "group": [
+      "variables"
+    ],
+    "name": "from_nums",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VALS": {
+          "label": "vals",
+          "type": "num_list_eval"
+        }
+      },
+      "roles": "FZK",
+      "slots": [
+        "assignment"
+      ],
+      "tokens": [
+        "fromNumbers",
+        ": ",
+        "$VALS"
+      ]
+    }
+  },
+  {
+    "desc": "From Object: Assigns the calculated object",
     "group": [
       "variables"
     ],
@@ -1272,7 +1322,7 @@ const spec = [
     }
   },
   {
-    "desc": "From Record: Assigns the passed record.",
+    "desc": "From Record: Assigns the calculated record.",
     "group": [
       "variables"
     ],
@@ -1297,11 +1347,11 @@ const spec = [
     }
   },
   {
-    "desc": "From Record List: Assigns the passed record list.",
+    "desc": "From Records: Assigns the calculated records.",
     "group": [
       "variables"
     ],
-    "name": "from_record_list",
+    "name": "from_records",
     "uses": "flow",
     "with": {
       "params": {
@@ -1315,14 +1365,14 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "fromRecordList",
+        "fromRecords",
         ": ",
         "$VALS"
       ]
     }
   },
   {
-    "desc": "From Text: Assigns the passed piece of text.",
+    "desc": "From Text: Assigns the calculated piece of text.",
     "group": [
       "variables"
     ],
@@ -1347,11 +1397,11 @@ const spec = [
     }
   },
   {
-    "desc": "From Text List: Assigns the passed text list.",
+    "desc": "From Texts: Assigns the calculated texts.",
     "group": [
       "variables"
     ],
-    "name": "from_text_list",
+    "name": "from_texts",
     "uses": "flow",
     "with": {
       "params": {
@@ -1365,7 +1415,7 @@ const spec = [
         "assignment"
       ],
       "tokens": [
-        "fromTextList",
+        "fromTexts",
         ": ",
         "$VALS"
       ]
@@ -1420,9 +1470,15 @@ const spec = [
       "variables"
     ],
     "name": "get_var",
-    "spec": "var: {name:text}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$NAME": {
+          "label": "name",
+          "type": "text"
+        }
+      },
+      "roles": "FZK",
       "slots": [
         "bool_eval",
         "number_eval",
@@ -1433,6 +1489,11 @@ const spec = [
         "text_list_eval",
         "record_list_eval",
         "assignment"
+      ],
+      "tokens": [
+        "var",
+        ": ",
+        "$NAME"
       ]
     }
   },
@@ -1688,25 +1749,30 @@ const spec = [
       "objects"
     ],
     "name": "is_kind_of",
-    "spec": "is {object:object_eval} a kind of {kind:singular_kind}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$KIND": {
+          "label": "is",
+          "type": "text"
+        },
+        "$OBJECT": {
+          "label": "object",
+          "type": "object_eval"
+        }
+      },
+      "roles": "FZKZSZK",
       "slots": [
         "bool_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Is True: Transparently returns the result of a boolean expression.",
-    "group": [
-      "logic"
-    ],
-    "name": "is_true",
-    "spec": "{test:bool_eval} is true",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "bool_eval"
+      ],
+      "tokens": [
+        "kindOf",
+        ": ",
+        "$OBJECT",
+        ", ",
+        "is",
+        ": ",
+        "$KIND"
       ]
     }
   },
@@ -2364,14 +2430,12 @@ const spec = [
           "type": "bool_eval"
         }
       },
-      "roles": "QZSZK",
+      "roles": "FZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
-        "isNotTrue",
-        " ",
-        "test",
+        "not",
         ": ",
         "$TEST"
       ]
@@ -3084,7 +3148,7 @@ const spec = [
       "comparison"
     ],
     "name": "unequal",
-    "spec": "is not",
+    "spec": "\u003c\u003e",
     "uses": "flow",
     "with": {
       "slots": [

@@ -20,10 +20,13 @@ var Slots = []composer.Slot{{
 
 var Slats = []composer.Composer{
 	(*Activity)(nil),
+
+	// some boolean tests:
 	(*Always)(nil),
 	(*AllTrue)(nil),
 	(*AnyTrue)(nil),
 	(*HasDominion)(nil),
+	(*IsNotTrue)(nil), // inverts a bool eval
 
 	// Assign turns an Assignment a normal statement.
 	(*Assign)(nil),
@@ -34,9 +37,9 @@ var Slats = []composer.Composer{
 	(*FromName)(nil),
 	(*FromRecord)(nil),
 	(*FromObject)(nil),
-	(*FromNumList)(nil),
-	(*FromTextList)(nil),
-	(*FromRecordList)(nil),
+	(*FromNumbers)(nil),
+	(*FromTexts)(nil),
+	(*FromRecords)(nil),
 	(*CopyFrom)(nil),
 	(*Make)(nil),
 
@@ -46,9 +49,6 @@ var Slats = []composer.Composer{
 	// FIX: compare scalar?
 	(*CompareNum)(nil),
 	(*CompareText)(nil),
-
-	(*IsTrue)(nil),    // transparent pass-through of a bool eval
-	(*IsNotTrue)(nil), // inverts a bool eval
 
 	// literals
 	(*Bool)(nil),

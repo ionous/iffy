@@ -191,9 +191,9 @@ func newAssignment(arg r.Value) (ret core.Assignment, err error) {
 	case rt.TextEval:
 		ret = &core.FromText{arg}
 	case rt.NumListEval:
-		ret = &core.FromNumList{arg}
+		ret = &core.FromNumbers{arg}
 	case rt.TextListEval:
-		ret = &core.FromTextList{arg}
+		ret = &core.FromTexts{arg}
 	default:
 		err = errutil.Fmt("unknown pattern parameter type %T", arg)
 	}

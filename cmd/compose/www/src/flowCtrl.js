@@ -22,24 +22,21 @@ Vue.component('mk-flow-ctrl', {
     els() {
       let els= [];
       const { node, "$root": root  } = this;
-
       // node.itemType -> Type, with.slots
-
       node.forEach(({token, param, role, kid})=> {
         var opener, closer, plain ;
         // plain text doesnt have param
         if (!param) {
-          if (!els.length && role && role.charAt(0) == "C") {
+          const ch= (role || "").charAt(els.length);
+          if (ch === 'C' || ch === 'F') {
             token= token.charAt(0).toUpperCase() + token.slice(1);
           }
         } else {
           const type= param.type;
           const filters = param.filters;
-          if (filters) {
-            if (filters.includes("quote")) {
-              opener= `\u201C`;
-              closer= `\u201D`;
-            }
+          if (filters && filters.includes("quote")) {
+            opener= `\u201C`;
+            closer= `\u201D`;
           }
           plain= token.trim().replace(/ /g, '-').replace(/^\$/, '').toLowerCase();
         }

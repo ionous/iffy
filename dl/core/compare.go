@@ -10,24 +10,23 @@ import (
 )
 
 type CompareNum struct {
-	A  rt.NumberEval
-	Is Comparator
-	B  rt.NumberEval
+	A  rt.NumberEval `if:"selector=num"`
+	Is Comparator    `if:"selector,compact"`
+	B  rt.NumberEval `if:"selector"`
 	// fix: add optional epsilon?
 }
 
 type CompareText struct {
-	A  rt.TextEval
-	Is Comparator
-	B  rt.TextEval
+	A  rt.TextEval `if:"selector=txt"`
+	Is Comparator  `if:"selector,compact"`
+	B  rt.TextEval `if:"selector"`
 }
 
 func (*CompareNum) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "compare_num",
-		Group: "logic",
-		Spec:  "{a:number_eval} {is:comparator} {b:number_eval}",
-		Desc:  "Compare Numbers: True if eq,ne,gt,lt,ge,le two numbers.",
+		Fluent: &composer.Fluid{Name: "is", Role: composer.Function},
+		Group:  "logic",
+		Desc:   "Compare Numbers: True if eq,ne,gt,lt,ge,le two numbers.",
 	}
 }
 
@@ -47,10 +46,9 @@ func (op *CompareNum) GetBool(run rt.Runtime) (ret g.Value, err error) {
 
 func (*CompareText) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "compare_text",
-		Group: "logic",
-		Desc:  "Compare Text: True if eq,ne,gt,lt,ge,le two strings ( lexical. )",
-		Spec:  "{a:text_eval} {is:comparator} {b:text_eval}",
+		Fluent: &composer.Fluid{Name: "is", Role: composer.Function},
+		Group:  "logic",
+		Desc:   "Compare Text: True if eq,ne,gt,lt,ge,le two strings ( lexical. )",
 	}
 }
 

@@ -20,8 +20,23 @@ import (
 // until template parsing gets re-written we cant handle fluid specs ( selector messaging )
 // we can do a basic test to ensure it's possible to build the function signatures from the composer.Spec(s) tho.
 func TestFluid(t *testing.T) {
-	if got := makeSig((*core.IsEmpty)(nil)); !got.equals(
-		"isEmpty:",
+	if got := makeSig((*core.IsKindOf)(nil)); !got.equals(
+		"kindOf:is:",
+	) {
+		t.Error(got)
+	}
+	if got := makeSig((*core.IsExactKindOf)(nil)); !got.equals(
+		"kindOf:isExactly:",
+	) {
+		t.Error(got)
+	}
+	if got := makeSig((*core.CompareNum)(nil)); !got.equals(
+		"is num:equalTo:", "is num:otherThan:", "is num:greaterThan:", "is num:lessThan:", "is num:atLeast:", "is num:atMost:",
+	) {
+		t.Error(got)
+	}
+	if got := makeSig((*core.IsNotTrue)(nil)); !got.equals(
+		"not:",
 	) {
 		t.Error(got)
 	}
@@ -185,6 +200,11 @@ func makeSig(v composer.Composer) signature {
 					//  write camel "fieldName:"
 					if tags.Exists("optional") {
 						sig = sig.dupSelectors(label)
+					} else if unlabeled {
+						// helps with "compact" to run an arg under the previous interface
+						// ex. for compare num
+						sig = sig.addSelector("")
+
 					} else {
 						sig = sig.addSelector(label)
 					}
@@ -200,13 +220,14 @@ func makeSig(v composer.Composer) signature {
 						name := specName(x)
 						sig = sig.dupSelectors(name)
 					}
-					// basically: dont generate all of the possible selectors for all of the possible commands that match num evals, etc.
+
 				case k == r.Interface && !strings.HasSuffix(n, "Eval") && (n != "Assignment"):
+					// avoids generating (the large number of) selectors for commands matching text evals, etc.
 					// assumes interfaces are all unlabeled...
 					if slats := implementorsOf(f.Type); len(slats) == 0 {
 						panic("no slats found") // mul will return nil
 					} else {
-						sig = sig.mulSelectors(slats, tags.Exists("optional"))
+						sig = sig.mulSelectors(slats, tags.Exists("optional"), tags.Exists("compact"))
 					}
 				}
 			}
@@ -269,14 +290,18 @@ func (sig signature) addFlags(cs []string) signature {
 	return sig
 }
 
-func (sig signature) mulSelectors(sel []string, optional bool) signature {
+func (sig signature) mulSelectors(sel []string, optional, compact bool) signature {
 	var out signature
 	if optional {
 		out = sig
 	}
+	var sep string
+	if !compact {
+		sep = ":"
+	}
 	for i, cnt := 0, len(sig); i < cnt; i++ {
 		for _, sel := range sel {
-			out = append(out, sig[i]+sel+":")
+			out = append(out, sig[i]+sel+sep)
 		}
 	}
 	return out

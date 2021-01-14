@@ -40,7 +40,7 @@ func assignProps(out r.Value, args []r.Value) (err error) {
 		return done || err != nil // returns "done" when there is an error.
 	})
 	if err == nil && len(args) > 0 {
-		err = errutil.New("unable to consume all args")
+		err = errutil.New("unable to consume all args in", outType.Name())
 	}
 	return
 }

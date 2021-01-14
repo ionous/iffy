@@ -55,15 +55,15 @@ type FromObject struct {
 	Val rt.ObjectEval `if:"selector"`
 }
 
-type FromNumList struct {
+type FromNumbers struct {
 	Vals rt.NumListEval `if:"selector"`
 }
 
-type FromTextList struct {
+type FromTexts struct {
 	Vals rt.TextListEval `if:"selector"`
 }
 
-type FromRecordList struct {
+type FromRecords struct {
 	Vals rt.RecordListEval `if:"selector"`
 }
 
@@ -88,7 +88,7 @@ func (*FromBool) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "from_bool",
 		Group:  "variables",
-		Desc:   "From Bool: Assigns the passed boolean value.",
+		Desc:   "From Bool: Assigns the calculated boolean value.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
@@ -109,7 +109,7 @@ func (*FromNum) Compose() composer.Spec {
 		Name:   "from_num",
 		Spec:   "{val:number_eval}",
 		Group:  "variables",
-		Desc:   "From Number: Assigns the passed number.",
+		Desc:   "From Number: Assigns the calculated number.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
@@ -129,7 +129,7 @@ func (*FromText) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "from_text",
 		Group:  "variables",
-		Desc:   "From Text: Assigns the passed piece of text.",
+		Desc:   "From Text: Assigns the calculated piece of text.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
@@ -149,7 +149,7 @@ func (*FromName) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "from_name",
 		Group:  "variables",
-		Desc:   "From Name: Assigns the passed piece of name.",
+		Desc:   "From Name: Assigns the calculated piece of name.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
@@ -171,7 +171,7 @@ func (*FromRecord) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "from_record",
 		Group:  "variables",
-		Desc:   "From Record: Assigns the passed record.",
+		Desc:   "From Record: Assigns the calculated record.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
@@ -191,7 +191,7 @@ func (*FromObject) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "from_object",
 		Group:  "variables",
-		Desc:   "From Object: Assigns the passed object",
+		Desc:   "From Object: Assigns the calculated object",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
@@ -207,18 +207,18 @@ func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 	return
 }
 
-func (*FromNumList) Compose() composer.Spec {
+func (*FromNumbers) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_num_list",
+		Name:   "from_nums",
 		Group:  "variables",
-		Desc:   "From Number List: Assigns the passed number list.",
+		Desc:   "From Numbers: Assigns the calculated numbers.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
-func (op *FromNumList) Affinity() affine.Affinity {
+func (op *FromNumbers) Affinity() affine.Affinity {
 	return affine.NumList
 }
-func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+func (op *FromNumbers) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if vals, e := safe.GetNumList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -227,18 +227,18 @@ func (op *FromNumList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error)
 	return
 }
 
-func (*FromTextList) Compose() composer.Spec {
+func (*FromTexts) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_text_list",
+		Name:   "from_texts",
 		Group:  "variables",
-		Desc:   "From Text List: Assigns the passed text list.",
+		Desc:   "From Texts: Assigns the calculated texts.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
-func (op *FromTextList) Affinity() affine.Affinity {
+func (op *FromTexts) Affinity() affine.Affinity {
 	return affine.TextList
 }
-func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+func (op *FromTexts) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if vals, e := safe.GetTextList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -247,18 +247,18 @@ func (op *FromTextList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error
 	return
 }
 
-func (*FromRecordList) Compose() composer.Spec {
+func (*FromRecords) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_record_list",
+		Name:   "from_records",
 		Group:  "variables",
-		Desc:   "From Record List: Assigns the passed record list.",
+		Desc:   "From Records: Assigns the calculated records.",
 		Fluent: &composer.Fluid{Role: composer.Function},
 	}
 }
-func (op *FromRecordList) Affinity() affine.Affinity {
+func (op *FromRecords) Affinity() affine.Affinity {
 	return affine.RecordList
 }
-func (op *FromRecordList) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
+func (op *FromRecords) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if objs, e := safe.GetRecordList(run, op.Vals); e != nil {
 		err = cmdError(op, e)
 	} else {
