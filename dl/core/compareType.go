@@ -30,10 +30,10 @@ func (*LessThan) Compare() CompareType {
 	return Compare_LessThan
 }
 func (*GreaterOrEqual) Compare() CompareType {
-	return Compare_LessThan | Compare_EqualTo
+	return Compare_GreaterThan | Compare_EqualTo
 }
 func (*LessOrEqual) Compare() CompareType {
-	return Compare_GreaterThan | Compare_EqualTo
+	return Compare_LessThan | Compare_EqualTo
 }
 
 //go:generate stringer -type=CompareType

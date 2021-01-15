@@ -9,35 +9,35 @@ import (
 )
 
 type RelativeOf struct {
-	Obj rt.TextEval `if:"selector"`
-	Via Relation
+	Via Relation    `if:"selector"`
+	Obj rt.TextEval `if:"selector=of"`
 }
 
 type RelativesOf struct {
-	Obj rt.TextEval `if:"selector"`
-	Via Relation
+	Via Relation    `if:"selector"`
+	Obj rt.TextEval `if:"selector=of"`
 }
 
 type ReciprocalOf struct {
-	Obj rt.TextEval `if:"selector"`
-	Via Relation
+	Via Relation    `if:"selector"`
+	Obj rt.TextEval `if:"selector=of"`
 }
 
 type ReciprocalsOf struct {
-	Obj rt.TextEval `if:"selector"`
-	Via Relation
+	Via Relation    `if:"selector"`
+	Obj rt.TextEval `if:"selector=of"`
 }
 
 func (*RelativeOf) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluid{Role: composer.Function},
+		Fluent: &composer.Fluid{Name: "relative", Role: composer.Function},
 		Group:  "relations",
 		Desc:   "RelativeOf: Returns the relative of a noun (ex. the target of a one-to-one relation.)",
 	}
 }
 func (*RelativesOf) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluid{Role: composer.Function},
+		Fluent: &composer.Fluid{Name: "relatives", Role: composer.Function},
 		Group:  "relations",
 		Desc:   "RelativesOf: Returns the relatives of a noun as a list of names (ex. the targets of one-to-many relation).",
 	}
@@ -45,7 +45,7 @@ func (*RelativesOf) Compose() composer.Spec {
 
 func (*ReciprocalOf) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluid{Role: composer.Function},
+		Fluent: &composer.Fluid{Name: "reciprocal", Role: composer.Function},
 		Group:  "relations",
 		Desc:   "ReciprocalOf: Returns the implied relative of a noun (ex. the source in a one-to-many relation.)",
 	}
@@ -53,7 +53,7 @@ func (*ReciprocalOf) Compose() composer.Spec {
 
 func (*ReciprocalsOf) Compose() composer.Spec {
 	return composer.Spec{
-		Fluent: &composer.Fluid{Role: composer.Function},
+		Fluent: &composer.Fluid{Name: "reciprocals", Role: composer.Function},
 		Group:  "relations",
 		Desc:   "ReciprocalsOf: Returns the implied relative of a noun (ex. the sources of a many-to-many relation.)",
 	}

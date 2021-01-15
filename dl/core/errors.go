@@ -19,10 +19,10 @@ func (e *CommandError) Error() string {
 	return errutil.Sprintf("error in command %q%s%s", name, padding, e.Ctx)
 }
 
-func cmdError(op composer.Composer, e error) error {
-	return errutil.Append(&CommandError{Cmd: op}, e)
+func cmdError(op composer.Composer, err error) error {
+	return errutil.Append(err, &CommandError{Cmd: op})
 }
 
-func cmdErrorCtx(op composer.Composer, ctx string, e error) error {
-	return errutil.Append(&CommandError{Cmd: op, Ctx: ctx}, e)
+func cmdErrorCtx(op composer.Composer, ctx string, err error) error {
+	return errutil.Append(err, &CommandError{Cmd: op, Ctx: ctx})
 }

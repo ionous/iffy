@@ -25,7 +25,10 @@ var Slats = []composer.Composer{
 	(*Always)(nil),
 	(*AllTrue)(nil),
 	(*AnyTrue)(nil),
+	(*CompareNum)(nil),
+	(*CompareText)(nil),
 	(*HasDominion)(nil),
+	(*IsKindOf)(nil),
 	(*IsNotTrue)(nil), // inverts a bool eval
 
 	// Assign turns an Assignment a normal statement.
@@ -46,9 +49,6 @@ var Slats = []composer.Composer{
 	// FIX: Choose scalar/any?
 	(*ChooseNum)(nil),
 	(*ChooseText)(nil),
-	// FIX: compare scalar?
-	(*CompareNum)(nil),
-	(*CompareText)(nil),
 
 	// literals
 	(*Bool)(nil),
@@ -69,7 +69,6 @@ var Slats = []composer.Composer{
 	(*ObjectExists)(nil),
 	(*NameOf)(nil),
 	(*KindOf)(nil),
-	(*IsKindOf)(nil),
 
 	(*PrintNum)(nil),
 	(*PrintNumWord)(nil),
@@ -91,8 +90,10 @@ var Slats = []composer.Composer{
 	(*MakeReversed)(nil),
 	//
 	(*Matches)(nil),
-	// sequences
+	// loops and sequences
 	(*While)(nil),
+	(*Next)(nil),
+	(*Break)(nil),
 	(*CycleText)(nil),
 	(*ShuffleText)(nil),
 	(*StoppingText)(nil),

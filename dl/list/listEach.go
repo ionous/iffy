@@ -1,6 +1,8 @@
 package list
 
 import (
+	"errors"
+
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/dl/composer"
@@ -89,8 +91,13 @@ func (op *Each) forEach(run rt.Runtime) (err error) {
 						err = e
 						break
 					} else if e := op.Do.Execute(run); e != nil {
-						err = e
-						break
+						var i core.DoInterrupt
+						if !errors.As(e, &i) {
+							err = e
+							break
+						} else if !i.KeepGoing {
+							break
+						}
 					}
 				}
 				run.PopScope()

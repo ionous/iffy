@@ -15,6 +15,6 @@ var Slats = []composer.Composer{
 	(*ReciprocalsOf)(nil),
 }
 
-func cmdError(op composer.Composer, e error) error {
-	return errutil.Append(&core.CommandError{Cmd: op}, e)
+func cmdError(op composer.Composer, err error) error {
+	return errutil.Append(err, &core.CommandError{Cmd: op})
 }

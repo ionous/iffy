@@ -52,7 +52,7 @@ func TestFluid(t *testing.T) {
 	}
 	// rel
 	if got := makeSig((*rel.RelativesOf)(nil)); !got.equals(
-		"relativesOf:via:",
+		"relatives:of:",
 	) {
 		t.Error(got)
 	}

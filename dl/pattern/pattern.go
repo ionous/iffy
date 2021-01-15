@@ -38,10 +38,10 @@ var Slats = []composer.Composer{
 	(*DetermineTextList)(nil),
 }
 
-func cmdError(op composer.Composer, e error) error {
-	return errutil.Append(&core.CommandError{Cmd: op}, e)
+func cmdError(op composer.Composer, err error) error {
+	return errutil.Append(err, &core.CommandError{Cmd: op})
 }
 
-func cmdErrorCtx(op composer.Composer, ctx string, e error) error {
-	return errutil.Append(&core.CommandError{Cmd: op, Ctx: ctx}, e)
+func cmdErrorCtx(op composer.Composer, ctx string, err error) error {
+	return errutil.Append(err, &core.CommandError{Cmd: op, Ctx: ctx})
 }

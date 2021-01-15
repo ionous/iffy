@@ -110,7 +110,7 @@ func parseSpec(t r.Type, fluid *composer.Fluid) ([]string, string, export.Dict) 
 				"label": label,
 				"type":  typeName,
 			}
-			if f.Type.Kind() == r.Ptr {
+			if f.Type.Kind() == r.Ptr || tags.Exists("optional") {
 				m["optional"] = true
 			}
 			if repeats {

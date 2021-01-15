@@ -21,7 +21,7 @@ func (*Activity) Compose() composer.Spec {
 }
 
 func (op *Activity) Empty() bool {
-	return len(op.Exe) > 0
+	return len(op.Exe) == 0
 }
 
 // Execute statements
