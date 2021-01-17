@@ -170,7 +170,7 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 			// expressions are text patterns... so for now adapt via text
 			// expressions would ideally adapt based on the pattern type
 			// the assembler probably needs to work directly on tokens...
-			c.buildOne(&core.Buffer{core.NewActivity(&pattern.DetermineAct{
+			c.buildOne(&core.Buffer{core.NewActivity(&pattern.Determine{
 				Pattern:   pattern.PatternName(name),
 				Arguments: &ps,
 			})})

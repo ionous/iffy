@@ -1,16 +1,17 @@
-package story
+package story_test
 
 import (
 	"strings"
 	"testing"
 
+	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 	"github.com/kr/pretty"
 )
 
 func TestImportNamedNouns(t *testing.T) {
-	k, db := newImporter(t, testdb.Memory)
+	k, _, db := newImporter(t, testdb.Memory)
 	defer db.Close()
 	//
 	nouns := []string{
@@ -80,9 +81,9 @@ order by noun collate nocase, trait`, 2)
 	}
 }
 
-func makeNoun(det, name string) NamedNoun {
-	return NamedNoun{
-		Determiner: Determiner{Str: det},
-		Name:       NounName{Str: name},
+func makeNoun(det, name string) story.NamedNoun {
+	return story.NamedNoun{
+		Determiner: story.Determiner{Str: det},
+		Name:       story.NounName{Str: name},
 	}
 }

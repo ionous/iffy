@@ -7,27 +7,27 @@ import (
 )
 
 // BoolPattern finds the first matched rule and returns the result of that evaluation.
-type BoolPattern struct {
+type xBoolPattern struct {
 	CommonPattern
-	Rules []*BoolRule
+	Rules []*xBoolRule
 }
 
 // NumberPattern finds the first matched rule and returns the result of that evaluation.
 // It implements rt.NumberEval.
-type NumberPattern struct {
+type xNumberPattern struct {
 	CommonPattern
-	Rules []*NumberRule
+	Rules []*xNumberRule
 }
 
 // TextPattern finds the first matched rule and returns the result of that evaluation.
 // It implements rt.TextEval.
-type TextPattern struct {
+type xTextPattern struct {
 	CommonPattern
-	Rules []*TextRule
+	Rules []*xTextRule
 }
 
 // GetBool returns the first matching bool evaluation.
-func (ps *BoolPattern) GetBool(run rt.Runtime) (ret g.Value, err error) {
+func (ps *xBoolPattern) GetBool(run rt.Runtime) (ret g.Value, err error) {
 	ret = g.False // provisionally
 	for i, cnt := 0, len(ps.Rules); i < cnt; i++ {
 		p := ps.Rules[cnt-i-1]
@@ -43,7 +43,7 @@ func (ps *BoolPattern) GetBool(run rt.Runtime) (ret g.Value, err error) {
 }
 
 // GetNumber returns the first matching num evaluation.
-func (ps *NumberPattern) GetNumber(run rt.Runtime) (ret g.Value, err error) {
+func (ps *xNumberPattern) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 	ret = g.Zero // provisionally
 	for i, cnt := 0, len(ps.Rules); i < cnt; i++ {
 		p := ps.Rules[cnt-i-1]
@@ -59,7 +59,7 @@ func (ps *NumberPattern) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 }
 
 // GetText returns the first matching text evaluation.
-func (ps *TextPattern) GetText(run rt.Runtime) (ret g.Value, err error) {
+func (ps *xTextPattern) GetText(run rt.Runtime) (ret g.Value, err error) {
 	ret = g.Empty // provisionally
 	for i, cnt := 0, len(ps.Rules); i < cnt; i++ {
 		p := ps.Rules[cnt-i-1]

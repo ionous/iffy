@@ -8,51 +8,11 @@ import (
 	"github.com/ionous/iffy/tables"
 )
 
-func (op *DetermineAct) ImportStub(k *Importer) (ret interface{}, err error) {
+func (op *Determine) ImportStub(k *Importer) (ret interface{}, err error) {
 	if p, args, e := importCall(k, "execute", op.Name, op.Arguments); e != nil {
 		err = ImportError(op, op.At, e)
 	} else {
-		ret = &pattern.DetermineAct{Pattern: pattern.PatternName(p.String()), Arguments: args}
-	}
-	return
-}
-func (op *DetermineNum) ImportStub(k *Importer) (ret interface{}, err error) {
-	if p, args, e := importCall(k, "number_eval", op.Name, op.Arguments); e != nil {
-		err = ImportError(op, op.At, e)
-	} else {
-		ret = &pattern.DetermineNum{Pattern: pattern.PatternName(p.String()), Arguments: args}
-	}
-	return
-}
-func (op *DetermineText) ImportStub(k *Importer) (ret interface{}, err error) {
-	if p, args, e := importCall(k, "text_eval", op.Name, op.Arguments); e != nil {
-		err = ImportError(op, op.At, e)
-	} else {
-		ret = &pattern.DetermineText{Pattern: pattern.PatternName(p.String()), Arguments: args}
-	}
-	return
-}
-func (op *DetermineBool) ImportStub(k *Importer) (ret interface{}, err error) {
-	if p, args, e := importCall(k, "bool_eval", op.Name, op.Arguments); e != nil {
-		err = ImportError(op, op.At, e)
-	} else {
-		ret = &pattern.DetermineBool{Pattern: pattern.PatternName(p.String()), Arguments: args}
-	}
-	return
-}
-func (op *DetermineNumList) ImportStub(k *Importer) (ret interface{}, err error) {
-	if p, args, e := importCall(k, "num_list_eval", op.Name, op.Arguments); e != nil {
-		err = ImportError(op, op.At, e)
-	} else {
-		ret = &pattern.DetermineNumList{Pattern: pattern.PatternName(p.String()), Arguments: args}
-	}
-	return
-}
-func (op *DetermineTextList) ImportStub(k *Importer) (ret interface{}, err error) {
-	if p, args, e := importCall(k, "text_list_eval", op.Name, op.Arguments); e != nil {
-		err = ImportError(op, op.At, e)
-	} else {
-		ret = &pattern.DetermineTextList{Pattern: pattern.PatternName(p.String()), Arguments: args}
+		ret = &pattern.Determine{Pattern: pattern.PatternName(p.String()), Arguments: args}
 	}
 	return
 }

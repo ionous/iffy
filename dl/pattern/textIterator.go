@@ -7,18 +7,18 @@ import (
 )
 
 // implements chain.StreamIterator for multiple streams of text
-type textIterator struct {
+type xtextIterator struct {
 	run   rt.Runtime
-	pat   *TextListPattern
+	pat   *xTextListPattern
 	order []int
 	curr  int
 }
 
-func (k *textIterator) HasNextStream() bool {
+func (k *xtextIterator) HasNextStream() bool {
 	return k.curr < len(k.order)
 }
 
-func (k *textIterator) GetNextStream() (ret g.Iterator, err error) {
+func (k *xtextIterator) GetNextStream() (ret g.Iterator, err error) {
 	if !k.HasNextStream() {
 		err = g.StreamExceeded
 	} else {

@@ -4,7 +4,6 @@ import (
 	"math"
 	"testing"
 
-	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/chain"
 	g "github.com/ionous/iffy/rt/generic"
@@ -12,14 +11,14 @@ import (
 )
 
 func TestTextIteration(t *testing.T) {
-	ps := []*TextListRule{
+	ps := []*xTextListRule{
 		{ListRule{Flags: Terminal}, Text("1")},
 		{ListRule{Flags: Postfix}, Text("2")},
 		{ListRule{Flags: Prefix}, Text("3")},
 		{ListRule{Filter: Skip}, Text("0")},
 		{ListRule{Flags: Postfix}, Text("4")},
 	}
-	if inds, e := splitText(nil, ps); e != nil {
+	if inds, e := xsplitText(nil, ps); e != nil {
 		t.Fatal(e)
 	} else if cnt := len(inds); cnt != 4 {
 		t.Fatal("expected 4 matching rules")
@@ -39,8 +38,8 @@ func TestTextIteration(t *testing.T) {
 		//
 		t.Run("text iteration", func(t *testing.T) {
 			var str string
-			pat := &TextListPattern{CommonPattern{Name: "textList"}, ps}
-			it := chain.NewStreamOfStreams(&textIterator{pat: pat, order: inds})
+			pat := &xTextListPattern{CommonPattern{Name: "textList"}, ps}
+			it := chain.NewStreamOfStreams(&xtextIterator{pat: pat, order: inds})
 
 			for i := 0; it.HasNext(); i++ {
 				if i >= cnt {
@@ -61,21 +60,21 @@ func TestTextIteration(t *testing.T) {
 }
 
 func TestNumIteration(t *testing.T) {
-	ps := []*NumListRule{
+	ps := []*xNumListRule{
 		{ListRule{Flags: Terminal}, Number(1)},
 		{ListRule{Filter: Skip}, Number(88)},
 		{ListRule{Flags: Postfix}, Number(2)},
 		{ListRule{Flags: Prefix}, Number(3)},
 		{ListRule{Flags: Postfix}, Number(4)},
 	}
-	if inds, e := splitNumbers(nil, ps); e != nil {
+	if inds, e := xsplitNumbers(nil, ps); e != nil {
 		t.Fatal(e)
 	} else if cnt := len(inds); cnt != 4 {
 		t.Fatal("expected 4 matching rules")
 	} else {
 		var fin float64
-		pat := &NumListPattern{CommonPattern{Name: "numList"}, ps}
-		it := chain.NewStreamOfStreams(&numIterator{pat: pat, order: inds})
+		pat := &xNumListPattern{CommonPattern{Name: "numList"}, ps}
+		it := chain.NewStreamOfStreams(&xnumIterator{pat: pat, order: inds})
 		for i := 0; it.HasNext(); i++ {
 			if i >= cnt {
 				t.Fatal(g.StreamExceeded)
@@ -113,5 +112,3 @@ func (b Bool) GetBool(rt.Runtime) (g.Value, error) {
 }
 
 var Skip = Bool(false)
-
-func V(n string) *core.Var { return &core.Var{Name: n} }

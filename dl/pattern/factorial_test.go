@@ -14,38 +14,49 @@ import (
 func TestFactorial(t *testing.T) {
 	// rules are run in reverse order.
 	run := patternRuntime{PatternMap: testutil.PatternMap{
-		"factorial": &pattern.NumberPattern{
+		"factorial": &pattern.ActivityPattern{
 			pattern.CommonPattern{
 				Name: "factorial",
-				Prologue: []term.Preparer{
+				Params: []term.Preparer{
 					&term.Number{Name: "num"},
 				},
-			}, []*pattern.NumberRule{{
-				NumberEval: &core.ProductOf{
-					&core.Var{Name: "num"},
-					&pattern.DetermineNum{
-						Pattern: "factorial", Arguments: core.NamedArgs(
-							"num", &core.FromNum{
-								&core.DiffOf{
-									&core.Var{Name: "num"},
-									&core.Number{1},
-								},
-							},
-						)}},
+				Returns: &term.Number{Name: "num"},
+			}, []*pattern.ExecuteRule{{
+				Execute: core.NewActivity(
+					&core.Assign{Var: N("num"),
+						From: &core.FromNum{
+							&core.ProductOf{
+								A: V("num"),
+								B: &pattern.Determine{
+									Pattern: "factorial",
+									Arguments: core.NamedArgs(
+										"num", &core.FromNum{
+											&core.DiffOf{
+												V("num"),
+												I(1),
+											},
+										},
+									)}}}}),
 			}, {
 				Filter: &core.CompareNum{
-					&core.Var{Name: "num"},
+					V("num"),
 					&core.EqualTo{},
-					&core.Number{0},
+					I(0),
 				},
-				NumberEval: &core.Number{1},
+				Execute: core.NewActivity(
+					&core.Assign{Var: N("num"),
+						From: &core.FromNum{
+							I(1),
+						}},
+				),
 			}}},
 	}}
 	// determine the factorial of the number 3
-	det := pattern.DetermineNum{
-		Pattern: "factorial", Arguments: core.NamedArgs(
+	det := pattern.Determine{
+		Pattern: "factorial",
+		Arguments: core.NamedArgs(
 			"num", &core.FromNum{
-				&core.Number{3},
+				I(3),
 			}),
 	}
 	if v, e := safe.GetNumber(&run, &det); e != nil {

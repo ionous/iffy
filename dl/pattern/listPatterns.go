@@ -7,36 +7,36 @@ import (
 	"github.com/ionous/iffy/rt/safe"
 )
 
-type NumListPattern struct {
+type xNumListPattern struct {
 	CommonPattern
-	Rules []*NumListRule
+	Rules []*xNumListRule
 }
-type TextListPattern struct {
+type xTextListPattern struct {
 	CommonPattern
-	Rules []*TextListRule
+	Rules []*xTextListRule
 }
 type ActivityPattern struct {
 	CommonPattern
 	Rules []*ExecuteRule
 }
 
-func (ps *NumListPattern) GetNumList(run rt.Runtime) (ret g.Value, err error) {
-	if inds, e := splitNumbers(run, ps.Rules); e != nil {
+func (ps *xNumListPattern) GetNumList(run rt.Runtime) (ret g.Value, err error) {
+	if inds, e := xsplitNumbers(run, ps.Rules); e != nil {
 		err = e
 	} else {
 		// fix: simplify this, doesnt need the iterators
-		it := numIterator{run, ps, inds, 0}
+		it := xnumIterator{run, ps, inds, 0}
 		x := chain.NewStreamOfStreams(&it)
 		ret, err = g.CompactNumbers(x, nil)
 	}
 	return
 }
 
-func (ps *TextListPattern) GetTextList(run rt.Runtime) (ret g.Value, err error) {
-	if inds, e := splitText(run, ps.Rules); e != nil {
+func (ps *xTextListPattern) GetTextList(run rt.Runtime) (ret g.Value, err error) {
+	if inds, e := xsplitText(run, ps.Rules); e != nil {
 		err = e
 	} else {
-		it := textIterator{run, ps, inds, 0}
+		it := xtextIterator{run, ps, inds, 0}
 		// fix: simplify this, doesnt need the iterators
 		x := chain.NewStreamOfStreams(&it)
 		ret, err = g.CompactTexts(x, nil)

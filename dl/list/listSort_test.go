@@ -31,7 +31,7 @@ package list_test
 // var sortPattern = pattern.BoolPattern{
 // 	CommonPattern: pattern.CommonPattern{
 // 		Name: "sort",
-// 		Prologue: []term.Preparer{
+// 		Params: []term.Preparer{
 // 			&term.Text{Name: "a"},
 // 			&term.Text{Name: "b"},
 // 		},

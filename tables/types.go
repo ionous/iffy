@@ -22,6 +22,7 @@ const (
 	NAMED_NOUN         = "noun"
 	NAMED_PATTERN      = "pattern"
 	NAMED_LOCAL        = "local"
+	NAMED_RETURN       = "return"
 	NAMED_PARAMETER    = "parameter"
 	NAMED_ARGUMENT     = "argument"
 	NAMED_RELATION     = "relation"

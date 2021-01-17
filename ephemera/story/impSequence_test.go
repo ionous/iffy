@@ -1,4 +1,4 @@
-package story
+package story_test
 
 import (
 	"testing"
@@ -10,9 +10,9 @@ import (
 )
 
 func TestImportSequence(t *testing.T) {
-	k, db := newImporter(t, testdb.Memory)
+	_, decoder, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if cmd, e := k.decoder.ReadSpec(_cycle_text); e != nil {
+	if cmd, e := decoder.ReadSpec(_cycle_text); e != nil {
 		t.Fatal("failed to read sequence", e)
 	} else if diff := pretty.Diff(cmd, &core.CycleText{
 		Sequence: core.Sequence{

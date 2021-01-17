@@ -1,4 +1,4 @@
-package story
+package story_test
 
 import (
 	"database/sql"
@@ -9,6 +9,7 @@ import (
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 )
@@ -18,7 +19,7 @@ func lines(s ...string) string {
 }
 
 // for tests where we need a default decoder to read json
-func newImporter(t *testing.T, where string) (ret *Importer, retDB *sql.DB) {
+func newImporter(t *testing.T, where string) (ret *story.Importer, retDec *decode.Decoder, retDB *sql.DB) {
 	db := newImportDB(t, where)
 	if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create ephemera", e)
@@ -27,10 +28,10 @@ func newImporter(t *testing.T, where string) (ret *Importer, retDB *sql.DB) {
 		dec := decode.NewDecoderReporter(t.Name(), func(pos reader.Position, err error) {
 			t.Errorf("%s at %s", err, pos)
 		})
-		k := NewImporterDecoder(t.Name(), db, dec)
+		k := story.NewImporterDecoder(t.Name(), db, dec)
 		dec.AddDefaultCallbacks(core.Slats)
-		k.AddModel(Model)
-		ret, retDB = k, db
+		k.AddModel(story.Model)
+		ret, retDec, retDB = k, dec, db
 	}
 	return
 }

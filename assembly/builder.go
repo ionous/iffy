@@ -25,15 +25,18 @@ type patternEntry struct {
 	patternType string          // "return" type of the pattern
 	prologue    []term.Preparer // list of all parameters sent to the pattern
 	locals      []term.Preparer // ...
+	returns     term.Preparer
 }
 
-// fix? should
 func (pat *patternEntry) AddParam(cat string, param term.Preparer) (err error) {
 	switch cat {
 	case tables.NAMED_PARAMETER:
 		pat.prologue = append(pat.prologue, param)
 	case tables.NAMED_LOCAL:
 		pat.locals = append(pat.locals, param)
+	case tables.NAMED_RETURN:
+		// fix? check for multiple / different sets?
+		pat.returns = param
 	default:
 		err = errutil.New("unknown category", cat)
 	}
@@ -45,8 +48,9 @@ type patternCache map[string]*patternEntry
 func (cache patternCache) init(name, patternType string) (ret pattern.CommonPattern, okay bool) {
 	if c, ok := (cache)[name]; ok && c.patternType == patternType {
 		ret.Name = name
-		ret.Prologue = c.prologue
+		ret.Params = c.prologue
 		ret.Locals = c.locals
+		ret.Returns = c.returns
 		okay = true
 	}
 	return
@@ -144,85 +148,21 @@ func buildPatterns(asm *Assembler) (err error) {
 }
 
 func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
-	var rules = []BuildRule{{
-		Query: `select pattern, prog from asm_rule where type='bool_rule'`,
-		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns.init(name, "bool_eval"); ok {
-				ret = &pattern.BoolPattern{CommonPattern: c}
-			}
-			return
-		},
-		NewEl: func(c interface{}) interface{} {
-			pat := c.(*pattern.BoolPattern)
-			pat.Rules = append(pat.Rules, &pattern.BoolRule{})
-			return pat.Rules[len(pat.Rules)-1]
-		},
-	}, {
-		Query: `select pattern, prog from asm_rule where type='number_rule'`,
-		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns.init(name, "number_eval"); ok {
-				ret = &pattern.NumberPattern{CommonPattern: c}
-			}
-			return
-		},
-		NewEl: func(c interface{}) interface{} {
-			pat := c.(*pattern.NumberPattern)
-			pat.Rules = append(pat.Rules, &pattern.NumberRule{})
-			return pat.Rules[len(pat.Rules)-1]
-		},
-	}, {
-		Query: `select pattern, prog from asm_rule where type='text_rule'`,
-		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns.init(name, "text_eval"); ok {
-				ret = &pattern.TextPattern{CommonPattern: c}
-			}
-			return
-		},
-		NewEl: func(c interface{}) interface{} {
-			pat := c.(*pattern.TextPattern)
-			pat.Rules = append(pat.Rules, &pattern.TextRule{})
-			return pat.Rules[len(pat.Rules)-1]
-		},
-	}, {
-		Query: `select pattern, prog from asm_rule where type='num_list_rule'`,
-		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns.init(name, "num_list_eval"); ok {
-				ret = &pattern.NumListPattern{CommonPattern: c}
-			}
-			return
-		},
-		NewEl: func(c interface{}) interface{} {
-			pat := c.(*pattern.NumListPattern)
-			pat.Rules = append(pat.Rules, &pattern.NumListRule{})
-			return pat.Rules[len(pat.Rules)-1]
-		},
-	}, {
-		Query: `select pattern, prog from asm_rule where type='text_list_rule'`,
-		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns.init(name, "text_list_eval"); ok {
-				ret = &pattern.TextListPattern{CommonPattern: c}
-			}
-			return
-		},
-		NewEl: func(c interface{}) interface{} {
-			pat := c.(*pattern.TextListPattern)
-			pat.Rules = append(pat.Rules, &pattern.TextListRule{})
-			return pat.Rules[len(pat.Rules)-1]
-		},
-	}, {
-		Query: `select pattern, prog from asm_rule where type='execute_rule'`,
-		NewContainer: func(name string) (ret interface{}) {
-			if c, ok := patterns.init(name, "execute"); ok {
-				ret = &pattern.ActivityPattern{CommonPattern: c}
-			}
-			return
-		},
-		NewEl: func(c interface{}) interface{} {
-			pat := c.(*pattern.ActivityPattern)
-			pat.Rules = append(pat.Rules, &pattern.ExecuteRule{})
-			return pat.Rules[len(pat.Rules)-1]
-		},
-	}}
+	var rules = []BuildRule{
+		{
+			Query: `select pattern, prog from asm_rule where type='execute_rule'`,
+			NewContainer: func(name string) (ret interface{}) {
+				if c, ok := patterns.init(name, "execute"); ok {
+					ret = &pattern.ActivityPattern{CommonPattern: c}
+				}
+				return
+			},
+			NewEl: func(c interface{}) interface{} {
+				pat := c.(*pattern.ActivityPattern)
+				pat.Rules = append(pat.Rules, &pattern.ExecuteRule{})
+				return pat.Rules[len(pat.Rules)-1]
+			},
+		}}
 	for _, rule := range rules {
 		var name string
 		var prog []byte

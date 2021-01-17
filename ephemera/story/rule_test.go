@@ -1,9 +1,10 @@
-package story
+package story_test
 
 import (
 	"strings"
 	"testing"
 
+	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/rt/print"
 	"github.com/ionous/iffy/rt/safe"
@@ -14,25 +15,10 @@ import (
 	"github.com/kr/pretty"
 )
 
-// import an object type description
-func TestObjectFunc(t *testing.T) {
-	k, db := newImporter(t, testdb.Memory)
-	defer db.Close()
-	if i, e := k.decoder.ReadSpec(_object_func); e != nil {
-		t.Fatal(e)
-	} else if rule, ok := i.(*ObjectFunc); !ok {
-		t.Fatalf("unexpected import %T", rule)
-	} else if text, e := safe.GetText(nil, rule.Name); e != nil {
-		t.Fatal(e)
-	} else if text := text.String(); text != "hello" {
-		t.Fatal(text)
-	}
-}
-
 func TestPatternActivity(t *testing.T) {
-	k, db := newImporter(t, testdb.Memory)
+	_, decoder, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if prog, e := k.decoder.ReadSpec(_pattern_activity); e != nil {
+	if prog, e := decoder.ReadSpec(_pattern_activity); e != nil {
 		t.Fatal(e)
 	} else if exe, ok := prog.(rt.Execute); !ok {
 		t.Fatalf("cant cast %T to execute", exe)
@@ -50,11 +36,11 @@ func TestPatternActivity(t *testing.T) {
 }
 
 func TestPatternRule(t *testing.T) {
-	k, db := newImporter(t, testdb.Memory)
+	k, decoder, db := newImporter(t, testdb.Memory)
 	defer db.Close()
-	if i, e := k.decoder.ReadSpec(_pattern_actions); e != nil {
+	if i, e := decoder.ReadSpec(_pattern_actions); e != nil {
 		t.Fatal(e)
-	} else if act, ok := i.(*PatternActions); !ok {
+	} else if act, ok := i.(*story.PatternActions); !ok {
 		t.Fatalf("cant cast %T to pattern actions", i)
 	} else if e := act.ImportPhrase(k); e != nil {
 		t.Fatal(e)
@@ -106,13 +92,6 @@ var _pattern_actions = map[string]interface{}{
 								"value": map[string]interface{}{
 									"$ACTIVITY": _pattern_activity,
 								}}}}}}}},
-}
-
-var _object_func = map[string]interface{}{
-	"type": "object_func",
-	"value": map[string]interface{}{
-		"$NAME": _text_eval,
-	},
 }
 
 var _pattern_activity = map[string]interface{}{

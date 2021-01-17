@@ -1,4 +1,4 @@
-package story
+package story_test
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/ionous/iffy/ephemera/debug"
 	"github.com/ionous/iffy/ephemera/reader"
+	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 )
@@ -19,7 +20,7 @@ func TestImportStory(t *testing.T) {
 		t.Fatal("read json", e)
 	} else if e := tables.CreateEphemera(db); e != nil {
 		t.Fatal("create tables", e)
-	} else if _, e := ImportStory(t.Name(), db, in, func(pos reader.Position, err error) {
+	} else if _, e := story.ImportStory(t.Name(), db, in, func(pos reader.Position, err error) {
 		t.Errorf("%s at %s", err, pos)
 	}); e != nil {
 		t.Fatal("import", e)

@@ -228,7 +228,7 @@ func TestTemplates(t *testing.T) {
 	t.Run("indexed", func(t *testing.T) {
 		if e := testTemplate("{'world'|hello!}",
 			&core.Buffer{core.NewActivity(
-				&pattern.DetermineAct{
+				&pattern.Determine{
 					Pattern: "hello", Arguments: core.Args(
 						&core.FromText{T("world")},
 					)})}); e != nil {

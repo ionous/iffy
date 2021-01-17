@@ -24,7 +24,7 @@ func TestMatching(t *testing.T) {
 	}
 
 	a, b := k.NewRecord(), k.NewRecord()
-	runMatching := &pattern.DetermineBool{
+	runMatching := &pattern.Determine{
 		Pattern: "matchGroups", Arguments: core.Args(
 			&core.FromValue{g.RecordOf(a)},
 			&core.FromValue{g.RecordOf(b)},

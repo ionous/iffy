@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ionous/iffy/ephemera/debug"
-	"github.com/ionous/iffy/rt/scope"
 	"github.com/ionous/iffy/test/testutil"
 )
 
@@ -17,12 +16,11 @@ func ExampleSayMe() {
 	}}
 	// say 4 numbers
 	for i := 1; i <= 4; i++ {
-		if text, e := debug.DetermineSay(i).GetText(&run); e != nil {
+		fmt.Printf(`say_me %d = "`, i)
+		if e := debug.DetermineSay(i).Execute(&run); e != nil {
 			fmt.Println("Error:", e)
-			break
-		} else {
-			fmt.Println(fmt.Sprintf("say_me %d = \"%s\"", i, text))
 		}
+		fmt.Println(`"`)
 	}
 
 	// Output:
@@ -30,14 +28,4 @@ func ExampleSayMe() {
 	// say_me 2 = "Two!"
 	// say_me 3 = "Three!"
 	// say_me 4 = "Not between 1 and 3."
-}
-
-type baseRuntime struct {
-	testutil.PanicRuntime
-}
-
-type patternRuntime struct {
-	baseRuntime
-	scope.ScopeStack    // parameters are pushed onto the stack.
-	testutil.PatternMap // holds pointers to patterns
 }

@@ -18,7 +18,7 @@ type activityCache struct {
 	run    rt.Runtime
 }
 
-// see also pattern.Stitch
+// see also pattern.CreateScope
 func (op *activityCache) call(run rt.Runtime, ps *g.Record) (err error) {
 	ls := op.lk.NewRecord()
 	run.PushScope(&scope.TargetRecord{object.Variables, ps})
@@ -55,7 +55,7 @@ func (op *activityCache) newParams(run rt.Runtime) (ret *g.Kind, err error) {
 		ret = op.pk
 	} else {
 		var parms term.Terms
-		if e := op.pat.ComputeParams(run, &parms); e != nil {
+		if _, e := op.pat.ComputeParams(run, &parms); e != nil {
 			err = e
 		} else {
 			pk := parms.NewKind(run)
@@ -71,7 +71,7 @@ func (op *activityCache) newLocals(run rt.Runtime) (ret *g.Kind, err error) {
 		ret = op.lk
 	} else {
 		var locals term.Terms
-		if e := op.pat.ComputeLocals(run, &locals); e != nil {
+		if _, e := op.pat.ComputeLocals(run, &locals); e != nil {
 			err = e
 		} else {
 			lk := locals.NewKind(run)

@@ -16,7 +16,7 @@ var runCollateGroups = list.Reduce{
 var collateGroups = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{
 		Name: "collateGroups",
-		Prologue: []term.Preparer{
+		Params: []term.Preparer{
 			&term.Record{Name: "settings", Kind: "GroupSettings"},
 			&term.Record{Name: "collation", Kind: "GroupCollation"},
 		},
@@ -36,7 +36,7 @@ var collateGroups = pattern.ActivityPattern{
 				As:   &list.AsRec{N("el")},
 				Do: core.MakeActivity(
 					&core.ChooseAction{
-						If: &pattern.DetermineBool{
+						If: &pattern.Determine{
 							Pattern:   "matchGroups",
 							Arguments: core.Args(V("settings"), &core.Unpack{V("el"), "Settings"})},
 						Do: core.MakeActivity(

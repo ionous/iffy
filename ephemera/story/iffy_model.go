@@ -326,92 +326,17 @@ func (*DebugLevel) Compose() composer.Spec {
 	}
 }
 
-// DetermineAct requires various parameters.
-type DetermineAct struct {
+// Determine requires various parameters.
+type Determine struct {
 	At        reader.Position `if:"internal"`
 	Name      PatternName
 	Arguments *Arguments
 }
 
-func (*DetermineAct) Compose() composer.Spec {
+func (*Determine) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "determine_act",
-		Desc:  `Determine act: Determine an activity`,
-		Group: "patterns",
-	}
-}
-
-// DetermineBool requires various parameters.
-type DetermineBool struct {
-	At        reader.Position `if:"internal"`
-	Name      PatternName
-	Arguments *Arguments
-}
-
-func (*DetermineBool) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "determine_bool",
-		Desc:  `Determine bool: Determine a true/false value`,
-		Group: "patterns",
-	}
-}
-
-// DetermineNum requires various parameters.
-type DetermineNum struct {
-	At        reader.Position `if:"internal"`
-	Name      PatternName
-	Arguments *Arguments
-}
-
-func (*DetermineNum) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "determine_num",
-		Desc:  `Determine num: Determine a number`,
-		Group: "patterns",
-	}
-}
-
-// DetermineNumList requires various parameters.
-type DetermineNumList struct {
-	At        reader.Position `if:"internal"`
-	Name      PatternName
-	Arguments *Arguments
-}
-
-func (*DetermineNumList) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "determine_num_list",
-		Desc:  `Determine num list: Determine a list of numbers`,
-		Group: "patterns",
-	}
-}
-
-// DetermineText requires various parameters.
-type DetermineText struct {
-	At        reader.Position `if:"internal"`
-	Name      PatternName
-	Arguments *Arguments
-}
-
-func (*DetermineText) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "determine_text",
-		Desc:  `Determine text: Determine some text`,
-		Group: "patterns",
-	}
-}
-
-// DetermineTextList requires various parameters.
-type DetermineTextList struct {
-	At        reader.Position `if:"internal"`
-	Name      PatternName
-	Arguments *Arguments
-}
-
-func (*DetermineTextList) Compose() composer.Spec {
-	return composer.Spec{
-		Name:  "determine_text_list",
-		Desc:  `Determine text list: Determine a list of text`,
+		Name:  "determine",
+		Desc:  `Determine: Runs a pattern, and potentially returns a value.`,
 		Group: "patterns",
 	}
 }
@@ -864,19 +789,6 @@ func (*NumberList) Compose() composer.Spec {
 	}
 }
 
-// ObjectFunc requires various parameters.
-type ObjectFunc struct {
-	At   reader.Position `if:"internal"`
-	Name rt.TextEval
-}
-
-func (*ObjectFunc) Compose() composer.Spec {
-	return composer.Spec{
-		Name: "object_func",
-		Spec: "an object named {name:text_eval}",
-	}
-}
-
 // ObjectType requires various parameters.
 type ObjectType struct {
 	At   reader.Position `if:"internal"`
@@ -1080,14 +992,13 @@ type PatternType struct {
 func (*PatternType) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "pattern_type",
-		Spec: "an {activity:patterned_activity} or a {value:variable_type}",
+		Spec: "an {activity:patterned_activity}",
 	}
 }
 
 func (*PatternType) Choices() map[string]interface{} {
 	return map[string]interface{}{
 		"activity": (*PatternedActivity)(nil),
-		"value":    (*VariableType)(nil),
 	}
 }
 
@@ -1169,27 +1080,6 @@ func (*PluralKinds) Compose() composer.Spec {
 	}
 }
 
-// PrimitiveFunc swaps between various options
-type PrimitiveFunc struct {
-	At  reader.Position `if:"internal"`
-	Opt interface{}
-}
-
-func (*PrimitiveFunc) Compose() composer.Spec {
-	return composer.Spec{
-		Name: "primitive_func",
-		Spec: "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}",
-	}
-}
-
-func (*PrimitiveFunc) Choices() map[string]interface{} {
-	return map[string]interface{}{
-		"number_eval": (*NumberEval)(nil),
-		"text_eval":   (*TextEval)(nil),
-		"bool_eval":   (*BoolEval)(nil),
-	}
-}
-
 // PrimitiveType requires a user-specified string.
 type PrimitiveType struct {
 	At  reader.Position `if:"internal"`
@@ -1245,47 +1135,13 @@ type ProgramHook struct {
 func (*ProgramHook) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "program_hook",
-		Spec: "run an {activity} or return a {result:program_return}",
+		Spec: "run an {activity}",
 	}
 }
 
 func (*ProgramHook) Choices() map[string]interface{} {
 	return map[string]interface{}{
 		"activity": (*Activity)(nil),
-		"result":   (*ProgramReturn)(nil),
-	}
-}
-
-// ProgramResult swaps between various options
-type ProgramResult struct {
-	At  reader.Position `if:"internal"`
-	Opt interface{}
-}
-
-func (*ProgramResult) Compose() composer.Spec {
-	return composer.Spec{
-		Name: "program_result",
-		Spec: "a {simple value%primitive:primitive_func} or an {object:object_func}",
-	}
-}
-
-func (*ProgramResult) Choices() map[string]interface{} {
-	return map[string]interface{}{
-		"primitive": (*PrimitiveFunc)(nil),
-		"object":    (*ObjectFunc)(nil),
-	}
-}
-
-// ProgramReturn requires various parameters.
-type ProgramReturn struct {
-	At     reader.Position `if:"internal"`
-	Result ProgramResult
-}
-
-func (*ProgramReturn) Compose() composer.Spec {
-	return composer.Spec{
-		Name: "program_return",
-		Spec: "returning {result:program_result}",
 	}
 }
 
@@ -1892,12 +1748,7 @@ var Model = []composer.Composer{
 	(*Comment)(nil),
 	(*CycleText)(nil),
 	(*DebugLevel)(nil),
-	(*DetermineAct)(nil),
-	(*DetermineBool)(nil),
-	(*DetermineNum)(nil),
-	(*DetermineNumList)(nil),
-	(*DetermineText)(nil),
-	(*DetermineTextList)(nil),
+	(*Determine)(nil),
 	(*Determiner)(nil),
 	(*ExtType)(nil),
 	(*KindOfNoun)(nil),
@@ -1922,7 +1773,6 @@ var Model = []composer.Composer{
 	(*NounTraits)(nil),
 	(*Number)(nil),
 	(*NumberList)(nil),
-	(*ObjectFunc)(nil),
 	(*ObjectType)(nil),
 	(*OneToMany)(nil),
 	(*OneToOne)(nil),
@@ -1940,12 +1790,9 @@ var Model = []composer.Composer{
 	(*PatternVariablesTail)(nil),
 	(*PatternedActivity)(nil),
 	(*PluralKinds)(nil),
-	(*PrimitiveFunc)(nil),
 	(*PrimitiveType)(nil),
 	(*PrimitiveValue)(nil),
 	(*ProgramHook)(nil),
-	(*ProgramResult)(nil),
-	(*ProgramReturn)(nil),
 	(*Pronoun)(nil),
 	(*Property)(nil),
 	(*PropertyAspect)(nil),

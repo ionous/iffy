@@ -143,7 +143,7 @@ func assemblyTemplate() string {
 		"\tcat\n" +
 		"from asm_pattern \n" +
 		"where decl = 1 \n" +
-		"group by pattern, param\n" +
+		"group by pattern, param, cat\n" +
 		"order by ogid;\n" +
 		"\n" +
 		"\n" +
@@ -235,6 +235,9 @@ func assemblyTemplate() string {
 		"\n" +
 		"\n" +
 		"/* resolve rules to programs\n" +
+		" * note: it includes ordering by domain, which is a step towards supporting hierarchical domains\n" +
+		" * it works because the base domain is always listed first, other domains later, and later rules are more important.\n" +
+		" * ( and rules include a domain test, better might be selecting/rebuilding rules by domain )\n" +
 		" */\n" +
 		"create temp view \n" +
 		"asm_rule as \n" +

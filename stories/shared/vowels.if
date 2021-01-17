@@ -153,29 +153,44 @@
                               "id": "id-174cda99dde-20",
                               "type": "program_hook",
                               "value": {
-                                "$RESULT": {
-                                  "id": "id-174cdb223ae-7",
-                                  "type": "program_return",
+                                "$ACTIVITY": {
+                                  "id": "id-1770e38f8db-0",
+                                  "type": "activity",
                                   "value": {
-                                    "$RESULT": {
-                                      "id": "id-174cdb223ae-8",
-                                      "type": "program_result",
-                                      "value": {
-                                        "$PRIMITIVE": {
-                                          "id": "id-174cdb223ae-9",
-                                          "type": "primitive_func",
+                                    "$EXE": [
+                                      {
+                                        "id": "id-1770e38f8db-1",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-1770e38f8db-2",
+                                          "type": "assign",
                                           "value": {
-                                            "$BOOL_EVAL": {
-                                              "id": "id-174cdb223ae-10",
-                                              "type": "bool_eval",
+                                            "$VAR": {
+                                              "id": "id-1770e38f8db-3",
+                                              "type": "variable_name",
+                                              "value": "matching"
+                                            },
+                                            "$FROM": {
+                                              "id": "id-1770e38f8db-4",
+                                              "type": "assignment",
                                               "value": {
-                                                "id": "id-174cdb223ae-11",
-                                                "type": "bool_value",
+                                                "id": "id-1770e38f8db-5",
+                                                "type": "from_bool",
                                                 "value": {
-                                                  "$BOOL": {
-                                                    "id": "id-174cdb223ae-12",
-                                                    "type": "bool",
-                                                    "value": "$TRUE"
+                                                  "$VAL": {
+                                                    "id": "id-1770e38f8db-6",
+                                                    "type": "bool_eval",
+                                                    "value": {
+                                                      "id": "id-1770e38f8db-7",
+                                                      "type": "bool_value",
+                                                      "value": {
+                                                        "$BOOL": {
+                                                          "id": "id-1770e38f8db-8",
+                                                          "type": "bool",
+                                                          "value": "$TRUE"
+                                                        }
+                                                      }
+                                                    }
                                                   }
                                                 }
                                               }
@@ -183,7 +198,7 @@
                                           }
                                         }
                                       }
-                                    }
+                                    ]
                                   }
                                 }
                               }
@@ -228,29 +243,44 @@
                               "id": "id-174cdb223ae-15",
                               "type": "program_hook",
                               "value": {
-                                "$RESULT": {
-                                  "id": "id-174cdb223ae-19",
-                                  "type": "program_return",
+                                "$ACTIVITY": {
+                                  "id": "id-1770e38f8db-9",
+                                  "type": "activity",
                                   "value": {
-                                    "$RESULT": {
-                                      "id": "id-174cdb223ae-20",
-                                      "type": "program_result",
-                                      "value": {
-                                        "$PRIMITIVE": {
-                                          "id": "id-174cdb223ae-21",
-                                          "type": "primitive_func",
+                                    "$EXE": [
+                                      {
+                                        "id": "id-1770e38f8db-10",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-1770e38f8db-11",
+                                          "type": "assign",
                                           "value": {
-                                            "$BOOL_EVAL": {
-                                              "id": "id-174cdb223ae-22",
-                                              "type": "bool_eval",
+                                            "$VAR": {
+                                              "id": "id-1770e38f8db-12",
+                                              "type": "variable_name",
+                                              "value": "matching"
+                                            },
+                                            "$FROM": {
+                                              "id": "id-1770e38f8db-13",
+                                              "type": "assignment",
                                               "value": {
-                                                "id": "id-174cdb223ae-23",
-                                                "type": "bool_value",
+                                                "id": "id-1770e38f8db-14",
+                                                "type": "from_bool",
                                                 "value": {
-                                                  "$BOOL": {
-                                                    "id": "id-174cdb223ae-24",
-                                                    "type": "bool",
-                                                    "value": "$FALSE"
+                                                  "$VAL": {
+                                                    "id": "id-1770e38f8db-15",
+                                                    "type": "bool_eval",
+                                                    "value": {
+                                                      "id": "id-1770e38f8db-16",
+                                                      "type": "bool_value",
+                                                      "value": {
+                                                        "$BOOL": {
+                                                          "id": "id-1770e38f8db-17",
+                                                          "type": "bool",
+                                                          "value": "$FALSE"
+                                                        }
+                                                      }
+                                                    }
                                                   }
                                                 }
                                               }
@@ -258,7 +288,7 @@
                                           }
                                         }
                                       }
-                                    }
+                                    ]
                                   }
                                 }
                               }
@@ -303,29 +333,44 @@
                               "id": "id-174cdb223ae-30",
                               "type": "program_hook",
                               "value": {
-                                "$RESULT": {
-                                  "id": "id-174cdb223ae-42",
-                                  "type": "program_return",
+                                "$ACTIVITY": {
+                                  "id": "id-1770e38f8db-18",
+                                  "type": "activity",
                                   "value": {
-                                    "$RESULT": {
-                                      "id": "id-174cdb223ae-43",
-                                      "type": "program_result",
-                                      "value": {
-                                        "$PRIMITIVE": {
-                                          "id": "id-174cdb223ae-44",
-                                          "type": "primitive_func",
+                                    "$EXE": [
+                                      {
+                                        "id": "id-1770e38f8db-19",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-1770e38f8db-20",
+                                          "type": "assign",
                                           "value": {
-                                            "$BOOL_EVAL": {
-                                              "id": "id-174cdb223ae-45",
-                                              "type": "bool_eval",
+                                            "$VAR": {
+                                              "id": "id-1770e38f8db-21",
+                                              "type": "variable_name",
+                                              "value": "matching"
+                                            },
+                                            "$FROM": {
+                                              "id": "id-1770e38f8db-22",
+                                              "type": "assignment",
                                               "value": {
-                                                "id": "id-174cdb223ae-48",
-                                                "type": "bool_value",
+                                                "id": "id-1770e38f8db-23",
+                                                "type": "from_bool",
                                                 "value": {
-                                                  "$BOOL": {
-                                                    "id": "id-174cdb223ae-49",
-                                                    "type": "bool",
-                                                    "value": "$TRUE"
+                                                  "$VAL": {
+                                                    "id": "id-1770e38f8db-24",
+                                                    "type": "bool_eval",
+                                                    "value": {
+                                                      "id": "id-1770e38f8db-25",
+                                                      "type": "bool_value",
+                                                      "value": {
+                                                        "$BOOL": {
+                                                          "id": "id-1770e38f8db-26",
+                                                          "type": "bool",
+                                                          "value": "$TRUE"
+                                                        }
+                                                      }
+                                                    }
                                                   }
                                                 }
                                               }
@@ -333,7 +378,7 @@
                                           }
                                         }
                                       }
-                                    }
+                                    ]
                                   }
                                 }
                               }
@@ -341,6 +386,39 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$PATTERN_RETURN": {
+                    "id": "id-1770e38f8db-27",
+                    "type": "pattern_return",
+                    "value": {
+                      "$RESULT": {
+                        "id": "id-1770e38f8db-28",
+                        "type": "variable_decl",
+                        "value": {
+                          "$AN": {
+                            "id": "id-1770e38f8db-29",
+                            "type": "determiner",
+                            "value": "$A"
+                          },
+                          "$NAME": {
+                            "id": "id-1770e38f8db-30",
+                            "type": "variable_name",
+                            "value": "matching"
+                          },
+                          "$TYPE": {
+                            "id": "id-1770e38f8db-31",
+                            "type": "variable_type",
+                            "value": {
+                              "$PRIMITIVE": {
+                                "id": "id-1770e38f8db-32",
+                                "type": "primitive_type",
+                                "value": "$BOOL"
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }

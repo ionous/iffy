@@ -46,13 +46,13 @@ func splitRules(run rt.Runtime, cnt int, apply applyByIndex) (ret []int, err err
 	return
 }
 
-func splitNumbers(run rt.Runtime, rules []*NumListRule) ([]int, error) {
+func xsplitNumbers(run rt.Runtime, rules []*xNumListRule) ([]int, error) {
 	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
 		return rules[i].GetFlags(run)
 	})
 }
 
-func splitText(run rt.Runtime, rules []*TextListRule) ([]int, error) {
+func xsplitText(run rt.Runtime, rules []*xTextListRule) ([]int, error) {
 	return splitRules(run, len(rules), func(run rt.Runtime, i int) (Flags, error) {
 		return rules[i].GetFlags(run)
 	})

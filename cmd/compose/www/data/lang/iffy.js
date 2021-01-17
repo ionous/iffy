@@ -84,7 +84,7 @@ function localLang(make) {
     make.flow("pattern_variables_tail", "It requires {+variable_decl|comma-and}.",
        `Pattern variables: Storage for values used during the execution of a pattern.`);
 
-    make.swap("pattern_type", "an {activity:patterned_activity} or a {value:variable_type}");
+    make.swap("pattern_type", "an {activity:patterned_activity}");
     make.str("patterned_activity", "{an activity%activity}");
     make.str("pattern_name");
 
@@ -101,17 +101,9 @@ function localLang(make) {
     make.flow("pattern_locals", " using {+variable_decl|comma-and}",
       "Local: local variables can use the parameters of a pattern to compute temporary values.");
 
-    make.swap("program_hook", "run an {activity} or return a {result:program_return}");
+    make.swap("program_hook", "run an {activity}");
 
     make.flow("pattern_return", "returning {result:variable_decl}");
-
-    // fix? activity and program_return both exist for the sake of appearance only.
-    make.flow("program_return", "returning {result:program_result}");
-
-    make.swap("program_result", "a {simple value%primitive:primitive_func} or an {object:object_func}");
-
-    make.swap("primitive_func", "{a number%number_eval}, {some text%text_eval}, {a true/false value%bool_eval}");
-    make.flow("object_func", "an object named {name:text_eval}");
   });
 
   make.group("Relations", function() {

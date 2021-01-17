@@ -578,17 +578,50 @@
                     "type": "pattern_name",
                     "value": "match groups"
                   },
+                  "$PATTERN_RETURN": {
+                    "id": "id-1770d94d1b4-0",
+                    "type": "pattern_return",
+                    "value": {
+                      "$RESULT": {
+                        "id": "id-1770d94d1b4-1",
+                        "type": "variable_decl",
+                        "value": {
+                          "$AN": {
+                            "id": "id-1770d94d1b4-2",
+                            "type": "determiner",
+                            "value": "$A"
+                          },
+                          "$NAME": {
+                            "id": "id-1770d94d1b4-3",
+                            "type": "variable_name",
+                            "value": "matching"
+                          },
+                          "$TYPE": {
+                            "id": "id-1770d94d1b4-4",
+                            "type": "variable_type",
+                            "value": {
+                              "$PRIMITIVE": {
+                                "id": "id-1770d94d1b4-5",
+                                "type": "primitive_type",
+                                "value": "$BOOL"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
                   "$PATTERN_RULES": {
                     "id": "id-17692f1b70b-159",
                     "type": "pattern_rules",
                     "value": {
                       "$PATTERN_RULE": [
                         {
-                          "id": "id-17692f1b70b-160",
+                          "id": "id-1770d94d1b4-6",
                           "type": "pattern_rule",
                           "value": {
                             "$GUARD": {
-                              "id": "id-17692f1b70b-161",
+                              "id": "id-1770d94d1b4-7",
                               "type": "bool_eval",
                               "value": {
                                 "id": "id-17692f1b70b-162",
@@ -837,32 +870,47 @@
                               }
                             },
                             "$HOOK": {
-                              "id": "id-17692f1b70b-211",
+                              "id": "id-1770d94d1b4-8",
                               "type": "program_hook",
                               "value": {
-                                "$RESULT": {
-                                  "id": "id-17692f1b70b-212",
-                                  "type": "program_return",
+                                "$ACTIVITY": {
+                                  "id": "id-1770d94d1b4-9",
+                                  "type": "activity",
                                   "value": {
-                                    "$RESULT": {
-                                      "id": "id-17692f1b70b-213",
-                                      "type": "program_result",
-                                      "value": {
-                                        "$PRIMITIVE": {
-                                          "id": "id-17692f1b70b-214",
-                                          "type": "primitive_func",
+                                    "$EXE": [
+                                      {
+                                        "id": "id-1770d94d1b4-10",
+                                        "type": "execute",
+                                        "value": {
+                                          "id": "id-1770d94d1b4-11",
+                                          "type": "assign",
                                           "value": {
-                                            "$BOOL_EVAL": {
-                                              "id": "id-17692f1b70b-215",
-                                              "type": "bool_eval",
+                                            "$VAR": {
+                                              "id": "id-1770d94d1b4-12",
+                                              "type": "variable_name",
+                                              "value": "matching"
+                                            },
+                                            "$FROM": {
+                                              "id": "id-1770d94d1b4-13",
+                                              "type": "assignment",
                                               "value": {
-                                                "id": "id-17692f1b70b-216",
-                                                "type": "bool_value",
+                                                "id": "id-1770d94d1b4-14",
+                                                "type": "from_bool",
                                                 "value": {
-                                                  "$BOOL": {
-                                                    "id": "id-17692f1b70b-217",
-                                                    "type": "bool",
-                                                    "value": "$TRUE"
+                                                  "$VAL": {
+                                                    "id": "id-1770d94d1b4-15",
+                                                    "type": "bool_eval",
+                                                    "value": {
+                                                      "id": "id-1770d94d1b4-16",
+                                                      "type": "bool_value",
+                                                      "value": {
+                                                        "$BOOL": {
+                                                          "id": "id-1770d94d1b4-17",
+                                                          "type": "bool",
+                                                          "value": "$TRUE"
+                                                        }
+                                                      }
+                                                    }
                                                   }
                                                 }
                                               }
@@ -870,7 +918,7 @@
                                           }
                                         }
                                       }
-                                    }
+                                    ]
                                   }
                                 }
                               }

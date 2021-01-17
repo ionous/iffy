@@ -1,36 +1,37 @@
-package story
+package story_test
 
 import (
 	"strings"
 	"testing"
 
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/ephemera/story"
 	"github.com/ionous/iffy/tables"
 	"github.com/ionous/iffy/test/testdb"
 )
 
 func TestPatternVars(t *testing.T) {
-	patternVariables := &PatternVariablesDecl{
-		PatternName: PatternName{
+	patternVariables := &story.PatternVariablesDecl{
+		PatternName: story.PatternName{
 			Str: "corral",
 		},
-		VariableDecl: []VariableDecl{{
-			Type: VariableType{
-				Opt: &ObjectType{
-					An: Ana{
+		VariableDecl: []story.VariableDecl{{
+			Type: story.VariableType{
+				Opt: &story.ObjectType{
+					An: story.Ana{
 						Str: "$AN",
 					},
-					Kind: SingularKind{
+					Kind: story.SingularKind{
 						Str: "animal",
 					},
 				},
 			},
-			Name: VariableName{core.Variable{
+			Name: story.VariableName{core.Variable{
 				Str: "pet",
 			}},
 		}},
 	}
-	k, db := newImporter(t, testdb.Memory)
+	k, _, db := newImporter(t, testdb.Memory)
 	defer db.Close()
 
 	if e := patternVariables.ImportPhrase(k); e != nil {
@@ -53,18 +54,18 @@ func TestPatternVars(t *testing.T) {
 }
 
 func TestPatternDecl(t *testing.T) {
-	patternDecl := &PatternDecl{
-		Name: PatternName{
+	patternDecl := &story.PatternDecl{
+		Name: story.PatternName{
 			Str: "corral",
 		},
-		Type: PatternType{
-			Opt: &PatternedActivity{
+		Type: story.PatternType{
+			Opt: &story.PatternedActivity{
 				Str: "$ACTIVITY",
 			},
 		},
 	}
 
-	k, db := newImporter(t, testdb.Memory)
+	k, _, db := newImporter(t, testdb.Memory)
 	defer db.Close()
 	if e := patternDecl.ImportPhrase(k); e != nil {
 		t.Fatal(e)

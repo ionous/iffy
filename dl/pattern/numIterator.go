@@ -7,18 +7,18 @@ import (
 )
 
 // implements chain.StreamIterator for multiple streams of numbers
-type numIterator struct {
+type xnumIterator struct {
 	run   rt.Runtime
-	pat   *NumListPattern
+	pat   *xNumListPattern
 	order []int
 	curr  int
 }
 
-func (k *numIterator) HasNextStream() bool {
+func (k *xnumIterator) HasNextStream() bool {
 	return k.curr < len(k.order)
 }
 
-func (k *numIterator) GetNextStream() (ret g.Iterator, err error) {
+func (k *xnumIterator) GetNextStream() (ret g.Iterator, err error) {
 	if !k.HasNextStream() {
 		err = g.StreamExceeded
 	} else {

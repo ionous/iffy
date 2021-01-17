@@ -1,4 +1,4 @@
-package story
+package story_test
 
 import (
 	"testing"

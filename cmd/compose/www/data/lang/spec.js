@@ -937,86 +937,23 @@ const spec = [
     }
   },
   {
-    "desc": "determine act: Determine an activity",
+    "desc": "determine: Runs a pattern, and potentially returns a value.",
     "group": [
       "patterns"
     ],
-    "name": "determine_act",
-    "spec": "determine {activity%name:pattern_name}{?arguments}",
+    "name": "determine",
+    "spec": "determine {pattern%name:pattern_name}{?arguments}",
     "uses": "flow",
     "with": {
       "slots": [
-        "execute"
-      ]
-    }
-  },
-  {
-    "desc": "determine bool: Determine a true/false value",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_bool",
-    "spec": "{true/false pattern%name:pattern_name}{?arguments}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "bool_eval"
-      ]
-    }
-  },
-  {
-    "desc": "determine num: Determine a number",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_num",
-    "spec": "{number pattern%name:pattern_name}{?arguments}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "number_eval"
-      ]
-    }
-  },
-  {
-    "desc": "determine num list: Determine a list of numbers",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_num_list",
-    "spec": "{number list pattern%name:pattern_name}{?arguments}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "num_list_eval"
-      ]
-    }
-  },
-  {
-    "desc": "determine text: Determine some text",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_text",
-    "spec": "{text pattern%name:pattern_name}{?arguments}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "text_eval"
-      ]
-    }
-  },
-  {
-    "desc": "determine text list: Determine a list of text",
-    "group": [
-      "patterns"
-    ],
-    "name": "determine_text_list",
-    "spec": "{text list pattern%name:pattern_name}{?arguments}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "text_list_eval"
+        "execute",
+        "bool_eval",
+        "number_eval",
+        "text_eval",
+        "record_eval",
+        "num_list_eval",
+        "text_list_eval",
+        "record_list_eval"
       ]
     }
   },
@@ -3275,12 +3212,7 @@ const stub = [
   "argument",
   "debug_level",
   "render_template",
-  "determine_act",
-  "determine_num",
-  "determine_text",
-  "determine_bool",
-  "determine_num_list",
-  "determine_text_list",
+  "determine",
   "list_case",
   "list_edge",
   "list_order"

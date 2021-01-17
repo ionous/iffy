@@ -59,7 +59,7 @@ package list_test
 // var reduceRecords = pattern.ActivityPattern{
 // 	CommonPattern: pattern.CommonPattern{
 // 		Name: "reduce",
-// 		Prologue: []term.Preparer{
+// 		Params: []term.Preparer{
 // 			&term.Record{Name: "in", Kind: "Fruit"},
 // 			&term.Text{Name: "out"},
 // 		},

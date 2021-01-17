@@ -120,7 +120,7 @@ var remap = list.Map{FromList: &core.Var{Name: "Fruits"}, ToList: "Results", Usi
 var reverseRecords = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{
 		Name: "remap",
-		Prologue: []term.Preparer{
+		Params: []term.Preparer{
 			&term.Record{Name: "in", Kind: "Fruit"},
 			&term.Record{Name: "out", Kind: "Fruit"},
 		},
@@ -146,7 +146,7 @@ var reverseRecords = pattern.ActivityPattern{
 var reverseStrings = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{
 		Name: "remap",
-		Prologue: []term.Preparer{
+		Params: []term.Preparer{
 			&term.Text{Name: "in"},
 			&term.Text{Name: "out"},
 		},

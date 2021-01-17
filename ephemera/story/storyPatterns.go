@@ -16,9 +16,23 @@ func (op *PatternActions) ImportPhrase(k *Importer) (err error) {
 		err = e
 	} else if e := op.PatternRules.ImportPattern(k, patternName); e != nil {
 		err = e
+	} else if e := op.PatternReturn.ImportReturn(k, patternName); e != nil {
+		err = e
 	} else {
+		// import each local if they exist
 		if els := op.PatternLocals; els != nil {
 			err = els.ImportPattern(k, patternName)
+		}
+	}
+	return
+}
+
+func (op *PatternReturn) ImportReturn(k *Importer, patternName ephemera.Named) (err error) {
+	if op != nil { // pattern returns are optional
+		if val, e := op.Result.ImportVariable(k, tables.NAMED_RETURN); e != nil {
+			err = errutil.Append(err, e)
+		} else {
+			k.NewPatternDecl(patternName, val.name, val.typeName, val.affinity)
 		}
 	}
 	return

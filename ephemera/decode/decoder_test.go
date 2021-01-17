@@ -1,4 +1,4 @@
-package decode
+package decode_test
 
 import (
 	"encoding/json"
@@ -6,12 +6,13 @@ import (
 
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/ephemera/debug"
+	"github.com/ionous/iffy/ephemera/decode"
 	"github.com/kr/pretty"
 )
 
 // read simple unit test story into memory as a golang struct
 func TestDecode(t *testing.T) {
-	dec := NewDecoder()
+	dec := decode.NewDecoder()
 	// register creation functions for all the slats.
 	dec.AddDefaultCallbacks(core.Slats)
 	// read say story data

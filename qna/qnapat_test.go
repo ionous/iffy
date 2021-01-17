@@ -1,6 +1,7 @@
 package qna
 
 import (
+	"bytes"
 	"encoding/gob"
 	"testing"
 
@@ -33,9 +34,11 @@ func TestSayMe(t *testing.T) {
 	}
 	run := NewRuntime(db)
 	for i, expect := range []string{"One!", "Two!", "Three!", "Not between 1 and 3."} {
-		if text, e := debug.DetermineSay(i + 1).GetText(run); e != nil {
+		var buf bytes.Buffer
+		run.SetWriter(&buf)
+		if e := debug.DetermineSay(i + 1).Execute(run); e != nil {
 			t.Fatal(e)
-		} else if text := text.String(); expect != text {
+		} else if text := buf.String(); expect != text {
 			t.Fatal(i, text)
 		} else {
 			t.Log(text)

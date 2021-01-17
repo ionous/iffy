@@ -6,6 +6,7 @@ import (
 	"github.com/ionous/iffy/rt/writer"
 )
 
+// AutoWriter accepts incoming text chunks and writes them to target writing newlines at the end of sentences.
 type AutoWriter struct {
 	writer.ChunkOutput
 	Target writer.Output

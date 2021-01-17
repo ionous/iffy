@@ -132,7 +132,7 @@ select pattern, param, type, affinity, ogid,
 	cat
 from asm_pattern 
 where decl = 1 
-group by pattern, param
+group by pattern, param, cat
 order by ogid;
 
 

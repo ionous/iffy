@@ -17,7 +17,7 @@ var runGroupTogther = list.Map{
 var assignGrouping = pattern.ActivityPattern{
 	CommonPattern: pattern.CommonPattern{
 		Name: "assignGrouping",
-		Prologue: []term.Preparer{
+		Params: []term.Preparer{
 			&term.Text{Name: "in"},
 			&term.Record{Name: "out", Kind: "GroupSettings"},
 		},
