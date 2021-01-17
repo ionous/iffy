@@ -57,7 +57,7 @@ func TestFluid(t *testing.T) {
 		t.Error(got)
 	}
 	if got := makeSig((*rel.Relate)(nil)); !got.equals(
-		"relate obj:toObj:via:",
+		"relate:to:via:",
 	) {
 		t.Error(got)
 	}
