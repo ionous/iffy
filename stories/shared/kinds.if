@@ -237,6 +237,59 @@
                   ]
                 }
               }
+            },
+            {
+              "id": "id-1770cb3192a-75",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1770cb3192a-76",
+                "type": "kinds_of_aspect",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-1770cb3192a-77",
+                    "type": "aspect",
+                    "value": " player controlled"
+                  }
+                }
+              }
+            },
+            {
+              "id": "id-1770cb3192a-78",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1770cb3192a-79",
+                "type": "aspect_traits",
+                "value": {
+                  "$ASPECT": {
+                    "id": "id-1770cb3192a-80",
+                    "type": "aspect",
+                    "value": " player controlled"
+                  },
+                  "$TRAIT_PHRASE": {
+                    "id": "id-1770cb3192a-81",
+                    "type": "trait_phrase",
+                    "value": {
+                      "$ARE_EITHER": {
+                        "id": "id-1770cb3192a-82",
+                        "type": "are_either",
+                        "value": "$EITHER"
+                      },
+                      "$TRAIT": [
+                        {
+                          "id": "id-1770cb3192a-83",
+                          "type": "trait",
+                          "value": "player"
+                        },
+                        {
+                          "id": "id-1770cb3192a-84",
+                          "type": "trait",
+                          "value": "not player"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
             }
           ]
         }

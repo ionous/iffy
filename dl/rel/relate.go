@@ -7,8 +7,9 @@ import (
 )
 
 type Relate struct {
-	Obj, ToObj rt.TextEval
-	Via        Relation
+	Obj   rt.TextEval `if:"selector"`
+	ToObj rt.TextEval `if:"selector=to"`
+	Via   Relation
 }
 
 func (*Relate) Compose() composer.Spec {
