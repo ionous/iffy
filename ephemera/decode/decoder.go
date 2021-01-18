@@ -199,6 +199,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 					// fix?: by using field by name we "unwrap" embedded structs
 					// ex. VariableName { core.Variable }
 					outAt.FieldByName("Str").SetString(str)
+					storeAt(p, outAt)
 				}
 				return
 			}); e != nil {
@@ -234,6 +235,7 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 							if e := dec.importValue(ptr.Elem(), contents); e != nil {
 								err = e
 							} else {
+								storeAt(p, outAt)
 								outAt.Field(outAt.NumField() - 1).Set(ptr)
 							}
 							found = true
@@ -321,6 +323,14 @@ func (dec *Decoder) importValue(outAt r.Value, inVal interface{}) (err error) {
 		}
 	}
 	return
+}
+
+func storeAt(m reader.Map, val r.Value) {
+	if at := reader.At(m); len(at) > 0 {
+		if v := val.FieldByName("At"); !v.IsValid() {
+			v.Set(r.ValueOf(at))
+		}
+	}
 }
 
 // cast inVal to a map, and call setter with contents of "value"

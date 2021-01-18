@@ -355,7 +355,7 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17691d01da5-277",
-                                                      "type": "determine_act",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$NAME": {
                                                           "id": "id-17691d01da5-278",
@@ -464,7 +464,7 @@
                                                                             "type": "execute",
                                                                             "value": {
                                                                               "id": "id-17691d01da5-306",
-                                                                              "type": "determine_act",
+                                                                              "type": "determine",
                                                                               "value": {
                                                                                 "$NAME": {
                                                                                   "id": "id-17691d01da5-307",
@@ -747,7 +747,7 @@
                                         "type": "execute",
                                         "value": {
                                           "id": "id-17691b305f6-129",
-                                          "type": "determine_act",
+                                          "type": "determine",
                                           "value": {
                                             "$NAME": {
                                               "id": "id-17691b305f6-130",

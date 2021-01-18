@@ -84,27 +84,9 @@
                     "id": "id-176f4124f37-4",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-176f4124f37-5",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-176f4124f37-6",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-176f4124f37-7",
-                                "type": "ana",
-                                "value": "$AN"
-                              },
-                              "$KIND": {
-                                "id": "id-176f4124f37-8",
-                                "type": "singular_kind",
-                                "value": "object"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   },
@@ -343,27 +325,9 @@
                     "id": "id-176f427859d-9",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-176f427859d-10",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-176f427859d-11",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-176f427859d-12",
-                                "type": "ana",
-                                "value": "$A"
-                              },
-                              "$KIND": {
-                                "id": "id-176f427859d-13",
-                                "type": "singular_kind",
-                                "value": "room"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   },
@@ -586,7 +550,7 @@
                                                                 "type": "text_eval",
                                                                 "value": {
                                                                   "id": "id-176f7f50aeb-21",
-                                                                  "type": "determine_text",
+                                                                  "type": "determine",
                                                                   "value": {
                                                                     "$NAME": {
                                                                       "id": "id-176f7f50aeb-22",
@@ -861,27 +825,9 @@
                     "id": "id-17703f5400a-8",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-17703f5400a-9",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-17703f5400a-10",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-17703f5400a-11",
-                                "type": "ana",
-                                "value": "$AN"
-                              },
-                              "$KIND": {
-                                "id": "id-17703f5400a-12",
-                                "type": "singular_kind",
-                                "value": "object"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   },
@@ -1434,7 +1380,7 @@
                                                                             "type": "text_eval",
                                                                             "value": {
                                                                               "id": "id-17703f5400a-211",
-                                                                              "type": "determine_text",
+                                                                              "type": "determine",
                                                                               "value": {
                                                                                 "$NAME": {
                                                                                   "id": "id-17703f5400a-212",
@@ -1666,7 +1612,7 @@
                                                                 "type": "text_eval",
                                                                 "value": {
                                                                   "id": "id-17703f5400a-149",
-                                                                  "type": "determine_text",
+                                                                  "type": "determine",
                                                                   "value": {
                                                                     "$NAME": {
                                                                       "id": "id-17703f5400a-150",
@@ -1941,16 +1887,9 @@
                     "id": "id-17703f5400a-295",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-17703f5400a-296",
-                        "type": "variable_type",
-                        "value": {
-                          "$PRIMITIVE": {
-                            "id": "id-17703f5400a-297",
-                            "type": "primitive_type",
-                            "value": "$BOOL"
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   }
@@ -2279,7 +2218,7 @@
                                                                 "type": "text_eval",
                                                                 "value": {
                                                                   "id": "id-17703f5400a-424",
-                                                                  "type": "determine_text",
+                                                                  "type": "determine",
                                                                   "value": {
                                                                     "$NAME": {
                                                                       "id": "id-17703f5400a-425",
@@ -2685,27 +2624,9 @@
                     "id": "id-17703f5400a-482",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-17703f5400a-484",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-17703f5400a-485",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-17703f5400a-486",
-                                "type": "ana",
-                                "value": "$AN"
-                              },
-                              "$KIND": {
-                                "id": "id-17703f5400a-487",
-                                "type": "singular_kind",
-                                "value": "object"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   },
@@ -2865,7 +2786,7 @@
                                                     "type": "text_eval",
                                                     "value": {
                                                       "id": "id-17703f5400a-520",
-                                                      "type": "determine_text",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$NAME": {
                                                           "id": "id-17703f5400a-521",
@@ -3072,27 +2993,9 @@
                     "id": "id-17703f5400a-565",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-17703f5400a-566",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-17703f5400a-567",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-17703f5400a-568",
-                                "type": "ana",
-                                "value": "$AN"
-                              },
-                              "$KIND": {
-                                "id": "id-17703f5400a-569",
-                                "type": "singular_kind",
-                                "value": "object"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   }
@@ -3252,7 +3155,7 @@
                                                     "type": "text_eval",
                                                     "value": {
                                                       "id": "id-17703f5400a-601",
-                                                      "type": "determine_text",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$NAME": {
                                                           "id": "id-17703f5400a-602",
@@ -3417,27 +3320,9 @@
                     "id": "id-1770c8a62f5-96",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-1770c8a62f5-97",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-1770c8a62f5-98",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-1770c8a62f5-99",
-                                "type": "ana",
-                                "value": "$AN"
-                              },
-                              "$KIND": {
-                                "id": "id-1770c8a62f5-100",
-                                "type": "singular_kind",
-                                "value": "actor"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   },
@@ -3612,7 +3497,7 @@
                                                     "type": "text_eval",
                                                     "value": {
                                                       "id": "id-1770c8a62f5-132",
-                                                      "type": "determine_text",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$NAME": {
                                                           "id": "id-1770c8a62f5-133",
@@ -3777,27 +3662,9 @@
                     "id": "id-17703f5400a-641",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-17703f5400a-642",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-17703f5400a-643",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-17703f5400a-644",
-                                "type": "ana",
-                                "value": "$AN"
-                              },
-                              "$KIND": {
-                                "id": "id-17703f5400a-645",
-                                "type": "singular_kind",
-                                "value": "actor"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   },
@@ -3972,7 +3839,7 @@
                                                     "type": "text_eval",
                                                     "value": {
                                                       "id": "id-17703f5400a-677",
-                                                      "type": "determine_text",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$NAME": {
                                                           "id": "id-17703f5400a-678",
@@ -4179,27 +4046,9 @@
                     "id": "id-1770c8a62f5-19",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-1770c8a62f5-20",
-                        "type": "variable_type",
-                        "value": {
-                          "$OBJECT": {
-                            "id": "id-1770c8a62f5-21",
-                            "type": "object_type",
-                            "value": {
-                              "$AN": {
-                                "id": "id-1770c8a62f5-22",
-                                "type": "ana",
-                                "value": "$AN"
-                              },
-                              "$KIND": {
-                                "id": "id-1770c8a62f5-23",
-                                "type": "singular_kind",
-                                "value": "actor"
-                              }
-                            }
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   },
@@ -4374,7 +4223,7 @@
                                                     "type": "text_eval",
                                                     "value": {
                                                       "id": "id-1770c8a62f5-55",
-                                                      "type": "determine_text",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$NAME": {
                                                           "id": "id-1770c8a62f5-56",

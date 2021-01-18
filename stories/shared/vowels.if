@@ -24,18 +24,12 @@
                     "id": "id-174cda99dde-3",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-174cda99dde-6",
-                        "type": "variable_type",
-                        "value": {
-                          "$PRIMITIVE": {
-                            "id": "id-174cda99dde-7",
-                            "type": "primitive_type",
-                            "value": "$BOOL"
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
+                    
                   },
                   "$OPTVARS": {
                     "id": "id-174cda99dde-8",
@@ -510,7 +504,7 @@
                                           "type": "bool_eval",
                                           "value": {
                                             "id": "id-174cdd39e3a-0",
-                                            "type": "determine_bool",
+                                            "type": "determine",
                                             "value": {
                                               "$NAME": {
                                                 "id": "id-174cdd39e3a-1",
@@ -619,7 +613,7 @@
                                           "type": "bool_eval",
                                           "value": {
                                             "id": "id-174d0e35aff-5",
-                                            "type": "determine_bool",
+                                            "type": "determine",
                                             "value": {
                                               "$NAME": {
                                                 "id": "id-174d0e35aff-6",
@@ -728,7 +722,7 @@
                                           "type": "bool_eval",
                                           "value": {
                                             "id": "id-174d0e35aff-36",
-                                            "type": "determine_bool",
+                                            "type": "determine",
                                             "value": {
                                               "$NAME": {
                                                 "id": "id-174d0e35aff-37",
@@ -837,7 +831,7 @@
                                           "type": "bool_eval",
                                           "value": {
                                             "id": "id-174d0e35aff-57",
-                                            "type": "determine_bool",
+                                            "type": "determine",
                                             "value": {
                                               "$NAME": {
                                                 "id": "id-174d0e35aff-58",

@@ -490,7 +490,7 @@
                                                                             "type": "text_eval",
                                                                             "value": {
                                                                               "id": "id-1770cb3192a-58",
-                                                                              "type": "determine_text",
+                                                                              "type": "determine",
                                                                               "value": {
                                                                                 "$NAME": {
                                                                                   "id": "id-1770cb3192a-59",
@@ -816,11 +816,6 @@
                                                   }
                                                 ]
                                               }
-                                            },
-                                            "$ELSE": {
-                                              "id": "id-1770cb3192a-272",
-                                              "type": "brancher",
-                                              "value": null
                                             }
                                           }
                                         }
@@ -1136,7 +1131,7 @@
                                                           "type": "text_eval",
                                                           "value": {
                                                             "id": "id-1770d66eb57-111",
-                                                            "type": "determine_text",
+                                                            "type": "determine",
                                                             "value": {
                                                               "$NAME": {
                                                                 "id": "id-1770d66eb57-112",
@@ -1220,7 +1215,7 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-1770d66eb57-120",
-                                                      "type": "determine_act",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$NAME": {
                                                           "id": "id-1770d66eb57-121",

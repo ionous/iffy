@@ -1,6 +1,8 @@
 package story
 
 import (
+	"log"
+
 	"github.com/ionous/errutil"
 )
 
@@ -62,6 +64,12 @@ func (op *Certainties) ImportPhrase(k *Importer) (err error) {
 
 func (op *Comment) ImportPhrase(k *Importer) (err error) {
 	// do nothing for now.
+	return
+}
+
+// (the) colors are red, blue, or green.
+func (op *KindOfRelation) ImportPhrase(k *Importer) (err error) {
+	log.Println("KindOfRelation not implemented")
 	return
 }
 

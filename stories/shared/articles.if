@@ -398,7 +398,6 @@
                     "type": "pattern_type",
                     "value": {
                       "$ACTIVITY": {
-                        "id": "id-174f06d08a4-68",
                         "type": "patterned_activity",
                         "value": "$ACTIVITY"
                       }
@@ -1022,11 +1021,9 @@
                     "value": "print article"
                   },
                   "$TYPE": {
-                    "id": "id-174f08a1a93-2",
                     "type": "pattern_type",
                     "value": {
                       "$ACTIVITY": {
-                        "id": "id-174f08a1a93-5",
                         "type": "patterned_activity",
                         "value": "$ACTIVITY"
                       }
@@ -1188,7 +1185,7 @@
                               "type": "bool_eval",
                               "value": {
                                 "id": "id-174f0910998-12",
-                                "type": "determine_bool",
+                                "type": "determine",
                                 "value": {
                                   "$NAME": {
                                     "id": "id-174f0910998-13",

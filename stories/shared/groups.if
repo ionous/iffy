@@ -455,16 +455,9 @@
                     "id": "id-17692f1b70b-136",
                     "type": "pattern_type",
                     "value": {
-                      "$VALUE": {
-                        "id": "id-17692f1b70b-137",
-                        "type": "variable_type",
-                        "value": {
-                          "$PRIMITIVE": {
-                            "id": "id-17692f1b70b-138",
-                            "type": "primitive_type",
-                            "value": "$BOOL"
-                          }
-                        }
+                      "$ACTIVITY": {
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
                       }
                     }
                   }
@@ -1552,7 +1545,7 @@
                                                                       "type": "bool_eval",
                                                                       "value": {
                                                                         "id": "id-17692f1b70b-352",
-                                                                        "type": "determine_bool",
+                                                                        "type": "determine",
                                                                         "value": {
                                                                           "$NAME": {
                                                                             "id": "id-17692f1b70b-353",
@@ -2685,7 +2678,7 @@
                               "type": "execute",
                               "value": {
                                 "id": "id-17692f1b70b-513",
-                                "type": "determine_act",
+                                "type": "determine",
                                 "value": {
                                   "$NAME": {
                                     "id": "id-17692f1b70b-514",
@@ -2939,7 +2932,7 @@
                               "type": "execute",
                               "value": {
                                 "id": "id-17692f1b70b-541",
-                                "type": "determine_act",
+                                "type": "determine",
                                 "value": {
                                   "$NAME": {
                                     "id": "id-17692f1b70b-542",
@@ -3114,7 +3107,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-17692f1b70b-597",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-17692f1b70b-598",
@@ -3220,7 +3213,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-1769dc19ed4-6",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-1769dc19ed4-7",
@@ -3779,7 +3772,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-1769e087ca0-55",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-1769e087ca0-56",
@@ -3885,7 +3878,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-1769e087ca0-75",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-1769e087ca0-76",
@@ -4293,7 +4286,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-1769e215da7-6",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-1769e215da7-7",
@@ -4399,7 +4392,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-1769e215da7-54",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-1769e215da7-55",
@@ -5023,7 +5016,7 @@
                               "type": "execute",
                               "value": {
                                 "id": "id-176a185900d-87",
-                                "type": "determine_act",
+                                "type": "determine",
                                 "value": {
                                   "$NAME": {
                                     "id": "id-176a185900d-88",
@@ -5423,7 +5416,7 @@
                               "type": "execute",
                               "value": {
                                 "id": "id-176a185900d-135",
-                                "type": "determine_act",
+                                "type": "determine",
                                 "value": {
                                   "$NAME": {
                                     "id": "id-176a185900d-136",
@@ -5842,7 +5835,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-176a185900d-218",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-176a185900d-219",
@@ -5943,7 +5936,7 @@
                                                 "type": "execute",
                                                 "value": {
                                                   "id": "id-176a185900d-238",
-                                                  "type": "determine_act",
+                                                  "type": "determine",
                                                   "value": {
                                                     "$NAME": {
                                                       "id": "id-176a185900d-239",

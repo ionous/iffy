@@ -702,7 +702,7 @@
                                                                                   "type": "execute",
                                                                                   "value": {
                                                                                     "id": "id-17692024e5f-55",
-                                                                                    "type": "determine_act",
+                                                                                    "type": "determine",
                                                                                     "value": {
                                                                                       "$NAME": {
                                                                                         "id": "id-17692024e5f-56",
@@ -1089,7 +1089,7 @@
                                                                                                                       "type": "execute",
                                                                                                                       "value": {
                                                                                                                         "id": "id-17692024e5f-145",
-                                                                                                                        "type": "determine_act",
+                                                                                                                        "type": "determine",
                                                                                                                         "value": {
                                                                                                                           "$NAME": {
                                                                                                                             "id": "id-17692024e5f-146",
@@ -1203,7 +1203,7 @@
                                                                                                           "type": "execute",
                                                                                                           "value": {
                                                                                                             "id": "id-17692024e5f-213",
-                                                                                                            "type": "determine_act",
+                                                                                                            "type": "determine",
                                                                                                             "value": {
                                                                                                               "$NAME": {
                                                                                                                 "id": "id-17692024e5f-214",

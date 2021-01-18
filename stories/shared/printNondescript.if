@@ -526,7 +526,7 @@
                                                                       "type": "execute",
                                                                       "value": {
                                                                         "id": "id-17692fbc689-30",
-                                                                        "type": "determine_act",
+                                                                        "type": "determine",
                                                                         "value": {
                                                                           "$NAME": {
                                                                             "id": "id-17692fbc689-31",
@@ -1011,7 +1011,7 @@
                                                           "type": "execute",
                                                           "value": {
                                                             "id": "id-17672fb43de-120",
-                                                            "type": "determine_act",
+                                                            "type": "determine",
                                                             "value": {
                                                               "$NAME": {
                                                                 "id": "id-17672fb43de-121",
@@ -1255,7 +1255,7 @@
                                                                                               "type": "execute",
                                                                                               "value": {
                                                                                                 "id": "id-17692b598b2-79",
-                                                                                                "type": "determine_act",
+                                                                                                "type": "determine",
                                                                                                 "value": {
                                                                                                   "$NAME": {
                                                                                                     "id": "id-17692b598b2-80",
@@ -1363,7 +1363,7 @@
                                                                                                                       "type": "execute",
                                                                                                                       "value": {
                                                                                                                         "id": "id-17692b598b2-95",
-                                                                                                                        "type": "determine_act",
+                                                                                                                        "type": "determine",
                                                                                                                         "value": {
                                                                                                                           "$NAME": {
                                                                                                                             "id": "id-17692b598b2-96",

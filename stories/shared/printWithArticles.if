@@ -515,7 +515,7 @@
                                                     "type": "execute",
                                                     "value": {
                                                       "id": "id-17691d01da5-102",
-                                                      "type": "determine_act",
+                                                      "type": "determine",
                                                       "value": {
                                                         "$ARGUMENTS": {
                                                           "id": "id-17691d01da5-104",
