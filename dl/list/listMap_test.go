@@ -117,16 +117,14 @@ func TestMapRecords(t *testing.T) {
 
 var remap = list.Map{FromList: &core.Var{Name: "Fruits"}, ToList: "Results", UsingPattern: "remap"}
 
-var reverseRecords = pattern.ActivityPattern{
-	CommonPattern: pattern.CommonPattern{
-		Name: "remap",
-		Params: []term.Preparer{
-			&term.Record{Name: "in", Kind: "Fruit"},
-			&term.Record{Name: "out", Kind: "Fruit"},
-		},
+var reverseRecords = pattern.Pattern{
+	Name: "remap",
+	Params: []term.Preparer{
+		&term.Record{Name: "in", Kind: "Fruit"},
+		&term.Record{Name: "out", Kind: "Fruit"},
 	},
-	Rules: []*pattern.ExecuteRule{
-		&pattern.ExecuteRule{
+	Rules: []*pattern.Rule{
+		&pattern.Rule{
 			Execute: &core.PutAtField{
 				Into:    &core.IntoRec{N("out")},
 				AtField: "Name",
@@ -143,16 +141,14 @@ var reverseRecords = pattern.ActivityPattern{
 	},
 }
 
-var reverseStrings = pattern.ActivityPattern{
-	CommonPattern: pattern.CommonPattern{
-		Name: "remap",
-		Params: []term.Preparer{
-			&term.Text{Name: "in"},
-			&term.Text{Name: "out"},
-		},
+var reverseStrings = pattern.Pattern{
+	Name: "remap",
+	Params: []term.Preparer{
+		&term.Text{Name: "in"},
+		&term.Text{Name: "out"},
 	},
-	Rules: []*pattern.ExecuteRule{
-		&pattern.ExecuteRule{
+	Rules: []*pattern.Rule{
+		&pattern.Rule{
 			Execute: &core.Assign{
 				Var: core.Variable{Str: "out"},
 				From: &core.FromText{

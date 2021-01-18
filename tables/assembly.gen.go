@@ -233,7 +233,6 @@ func assemblyTemplate() string {
 		"\tleft join eph_named nb\n" +
 		"\t\ton (rel.idNamedDependent = nb.rowid);\n" +
 		"\n" +
-		"\n" +
 		"/* resolve rules to programs\n" +
 		" * note: it includes ordering by domain, which is a step towards supporting hierarchical domains\n" +
 		" * it works because the base domain is always listed first, other domains later, and later rules are more important.\n" +
@@ -249,20 +248,6 @@ func assemblyTemplate() string {
 		"\ton (er.idProg = ep.rowid)\n" +
 		"order by pattern, type, domain, idProg;\n" +
 		"\n" +
-		"/* patterns and rules with similar names and possibly different types\n" +
-		"* fix: does this need to be updated with affinity?\n" +
-		" */\n" +
-		"create temp view \n" +
-		"asm_rule_match as \n" +
-		"\tselect pattern, ap.type pt, ar.type rt, prog,\n" +
-		"\treplace(ap.type, '_eval', '') =\n" +
-		"\treplace(ar.type, '_rule', '') as matched\n" +
-		"from asm_rule ar \n" +
-		"join asm_pattern ap \n" +
-		"using (pattern)\n" +
-		"where ap.decl = 1 \n" +
-		"and ap.pattern = ap.param\n" +
-		"and ap.pattern = ar.pattern;\n" +
 		"\n" +
 		"/* resolve value ephemera to strings.\n" +
 		" */\n" +

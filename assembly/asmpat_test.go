@@ -76,7 +76,7 @@ func TestRuleAsm(t *testing.T) {
 				"say_me", "num", "number_eval", "true")
 
 			for i, rule := range debug.SayPattern.Rules {
-				prog, e := asm.rec.NewGob("execute_rule", &rule)
+				prog, e := asm.rec.NewGob("rule", &rule)
 				if e != nil {
 					t.Fatal(e)
 				}
@@ -92,7 +92,7 @@ func TestRuleAsm(t *testing.T) {
 			} else {
 				var visited bool
 				var progName, typeName string
-				var pat pattern.ActivityPattern
+				var pat pattern.Pattern
 				if e := tables.QueryAll(asm.db, "select * from mdl_prog",
 					func() (err error) {
 						if visited {
@@ -102,7 +102,7 @@ func TestRuleAsm(t *testing.T) {
 						return
 					}, &progName, &typeName, tables.NewGobScanner(&pat)); e != nil {
 					t.Fatal(e)
-				} else if progName != "say_me" || typeName != "ActivityPattern" {
+				} else if progName != "say_me" || typeName != "Pattern" {
 					t.Fatalf("mismatched columns %q %q", progName, typeName)
 				} else if diff := pretty.Diff(debug.SayPattern, pat); len(diff) > 0 {
 					pretty.Println("want:", debug.SayPattern)

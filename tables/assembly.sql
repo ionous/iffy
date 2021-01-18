@@ -222,7 +222,6 @@ left join eph_named nv
 	left join eph_named nb
 		on (rel.idNamedDependent = nb.rowid);
 
-
 /* resolve rules to programs
  * note: it includes ordering by domain, which is a step towards supporting hierarchical domains
  * it works because the base domain is always listed first, other domains later, and later rules are more important.
@@ -238,20 +237,6 @@ join eph_prog ep
 	on (er.idProg = ep.rowid)
 order by pattern, type, domain, idProg;
 
-/* patterns and rules with similar names and possibly different types
-* fix: does this need to be updated with affinity?
- */
-create temp view 
-asm_rule_match as 
-	select pattern, ap.type pt, ar.type rt, prog,
-	replace(ap.type, '_eval', '') =
-	replace(ar.type, '_rule', '') as matched
-from asm_rule ar 
-join asm_pattern ap 
-using (pattern)
-where ap.decl = 1 
-and ap.pattern = ap.param
-and ap.pattern = ar.pattern;
 
 /* resolve value ephemera to strings.
  */

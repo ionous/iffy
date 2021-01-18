@@ -45,12 +45,14 @@ func (pat *patternEntry) AddParam(cat string, param term.Preparer) (err error) {
 
 type patternCache map[string]*patternEntry
 
-func (cache patternCache) init(name, patternType string) (ret pattern.CommonPattern, okay bool) {
+func (cache patternCache) init(name, patternType string) (ret *pattern.Pattern, okay bool) {
 	if c, ok := (cache)[name]; ok && c.patternType == patternType {
-		ret.Name = name
-		ret.Params = c.prologue
-		ret.Locals = c.locals
-		ret.Returns = c.returns
+		ret = &pattern.Pattern{
+			Name:    name,
+			Params:  c.prologue,
+			Locals:  c.locals,
+			Returns: c.returns,
+		}
 		okay = true
 	}
 	return
@@ -147,29 +149,22 @@ func buildPatterns(asm *Assembler) (err error) {
 	return
 }
 
-func buildPatternRules(asm *Assembler, patterns patternCache) (err error) {
-	var rules = []BuildRule{
-		{
-			Query: `select pattern, prog from asm_rule where type='execute_rule'`,
-			NewContainer: func(name string) (ret interface{}) {
-				if c, ok := patterns.init(name, "execute"); ok {
-					ret = &pattern.ActivityPattern{CommonPattern: c}
-				}
-				return
-			},
-			NewEl: func(c interface{}) interface{} {
-				pat := c.(*pattern.ActivityPattern)
-				pat.Rules = append(pat.Rules, &pattern.ExecuteRule{})
-				return pat.Rules[len(pat.Rules)-1]
-			},
-		}}
-	for _, rule := range rules {
-		var name string
-		var prog []byte
-		if e := rule.buildFromRule(asm, &name, &prog); e != nil {
-			err = e
-			break
-		}
+func buildPatternRules(asm *Assembler, patterns patternCache) error {
+	var name string
+	var prog []byte
+	rule := BuildRule{
+		Query: `select pattern, prog from asm_rule where type='rule'`,
+		NewContainer: func(name string) (ret interface{}) {
+			if c, ok := patterns.init(name, "execute"); ok {
+				ret = c
+			}
+			return
+		},
+		NewEl: func(c interface{}) interface{} {
+			pat := c.(*pattern.Pattern)
+			pat.Rules = append(pat.Rules, &pattern.Rule{})
+			return pat.Rules[len(pat.Rules)-1]
+		},
 	}
-	return
+	return rule.buildFromRule(asm, &name, &prog)
 }

@@ -56,16 +56,14 @@ package list_test
 // var reduce = list.Reduce{FromList: "Source", IntoValue: "res", UsingPattern: "reduce"}
 
 // // join each record in turn
-// var reduceRecords = pattern.ActivityPattern{
-// 	CommonPattern: pattern.CommonPattern{
+// var reduceRecords = pattern.Pattern{
 // 		Name: "reduce",
 // 		Params: []term.Preparer{
 // 			&term.Record{Name: "in", Kind: "Fruit"},
 // 			&term.Text{Name: "out"},
 // 		},
-// 	},
-// 	Rules: []*pattern.ExecuteRule{
-// 		&pattern.ExecuteRule{
+// 	Rules: []*pattern.Rule{
+// 		&pattern.Rule{
 // 			Execute: &core.Assign{
 // 				Name: "out",
 // 				From: &core.FromText{&core.Join{Sep: T(", "), Parts: []rt.TextEval{

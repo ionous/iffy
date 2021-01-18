@@ -146,68 +146,6 @@ func TestPatternCheck(t *testing.T) {
 		})
 	}
 }
-
-// check that the pattern type matches the rule
-func TestRuleCheck(t *testing.T) {
-	if asm, e := newAssemblyTest(t, testdb.Memory); e != nil {
-		t.Fatal(e)
-	} else {
-		defer asm.db.Close()
-		t.Run("normal", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1")
-			addEphRule(asm.rec,
-				"pat", "number_rule", "some text")
-			if e := checkRuleSetup(asm.db); e != nil {
-				t.Fatal(e)
-			} else {
-				t.Log("ok")
-			}
-		})
-		t.Run("multi", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"num", "", "number_eval", "true",
-				"txt", "", "text_eval", "true",
-				"exe", "", "execute", "false",
-			)
-			addEphRule(asm.rec,
-				"num", "number_rule", "some text",
-				"txt", "text_rule", "some text",
-			)
-			if e := checkRuleSetup(asm.db); e != nil {
-				t.Fatal(e)
-			} else {
-				t.Log("ok")
-			}
-		})
-		//
-		t.Run("missing rules", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1")
-			if e := checkRuleSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Error("expected missing rule")
-			}
-		})
-		t.Run("mismatched rule type", func(t *testing.T) {
-			cleanPatterns(asm.db)
-			addEphPattern(asm.rec,
-				"pat", "", "number_eval", "1")
-			addEphRule(asm.rec,
-				"pat", "text_eval", "some text")
-			if e := checkRuleSetup(asm.db); e != nil {
-				t.Log("ok", e)
-			} else {
-				t.Error("expected mismatched rule")
-			}
-		})
-	}
-}
-
 func cleanPatterns(db *sql.DB) {
 	tables.Must(db, "delete from eph_pattern")
 	tables.Must(db, "delete from eph_rule")

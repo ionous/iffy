@@ -14,15 +14,13 @@ var runGroupTogther = list.Map{
 	UsingPattern: "assignGrouping"}
 
 // from a list of object names, build a list of group settings
-var assignGrouping = pattern.ActivityPattern{
-	CommonPattern: pattern.CommonPattern{
-		Name: "assignGrouping",
-		Params: []term.Preparer{
-			&term.Text{Name: "in"},
-			&term.Record{Name: "out", Kind: "GroupSettings"},
-		},
+var assignGrouping = pattern.Pattern{
+	Name: "assignGrouping",
+	Params: []term.Preparer{
+		&term.Text{Name: "in"},
+		&term.Record{Name: "out", Kind: "GroupSettings"},
 	},
-	Rules: []*pattern.ExecuteRule{
+	Rules: []*pattern.Rule{
 		{Execute: &core.Activity{[]rt.Execute{
 			Put("out", "Name", V("in")),
 			&core.ChooseAction{

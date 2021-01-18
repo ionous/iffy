@@ -13,7 +13,7 @@ import (
 // temp: to call activities with values that we can manipulate semi-efficiently
 // we should be able to build the kinds in the assembler
 type activityCache struct {
-	pat    pattern.ActivityPattern
+	pat    pattern.Pattern
 	pk, lk *g.Kind
 	run    rt.Runtime
 }

@@ -9,17 +9,15 @@ import (
 
 // a pattern for matching groups --
 // we add rules that if things arent equal we return false
-var matchGroups = pattern.ActivityPattern{
-	CommonPattern: pattern.CommonPattern{
-		Name: "matchGroups",
-		Params: []term.Preparer{
-			&term.Record{Name: "a", Kind: "GroupSettings"},
-			&term.Record{Name: "b", Kind: "GroupSettings"},
-		},
-		Returns: &term.Bool{Name: "matches"},
+var matchGroups = pattern.Pattern{
+	Name: "matchGroups",
+	Params: []term.Preparer{
+		&term.Record{Name: "a", Kind: "GroupSettings"},
+		&term.Record{Name: "b", Kind: "GroupSettings"},
 	},
+	Returns: &term.Bool{Name: "matches"},
 	// rules are evaluated in reverse order ( see splitRules )
-	Rules: []*pattern.ExecuteRule{{
+	Rules: []*pattern.Rule{{
 		Filter:  &core.Always{},
 		Execute: matches(true),
 	}, {

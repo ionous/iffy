@@ -47,7 +47,7 @@ func TestPatternRule(t *testing.T) {
 	} else {
 		var buf strings.Builder
 		// -- eph?rule
-		// execute_rule
+		// rule
 		tables.WriteCsv(db, &buf, "select progType from eph_prog", 1)
 		// example, pattern_name
 		tables.WriteCsv(db, &buf, "select name, category from eph_named where category != 'scene'", 2)
@@ -56,7 +56,7 @@ func TestPatternRule(t *testing.T) {
 		// 1, 1 - the first name, the first program are used to make the rule
 		tables.WriteCsv(db, &buf, "select idNamedPattern, idProg from eph_rule", 2)
 		if have, want := buf.String(), lines(
-			"execute_rule",
+			"rule",
 			"example,pattern",
 			"0", // eph_pattern -- rules are recorded via eph_prog,
 			"2,1",

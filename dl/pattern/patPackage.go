@@ -11,7 +11,7 @@ import (
 // fix: would it be better to list rule sets?
 // the rule set elements could be used to find the individual rule types.
 var Support = []interface{}{
-	(*ExecuteRule)(nil),
+	(*Rule)(nil),
 	//
 	//(*term.Preparer)(nil),
 	(*term.Number)(nil),

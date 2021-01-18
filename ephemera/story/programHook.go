@@ -21,7 +21,7 @@ func (b *executeSlot) SlotType() string {
 	return "execute"
 }
 func (b *executeSlot) NewRule(guard rt.BoolEval, flags pattern.Flags) (string, interface{}) {
-	return "execute_rule", &pattern.ExecuteRule{guard, flags, b.cmd}
+	return "rule", &pattern.Rule{guard, flags, b.cmd}
 }
 func (b *executeSlot) CmdPtr() interface{} {
 	return &b.cmd

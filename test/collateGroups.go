@@ -13,22 +13,20 @@ var runCollateGroups = list.Reduce{
 	IntoValue:    "Collation",
 	UsingPattern: "collateGroups"}
 
-var collateGroups = pattern.ActivityPattern{
-	CommonPattern: pattern.CommonPattern{
-		Name: "collateGroups",
-		Params: []term.Preparer{
-			&term.Record{Name: "settings", Kind: "GroupSettings"},
-			&term.Record{Name: "collation", Kind: "GroupCollation"},
-		},
-		Locals: []term.Preparer{
-			&term.Number{Name: "idx"},
-			&term.RecordList{Name: "groups", Kind: "GroupedObjects"},
-			&term.Record{Name: "group", Kind: "GroupedObjects"},
-			&term.TextList{Name: "names"},
-		},
+var collateGroups = pattern.Pattern{
+	Name: "collateGroups",
+	Params: []term.Preparer{
+		&term.Record{Name: "settings", Kind: "GroupSettings"},
+		&term.Record{Name: "collation", Kind: "GroupCollation"},
 	},
-	Rules: []*pattern.ExecuteRule{
-		&pattern.ExecuteRule{Execute: core.NewActivity(
+	Locals: []term.Preparer{
+		&term.Number{Name: "idx"},
+		&term.RecordList{Name: "groups", Kind: "GroupedObjects"},
+		&term.Record{Name: "group", Kind: "GroupedObjects"},
+		&term.TextList{Name: "names"},
+	},
+	Rules: []*pattern.Rule{
+		&pattern.Rule{Execute: core.NewActivity(
 			// walk collation.Groups for matching settings
 			&core.Assign{core.Variable{Str: "groups"}, &core.Unpack{V("collation"), "Groups"}},
 			&list.Each{

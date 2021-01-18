@@ -12,8 +12,6 @@ func AssemblePatterns(asm *Assembler) (err error) {
 	db := asm.cache.DB()
 	if e := checkPatternSetup(db); e != nil {
 		err = e
-	} else if e := checkRuleSetup(db); e != nil {
-		err = e
 	} else if e := buildPatterns(asm); e != nil {
 		err = e
 	} else if e := copyPatterns(db); e != nil {

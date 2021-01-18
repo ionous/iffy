@@ -38,13 +38,12 @@ func DetermineSay(i int) *pattern.Determine {
   }
 }
 
-var SayPattern = pattern.ActivityPattern{
-  pattern.CommonPattern{
-    Name: "say_me",
-    Params: []term.Preparer{
-      &term.Number{Name: "num"},
-    }},
-  []*pattern.ExecuteRule{
+var SayPattern = pattern.Pattern{
+  Name: "say_me",
+  Params: []term.Preparer{
+    &term.Number{Name: "num"},
+  },
+  Rules: []*pattern.Rule{
     {Execute: SayIt("Not between 1 and 3.")},
     {Filter: &MatchNumber{3}, Execute: SayIt("San!")},
     {Filter: &MatchNumber{3}, Execute: SayIt("Three!")},

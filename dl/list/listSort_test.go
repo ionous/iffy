@@ -29,13 +29,11 @@ package list_test
 // }
 
 // var sortPattern = pattern.BoolPattern{
-// 	CommonPattern: pattern.CommonPattern{
 // 		Name: "sort",
 // 		Params: []term.Preparer{
 // 			&term.Text{Name: "a"},
 // 			&term.Text{Name: "b"},
 // 		},
-// 	},
 // 	Rules: []*pattern.BoolRule{
 // 		&pattern.BoolRule{
 // 			Filter: B(true),

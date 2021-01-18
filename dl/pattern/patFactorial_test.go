@@ -14,14 +14,13 @@ import (
 func TestFactorial(t *testing.T) {
 	// rules are run in reverse order.
 	run := patternRuntime{PatternMap: testutil.PatternMap{
-		"factorial": &pattern.ActivityPattern{
-			pattern.CommonPattern{
-				Name: "factorial",
-				Params: []term.Preparer{
-					&term.Number{Name: "num"},
-				},
-				Returns: &term.Number{Name: "num"},
-			}, []*pattern.ExecuteRule{{
+		"factorial": &pattern.Pattern{
+			Name: "factorial",
+			Params: []term.Preparer{
+				&term.Number{Name: "num"},
+			},
+			Returns: &term.Number{Name: "num"},
+			Rules: []*pattern.Rule{{
 				Execute: core.NewActivity(
 					&core.Assign{Var: N("num"),
 						From: &core.FromNum{

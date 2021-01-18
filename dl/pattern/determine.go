@@ -20,7 +20,7 @@ type Determine struct {
 
 // Stitch finds the pattern, builds the scope, and executes the passed callback to generate a result.
 // It's an adapter from the the specific DetermineActivity, DetermineNumber, etc. statements.
-func (op *Determine) newScope(run rt.Runtime, pat *ActivityPattern) (ret *patScope, err error) {
+func (op *Determine) newScope(run rt.Runtime, pat *Pattern) (ret *patScope, err error) {
 	// find the pattern (p), qna's implementation assembles the rules by querying the db.
 	if e := run.GetEvalByName(op.Pattern.String(), pat); e != nil {
 		err = e
@@ -50,7 +50,7 @@ func (op *Determine) newScope(run rt.Runtime, pat *ActivityPattern) (ret *patSco
 }
 
 func (op *Determine) runPattern(run rt.Runtime, aff affine.Affinity) (ret g.Value, err error) {
-	var pat ActivityPattern
+	var pat Pattern
 	if x, e := op.newScope(run, &pat); e != nil {
 		err = e
 	} else {
