@@ -109,10 +109,10 @@ function localLang(make) {
   make.group("Relations", function() {
     make.flow("kind_of_relation", "story_statement", "{relation:relation_name} relates {relation_cardinality}");
     make.swap("relation_cardinality", "{one_to_one}, {one_to_many}, {many_to_one}, or {many_to_many}");
-    make.flow("one_to_one",  "one {singular_kind} to one {singular_kind}");
-    make.flow("one_to_many", "one {singular_kind} to many {plural_kinds}");
-    make.flow("many_to_one", "many {plural_kinds} to one {singular_kind}");
-    make.flow("many_to_many", "many {plural_kinds} to many {plural_kinds}");
+    make.flow("one_to_one",  "one {kind:singular_kind} to one {other_kind:singular_kind}");
+    make.flow("one_to_many", "one {kind:singular_kind} to many {kinds:plural_kinds}");
+    make.flow("many_to_one", "many {kinds:plural_kinds} to one {kind:singular_kind}");
+    make.flow("many_to_many", "many {kinds:plural_kinds} to many {other_kinds:plural_kinds}");
 
     make.flow("noun_relation",  "{?are_being} {relation:relation_name} {nouns+named_noun|comma-and}");
 
