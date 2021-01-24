@@ -244,23 +244,20 @@
                                     "type": "text_eval",
                                     "value": {
                                       "id": "id-17494737044-23",
-                                      "type": "get_field",
+                                      "type": "get_at_field",
                                       "value": {
                                         "$FIELD": {
                                           "id": "id-17669095400-10",
                                           "type": "text",
                                           "value": "printed plural name"
                                         },
-                                        "$OBJECT": {
-                                          "id": "id-17494737044-25",
-                                          "type": "object_eval",
+                                        "$FROM": {
+                                          "type": "from_source_fields",
                                           "value": {
-                                            "id": "id-17494737044-28",
-                                            "type": "get_var",
+                                            "type": "from_var",
                                             "value": {
-                                              "$NAME": {
-                                                "id": "id-17494737044-30",
-                                                "type": "text",
+                                              "$VAR": {
+                                                "type": "variable_name",
                                                 "value": "target"
                                               }
                                             }

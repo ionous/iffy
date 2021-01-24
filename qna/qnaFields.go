@@ -311,17 +311,6 @@ func (n *Runner) GetField(target, rawField string) (ret g.Value, err error) {
 			return
 		})
 
-	case object.Locale:
-		// find the name of the parent, then return that cached object
-		objId := rawField
-		if parent, e := n.nounLocale.localeOf(objId); e != nil {
-			err = e
-		} else if len(parent) == 0 {
-			err = g.UnknownObject("") // fix: what's the right value for empty value?
-		} else {
-			ret, err = n.GetField(object.Value, parent)
-		}
-
 	case object.Name:
 		// given an id, make sure the object should be available,
 		// then return its author given name.

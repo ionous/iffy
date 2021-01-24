@@ -126,13 +126,13 @@ var reverseRecords = pattern.Pattern{
 	Rules: []*pattern.Rule{
 		&pattern.Rule{
 			Execute: &core.PutAtField{
-				Into:    &core.IntoRec{N("out")},
+				Into:    &core.IntoVar{N("out")},
 				AtField: "Name",
 				From: &core.FromText{
 					&core.MakeReversed{
-						&core.Unpack{
-							Record: V("in"),
-							Field:  "Name",
+						&core.GetAtField{
+							Field: "Name",
+							From:  &core.FromVar{N("in")},
 						},
 					},
 				},

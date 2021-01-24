@@ -19,7 +19,7 @@ type MatchNumber struct {
 }
 
 func (m MatchNumber) GetBool(run rt.Runtime) (ret g.Value, err error) {
-  if a, e := safe.Variable(run, "num", affine.Number); e != nil {
+  if a, e := safe.CheckVariable(run, "num", affine.Number); e != nil {
     err = e
   } else {
     n := a.Int()

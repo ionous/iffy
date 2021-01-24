@@ -33,7 +33,7 @@ func (op *Make) makeRecord(run rt.Runtime) (ret *g.Record, err error) {
 		b := k.NewRecord()
 		if op.Arguments == nil {
 			ret = b // return the empty record
-		} else if e := op.Arguments.Distill(run, b); e != nil {
+		} else if e := op.Arguments.Distill(run, nil, b); e != nil {
 			err = e
 		} else {
 			ret = b

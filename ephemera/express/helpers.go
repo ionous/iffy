@@ -2,6 +2,7 @@ package express
 
 import (
 	"github.com/ionous/iffy/dl/core"
+	"github.com/ionous/iffy/dl/render"
 	"github.com/ionous/iffy/rt"
 )
 
@@ -14,11 +15,11 @@ func N(n float64) rt.NumberEval {
 func B(b bool) rt.BoolEval {
 	return &core.Bool{b}
 }
-func O(n string, exact bool) (ret rt.ObjectEval) {
+func O(n string, exact bool) (ret rt.TextEval) {
 	if !exact {
-		ret = &core.Var{Name: n, Flags: core.TryAsBoth}
+		ret = &render.RenderRef{core.Var{n}, render.TryAsBoth}
 	} else {
-		ret = &core.ObjectName{T(n)}
+		ret = T(n)
 	}
 	return ret
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/dl/pattern"
-	"github.com/ionous/iffy/lang"
+	"github.com/ionous/iffy/dl/render"
 	"github.com/ionous/iffy/rt"
 	"github.com/ionous/iffy/template"
 	"github.com/ionous/iffy/template/postfix"
@@ -31,8 +31,8 @@ func (c *Converter) Convert(xs template.Expression) (ret interface{}, err error)
 		err = e
 	} else if op, e := c.stack.flush(); e != nil {
 		err = e
-	} else if on, ok := op.(*dottedName); ok {
-		// if the entire template can be reduced to an dottedName
+	} else if on, ok := op.(dotName); ok {
+		// if the entire template can be reduced to an dotName
 		// ex. {.lantern} then we treat it as a request for the friendly name of the object
 		ret = on.getPrintedName()
 	} else {
@@ -182,7 +182,7 @@ func (c *Converter) buildPattern(name string, arity int) (err error) {
 // an eval has been passed to a pattern, return the command to assign the eval to an arg.
 func newAssignment(arg r.Value) (ret core.Assignment, err error) {
 	switch arg := arg.Interface().(type) {
-	case *dottedName:
+	case dotName:
 		ret = arg.getFromVar()
 	case rt.BoolEval:
 		ret = &core.FromBool{arg}
@@ -226,7 +226,7 @@ func (c *Converter) buildSpan(arity int) (err error) {
 			// in a list of text evaluations,
 			// for example maybe "{.bennie} and the {.jets}"
 			// single occurrences of dotted names are treated as requests for a friendly name
-			case *dottedName:
+			case dotName:
 				txts = append(txts, el.getPrintedName())
 			case rt.TextEval:
 				txts = append(txts, el)
@@ -267,20 +267,7 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 		} else {
 			// fix: this should add ephemera that there's an object of name
 			// fix: can this add ephemera that there's a local of name?
-			firstField := fields[0]
-			//
-			var obj rt.ObjectEval
-			if lang.IsCapitalized(firstField) {
-				obj = &core.ObjectName{T(firstField)}
-			} else {
-				// unboxing: get the object id from the variable named by the first dot
-				// its possible though that the name requested is actually an object in the first place
-				// ex. could be .ringBearer, or could be .samWise
-				// lets assume for now, that if a variable holds text referring to an object....
-				// then it needs to hold the object id, ie. we dont have to resolve the name of the object again.
-				obj = &core.Var{Name: firstField, Flags: core.TryAsBoth}
-			}
-			if len(fields) == 1 {
+			if firstField := fields[0]; len(fields) == 1 {
 				// we dont know yet how { .name.... } is being used:
 				// - a command arg, so the desired type is known.
 				// - a pattern arg, so the desired type isn't known.
@@ -291,26 +278,23 @@ func (c *Converter) addFunction(fn postfix.Function) (err error) {
 				// - the name of a pattern parameter,
 				// - a loop counter,
 				// - etc.
-				c.buildOne(&dottedName{firstField})
+				c.buildOne(dotName(firstField))
 			} else {
-				// a chain of dots indicates we're getting one or more fields of objects
-				// ex. for { .object.fieldContainingAnObject.otherField }
-				var getField *core.Field
+				// a chaing of dots indicates one or more fields of a record
+				// ex.  .object.fieldContainingAnRecord.otherField
+				var fieldSet core.FromSourceFields = &render.RenderField{T(firstField)}
+
+				var getField *core.GetAtField
 				// .a.b: from the named object a, we want its field b
 				// .a.b.c: after getting the object name in field b, get that object's field c
 				for _, field := range fields[1:] {
-					// the first time through, we already have an object id
-					// on subsequent loops we turn the results of the previous GetField
-					// into a request for that object's name.
+					// the nth time through?
 					if getField != nil {
-						// fix? the stored name should be an id so
-						// this is going to be a non-op, we could add a command that's just "return id"
-						obj = &core.ObjectName{getField}
+						fieldSet = &core.FromRec{getField}
 					}
-					//
-					getField = &core.Field{
-						Object: obj,
-						Field:  field,
+					getField = &core.GetAtField{
+						Field: field,
+						From:  fieldSet,
 					}
 				}
 				c.buildOne(getField)

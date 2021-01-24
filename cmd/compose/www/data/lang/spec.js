@@ -147,8 +147,13 @@ const spec = [
     "uses": "slot"
   },
   {
-    "desc": "fields: Helper for setting fields.",
-    "name": "fields",
+    "desc": "from_source_fields: Helper for getting fields.",
+    "name": "from_source_fields",
+    "uses": "slot"
+  },
+  {
+    "desc": "into_target_fields: Helper for setting fields.",
+    "name": "into_target_fields",
     "uses": "slot"
   },
   {
@@ -174,11 +179,6 @@ const spec = [
   {
     "desc": "Numbers: Statements which return a number.",
     "name": "number_eval",
-    "uses": "slot"
-  },
-  {
-    "desc": "Object: Statements which return an object.",
-    "name": "object_eval",
     "uses": "slot"
   },
   {
@@ -942,7 +942,7 @@ const spec = [
       "patterns"
     ],
     "name": "determine",
-    "spec": "determine {pattern%name:pattern_name}{?arguments}",
+    "spec": "{pattern%name:pattern_name}{?arguments}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1160,31 +1160,6 @@ const spec = [
     }
   },
   {
-    "desc": "From Name: Assigns the calculated piece of name.",
-    "group": [
-      "variables"
-    ],
-    "name": "from_name",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "text_eval"
-        }
-      },
-      "roles": "FZK",
-      "slots": [
-        "assignment"
-      ],
-      "tokens": [
-        "fromName",
-        ": ",
-        "$VAL"
-      ]
-    }
-  },
-  {
     "desc": "From Number: Assigns the calculated number.",
     "group": [
       "variables"
@@ -1246,27 +1221,46 @@ const spec = [
     }
   },
   {
-    "desc": "From Object: Assigns the calculated object",
-    "group": [
-      "variables"
-    ],
-    "name": "from_object",
+    "desc": "FromObj: Targets an object with a computed name.",
+    "name": "from_obj",
     "uses": "flow",
     "with": {
       "params": {
-        "$VAL": {
-          "label": "val",
-          "type": "object_eval"
+        "$OBJECT": {
+          "label": "object",
+          "type": "text_eval"
         }
       },
-      "roles": "FZK",
+      "roles": "SZK",
       "slots": [
-        "assignment"
+        "from_source_fields"
       ],
       "tokens": [
-        "fromObject",
+        "fromObj",
         ": ",
-        "$VAL"
+        "$OBJECT"
+      ]
+    }
+  },
+  {
+    "desc": "FromRec: Targets a record stored in a record.",
+    "name": "from_rec",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$REC": {
+          "label": "rec",
+          "type": "record_eval"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "from_source_fields"
+      ],
+      "tokens": [
+        "fromRec",
+        ": ",
+        "$REC"
       ]
     }
   },
@@ -1415,14 +1409,46 @@ const spec = [
     }
   },
   {
-    "desc": "Get Field: Return the value of the named object property.",
-    "group": [
-      "objects"
-    ],
-    "name": "get_field",
-    "spec": "the {field:text} of {object:object_eval}",
+    "desc": "FromVar: Targets a record stored in a variable.",
+    "name": "from_var",
     "uses": "flow",
     "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "from_source_fields"
+      ],
+      "tokens": [
+        "fromVar",
+        ": ",
+        "$VAR"
+      ]
+    }
+  },
+  {
+    "desc": "GetAtField: Get a value from a record.",
+    "group": [
+      "variables"
+    ],
+    "name": "get_at_field",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$FIELD": {
+          "label": "field",
+          "type": "text"
+        },
+        "$FROM": {
+          "label": "from",
+          "type": "from_source_fields"
+        }
+      },
+      "roles": "FZKZK",
       "slots": [
         "bool_eval",
         "number_eval",
@@ -1432,6 +1458,13 @@ const spec = [
         "text_list_eval",
         "record_list_eval",
         "assignment"
+      ],
+      "tokens": [
+        "get",
+        ": ",
+        "$FIELD",
+        ", ",
+        "$FROM"
       ]
     }
   },
@@ -1455,7 +1488,6 @@ const spec = [
         "number_eval",
         "text_eval",
         "record_eval",
-        "object_eval",
         "num_list_eval",
         "text_list_eval",
         "record_list_eval",
@@ -1514,7 +1546,7 @@ const spec = [
       "objects"
     ],
     "name": "has_trait",
-    "spec": "{object:object_eval} is {trait:text_eval}",
+    "spec": "{object:text_eval} is {trait:text_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -1580,68 +1612,24 @@ const spec = [
     }
   },
   {
-    "desc": "IntoObj: Targets an object with a predetermined name",
+    "desc": "IntoObj: Targets an object with a computed name.",
     "name": "into_obj",
     "uses": "flow",
     "with": {
       "params": {
-        "$VAR": {
-          "label": "var",
-          "type": "variable_name"
-        }
-      },
-      "roles": "SZK",
-      "slots": [
-        "fields"
-      ],
-      "tokens": [
-        "intoObj",
-        ": ",
-        "$VAR"
-      ]
-    }
-  },
-  {
-    "desc": "IntoObjNamed: Targets an object with a computed name",
-    "name": "into_obj_named",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$OBJ_NAME": {
-          "label": "objName",
+        "$OBJECT": {
+          "label": "object",
           "type": "text_eval"
         }
       },
       "roles": "SZK",
       "slots": [
-        "fields"
+        "into_target_fields"
       ],
       "tokens": [
-        "intoObjNamed",
+        "intoObj",
         ": ",
-        "$OBJ_NAME"
-      ]
-    }
-  },
-  {
-    "desc": "IntoRec: Targets a record stored in a variable",
-    "name": "into_rec",
-    "uses": "flow",
-    "with": {
-      "params": {
-        "$VAR": {
-          "label": "var",
-          "type": "variable_name"
-        }
-      },
-      "roles": "SZK",
-      "slots": [
-        "fields"
-      ],
-      "tokens": [
-        "intoRec",
-        ": ",
-        "$VAR"
+        "$OBJECT"
       ]
     }
   },
@@ -1690,6 +1678,28 @@ const spec = [
     }
   },
   {
+    "desc": "IntoVar: Targets an object or record stored in a variable",
+    "name": "into_var",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$VAR": {
+          "label": "var",
+          "type": "variable_name"
+        }
+      },
+      "roles": "SZK",
+      "slots": [
+        "into_target_fields"
+      ],
+      "tokens": [
+        "intoVar",
+        ": ",
+        "$VAR"
+      ]
+    }
+  },
+  {
     "desc": "Is Empty: True if the text is empty.",
     "group": [
       "strings"
@@ -1703,14 +1713,49 @@ const spec = [
           "type": "text_eval"
         }
       },
-      "roles": "FZK",
+      "roles": "FZSZK",
       "slots": [
         "bool_eval"
       ],
       "tokens": [
-        "isEmpty",
+        "is",
+        " ",
+        "empty",
         ": ",
         "$TEXT"
+      ]
+    }
+  },
+  {
+    "desc": "Is Kind Of: True if the object is compatible with the named kind.",
+    "group": [
+      "objects"
+    ],
+    "name": "is_exact_kind_of",
+    "uses": "flow",
+    "with": {
+      "params": {
+        "$KIND": {
+          "label": "isExactly",
+          "type": "text"
+        },
+        "$OBJECT": {
+          "label": "object",
+          "type": "text_eval"
+        }
+      },
+      "roles": "FZKZSZK",
+      "slots": [
+        "bool_eval"
+      ],
+      "tokens": [
+        "kindOf",
+        ": ",
+        "$OBJECT",
+        ", ",
+        "isExactly",
+        ": ",
+        "$KIND"
       ]
     }
   },
@@ -1729,7 +1774,7 @@ const spec = [
         },
         "$OBJECT": {
           "label": "object",
-          "type": "object_eval"
+          "type": "text_eval"
         }
       },
       "roles": "FZKZSZK",
@@ -1789,7 +1834,7 @@ const spec = [
       "objects"
     ],
     "name": "kind_of",
-    "spec": "kind of {object:object_eval}",
+    "spec": "kind of {object:text_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -2379,7 +2424,7 @@ const spec = [
       "objects"
     ],
     "name": "name_of",
-    "spec": "name of {object:object_eval}",
+    "spec": "name of {object:text_eval}",
     "uses": "flow",
     "with": {
       "slots": [
@@ -2473,30 +2518,29 @@ const spec = [
     }
   },
   {
-    "desc": "Object Exists: Returns whether there is a noun of the specified name.",
+    "desc": "Object Exists: Returns whether there is a object of the specified name.",
     "group": [
       "objects"
     ],
     "name": "object_exists",
-    "spec": "object named {name:text_eval}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$OBJECT": {
+          "label": "object",
+          "type": "text_eval"
+        }
+      },
+      "roles": "FZSZK",
       "slots": [
         "bool_eval"
-      ]
-    }
-  },
-  {
-    "desc": "Object Name: Returns a noun's object id.",
-    "group": [
-      "objects"
-    ],
-    "name": "object_name",
-    "spec": "object named {name:text_eval}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "object_eval"
+      ],
+      "tokens": [
+        "is",
+        " ",
+        "valid",
+        ": ",
+        "$OBJECT"
       ]
     }
   },
@@ -2571,6 +2615,9 @@ const spec = [
   },
   {
     "desc": "Put: put a value into the field of an record or object",
+    "group": [
+      "variables"
+    ],
     "name": "put_at_field",
     "uses": "flow",
     "with": {
@@ -2585,7 +2632,7 @@ const spec = [
         },
         "$INTO": {
           "label": "into",
-          "type": "fields"
+          "type": "into_target_fields"
         }
       },
       "roles": "CZKZKZSZKT",
@@ -2744,7 +2791,7 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$OBJ": {
+        "$OBJECT": {
           "label": "of",
           "type": "text_eval"
         },
@@ -2764,7 +2811,7 @@ const spec = [
         ", ",
         "of",
         ": ",
-        "$OBJ"
+        "$OBJECT"
       ]
     }
   },
@@ -2777,7 +2824,7 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$OBJ": {
+        "$OBJECT": {
           "label": "of",
           "type": "text_eval"
         },
@@ -2797,7 +2844,7 @@ const spec = [
         ", ",
         "of",
         ": ",
-        "$OBJ"
+        "$OBJECT"
       ]
     }
   },
@@ -2810,11 +2857,11 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$OBJ": {
-          "label": "obj",
+        "$OBJECT": {
+          "label": "object",
           "type": "text_eval"
         },
-        "$TO_OBJ": {
+        "$TO_OBJECT": {
           "label": "to",
           "type": "text_eval"
         },
@@ -2830,11 +2877,11 @@ const spec = [
       "tokens": [
         "relate",
         ": ",
-        "$OBJ",
+        "$OBJECT",
         ", ",
         "to",
         ": ",
-        "$TO_OBJ",
+        "$TO_OBJECT",
         ", ",
         "via",
         ": ",
@@ -2852,7 +2899,7 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$OBJ": {
+        "$OBJECT": {
           "label": "of",
           "type": "text_eval"
         },
@@ -2872,7 +2919,7 @@ const spec = [
         ", ",
         "of",
         ": ",
-        "$OBJ"
+        "$OBJECT"
       ]
     }
   },
@@ -2885,7 +2932,7 @@ const spec = [
     "uses": "flow",
     "with": {
       "params": {
-        "$OBJ": {
+        "$OBJECT": {
           "label": "of",
           "type": "text_eval"
         },
@@ -2905,7 +2952,7 @@ const spec = [
         ", ",
         "of",
         ": ",
-        "$OBJ"
+        "$OBJECT"
       ]
     }
   },
@@ -3146,27 +3193,6 @@ const spec = [
     }
   },
   {
-    "desc": "Unpack: Get a value from a record.",
-    "group": [
-      "variables"
-    ],
-    "name": "unpack",
-    "spec": "unpack {field:text} from {record:record_eval}",
-    "uses": "flow",
-    "with": {
-      "slots": [
-        "bool_eval",
-        "number_eval",
-        "text_eval",
-        "record_eval",
-        "num_list_eval",
-        "text_list_eval",
-        "record_list_eval",
-        "assignment"
-      ]
-    }
-  },
-  {
     "desc": "While: Repeat a series of statements while a conditional is true.",
     "group": [
       "flow"
@@ -3204,12 +3230,12 @@ const spec = [
   }
 ];
 const stub = [
+  "arguments",
+  "argument",
   "text_value",
   "cycle_text",
   "shuffle_text",
   "stopping_text",
-  "arguments",
-  "argument",
   "debug_level",
   "render_template",
   "determine",

@@ -37,7 +37,7 @@ func (op *Reduce) Execute(run rt.Runtime) (err error) {
 func (op *Reduce) reduce(run rt.Runtime) (err error) {
 	if fromList, e := core.GetAssignedValue(run, op.FromList); e != nil {
 		err = e
-	} else if outVal, e := safe.Variable(run, op.IntoValue, ""); e != nil {
+	} else if outVal, e := safe.CheckVariable(run, op.IntoValue, ""); e != nil {
 		err = e
 	} else if e := op.cacheKinds(run, op.UsingPattern); e != nil {
 		err = e

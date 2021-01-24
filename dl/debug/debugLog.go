@@ -48,7 +48,7 @@ func (op *Log) Execute(run rt.Runtime) (err error) {
 			i = v.String()
 		case affine.TextList:
 			i = v.Strings()
-		case affine.Object:
+		case affine.Object: // this probably never happens... but just in case.
 			i = v.String()
 		case affine.Record:
 			i = pretty.Sprint(generic.RecordToValue(v.Record()))

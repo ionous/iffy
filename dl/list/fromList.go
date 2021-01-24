@@ -61,7 +61,7 @@ func (*FromRecList) Compose() composer.Spec {
 }
 
 func (op *FromNumList) GetListSource(run rt.Runtime) (ret g.Value, err error) {
-	if v, e := safe.Variable(run, op.Var.String(), op.Affinity()); e != nil {
+	if v, e := safe.CheckVariable(run, op.Var.String(), op.Affinity()); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -70,7 +70,7 @@ func (op *FromNumList) GetListSource(run rt.Runtime) (ret g.Value, err error) {
 }
 
 func (op *FromRecList) GetListSource(run rt.Runtime) (ret g.Value, err error) {
-	if v, e := safe.Variable(run, op.Var.String(), op.Affinity()); e != nil {
+	if v, e := safe.CheckVariable(run, op.Var.String(), op.Affinity()); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v
@@ -79,7 +79,7 @@ func (op *FromRecList) GetListSource(run rt.Runtime) (ret g.Value, err error) {
 }
 
 func (op *FromTxtList) GetListSource(run rt.Runtime) (ret g.Value, err error) {
-	if v, e := safe.Variable(run, op.Var.String(), op.Affinity()); e != nil {
+	if v, e := safe.CheckVariable(run, op.Var.String(), op.Affinity()); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = v

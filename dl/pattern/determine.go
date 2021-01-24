@@ -39,7 +39,7 @@ func (op *Determine) newScope(run rt.Runtime, pat *Pattern) (ret *patScope, err 
 			vs := ts.NewKind(run).NewRecord()
 			if op.Arguments != nil {
 				// read from each argument and store into the parameters
-				err = op.Arguments.Distill(run, vs)
+				err = op.Arguments.Distill(run, ts, vs)
 			}
 			if err == nil {
 				ret = newScope(retVar, vs)
@@ -79,7 +79,7 @@ func (op *Determine) determine(run rt.Runtime, aff affine.Affinity) (ret g.Value
 func (*Determine) Compose() composer.Spec {
 	return composer.Spec{
 		Name:  "determine",
-		Spec:  "determine {pattern%name:pattern_name}{?arguments}",
+		Spec:  "{pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Runs a pattern, and potentially returns a value.",
 		Stub:  true,

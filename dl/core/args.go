@@ -5,6 +5,7 @@ import (
 
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/dl/composer"
+	"github.com/ionous/iffy/dl/term"
 	"github.com/ionous/iffy/lang"
 	"github.com/ionous/iffy/rt"
 	g "github.com/ionous/iffy/rt/generic"
@@ -38,12 +39,14 @@ func (*Arguments) Compose() composer.Spec {
 }
 
 //
-func (op *Arguments) Distill(run rt.Runtime, out *g.Record) (err error) {
+func (op *Arguments) Distill(run rt.Runtime, ts term.Terms, out *g.Record) (err error) {
 	k := out.Kind()
-	for _, arg := range op.Args {
+	for i, arg := range op.Args {
 		if name, e := getParamName(k, arg.Name); e != nil {
 			err = errutil.Append(err, e)
-		} else if val, e := arg.From.GetAssignedValue(run); e != nil {
+		} else if val, e := GetAssignedValue(run, arg.From); e != nil {
+			err = errutil.Append(err, e)
+		} else if val, e := ts.ConvertTerm(run, i, val); e != nil {
 			err = errutil.Append(err, e)
 		} else if e := out.SetNamedField(name, val); e != nil {
 			err = errutil.Append(err, e)

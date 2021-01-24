@@ -30,6 +30,7 @@ func (op *Name) Compose() composer.Spec {
 		Group: "internal",
 	}
 }
+
 func (op *Name) GetText(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := op.getName(run); e != nil {
 		err = cmdError(op, e)
@@ -38,6 +39,7 @@ func (op *Name) GetText(run rt.Runtime) (ret g.Value, err error) {
 	}
 	return
 }
+
 func (op *Name) getName(run rt.Runtime) (ret g.Value, err error) {
 	// uppercase names are assumed to be requests for object names.
 	if name := op.Name; lang.IsCapitalized(name) {
@@ -76,7 +78,7 @@ func (op *Name) getPrintedNamedOf(run rt.Runtime, objectName string) (ret g.Valu
 	if printedName, e := safe.GetText(run, &core.Buffer{core.NewActivity(
 		&pattern.Determine{
 			Pattern:   "print_name",
-			Arguments: core.Args(&core.FromObject{&core.ObjectName{&core.Text{objectName}}}),
+			Arguments: core.Args(&core.FromText{&core.Text{objectName}}),
 		})}); e != nil {
 		err = e
 	} else {

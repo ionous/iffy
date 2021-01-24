@@ -13,5 +13,4 @@ const Domain = "$domain"   // returns whether a named domain is active
 const Name = "$name"     // name of an object as declared by the user
 const Kind = "$kind"     // type of a game object
 const Kinds = "$kinds"   // hierarchy of an object's types ( a path )
-const Locale = "$locale" // locale parent
 const Active = "$active" // is the noun in a valid domain

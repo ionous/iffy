@@ -600,29 +600,29 @@ func (*ListOrder) Compose() composer.Spec {
 
 // ManyToMany requires various parameters.
 type ManyToMany struct {
-	At           reader.Position `if:"internal"`
-	PluralKinds  PluralKinds
-	PluralKinds1 PluralKinds
+	At         reader.Position `if:"internal"`
+	Kinds      PluralKinds
+	OtherKinds PluralKinds
 }
 
 func (*ManyToMany) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "many_to_many",
-		Spec: "many {plural_kinds} to many {plural_kinds}",
+		Spec: "many {kinds:plural_kinds} to many {other_kinds:plural_kinds}",
 	}
 }
 
 // ManyToOne requires various parameters.
 type ManyToOne struct {
-	At           reader.Position `if:"internal"`
-	PluralKinds  PluralKinds
-	SingularKind SingularKind
+	At    reader.Position `if:"internal"`
+	Kinds PluralKinds
+	Kind  SingularKind
 }
 
 func (*ManyToOne) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "many_to_one",
-		Spec: "many {plural_kinds} to one {singular_kind}",
+		Spec: "many {kinds:plural_kinds} to one {kind:singular_kind}",
 	}
 }
 
@@ -805,29 +805,29 @@ func (*ObjectType) Compose() composer.Spec {
 
 // OneToMany requires various parameters.
 type OneToMany struct {
-	At           reader.Position `if:"internal"`
-	SingularKind SingularKind
-	PluralKinds  PluralKinds
+	At    reader.Position `if:"internal"`
+	Kind  SingularKind
+	Kinds PluralKinds
 }
 
 func (*OneToMany) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "one_to_many",
-		Spec: "one {singular_kind} to many {plural_kinds}",
+		Spec: "one {kind:singular_kind} to many {kinds:plural_kinds}",
 	}
 }
 
 // OneToOne requires various parameters.
 type OneToOne struct {
-	At            reader.Position `if:"internal"`
-	SingularKind  SingularKind
-	SingularKind1 SingularKind
+	At        reader.Position `if:"internal"`
+	Kind      SingularKind
+	OtherKind SingularKind
 }
 
 func (*OneToOne) Compose() composer.Spec {
 	return composer.Spec{
 		Name: "one_to_one",
-		Spec: "one {singular_kind} to one {singular_kind}",
+		Spec: "one {kind:singular_kind} to one {other_kind:singular_kind}",
 	}
 }
 

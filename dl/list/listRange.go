@@ -56,7 +56,7 @@ func (op *Range) getNumList(run rt.Runtime) (ret g.Value, err error) {
 
 // ranger is a PanicValue where every method panics except type and affinity.
 type ranger struct {
-	g.Nothing
+	g.PanicValue
 	start, stop, step int
 }
 

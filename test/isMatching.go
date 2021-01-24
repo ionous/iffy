@@ -22,40 +22,40 @@ var matchGroups = pattern.Pattern{
 		Execute: matches(true),
 	}, {
 		Filter: &core.CompareText{
-			&core.Unpack{
-				Record: &core.Var{Name: "a"},
-				Field:  "Label",
+			&core.GetAtField{
+				From:  &core.FromVar{N("a")},
+				Field: "Label",
 			},
 			&core.NotEqualTo{},
-			&core.Unpack{
-				Record: &core.Var{Name: "b"},
-				Field:  "Label",
+			&core.GetAtField{
+				From:  &core.FromVar{N("b")},
+				Field: "Label",
 			},
 		},
 		Execute: matches(false),
 	}, {
 		Filter: &core.CompareText{
-			&core.Unpack{
-				Record: &core.Var{Name: "a"},
-				Field:  "Innumerable",
+			&core.GetAtField{
+				From:  &core.FromVar{N("a")},
+				Field: "Innumerable",
 			},
 			&core.NotEqualTo{},
-			&core.Unpack{
-				Record: &core.Var{Name: "b"},
-				Field:  "Innumerable",
+			&core.GetAtField{
+				From:  &core.FromVar{N("b")},
+				Field: "Innumerable",
 			},
 		},
 		Execute: matches(false),
 	}, {
 		Filter: &core.CompareText{
-			&core.Unpack{
-				Record: &core.Var{Name: "a"},
-				Field:  "GroupOptions",
+			&core.GetAtField{
+				From:  &core.FromVar{N("a")},
+				Field: "GroupOptions",
 			},
 			&core.NotEqualTo{},
-			&core.Unpack{
-				Record: &core.Var{Name: "b"},
-				Field:  "GroupOptions",
+			&core.GetAtField{
+				From:  &core.FromVar{N("b")},
+				Field: "GroupOptions",
 			},
 		},
 		Execute: matches(false),

@@ -32,7 +32,6 @@ func NewRuntime(db *sql.DB) *Runner {
 			},
 			activeNouns:   activeNouns{q: fields.activeNouns},
 			relativeKinds: relativeKinds{q: fields.relativeKinds},
-			nounLocale:    nounLocale{q: fields.relativesOf},
 		}
 		run.SetWriter(print.NewAutoWriter(writer.NewStdout()))
 	}
@@ -50,7 +49,6 @@ type Runner struct {
 	kinds   qnaKinds
 	activeNouns
 	relativeKinds
-	nounLocale
 }
 
 func (run *Runner) ActivateDomain(domain string, active bool) {
@@ -74,7 +72,6 @@ func (run *Runner) ActivateDomain(domain string, active bool) {
 	// then, we can just strcmp the noun's path and the active domain to match
 	// maybe even a generalized "hierarchy" test  ( re: kinds ) -- could be even just a string type.
 	run.activeNouns.reset()
-	run.nounLocale.reset()
 }
 
 func (run *Runner) GetKindByName(n string) (*g.Kind, error) {

@@ -61,6 +61,7 @@ func (n *Object) String() string {
 	return n.Name
 }
 
+// fix: see notes in terms
 func (n *Object) Prepare(run rt.Runtime, p *Terms) (err error) {
 	if k, e := run.GetKindByName(n.Kind); e != nil {
 		err = e

@@ -10,7 +10,7 @@
         "op": "remove",
         "path": {
           "parent": "$.value",
-          "part": "$ELSE"
+          "field": "$ELSE"
         },
         "reason": "remove #else block, always empty right now"
       },
@@ -18,11 +18,11 @@
         "op": "move",
         "from": {
           "parent": "$.value",
-          "part": "$GO"
+          "field": "$GO"
         },
         "path": {
           "parent": "$.value",
-          "part": "$DO"
+          "field": "$DO"
         },
         "reason": "#go now #do"
       },
@@ -30,7 +30,7 @@
         "op": "replace",
         "path": {
           "parent": "$.value",
-          "part": "$AS"
+          "field": "$AS"
         },
         "reason": "add #as seletion",
         "value": {
@@ -50,11 +50,11 @@
         "op": "move",
         "from": {
           "parent": "$.value['$WITH']",
-          "part": "value"
+          "field": "value"
         },
         "path": {
           "parent": "$.value['$AS'].value.value['$VAR']",
-          "part": "value"
+          "field": "value"
         },
         "reason": "move var name in"
       },
@@ -62,7 +62,7 @@
         "op": "remove",
         "path": {
           "parent": "$.value",
-          "part": "$WITH"
+          "field": "$WITH"
         },
         "reason": "remove #with"
       }

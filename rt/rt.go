@@ -23,10 +23,6 @@ var Slots = []composer.Slot{{
 	Type: (*RecordEval)(nil),
 	Desc: "Texts: Statements which return a record.",
 }, {
-	Name: "object_eval",
-	Type: (*ObjectEval)(nil),
-	Desc: "Object: Statements which return an object.",
-}, {
 	Name: "num_list_eval",
 	Type: (*NumListEval)(nil),
 	Desc: "Number List: Statements which return a list of numbers.",

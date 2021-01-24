@@ -10,7 +10,7 @@ import (
 )
 
 type qnaObject struct {
-	g.Nothing
+	g.PanicValue
 	n  *Runner // for pointing back to the field cache
 	id string
 }
@@ -49,7 +49,7 @@ func (q *qnaObject) Type() (ret string) {
 func (q *qnaObject) FieldByName(field string) (ret g.Value, err error) {
 	// fix temp:
 	switch field {
-	case object.Name, object.Kind, object.Kinds, object.Locale:
+	case object.Name, object.Kind, object.Kinds:
 		ret, err = q.n.GetField(field, q.id)
 	default:
 		ret, err = q.n.GetField(q.id, field)
@@ -61,17 +61,6 @@ func (q *qnaObject) SetFieldByName(field string, val g.Value) (err error) {
 	switch {
 	case len(field) == 0:
 		err = errutil.Fmt("no field specified")
-	case field == object.Locale:
-		if va := val.Affinity(); va != affine.Object {
-			err = errutil.New("set expected object not", va)
-		} else {
-			id, parent := q.id, val.String()
-			if e := q.n.RelateTo(id, parent, "locale"); e != nil {
-				err = e
-			} else {
-				q.n.nounLocale.setLocaleOf(id, parent)
-			}
-		}
 	case field[0] == object.Prefix:
 		err = errutil.Fmt("can't change reserved field %q", field)
 	default:

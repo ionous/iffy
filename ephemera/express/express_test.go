@@ -88,27 +88,54 @@ func TestExpressions(t *testing.T) {
 	})
 	t.Run("big dot", func(t *testing.T) {
 		if e := testExpression(".A.num",
-			&core.Field{O("A", true), "num"}); e != nil {
+			// get 'num' out of 'A' ( note: get field at supports any value )
+			&core.GetAtField{
+				Field: "num",
+				// get "a" -- some value supporting field access
+				// could be a record or an object variable, or a global object.
+				// ( b/c its capitalized, we know its going to be a global object )
+				From: &render.RenderField{
+					Name: &core.Text{Text: "A"},
+				},
+			}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("little dot", func(t *testing.T) {
 		if e := testExpression(".a.b.c",
-			&core.Field{
-				&core.ObjectName{
-					Name: &core.Field{
-						O("a", false),
-						"b"},
-				},
-				"c"}); e != nil {
+			// c, a value in b, can be anything.
+			&core.GetAtField{
+				Field: "c",
+				// to get a value from b, b must have been specifically a record.
+				From: &core.FromRec{
+					// get b out of a ( note: get field at supports any value )
+					Rec: &core.GetAtField{
+						Field: "b",
+						// get "a" -- some value supporting field access
+						// could be a record or an object variable, or a global object.
+						From: &render.RenderField{
+							Name: &core.Text{Text: "a"},
+						},
+					},
+				}}); e != nil {
 			t.Fatal(e)
 		}
 	})
 	t.Run("binary", func(t *testing.T) {
 		if e := testExpression(".A.num * .b.num",
 			&core.ProductOf{
-				&core.Field{O("A", true), "num"},
-				&core.Field{O("b", false), "num"},
+				A: &core.GetAtField{
+					Field: "num",
+					From: &render.RenderField{
+						Name: &core.Text{Text: "A"},
+					},
+				},
+				B: &core.GetAtField{
+					Field: "num",
+					From: &render.RenderField{
+						Name: &core.Text{Text: "b"},
+					},
+				},
 			}); e != nil {
 			t.Fatal(e)
 		}
@@ -131,9 +158,9 @@ func TestTemplates(t *testing.T) {
 	t.Run("print", func(t *testing.T) {
 		if e := testTemplate("{print_num_word: .group_size}",
 			&core.PrintNumWord{
-				Num: &core.Var{
-					Name:  "group_size",
-					Flags: core.TryAsBoth,
+				Num: &render.RenderRef{
+					core.Var{"group_size"},
+					render.TryAsBoth,
 				},
 			}); e != nil {
 			t.Fatal(e)
@@ -248,9 +275,15 @@ func TestTemplates(t *testing.T) {
 	})
 
 	// dotted names started with capital letters are requests for objects exactly matching that name
+	// note: we do the cap check at runtime now, so there's no difference in the resulting commands b/t .Object and .object
 	t.Run("global prop", func(t *testing.T) {
 		if e := testTemplate("{.Object.prop}",
-			&core.Field{O("Object", true), "prop"},
+			&core.GetAtField{
+				Field: "prop",
+				From: &render.RenderField{
+					Name: &core.Text{Text: "Object"},
+				},
+			},
 		); e != nil {
 			t.Fatal(e)
 		}

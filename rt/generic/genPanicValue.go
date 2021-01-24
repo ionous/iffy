@@ -4,97 +4,97 @@ import (
 	"github.com/ionous/iffy/affine"
 )
 
-// Nothing is a PanicValue where every method panics except type and affinity.
-type Nothing struct{}
+// PanicValue is a PanicValue where every method panics except type and affinity.
+type PanicValue struct{}
 
-var _ Value = (*Nothing)(nil)
+var _ Value = (*PanicValue)(nil)
 
 // Affinity returns a blank string.
-func (n Nothing) Affinity() affine.Affinity {
+func (n PanicValue) Affinity() affine.Affinity {
 	return ""
 }
 
 // Type returns a blank string.
-func (n Nothing) Type() string {
+func (n PanicValue) Type() string {
 	return ""
 }
 
 // Bool panics
-func (n Nothing) Bool() bool {
+func (n PanicValue) Bool() bool {
 	panic("value is not a bool")
 }
 
 // Float panics
-func (n Nothing) Float() float64 {
+func (n PanicValue) Float() float64 {
 	panic("value is not a number")
 }
 
 // Int panics
-func (n Nothing) Int() int {
+func (n PanicValue) Int() int {
 	panic("value is not a number")
 }
 
 // String panics
-func (n Nothing) String() string {
+func (n PanicValue) String() string {
 	panic("value is not a text")
 }
 
 // Record panics
-func (n Nothing) Record() *Record {
+func (n PanicValue) Record() *Record {
 	panic("value is not a record")
 }
 
 // Floats panics
-func (Floats Nothing) Floats() []float64 {
+func (Floats PanicValue) Floats() []float64 {
 	panic("value is not a number list")
 }
 
 // Strings panics
-func (n Nothing) Strings() []string {
+func (n PanicValue) Strings() []string {
 	panic("value is not a text list")
 }
 
 // Records panics
-func (n Nothing) Records() []*Record {
+func (n PanicValue) Records() []*Record {
 	panic("value is not a record list")
 }
 
 // Index panics
-func (n Nothing) Index(int) Value {
+func (n PanicValue) Index(int) Value {
 	panic("value is not indexable")
 }
 
 // Len panics
-func (n Nothing) Len() int {
+func (n PanicValue) Len() int {
 	panic("value is not measurable")
 }
 
 // FieldByName panics
-func (n Nothing) FieldByName(string) (Value, error) {
+func (n PanicValue) FieldByName(string) (Value, error) {
 	panic("value is not an object")
 }
 
 // SetFieldByName panics
-func (n Nothing) SetFieldByName(string, Value) error {
+func (n PanicValue) SetFieldByName(string, Value) error {
 	panic("value is not field writable")
 }
 
 // SetIndex panics
-func (n Nothing) SetIndex(int, Value) {
+func (n PanicValue) SetIndex(int, Value) {
 	panic("value is not index writable")
 }
 
 // Append panics
-func (n Nothing) Append(Value) {
+func (n PanicValue) Append(Value) {
 	panic("value is not appendable")
 }
 
 // Slice panics
-func (n Nothing) Slice(i, j int) (Value, error) {
+func (n PanicValue) Slice(i, j int) (Value, error) {
 	panic("value is not sliceable")
 }
 
 // Splice panics
-func (n Nothing) Splice(start, end int, add Value) (Value, error) {
+func (n PanicValue) Splice(start, end int, add Value) (Value, error) {
 	panic("value is not spliceable")
 }

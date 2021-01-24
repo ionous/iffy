@@ -1,4 +1,4 @@
-package core
+package render
 
 // TryAsNoun provides a backdoor for templates.
 // currently they can't analyze the context they're being called in, so:

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ionous/errutil"
+	"github.com/ionous/iffy/affine"
 	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
@@ -69,8 +70,8 @@ func TestObjects(t *testing.T) {
 	})
 }
 
-func named(n string) *ObjectName {
-	return &ObjectName{Name: &Text{n}}
+func named(n string) *Text {
+	return &Text{n}
 }
 
 type modelTest struct {
@@ -84,7 +85,7 @@ func (m *modelTest) GetField(target, field string) (ret g.Value, err error) {
 		if _, ok := m.clsMap[field]; !ok {
 			err = g.UnknownObject(field)
 		} else {
-			ret = &objTest{model: m, name: field}
+			ret = &objValue{model: m, name: field}
 		}
 	default:
 		err = g.UnknownField{target, field}
@@ -92,13 +93,17 @@ func (m *modelTest) GetField(target, field string) (ret g.Value, err error) {
 	return
 }
 
-type objTest struct {
-	g.Nothing
+type objValue struct {
+	g.PanicValue
 	model *modelTest
 	name  string
 }
 
-func (j *objTest) FieldByName(field string) (ret g.Value, err error) {
+func (j *objValue) Affinity() affine.Affinity {
+	return affine.Object
+}
+
+func (j *objValue) FieldByName(field string) (ret g.Value, err error) {
 	switch m := j.model; field {
 	case object.Kind:
 		if cls, ok := m.clsMap[j.name]; !ok {

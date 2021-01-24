@@ -1,0 +1,756 @@
+{
+  "id": "id-1771724a77b-1",
+  "type": "story",
+  "value": {
+    "$PARAGRAPH": [
+      {
+        "id": "id-1771724a77b-2",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1771724a77b-3",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-4",
+                "type": "noun_statement",
+                "value": {
+                  "$LEDE": {
+                    "id": "id-1771724a77b-5",
+                    "type": "lede",
+                    "value": {
+                      "$NOUNS": [
+                        {
+                          "id": "id-1771724a77b-6",
+                          "type": "named_noun",
+                          "value": {
+                            "$DETERMINER": {
+                              "id": "id-1771724a77b-7",
+                              "type": "determiner",
+                              "value": "$THE"
+                            },
+                            "$NAME": {
+                              "id": "id-1771724a77b-8",
+                              "type": "noun_name",
+                              "value": "table"
+                            }
+                          }
+                        }
+                      ],
+                      "$NOUN_PHRASE": {
+                        "id": "id-1771724a77b-9",
+                        "type": "noun_phrase",
+                        "value": {
+                          "$KIND_OF_NOUN": {
+                            "id": "id-1771724a77b-10",
+                            "type": "kind_of_noun",
+                            "value": {
+                              "$ARE_AN": {
+                                "id": "id-1771724a77b-11",
+                                "type": "are_an",
+                                "value": "$ISA"
+                              },
+                              "$KIND": {
+                                "id": "id-1771724a77b-12",
+                                "type": "singular_kind",
+                                "value": "supporter"
+                              },
+                              "$TRAIT": []
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "$TAIL": []
+                }
+              }
+            },
+            {
+              "id": "id-1771724a77b-13",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-14",
+                "type": "noun_statement",
+                "value": {
+                  "$LEDE": {
+                    "id": "id-1771724a77b-15",
+                    "type": "lede",
+                    "value": {
+                      "$NOUNS": [
+                        {
+                          "id": "id-1771724a77b-16",
+                          "type": "named_noun",
+                          "value": {
+                            "$DETERMINER": {
+                              "id": "id-1771724a77b-17",
+                              "type": "determiner",
+                              "value": "$THE"
+                            },
+                            "$NAME": {
+                              "id": "id-1771724a77b-18",
+                              "type": "noun_name",
+                              "value": "lab"
+                            }
+                          }
+                        }
+                      ],
+                      "$NOUN_PHRASE": {
+                        "id": "id-1771724a77b-19",
+                        "type": "noun_phrase",
+                        "value": {
+                          "$KIND_OF_NOUN": {
+                            "id": "id-1771724a77b-20",
+                            "type": "kind_of_noun",
+                            "value": {
+                              "$ARE_AN": {
+                                "id": "id-1771724a77b-21",
+                                "type": "are_an",
+                                "value": "$ISA"
+                              },
+                              "$KIND": {
+                                "id": "id-1771724a77b-22",
+                                "type": "singular_kind",
+                                "value": "room"
+                              },
+                              "$TRAIT": []
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "$TAIL": []
+                }
+              }
+            },
+            {
+              "id": "id-1771724a77b-23",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-24",
+                "type": "noun_statement",
+                "value": {
+                  "$LEDE": {
+                    "id": "id-1771724a77b-25",
+                    "type": "lede",
+                    "value": {
+                      "$NOUNS": [
+                        {
+                          "id": "id-1771724a77b-26",
+                          "type": "named_noun",
+                          "value": {
+                            "$DETERMINER": {
+                              "id": "id-1771724a77b-27",
+                              "type": "determiner",
+                              "value": "$THE"
+                            },
+                            "$NAME": {
+                              "id": "id-1771724a77b-28",
+                              "type": "noun_name",
+                              "value": "basket"
+                            }
+                          }
+                        }
+                      ],
+                      "$NOUN_PHRASE": {
+                        "id": "id-1771724a77b-29",
+                        "type": "noun_phrase",
+                        "value": {
+                          "$KIND_OF_NOUN": {
+                            "id": "id-1771724a77b-30",
+                            "type": "kind_of_noun",
+                            "value": {
+                              "$ARE_AN": {
+                                "id": "id-1771724a77b-31",
+                                "type": "are_an",
+                                "value": "$ISA"
+                              },
+                              "$KIND": {
+                                "id": "id-1771724a77b-32",
+                                "type": "singular_kind",
+                                "value": "container"
+                              },
+                              "$TRAIT": []
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "$TAIL": []
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1771724a77b-38",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1771724a77b-39",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-40",
+                "type": "comment",
+                "value": {
+                  "$LINES": {
+                    "id": "id-1771724a77b-41",
+                    "type": "lines",
+                    "value": "Mildred and the table are in the room. The basket is on the table. The apple is in the basket. Mildred is carrying the knife and wearing the pen."
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1771724a77b-33",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1771724a77b-34",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-35",
+                "type": "test_scene",
+                "value": {
+                  "$STORY": {
+                    "id": "id-1771724a77b-37",
+                    "type": "story",
+                    "value": {
+                      "$PARAGRAPH": [
+                        {
+                          "id": "id-1771724a77b-42",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
+                              {
+                                "id": "id-1771724a77b-43",
+                                "type": "story_statement",
+                                "value": {
+                                  "id": "id-1771724a77b-56",
+                                  "type": "noun_statement",
+                                  "value": {
+                                    "$LEDE": {
+                                      "id": "id-1771724a77b-57",
+                                      "type": "lede",
+                                      "value": {
+                                        "$NOUNS": [
+                                          {
+                                            "id": "id-1771724a77b-58",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-1771724a77b-59",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-1771724a77b-60",
+                                                "type": "noun_name",
+                                                "value": "table"
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "id": "id-1771724a77b-62",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-1771724a77b-63",
+                                                "type": "determiner",
+                                                "value": "$OUR"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-1771724a77b-64",
+                                                "type": "noun_name",
+                                                "value": "Mildred"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "$NOUN_PHRASE": {
+                                          "id": "id-1771724a77b-61",
+                                          "type": "noun_phrase",
+                                          "value": {
+                                            "$NOUN_RELATION": {
+                                              "id": "id-1771724a77b-65",
+                                              "type": "noun_relation",
+                                              "value": {
+                                                "$ARE_BEING": {
+                                                  "id": "id-1771724a77b-70",
+                                                  "type": "are_being",
+                                                  "value": "$ARE"
+                                                },
+                                                "$NOUNS": [
+                                                  {
+                                                    "id": "id-1771724a77b-67",
+                                                    "type": "named_noun",
+                                                    "value": {
+                                                      "$DETERMINER": {
+                                                        "id": "id-1771724a77b-68",
+                                                        "type": "determiner",
+                                                        "value": "$THE"
+                                                      },
+                                                      "$NAME": {
+                                                        "id": "id-1771724a77b-69",
+                                                        "type": "noun_name",
+                                                        "value": "lab"
+                                                      }
+                                                    }
+                                                  }
+                                                ],
+                                                "$RELATION": {
+                                                  "id": "id-1771724a77b-66",
+                                                  "type": "relation_name",
+                                                  "value": "whereabouts"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "$TAIL": []
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "id-1771724a77b-123",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
+                              {
+                                "id": "id-1771724a77b-124",
+                                "type": "story_statement",
+                                "value": {
+                                  "id": "id-1771724a77b-125",
+                                  "type": "noun_statement",
+                                  "value": {
+                                    "$LEDE": {
+                                      "id": "id-1771724a77b-126",
+                                      "type": "lede",
+                                      "value": {
+                                        "$NOUNS": [
+                                          {
+                                            "id": "id-1771724a77b-127",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-1771724a77b-128",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-1771724a77b-129",
+                                                "type": "noun_name",
+                                                "value": "basket"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "$NOUN_PHRASE": {
+                                          "id": "id-1771724a77b-130",
+                                          "type": "noun_phrase",
+                                          "value": {
+                                            "$NOUN_RELATION": {
+                                              "id": "id-1771724a77b-131",
+                                              "type": "noun_relation",
+                                              "value": {
+                                                "$ARE_BEING": {
+                                                  "id": "id-1771724a77b-136",
+                                                  "type": "are_being",
+                                                  "value": "$IS"
+                                                },
+                                                "$NOUNS": [
+                                                  {
+                                                    "id": "id-1771724a77b-133",
+                                                    "type": "named_noun",
+                                                    "value": {
+                                                      "$DETERMINER": {
+                                                        "id": "id-1771724a77b-134",
+                                                        "type": "determiner",
+                                                        "value": "$THE"
+                                                      },
+                                                      "$NAME": {
+                                                        "id": "id-1771724a77b-135",
+                                                        "type": "noun_name",
+                                                        "value": "table"
+                                                      }
+                                                    }
+                                                  }
+                                                ],
+                                                "$RELATION": {
+                                                  "id": "id-1771724a77b-132",
+                                                  "type": "relation_name",
+                                                  "value": "whereabouts"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "$TAIL": []
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "id-1771724a77b-71",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
+                              {
+                                "id": "id-1771724a77b-72",
+                                "type": "story_statement",
+                                "value": {
+                                  "id": "id-1771724a77b-73",
+                                  "type": "noun_statement",
+                                  "value": {
+                                    "$LEDE": {
+                                      "id": "id-1771724a77b-74",
+                                      "type": "lede",
+                                      "value": {
+                                        "$NOUNS": [
+                                          {
+                                            "id": "id-1771724a77b-75",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-1771724a77b-76",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-1771724a77b-77",
+                                                "type": "noun_name",
+                                                "value": "knife"
+                                              }
+                                            }
+                                          },
+                                          {
+                                            "id": "id-1771724a77b-78",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-1771724a77b-79",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-1771724a77b-80",
+                                                "type": "noun_name",
+                                                "value": "pen"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "$NOUN_PHRASE": {
+                                          "id": "id-1771724a77b-81",
+                                          "type": "noun_phrase",
+                                          "value": {
+                                            "$NOUN_RELATION": {
+                                              "id": "id-1771724a77b-82",
+                                              "type": "noun_relation",
+                                              "value": {
+                                                "$ARE_BEING": {
+                                                  "id": "id-1771724a77b-83",
+                                                  "type": "are_being",
+                                                  "value": "$ARE"
+                                                },
+                                                "$NOUNS": [
+                                                  {
+                                                    "id": "id-1771724a77b-85",
+                                                    "type": "named_noun",
+                                                    "value": {
+                                                      "$DETERMINER": {
+                                                        "id": "id-1771724a77b-86",
+                                                        "type": "determiner",
+                                                        "value": "$OUR"
+                                                      },
+                                                      "$NAME": {
+                                                        "id": "id-1771724a77b-87",
+                                                        "type": "noun_name",
+                                                        "value": "Mildred"
+                                                      }
+                                                    }
+                                                  }
+                                                ],
+                                                "$RELATION": {
+                                                  "id": "id-1771724a77b-84",
+                                                  "type": "relation_name",
+                                                  "value": "whereabouts"
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "$TAIL": []
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "id-1771724a77b-148",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
+                              {
+                                "id": "id-1771724a77b-99",
+                                "type": "story_statement",
+                                "value": {
+                                  "id": "id-1771724a77b-100",
+                                  "type": "noun_statement",
+                                  "value": {
+                                    "$LEDE": {
+                                      "id": "id-1771724a77b-101",
+                                      "type": "lede",
+                                      "value": {
+                                        "$NOUNS": [
+                                          {
+                                            "id": "id-1771724a77b-102",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-1771724a77b-103",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-1771724a77b-104",
+                                                "type": "noun_name",
+                                                "value": "pen"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "$NOUN_PHRASE": {
+                                          "id": "id-1771724a77b-105",
+                                          "type": "noun_phrase",
+                                          "value": {
+                                            "$NOUN_TRAITS": {
+                                              "id": "id-1771724a77b-120",
+                                              "type": "noun_traits",
+                                              "value": {
+                                                "$ARE_BEING": {
+                                                  "id": "id-1771724a77b-121",
+                                                  "type": "are_being",
+                                                  "value": "$IS"
+                                                },
+                                                "$TRAIT": [
+                                                  {
+                                                    "id": "id-1771724a77b-122",
+                                                    "type": "trait",
+                                                    "value": "worn"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "$TAIL": []
+                                  }
+                                }
+                              },
+                              {
+                                "id": "id-1771724a77b-137",
+                                "type": "story_statement",
+                                "value": {
+                                  "id": "id-1771724a77b-138",
+                                  "type": "noun_statement",
+                                  "value": {
+                                    "$LEDE": {
+                                      "id": "id-1771724a77b-139",
+                                      "type": "lede",
+                                      "value": {
+                                        "$NOUNS": [
+                                          {
+                                            "id": "id-1771724a77b-140",
+                                            "type": "named_noun",
+                                            "value": {
+                                              "$DETERMINER": {
+                                                "id": "id-1771724a77b-141",
+                                                "type": "determiner",
+                                                "value": "$THE"
+                                              },
+                                              "$NAME": {
+                                                "id": "id-1771724a77b-142",
+                                                "type": "noun_name",
+                                                "value": "knife"
+                                              }
+                                            }
+                                          }
+                                        ],
+                                        "$NOUN_PHRASE": {
+                                          "id": "id-1771724a77b-143",
+                                          "type": "noun_phrase",
+                                          "value": {
+                                            "$KIND_OF_NOUN": {
+                                              "id": "id-1771724a77b-144",
+                                              "type": "kind_of_noun",
+                                              "value": {
+                                                "$ARE_AN": {
+                                                  "id": "id-1771724a77b-145",
+                                                  "type": "are_an",
+                                                  "value": "$ISA"
+                                                },
+                                                "$KIND": {
+                                                  "id": "id-1771724a77b-146",
+                                                  "type": "singular_kind",
+                                                  "value": "prop"
+                                                },
+                                                "$TRAIT": [
+                                                  {
+                                                    "id": "id-1771724a77b-147",
+                                                    "type": "trait",
+                                                    "value": "carried"
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "$TAIL": []
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-1771724a77b-36",
+                    "type": "test_name",
+                    "value": "whereabouts"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1771724a77b-149",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1771724a77b-150",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-151",
+                "type": "test_statement",
+                "value": {
+                  "$TEST": {
+                    "id": "id-1771724a77b-153",
+                    "type": "testing",
+                    "value": {
+                      "id": "id-1771724a77b-154",
+                      "type": "test_output",
+                      "value": {
+                        "$LINES": {
+                          "id": "id-1771724a77b-155",
+                          "type": "lines",
+                          "value": "xxx"
+                        }
+                      }
+                    }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-1771724a77b-152",
+                    "type": "test_name",
+                    "value": "whereabouts"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "id-1771724a77b-156",
+        "type": "paragraph",
+        "value": {
+          "$STORY_STATEMENT": [
+            {
+              "id": "id-1771724a77b-157",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-158",
+                "type": "test_rule",
+                "value": {
+                  "$HOOK": {
+                    "id": "id-1771724a77b-160",
+                    "type": "program_hook",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-1771724a77b-161",
+                        "type": "activity",
+                        "value": {
+                          "$EXE": [
+                            {
+                              "id": "id-1771724a77b-162",
+                              "type": "execute",
+                              "value": {
+                                "id": "id-1771724a77b-163",
+                                "type": "say_text",
+                                "value": {
+                                  "$TEXT": {
+                                    "id": "id-1771724a77b-164",
+                                    "type": "text_eval",
+                                    "value": {
+                                      "id": "id-1771724a77b-165",
+                                      "type": "render_template",
+                                      "value": {
+                                        "$TEMPLATE": {
+                                          "id": "id-1771724a77b-166",
+                                          "type": "lines",
+                                          "value": "{parentOf: .Mildred}\n{parentOf: .basket}\n{parentOf: .knife}\n{locationOf: .Mildred}\n{locationOf: .knife}\n{enclosureOf: .basket}\n{enclosureOf: .apple}\n{supporterOf: .apple}\n{supporterOf: .basket}\n{ownerOf: .basket}\n{ownerOf: .knife}\n{ownerOf: .pen}\n{carrierOf: .pen}\n{carrierOf: .knife}\n{wearerOf: .pen}\n{wearerOf: .knife}"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-1771724a77b-159",
+                    "type": "test_name",
+                    "value": "whereabouts"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

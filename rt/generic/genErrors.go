@@ -7,6 +7,8 @@ import (
 // error constant for iterators
 const StreamExceeded errutil.Error = "stream exceeded"
 
+const NothingObject errutil.Error = "object is nothing"
+
 type Overflow struct {
 	Index, Bounds int
 }
@@ -27,6 +29,8 @@ type UnknownField struct {
 	Target, Field string
 }
 
+type UnknownVariable string
+
 func (e Underflow) Error() string {
 	return errutil.Sprint(e.Index, "below range", e.Bounds)
 }
@@ -45,4 +49,8 @@ func (e UnknownObject) Error() string {
 
 func (e UnknownTarget) Error() string {
 	return errutil.Sprintf("target not found %q", e.Target)
+}
+
+func (e UnknownVariable) Error() string {
+	return errutil.Sprintf("unknown variable %q", string(e))
 }

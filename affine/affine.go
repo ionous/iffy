@@ -53,3 +53,7 @@ func Element(list Affinity) (ret Affinity) {
 	}
 	return
 }
+
+func HasFields(a Affinity) bool {
+	return a == Record || a == Object
+}

@@ -13,12 +13,14 @@ import (
 type Assignment interface {
 	// write the results of evaluating this into that.
 	GetAssignedValue(rt.Runtime) (g.Value, error)
+
+	// fix: needed by importArgs right now for ... reasons...
 	Affinity() affine.Affinity
 }
 
 func GetAssignedValue(run rt.Runtime, a Assignment) (ret g.Value, err error) {
 	if a == nil {
-		err = safe.MissingEval("empty assignment")
+		err = safe.MissingEval("assignment")
 	} else {
 		ret, err = a.GetAssignedValue(run)
 	}
@@ -43,16 +45,8 @@ type FromText struct {
 	Val rt.TextEval `if:"selector"`
 }
 
-type FromName struct {
-	Val rt.TextEval `if:"selector"`
-}
-
 type FromRecord struct {
 	Val rt.RecordEval `if:"selector"`
-}
-
-type FromObject struct {
-	Val rt.ObjectEval `if:"selector"`
 }
 
 type FromNumbers struct {
@@ -145,28 +139,6 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (*FromName) Compose() composer.Spec {
-	return composer.Spec{
-		Name:   "from_name",
-		Group:  "variables",
-		Desc:   "From Name: Assigns the calculated piece of name.",
-		Fluent: &composer.Fluid{Role: composer.Function},
-	}
-}
-func (op *FromName) Affinity() affine.Affinity {
-	return affine.Object
-}
-func (op *FromName) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if val, e := safe.GetText(run, op.Val); e != nil {
-		err = cmdError(op, e)
-	} else if obj, e := safe.ObjectFromString(run, val.String()); e != nil {
-		err = cmdError(op, e)
-	} else {
-		ret = obj
-	}
-	return
-}
-
 func (*FromRecord) Compose() composer.Spec {
 	return composer.Spec{
 		Name:   "from_record",
@@ -180,26 +152,6 @@ func (op *FromRecord) Affinity() affine.Affinity {
 }
 func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 	if obj, e := safe.GetRecord(run, op.Val); e != nil {
-		err = cmdError(op, e)
-	} else {
-		ret = obj
-	}
-	return
-}
-
-func (*FromObject) Compose() composer.Spec {
-	return composer.Spec{
-		Name:   "from_object",
-		Group:  "variables",
-		Desc:   "From Object: Assigns the calculated object",
-		Fluent: &composer.Fluid{Role: composer.Function},
-	}
-}
-func (op *FromObject) Affinity() affine.Affinity {
-	return affine.Object
-}
-func (op *FromObject) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
-	if obj, e := safe.GetObject(run, op.Val); e != nil {
 		err = cmdError(op, e)
 	} else {
 		ret = obj

@@ -11,15 +11,20 @@ var Slots = []composer.Slot{{
 	Type: (*Assignment)(nil),
 	Desc: "Assignments: Helper for setting variables.",
 }, {
-	Type: (*Fields)(nil),
-	Desc: "Helper for setting fields.",
-}, {
 	Type: (*Brancher)(nil),
 	Desc: "Helper for choose action.",
+}, {
+	Type: (*FromSourceFields)(nil),
+	Desc: "Helper for getting fields.",
+}, {
+	Type: (*IntoTargetFields)(nil),
+	Desc: "Helper for setting fields.",
 }}
 
 var Slats = []composer.Composer{
 	(*Activity)(nil),
+	(*Arguments)(nil),
+	(*Argument)(nil),
 
 	// some boolean tests:
 	(*Always)(nil),
@@ -28,7 +33,6 @@ var Slats = []composer.Composer{
 	(*CompareNum)(nil),
 	(*CompareText)(nil),
 	(*HasDominion)(nil),
-	(*IsKindOf)(nil),
 	(*IsNotTrue)(nil), // inverts a bool eval
 
 	// Assign turns an Assignment a normal statement.
@@ -37,38 +41,38 @@ var Slats = []composer.Composer{
 	(*FromBool)(nil),
 	(*FromNum)(nil),
 	(*FromText)(nil),
-	(*FromName)(nil),
 	(*FromRecord)(nil),
-	(*FromObject)(nil),
 	(*FromNumbers)(nil),
 	(*FromTexts)(nil),
 	(*FromRecords)(nil),
-	(*CopyFrom)(nil),
-	(*Make)(nil),
-
-	// FIX: Choose scalar/any?
-	(*ChooseNum)(nil),
-	(*ChooseText)(nil),
 
 	// literals
 	(*Bool)(nil),
+	(*Make)(nil),
 	(*Number)(nil),
-	(*Text)(nil),
-	(*Lines)(nil),
 	(*Numbers)(nil),
+	(*Lines)(nil),
+	(*Text)(nil),
 	(*Texts)(nil),
+	// return a value
+	(*Var)(nil),
+	(*ChooseNum)(nil), // FIX: Choose scalar/any?
+	(*ChooseText)(nil),
 
+	// math
 	(*SumOf)(nil),
 	(*DiffOf)(nil),
 	(*ProductOf)(nil),
 	(*QuotientOf)(nil),
 	(*RemainderOf)(nil),
 
-	(*SimpleNoun)(nil),
-	(*ObjectName)(nil),
+	//object
 	(*ObjectExists)(nil),
 	(*NameOf)(nil),
 	(*KindOf)(nil),
+	(*IsKindOf)(nil),
+	(*IsExactKindOf)(nil),
+	(*HasTrait)(nil),
 
 	(*PrintNum)(nil),
 	(*PrintNumWord)(nil),
@@ -89,7 +93,6 @@ var Slats = []composer.Composer{
 	(*MakeSentenceCase)(nil),
 	(*MakeReversed)(nil),
 	//
-	(*Matches)(nil),
 	// loops and sequences
 	(*While)(nil),
 	(*Next)(nil),
@@ -98,14 +101,11 @@ var Slats = []composer.Composer{
 	(*ShuffleText)(nil),
 	(*StoppingText)(nil),
 
-	(*Field)(nil),
-	(*Unpack)(nil),
-	(*Var)(nil),
-	(*HasTrait)(nil),
-
+	// text
 	(*IsEmpty)(nil),
 	(*Includes)(nil),
 	(*Join)(nil),
+	(*Matches)(nil),
 
 	// comparison
 	(*EqualTo)(nil),
@@ -114,14 +114,15 @@ var Slats = []composer.Composer{
 	(*LessThan)(nil),
 	(*GreaterOrEqual)(nil),
 	(*LessOrEqual)(nil),
-
-	(*Arguments)(nil),
-	(*Argument)(nil),
+	// get at field
+	(*GetAtField)(nil),
+	(*FromObj)(nil),
+	(*FromRec)(nil),
+	(*FromVar)(nil),
 	// put at field
 	(*PutAtField)(nil),
-	(*IntoRec)(nil),
 	(*IntoObj)(nil),
-	(*IntoObjNamed)(nil),
+	(*IntoVar)(nil),
 	// choose action (if)
 	(*ChooseAction)(nil),
 	(*ChooseMore)(nil),

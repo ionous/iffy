@@ -11,9 +11,17 @@ import (
  * atField: string.
  */
 type PutAtField struct {
-	From    Assignment `if:"selector"`
-	Into    Fields     `if:"selector"`
+	From    Assignment       `if:"selector"`
+	Into    IntoTargetFields `if:"selector"`
 	AtField string
+}
+
+func (*PutAtField) Compose() composer.Spec {
+	return composer.Spec{
+		Fluent: &composer.Fluid{Name: "put", Role: composer.Command},
+		Group:  "variables",
+		Desc:   "Put: put a value into the field of an record or object",
+	}
 }
 
 func (op *PutAtField) Execute(run rt.Runtime) (err error) {
@@ -26,17 +34,10 @@ func (op *PutAtField) Execute(run rt.Runtime) (err error) {
 func (op *PutAtField) pack(run rt.Runtime) (err error) {
 	if val, e := GetAssignedValue(run, op.From); e != nil {
 		err = e
-	} else if target, e := GetFields(run, op.Into); e != nil {
+	} else if target, e := GetTargetFields(run, op.Into); e != nil {
 		err = e
 	} else {
 		err = target.SetFieldByName(op.AtField, val)
 	}
 	return
-}
-
-func (*PutAtField) Compose() composer.Spec {
-	return composer.Spec{
-		Fluent: &composer.Fluid{Name: "put", Role: composer.Command},
-		Desc:   "Put: put a value into the field of an record or object",
-	}
 }

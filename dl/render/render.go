@@ -9,6 +9,8 @@ import (
 var Slats = []composer.Composer{
 	(*Name)(nil),
 	(*Template)(nil),
+	(*RenderField)(nil),
+	(*RenderRef)(nil),
 }
 
 func cmdError(op composer.Composer, err error) error {

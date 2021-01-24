@@ -47,6 +47,16 @@ func RecordFrom(v *Record, subtype string) Value {
 	return makeValue(affine.Record, subtype, v)
 }
 
+func ObjectAsText(v Value) (ret Value) {
+	if v == nil {
+		ret = StringOf("") // fix: or "nothing"?
+	} else {
+		// fix: consider the type format: string#object?<kind>
+		ret = makeValue(affine.Text, v.Type(), v.String())
+	}
+	return
+}
+
 func StringsFrom(vs []string, subtype string) (ret Value) {
 	if a := affine.TextList; vs != nil {
 		ret = makeValue(a, subtype, &vs)

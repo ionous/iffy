@@ -60,6 +60,12 @@ func (op *SingularKind) NewName(k *Importer) (ret ephemera.Named, err error) {
 	return k.NewName(name, tables.NAMED_KIND, op.At.String()), nil
 }
 
+// fix: this is *not* where pluralization should happen
+func (op *SingularKind) FixPlurals(k *Importer) (ret ephemera.Named, err error) {
+	name := lang.Breakcase(lang.Pluralize(op.Str))
+	return k.NewName(name, tables.NAMED_KIND, op.At.String()), nil
+}
+
 func (op *TestName) NewName(k *Importer) (ret ephemera.Named, err error) {
 	// fix? all names should probably munge their own strings
 	// ( see ephemera's NewDomainName for the current hack )

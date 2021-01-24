@@ -56,7 +56,7 @@ func RunAll(run rt.Runtime, exes []rt.Execute) (err error) {
 // does *not* error if the passed exec is nil.
 func Run(run rt.Runtime, exe rt.Execute) (err error) {
 	if exe == nil {
-		err = MissingEval("empty execute")
+		err = MissingEval("execute")
 	} else {
 		err = exe.Execute(run)
 	}
@@ -79,7 +79,7 @@ func WriteText(run rt.Runtime, eval rt.TextEval) (err error) {
 // GetBool runs the specified eval, returning an error if the eval is nil.
 func GetBool(run rt.Runtime, eval rt.BoolEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty boolean eval")
+		err = MissingEval("boolean")
 	} else {
 		ret, err = eval.GetBool(run)
 	}
@@ -89,7 +89,7 @@ func GetBool(run rt.Runtime, eval rt.BoolEval) (ret g.Value, err error) {
 // GetNumber runs the specified eval, returning an error if the eval is nil.
 func GetNumber(run rt.Runtime, eval rt.NumberEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty number eval")
+		err = MissingEval("number")
 	} else {
 		ret, err = eval.GetNumber(run)
 	}
@@ -99,7 +99,7 @@ func GetNumber(run rt.Runtime, eval rt.NumberEval) (ret g.Value, err error) {
 // GetText runs the specified eval, returning an error if the eval is nil.
 func GetText(run rt.Runtime, eval rt.TextEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty text eval")
+		err = MissingEval("text")
 	} else {
 		ret, err = eval.GetText(run)
 	}
@@ -109,19 +109,9 @@ func GetText(run rt.Runtime, eval rt.TextEval) (ret g.Value, err error) {
 // GetRecord runs the specified eval, returning an error if the eval is nil.
 func GetRecord(run rt.Runtime, eval rt.RecordEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty record eval")
+		err = MissingEval("record")
 	} else {
 		ret, err = eval.GetRecord(run)
-	}
-	return
-}
-
-// GetObject runs the specified eval, returning an error if the eval is nil.
-func GetObject(run rt.Runtime, eval rt.ObjectEval) (ret g.Value, err error) {
-	if eval == nil {
-		err = MissingEval("empty object eval")
-	} else {
-		ret, err = eval.GetObject(run)
 	}
 	return
 }
@@ -180,7 +170,7 @@ func GetOptionalTexts(run rt.Runtime, eval rt.TextListEval, fallback []string) (
 // or an empty iterator if the value is null.
 func GetNumList(run rt.Runtime, eval rt.NumListEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty object eval")
+		err = MissingEval("num list")
 	} else {
 		ret, err = eval.GetNumList(run)
 	}
@@ -191,7 +181,7 @@ func GetNumList(run rt.Runtime, eval rt.NumListEval) (ret g.Value, err error) {
 // or an empty iterator if the value is null.
 func GetTextList(run rt.Runtime, eval rt.TextListEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty object eval")
+		err = MissingEval("text list")
 	} else {
 		ret, err = eval.GetTextList(run)
 	}
@@ -202,29 +192,36 @@ func GetTextList(run rt.Runtime, eval rt.TextListEval) (ret g.Value, err error) 
 // or an empty iterator if the value is null.
 func GetRecordList(run rt.Runtime, eval rt.RecordListEval) (ret g.Value, err error) {
 	if eval == nil {
-		err = MissingEval("empty object eval")
+		err = MissingEval("record list")
 	} else {
 		ret, err = eval.GetRecordList(run)
 	}
 	return
 }
 
-func ObjectFromText(run rt.Runtime, txt rt.TextEval) (ret g.Value, err error) {
-	if t, e := GetText(run, txt); e != nil {
+// WARNING: can return nil for the nothing/empty object ""
+func ObjectFromText(run rt.Runtime, eval rt.TextEval) (ret g.Value, err error) {
+	if eval == nil {
+		err = MissingEval("object text")
+	} else if t, e := GetText(run, eval); e != nil {
 		err = e
-	} else {
-		ret, err = ObjectFromString(run, t.String())
+	} else if n := t.String(); len(n) > 0 {
+		ret, err = ObjectFromString(run, n)
 	}
 	return
 }
 
 // find an object with the passed partial name
 func ObjectFromString(run rt.Runtime, n string) (ret g.Value, err error) {
-	switch val, e := run.GetField(object.Value, n); e.(type) {
-	case g.UnknownField:
-		err = g.UnknownObject(n)
-	default:
-		ret, err = val, e
+	if len(n) == 0 {
+		err = g.NothingObject
+	} else {
+		switch val, e := run.GetField(object.Value, n); e.(type) {
+		case g.UnknownField:
+			err = g.UnknownObject(n)
+		default:
+			ret, err = val, e
+		}
 	}
 	return
 }

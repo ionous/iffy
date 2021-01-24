@@ -20,6 +20,16 @@ import (
 // until template parsing gets re-written we cant handle fluid specs ( selector messaging )
 // we can do a basic test to ensure it's possible to build the function signatures from the composer.Spec(s) tho.
 func TestFluid(t *testing.T) {
+	if got := makeSig((*core.ObjectExists)(nil)); !got.equals(
+		"is valid:",
+	) {
+		t.Error(got)
+	}
+	if got := makeSig((*core.IsEmpty)(nil)); !got.equals(
+		"is empty:",
+	) {
+		t.Error(got)
+	}
 	if got := makeSig((*core.IsKindOf)(nil)); !got.equals(
 		"kindOf:is:",
 	) {
@@ -73,7 +83,7 @@ func TestFluid(t *testing.T) {
 	}
 	if got := makeSig((*core.ChooseAction)(nil)); !got.equals(
 		"if:do:",
-		"if:do:elseIf:", // fix: sort!?
+		"if:do:elseIf:", // fix: sort!? [currently order is as listed in core.go]
 		"if:do:elseDo:",
 	) {
 		t.Error(got)
@@ -84,9 +94,8 @@ func TestFluid(t *testing.T) {
 		t.Error(got)
 	}
 	if got := makeSig((*core.PutAtField)(nil)); !got.equals(
-		"put:intoRec:atField:",
 		"put:intoObj:atField:",
-		"put:intoObjNamed:atField:",
+		"put:intoVar:atField:",
 	) {
 		t.Error(got)
 	}

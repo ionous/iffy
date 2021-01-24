@@ -30,6 +30,11 @@
                           "type": "determiner",
                           "value": "$AN"
                         },
+                        "$COMMENT": {
+                          "id": "id-176690de3db-0",
+                          "type": "lines",
+                          "value": ", which if not set will be the article from the declaration of the noun; example: \"some\" soldiers."
+                        },
                         "$PROPERTY": {
                           "id": "id-17668e9a683-30",
                           "type": "property",
@@ -45,11 +50,6 @@
                               "value": "$TEXT"
                             }
                           }
-                        },
-                        "$COMMENT": {
-                          "id": "id-176690de3db-0",
-                          "type": "lines",
-                          "value": ", which if not set will be the article from the declaration of the noun; example: \"some\" soldiers."
                         }
                       }
                     },
@@ -152,11 +152,6 @@
                 "id": "id-174f06d08a4-3",
                 "type": "test_scene",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174f06d08a4-4",
-                    "type": "test_name",
-                    "value": "articles"
-                  },
                   "$STORY": {
                     "id": "id-174f06d08a4-5",
                     "type": "story",
@@ -241,12 +236,12 @@
                                                   "type": "are_an",
                                                   "value": "$AREA"
                                                 },
-                                                "$TRAIT": [],
                                                 "$KIND": {
                                                   "id": "id-174f06d08a4-22",
                                                   "type": "singular_kind",
                                                   "value": "thing"
-                                                }
+                                                },
+                                                "$TRAIT": []
                                               }
                                             }
                                           }
@@ -262,6 +257,11 @@
                         }
                       ]
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174f06d08a4-4",
+                    "type": "test_name",
+                    "value": "articles"
                   }
                 }
               }
@@ -281,11 +281,6 @@
                 "id": "id-174f06d08a4-25",
                 "type": "test_rule",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174f06d08a4-26",
-                    "type": "test_name",
-                    "value": "articles"
-                  },
                   "$HOOK": {
                     "id": "id-174f06d08a4-27",
                     "type": "program_hook",
@@ -324,6 +319,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174f06d08a4-26",
+                    "type": "test_name",
+                    "value": "articles"
                   }
                 }
               }
@@ -350,11 +350,6 @@
                 "id": "id-174f06d08a4-41",
                 "type": "test_statement",
                 "value": {
-                  "$TEST_NAME": {
-                    "id": "id-174f06d08a4-42",
-                    "type": "test_name",
-                    "value": "articles"
-                  },
                   "$TEST": {
                     "id": "id-174f06d08a4-43",
                     "type": "testing",
@@ -369,6 +364,11 @@
                         }
                       }
                     }
+                  },
+                  "$TEST_NAME": {
+                    "id": "id-174f06d08a4-42",
+                    "type": "test_name",
+                    "value": "articles"
                   }
                 }
               }
@@ -392,16 +392,6 @@
                     "id": "id-174f06d08a4-66",
                     "type": "pattern_name",
                     "value": "The"
-                  },
-                  "$TYPE": {
-                    "id": "id-174f06d08a4-67",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
                   },
                   "$OPTVARS": {
                     "id": "id-174f06d08a4-69",
@@ -447,6 +437,17 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$TYPE": {
+                    "id": "id-174f06d08a4-67",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-1771864067c-0",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
                     }
                   }
                 }
@@ -549,17 +550,6 @@
                     "type": "pattern_name",
                     "value": "the"
                   },
-                  "$TYPE": {
-                    "id": "id-174f06d08a4-94",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-174f06d08a4-95",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
-                  },
                   "$OPTVARS": {
                     "id": "id-174f06d08a4-96",
                     "type": "pattern_variables_tail",
@@ -604,6 +594,17 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$TYPE": {
+                    "id": "id-174f06d08a4-94",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-174f06d08a4-95",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
                     }
                   }
                 }
@@ -706,17 +707,6 @@
                     "type": "pattern_name",
                     "value": "A"
                   },
-                  "$TYPE": {
-                    "id": "id-174f06d08a4-121",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-174f06d08a4-122",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
-                  },
                   "$OPTVARS": {
                     "id": "id-174f06d08a4-123",
                     "type": "pattern_variables_tail",
@@ -761,6 +751,17 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$TYPE": {
+                    "id": "id-174f06d08a4-121",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-174f06d08a4-122",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
                     }
                   }
                 }
@@ -863,17 +864,6 @@
                     "type": "pattern_name",
                     "value": "a"
                   },
-                  "$TYPE": {
-                    "id": "id-174f06d08a4-148",
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "id": "id-174f06d08a4-149",
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
-                  },
                   "$OPTVARS": {
                     "id": "id-174f06d08a4-150",
                     "type": "pattern_variables_tail",
@@ -918,6 +908,17 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$TYPE": {
+                    "id": "id-174f06d08a4-148",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-174f06d08a4-149",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
                     }
                   }
                 }
@@ -1020,15 +1021,6 @@
                     "type": "pattern_name",
                     "value": "print article"
                   },
-                  "$TYPE": {
-                    "type": "pattern_type",
-                    "value": {
-                      "$ACTIVITY": {
-                        "type": "patterned_activity",
-                        "value": "$ACTIVITY"
-                      }
-                    }
-                  },
                   "$OPTVARS": {
                     "id": "id-174f08a1a93-6",
                     "type": "pattern_variables_tail",
@@ -1100,6 +1092,17 @@
                           }
                         }
                       ]
+                    }
+                  },
+                  "$TYPE": {
+                    "id": "id-1771864067c-1",
+                    "type": "pattern_type",
+                    "value": {
+                      "$ACTIVITY": {
+                        "id": "id-1771864067c-2",
+                        "type": "patterned_activity",
+                        "value": "$ACTIVITY"
+                      }
                     }
                   }
                 }
@@ -1187,11 +1190,6 @@
                                 "id": "id-174f0910998-12",
                                 "type": "determine",
                                 "value": {
-                                  "$NAME": {
-                                    "id": "id-174f0910998-13",
-                                    "type": "pattern_name",
-                                    "value": "starts with vowel"
-                                  },
                                   "$ARGUMENTS": {
                                     "id": "id-174f0910998-14",
                                     "type": "arguments",
@@ -1201,11 +1199,6 @@
                                           "id": "id-174f0910998-15",
                                           "type": "argument",
                                           "value": {
-                                            "$NAME": {
-                                              "id": "id-174f0910998-16",
-                                              "type": "variable_name",
-                                              "value": "text"
-                                            },
                                             "$FROM": {
                                               "id": "id-174f0910998-17",
                                               "type": "assignment",
@@ -1230,11 +1223,21 @@
                                                   }
                                                 }
                                               }
+                                            },
+                                            "$NAME": {
+                                              "id": "id-174f0910998-16",
+                                              "type": "variable_name",
+                                              "value": "text"
                                             }
                                           }
                                         }
                                       ]
                                     }
+                                  },
+                                  "$NAME": {
+                                    "id": "id-174f0910998-13",
+                                    "type": "pattern_name",
+                                    "value": "starts with vowel"
                                   }
                                 }
                               }
@@ -1293,7 +1296,7 @@
                                 "value": {
                                   "$OBJECT": {
                                     "id": "id-174f0910998-55",
-                                    "type": "object_eval",
+                                    "type": "text_eval",
                                     "value": {
                                       "id": "id-174f0910998-57",
                                       "type": "get_var",
@@ -1381,38 +1384,26 @@
                                     "type": "text_eval",
                                     "value": {
                                       "id": "id-174f0910998-80",
-                                      "type": "get_field",
+                                      "type": "get_at_field",
                                       "value": {
                                         "$FIELD": {
                                           "id": "id-174f0910998-84",
                                           "type": "text",
                                           "value": "indefinite article"
                                         },
-                                        "$OBJECT": {
-                                          "id": "id-174f0910998-82",
-                                          "type": "object_eval",
+                                        "$FROM": {
+                                          "type": "from_source_fields",
                                           "value": {
-                                            "id": "id-174f0910998-85",
-                                            "type": "get_var",
+                                            "type": "from_var",
                                             "value": {
-                                              "$NAME": {
-                                                "id": "id-174f0910998-88",
-                                                "type": "text",
+                                              "$VAR": {
+                                                "type": "variable_name",
                                                 "value": "target"
                                               }
                                             }
                                           }
                                         }
                                       }
-                                    }
-                                  },
-                                  "$IS": {
-                                    "id": "id-174f0910998-78",
-                                    "type": "comparator",
-                                    "value": {
-                                      "id": "id-174f0910998-89",
-                                      "type": "unequal",
-                                      "value": {}
                                     }
                                   },
                                   "$B": {
@@ -1428,6 +1419,15 @@
                                           "value": "$EMPTY"
                                         }
                                       }
+                                    }
+                                  },
+                                  "$IS": {
+                                    "id": "id-174f0910998-78",
+                                    "type": "comparator",
+                                    "value": {
+                                      "id": "id-174f0910998-89",
+                                      "type": "unequal",
+                                      "value": {}
                                     }
                                   }
                                 }
@@ -1500,15 +1500,6 @@
                                       }
                                     }
                                   },
-                                  "$IS": {
-                                    "id": "id-174f0910998-111",
-                                    "type": "comparator",
-                                    "value": {
-                                      "id": "id-174f0910998-112",
-                                      "type": "unequal",
-                                      "value": {}
-                                    }
-                                  },
                                   "$B": {
                                     "id": "id-174f0910998-113",
                                     "type": "text_eval",
@@ -1522,6 +1513,15 @@
                                           "value": "$EMPTY"
                                         }
                                       }
+                                    }
+                                  },
+                                  "$IS": {
+                                    "id": "id-174f0910998-111",
+                                    "type": "comparator",
+                                    "value": {
+                                      "id": "id-174f0910998-112",
+                                      "type": "unequal",
+                                      "value": {}
                                     }
                                   }
                                 }
@@ -1581,7 +1581,7 @@
                                 "value": {
                                   "$OBJECT": {
                                     "id": "id-174f2020d9d-31",
-                                    "type": "object_eval",
+                                    "type": "text_eval",
                                     "value": {
                                       "id": "id-174f2020d9d-32",
                                       "type": "get_var",

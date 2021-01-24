@@ -15,7 +15,6 @@ type Assignment core.Assignment
 type BoolEval rt.BoolEval
 type Execute rt.Execute
 type NumberEval rt.NumberEval
-type ObjectEval rt.ObjectEval
 type TextEval rt.TextEval
 
 type VariableName struct {

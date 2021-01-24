@@ -68,13 +68,13 @@ func eachTest(t *testing.T, src []string, res []accum, otherwise int) {
 }
 
 func (v *visitEach) Execute(run rt.Runtime) (err error) {
-	if i, e := safe.Variable(run, "index", affine.Number); e != nil {
+	if i, e := safe.CheckVariable(run, "index", affine.Number); e != nil {
 		err = e
-	} else if f, e := safe.Variable(run, "first", affine.Bool); e != nil {
+	} else if f, e := safe.CheckVariable(run, "first", affine.Bool); e != nil {
 		err = e
-	} else if l, e := safe.Variable(run, "last", affine.Bool); e != nil {
+	} else if l, e := safe.CheckVariable(run, "last", affine.Bool); e != nil {
 		err = e
-	} else if t, e := safe.Variable(run, "text", affine.Text); e != nil {
+	} else if t, e := safe.CheckVariable(run, "text", affine.Text); e != nil {
 		err = e
 	} else {
 		(*v.visits) = append((*v.visits), accum{
