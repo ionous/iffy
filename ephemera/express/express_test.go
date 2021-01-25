@@ -82,7 +82,7 @@ func TestExpressions(t *testing.T) {
 	})
 	t.Run("global", func(t *testing.T) {
 		if e := testExpression(".A",
-			&render.Name{"A"}); e != nil {
+			&render.RenderName{"A"}); e != nil {
 			t.Fatal(e)
 		}
 	})
@@ -268,7 +268,7 @@ func TestTemplates(t *testing.T) {
 		if e := testTemplate("hello {.object}",
 			&core.Join{Parts: []rt.TextEval{
 				T("hello "),
-				&render.Name{"object"}}},
+				&render.RenderName{"object"}}},
 		); e != nil {
 			t.Fatal(e)
 		}

@@ -50,7 +50,7 @@ func (on dotName) getFromVar() core.Assignment {
 // first attempting to read from the name as a variable,
 // and if that fails, attempting to render the name as an object.
 func (on dotName) getPrintedName() rt.TextEval {
-	// the render.Name function itself handles the capitalization check
+	// the render.RenderName function itself handles the capitalization check
 	// one thing missing here: if the text in a variable is not already an id
 	// this will just print the text.
 	return &render.RenderName{string(on)}
