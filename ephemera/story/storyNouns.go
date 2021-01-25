@@ -169,7 +169,7 @@ func (op *NounRelation) Import(k *Importer) (err error) {
 	} else {
 		for _, subject := range k.Recent.Nouns.Subjects {
 			for _, object := range k.Recent.Nouns.Objects {
-				k.NewRelative(subject, rel, object)
+				k.NewRelative(object, rel, subject)
 			}
 		}
 	}
