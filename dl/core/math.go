@@ -29,7 +29,6 @@ type RemainderOf struct{ A, B rt.NumberEval }
 
 func (*SumOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "sum_of",
 		Group: "math",
 		Desc:  "Add Numbers: Add two numbers.",
 		Spec:  "( {a:number_eval} + {b:number_eval} )",
@@ -47,7 +46,6 @@ func (op *SumOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 
 func (*DiffOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "diff_of",
 		Group: "math",
 		Spec:  "( {a:number_eval} - {b:number_eval} )",
 		Desc:  "Subtract Numbers: Subtract two numbers.",
@@ -65,7 +63,6 @@ func (op *DiffOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 
 func (*ProductOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "product_of",
 		Group: "math",
 		Spec:  "( {a:number_eval} * {b:number_eval} )",
 		Desc:  "Multiply Numbers: Multiply two numbers.",
@@ -83,7 +80,6 @@ func (op *ProductOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 
 func (*QuotientOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "quotient_of",
 		Group: "math",
 		Spec:  "( {a:number_eval} / {b:number_eval} )",
 		Desc:  "Divide Numbers: Divide one number by another.",
@@ -104,7 +100,6 @@ func (op *QuotientOf) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 
 func (*RemainderOf) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "remainder_of",
 		Group: "math",
 		Spec:  "( {a:number_eval} % {b:number_eval} )",
 		Desc:  "Modulus Numbers: Divide one number by another, and return the remainder.",

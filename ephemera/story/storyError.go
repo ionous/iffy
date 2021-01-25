@@ -21,8 +21,7 @@ func ImportError(op composer.Composer, at reader.Position, e error) error {
 }
 
 func (e *OpError) Error() string {
-	op := e.Op.Compose()
-	return errutil.Sprintf("%s in %s at %s", e.Err, op.Name, e.At.String())
+	return errutil.Sprintf("%s in %s at %s", e.Err, composer.SpecName(e.Op), e.At.String())
 }
 
 func (e *OpError) Unwrap() error {

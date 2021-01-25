@@ -21,7 +21,6 @@ type ChooseText struct {
 
 func (*ChooseNum) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "choose_num",
 		Group: "math",
 		Desc:  "Choose Number: Pick one of two numbers based on a boolean test.",
 	}
@@ -48,7 +47,6 @@ func (op *ChooseNum) GetNumber(run rt.Runtime) (ret g.Value, err error) {
 
 func (*ChooseText) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "choose_text",
 		Group: "format",
 		Desc:  "Choose Text: Pick one of two strings based on a boolean test.",
 	}

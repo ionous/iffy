@@ -12,7 +12,6 @@ type DoNothing struct {
 
 func (*DoNothing) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "do_nothing",
 		Group: "exec",
 		Desc:  "Do Nothing: Statement which does nothing.",
 	}

@@ -80,7 +80,6 @@ func (op *Assign) Execute(run rt.Runtime) (err error) {
 
 func (*FromBool) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_bool",
 		Group:  "variables",
 		Desc:   "From Bool: Assigns the calculated boolean value.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -100,8 +99,6 @@ func (op *FromBool) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromNum) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_num",
-		Spec:   "{val:number_eval}",
 		Group:  "variables",
 		Desc:   "From Number: Assigns the calculated number.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -121,7 +118,6 @@ func (op *FromNum) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromText) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_text",
 		Group:  "variables",
 		Desc:   "From Text: Assigns the calculated piece of text.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -141,7 +137,6 @@ func (op *FromText) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromRecord) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_record",
 		Group:  "variables",
 		Desc:   "From Record: Assigns the calculated record.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -161,7 +156,6 @@ func (op *FromRecord) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) 
 
 func (*FromNumbers) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_nums",
 		Group:  "variables",
 		Desc:   "From Numbers: Assigns the calculated numbers.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -181,7 +175,6 @@ func (op *FromNumbers) GetAssignedValue(run rt.Runtime) (ret g.Value, err error)
 
 func (*FromTexts) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_texts",
 		Group:  "variables",
 		Desc:   "From Texts: Assigns the calculated texts.",
 		Fluent: &composer.Fluid{Role: composer.Function},
@@ -201,7 +194,6 @@ func (op *FromTexts) GetAssignedValue(run rt.Runtime) (ret g.Value, err error) {
 
 func (*FromRecords) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "from_records",
 		Group:  "variables",
 		Desc:   "From Records: Assigns the calculated records.",
 		Fluent: &composer.Fluid{Role: composer.Function},

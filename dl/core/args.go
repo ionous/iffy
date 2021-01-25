@@ -22,7 +22,6 @@ type Arguments struct {
 
 func (*Argument) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "argument",
 		Spec:  " {name:variable_name}: {from:assignment}",
 		Group: "patterns",
 		Stub:  true,
@@ -31,7 +30,6 @@ func (*Argument) Compose() composer.Spec {
 
 func (*Arguments) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "arguments",
 		Spec:  " {arguments%args+argument|comma-and}",
 		Group: "patterns",
 		Stub:  true,

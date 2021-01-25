@@ -20,7 +20,6 @@ type Matches struct {
 // Compose defines a spec for the composer editor.
 func (*Matches) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "matches",
 		Group: "matching",
 		Desc:  `Matches: Determine whether the specified text is similar to the specified regular expression.`,
 		Spec:  "{text:text_eval} matches {pattern:text}",

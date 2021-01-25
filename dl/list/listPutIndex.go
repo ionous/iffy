@@ -19,7 +19,6 @@ type PutIndex struct {
 
 func (*PutIndex) Compose() composer.Spec {
 	return composer.Spec{
-		Name:   "put_index",
 		Fluent: &composer.Fluid{Name: "put", Role: composer.Command},
 		Desc:   "Put: replace one value in a list with another",
 	}

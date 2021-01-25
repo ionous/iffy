@@ -18,7 +18,7 @@ func (op *RenderTemplate) ImportStub(k *Importer) (ret interface{}, err error) {
 	} else if eval, ok := got.(rt.TextEval); !ok {
 		err = errutil.Fmt("render template has unknown expression %T", got)
 	} else {
-		ret = &render.Template{eval}
+		ret = &render.RenderTemplate{eval}
 		// pretty.Println(eval)
 	}
 	return
@@ -34,7 +34,7 @@ func convert_text_or_template(str string) (ret interface{}, err error) {
 			err = errutil.New(e, xs)
 		} else if eval, ok := got.(rt.TextEval); !ok {
 			err = errutil.Fmt("render template has unknown expression %T", got)
-		} else if prog, e := ephemera.EncodeGob(&render.Template{eval}); e != nil {
+		} else if prog, e := ephemera.EncodeGob(&render.RenderTemplate{eval}); e != nil {
 			err = e // note: we dont have to encode into render but maybe its nice to have a consistent root type
 		} else {
 			ret = prog // okay; return bytes.

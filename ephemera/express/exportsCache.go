@@ -1,6 +1,7 @@
 package express
 
 import (
+	"github.com/ionous/iffy/dl/composer"
 	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/lang"
 )
@@ -19,8 +20,8 @@ func (k *nameCache) get(n string) (ret interface{}, okay bool) {
 	if len(k.els) == 0 {
 		els := make(map[string]interface{})
 		for _, v := range core.Slats {
-			spec := v.Compose()
-			n := lang.Breakcase(spec.Name)
+			spec := composer.SpecName(v)
+			n := lang.Breakcase(spec)
 			els[n] = v
 		}
 		k.els = els

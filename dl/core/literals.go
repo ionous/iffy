@@ -132,7 +132,6 @@ func (op *Lines) String() string {
 
 func (*Numbers) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "numbers",
 		Group: "literals",
 		Desc:  "Number List: Specify a list of multiple numbers.",
 	}
@@ -147,7 +146,6 @@ func (op *Numbers) GetNumList(rt.Runtime) (ret g.Value, _ error) {
 
 func (*Texts) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "texts",
 		Group: "literals",
 		Desc:  "Text List: specifies multiple string values.",
 		Spec:  "text {values*text|comma-and}",

@@ -88,7 +88,6 @@ type MakeReversed struct {
 // Compose defines a spec for the composer editor.
 func (*MakeUppercase) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "make_uppercase",
 		Group: "format",
 		Desc: `Uppercase: returns new text, with every letter turned into uppercase. 
 		For example, "APPLE" from "apple".`,
@@ -99,7 +98,6 @@ func (*MakeUppercase) Compose() composer.Spec {
 // Compose defines a spec for the composer editor.
 func (*MakeLowercase) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "make_lowercase",
 		Group: "format",
 		Desc: `Lowercase: returns new text, with every letter turned into lowercase. 
 		For example, "shout" from "SHOUT".`,
@@ -110,7 +108,6 @@ func (*MakeLowercase) Compose() composer.Spec {
 // Compose defines a spec for the composer editor.
 func (*MakeTitleCase) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "make_title_case",
 		Group: "format",
 		Desc: `Title case: returns new text, starting each word with a capital letter. 
 		For example, "Empire Apple" from "empire apple".`,
@@ -121,7 +118,6 @@ func (*MakeTitleCase) Compose() composer.Spec {
 // Compose defines a spec for the composer editor.
 func (*MakeSentenceCase) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "make_sentence_case",
 		Group: "format",
 		Desc: `Sentence case: returns new text, start each sentence with a capital letter. 
 		For example, "Empire Apple." from "Empire apple.".`,
@@ -132,7 +128,6 @@ func (*MakeSentenceCase) Compose() composer.Spec {
 // Compose defines a spec for the composer editor.
 func (*MakeReversed) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "make_reversed",
 		Group: "format",
 		Desc: `Reverse text: returns new text flipped back to front. 
 		For example, "elppA" from "Apple", or "noon" from "noon".`,

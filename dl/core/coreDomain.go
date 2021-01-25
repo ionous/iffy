@@ -13,7 +13,6 @@ type HasDominion struct {
 
 func (*HasDominion) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "has_dominion",
 		Group: "logic",
 	}
 }

@@ -53,5 +53,5 @@ func (on dotName) getPrintedName() rt.TextEval {
 	// the render.Name function itself handles the capitalization check
 	// one thing missing here: if the text in a variable is not already an id
 	// this will just print the text.
-	return &render.Name{string(on)}
+	return &render.RenderName{string(on)}
 }

@@ -12,9 +12,7 @@ type Make struct {
 }
 
 func (*Make) Compose() composer.Spec {
-	return composer.Spec{
-		Name: "make",
-	}
+	return composer.Spec{}
 }
 
 func (op *Make) GetRecord(run rt.Runtime) (ret g.Value, err error) {

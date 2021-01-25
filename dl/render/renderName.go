@@ -20,18 +20,17 @@ import (
 // if the name is a variable with some other text: return that text.
 // if the name isn't a variable but refers to some object: return that object's printed object name.
 // otherwise, its an error.
-type Name struct {
+type RenderName struct {
 	Name string
 }
 
-func (op *Name) Compose() composer.Spec {
+func (op *RenderName) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "render_name",
 		Group: "internal",
 	}
 }
 
-func (op *Name) GetText(run rt.Runtime) (ret g.Value, err error) {
+func (op *RenderName) GetText(run rt.Runtime) (ret g.Value, err error) {
 	if v, e := op.getName(run); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -40,7 +39,7 @@ func (op *Name) GetText(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *Name) getName(run rt.Runtime) (ret g.Value, err error) {
+func (op *RenderName) getName(run rt.Runtime) (ret g.Value, err error) {
 	// uppercase names are assumed to be requests for object names.
 	if name := op.Name; lang.IsCapitalized(name) {
 		ret, err = op.getPrintedNamedOf(run, name)
@@ -74,7 +73,7 @@ func (op *Name) getName(run rt.Runtime) (ret g.Value, err error) {
 	return
 }
 
-func (op *Name) getPrintedNamedOf(run rt.Runtime, objectName string) (ret g.Value, err error) {
+func (op *RenderName) getPrintedNamedOf(run rt.Runtime, objectName string) (ret g.Value, err error) {
 	if printedName, e := safe.GetText(run, &core.Buffer{core.NewActivity(
 		&pattern.Determine{
 			Pattern:   "print_name",

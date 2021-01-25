@@ -47,7 +47,6 @@ func (op *IsEmpty) GetBool(run rt.Runtime) (ret g.Value, err error) {
 
 func (*Includes) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "includes",
 		Group: "strings",
 		Desc:  "Includes Text: True if text contains text.",
 	}
@@ -67,7 +66,6 @@ func (op *Includes) GetBool(run rt.Runtime) (ret g.Value, err error) {
 
 func (*Join) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "join",
 		Group: "strings",
 		Desc:  "Join Strings: Returns multiple pieces of text as a single new piece of text.",
 	}

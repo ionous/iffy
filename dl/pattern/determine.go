@@ -78,7 +78,6 @@ func (op *Determine) determine(run rt.Runtime, aff affine.Affinity) (ret g.Value
 
 func (*Determine) Compose() composer.Spec {
 	return composer.Spec{
-		Name:  "determine",
 		Spec:  "{pattern%name:pattern_name}{?arguments}",
 		Group: "patterns",
 		Desc:  "Runs a pattern, and potentially returns a value.",
