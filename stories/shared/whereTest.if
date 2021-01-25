@@ -50,12 +50,12 @@
                                 "type": "are_an",
                                 "value": "$ISA"
                               },
+                              "$TRAIT": [],
                               "$KIND": {
                                 "id": "id-1771724a77b-12",
                                 "type": "singular_kind",
                                 "value": "supporter"
-                              },
-                              "$TRAIT": []
+                              }
                             }
                           }
                         }
@@ -108,12 +108,12 @@
                                 "type": "are_an",
                                 "value": "$ISA"
                               },
+                              "$TRAIT": [],
                               "$KIND": {
                                 "id": "id-1771724a77b-22",
                                 "type": "singular_kind",
                                 "value": "room"
-                              },
-                              "$TRAIT": []
+                              }
                             }
                           }
                         }
@@ -166,12 +166,76 @@
                                 "type": "are_an",
                                 "value": "$ISA"
                               },
+                              "$TRAIT": [],
                               "$KIND": {
                                 "id": "id-1771724a77b-32",
                                 "type": "singular_kind",
                                 "value": "container"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "$TAIL": []
+                }
+              }
+            },
+            {
+              "id": "id-1771724a77b-137",
+              "type": "story_statement",
+              "value": {
+                "id": "id-1771724a77b-138",
+                "type": "noun_statement",
+                "value": {
+                  "$LEDE": {
+                    "id": "id-1771724a77b-139",
+                    "type": "lede",
+                    "value": {
+                      "$NOUNS": [
+                        {
+                          "id": "id-1771724a77b-140",
+                          "type": "named_noun",
+                          "value": {
+                            "$DETERMINER": {
+                              "id": "id-1771724a77b-141",
+                              "type": "determiner",
+                              "value": "$THE"
+                            },
+                            "$NAME": {
+                              "id": "id-1771724a77b-142",
+                              "type": "noun_name",
+                              "value": "knife"
+                            }
+                          }
+                        }
+                      ],
+                      "$NOUN_PHRASE": {
+                        "id": "id-1771724a77b-143",
+                        "type": "noun_phrase",
+                        "value": {
+                          "$KIND_OF_NOUN": {
+                            "id": "id-1771724a77b-144",
+                            "type": "kind_of_noun",
+                            "value": {
+                              "$ARE_AN": {
+                                "id": "id-1771724a77b-145",
+                                "type": "are_an",
+                                "value": "$ISA"
                               },
-                              "$TRAIT": []
+                              "$TRAIT": [
+                                {
+                                  "id": "id-1771724a77b-147",
+                                  "type": "trait",
+                                  "value": "carried"
+                                }
+                              ],
+                              "$KIND": {
+                                "id": "id-1771724a77b-146",
+                                "type": "singular_kind",
+                                "value": "prop"
+                              }
                             }
                           }
                         }
@@ -220,6 +284,11 @@
                 "id": "id-1771724a77b-35",
                 "type": "test_scene",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-1771724a77b-36",
+                    "type": "test_name",
+                    "value": "whereabouts"
+                  },
                   "$STORY": {
                     "id": "id-1771724a77b-37",
                     "type": "story",
@@ -288,6 +357,11 @@
                                                   "type": "are_being",
                                                   "value": "$ARE"
                                                 },
+                                                "$RELATION": {
+                                                  "id": "id-1771724a77b-66",
+                                                  "type": "relation_name",
+                                                  "value": "whereabouts"
+                                                },
                                                 "$NOUNS": [
                                                   {
                                                     "id": "id-1771724a77b-67",
@@ -305,12 +379,7 @@
                                                       }
                                                     }
                                                   }
-                                                ],
-                                                "$RELATION": {
-                                                  "id": "id-1771724a77b-66",
-                                                  "type": "relation_name",
-                                                  "value": "whereabouts"
-                                                }
+                                                ]
                                               }
                                             }
                                           }
@@ -371,6 +440,11 @@
                                                   "type": "are_being",
                                                   "value": "$IS"
                                                 },
+                                                "$RELATION": {
+                                                  "id": "id-1771724a77b-132",
+                                                  "type": "relation_name",
+                                                  "value": "whereabouts"
+                                                },
                                                 "$NOUNS": [
                                                   {
                                                     "id": "id-1771724a77b-133",
@@ -388,12 +462,7 @@
                                                       }
                                                     }
                                                   }
-                                                ],
-                                                "$RELATION": {
-                                                  "id": "id-1771724a77b-132",
-                                                  "type": "relation_name",
-                                                  "value": "whereabouts"
-                                                }
+                                                ]
                                               }
                                             }
                                           }
@@ -470,6 +539,11 @@
                                                   "type": "are_being",
                                                   "value": "$ARE"
                                                 },
+                                                "$RELATION": {
+                                                  "id": "id-1771724a77b-84",
+                                                  "type": "relation_name",
+                                                  "value": "whereabouts"
+                                                },
                                                 "$NOUNS": [
                                                   {
                                                     "id": "id-1771724a77b-85",
@@ -487,12 +561,7 @@
                                                       }
                                                     }
                                                   }
-                                                ],
-                                                "$RELATION": {
-                                                  "id": "id-1771724a77b-84",
-                                                  "type": "relation_name",
-                                                  "value": "whereabouts"
-                                                }
+                                                ]
                                               }
                                             }
                                           }
@@ -569,61 +638,80 @@
                                     "$TAIL": []
                                   }
                                 }
-                              },
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "id-17736705b90-46",
+                          "type": "paragraph",
+                          "value": {
+                            "$STORY_STATEMENT": [
                               {
-                                "id": "id-1771724a77b-137",
+                                "id": "id-17736705b90-47",
                                 "type": "story_statement",
                                 "value": {
-                                  "id": "id-1771724a77b-138",
+                                  "id": "id-17736705b90-48",
                                   "type": "noun_statement",
                                   "value": {
                                     "$LEDE": {
-                                      "id": "id-1771724a77b-139",
+                                      "id": "id-17736705b90-49",
                                       "type": "lede",
                                       "value": {
                                         "$NOUNS": [
                                           {
-                                            "id": "id-1771724a77b-140",
+                                            "id": "id-17736705b90-50",
                                             "type": "named_noun",
                                             "value": {
                                               "$DETERMINER": {
-                                                "id": "id-1771724a77b-141",
+                                                "id": "id-17736705b90-51",
                                                 "type": "determiner",
                                                 "value": "$THE"
                                               },
                                               "$NAME": {
-                                                "id": "id-1771724a77b-142",
+                                                "id": "id-17736705b90-52",
                                                 "type": "noun_name",
-                                                "value": "knife"
+                                                "value": "apple"
                                               }
                                             }
                                           }
                                         ],
                                         "$NOUN_PHRASE": {
-                                          "id": "id-1771724a77b-143",
+                                          "id": "id-17736705b90-53",
                                           "type": "noun_phrase",
                                           "value": {
-                                            "$KIND_OF_NOUN": {
-                                              "id": "id-1771724a77b-144",
-                                              "type": "kind_of_noun",
+                                            "$NOUN_RELATION": {
+                                              "id": "id-17736705b90-54",
+                                              "type": "noun_relation",
                                               "value": {
-                                                "$ARE_AN": {
-                                                  "id": "id-1771724a77b-145",
-                                                  "type": "are_an",
-                                                  "value": "$ISA"
+                                                "$RELATION": {
+                                                  "id": "id-17736705b90-55",
+                                                  "type": "relation_name",
+                                                  "value": "whereabouts"
                                                 },
-                                                "$KIND": {
-                                                  "id": "id-1771724a77b-146",
-                                                  "type": "singular_kind",
-                                                  "value": "prop"
-                                                },
-                                                "$TRAIT": [
+                                                "$NOUNS": [
                                                   {
-                                                    "id": "id-1771724a77b-147",
-                                                    "type": "trait",
-                                                    "value": "carried"
+                                                    "id": "id-17736705b90-56",
+                                                    "type": "named_noun",
+                                                    "value": {
+                                                      "$DETERMINER": {
+                                                        "id": "id-17736705b90-57",
+                                                        "type": "determiner",
+                                                        "value": "$THE"
+                                                      },
+                                                      "$NAME": {
+                                                        "id": "id-17736705b90-58",
+                                                        "type": "noun_name",
+                                                        "value": "basket"
+                                                      }
+                                                    }
                                                   }
-                                                ]
+                                                ],
+                                                "$ARE_BEING": {
+                                                  "id": "id-17736705b90-59",
+                                                  "type": "are_being",
+                                                  "value": "$IS"
+                                                }
                                               }
                                             }
                                           }
@@ -639,11 +727,6 @@
                         }
                       ]
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-1771724a77b-36",
-                    "type": "test_name",
-                    "value": "whereabouts"
                   }
                 }
               }
@@ -663,6 +746,11 @@
                 "id": "id-1771724a77b-151",
                 "type": "test_statement",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-1771724a77b-152",
+                    "type": "test_name",
+                    "value": "whereabouts"
+                  },
                   "$TEST": {
                     "id": "id-1771724a77b-153",
                     "type": "testing",
@@ -677,11 +765,6 @@
                         }
                       }
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-1771724a77b-152",
-                    "type": "test_name",
-                    "value": "whereabouts"
                   }
                 }
               }
@@ -701,6 +784,11 @@
                 "id": "id-1771724a77b-158",
                 "type": "test_rule",
                 "value": {
+                  "$TEST_NAME": {
+                    "id": "id-1771724a77b-159",
+                    "type": "test_name",
+                    "value": "whereabouts"
+                  },
                   "$HOOK": {
                     "id": "id-1771724a77b-160",
                     "type": "program_hook",
@@ -739,11 +827,6 @@
                         }
                       }
                     }
-                  },
-                  "$TEST_NAME": {
-                    "id": "id-1771724a77b-159",
-                    "type": "test_name",
-                    "value": "whereabouts"
                   }
                 }
               }
