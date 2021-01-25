@@ -1165,11 +1165,22 @@ const spec = [
       "variables"
     ],
     "name": "from_num",
-    "spec": "{val:number_eval}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$VAL": {
+          "label": "val",
+          "type": "number_eval"
+        }
+      },
+      "roles": "FZK",
       "slots": [
         "assignment"
+      ],
+      "tokens": [
+        "fromNum",
+        ": ",
+        "$VAL"
       ]
     }
   },
@@ -1200,7 +1211,7 @@ const spec = [
     "group": [
       "variables"
     ],
-    "name": "from_nums",
+    "name": "from_numbers",
     "uses": "flow",
     "with": {
       "params": {
@@ -2424,11 +2435,22 @@ const spec = [
       "objects"
     ],
     "name": "name_of",
-    "spec": "name of {object:text_eval}",
     "uses": "flow",
     "with": {
+      "params": {
+        "$OBJECT": {
+          "label": "object",
+          "type": "text_eval"
+        }
+      },
+      "roles": "FZK",
       "slots": [
         "text_eval"
+      ],
+      "tokens": [
+        "nameOf",
+        ": ",
+        "$OBJECT"
       ]
     }
   },

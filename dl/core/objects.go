@@ -19,7 +19,7 @@ type ObjectExists struct {
 // NameOf returns the full name of an object as declared by the author.
 // It doesnt change over the course of play. To change the name use the "printed name" property.
 type NameOf struct {
-	Object rt.TextEval
+	Object rt.TextEval `if:"selector"`
 }
 
 // KindOf returns the class of an object.
@@ -62,9 +62,9 @@ func (op *ObjectExists) GetBool(run rt.Runtime) (ret g.Value, err error) {
 
 func (*NameOf) Compose() composer.Spec {
 	return composer.Spec{
-		Group: "objects",
-		Desc:  "Name Of: Full name of the object.",
-		Spec:  "name of {object:text_eval}",
+		Group:  "objects",
+		Fluent: &composer.Fluid{Name: "nameOf", Role: composer.Function},
+		Desc:   "Name Of: Full name of the object.",
 	}
 }
 
