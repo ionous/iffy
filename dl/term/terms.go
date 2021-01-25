@@ -30,12 +30,14 @@ func (ps Terms) ConvertTerm(run rt.Runtime, i int, v g.Value) (ret g.Value, err 
 			// fix? templates do send us some object values right now...
 			case affine.Object:
 				ret = g.ObjectAsText(v)
-			// its text into text, where the input is supposed to be an id...
-			// lets make sure it *is* an id.
 			case affine.Text:
-				if v, e := safe.ObjectFromString(run, v.String()); e != nil {
+				// look up the named object...
+				if n := v.String(); len(n) == 0 {
+					ret = g.Empty
+				} else if v, e := safe.ObjectFromString(run, n); e != nil {
 					err = e
 				} else {
+					// ...and return its id
 					ret = g.ObjectAsText(v)
 				}
 			}

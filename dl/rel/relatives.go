@@ -62,6 +62,8 @@ func (*ReciprocalsOf) Compose() composer.Spec {
 func (op *RelativeOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 	if a, e := safe.ObjectFromText(run, op.Object); e != nil {
 		err = cmdError(op, e)
+	} else if a == nil {
+		ret = g.Empty
 	} else {
 		noun, rel := a.String(), op.Via.String()
 		if vs, e := run.ReciprocalsOf(noun, rel); e != nil {
@@ -84,7 +86,7 @@ func (op *RelativesOf) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	if a, e := safe.ObjectFromText(run, op.Object); e != nil {
 		err = cmdError(op, e)
 	} else if a == nil {
-		err = cmdError(op, g.NothingObject)
+		ret = g.StringsOf(nil)
 	} else if vs, e := run.RelativesOf(a.String(), op.Via.String()); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -97,7 +99,7 @@ func (op *ReciprocalOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 	if a, e := safe.ObjectFromText(run, op.Object); e != nil {
 		err = cmdError(op, e)
 	} else if a == nil {
-		err = cmdError(op, g.NothingObject)
+		ret = g.Empty
 	} else {
 		noun, rel := a.String(), op.Via.String()
 		if vs, e := run.ReciprocalsOf(noun, rel); e != nil {
@@ -120,7 +122,7 @@ func (op *ReciprocalsOf) GetTextList(run rt.Runtime) (ret g.Value, err error) {
 	if a, e := safe.ObjectFromText(run, op.Object); e != nil {
 		err = cmdError(op, e)
 	} else if a == nil {
-		err = cmdError(op, g.NothingObject)
+		ret = g.StringsOf(nil)
 	} else if vs, e := run.ReciprocalsOf(a.String(), op.Via.String()); e != nil {
 		err = cmdError(op, e)
 	} else {

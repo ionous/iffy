@@ -72,7 +72,7 @@ func (op *NameOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 	if obj, e := safe.ObjectFromText(run, op.Object); e != nil {
 		err = cmdError(op, e)
 	} else if obj == nil {
-		ret = g.StringOf("") // fix: or, should it be "nothing"
+		ret = g.Empty // fix: or, should it be "nothing"
 	} else if v, e := safe.Unpack(obj, object.Name, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
@@ -93,7 +93,7 @@ func (op *KindOf) GetText(run rt.Runtime) (ret g.Value, err error) {
 	if obj, e := safe.ObjectFromText(run, op.Object); e != nil {
 		err = cmdError(op, e)
 	} else if obj == nil {
-		ret = g.StringOf("")
+		ret = g.Empty
 	} else if v, e := safe.Unpack(obj, object.Kind, affine.Text); e != nil {
 		err = cmdError(op, e)
 	} else {
