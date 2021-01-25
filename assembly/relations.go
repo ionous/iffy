@@ -31,6 +31,8 @@ func (store *relStore) addTerm(m *Assembler) (err error) {
 		} else if e := m.WriteRelation(p.relation, p.kind.name,
 			p.cardinality, p.otherKind.name); e != nil {
 			err = errutil.Append(err, e)
+		} else if e := m.WriteVerb(p.relation, ""); e != nil {
+			err = errutil.Append(err, e)
 		}
 	}
 	return

@@ -190,16 +190,23 @@ func (m *Assembler) WriteTrait(aspect, trait string, rank int) error {
 	return e
 }
 
-func (m *Assembler) WriteVerb(relation, verb string) error {
+func (m *Assembler) WriteVerb(relation, verb string) (err error) {
 	const asm_verb = `insert into asm_verb(relation, stem)
 				select ?1, ?2
 				where not exists (
 					select 1 from asm_verb v
 					where v.relation=?1 and v.stem=?2
 				)`
-	stem := porterstemmer.StemString(verb)
-	_, e := m.cache.Exec(asm_verb, relation, stem)
-	return e
+	// fix: future. verbs only really matter once we can imply other facts
+	// like "supporting" means supporters; worn means set the worn flag; etc.
+	// but they are still used for building relations -- so we fake a verb of the same name for now.
+	if len(verb) > 0 {
+		stem := porterstemmer.StemString(verb)
+		_, err = m.cache.Exec(asm_verb, relation, stem)
+	} else {
+		_, err = m.cache.Exec(asm_verb, relation, relation)
+	}
+	return
 }
 
 var mdl_aspect = tables.Insert("mdl_aspect", "aspect", "trait", "rank")
