@@ -3,6 +3,7 @@ package pattern
 import (
 	"github.com/ionous/errutil"
 	"github.com/ionous/iffy/affine"
+	"github.com/ionous/iffy/dl/core"
 	"github.com/ionous/iffy/object"
 	g "github.com/ionous/iffy/rt/generic"
 	"github.com/ionous/iffy/rt/safe"
@@ -24,6 +25,13 @@ func (v *patScope) GetValue(aff affine.Affinity) (ret g.Value, err error) {
 			err = errutil.New("error trying to get return value", e)
 		} else if e := safe.Check(res, aff); e != nil {
 			err = errutil.New("error trying to get return value", e)
+		} else if len(aff) == 0 {
+			// the caller expects nothing but we have a return value.
+			if res.Affinity() == affine.Text {
+				core.HackTillTemplatesCanEvaluatePatternTypes = res.String()
+			} else {
+				err = errutil.New("the caller expects nothing but we returned", aff)
+			}
 		} else {
 			ret = res
 		}

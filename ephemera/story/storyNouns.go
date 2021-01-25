@@ -38,9 +38,9 @@ func (op *NamedNoun) Import(k *Importer) (err error) {
 	// declare a noun class that has several default fields
 	if once := "noun"; k.Once(once) {
 		// common or proper nouns ( rabbit, vs. Roger )
-		k.NewImplicitAspect("noun_types", "things", "common_named", "proper_named", "counted")
+		k.NewImplicitAspect("noun_types", "objects", "common_named", "proper_named", "counted")
 		// whether a player can refer to an object by its name.
-		k.NewImplicitAspect("private_names", "things", "publicly_named", "privately_named")
+		k.NewImplicitAspect("private_names", "objects", "publicly_named", "privately_named")
 	}
 	//
 	if cnt, ok := lang.WordsToNum(op.Determiner.Str); !ok {
@@ -58,7 +58,7 @@ func (op *NamedNoun) ReadCountedNoun(k *Importer, cnt int) (err error) {
 	// declare the existence of the field "printed name"
 	if once := "printed_name"; k.Once(once) {
 		domain := k.gameDomain()
-		things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
+		things := k.NewDomainName(domain, "objects", tables.NAMED_KINDS, once)
 		field := k.NewDomainName(domain, "printed_name", tables.NAMED_FIELD, once)
 		k.NewField(things, field, tables.PRIM_TEXT, "")
 	}
@@ -115,12 +115,12 @@ func (op *NamedNoun) ReadNamedNoun(k *Importer) (err error) {
 			article := k.NewName("indefinite_article", tables.NAMED_FIELD, op.At.String())
 			k.NewValue(noun, article, detStr)
 
-			// create a "indefinite article" field for all "things"
+			// create a "indefinite article" field for all objects
 			if once := "named_noun"; k.Once(once) {
 				domain := k.gameDomain()
-				things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)
+				objects := k.NewDomainName(domain, "objects", tables.NAMED_KINDS, once)
 				indefinite := k.NewDomainName(domain, "indefinite_article", tables.NAMED_FIELD, once)
-				k.NewField(things, indefinite, tables.PRIM_TEXT, "")
+				k.NewField(objects, indefinite, tables.PRIM_TEXT, "")
 			}
 
 		}

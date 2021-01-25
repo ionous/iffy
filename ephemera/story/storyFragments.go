@@ -26,7 +26,7 @@ func (op *Summary) Import(k *Importer) (err error) {
 	if text, e := op.Lines.ConvertText(); e != nil {
 		err = e
 	} else {
-		// declare the existence of the field "appearance"
+		// give "things" an "appearance"
 		if once := "summary"; k.Once(once) {
 			domain := k.gameDomain()
 			things := k.NewDomainName(domain, "things", tables.NAMED_KINDS, once)

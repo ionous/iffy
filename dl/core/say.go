@@ -136,8 +136,14 @@ func writeSpan(run rt.Runtime, span stringer, op composer.Composer, act *Activit
 		return safe.Run(run, act)
 	}); e != nil {
 		err = cmdError(op, e)
+	} else if res := span.String(); len(res) > 0 {
+		ret = g.StringOf(res)
 	} else {
-		ret = g.StringOf(span.String())
+		hack := &HackTillTemplatesCanEvaluatePatternTypes
+		ret = g.StringOf(*hack)
+		*hack = ""
 	}
 	return
 }
+
+var HackTillTemplatesCanEvaluatePatternTypes string

@@ -36,7 +36,7 @@ func Scalar(run rt.Runtime, n string) (ret g.Value, err error) {
 type MissingEval string
 
 // Error returns the name of the unknown variable.
-func (e MissingEval) Error() string { return string(e) }
+func (e MissingEval) Error() string { return "missing " + string(e) }
 
 // Run executes the passed statement using the passed runtime;
 // does *not* error if the passed exec is nil.

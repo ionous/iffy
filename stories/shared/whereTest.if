@@ -684,6 +684,11 @@
                                               "id": "id-17736705b90-54",
                                               "type": "noun_relation",
                                               "value": {
+                                                "$ARE_BEING": {
+                                                  "id": "id-17736705b90-59",
+                                                  "type": "are_being",
+                                                  "value": "$IS"
+                                                },
                                                 "$RELATION": {
                                                   "id": "id-17736705b90-55",
                                                   "type": "relation_name",
@@ -706,12 +711,7 @@
                                                       }
                                                     }
                                                   }
-                                                ],
-                                                "$ARE_BEING": {
-                                                  "id": "id-17736705b90-59",
-                                                  "type": "are_being",
-                                                  "value": "$IS"
-                                                }
+                                                ]
                                               }
                                             }
                                           }
@@ -761,7 +761,7 @@
                         "$LINES": {
                           "id": "id-1771724a77b-155",
                           "type": "lines",
-                          "value": "xxx"
+                          "value": "Mildred's parent is the lab.\nThe basket's parent is the table.\nMildred is in the lab.\nThe knife is in the lab.\nThe  encloses the basket.\nThe basket encloses the apple.\nThe  supports the apple.\nThe table supports the basket.\nThe basket's parent: table.\nThe knife's parent: Mildred.\nMildred owns the pen.\nThe  carries the pen.\nMildred carries the knife.\nThe pen is in Mildred's pocket.\nThe knife is worn by: .\n"
                         }
                       }
                     }
@@ -799,23 +799,23 @@
                         "value": {
                           "$EXE": [
                             {
-                              "id": "id-1771724a77b-162",
+                              "id": "id-17737908c16-0",
                               "type": "execute",
                               "value": {
-                                "id": "id-1771724a77b-163",
+                                "id": "id-17737908c16-1",
                                 "type": "say_text",
                                 "value": {
                                   "$TEXT": {
-                                    "id": "id-1771724a77b-164",
+                                    "id": "id-17737908c16-2",
                                     "type": "text_eval",
                                     "value": {
-                                      "id": "id-1771724a77b-165",
+                                      "id": "id-1773799a5eb-58",
                                       "type": "render_template",
                                       "value": {
                                         "$TEMPLATE": {
-                                          "id": "id-1771724a77b-166",
+                                          "id": "id-1773799a5eb-59",
                                           "type": "lines",
-                                          "value": "{parentOf: .Mildred}\n{parentOf: .basket}\n{parentOf: .knife}\n{locationOf: .Mildred}\n{locationOf: .knife}\n{enclosureOf: .basket}\n{enclosureOf: .apple}\n{supporterOf: .apple}\n{supporterOf: .basket}\n{ownerOf: .basket}\n{ownerOf: .knife}\n{ownerOf: .pen}\n{carrierOf: .pen}\n{carrierOf: .knife}\n{wearerOf: .pen}\n{wearerOf: .knife}"
+                                          "value": "Mildred's parent is {the: {parentOf: .Mildred}}.\nThe basket's parent is {the: {parentOf: .basket}}.\nMildred is in {the: {locationOf: .Mildred}}.\nThe knife is in {the: {locationOf: .knife}}.\n{The: {enclosureOf: .basket}} encloses the basket.\n{The: {enclosureOf: .apple}} encloses the apple.\n{The: {supporterOf: .apple}} supports the apple.\n{The: {supporterOf: .basket}} supports the basket.\nThe basket's parent: {name_of: {parentOf: .basket}}.\nThe knife's parent: {name_of: {parentOf: .knife}}.\n{The: {ownerOf: .pen}} owns the pen.\n{The: {carrierOf: .pen}} carries the pen.\n{The: {carrierOf: .knife}} carries the knife.\nThe pen is in {the: {wearerOf: .pen}}'s pocket.\nThe knife is worn by: {name_of: {wearerOf: .knife}}."
                                         }
                                       }
                                     }
