@@ -154,7 +154,7 @@ func assemblyTemplate() string {
 		"asm_relation as\n" +
 		"select \t\n" +
 		"\tidEphRel, \n" +
-		"\tstem, relation, cardinality, \n" +
+		"\tstem, relation, cardinality, domain,  \n" +
 		"\t\n" +
 		"\t/* first contains the kind of the user specified noun;\n" +
 		"\t\tswapped contains the kind of the relation \n" +
@@ -181,7 +181,7 @@ func assemblyTemplate() string {
 		"\tend as secondKind\n" +
 		"from (\n" +
 		"\tselect \n" +
-		"\t\tidEphRel,stem,relation,cardinality,\n" +
+		"\t\tidEphRel,stem,relation,cardinality,domain,\n" +
 		"\t\tcase swap when 1 then secondNoun else firstNoun end as firstNoun,\n" +
 		"\t\tcase swap when 1 then firstNoun else secondNoun end as secondNoun,\n" +
 		"\t\tcase swap when 1 then otherKind else kind end as firstKind,\n" +
@@ -213,7 +213,8 @@ func assemblyTemplate() string {
 		"\t( select me.noun from mdl_name me\n" +
 		"\t\twhere (me.name=ar.secondName) \n" +
 		"\t\torder by rank limit 1)\n" +
-		"\tas secondNoun \n" +
+		"\tas secondNoun,\n" +
+		"\tar.domain\n" +
 		"from asm_relative_name ar\n" +
 		"where firstNoun is not null and secondNoun is not null;\n" +
 		"\n" +
@@ -224,14 +225,17 @@ func assemblyTemplate() string {
 		"select rel.rowid as idEphRel, \n" +
 		"\tna.name as firstName, \n" +
 		"\tnv.name as stem,\n" +
-		"\tnb.name as secondName\n" +
+		"\tnb.name as secondName,\n" +
+		"\tnd.name as domain\n" +
 		"from eph_relative rel\n" +
 		"join eph_named na\n" +
 		"\ton (rel.idNamedHead = na.rowid)\n" +
 		"left join eph_named nv\n" +
-		"\t\ton (rel.idNamedStem = nv.rowid)\n" +
-		"\tleft join eph_named nb\n" +
-		"\t\ton (rel.idNamedDependent = nb.rowid);\n" +
+		"\ton (rel.idNamedStem = nv.rowid)\n" +
+		"left join eph_named nb\n" +
+		"\ton (rel.idNamedDependent = nb.rowid)\n" +
+		"left join eph_named nd\n" +
+		"\ton (rel.idNamedDomain = nd.rowid);\n" +
 		"\n" +
 		"/* resolve rules to programs\n" +
 		" * note: it includes ordering by domain, which is a step towards supporting hierarchical domains\n" +

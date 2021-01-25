@@ -41,7 +41,7 @@ create table eph_prog( idSource int, progType text, prog blob );
 /* connection between two kinds of object */
 create table eph_relation( idNamedRelation int, idNamedKind int, idNamedOtherKind int, cardinality text check (cardinality in ('one_one','one_any','any_one','any_any')));
 /* connection between two object instances */	
-create table eph_relative( idNamedHead int, idNamedStem int, idNamedDependent int );
+create table eph_relative( idNamedHead int, idNamedStem int, idNamedDependent int, idNamedDomain int );
 /* function handler for a pattern */
 create table eph_rule( idNamedPattern int, idProg int );/* uri, file name or other identification for the origin of the various ephemera recorded in the db. 
 while its not particularly useful to have a one column primitive data type column

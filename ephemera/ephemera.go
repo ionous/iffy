@@ -134,8 +134,8 @@ func (r *Recorder) NewRelation(relation, primaryKind, secondaryKind Named, cardi
 }
 
 // NewRelative connects two named nouns using a verb stem.
-func (r *Recorder) NewRelative(primary, stem, secondary Named) {
-	r.cache.Must(eph_relative, primary, stem, secondary)
+func (r *Recorder) NewRelative(primary, stem, secondary, domain Named) {
+	r.cache.Must(eph_relative, primary, stem, secondary, domain)
 }
 
 func (r *Recorder) NewTestProgram(test Named, prog Prog) {
@@ -178,7 +178,7 @@ var eph_pattern = tables.Insert("eph_pattern", "idNamedPattern", "idNamedParam",
 var eph_plural = tables.Insert("eph_plural", "idNamedPlural", "idNamedSingluar")
 var eph_prog = tables.Insert("eph_prog", "idSource", "progType", "prog")
 var eph_relation = tables.Insert("eph_relation", "idNamedRelation", "idNamedKind", "idNamedOtherKind", "cardinality")
-var eph_relative = tables.Insert("eph_relative", "idNamedHead", "idNamedStem", "idNamedDependent")
+var eph_relative = tables.Insert("eph_relative", "idNamedHead", "idNamedStem", "idNamedDependent", "idNamedDomain")
 var eph_source = tables.Insert("eph_source", "src")
 var eph_trait = tables.Insert("eph_trait", "idNamedTrait", "idNamedAspect", "rank")
 var eph_value = tables.Insert("eph_value", "idNamedNoun", "idNamedProp", "value")

@@ -120,7 +120,7 @@ func (op *RelativeToNoun) ImportPhrase(k *Importer) (err error) {
 	} else {
 		for _, object := range k.Recent.Nouns.Objects {
 			for _, subject := range k.Recent.Nouns.Subjects {
-				k.NewRelative(subject, relation, object)
+				k.NewRelative(subject, relation, object, k.Current.Domain)
 			}
 		}
 	}

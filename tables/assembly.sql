@@ -143,7 +143,7 @@ create temp view
 asm_relation as
 select 	
 	idEphRel, 
-	stem, relation, cardinality, 
+	stem, relation, cardinality, domain,  
 	
 	/* first contains the kind of the user specified noun;
 		swapped contains the kind of the relation 
@@ -170,7 +170,7 @@ select
 	end as secondKind
 from (
 	select 
-		idEphRel,stem,relation,cardinality,
+		idEphRel,stem,relation,cardinality,domain,
 		case swap when 1 then secondNoun else firstNoun end as firstNoun,
 		case swap when 1 then firstNoun else secondNoun end as secondNoun,
 		case swap when 1 then otherKind else kind end as firstKind,
@@ -202,7 +202,8 @@ select ar.idEphRel,
 	( select me.noun from mdl_name me
 		where (me.name=ar.secondName) 
 		order by rank limit 1)
-	as secondNoun 
+	as secondNoun,
+	ar.domain
 from asm_relative_name ar
 where firstNoun is not null and secondNoun is not null;
 
@@ -213,14 +214,17 @@ asm_relative_name as
 select rel.rowid as idEphRel, 
 	na.name as firstName, 
 	nv.name as stem,
-	nb.name as secondName
+	nb.name as secondName,
+	nd.name as domain
 from eph_relative rel
 join eph_named na
 	on (rel.idNamedHead = na.rowid)
 left join eph_named nv
-		on (rel.idNamedStem = nv.rowid)
-	left join eph_named nb
-		on (rel.idNamedDependent = nb.rowid);
+	on (rel.idNamedStem = nv.rowid)
+left join eph_named nb
+	on (rel.idNamedDependent = nb.rowid)
+left join eph_named nd
+	on (rel.idNamedDomain = nd.rowid);
 
 /* resolve rules to programs
  * note: it includes ordering by domain, which is a step towards supporting hierarchical domains
